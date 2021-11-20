@@ -238,48 +238,48 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
    jac[1][0] = 2 * (x[0] - x0);
 }
 
-void issue813_callback(const alglib::real_1d_array &, alglib::real_1d_array &, void *) {
+void issue813_callback(const real_1d_array &, real_1d_array &, void *) {
    throw 0;
 }
 
-void issue824_callback_i(const alglib::real_1d_array &, double &, void *) {
+void issue824_callback_i(const real_1d_array &, double &, void *) {
    throw(int *) (NULL);
 }
 
-void issue824_callback_d(const alglib::real_1d_array &, double &, void *) {
+void issue824_callback_d(const real_1d_array &, double &, void *) {
    throw(double *) (NULL);
 }
 
 void file_put_contents(const char *filename, const char *contents) {
    FILE *f = fopen(filename, "wb");
    if (f == NULL)
-      throw alglib::ap_error("file_put_contents: failed opening file");
+      throw ap_error("file_put_contents: failed opening file");
    if (fwrite((void *)contents, 1, strlen(contents), f) != strlen(contents))
-      throw alglib::ap_error("file_put_contents: failed writing to file");
+      throw ap_error("file_put_contents: failed writing to file");
    fclose(f);
 }
 
 #if AE_OS==AE_WINDOWS
 struct async_rbf_record {
-   alglib::rbfmodel *p_model;
-   alglib::rbfreport *p_report;
+   rbfmodel *p_model;
+   rbfreport *p_report;
    bool thread_finished;
 };
 DWORD WINAPI async_build_rbf_model(LPVOID T) {
    async_rbf_record *p = (async_rbf_record *) T;
-   alglib::rbfbuildmodel(*(p->p_model), *(p->p_report));
+   rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return 0;
 }
 #elif AE_OS==AE_POSIX
 struct async_rbf_record {
-   alglib::rbfmodel *p_model;
-   alglib::rbfreport *p_report;
+   rbfmodel *p_model;
+   rbfreport *p_report;
    bool thread_finished;
 };
 void *async_build_rbf_model(void *T) {
    async_rbf_record *p = (async_rbf_record *) T;
-   alglib::rbfbuildmodel(*(p->p_model), *(p->p_report));
+   rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return NULL;
 }
@@ -307,7 +307,7 @@ int main() {
       return 1;
    }
    {
-      alglib::real_1d_array x;
+      real_1d_array x;
       x.setlength(1);
       if (alglib_impl::_alloc_counter == 0)
          printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! ::::: \n");
@@ -343,7 +343,7 @@ int main() {
       // * test getcontent(), operator() and operator[] on constant arrays
       //   (in this case distinct implementation is used which must be tested separately)
       //
-         alglib::boolean_1d_array arr_0, arr_1("[]"), arr_2("[true,false,true]"), arr_3(arr_2), arr_4, arr_5;
+         boolean_1d_array arr_0, arr_1("[]"), arr_2("[true,false,true]"), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = "[true,true,false]";
          passed = passed && (arr_0.length() == 0);
@@ -369,7 +369,7 @@ int main() {
          bool a0_mod = false;
          bool a0_orig = true;
          bool *p6;
-         alglib::boolean_1d_array arr_6;
+         boolean_1d_array arr_6;
          arr_6.setcontent(5, a0);
          passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
          p6 = arr_6.getcontent();
@@ -381,7 +381,7 @@ int main() {
 
       // operations on constant arrays
          {
-            const alglib::boolean_1d_array &ac = arr_6;
+            const boolean_1d_array &ac = arr_6;
             passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
             passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
             const bool *p = ac.getcontent();
@@ -397,9 +397,9 @@ int main() {
       // * attempts to call setlength() must fail even when new size match original size
       //   of the array
       //
-         alglib::boolean_1d_array targt, acopy;
+         boolean_1d_array targt, acopy;
          targt = "[true,false,false,true]";
-         alglib::boolean_1d_array proxy(targt.c_ptr());
+         boolean_1d_array proxy(targt.c_ptr());
          acopy = proxy;
          passed = passed && targt[0] && !targt[1] && !targt[2] && targt[3];
          passed = passed && proxy[0] && !proxy[1] && !proxy[2] && proxy[3];
@@ -423,7 +423,7 @@ int main() {
             proxy = acopy;
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -433,7 +433,7 @@ int main() {
             proxy = "[true,true,true]";
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -443,7 +443,7 @@ int main() {
             proxy.setlength(100);
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -453,7 +453,7 @@ int main() {
             proxy.setlength(proxy.length());
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -485,7 +485,7 @@ int main() {
          int v40 = 9, v41 = 5, v42 = -12, v43 = 0;
          int v50 = 1, v51 = 7, v52 = 2, v53 = 1;
 
-         alglib::integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
+         integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
          passed = passed && (arr_0.length() == 0);
@@ -507,11 +507,11 @@ int main() {
          passed = passed && (arr_5.length() == 99);
 
       // setcontent/getcontent
-         alglib::ae_int_t a0[] = { 2, 3, 1, 9, 2 };
-         alglib::ae_int_t a0_mod = 7;
-         alglib::ae_int_t a0_orig = 2;
-         alglib::ae_int_t *p6;
-         alglib::integer_1d_array arr_6;
+         ae_int_t a0[] = { 2, 3, 1, 9, 2 };
+         ae_int_t a0_mod = 7;
+         ae_int_t a0_orig = 2;
+         ae_int_t *p6;
+         integer_1d_array arr_6;
          arr_6.setcontent(5, a0);
          passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
          p6 = arr_6.getcontent();
@@ -523,10 +523,10 @@ int main() {
 
       // operations on constant arrays
          {
-            const alglib::integer_1d_array &ac = arr_6;
+            const integer_1d_array &ac = arr_6;
             passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
             passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
-            const alglib::ae_int_t *p = ac.getcontent();
+            const ae_int_t *p = ac.getcontent();
             passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
          }
 
@@ -539,9 +539,9 @@ int main() {
       // * attempts to call setlength() must fail even when new size match original size
       //   of the array
       //
-         alglib::integer_1d_array targt, acopy;
+         integer_1d_array targt, acopy;
          targt = s3;
-         alglib::integer_1d_array proxy(targt.c_ptr());
+         integer_1d_array proxy(targt.c_ptr());
          acopy = proxy;
          passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
          passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
@@ -565,7 +565,7 @@ int main() {
             proxy = acopy;
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -575,7 +575,7 @@ int main() {
             proxy = s6;
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -585,7 +585,7 @@ int main() {
             proxy.setlength(100);
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -595,7 +595,7 @@ int main() {
             proxy.setlength(proxy.length());
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -630,7 +630,7 @@ int main() {
          const double v40 = 9, v41 = 5, v42 = -12, v43 = -0.01;
          const double v50 = 1, v51 = 7, v52 = 2, v53 = 1;
 
-         alglib::real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
+         real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
          passed = passed && (arr_0.length() == 0);
@@ -656,7 +656,7 @@ int main() {
          double a0_mod = 7;
          double a0_orig = 2;
          double *p6;
-         alglib::real_1d_array arr_6;
+         real_1d_array arr_6;
          arr_6.setcontent(5, a0);
          passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
          p6 = arr_6.getcontent();
@@ -668,7 +668,7 @@ int main() {
 
       // operations on constant arrays
          {
-            const alglib::real_1d_array &ac = arr_6;
+            const real_1d_array &ac = arr_6;
             passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
             passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
             const double *p = ac.getcontent();
@@ -685,9 +685,9 @@ int main() {
       //   of the array
       //
          {
-            alglib::real_1d_array targt, acopy;
+            real_1d_array targt, acopy;
             targt = s3;
-            alglib::real_1d_array proxy(targt.c_ptr());
+            real_1d_array proxy(targt.c_ptr());
             acopy = proxy;
             passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
             passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
@@ -711,7 +711,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -721,7 +721,7 @@ int main() {
                proxy = s6;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -731,7 +731,7 @@ int main() {
                proxy.setlength(100);
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -741,7 +741,7 @@ int main() {
                proxy.setlength(proxy.length());
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -760,7 +760,7 @@ int main() {
       //   of the array
       //
          {
-            alglib::real_1d_array proxy, acopy;
+            real_1d_array proxy, acopy;
             double targt[] = { v30, v31, v32, v33 };
             proxy.attach_to_ptr(4, targt);
             acopy = proxy;
@@ -786,7 +786,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -796,7 +796,7 @@ int main() {
                proxy = s6;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -806,7 +806,7 @@ int main() {
                proxy.setlength(100);
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -816,7 +816,7 @@ int main() {
                proxy.setlength(proxy.length());
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -932,7 +932,7 @@ int main() {
             proxy = acopy;
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -942,7 +942,7 @@ int main() {
             proxy = s6;
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -952,7 +952,7 @@ int main() {
             proxy.setlength(100);
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -962,7 +962,7 @@ int main() {
             proxy.setlength(proxy.length());
             passed = false;
          }
-         catch(alglib::ap_error e) {
+         catch(ap_error e) {
          }
          catch( ...) {
             passed = false;
@@ -1016,7 +1016,7 @@ int main() {
 #endif
          double r;
 
-         alglib::real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
+         real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
          passed = passed && (arr_0.rows() == 0) && (arr_0.cols() == 0) && (arr_0.getstride() == 0);
@@ -1049,12 +1049,12 @@ int main() {
          ae_int_t n, m, i, j;
          for (n = 1; n <= 10; n++)
             for (m = 1; m <= 10; m++) {
-               alglib::real_2d_array arr_6;
+               real_2d_array arr_6;
                double a0[100];
 
             // fill array by random values, test setcontent(0
                for (i = 0; i < m * n; i++)
-                  a0[i] = alglib::randomreal();
+                  a0[i] = randomreal();
                arr_6.setcontent(m, n, a0);
                for (i = 0; i < m; i++)
                   for (j = 0; j < n; j++) {
@@ -1070,7 +1070,7 @@ int main() {
 
             // operations on constant arrays
                {
-                  const alglib::real_2d_array &ac = arr_6;
+                  const real_2d_array &ac = arr_6;
                   for (i = 0; i < m; i++)
                      for (j = 0; j < n; j++) {
                         passed = passed && (ac[i][j] == a0[i * n + j]);
@@ -1090,9 +1090,9 @@ int main() {
       //
          { // test attach_to(ae_matrix*)
          // subtest 0
-            alglib::real_2d_array targt, acopy, acopy2;
+            real_2d_array targt, acopy, acopy2;
             targt = s3;
-            alglib::real_2d_array proxy(targt.c_ptr());
+            real_2d_array proxy(targt.c_ptr());
             acopy = proxy;
             for (i = 0; i < targt.rows(); i++)
                for (j = 0; j < targt.cols(); j++) {
@@ -1134,7 +1134,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1146,7 +1146,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1157,7 +1157,7 @@ int main() {
                proxy = s60;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1168,7 +1168,7 @@ int main() {
                proxy = s61;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1179,7 +1179,7 @@ int main() {
                proxy.setlength(100, 99);
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1190,7 +1190,7 @@ int main() {
                proxy.setlength(proxy.rows(), proxy.cols());
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1198,7 +1198,7 @@ int main() {
          }
          { // test attach_to(double*)
          // subtest 0
-            alglib::real_2d_array proxy, acopy, acopy2;
+            real_2d_array proxy, acopy, acopy2;
             double targt[] = { v30, v31, v32, v33, v34, v35 };
             const int NCOLS = 2;
             proxy.attach_to_ptr(3, 2, targt);
@@ -1243,7 +1243,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1255,7 +1255,7 @@ int main() {
                proxy = acopy;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1266,7 +1266,7 @@ int main() {
                proxy = s60;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1277,7 +1277,7 @@ int main() {
                proxy = s61;
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1288,7 +1288,7 @@ int main() {
                proxy.setlength(100, 99);
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1299,7 +1299,7 @@ int main() {
                proxy.setlength(proxy.rows(), proxy.cols());
                passed = false;
             }
-            catch(alglib::ap_error e) {
+            catch(ap_error e) {
             }
             catch( ...) {
                passed = false;
@@ -1327,15 +1327,15 @@ int main() {
       bool passed = true;
       try {
       // CSV_DEFAULT must be zero
-         passed = passed && alglib::CSV_DEFAULT == 0;
+         passed = passed && CSV_DEFAULT == 0;
 
       // absent file - must fail
          try {
-            alglib::real_2d_array arr;
-            read_csv("nonexistent123foralgtestinglib", '\t', alglib::CSV_DEFAULT, arr);
+            real_2d_array arr;
+            read_csv("nonexistent123foralgtestinglib", '\t', CSV_DEFAULT, arr);
             passed = false;
          }
-         catch(alglib::ap_error) {
+         catch(ap_error) {
          }
          catch( ...) {
             passed = false;
@@ -1343,37 +1343,37 @@ int main() {
 
       // non-rectangular file - must fail
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "a,b,c\r\n1,2");
-            read_csv(csv_name, ',', alglib::CSV_SKIP_HEADERS, arr);
+            read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = false;
          }
-         catch(alglib::ap_error) {
+         catch(ap_error) {
          }
          catch( ...) {
             passed = false;
          }
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "a,b,c\r\n1,2,3,4");
-            read_csv(csv_name, ',', alglib::CSV_SKIP_HEADERS, arr);
+            read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = false;
          }
-         catch(alglib::ap_error) {
+         catch(ap_error) {
          }
          catch( ...) {
             passed = false;
          }
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "1,2,3,4\n1,2,3\n1,2,3");
-            read_csv(csv_name, ',', alglib::CSV_DEFAULT, arr);
+            read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = false;
          }
-         catch(alglib::ap_error) {
+         catch(ap_error) {
          }
          catch( ...) {
             passed = false;
@@ -1381,9 +1381,9 @@ int main() {
 
       // empty file
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "");
-            read_csv(csv_name, '\t', alglib::CSV_DEFAULT, arr);
+            read_csv(csv_name, '\t', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = passed && arr.rows() == 0 && arr.cols() == 0;
          }
@@ -1393,9 +1393,9 @@ int main() {
 
       // one row with header, tab separator
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "a\tb\tc\n");
-            read_csv(csv_name, '\t', alglib::CSV_SKIP_HEADERS, arr);
+            read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.rows() == 0 && arr.cols() == 0;
          }
@@ -1405,9 +1405,9 @@ int main() {
 
       // no header, comma-separated, full stop as decimal point
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "1.5,2,3.25\n4,5,6");
-            read_csv(csv_name, ',', alglib::CSV_DEFAULT, arr);
+            read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.00,6.00]]";
          }
@@ -1417,9 +1417,9 @@ int main() {
 
       // header, tab-separated, mixed use of comma and full stop as decimal points
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, "a\tb\tc\n1.5\t2\t3,25\n4\t5.25\t6,1\n");
-            read_csv(csv_name, '\t', alglib::CSV_SKIP_HEADERS, arr);
+            read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.25,6.10]]";
          }
@@ -1429,9 +1429,9 @@ int main() {
 
       // header, tab-separated, fixed/exponential, spaces, mixed use of comma and full stop as decimal points
          try {
-            alglib::real_2d_array arr;
+            real_2d_array arr;
             file_put_contents(csv_name, " a\t b \tc\n1,1\t 2.9\t -3.5  \n  1.1E1  \t 2.0E-1 \t-3E+1 \n+1  \t -2\t 3.    \n.1\t-.2\t+.3\n");
-            read_csv(csv_name, '\t', alglib::CSV_SKIP_HEADERS, arr);
+            read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.10,2.90,-3.50],[11.00,0.20,-30.00],[1.00,-2.00,3.00],[0.10,-0.20,0.30]]";
          }
@@ -1460,39 +1460,39 @@ int main() {
    // Test kd-tree serialization
    //
       bool passed = true;
-      alglib::hqrndstate rs;
-      alglib::kdtree tree0;
-      alglib::real_2d_array xy, rxy0, rxy1;
-      alglib::real_1d_array qx;
+      hqrndstate rs;
+      kdtree tree0;
+      real_2d_array xy, rxy0, rxy1;
+      real_1d_array qx;
       const int npts = 50;
       const int nx = 2;
       const int ny = 1;
       int cnt0, cnt1;
-      alglib::hqrndrandomize(rs);
+      hqrndrandomize(rs);
       xy.setlength(npts, nx + ny);
       for (int i = 0; i < npts; i++)
          for (int j = 0; j < nx + ny; j++)
-            xy[i][j] = alglib::hqrndnormal(rs);
-      alglib::kdtreebuild(xy, npts, nx, ny, 2, tree0);
+            xy[i][j] = hqrndnormal(rs);
+      kdtreebuild(xy, npts, nx, ny, 2, tree0);
       qx.setlength(nx);
 
       try {
       // test string serialization/unserialization
-         alglib::kdtree tree1;
+         kdtree tree1;
          std::string s;
-         alglib::kdtreeserialize(tree0, s);
-         alglib::kdtreeunserialize(s, tree1);
+         kdtreeserialize(tree0, s);
+         kdtreeunserialize(s, tree1);
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
-               qx[j] = alglib::hqrndnormal(rs);
-            cnt0 = alglib::kdtreequeryknn(tree0, qx, 1, true);
-            cnt1 = alglib::kdtreequeryknn(tree1, qx, 1, true);
+               qx[j] = hqrndnormal(rs);
+            cnt0 = kdtreequeryknn(tree0, qx, 1, true);
+            cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if ((cnt0 != 1) || (cnt1 != 1)) {
                passed = false;
                break;
             }
-            alglib::kdtreequeryresultsxy(tree0, rxy0);
-            alglib::kdtreequeryresultsxy(tree1, rxy1);
+            kdtreequeryresultsxy(tree0, rxy0);
+            kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
@@ -1506,12 +1506,12 @@ int main() {
       //
       // NOTE: we add a few symbols at the beginning and after the end of the data
       //       in order to test algorithm ability to work in the middle of the stream
-         alglib::kdtree tree1;
+         kdtree tree1;
          std::stringstream s;
          s.put('b');
          s.put('e');
          s.put('g');
-         alglib::kdtreeserialize(tree0, s);
+         kdtreeserialize(tree0, s);
          s.put('e');
          s.put('n');
          s.put('d');
@@ -1519,21 +1519,21 @@ int main() {
          passed = passed && (s.get() == 'b');
          passed = passed && (s.get() == 'e');
          passed = passed && (s.get() == 'g');
-         alglib::kdtreeunserialize(s, tree1);
+         kdtreeunserialize(s, tree1);
          passed = passed && (s.get() == 'e');
          passed = passed && (s.get() == 'n');
          passed = passed && (s.get() == 'd');
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
-               qx[j] = alglib::hqrndnormal(rs);
-            cnt0 = alglib::kdtreequeryknn(tree0, qx, 1, true);
-            cnt1 = alglib::kdtreequeryknn(tree1, qx, 1, true);
+               qx[j] = hqrndnormal(rs);
+            cnt0 = kdtreequeryknn(tree0, qx, 1, true);
+            cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if ((cnt0 != 1) || (cnt1 != 1)) {
                passed = false;
                break;
             }
-            alglib::kdtreequeryresultsxy(tree0, rxy0);
-            alglib::kdtreequeryresultsxy(tree1, rxy1);
+            kdtreequeryresultsxy(tree0, rxy0);
+            kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
@@ -1544,22 +1544,22 @@ int main() {
 
       try {
       // test string-to-stream serialization/unserialization
-         alglib::kdtree tree1;
+         kdtree tree1;
          std::string s0;
-         alglib::kdtreeserialize(tree0, s0);
+         kdtreeserialize(tree0, s0);
          std::stringstream s1(s0);
-         alglib::kdtreeunserialize(s1, tree1);
+         kdtreeunserialize(s1, tree1);
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
-               qx[j] = alglib::hqrndnormal(rs);
-            cnt0 = alglib::kdtreequeryknn(tree0, qx, 1, true);
-            cnt1 = alglib::kdtreequeryknn(tree1, qx, 1, true);
+               qx[j] = hqrndnormal(rs);
+            cnt0 = kdtreequeryknn(tree0, qx, 1, true);
+            cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if ((cnt0 != 1) || (cnt1 != 1)) {
                passed = false;
                break;
             }
-            alglib::kdtreequeryresultsxy(tree0, rxy0);
-            alglib::kdtreequeryresultsxy(tree1, rxy1);
+            kdtreequeryresultsxy(tree0, rxy0);
+            kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
@@ -1570,22 +1570,22 @@ int main() {
 
       try {
       // test stream-to-string serialization/unserialization
-         alglib::kdtree tree1;
+         kdtree tree1;
          std::stringstream s0;
-         alglib::kdtreeserialize(tree0, s0);
+         kdtreeserialize(tree0, s0);
          std::string s1 = s0.str();
-         alglib::kdtreeunserialize(s1, tree1);
+         kdtreeunserialize(s1, tree1);
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
-               qx[j] = alglib::hqrndnormal(rs);
-            cnt0 = alglib::kdtreequeryknn(tree0, qx, 1, true);
-            cnt1 = alglib::kdtreequeryknn(tree1, qx, 1, true);
+               qx[j] = hqrndnormal(rs);
+            cnt0 = kdtreequeryknn(tree0, qx, 1, true);
+            cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if ((cnt0 != 1) || (cnt1 != 1)) {
                passed = false;
                break;
             }
-            alglib::kdtreequeryresultsxy(tree0, rxy0);
-            alglib::kdtreequeryresultsxy(tree1, rxy1);
+            kdtreequeryresultsxy(tree0, rxy0);
+            kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
@@ -1670,17 +1670,17 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 00000000q04 n1b9361vI14 mhJhviUE114 54a_qyBrH1C 00000000q04 \
 10000000000 40000000000 StLCgor39-3 00000000000 00000000000 \
 6qTG7Ae-1_3\n";
-      alglib::real_1d_array ref_val("[-0.042560546916643, 0.942523544654062, 0.875197036560778, 0.0656948997826632, -0.743065973803404, -0.8903682039297, -0.26994815318748, 0.602248517290195, 0.980011992233124, 0.436594293214176]");
+      real_1d_array ref_val("[-0.042560546916643, 0.942523544654062, 0.875197036560778, 0.0656948997826632, -0.743065973803404, -0.8903682039297, -0.26994815318748, 0.602248517290195, 0.980011992233124, 0.436594293214176]");
       bool passed = true;
 
       try {
       // test unserialization from string without trailing end-of-stream symbol (dot)
       // this test is necessary for backward compatibility
          double eps = 0.0000000001;
-         alglib::rbfmodel model;
-         alglib::rbfunserialize(std::string(pc_str), model);
+         rbfmodel model;
+         rbfunserialize(std::string(pc_str), model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(alglib::rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
       }
       catch( ...) {
          passed = false;
@@ -1690,10 +1690,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       // test unserialization from string with trailing end-of-stream symbol (dot)
       // this test is necessary for forward compatibility
          double eps = 0.0000000001;
-         alglib::rbfmodel model;
-         alglib::rbfunserialize(std::string(pc_str) + ".", model);
+         rbfmodel model;
+         rbfunserialize(std::string(pc_str) + ".", model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(alglib::rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
       }
       catch( ...) {
          passed = false;
@@ -1705,8 +1705,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          double eps = 0.0000000001;
          std::string _s(pc_str);
          std::istringstream stream(_s);
-         alglib::rbfmodel model;
-         alglib::rbfunserialize(stream, model);
+         rbfmodel model;
+         rbfunserialize(stream, model);
          passed = false;
       }
       catch( ...) {
@@ -1718,10 +1718,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          double eps = 0.0000000001;
          std::string _s = std::string(pc_str) + ".";
          std::istringstream stream(_s);
-         alglib::rbfmodel model;
-         alglib::rbfunserialize(stream, model);
+         rbfmodel model;
+         rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(alglib::rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
       }
       catch( ...) {
          passed = false;
@@ -1732,10 +1732,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          double eps = 0.0000000001;
          std::string _s = std::string(pc_str) + ".<az>";
          std::istringstream stream(_s);
-         alglib::rbfmodel model;
-         alglib::rbfunserialize(stream, model);
+         rbfmodel model;
+         rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(alglib::rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
          passed = passed && (stream.get() == '<');
          passed = passed && (stream.get() == 'a');
          passed = passed && (stream.get() == 'z');
@@ -1756,23 +1756,23 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    {
       bool passed = true;
 #if (AE_OS==AE_WINDOWS) || AE_OS==AE_POSIX
-      alglib::hqrndstate rs;
-      alglib::rbfmodel rbf;
-      alglib::rbfreport rep;
-      alglib::real_2d_array xy;
+      hqrndstate rs;
+      rbfmodel rbf;
+      rbfreport rep;
+      real_2d_array xy;
       int n = 1000, nx = 2, ny = 1;
       double rbase = 1.0;
       async_rbf_record async_rec;
-      alglib::hqrndseed(464, 764, rs);
+      hqrndseed(464, 764, rs);
       xy.setlength(n, nx + ny);
       for (int i = 0; i < n; i++)
          for (int j = 0; j <= nx + ny; j++)
-            xy[i][j] = alglib::hqrndnormal(rs);
-      alglib::rbfcreate(nx, ny, rbf);
-      alglib::rbfsetalgohierarchical(rbf, rbase, 1, 0.0);
-      alglib::rbfsetpoints(rbf, xy);
-      alglib::rbfsetv2its(rbf, 100000);
-      passed = passed && (alglib::rbfpeekprogress(rbf) == 0);
+            xy[i][j] = hqrndnormal(rs);
+      rbfcreate(nx, ny, rbf);
+      rbfsetalgohierarchical(rbf, rbase, 1, 0.0);
+      rbfsetpoints(rbf, xy);
+      rbfsetv2its(rbf, 100000);
+      passed = passed && (rbfpeekprogress(rbf) == 0);
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
@@ -1796,24 +1796,24 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 #   endif
       double last_progress = 0;
       for (;;) {
-         double new_progress = alglib::rbfpeekprogress(rbf);
+         double new_progress = rbfpeekprogress(rbf);
          passed = passed && (new_progress >= last_progress);
          passed = passed && (new_progress <= 0.1); // we expect to terminate well before reaching 10%
          last_progress = new_progress;
          if (new_progress >= 0.001) {
-            alglib::rbfrequesttermination(rbf);
+            rbfrequesttermination(rbf);
             break;
          }
       }
       for (;;) {
-         double new_progress = alglib::rbfpeekprogress(rbf);
+         double new_progress = rbfpeekprogress(rbf);
          passed = passed && ((new_progress <= 0.1) || (new_progress == 1.0)); // we expect to terminate well before reaching 10%
          if (async_rec.thread_finished)
             break;
       }
-      passed = passed && (alglib::rbfpeekprogress(rbf) == 1);
+      passed = passed && (rbfpeekprogress(rbf) == 1);
       passed = passed && (rep.terminationtype == 8);
-      passed = passed && (alglib::rbfcalc2(rbf, alglib::hqrndnormal(rs), alglib::hqrndnormal(rs)) == 0.0);
+      passed = passed && (rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0);
       printf(fmt_str, "* Progress/termination (RBF)", passed ? "OK" : "FAILED");
       fflush(stdout);
       if (!passed)
@@ -1921,8 +1921,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rbfsetpoints(model0, xy);
                rbfsetalgohierarchical(model0, 1.0, 3, 0.0);
                rbfbuildmodel(model0, rep);
-               alglib::rbfserialize(model0, s);
-               alglib::rbfunserialize(s, model1);
+               rbfserialize(model0, s);
+               rbfunserialize(s, model1);
                v = rbfcalc2(model0, 0.0, 0.0);
                v = rbfcalc2(model1, 0.0, 0.0);
                rbfbuildmodel(model0, rep);
@@ -1958,23 +1958,23 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // with different threading settings.
    //
       printf("SMP settings vs GEMM speedup:\n");
-      if (alglib::_ae_cores_count() > 1) {
+      if (_ae_cores_count() > 1) {
          bool passed = true;
-         alglib_impl::ae_uint64_t default_global_threading = alglib::_ae_get_global_threading();
-         alglib::ae_int_t default_nworkers = alglib::getnworkers();
+         alglib_impl::ae_uint64_t default_global_threading = _ae_get_global_threading();
+         ae_int_t default_nworkers = getnworkers();
          double time_default = 0, time_glob_ser = 0, time_glob_smp = 0, time_glob_ser_loc_ser = 0, time_glob_ser_loc_smp = 0, time_glob_smp_loc_ser = 0, time_glob_smp_loc_smp = 0, time_glob_smp_nw1 = 0;
-         alglib::ae_int_t n = 800, mintime = 2000, cnt, t0;
+         ae_int_t n = 800, mintime = 2000, cnt, t0;
          try {
          // allocate temporary matrices
-            alglib::real_2d_array a, b, c;
+            real_2d_array a, b, c;
             int i, j;
             a.setlength(n, n);
             b.setlength(n, n);
             c.setlength(n, n);
             for (i = 0; i < n; i++)
                for (j = 0; j < n; j++) {
-                  a[i][j] = alglib::randomreal() - 0.5;
-                  b[i][j] = alglib::randomreal() - 0.5;
+                  a[i][j] = randomreal() - 0.5;
+                  b[i][j] = randomreal() - 0.5;
                   c[i][j] = 0.0;
                }
 
@@ -1983,60 +1983,60 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             while (time_default < mintime) {
             // default threading
                t0 = alglib_impl::ae_tickcount();
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_default += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global serial
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::serial);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
+               setglobalthreading(serial);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global parallel
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::parallel);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
+               setglobalthreading(parallel);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global serial, local serial
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::serial);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, alglib::serial);
+               setglobalthreading(serial);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, serial);
                time_glob_ser_loc_ser += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global serial, local parallel
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::serial);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, alglib::parallel);
+               setglobalthreading(serial);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, parallel);
                time_glob_ser_loc_smp += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global parallel, local serial
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::parallel);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, alglib::serial);
+               setglobalthreading(parallel);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, serial);
                time_glob_smp_loc_ser += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global parallel, local parallel
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::parallel);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, alglib::parallel);
+               setglobalthreading(parallel);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0, parallel);
                time_glob_smp_loc_smp += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
+               _ae_set_global_threading(default_global_threading); // restore
 
             // global parallel, nworkers=1
                t0 = alglib_impl::ae_tickcount();
-               alglib::setglobalthreading(alglib::parallel);
-               alglib::setnworkers(1);
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
+               setglobalthreading(parallel);
+               setnworkers(1);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_nw1 += alglib_impl::ae_tickcount() - t0;
-               alglib::_ae_set_global_threading(default_global_threading); // restore
-               alglib::setnworkers(default_nworkers);
+               _ae_set_global_threading(default_global_threading); // restore
+               setnworkers(default_nworkers);
             }
          }
          catch(ap_error) {
@@ -2086,7 +2086,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgstate state;
          mincgreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20 * alglib::randomreal() - 10;
+         double x0 = 20 * randomreal() - 10;
          double epsx = 1.0E-9;
          mincgcreate(1, x, state);
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
@@ -2105,7 +2105,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmstate state;
          minlmreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20 * alglib::randomreal() - 10;
+         double x0 = 20 * randomreal() - 10;
          double epsx = 1.0E-9;
          minlmcreatevj(1, 2, x, state);
          minlmsetcond(state, epsx, 0);
@@ -2128,7 +2128,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    //
    // This test is performed only in 64-bit mode.
    //
-      if (sizeof(alglib::ae_int_t) > 4) {
+      if (sizeof(ae_int_t) > 4) {
       //
       // 64-bit mode, perform test:
       // * use large NMax>2^31
@@ -2140,11 +2140,11 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       //   ad hoc threshold 0.45 < n0,n1 < 0.55.
       //
          try {
-            alglib::hqrndstate rs;
-            alglib::ae_int_t nmax[3];
-            alglib::ae_int_t ncnt = 3, nidx;
+            hqrndstate rs;
+            ae_int_t nmax[3];
+            ae_int_t ncnt = 3, nidx;
             double n0, n1;
-            alglib::hqrndrandomize(rs);
+            hqrndrandomize(rs);
 
          //
          // nmax:
@@ -2161,7 +2161,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                n0 = 0;
                n1 = 0;
                for (int i = 0; i < 1000000; i++) {
-                  alglib::ae_int_t v = alglib::hqrnduniformi(rs, nmax[nidx]);
+                  ae_int_t v = hqrnduniformi(rs, nmax[nidx]);
                   if (v < nmax[nidx] / 2)
                      n0++;
                   else
@@ -2275,23 +2275,23 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // ae_shared_pool_init_copy() function.
    //
       try {
-         alglib::multilayerperceptron net0, net1;
-         alglib::real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
-         alglib::mlpcreate0(2, 2, net0);
-         alglib::mlpprocess(net0, x, y0);
+         multilayerperceptron net0, net1;
+         real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
+         mlpcreate0(2, 2, net0);
+         mlpprocess(net0, x, y0);
 
       //
       // Test assignment constructor
       //
          net1 = net0;
-         alglib::mlpprocess(net1, x, y1);
+         mlpprocess(net1, x, y1);
          issue591_passed = issue591_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
 
       //
       // Test copy constructor
       //
-         alglib::multilayerperceptron net2(net0);
-         alglib::mlpprocess(net2, x, y2);
+         multilayerperceptron net2(net0);
+         mlpprocess(net2, x, y2);
          issue591_passed = issue591_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
       }
       catch( ...) {
@@ -2311,10 +2311,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // constructor
    //
       try {
-         alglib::multilayerperceptron net0, net1;
-         alglib::real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
-         alglib::mlpcreate0(2, 2, net0);
-         alglib::mlpprocess(net0, x, y0);
+         multilayerperceptron net0, net1;
+         real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
+         mlpcreate0(2, 2, net0);
+         mlpprocess(net0, x, y0);
 
       //
       // Test assignment and copy constructors:
@@ -2324,10 +2324,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       // * process vector with copied networks and compare
       //
          net1 = net0;
-         alglib::multilayerperceptron net2(net0);
-         alglib::mlprandomize(net0);
-         alglib::mlpprocess(net1, x, y1);
-         alglib::mlpprocess(net2, x, y2);
+         multilayerperceptron net2(net0);
+         mlprandomize(net0);
+         mlpprocess(net1, x, y1);
+         mlpprocess(net2, x, y2);
          issue594_passed = issue594_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
          issue594_passed = issue594_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
       }
@@ -2385,14 +2385,14 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    //            cycles forever.
    //
       {
-         alglib::minlmstate state;
-         alglib::real_1d_array x;
+         minlmstate state;
+         real_1d_array x;
          x.setlength(1);
          x[0] = 0;
-         alglib::minlmcreatev(1, x, 1e-5, state);
+         minlmcreatev(1, x, 1e-5, state);
          issue813_passed = false;
          try {
-            alglib::minlmoptimize(state, &issue813_callback);
+            minlmoptimize(state, &issue813_callback);
          }
          catch( ...) {
             issue813_passed = true;
@@ -2407,16 +2407,16 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // Issue 824: pre-3.16 versions of ALGLIB hide exceptions generated in user callbacks
    //
       {
-         alglib::mincgstate state;
-         alglib::real_1d_array x;
+         mincgstate state;
+         real_1d_array x;
          x.setlength(1);
          x[0] = 0;
-         alglib::mincgcreatef(1, x, 1e-5, state);
+         mincgcreatef(1, x, 1e-5, state);
          issue824_passed = true;
 
       // throw int*
          try {
-            alglib::mincgoptimize(state, &issue824_callback_i);
+            mincgoptimize(state, &issue824_callback_i);
          }
          catch(int *) {
          }
@@ -2429,7 +2429,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 
       // throw double*
          try {
-            alglib::mincgoptimize(state, &issue824_callback_d);
+            mincgoptimize(state, &issue824_callback_d);
          }
          catch(int *) {
             issue824_passed = false;
@@ -2470,41 +2470,38 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          //
          // Actual processing
          //
-            alglib::real_2d_array a, b, c;
+            real_2d_array a, b, c;
             double perf0, perf1, perf2;
             a.setlength(n, n);
             b.setlength(n, n);
             c.setlength(n, n);
             for (i = 0; i < n; i++)
                for (j = 0; j < n; j++) {
-                  a[i][j] = alglib::randomreal() - 0.5;
-                  b[i][j] = alglib::randomreal() - 0.5;
+                  a[i][j] = randomreal() - 0.5;
+                  b[i][j] = randomreal() - 0.5;
                   c[i][j] = 0.0;
                }
 
             t = alglib_impl::ae_tickcount();
             for (k = 0; k < nrepeat; k++)
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
             t = alglib_impl::ae_tickcount() - t;
             perf0 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, (double)perf0);
 
-            alglib::setnworkers(0);
+            setnworkers(0);
             t = alglib_impl::ae_tickcount();
             for (k = 0; k < nrepeat; k++)
-               alglib::rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0, alglib::parallel);
+               rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0, parallel);
             t = alglib_impl::ae_tickcount() - t;
             perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2 / perf0));
-            alglib::setnworkers(1);
+            setnworkers(1);
 
          }
       }
    }
-
-//
 // Check allocation counter on exit
-//
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter checked... ");
 #   ifdef _ALGLIB_HAS_WORKSTEALING
@@ -2512,14 +2509,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    alglib_impl::ae_complete_finalization_before_exit();
 #   endif
    if (alglib_impl::_alloc_counter != 0) {
-      printf("FAILURE: alloc_counter is non-zero on end!\n");
+      printf("Failed: alloc_counter is non-zero on end!\n");
       return 1;
-   } else
-      printf("OK\n");
+   } else printf("Ok\n");
 #endif
-
-//
 // Return
-//
    return 0;
 }
