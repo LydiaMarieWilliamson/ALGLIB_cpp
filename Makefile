@@ -12,13 +12,14 @@ X=
 #X=.exe
 O=.o
 #O=.obj
-Mods=KernelsSse2 KernelsAvx2 KernelsFma Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
+ModA=Ap KernelsAvx2 KernelsFma KernelsSse2
+Mods=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
 Objs=$(Mods:%=%$O)
-ModX=KernelsSse2 KernelsAvx2 KernelsFma Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics
+ModX=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics
 ObjX=$(ModX:%=%$O)
-ModY=KernelsSse2 KernelsAvx2 KernelsFma Ap AlgLibInternal AlgLibMisc LinAlg
+ModY=${ModA} AlgLibInternal AlgLibMisc LinAlg
 ObjY=$(ModY:%=%$O)
-ModZ=KernelsSse2 KernelsAvx2 KernelsFma Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions
+ModZ=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions
 SrcZ=$(ModZ:%=%.cpp)
 
 all: test
@@ -85,10 +86,12 @@ test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestC: Internal Routines"
 	./TestC$X
 clean:
-	rm -f Test{I,X,Y,Z,C}$X Test{I,X,Y,Z,C}$O ${Objs}
+	rm -f Test{I,X,Y,Z,C}$O ${Objs}
+clobber: clean
+	rm -f Test{I,X,Y,Z,C}$X
 
 ## Source - Header dependencies:
-Ap.cpp: Ap.h KernelsSse2.h KernelsAvx2.h KernelsFma.h
+Ap.cpp: Ap.h
 AlgLibInternal.cpp: AlgLibInternal.h
 AlgLibMisc.cpp: AlgLibMisc.h
 DataAnalysis.cpp: DataAnalysis.h
@@ -96,16 +99,21 @@ DiffEquations.cpp: DiffEquations.h
 FastTransforms.cpp: FastTransforms.h
 Integration.cpp: Integration.h
 Interpolation.cpp: Interpolation.h
-KernelsSse2.cpp: KernelsSse2.h
 KernelsAvx2.cpp: KernelsAvx2.h
 KernelsFma.cpp: KernelsFma.h
+KernelsSse2.cpp: KernelsSse2.h
 LinAlg.cpp: LinAlg.h
 Optimization.cpp: Optimization.h
 Solvers.cpp: Solvers.h
 SpecialFunctions.cpp: SpecialFunctions.h
 Statistics.cpp: Statistics.h
+TestC.cpp TestI.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
+TestX.cpp:	DataAnalysis.h Interpolation.h
+TestY.cpp:	LinAlg.h
+TestZ.cpp:	Interpolation.h
 
 ## Header - Header dependencies:
+## KernelsAvx2, KernelsFma, KernelsSse2 -> Ap
 ## Optimization -> Solvers -> LinAlg -> AlgLibMisc -> AlgLibInternal -> Ap
 ## DiffEquations, FastTransforms -> AlgLibInternal
 ## SpecialFunctions -> AlgLibMisc
@@ -118,6 +126,7 @@ Statistics.cpp: Statistics.h
 ## TestY -> LinAlg
 ## TestZ -> Interpolation
 AlgLibInternal.h:	Ap.h
+KernelsAvx2.h KernelsFma.h KernelsSse2.h: Ap.h
 AlgLibMisc.h DiffEquations.h FastTransforms.h:	AlgLibInternal.h
 LinAlg.h SpecialFunctions.h:	AlgLibMisc.h
 Integration.h Statistics.h Solvers.h:	LinAlg.h
@@ -126,7 +135,3 @@ Optimization.h:		Solvers.h
 DataAnalysis.h Interpolation.h:	Optimization.h
 DataAnalysis.h:		Statistics.h
 Interpolation.h:	Integration.h
-TestC.cpp TestI.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
-TestX.cpp:	DataAnalysis.h Interpolation.h
-TestY.cpp:	LinAlg.h
-TestZ.cpp:	Interpolation.h
