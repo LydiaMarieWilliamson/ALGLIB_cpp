@@ -61,6 +61,7 @@ a.nav:hover     { color:#000077; font-weight:bold; text-decoration: underline; }
 <a href='#gs_compiling'>4 Compiling ALGLIB</a>
     <a href='#gs_attaching'>4.1 Adding to your project</a>
     <a href='#gs_configuring'>4.2 Configuring for your compiler</a>
+    <a href='#gs_configuring2'>4.3 Improving performance (CPU-specific and OS-specific optimizations)</a>
     <a href='#gs_simd'>4.3 Utilizing SIMD</a>
         <a href='#gs_simd_overview'>4.3.1 Overview</a>
         <a href='#gs_simd_performance'>4.3.2 Achieving best performance</a>
@@ -486,11 +487,9 @@ Just assign datatype name to them, and ALGLIB will automatically use your defini
 You may define all or just one/two types (those which are not detected automatically).</li>
 </ul>
 
-
 <a name='gs_simd' class='sheader'></a><h2>4.3 Utilizing SIMD</h2>
-
+ 
 <a name='gs_simd_overview' class='sheader'></a><h3>4.3.1 Overview</h3>
-
 <p>
 ALGLIB has two-layered structure: some set of basic performance-critical primitives is implemented using optimized code
 (<code>KernelsSse2.cpp</code>, <code>KernelsAvx2.cpp</code> and <code>KernelsFma.cpp</code>),
@@ -613,12 +612,12 @@ you should compile it in the OS-specific mode by #defining either <code>AE_OS=AE
 depending on the OS being used.
 The former corresponds to any modern OS (32/64-bit Windows XP and later) from Windows family,
 while the latter means almost any POSIX-compatible OS (or any OS from the Linux family).
-Only threading-related functions are used by ALGLIB: pthreads under POSIX systems, threading subset of WinAPI under Windows.
+Only threading-related functions are used by ALGLIB: pthreads under POSIX systems, the threading subset of WinAPI under Windows.
 </p>
 
 <p>
-The paragraph above applies only to the Commercial Edition.
-The open source version is always OS-agnostic (does not use functions beyond C/C++ standard library) even in the presence of OS-specific definitions.
+The paragraph above applies only to the Commercial Edition of ALGLIB.
+The open source version is always OS-agnostic (it does not use functions beyond the C/C++ standard library), even in the presence of OS-specific definitions.
 </p>
 
 <a name='gs_compile_examples' class='sheader'></a><h2>4.5 Examples (free and commercial editions)</h2>
@@ -707,13 +706,13 @@ We used 3.2 GHz 4-core CPU for this test.
 </p>
 
 <p>
-First example covers platform-agnostic compilation without optimization settings - the most simple way to compile ALGLIB.
+The first example covers platform-agnostic compilation without optimization settings - the most simple way to compile ALGLIB.
 This step is same in both open source and commercial editions.
 However, in platform-agnostic mode ALGLIB is unable to use all performance related features present in commercial edition.
 </p>
 
 <p>
-We starts from copying all <code>cpp</code> and <code>h</code> files to current directory,
+We start from copying all <code>cpp</code> and <code>h</code> files to current directory,
 then we will compile them along with <code>demo.cpp</code>.
 In this and following examples we will omit compiler output for the sake of simplicity.
 </p>
@@ -1938,8 +1937,7 @@ to reduce code size in cases when linker is unable to remove unused code
 (happens with some compilers when ALGLIB is compiled as part of the shared library)
 </li>
 <li>
-to reduce build time (disabled code is silently removed by preprocessor,
-thus no time is spent in the compiler)
+to reduce build time (disabled code is silently removed by preprocessor, thus no time is spent in the compiler)
 </li>
 </ul>
 
