@@ -71,10 +71,10 @@
 #endif
 
 // The compiler type and compiler-specific definitions and includes.
-#define AE_OTHERC	0
-#define AE_MSVC		1
-#define AE_GNUC		2
-#define AE_SUNC		3
+#define AE_OTHERC	0 // Unknown to ALGLIB++.
+#define AE_MSVC		1 // MSVC.
+#define AE_GNUC		2 // GCC/CLANG/ICC.
+#define AE_SUNC		3 // Sun studio.
 #if defined __GNUC__
 #   define AE_COMPILER AE_GNUC
 #elif defined __SUNPRO_C || defined __SUNPRO_CC
@@ -115,24 +115,22 @@
 
 // SSE2 intrinsics
 // The preprocessor directives below:
-// -	include headers for SSE2 intrinsics
-// -	define AE_HAS_SSE2_INTRINSICS definition
+// -	include headers for SSE2 intrinsics,
+// -	define AE_HAS_SSE2_INTRINSICS definition.
 // These actions are performed when we have:
-// -	an x86 architecture definition AE_CPU == AE_INTEL
-// -	a compiler which supports intrinsics
+// -	an x86 architecture definition AE_CPU == AE_INTEL,
+// -	a compiler which supports intrinsics.
 // The presence of AE_HAS_SSE2_INTRINSICS does NOT mean that our CPU actually supports SSE2 -
 // such things should be determined by CurCPU, which is initialized on start-up.
 // It means that we are working under Intel and our compiler can issue SSE2-capable code.
 #if defined AE_CPU && AE_CPU == AE_INTEL
-#   if AE_COMPILER == AE_MSVC
-#      include <emmintrin.h>
-#      define AE_HAS_SSE2_INTRINSICS
-#   elif AE_COMPILER == AE_GNUC
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
 #      include <xmmintrin.h>
-#      define AE_HAS_SSE2_INTRINSICS
-#   elif AE_COMPILER == AE_SUNC
-#      include <xmmintrin.h>
+#   endif
+#   if AE_COMPILER == AE_MSVC || AE_COMPILER == AE_SUNC
 #      include <emmintrin.h>
+#   endif
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_MSVC || AE_COMPILER == AE_SUNC
 #      define AE_HAS_SSE2_INTRINSICS
 #   endif
 #endif
@@ -795,7 +793,7 @@ void clear_error_flag();
 // This CAN be quashed down to 1 layer ...
 // by just writing the member functions directly in the corresponding types currently contained in the alglib_impl namespace,
 // and using this, instead.
-// However, it requires rewriting all the code involving smart pointers and share pools as templates
+// However, it requires rewriting all the code involving smart pointers and shared pools as templates
 // or by using C++'s native facilities for shared pools.
 #define DecClass(Type, Pars) \
 struct Type##I { \
