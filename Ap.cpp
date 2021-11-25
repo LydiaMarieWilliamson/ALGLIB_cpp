@@ -10137,9 +10137,7 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
 //
 // RESULT:
 //     (X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
    double result;
@@ -10166,9 +10164,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 //
 // RESULT:
 //     (X,Ai)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
    ae_int_t j;
    double result;
@@ -10194,9 +10190,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
 //
 // RESULT:
 //     (X,Ai)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state) {
    ae_int_t j;
    double result;
@@ -10220,9 +10214,7 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
 //
 // RESULT:
 //     (X,X)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -10252,9 +10244,7 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 //
 //
 // NOTE: destination and source should NOT overlap
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t j;
 
@@ -10277,9 +10267,7 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     A       -   leading N elements of I-th row are replaced by X
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
    ae_int_t j;
 
@@ -10302,9 +10290,7 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   array[N], destination
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
    ae_int_t j;
 
@@ -10330,9 +10316,7 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     B       -   row K overwritten
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state) {
    ae_int_t j;
 
@@ -10355,9 +10339,7 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
 //
 // OUTPUT PARAMETERS:
 //     Y       -   array[N], Y = V*X
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
 
@@ -10381,9 +10363,7 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     Y       -   Y[RIdx,...] = V*X
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state) {
    ae_int_t i;
 
@@ -10405,9 +10385,7 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
 //
 // OUTPUT PARAMETERS:
 //     Y       -   X copied to Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
    ae_int_t j;
 
@@ -10432,9 +10410,7 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 //
 //
 // NOTE: destination and source should NOT overlap
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
    ae_int_t j;
 
@@ -10456,9 +10432,7 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   leading N elements are replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
    ae_int_t j;
 
@@ -10481,9 +10455,7 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     A       -   leading N elements of I-th row are replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
    ae_int_t j;
 
@@ -10505,9 +10477,7 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   X[OffsX:OffsX+N-1] is replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
    ae_int_t j;
 
@@ -10529,9 +10499,7 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 //
 // OUTPUT PARAMETERS:
 //     A       -   leading M rows, N cols are replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state *_state) {
    _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, pDest, _state));
 
@@ -10570,9 +10538,7 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   leading N elements are replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
    ae_int_t j;
 
@@ -10594,9 +10560,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   leading N elements are replaced by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
    ae_int_t j;
 
@@ -10618,9 +10582,7 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   elements 0...N-1 multiplied by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10642,9 +10604,7 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     X       -   elements 0...N-1 of row RowIdx are multiplied by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
 
@@ -10666,9 +10626,7 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
 //
 // OUTPUT PARAMETERS:
 //     X       -   elements OffsX:OffsX+N-1 multiplied by V
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
    ae_int_t i;
 
@@ -10691,9 +10649,7 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 //
 // RESULT:
 //     X := X + alpha*Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10716,9 +10672,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 //
 // RESULT:
 //     X := X + alpha*Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
 
@@ -10742,9 +10696,7 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
 //
 // RESULT:
 //     X := X + alpha*Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10769,9 +10721,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 //
 // RESULT:
 //     X := X + alpha*Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
    ae_int_t i;
 
@@ -10796,9 +10746,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 //
 // RESULT:
 //     X := X + alpha*Y
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
    ae_int_t i;
 
@@ -10820,9 +10768,7 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
 //
 // RESULT:
 //     X := componentwise(X*Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10844,9 +10790,7 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 //
 // RESULT:
 //     X := componentwise(X*Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
 
@@ -10868,9 +10812,7 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 //
 // RESULT:
 //     X := componentwise(X*Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10892,9 +10834,7 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
 //
 // RESULT:
 //     X := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10916,9 +10856,7 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 //
 // RESULT:
 //     X := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
 
@@ -10940,9 +10878,7 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 //
 // RESULT:
 //     Y := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
    ae_int_t i;
 
@@ -10964,9 +10900,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 //
 // RESULT:
 //     X := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
 
@@ -10988,9 +10922,7 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 //
 // RESULT:
 //     X := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
 
@@ -11012,9 +10944,7 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 //
 // RESULT:
 //     X := componentwise_max(X,Y)
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
    ae_int_t i;
 
@@ -11036,9 +10966,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 // OUTPUT PARAMETERS:
 //     max(X[i])
 //     zero for N=0
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -11070,9 +10998,7 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
 // OUTPUT PARAMETERS:
 //     max(X[RowIdx,i])
 //     zero for N=0
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -11103,9 +11029,7 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 // OUTPUT PARAMETERS:
 //     max(|X[i]|)
 //     zero for N=0
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -11134,9 +11058,7 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
 // OUTPUT PARAMETERS:
 //     max(|X[RowIdx,i]|)
 //     zero for N=0
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -11169,9 +11091,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state) {
    ae_int_t j;
 
@@ -11197,9 +11117,7 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
-//
-//   -- ALGLIB --
-//      Copyright 20.01.2020 by Bochkanov Sergey
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state) {
    ae_int_t j;
 
@@ -11243,12 +11161,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 //     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
-//
-//
-//   -- ALGLIB routine --
-//
-//      01.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
 void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -11336,12 +11249,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
-//
-//
-//   -- ALGLIB routine --
-//
-//      01.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
 void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -11405,11 +11313,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 //     Alpha-  coefficient
 //     U   -   vector #1
 //     V   -   vector #2
-//
-//
-//   -- ALGLIB routine --
-//      07.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
 void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -11452,9 +11356,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //
 // OUTPUT PARAMETERS
 //     X       -   solution replaces elements X[IX:IX+N-1]
-//
-//   -- ALGLIB routine --
-//      (c) 07.09.2021 Bochkanov Sergey
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -11525,10 +11427,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
 }
 
 // Fast rGEMM kernel with AVX2/FMA support
-//
-//   -- ALGLIB routine --
-//      19.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
 bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
 #   if !defined(_ALGLIB_HAS_AVX2_INTRINSICS)
    return false;
@@ -11624,10 +11523,7 @@ ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state) {
 // INPUT PARAMETERS:
 //
 // OUTPUT PARAMETERS:
-//
-//   -- ALGLIB routine --
-//      08.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -11692,10 +11588,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 // * True if update was applied
 // * False if kernel refused to perform an update (quick exit for unsupported
 //   combinations of input sizes)
-//
-//   -- ALGLIB routine --
-//      20.09.2020
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
@@ -11931,10 +11824,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
 // Return value:
 // * True if update was applied
 // * False if kernel refused to perform an update.
-//
-//   -- ALGLIB routine --
-//      20.09.2020
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
    ae_int_t k;
    ae_int_t targetrow;

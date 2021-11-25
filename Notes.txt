@@ -224,6 +224,72 @@ F:	barycentricfitfloaterhormann, barycentricfitfloaterhormannwc,
 
 A6. ALGLIB ⇒ ALGLIB++ Revision Sequence
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A6.1. Revision Notes
+────────────────────
+For performance reasons, functions may be implemented with slight differences from how they are documented.
+In particular, while output parameters are documented and declared and implemented as (Type &Par),
+input parameters are documented as (Type Par), but declared and implemented
+as (const Type Par) for the scalar types (bool), (ae_int_t), (double) and (complex),
+and as (const Type &amp;Par) for all other types.
+This is discussed in greater depth by Stroustrup et al. (https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-in) in-parameter passing with constant references.
+For user-supplied functions in the iteration routines and their high-level versions, however, the prototypes actually required are made explicit.
+For both these routines as well as for the serializer/unserializer routines, the documented and declared/implemented versions match.
+
+Other exceptions include array parameters, which are documented as (Type &), but declared as (const Type &), as indicated below:
+	rankdatacentered(∙,_,_);
+	rankdata(∙,_,_);
+	xdebugb1not(∙);
+	xdebugb2not(∙);
+	xdebugc1neg(∙);
+	xdebugc2neg(∙);
+	xdebugi1neg(∙);
+	xdebugi2neg(∙);
+	xdebugr1neg(∙);
+	xdebugr2neg(∙);
+	rvectorcopy(_,_,_,∙,_);
+	rmatrixcopy(_,_,_,_,_,∙,_,_);
+	rmatrixgencopy(_,_,_,_,_,_,_,∙,_,_);
+	rmatrixgemv(_,_,_,_,_,_,_,_,_,_,∙,_);
+	sparsegemv(_,_,_,_,_,_,∙,_);
+	rmatrixmv(_,_,_,_,_,_,_,_,∙,_);
+	rmatrixsymv(_,_,_,_,_,_,_,_,_,∙,_);
+	rmatrixsyvmv(_,_,_,_,_,_,_,∙);
+	sparsetrmv(_,_,_,_,∙,_);
+	rmatrixger(_,_,∙,_,_,_,_,_,_,_);
+	rmatrixtranspose(_,_,_,_,_,∙,_,_);
+	rmatrixtrsv(_,_,_,_,_,_,_,∙,_);
+	sparsetrsv(_,_,_,_,∙);
+	rmatrixenforcesymmetricity(∙,_,_);
+	rmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
+	cmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
+	rmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
+	cmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
+	cmatrixherk(_,_,_,_,_,_,_,_,∙,_,_,_);
+	rmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+	cmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+	rmatrixlusolvefast(_,_,_,∙,_);
+	cmatrixlusolvefast(_,_,_,∙,_);
+	spdmatrixcholeskysolvefast(_,_,_,∙,_);
+	hpdmatrixcholeskysolvefast(_,_,_,∙,_);
+	rmatrixlusolvemfast(_,_,_,∙,_,_);
+	cmatrixlusolvemfast(_,_,_,∙,_,_);
+	spdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
+	hpdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
+	rmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+	cmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+	rmatrixsolvefast(_,_,∙,_);
+	cmatrixsolvefast(_,_,∙,_);
+	spdmatrixsolvefast(_,_,_,∙,_);
+	hpdmatrixsolvefast(_,_,_,∙,_);
+	rmatrixsolvemfast(_,_,∙,_,_);
+	cmatrixsolvemfast(_,_,∙,_,_);
+	spdmatrixsolvemfast(_,_,_,∙,_,_);
+	hpdmatrixsolvemfast(_,_,_,∙,_,_);
+	spdmatrixcholeskyupdateadd1buf(∙,_,_,_,_);
+	spdmatrixcholeskyupdateadd1(∙,_,_,_);
+	spdmatrixcholeskyupdatefixbuf(∙,_,_,_,_);
+	spdmatrixcholeskyupdatefix(∙,_,_,_);
+
 A6.2. Test Stages
 ─────────────────
 39	Integration of version 3.18.0 ― being done separately from the main branch.
@@ -239,6 +305,7 @@ A6.3. Test Results
 39	6712 1.2x 12347 1.0x 12052 0.9x 9104 1.0x 1637111328 (61945620) 91
 39	7813 0.9x 11629 0.9x  9527 1.0x 9296 1.0x 1637355701 (619810b5) 88
 39	7813 1.0x 12196 1.0x 12199 1.0x 9023 1.1x 1637444986 (61996d7a) 87
+39	6452 1.2x 12501 1.0x 12052 1.0x 9641 1.0x 1637823278 (619f332e) 87
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -295,19 +362,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7813
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12196
+* RGEMM-SEQ-16   (MFLOPS)   6452
+* RGEMM-MTN-16              1.2x
+* RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  12052
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9023
-* RGEMM-MTN-1024            1.1x
+* RGEMM-SEQ-1024 (MFLOPS)   9641
+* RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1637444986
+SEED: 1637823278
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian

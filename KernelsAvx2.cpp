@@ -1046,10 +1046,7 @@ void rgemvx_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alp
 //
 // The function is present in two versions, one  with  variable  opsrc_length
 // and another one with opsrc_length==block_size==32.
-//
-//   -- ALGLIB routine --
-//      19.07.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 ae_int_t ablasf_packblkh_avx2(const double *src, ae_int_t src_stride, ae_int_t op, ae_int_t opsrc_length, ae_int_t opsrc_width, double *dst, ae_int_t block_size, ae_int_t micro_size) {
    ae_int_t i;
 
@@ -1210,10 +1207,7 @@ ae_int_t ablasf_packblkh32_avx2(const double *src, ae_int_t src_stride, ae_int_t
 // is undefined for other micro sizes.
 //
 // Requires AVX2, does NOT check its presense.
-//
-//   -- ALGLIB routine --
-//      19.07.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 void ablasf_dotblkh_avx2(const double *src_a, const double *src_b, ae_int_t round_length, ae_int_t block_size, ae_int_t micro_size, double *dst, ae_int_t dst_stride) {
    ae_int_t z;
    __m256d r00 = _mm256_setzero_pd(), r01 = _mm256_setzero_pd(), r10 = _mm256_setzero_pd(), r11 = _mm256_setzero_pd();
@@ -1255,10 +1249,7 @@ void ablasf_dotblkh_avx2(const double *src_a, const double *src_b, ae_int_t roun
 // Y := alpha*X + beta*Y
 //
 // Requires AVX2, does NOT check its presense.
-//
-//   -- ALGLIB routine --
-//      19.07.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 void ablasf_daxpby_avx2(ae_int_t n, double alpha, const double *src, double beta, double *dst) {
    if (beta == 1.0) {
    // The most optimized case: DST := alpha*SRC + DST

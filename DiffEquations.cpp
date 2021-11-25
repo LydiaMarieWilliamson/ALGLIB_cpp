@@ -37,51 +37,6 @@ DefClass(odesolverstate, AndD DecVal(needdy) AndD DecVar(y) AndD DecVar(dy) AndD
 //
 DefClass(odesolverreport, AndD DecVal(nfev) AndD DecVal(terminationtype))
 
-// Cash-Karp adaptive ODE solver.
-//
-// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-// (here Y may be single variable or vector of N variables).
-//
-// INPUT PARAMETERS:
-//     Y       -   initial conditions, array[0..N-1].
-//                 contains values of Y[] at X[0]
-//     N       -   system size
-//     X       -   points at which Y should be tabulated, array[0..M-1]
-//                 integrations starts at X[0], ends at X[M-1],  intermediate
-//                 values at X[i] are returned too.
-//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-//     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
-//                   intermediate points
-//                 * M=2 means that you want just to integrate from  X[0]  to
-//                   X[1] and don't interested in intermediate values.
-//                 * M=1 means that you don't want to integrate :)
-//                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
-//     Eps     -   tolerance (absolute/relative error on each  step  will  be
-//                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
-//                   are calculated with respect to maximum values of  Y seen
-//                   so far. Be careful to use this criterion  when  starting
-//                   from Y[] that are close to zero.
-//     H       -   initial  step  lenth,  it  will  be adjusted automatically
-//                 after the first  step.  If  H=0,  step  will  be  selected
-//                 automatically  (usualy  it  will  be  equal  to  0.001  of
-//                 min(x[i]-x[j])).
-//
-// OUTPUT PARAMETERS
-//     State   -   structure which stores algorithm state between  subsequent
-//                 calls of OdeSolverIteration. Used for reverse communication.
-//                 This structure should be passed  to the OdeSolverIteration
-//                 subroutine.
-//
-// SEE ALSO
-//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-//
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -101,52 +56,6 @@ void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Cash-Karp adaptive ODE solver.
-//
-// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-// (here Y may be single variable or vector of N variables).
-//
-// INPUT PARAMETERS:
-//     Y       -   initial conditions, array[0..N-1].
-//                 contains values of Y[] at X[0]
-//     N       -   system size
-//     X       -   points at which Y should be tabulated, array[0..M-1]
-//                 integrations starts at X[0], ends at X[M-1],  intermediate
-//                 values at X[i] are returned too.
-//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-//     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
-//                   intermediate points
-//                 * M=2 means that you want just to integrate from  X[0]  to
-//                   X[1] and don't interested in intermediate values.
-//                 * M=1 means that you don't want to integrate :)
-//                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
-//     Eps     -   tolerance (absolute/relative error on each  step  will  be
-//                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
-//                   are calculated with respect to maximum values of  Y seen
-//                   so far. Be careful to use this criterion  when  starting
-//                   from Y[] that are close to zero.
-//     H       -   initial  step  lenth,  it  will  be adjusted automatically
-//                 after the first  step.  If  H=0,  step  will  be  selected
-//                 automatically  (usualy  it  will  be  equal  to  0.001  of
-//                 min(x[i]-x[j])).
-//
-// OUTPUT PARAMETERS
-//     State   -   structure which stores algorithm state between  subsequent
-//                 calls of OdeSolverIteration. Used for reverse communication.
-//                 This structure should be passed  to the OdeSolverIteration
-//                 subroutine.
-//
-// SEE ALSO
-//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-//
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -169,9 +78,6 @@ void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double 
 }
 #endif
 
-// This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
-// See below for functions which provide better documented API
 bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -192,6 +98,12 @@ bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
    return *(reinterpret_cast < bool *>(&result));
 }
 
+// This function is used to launcn iterations of ODE solver
+//
+// It accepts following parameters:
+//     diff    -   callback which calculates dy/dx for given y and x
+//     ptr     -   optional pointer which is passed to diff; can be NULL
+// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -219,27 +131,6 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-// ODE solver results
-//
-// Called after OdeSolverIteration returned False.
-//
-// INPUT PARAMETERS:
-//     State   -   algorithm state (used by OdeSolverIteration).
-//
-// OUTPUT PARAMETERS:
-//     M       -   number of tabulated values, M>=1
-//     XTbl    -   array[0..M-1], values of X
-//     YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
-//     Rep     -   solver report:
-//                 * Rep.TerminationType completetion code:
-//                     * -2    X is not ordered  by  ascending/descending  or
-//                             there are non-distinct X[],  i.e.  X[i]=X[i+1]
-//                     * -1    incorrect parameters were specified
-//                     *  1    task has been solved
-//                 * Rep.NFEV contains number of function calculations
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -311,10 +202,9 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 //
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-//
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
+// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
+// API: void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
+// API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
 
    _odesolverstate_clear(state);
@@ -331,9 +221,11 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
    odesolver_odesolverinit(0, y, n, x, m, eps, h, state, _state);
 }
 
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
+// This function provides a reverse communication interface, which is not documented or recommended for use.
+// Instead, it is recommended that you use the better-documented API function odesolversolve() listed below.
+// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
+// API: bool odesolveriteration(const odesolverstate &state, const xparams _xparams = xdefault);
+// API: void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
 bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -628,9 +520,8 @@ lbl_rcomm:
 //                     * -1    incorrect parameters were specified
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
-//
-//   -- ALGLIB --
-//      Copyright 01.09.2009 by Bochkanov Sergey
+// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
+// API: void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = xdefault);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state) {
    double v;
    ae_int_t i;

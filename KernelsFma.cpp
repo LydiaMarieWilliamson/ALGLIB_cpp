@@ -516,10 +516,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
 // is undefined for other micro sizes.
 //
 // Requires AVX2, does NOT check its presense.
-//
-//   -- ALGLIB routine --
-//      19.07.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 void ablasf_dotblkh_fma(const double *src_a, const double *src_b, ae_int_t round_length, ae_int_t block_size, ae_int_t micro_size, double *dst, ae_int_t dst_stride) {
    ae_int_t z;
    __m256d r00 = _mm256_setzero_pd(), r01 = _mm256_setzero_pd(), r10 = _mm256_setzero_pd(), r11 = _mm256_setzero_pd();
@@ -566,10 +563,7 @@ void ablasf_dotblkh_fma(const double *src_a, const double *src_b, ae_int_t round
 // INPUT PARAMETERS:
 //
 // OUTPUT PARAMETERS:
-//
-//   -- ALGLIB routine --
-//      08.09.2021
-//      Bochkanov Sergey
+// ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
    ae_int_t k;
 

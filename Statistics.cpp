@@ -45,24 +45,6 @@ namespace alglib {
 // === STUDENTTTESTS Package ===
 
 // === BASESTAT Package ===
-// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// OUTPUT PARAMETERS
-//     Mean    -   mean.
-//     Variance-   variance.
-//     Skewness-   skewness (if variance<>0; zero otherwise).
-//     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
-//
-// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -82,25 +64,6 @@ void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, doubl
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// OUTPUT PARAMETERS
-//     Mean    -   mean.
-//     Variance-   variance.
-//     Skewness-   skewness (if variance<>0; zero otherwise).
-//     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
-//
-// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -121,22 +84,6 @@ void samplemoments(const real_1d_array &x, double &mean, double &variance, doubl
 }
 #endif
 
-// Calculation of the mean.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Mean' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -156,23 +103,6 @@ double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xpara
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Calculation of the mean.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Mean' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplemean(const real_1d_array &x, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -193,22 +123,6 @@ double samplemean(const real_1d_array &x, const xparams _xparams) {
 }
 #endif
 
-// Calculation of the variance.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Variance' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -228,23 +142,6 @@ double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _x
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Calculation of the variance.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Variance' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplevariance(const real_1d_array &x, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -265,22 +162,6 @@ double samplevariance(const real_1d_array &x, const xparams _xparams) {
 }
 #endif
 
-// Calculation of the skewness.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Skewness' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -300,23 +181,6 @@ double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _x
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Calculation of the skewness.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Skewness' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double sampleskewness(const real_1d_array &x, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -337,22 +201,6 @@ double sampleskewness(const real_1d_array &x, const xparams _xparams) {
 }
 #endif
 
-// Calculation of the kurtosis.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Kurtosis' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -372,23 +220,6 @@ double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _x
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Calculation of the kurtosis.
-//
-// INPUT PARAMETERS:
-//     X       -   sample
-//     N       -   N>=0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Kurtosis' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplekurtosis(const real_1d_array &x, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -409,19 +240,6 @@ double samplekurtosis(const real_1d_array &x, const xparams _xparams) {
 }
 #endif
 
-// ADev
-//
-// Input parameters:
-//     X   -   sample
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Output parameters:
-//     ADev-   ADev
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -441,20 +259,6 @@ void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xp
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// ADev
-//
-// Input parameters:
-//     X   -   sample
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Output parameters:
-//     ADev-   ADev
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -475,19 +279,6 @@ void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams) {
 }
 #endif
 
-// Median calculation.
-//
-// Input parameters:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Output parameters:
-//     Median
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -507,20 +298,6 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Median calculation.
-//
-// Input parameters:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Output parameters:
-//     Median
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplemedian(const real_1d_array &x, double &median, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -541,20 +318,6 @@ void samplemedian(const real_1d_array &x, double &median, const xparams _xparams
 }
 #endif
 
-// Percentile calculation.
-//
-// Input parameters:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//     P   -   percentile (0<=P<=1)
-//
-// Output parameters:
-//     V   -   percentile
-//
-//   -- ALGLIB --
-//      Copyright 01.03.2008 by Bochkanov Sergey
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -574,21 +337,6 @@ void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Percentile calculation.
-//
-// Input parameters:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//     P   -   percentile (0<=P<=1)
-//
-// Output parameters:
-//     V   -   percentile
-//
-//   -- ALGLIB --
-//      Copyright 01.03.2008 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -609,20 +357,6 @@ void samplepercentile(const real_1d_array &x, const double p, double &v, const x
 }
 #endif
 
-// 2-sample covariance
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     covariance (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -642,21 +376,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// 2-sample covariance
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     covariance (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -678,21 +397,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xpara
 }
 #endif
 
-// Pearson product-moment correlation coefficient
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Pearson product-moment correlation coefficient
-//     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -712,22 +416,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Pearson product-moment correlation coefficient
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Pearson product-moment correlation coefficient
-//     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -749,21 +437,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparam
 }
 #endif
 
-// Spearman's rank correlation coefficient
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Spearman's rank correlation coefficient
-//     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -783,22 +456,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_in
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-
-// Spearman's rank correlation coefficient
-//
-// Input parameters:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Spearman's rank correlation coefficient
-//     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -820,24 +477,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xpara
 }
 #endif
 
-// Covariance matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -857,25 +496,6 @@ void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_ar
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Covariance matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -898,24 +518,6 @@ void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams) {
 }
 #endif
 
-// Pearson product-moment correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -935,25 +537,6 @@ void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, re
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Pearson product-moment correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -976,24 +559,6 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xpara
 }
 #endif
 
-// Spearman's rank correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1013,25 +578,6 @@ void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, r
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Spearman's rank correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1054,30 +600,6 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xpar
 }
 #endif
 
-// Cross-covariance matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1097,31 +619,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, con
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Cross-covariance matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1147,30 +644,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, con
 }
 #endif
 
-// Pearson product-moment cross-correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1190,31 +663,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Pearson product-moment cross-correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1240,30 +688,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 }
 #endif
 
-// Spearman's rank cross-correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1283,31 +707,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// Spearman's rank cross-correlation matrix
-//
-// INPUT PARAMETERS:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// OUTPUT PARAMETERS:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1333,24 +732,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
 }
 #endif
 
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// INPUT PARAMETERS:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// OUTPUT PARAMETERS:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1370,25 +751,6 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// INPUT PARAMETERS:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// OUTPUT PARAMETERS:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void rankdata(real_2d_array &xy, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1411,26 +773,6 @@ void rankdata(real_2d_array &xy, const xparams _xparams) {
 }
 #endif
 
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
-//   mean value, but does NOT change higher moments
-//
-// INPUT PARAMETERS:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// OUTPUT PARAMETERS:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1450,27 +792,6 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
-//   mean value, but does NOT change higher moments
-//
-// INPUT PARAMETERS:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// OUTPUT PARAMETERS:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void rankdatacentered(real_2d_array &xy, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1493,10 +814,6 @@ void rankdatacentered(real_2d_array &xy, const xparams _xparams) {
 }
 #endif
 
-// Obsolete function, we recommend to use PearsonCorr2().
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1517,10 +834,6 @@ double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const 
    return *(reinterpret_cast < double *>(&result));
 }
 
-// Obsolete function, we recommend to use SpearmanCorr2().
-//
-//     -- ALGLIB --
-//     Copyright 09.04.2007 by Bochkanov Sergey
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1542,40 +855,6 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 }
 
 // === CORRELATIONTESTS Package ===
-// Pearson's correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5
-//     * normality of distributions of X and Y.
-//
-// Input parameters:
-//     R   -   Pearson's correlation coefficient for X and Y
-//     N   -   number of elements in samples, N>=5.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1596,42 +875,6 @@ void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bo
    return;
 }
 
-// Spearman's rank correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5.
-//
-// The test is non-parametric and doesn't require distributions X and Y to be
-// normal.
-//
-// Input parameters:
-//     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N>=5.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1653,34 +896,6 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 }
 
 // === JARQUEBERA Package ===
-// Jarque-Bera test
-//
-// This test checks hypotheses about the fact that a  given  sample  X  is  a
-// sample of normal random variable.
-//
-// Requirements:
-//     * the number of elements in the sample is not less than 5.
-//
-// Input parameters:
-//     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N>=5
-//
-// Output parameters:
-//     P           -   p-value for the test
-//
-// Accuracy of the approximation used (5<=N<=1951):
-//
-// p-value          relative error (5<=N<=1951)
-// [1, 0.1]            < 1%
-// [0.1, 0.01]         < 2%
-// [0.01, 0.001]       < 6%
-// [0.001, 0]          wasn't measured
-//
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
-// from table values.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1702,40 +917,6 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const x
 }
 
 // === VARIANCETESTS Package ===
-// Two-sample F-test
-//
-// This test checks three hypotheses about dispersions of the given  samples.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersions are equal)
-//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
-//       sample is greater than or equal to  the  dispersion  of  the  second
-//       sample).
-//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
-//       sample is less than or equal to the dispersion of the second sample)
-//
-// The test is based on the following assumptions:
-//     * the given samples have normal distributions
-//     * the samples are independent.
-//
-// Input parameters:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   sample size.
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   sample size.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 19.09.2006 by Bochkanov Sergey
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1756,38 +937,6 @@ void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, con
    return;
 }
 
-// One-sample chi-square test
-//
-// This test checks three hypotheses about the dispersion of the given sample
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersion equals  the  given
-//       number)
-//     * left-tailed test (null hypothesis - the dispersion is  greater  than
-//       or equal to the given number)
-//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
-//       equal to the given number).
-//
-// Test is based on the following assumptions:
-//     * the given sample has a normal distribution.
-//
-// Input parameters:
-//     X           -   sample 1. Array whose index goes from 0 to N-1.
-//     N           -   size of the sample.
-//     Variance    -   dispersion value to compare with.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 19.09.2006 by Bochkanov Sergey
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1809,53 +958,6 @@ void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const doubl
 }
 
 // === WSR Package ===
-// Wilcoxon signed-rank test
-//
-// This test checks three hypotheses about the median  of  the  given sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis  -  the  median  is  less than or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
-//       the test could not be applied to nominal variables).
-//     * the distribution should be continuous and symmetric relative to  its
-//       median.
-//     * number of distinct values in the X array should be greater than 4
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Input parameters:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with two decimal places in interval [0.0001, 1].
-//
-// "Two decimal places" does not sound very impressive, but in  practice  the
-// relative error of less than 1% is enough to make a decision.
-//
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1877,72 +979,6 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
 }
 
 // === MANNWHITNEYU Package ===
-// Mann-Whitney U-test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous distributions of the same shape  and  same  median  or  whether
-// their medians are different.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the medians are equal)
-//     * left-tailed test (null hypothesis - the median of the  first  sample
-//       is greater than or equal to the median of the second sample)
-//     * right-tailed test (null hypothesis - the median of the first  sample
-//       is less than or equal to the median of the second sample).
-//
-// Requirements:
-//     * the samples are independent
-//     * X and Y are continuous distributions (or discrete distributions well-
-//       approximating continuous distributions)
-//     * distributions of X and Y have the  same  shape.  The  only  possible
-//       difference is their position (i.e. the value of the median)
-//     * the number of elements in each sample is not less than 5
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distributions to be normal.
-//
-// Input parameters:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N>=5
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   size of the sample. M>=5
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-//
-// Relative precision of approximation of p-value:
-//
-// N          M          Max.err.   Rms.err.
-// 5..10      N..10      1.4e-02    6.0e-04
-// 5..10      N..100     2.2e-02    5.3e-06
-// 10..15     N..15      1.0e-02    3.2e-04
-// 10..15     N..100     1.0e-02    2.2e-05
-// 15..100    N..100     6.1e-03    2.7e-06
-//
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
-// account characteristics of asymptotic approximation used, precision should
-// not be sharply different from the values for interval [5, 100].
-//
-// NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
-//       P's outside of this interval are enforced to these bounds. Say,  you
-//       may quite often get P equal to exactly 0.25 or 0.0001.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -1964,44 +1000,6 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 }
 
 // === STEST Package ===
-// Sign test
-//
-// This test checks three hypotheses about the median of  the  given  sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the  median  is  less  than  or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Input parameters:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// While   calculating   p-values   high-precision   binomial    distribution
-// approximation is used, so significance levels have about 15 exact digits.
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -2023,46 +1021,6 @@ void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double me
 }
 
 // === STUDENTTTESTS Package ===
-// One-sample t-test
-//
-// This test checks three hypotheses about the mean of the given sample.  The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
-//       value)
-//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the mean is less than or  equal
-//       to the given value).
-//
-// The test is based on the assumption that  a  given  sample  has  a  normal
-// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
-// differs from normal, the test will work incorrectly.
-//
-// INPUT PARAMETERS:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of sample, N>=0
-//     Mean    -   assumed value of the mean.
-//
-// OUTPUT PARAMETERS:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0, all p-values are set to 1.0
-//       * when variance of X[] is exactly zero, p-values are set
-//         to 1.0 or 0.0, depending on difference between sample mean and
-//         value of mean being tested.
-//
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -2083,45 +1041,6 @@ void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, 
    return;
 }
 
-// Two-sample pooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * dispersions are equal
-//     * samples are independent.
-//
-// Input parameters:
-//     X       -   sample 1. Array whose index goes from 0 to N-1.
-//     N       -   size of sample.
-//     Y       -   sample 2. Array whose index goes from 0 to M-1.
-//     M       -   size of sample.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has exactly zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-//
-//   -- ALGLIB --
-//      Copyright 18.09.2006 by Bochkanov Sergey
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -2142,47 +1061,6 @@ void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array
    return;
 }
 
-// Two-sample unpooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * samples are independent.
-// Equality of variances is NOT required.
-//
-// Input parameters:
-//     X - sample 1. Array whose index goes from 0 to N-1.
-//     N - size of the sample.
-//     Y - sample 2. Array whose index goes from 0 to M-1.
-//     M - size of the sample.
-//
-// Output parameters:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-//       * when only one sample has zero variance, test reduces to 1-sample
-//         version.
-//
-//   -- ALGLIB --
-//      Copyright 18.09.2006 by Bochkanov Sergey
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -2419,9 +1297,9 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
 //
 // NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
+// API: void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
 void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -2495,10 +1373,9 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Mean' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double samplemean(const real_1d_array &x, const xparams _xparams = xdefault);
 double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
    double mean;
    double tmp0;
@@ -2523,10 +1400,9 @@ double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Variance' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double samplevariance(const real_1d_array &x, const xparams _xparams = xdefault);
 double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
    double variance;
    double tmp0;
@@ -2551,10 +1427,9 @@ double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Skewness' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double sampleskewness(const real_1d_array &x, const xparams _xparams = xdefault);
 double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
    double skewness;
    double tmp0;
@@ -2579,10 +1454,9 @@ double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Kurtosis' variable.
-//
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double samplekurtosis(const real_1d_array &x, const xparams _xparams = xdefault);
 double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
    double kurtosis;
    double tmp0;
@@ -2605,9 +1479,9 @@ double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // Output parameters:
 //     ADev-   ADev
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams = xdefault);
+// API: void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams = xdefault);
 void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
    ae_int_t i;
    double mean;
@@ -2647,9 +1521,9 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
 //
 // Output parameters:
 //     Median
-//
-//   -- ALGLIB --
-//      Copyright 06.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams = xdefault);
+// API: void samplemedian(const real_1d_array &x, double &median, const xparams _xparams = xdefault);
 void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
    ae_frame _frame_block;
    ae_vector _x;
@@ -2780,9 +1654,9 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 //
 // Output parameters:
 //     V   -   percentile
-//
-//   -- ALGLIB --
-//      Copyright 01.03.2008 by Bochkanov Sergey
+// ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
+// API: void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams = xdefault);
+// API: void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams = xdefault);
 void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_state) {
    ae_frame _frame_block;
    ae_vector _x;
@@ -2832,9 +1706,9 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
 //
 // Result:
 //     covariance (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
 double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    double xmean;
@@ -2908,9 +1782,9 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // Result:
 //     Pearson product-moment correlation coefficient
 //     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
 double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    double xmean;
@@ -2998,9 +1872,9 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // Result:
 //     Spearman's rank correlation coefficient
 //     (zero for N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
 double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_vector _x;
@@ -3052,9 +1926,9 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
 void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _x;
@@ -3146,9 +2020,9 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
 void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_vector t;
@@ -3199,9 +2073,9 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
 void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -3328,9 +2202,9 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
 void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _x;
@@ -3466,9 +2340,9 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _x;
@@ -3645,9 +2519,9 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 //
 // OUTPUT PARAMETERS:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
-//   -- ALGLIB --
-//      Copyright 28.10.2010 by Bochkanov Sergey
+// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
+// API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
 void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -3816,9 +2690,9 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 // OUTPUT PARAMETERS:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
+// API: void rankdata(real_2d_array &xy, const xparams _xparams = xdefault);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
    ae_frame _frame_block;
    apbuffers buf0;
@@ -3882,9 +2756,9 @@ bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_st
 // OUTPUT PARAMETERS:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
+// API: void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
    ae_frame _frame_block;
    apbuffers buf0;
@@ -3932,9 +2806,8 @@ bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeature
 }
 
 // Obsolete function, we recommend to use PearsonCorr2().
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
 double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    double result;
 
@@ -3943,9 +2816,8 @@ double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) 
 }
 
 // Obsolete function, we recommend to use SpearmanCorr2().
-//
-//     -- ALGLIB --
-//     Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
 double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    double result;
 
@@ -3973,9 +2845,7 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_st
 // OUTPUT PARAMETERS:
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
    ae_frame _frame_block;
    apbuffers *buf0;
@@ -4044,9 +2914,7 @@ bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_in
 // OUTPUT PARAMETERS:
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
-//   -- ALGLIB --
-//      Copyright 18.04.2013 by Bochkanov Sergey
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state) {
    ae_int_t i;
 
@@ -4098,9 +2966,8 @@ bool _trypexec_basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, 
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    double t;
    double p;
@@ -4169,9 +3036,8 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    double t;
    double p;
@@ -4632,9 +3498,8 @@ static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_sta
 //
 // For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
 void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
    double s;
 
@@ -6566,9 +5431,8 @@ static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, doubl
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 19.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    double xmean;
@@ -6656,9 +5520,8 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
-//   -- ALGLIB --
-//      Copyright 19.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    double xmean;
@@ -6748,9 +5611,8 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 //
 // There is no approximation outside the [0.0001, 1] interval. Therefore,  if
 // the significance level outlies this interval, the test returns 0.0001.
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_frame _frame_block;
    ae_vector _x;
@@ -11511,9 +10373,8 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
 // NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
 //       P's outside of this interval are enforced to these bounds. Say,  you
 //       may quite often get P equal to exactly 0.25 or 0.0001.
-//
-//   -- ALGLIB --
-//      Copyright 09.04.2007 by Bochkanov Sergey
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -15220,9 +14081,8 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //
 // While   calculating   p-values   high-precision   binomial    distribution
 // approximation is used, so significance levels have about 15 exact digits.
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    ae_int_t gtcnt;
@@ -15302,10 +14162,8 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
 //       * when variance of X[] is exactly zero, p-values are set
 //         to 1.0 or 0.0, depending on difference between sample mean and
 //         value of mean being tested.
-//
-//
-//   -- ALGLIB --
-//      Copyright 08.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    double xmean;
@@ -15425,9 +14283,8 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
 //       * when N=0 or M=0, all p-values are set to 1.0
 //       * when both samples has exactly zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
-//
-//   -- ALGLIB --
-//      Copyright 18.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    bool samex;
@@ -15554,9 +14411,8 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
 //         to 1.0 or 0.0, depending on difference between means.
 //       * when only one sample has zero variance, test reduces to 1-sample
 //         version.
-//
-//   -- ALGLIB --
-//      Copyright 18.09.2006 by Bochkanov Sergey
+// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_int_t i;
    bool samex;
