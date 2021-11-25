@@ -123,7 +123,7 @@ An older, less natural, way is to use function pointers; but a few iteration rou
 Originally, in ALGLIB, a decision was made early on to avoid using function pointers and the library predates the inclusion of multi-threading in C, C++, C#, CPython,
 so a manually-threaded interface was used for each iteration routine.
 This design was inherited by ALGLIB++ and has not yet been modified, but will be.
-Over the short term, the prototypes of the iteration routines (such as <code>minlmiteration</code>), &mdash; which are in both the <code>alglib_impl</code> and <code>alglib</code> namespaces but are not documented here (and were not documented by ALGLIB either), will undergo changes that will render them incompatible with ALGLIB.
+Over the short term, the prototypes of the iteration routines (such as <code>minlmiteration</code>), &mdash; which are in both the <code>alglib_impl</code> and <code>alglib</code> namespaces but are not documented here (and were not documented by ALGLIB either), will undergo changes that will render them incompatible with the current and previous versions of ALGLIB.
 </p>
 <p>
 <a name=int_license class=sheader></a><h3>1.2. Versions and Licenses</h3>
@@ -509,29 +509,118 @@ to suitable datatype names, for whichever of the 4 respective types you need to 
 <a href=#gs_simd_portability>Achieving best portability</a> |
 <a href=#gs_simd_detailed>Disabling SIMD instruction sets at compile time</a>
 ]</font>
-ALGLIB++ can be optimized by:
+</p>
+<p>
+The following section describes features, new to version 3.18.0, that have been inherited from ALGLIB.
+Only those available for the Free Edition have been included here in ALGLIB++.
+</p>
+<p>
+<a name=gs_simd_overview></a><h4>4.3.1. Overview</h4>
+ALGLIB has two-layered structure: some set of basic performance-critical primitives is implemented using optimized code
+(<code>KernelsSse2.cpp</code>, <code>KernelsAvx2.cpp</code> and <code>KernelsFma.cpp</code>),
+and the rest of the library is built on top of these primitives.
+By default, ALGLIB uses generic C code to implement these primitives (matrix multiplication, decompositions, etc.).
+This code works on any CPU architecture that has IEEE-754 floating point support (including exotic DSPs).
+</p>
+<p>
+However, much better performance may be achieved by utilizing SIMD-capable high-performance kernels included into the ALGLIB.
+These kernels are implemented using C/C++ SIMD intrinsics (as opposed to the assembly language) and provide good performance combined with benefits of using high-level language like C/C++.
+</p>
+<p>
+As of the ALGLIB version 3.18, same set of SIMD kernels is included in both Free and Commercial editions.
+</p>
+<p class=p_note>
+Commercial Edition may be linked with Intel MKL which replaces some of ALGLIB's own SIMD kernels.
+Intel MKL is written in the assembly language and has much better performance than the C/C++ SIMD code included into the ALGLIB.
+This feature is absent in the Free Edition.
+</p>
+<p>
+Presently ALGLIB supports only x86/x64 SIMD, including SSE2, AVX2 and FMA instruction sets.
+This support can be activated by compiling ALGLIB with <code>AE_CPU=AE_INTEL</code> macro symbol being #defined at the global level.
+Sections below discuss how to compile ALGLIB in order to get the fastest executable possible or, alternatively, to get the most portable one.
+</p>
+<p>
+<a name=gs_simd_performance></a><h4>4.3.2. Achieving best performance</h4>
+Obviously, the fastest executable can be obtained by compiling entire ALGLIB (both low level kernels and the code relying on these kernels)
+using the best SIMD instruction set available, e.g. FMA.
+In this case compiler may use SIMD to accelerate both SIMD-capable kernels and generic C code,
+e.g. use SIMD registers to pass parameters to function, perform quick memcpy() and so on.
+</p>
+<p>
+In order to do so, two steps are necessary:
 <ul>
-<li>compiling with advanced optimization turned on, or</li>
-<li>by defining <code>AE_CPU=AE_INTEL</code>, if you are compiling ALGLIB++ to an Intel processor.</li>
+<li>#define <code>AE_CPU=AE_INTEL</code> preprocessor symbol at the global level</li>
+<li>compile all ALGLIB sources with SSE2/AVX2/FMA compiler switches</li>
 </ul>
-When the <code>AE_CPU</code> macro is defined to <code>AE_INTEL</code>,
-ALGLIB++ will use the <code>cpuid</code> instruction of the Intel CPU to determine whether your CPU supports SSE2-capable code.
-If so, then it will use SSE2 intrinsics which are portable across different compilers and efficient enough for most practical purposes.
 </p>
 <p>
-<a name=gs_simd_overview></a><h4>4.3.1 Overview</h4>
+The former tells ALGLIB that it may use C/C++ SIMD intrinsics to accelerate computations.
+Depending on the compiler being used, the latter step can be done as follows:
+<ul>
+<li>under MSVC: add <code>/arch:AVX2</code> compiler switch (which activates both AVX2 and FMA)</li>
+<li>for the GCC/Clang/ICC family of compilers: add <code>-mavx2 -mfma</code> pair of options</li>
+</ul>
 </p>
 <p>
-<a name=gs_simd_performance></a><h4>4.3.2 Achieving best performance</h4>
+The downside of this approach is that your entire application becomes less portable.
+Of course, ALGLIB includes a CPU dispatcher which checks at runtime which SIMD instruction sets are available at your CPU.
+If your CPU lacks FMA, ALGLIB won't call functions from <code>KernelsFma.cpp</code>.
+Similarly, if you don't have AVX2, <code>KernelsAvx2.cpp</code> will be ignored.
+The problem is that because <i>entire ALGLIB</i> was compiled with SIMD support,
+a compiler may insert SIMD instructions on its own to accelerate even generic C parts.
 </p>
 <p>
-<a name=gs_simd_portability></a><h4>4.3.3 Achieving best portability</h4>
+The point above applies in some degree to all modern compilers, although the behavior may change from version to version and may depend on the optimization settings.
+In some cases (usually with optimization turned off) compilers generate completely portable code even in the presence of SIMD support.
+As a counterexample, some MSVC versions are known to replace generic C code like <code>a+b*c</code>
+by the fused multiply-adds when the code is compiled with <code>/arch:AVX2</code>
+- which, by the way, violates the language specification.
 </p>
 <p>
-<a name=gs_simd_detailed></a><h4>4.3.4 Disabling SIMD instruction sets at compile time</h4>
+<a name=gs_simd_portability></a><h4>4.3.3. Achieving best portability</h4>
+If one needs a SIMD-capable application with portability guarantees, one has to:
+<ul>
+<li>#define <code>AE_CPU=AE_INTEL</code> preprocessor symbol at the global level</li>
+<li>compile <code>KernelsFma.cpp</code> with SSE2/AVX2/FMA support enabled at the compiler level</li>
+<li>compile <code>KernelsAvx2.cpp</code> with SSE2/AVX2 support enabled</li>
+<li>compile <code>KernelsSse2.cpp</code> with SSE2 support enabled</li>
+<li>compile the rest of the library using no special compiler settings</li>
+</ul>
+</p>
+<p>
+ALGLIB guarantees that it won't call functions from <code>KernelsFma.cpp</code> without checking for FMA support first,
+won't access <code>KernelsAvx2.cpp</code> without checking for AVX2 and so on.
+Thus, when the library is compiled this way, it will have guaranteed portability across x86/x64 systems.
+</p>
+<p>
+<a name=gs_simd_detailed></a><h4>4.3.4. Disabling SIMD instruction sets at compile time</h4>
+By default, ALGLIB includes SIMD kernels for all x64 SIMD instruction sets present: SSE2, AVX2 and FMA.
+Of course, it has a CPU dispatcher which detects CPU support for SIMD and will choose proper SIMD kernel or generic C fallback.
+However, in some cases SIMD instruction sets should be deactivated at compile time.
+Most often it happens when one has to compile ALGLIB using some <i>really</i> outdated compiler which does not support post-SSE SIMD intrinsics.
+</p>
+<p>
+It is possible to selectively disable a SIMD instruction set of your choice by combining <code>AE_CPU=AE_INTEL</code> #definition with one of the following #defines:
+<ul>
+<li><code>AE_NO_FMA</code> to skip compilation of the FMA-capable kernels</li>
+<li><code>AE_NO_AVX2</code> to skip compilation of the AVX2/FMA-capable kernels</li>
+<li><code>AE_NO_SSE2</code> to skip compilation of all SSE2/AVX2/FMA SIMD kernels</li>
+</ul>
 </p>
 <p>
 <a name=gs_configuring_os class=sheader></a><h3>4.4. Utilizing SMP</h3>
+The following applies only to the Commercial Edition of ALGLIB, and has not been inherited by or made available in ALGLIB++.
+The open source version of ALGLIB is always OS-agnostic (it does not use functions beyond the C/C++ standard library),
+ven in the presence of OS-specific definitions.
+</p>
+<p>
+If you want to use multithreaded capabilities of the <i>Commercial</i> Edition,
+you should compile it in the OS-specific mode by #defining either <code>AE_OS=AE_WINDOWS</code>,
+<code>AE_OS=AE_POSIX</code> or <code>AE_OS=AE_LINUX</code> (POSIX with Linux-specific extensions) at compile time,
+depending on the OS being used.
+The former corresponds to any modern OS (32/64-bit Windows XP and later) from Windows family,
+while the latter means almost any POSIX-compatible OS (or any OS from the Linux family).
+Only threading-related functions are used by ALGLIB: pthreads under POSIX systems, the threading subset of WinAPI under Windows.
 </p>
 <p>
 <a name=gs_compile_examples class=sheader></a><h3>4.5. Examples</h3>
