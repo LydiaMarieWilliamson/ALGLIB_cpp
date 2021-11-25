@@ -1080,7 +1080,7 @@ private:
 #define TryX(Q)		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&(Q), &BreakAt); else
 #define TryCatch(Q, X)	TryX(Q) { ThrowErrorMsg(Q, X); }
 
-#define EndD		
+#define EndD
 #define AndD		,
 #define DecVal(X)	X(Obj->X)
 #define DecVar(X)	X(&Obj->X)
