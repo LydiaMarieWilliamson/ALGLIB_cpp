@@ -142,7 +142,7 @@ void polynomialsolverreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(polynomialsolverreport, AndD DecVal(maxerr))
+DefClass(polynomialsolverreport, DecVal(maxerr))
 
 void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep) {
    alglib_impl::ae_state_init();
@@ -3195,8 +3195,8 @@ void densesolverlsreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(densesolverreport, AndD DecVal(r1) AndD DecVal(rinf))
-DefClass(densesolverlsreport, AndD DecVal(r2) AndD DecVar(cx) AndD DecVal(n) AndD DecVal(k))
+DefClass(densesolverreport, DecVal(r1) DecVal(rinf))
+DefClass(densesolverlsreport, DecVal(r2) DecVar(cx) DecVal(n) DecVal(k))
 
 void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
    alglib_impl::ae_state_init();
@@ -3789,7 +3789,7 @@ namespace alglib {
 // This structure is a sparse solver report.
 //
 // Following fields can be accessed by users:
-DefClass(sparsesolverreport, AndD DecVal(terminationtype))
+DefClass(sparsesolverreport, DecVal(terminationtype))
 
 void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
    alglib_impl::ae_state_init();
@@ -4463,8 +4463,8 @@ namespace alglib {
 // This object stores state of the linear CG method.
 // You should use ALGLIB functions to work with this object.
 // Never try to access its fields directly!
-DefClass(lincgstate, EndD)
-DefClass(lincgreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(terminationtype) AndD DecVal(r2))
+DefClass(lincgstate, )
+DefClass(lincgreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype) DecVal(r2))
 
 void lincgcreate(const ae_int_t n, lincgstate &state) {
    alglib_impl::ae_state_init();
@@ -5275,8 +5275,8 @@ void linlsqrreport_free(void *_p, bool make_automatic) {
 namespace alglib {
 // This object stores state of the LinLSQR method.
 // You should use ALGLIB functions to work with this object.
-DefClass(linlsqrstate, EndD)
-DefClass(linlsqrreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(terminationtype))
+DefClass(linlsqrstate, )
+DefClass(linlsqrreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
    alglib_impl::ae_state_init();
@@ -5834,8 +5834,8 @@ void nleqreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(nleqstate, AndD DecVal(needf) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
-DefClass(nleqreport, AndD DecVal(iterationscount) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(terminationtype))
+DefClass(nleqstate, DecVal(needf) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(j) DecVar(x))
+DefClass(nleqreport, DecVal(iterationscount) DecVal(nfunc) DecVal(njac) DecVal(terminationtype))
 
 void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state) {
    alglib_impl::ae_state_init();

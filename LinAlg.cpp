@@ -10698,7 +10698,7 @@ namespace alglib {
 //     SparseGetRow                            +           +
 //     SparseGetCompressedRow                  +           +
 //     sparse-dense linear algebra             +           +
-DefClass(sparsematrix, EndD)
+DefClass(sparsematrix, )
 
 // Temporary buffers for sparse matrix operations.
 //
@@ -10706,7 +10706,7 @@ DefClass(sparsematrix, EndD)
 // It allows to reuse memory during repeated sparse  factorizations.  You  do
 // not have to call some initialization function - simply passing an instance
 // to factorization function is enough.
-DefClass(sparsebuffers, EndD)
+DefClass(sparsebuffers, )
 
 void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s) {
    alglib_impl::ae_state_init();
@@ -17140,11 +17140,11 @@ void eigsubspacereport_free(void *_p, bool make_automatic) {
 namespace alglib {
 // This object stores state of the subspace iteration algorithm.
 // You should use ALGLIB functions to work with this object.
-DefClass(eigsubspacestate, EndD)
+DefClass(eigsubspacestate, )
 
 // This object stores state of the subspace iteration algorithm.
 // You should use ALGLIB functions to work with this object.
-DefClass(eigsubspacereport, AndD DecVal(iterationscount))
+DefClass(eigsubspacereport, DecVal(iterationscount))
 
 void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state) {
    alglib_impl::ae_state_init();
@@ -24431,7 +24431,7 @@ namespace alglib {
 // An analysis of the sparse matrix decomposition, performed prior to  actual
 // numerical factorization. You should not directly  access  fields  of  this
 // object - use appropriate ALGLIB functions to work with this object.
-DefClass(sparsedecompositionanalysis, EndD)
+DefClass(sparsedecompositionanalysis, )
 
 void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots) {
    alglib_impl::ae_state_init();
@@ -28643,7 +28643,7 @@ void normestimatorstate_free(void *_p, bool make_automatic) {
 namespace alglib {
 // This object stores state of the iterative norm estimation algorithm.
 // You should use ALGLIB functions to work with this object.
-DefClass(normestimatorstate, EndD)
+DefClass(normestimatorstate, )
 
 void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state) {
    alglib_impl::ae_state_init();
@@ -29992,7 +29992,7 @@ namespace alglib {
 // Matrix inverse report:
 // * R1    reciprocal of condition number in 1-norm
 // * RInf  reciprocal of condition number in inf-norm
-DefClass(matinvreport, AndD DecVal(r1) AndD DecVal(rinf))
+DefClass(matinvreport, DecVal(r1) DecVal(rinf))
 
 void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state_init();

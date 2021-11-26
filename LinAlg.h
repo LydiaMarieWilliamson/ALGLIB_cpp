@@ -278,8 +278,8 @@ ae_int_t sparsegetlowercount(sparsematrix *s);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsematrix, EndD);
-DecClass(sparsebuffers, EndD);
+DecClass(sparsematrix, );
+DecClass(sparsebuffers, );
 
 void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s);
 void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s);
@@ -429,7 +429,7 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(eigsubspacestate, EndD);
+DecClass(eigsubspacestate, );
 DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 
 void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state);
@@ -729,7 +729,7 @@ bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, R
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsedecompositionanalysis, EndD);
+DecClass(sparsedecompositionanalysis, );
 
 void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
@@ -911,7 +911,7 @@ void normestimatorrestart(normestimatorstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(normestimatorstate, EndD);
+DecClass(normestimatorstate, );
 
 void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state);
 void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval);

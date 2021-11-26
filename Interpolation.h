@@ -43,7 +43,7 @@ void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(barycentricinterpolant, EndD);
+DecClass(barycentricinterpolant, );
 
 double barycentriccalc(const barycentricinterpolant &b, const double t);
 void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df);
@@ -155,9 +155,9 @@ void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(idwcalcbuffer, EndD);
-DecClass(idwmodel, EndD);
-DecClass(idwbuilder, EndD);
+DecClass(idwcalcbuffer, );
+DecClass(idwmodel, );
+DecClass(idwbuilder, );
 DecClass(idwreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
 void idwserialize(idwmodel &obj, std::string &s_out);
 void idwserialize(idwmodel &obj, std::ostream &s_out);
@@ -289,7 +289,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(spline1dinterpolant, EndD);
+DecClass(spline1dinterpolant, );
 DecClass(spline1dfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
 
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c);
@@ -612,8 +612,8 @@ void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, doub
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(pspline2interpolant, EndD);
-DecClass(pspline3interpolant, EndD);
+DecClass(pspline2interpolant, );
+DecClass(pspline3interpolant, );
 
 void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
 void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
@@ -852,8 +852,8 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(spline2dinterpolant, EndD);
-DecClass(spline2dbuilder, EndD);
+DecClass(spline2dinterpolant, );
+DecClass(spline2dbuilder, );
 DecClass(spline2dfitreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out);
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out);
@@ -1006,7 +1006,7 @@ void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t 
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(spline3dinterpolant, EndD);
+DecClass(spline3dinterpolant, );
 
 void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
 void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
@@ -1126,8 +1126,8 @@ void rbfrequesttermination(rbfmodel *s);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(rbfcalcbuffer, EndD);
-DecClass(rbfmodel, EndD);
+DecClass(rbfcalcbuffer, );
+DecClass(rbfmodel, );
 DecClass(rbfreport, double &rmserror; double &maxerror; ae_int_t &arows; ae_int_t &acols; ae_int_t &annz; ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 void rbfserialize(rbfmodel &obj, std::string &s_out);
 void rbfserialize(rbfmodel &obj, std::ostream &s_out);

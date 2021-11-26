@@ -409,7 +409,7 @@ namespace alglib {
 // More detailed error log can  be  obtained  from  optimizer  by  explicitly
 // requesting reports for tests C0.0, C1.0, C1.1.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardreport, AndD DecVal(nonc0suspected) AndD DecVal(nonc0test0positive) AndD DecVal(nonc0fidx) AndD DecVal(nonc0lipschitzc) AndD DecVal(nonc1suspected) AndD DecVal(nonc1test0positive) AndD DecVal(nonc1test1positive) AndD DecVal(nonc1fidx) AndD DecVal(nonc1lipschitzc) AndD DecVal(badgradsuspected) AndD DecVal(badgradfidx) AndD DecVal(badgradvidx) AndD DecVar(badgradxbase) AndD DecVar(badgraduser) AndD DecVar(badgradnum))
+DefClass(optguardreport, DecVal(nonc0suspected) DecVal(nonc0test0positive) DecVal(nonc0fidx) DecVal(nonc0lipschitzc) DecVal(nonc1suspected) DecVal(nonc1test0positive) DecVal(nonc1test1positive) DecVal(nonc1fidx) DecVal(nonc1lipschitzc) DecVal(badgradsuspected) DecVal(badgradfidx) DecVal(badgradvidx) DecVar(badgradxbase) DecVar(badgraduser) DecVar(badgradnum))
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C0
 // continuity violation.
@@ -449,7 +449,7 @@ DefClass(optguardreport, AndD DecVal(nonc0suspected) AndD DecVal(nonc0test0posit
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #0 (OptGuard  has several tests
@@ -492,7 +492,7 @@ DefClass(optguardnonc0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVa
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(f) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #1 (OptGuard  has several tests
@@ -546,7 +546,7 @@ DefClass(optguardnonc1test0report, AndD DecVal(positive) AndD DecVal(fidx) AndD 
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test1report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVal(vidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(g) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+DefClass(optguardnonc1test1report, DecVal(positive) DecVal(fidx) DecVal(vidx) DecVar(x0) DecVar(d) DecVal(n) DecVar(stp) DecVar(g) DecVal(cnt) DecVal(stpidxa) DecVal(stpidxb))
 } // end of namespace alglib
 
 // === OPTSERV Package ===
@@ -4706,7 +4706,7 @@ void minlbfgsreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(minlbfgsstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+DefClass(minlbfgsstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -4730,7 +4730,7 @@ DefClass(minlbfgsstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupda
 //         request was submitted.
 //
 // Other fields of this structure are not documented and should not be used!
-DefClass(minlbfgsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
+DefClass(minlbfgsreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype))
 
 void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state) {
    alglib_impl::ae_state_init();
@@ -14225,7 +14225,7 @@ namespace alglib {
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinBLEIC subpackage to work with this
 // object
-DefClass(minbleicstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+DefClass(minbleicstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
 // This structure stores optimization report:
 // * IterationsCount           number of iterations
@@ -14259,7 +14259,7 @@ DefClass(minbleicstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupda
 //                             to the feasible set
 // * DebugFF                   f, calculated at the final point
 // * DebugDX                   |X_start-X_final|
-DefClass(minbleicreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype) AndD DecVal(debugeqerr) AndD DecVal(debugfs) AndD DecVal(debugff) AndD DecVal(debugdx) AndD DecVal(debugfeasqpits) AndD DecVal(debugfeasgpaits) AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount))
+DefClass(minbleicreport, DecVal(iterationscount) DecVal(nfev) DecVal(varidx) DecVal(terminationtype) DecVal(debugeqerr) DecVal(debugfs) DecVal(debugff) DecVal(debugdx) DecVal(debugfeasqpits) DecVal(debugfeasgpaits) DecVal(inneriterationscount) DecVal(outeriterationscount))
 
 void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state) {
    alglib_impl::ae_state_init();
@@ -20295,7 +20295,7 @@ namespace alglib {
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinQP subpackage to work with this
 // object
-DefClass(minqpstate, EndD)
+DefClass(minqpstate, )
 
 // This structure stores optimization report:
 // * InnerIterationsCount      number of inner iterations
@@ -20375,7 +20375,7 @@ DefClass(minqpstate, EndD)
 // NOTE: methods  from  IPM  family  may  also  return  meaningful   Lagrange
 //       multipliers  on  completion   with   code   -2   (infeasibility   or
 //       unboundedness  detected).
-DefClass(minqpreport, AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount) AndD DecVal(nmv) AndD DecVal(ncholesky) AndD DecVal(terminationtype) AndD DecVar(lagbc) AndD DecVar(laglc))
+DefClass(minqpreport, DecVal(inneriterationscount) DecVal(outeriterationscount) DecVal(nmv) DecVal(ncholesky) DecVal(terminationtype) DecVar(lagbc) DecVar(laglc))
 
 void minqpcreate(const ae_int_t n, minqpstate &state) {
    alglib_impl::ae_state_init();
@@ -22917,7 +22917,7 @@ namespace alglib {
 // This structure should be created using one of the MinLMCreate???()
 // functions. You should not access its fields directly; use ALGLIB functions
 // to work with it.
-DefClass(minlmstate, AndD DecVal(needf)/* AndD DecVal(needfg)*/ AndD DecVal(needfgh) AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(g) AndD DecVar(h) AndD DecVar(j) AndD DecVar(x))
+DefClass(minlmstate, DecVal(needf)/* DecVal(needfg)*/ DecVal(needfgh) DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(g) DecVar(h) DecVar(j) DecVar(x))
 
 // Optimization report, filled by MinLMResults() function
 //
@@ -22942,7 +22942,7 @@ DefClass(minlmstate, AndD DecVal(needf)/* AndD DecVal(needfg)*/ AndD DecVal(need
 // * NGrad, number of gradient calculations
 // * NHess, number of Hessian calculations
 // * NCholesky, number of Cholesky decomposition calculations
-DefClass(minlmreport, AndD DecVal(iterationscount) AndD DecVal(terminationtype) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(ngrad) AndD DecVal(nhess) AndD DecVal(ncholesky))
+DefClass(minlmreport, DecVal(iterationscount) DecVal(terminationtype) DecVal(nfunc) DecVal(njac) DecVal(ngrad) DecVal(nhess) DecVal(ncholesky))
 
 void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state_init();
@@ -24755,7 +24755,7 @@ namespace alglib {
 // This object stores state of the nonlinear CG optimizer.
 //
 // You should use ALGLIB functions to work with this object.
-DefClass(mincgstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+DefClass(mincgstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -24779,7 +24779,7 @@ DefClass(mincgstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated
 //         submitted.
 //
 // Other fields of this structure are not documented and should not be used!
-DefClass(mincgreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
+DefClass(mincgreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype))
 
 void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state) {
    alglib_impl::ae_state_init();
@@ -31947,7 +31947,7 @@ namespace alglib {
 // This object stores linear solver state.
 // You should use functions provided by MinLP subpackage to work with this
 // object
-DefClass(minlpstate, EndD)
+DefClass(minlpstate, )
 
 // This structure stores optimization report:
 // * f                         target function value
@@ -31993,7 +31993,7 @@ DefClass(minlpstate, EndD)
 // * C is a cost vector (linear term)
 // * Ei is a vector with 1.0 at position I and 0 in other positions
 // * Ai is an I-th row of linear constraint matrix
-DefClass(minlpreport, AndD DecVal(f) AndD DecVar(lagbc) AndD DecVar(laglc) AndD DecVar(y) AndD DecVar(stats) AndD DecVal(primalerror) AndD DecVal(dualerror) AndD DecVal(slackerror) AndD DecVal(iterationscount) AndD DecVal(terminationtype))
+DefClass(minlpreport, DecVal(f) DecVar(lagbc) DecVar(laglc) DecVar(y) DecVar(stats) DecVal(primalerror) DecVal(dualerror) DecVal(slackerror) DecVal(iterationscount) DecVal(terminationtype))
 
 void minlpcreate(const ae_int_t n, minlpstate &state) {
    alglib_impl::ae_state_init();
@@ -37047,7 +37047,7 @@ namespace alglib {
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinNLC subpackage to work  with  this
 // object
-DefClass(minnlcstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
+DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(j) DecVar(x))
 
 // These fields store optimization report:
 // * iterationscount           total number of inner iterations
@@ -37097,7 +37097,7 @@ DefClass(minnlcstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupda
 //         last accepted point is returned
 //
 // Other fields of this structure are not documented and should not be used!
-DefClass(minnlcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(bcerr) AndD DecVal(bcidx) AndD DecVal(lcerr) AndD DecVal(lcidx) AndD DecVal(nlcerr) AndD DecVal(nlcidx) AndD DecVal(dbgphase0its))
+DefClass(minnlcreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype) DecVal(bcerr) DecVal(bcidx) DecVal(lcerr) DecVal(lcidx) DecVal(nlcerr) DecVal(nlcidx) DecVal(dbgphase0its))
 
 void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state) {
    alglib_impl::ae_state_init();
@@ -39549,7 +39549,7 @@ namespace alglib {
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinNS subpackage to work  with  this
 // object
-DefClass(minnsstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
+DefClass(minnsstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(j) DecVar(x))
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -39576,7 +39576,7 @@ DefClass(minnsstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdat
 //    8    User requested termination via MinNSRequestTermination()
 //
 // Other fields of this structure are not documented and should not be used!
-DefClass(minnsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(cerr) AndD DecVal(lcerr) AndD DecVal(nlcerr) AndD DecVal(terminationtype) AndD DecVal(varidx) AndD DecVal(funcidx))
+DefClass(minnsreport, DecVal(iterationscount) DecVal(nfev) DecVal(cerr) DecVal(lcerr) DecVal(nlcerr) DecVal(terminationtype) DecVal(varidx) DecVal(funcidx))
 
 void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state) {
    alglib_impl::ae_state_init();
@@ -40553,8 +40553,8 @@ void minasareport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(minasastate, AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-DefClass(minasareport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(activeconstraints))
+DefClass(minasastate, DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
+DefClass(minasareport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype) DecVal(activeconstraints))
 
 void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state) {
    alglib_impl::ae_state_init();
@@ -42388,7 +42388,7 @@ namespace alglib {
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinBC subpackage to work with this
 // object
-DefClass(minbcstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+DefClass(minbcstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
 // This structure stores optimization report:
 // * iterationscount           number of iterations
@@ -42411,7 +42411,7 @@ DefClass(minbcstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated
 //    8    terminated by user who called minbcrequesttermination(). X contains
 //         point which was "current accepted" when  termination  request  was
 //         submitted.
-DefClass(minbcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype))
+DefClass(minbcreport, DecVal(iterationscount) DecVal(nfev) DecVal(varidx) DecVal(terminationtype))
 
 void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state) {
    alglib_impl::ae_state_init();

@@ -237,7 +237,7 @@ void lincgrestart(lincgstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(lincgstate, EndD);
+DecClass(lincgstate, );
 DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype; double &r2;);
 
 void lincgcreate(const ae_int_t n, lincgstate &state);
@@ -341,7 +341,7 @@ void linlsqrrequesttermination(linlsqrstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(linlsqrstate, EndD);
+DecClass(linlsqrstate, );
 DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
 void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);

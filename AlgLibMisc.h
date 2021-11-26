@@ -44,7 +44,7 @@ double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(hqrndstate, EndD);
+DecClass(hqrndstate, );
 
 void hqrndrandomize(hqrndstate &state);
 void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
@@ -223,8 +223,8 @@ void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_i
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(kdtreerequestbuffer, EndD);
-DecClass(kdtree, EndD);
+DecClass(kdtreerequestbuffer, );
+DecClass(kdtree, );
 void kdtreeserialize(kdtree &obj, std::string &s_out);
 void kdtreeserialize(kdtree &obj, std::ostream &s_out);
 void kdtreeunserialize(const std::string &s_in, kdtree &obj);

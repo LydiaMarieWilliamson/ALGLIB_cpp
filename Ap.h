@@ -775,11 +775,9 @@ void clear_error_flag();
 #define TryCatch(X)	TryX { ThrowErrorMsg(X); }
 
 // Class declaration/definition macros.
-#define EndD
-#define AndD		,
-#define DecVal(X)	X(Obj.X)
-#define DecVar(X)	X(&Obj.X)
-#define DecComplex(X)	X(*(complex *)&Obj.X)
+#define DecVal(X)	, X(Obj.X)
+#define DecVar(X)	, X(&Obj.X)
+#define DecComplex(X)	, X(*(complex *)&Obj.X)
 #define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
 #define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
 
