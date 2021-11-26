@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === BASESTAT Package ===
 
@@ -1082,7 +1081,6 @@ void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === BASESTAT Package ===
 static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state);

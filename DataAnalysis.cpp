@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === PCA Package ===
 
@@ -5767,7 +5766,6 @@ void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_in
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === PCA Package ===
 

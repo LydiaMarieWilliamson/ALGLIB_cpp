@@ -16,7 +16,6 @@
 
 #include "AlgLibInternal.h"
 
-// Declarations for the computational core: datatypes.
 namespace alglib_impl {
 // === ODESOLVER Package ===
 typedef struct {
@@ -52,21 +51,19 @@ typedef struct {
 } odesolverreport;
 } // end of namespace alglib_impl
 
-// Declarations for the C++ interface.
 namespace alglib {
 // === ODESOLVER Package ===
 DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
 DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // === ODESOLVER Package ===
-void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = alglib::xdefault);
-void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = alglib::xdefault);
-bool odesolveriteration(const odesolverstate &state, const xparams _xparams = alglib::xdefault);
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = alglib::xdefault);
-void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = alglib::xdefault);
+void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
+void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
+bool odesolveriteration(const odesolverstate &state, const xparams _xparams = xdefault);
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
+void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
-// Declarations for the computational core: functions.
 namespace alglib_impl {
 // === ODESOLVER Package ===
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);

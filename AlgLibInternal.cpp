@@ -26,11 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
-namespace alglib {
-} // end of namespace alglib
-
-// Implementation of the computational core.
 namespace alglib_impl {
 // === APSERV Package ===
 
@@ -13254,6 +13249,4 @@ void _mlpbuffers_destroy(void *_p) {
    ae_vector_destroy(&p->g);
    ae_vector_destroy(&p->tmp0);
 }
-
-// === ALGLIBBASICS Package ===
 } // end of namespace alglib_impl

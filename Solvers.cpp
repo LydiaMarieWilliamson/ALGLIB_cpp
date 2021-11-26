@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === POLYNOMIALSOLVER Package ===
 
@@ -1969,7 +1968,6 @@ void nleqrestartfrom(const nleqstate &state, const real_1d_array &x, const xpara
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === POLYNOMIALSOLVER Package ===
 

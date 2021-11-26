@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === GAMMAFUNC Package ===
 
@@ -1498,7 +1497,6 @@ double incompleteellipticintegrale(const double phi, const double m, const xpara
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === GAMMAFUNC Package ===
 static double gammafunc_gammastirf(double x, ae_state *_state);

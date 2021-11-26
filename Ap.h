@@ -154,8 +154,8 @@
 #   endif
 #endif
 
-// Declarations for basic functionality, like memory management for vectors/matrices, which is shared between the C++ and pure C libraries.
 namespace alglib_impl {
+// Core Code (Vectors, Matrices, Memory Management, etc.)
 // if we work under C++ environment, define several conditions
 #ifdef AE_USE_CPP
 #   define AE_USE_CPP_BOOL
@@ -1054,8 +1054,9 @@ extern FILE *alglib_trace_file;
 #endif
 } // end of namespace alglib_impl
 
-// Declarations for C++-related functionality.
 namespace alglib {
+// Declarations for C++-related functionality.
+
 typedef alglib_impl::ae_int_t ae_int_t;
 
 ae_int_t vlen(ae_int_t n1, ae_int_t n2);
@@ -1962,8 +1963,8 @@ void clear_error_flag();
 #endif
 } // end of namespace alglib
 
-// Declarations for optimized linear algebra codes, which is shared between the C++ and pure C libraries.
 namespace alglib_impl {
+// Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
 void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride);
 void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride);

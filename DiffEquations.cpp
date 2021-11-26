@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === ODESOLVER Package ===
 
@@ -152,7 +151,6 @@ void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &x
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === ODESOLVER Package ===
 static double odesolver_odesolvermaxgrow = 3.0;

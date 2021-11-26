@@ -17568,13 +17568,13 @@ ae_int_t mnlclserror(logitmodel lm, real_2d_array xy, ae_int_t npoints, <b>const
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
@@ -17698,13 +17698,13 @@ ae_int_t mnlclserror(logitmodel lm, real_2d_array xy, ae_int_t npoints, <b>const
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
@@ -17897,13 +17897,13 @@ ae_int_t mnlclserror(logitmodel lm, real_2d_array xy, ae_int_t npoints, <b>const
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  &quot;EQUALITY  CONSTRAINTS&quot;   for   more
 //                 information about constraints.
@@ -28623,8 +28623,8 @@ using namespace alglib;
 //     BndU    -   upper bounds, array[N].
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -28668,8 +28668,8 @@ using namespace alglib;
 //     BndU    -   upper bound, same for all variables
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -28712,8 +28712,8 @@ using namespace alglib;
 //     BndU    -   upper bound for I-th variable
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -33182,8 +33182,8 @@ using namespace alglib;
 //                 it will allow solver to use better algorithm).
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -33227,8 +33227,8 @@ using namespace alglib;
 //     BndU    -   upper bound, same for all variables
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -33263,8 +33263,8 @@ using namespace alglib;
 //     BndU    -   upper bound
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical

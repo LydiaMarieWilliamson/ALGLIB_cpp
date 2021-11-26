@@ -16,7 +16,6 @@
 
 #include "Ap.h"
 
-// Declarations for the computational core: datatypes.
 namespace alglib_impl {
 // === APSERV Package ===
 typedef struct {
@@ -159,15 +158,8 @@ typedef struct {
    ae_vector g;
    ae_vector tmp0;
 } mlpbuffers;
-
-// === ALGLIBBASICS Package ===
 } // end of namespace alglib_impl
 
-// Declarations for the C++ interface.
-namespace alglib {
-} // end of namespace alglib
-
-// Declarations for the computational core: functions.
 namespace alglib_impl {
 // === APSERV Package ===
 void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s, ae_state *_state);
@@ -642,8 +634,6 @@ void _mlpbuffers_init(void *_p, ae_state *_state, bool make_automatic);
 void _mlpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _mlpbuffers_clear(void *_p);
 void _mlpbuffers_destroy(void *_p);
-
-// === ALGLIBBASICS Package ===
 } // end of namespace alglib_impl
 
 #endif // OnceOnly

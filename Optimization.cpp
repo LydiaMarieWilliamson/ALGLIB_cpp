@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === OPTGUARDAPI Package ===
 
@@ -6524,7 +6523,6 @@ void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, c
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === OPTGUARDAPI Package ===
 
@@ -27427,8 +27425,8 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
 //                 it will allow solver to use better algorithm).
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -27480,8 +27478,8 @@ void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //     BndU    -   upper bound, same for all variables
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -27523,8 +27521,8 @@ void minqpsetbcall(minqpstate *state, double bndl, double bndu, ae_state *_state
 //     BndU    -   upper bound
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -41281,8 +41279,8 @@ void minlpsetscale(minlpstate *state, RVector *s, ae_state *_state) {
 //     BndU    -   upper bounds, array[N].
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -41332,8 +41330,8 @@ void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //     BndU    -   upper bound, same for all variables
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical
@@ -41380,8 +41378,8 @@ void minlpsetbcall(minlpstate *state, double bndl, double bndu, ae_state *_state
 //     BndU    -   upper bound for I-th variable
 //
 // NOTE: infinite values can be specified by means of Double.PositiveInfinity
-//       and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
-//       alglib::fp_neginf (in C++).
+//       and  Double.NegativeInfinity  (in  C#)  and  +INFINITY   and
+//       -INFINITY (in C++).
 //
 // NOTE: you may replace infinities by very small/very large values,  but  it
 //       is not recommended because large numbers may introduce large numerical

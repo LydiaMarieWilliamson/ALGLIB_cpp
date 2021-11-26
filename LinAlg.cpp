@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === ABLAS Package ===
 
@@ -4748,7 +4747,6 @@ double spdmatrixdet(const real_2d_array &a, const xparams _xparams) {
 #endif
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === ABLAS Package ===
 static ae_int_t ablas_blas2minvendorkernelsize = 8;

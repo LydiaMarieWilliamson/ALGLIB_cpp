@@ -55,8 +55,8 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Basic functionality, like memory management for vectors/matrices, which is shared between the C++ and pure C libraries.
 namespace alglib_impl {
+// Core Code (Vectors, Matrices, Memory Management, etc.)
 // OS-specific includes
 #ifdef AE_USE_CPP
 } // end of namespace alglib_impl
@@ -5192,8 +5192,9 @@ void _rcommstate_destroy(rcommstate *p) {
 }
 } // end of namespace alglib_impl
 
-// Implementation of C++-related functionality.
 namespace alglib {
+// Declarations for C++-related functionality.
+
 // Internal forwards
 double get_aenv_nan();
 double get_aenv_posinf();
@@ -7863,7 +7864,7 @@ void trace_disable() {
 }
 } // end of namespace alglib
 
-// Optimized linear algebra code, which is shared between the C++ and pure C libraries.
+// Optimized shared C/C++ linear algebra code.
 #if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
 #   include "KernelsSse2.h"
 #endif
@@ -11914,8 +11915,4 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
 
 // ALGLIB_NO_FAST_KERNELS
 #endif
-} // end of namespace alglib_impl
-
-// Parallel subroutines.
-namespace alglib_impl {
 } // end of namespace alglib_impl

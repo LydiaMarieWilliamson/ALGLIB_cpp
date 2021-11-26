@@ -16,7 +16,6 @@
 
 #include "AlgLibInternal.h"
 
-// Declarations for the computational core: datatypes.
 namespace alglib_impl {
 // === HQRND Package ===
 typedef struct {
@@ -65,7 +64,6 @@ typedef struct {
 } kdtree;
 } // end of namespace alglib_impl
 
-// Declarations for the C++ interface.
 namespace alglib {
 // === HQRND Package ===
 DecClass(hqrndstate, EndD);
@@ -80,98 +78,97 @@ DecClass(kdtreerequestbuffer, EndD);
 DecClass(kdtree, EndD);
 
 // === HQRND Package ===
-void hqrndrandomize(hqrndstate &state, const xparams _xparams = alglib::xdefault);
-void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = alglib::xdefault);
-double hqrnduniformr(const hqrndstate &state, const xparams _xparams = alglib::xdefault);
-ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n, const xparams _xparams = alglib::xdefault);
-double hqrndnormal(const hqrndstate &state, const xparams _xparams = alglib::xdefault);
-void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x, const xparams _xparams = alglib::xdefault);
-void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x, const xparams _xparams = alglib::xdefault);
-void hqrndunit2(const hqrndstate &state, double &x, double &y, const xparams _xparams = alglib::xdefault);
-void hqrndnormal2(const hqrndstate &state, double &x1, double &x2, const xparams _xparams = alglib::xdefault);
-double hqrndexponential(const hqrndstate &state, const double lambdav, const xparams _xparams = alglib::xdefault);
-double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = alglib::xdefault);
-double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = alglib::xdefault);
+void hqrndrandomize(hqrndstate &state, const xparams _xparams = xdefault);
+void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = xdefault);
+double hqrnduniformr(const hqrndstate &state, const xparams _xparams = xdefault);
+ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n, const xparams _xparams = xdefault);
+double hqrndnormal(const hqrndstate &state, const xparams _xparams = xdefault);
+void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x, const xparams _xparams = xdefault);
+void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x, const xparams _xparams = xdefault);
+void hqrndunit2(const hqrndstate &state, double &x, double &y, const xparams _xparams = xdefault);
+void hqrndnormal2(const hqrndstate &state, double &x1, double &x2, const xparams _xparams = xdefault);
+double hqrndexponential(const hqrndstate &state, const double lambdav, const xparams _xparams = xdefault);
+double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
+double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
 
 // === XDEBUG Package ===
-void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams = alglib::xdefault);
-ae_int_t xdebugb1count(const boolean_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb1not(const boolean_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb1appendcopy(boolean_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a, const xparams _xparams = alglib::xdefault);
-ae_int_t xdebugi1sum(const integer_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi1neg(const integer_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi1appendcopy(integer_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi1outeven(const ae_int_t n, integer_1d_array &a, const xparams _xparams = alglib::xdefault);
-double xdebugr1sum(const real_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr1neg(const real_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr1appendcopy(real_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr1outeven(const ae_int_t n, real_1d_array &a, const xparams _xparams = alglib::xdefault);
-complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc1neg(const complex_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc1appendcopy(complex_1d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc1outeven(const ae_int_t n, complex_1d_array &a, const xparams _xparams = alglib::xdefault);
-ae_int_t xdebugb2count(const boolean_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb2not(const boolean_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb2transpose(boolean_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a, const xparams _xparams = alglib::xdefault);
-ae_int_t xdebugi2sum(const integer_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi2neg(const integer_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi2transpose(integer_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a, const xparams _xparams = alglib::xdefault);
-double xdebugr2sum(const real_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr2neg(const real_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr2transpose(real_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a, const xparams _xparams = alglib::xdefault);
-complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc2neg(const complex_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc2transpose(complex_2d_array &a, const xparams _xparams = alglib::xdefault);
-void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const xparams _xparams = alglib::xdefault);
-double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c, const xparams _xparams = alglib::xdefault);
+void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams = xdefault);
+ae_int_t xdebugb1count(const boolean_1d_array &a, const xparams _xparams = xdefault);
+void xdebugb1not(const boolean_1d_array &a, const xparams _xparams = xdefault);
+void xdebugb1appendcopy(boolean_1d_array &a, const xparams _xparams = xdefault);
+void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a, const xparams _xparams = xdefault);
+ae_int_t xdebugi1sum(const integer_1d_array &a, const xparams _xparams = xdefault);
+void xdebugi1neg(const integer_1d_array &a, const xparams _xparams = xdefault);
+void xdebugi1appendcopy(integer_1d_array &a, const xparams _xparams = xdefault);
+void xdebugi1outeven(const ae_int_t n, integer_1d_array &a, const xparams _xparams = xdefault);
+double xdebugr1sum(const real_1d_array &a, const xparams _xparams = xdefault);
+void xdebugr1neg(const real_1d_array &a, const xparams _xparams = xdefault);
+void xdebugr1appendcopy(real_1d_array &a, const xparams _xparams = xdefault);
+void xdebugr1outeven(const ae_int_t n, real_1d_array &a, const xparams _xparams = xdefault);
+complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams = xdefault);
+void xdebugc1neg(const complex_1d_array &a, const xparams _xparams = xdefault);
+void xdebugc1appendcopy(complex_1d_array &a, const xparams _xparams = xdefault);
+void xdebugc1outeven(const ae_int_t n, complex_1d_array &a, const xparams _xparams = xdefault);
+ae_int_t xdebugb2count(const boolean_2d_array &a, const xparams _xparams = xdefault);
+void xdebugb2not(const boolean_2d_array &a, const xparams _xparams = xdefault);
+void xdebugb2transpose(boolean_2d_array &a, const xparams _xparams = xdefault);
+void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a, const xparams _xparams = xdefault);
+ae_int_t xdebugi2sum(const integer_2d_array &a, const xparams _xparams = xdefault);
+void xdebugi2neg(const integer_2d_array &a, const xparams _xparams = xdefault);
+void xdebugi2transpose(integer_2d_array &a, const xparams _xparams = xdefault);
+void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a, const xparams _xparams = xdefault);
+double xdebugr2sum(const real_2d_array &a, const xparams _xparams = xdefault);
+void xdebugr2neg(const real_2d_array &a, const xparams _xparams = xdefault);
+void xdebugr2transpose(real_2d_array &a, const xparams _xparams = xdefault);
+void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a, const xparams _xparams = xdefault);
+complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams = xdefault);
+void xdebugc2neg(const complex_2d_array &a, const xparams _xparams = xdefault);
+void xdebugc2transpose(complex_2d_array &a, const xparams _xparams = xdefault);
+void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const xparams _xparams = xdefault);
+double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c, const xparams _xparams = xdefault);
 
 // === NEARESTNEIGHBOR Package ===
 void kdtreeserialize(kdtree &obj, std::string &s_out);
 void kdtreeunserialize(const std::string &s_in, kdtree &obj);
 void kdtreeserialize(kdtree &obj, std::ostream &s_out);
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj);
-void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = alglib::xdefault);
-void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = alglib::xdefault);
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = alglib::xdefault);
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = alglib::xdefault);
-void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = alglib::xdefault);
-ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r, const xparams _xparams = alglib::xdefault);
-void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x, const xparams _xparams = alglib::xdefault);
-void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy, const xparams _xparams = alglib::xdefault);
-void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags, const xparams _xparams = alglib::xdefault);
-void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = alglib::xdefault);
-void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams = alglib::xdefault);
+void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
+void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
+void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = xdefault);
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = xdefault);
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = xdefault);
+ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = xdefault);
+ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = xdefault);
+void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x, const xparams _xparams = xdefault);
+void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = xdefault);
+void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = xdefault);
+void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r, const xparams _xparams = xdefault);
+void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x, const xparams _xparams = xdefault);
+void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy, const xparams _xparams = xdefault);
+void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags, const xparams _xparams = xdefault);
+void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r, const xparams _xparams = xdefault);
+void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams = xdefault);
+void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = xdefault);
+void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = xdefault);
+void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
-// Declarations for the computational core: functions.
 namespace alglib_impl {
 // === HQRND Package ===
 void hqrndrandomize(hqrndstate *state, ae_state *_state);

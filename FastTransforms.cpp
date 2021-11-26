@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === FFT Package ===
 
@@ -477,7 +476,6 @@ void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === FFT Package ===
 

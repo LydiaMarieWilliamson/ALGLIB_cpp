@@ -26,7 +26,6 @@
 #   pragma warning(disable:4996)
 #endif
 
-// Implementation of the C++ interface.
 namespace alglib {
 // === RATINT Package ===
 
@@ -5395,7 +5394,6 @@ void rbfrequesttermination(const rbfmodel &s, const xparams _xparams) {
 }
 } // end of namespace alglib
 
-// Implementation of the computational core.
 namespace alglib_impl {
 // === RATINT Package ===
 static void ratint_barycentricnormalize(barycentricinterpolant *b, ae_state *_state);
@@ -13872,13 +13870,13 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
@@ -14098,13 +14096,13 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
@@ -14210,13 +14208,13 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //     CnstrLeft-  optional equality constraint for model value at the   left
 //                 boundary (at X=0). Specify NAN (Not-a-Number)  if  you  do
 //                 not need constraint on the model value at X=0 (in C++  you
-//                 can pass alglib::fp_nan as parameter, in  C#  it  will  be
+//                 can pass NAN as parameter, in  C#  it  will  be
 //                 Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //     CnstrRight- optional equality constraint for model value at X=infinity.
 //                 Specify NAN (Not-a-Number) if you do not  need  constraint
-//                 on the model value (in C++  you can pass alglib::fp_nan as
+//                 on the model value (in C++  you can pass NAN as
 //                 parameter, in  C# it will  be Double.NaN).
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.

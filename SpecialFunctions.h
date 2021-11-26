@@ -16,7 +16,6 @@
 
 #include "AlgLibMisc.h"
 
-// Declarations for the computational core: datatypes.
 namespace alglib_impl {
 // === GAMMAFUNC Package ===
 
@@ -65,7 +64,6 @@ namespace alglib_impl {
 // === ELLIPTIC Package ===
 } // end of namespace alglib_impl
 
-// Declarations for the C++ interface.
 namespace alglib {
 // === GAMMAFUNC Package ===
 
@@ -114,123 +112,122 @@ namespace alglib {
 // === ELLIPTIC Package ===
 
 // === GAMMAFUNC Package ===
-double gammafunction(const double x, const xparams _xparams = alglib::xdefault);
-double lngamma(const double x, double &sgngam, const xparams _xparams = alglib::xdefault);
+double gammafunction(const double x, const xparams _xparams = xdefault);
+double lngamma(const double x, double &sgngam, const xparams _xparams = xdefault);
 
 // === NORMALDISTR Package ===
-double errorfunction(const double x, const xparams _xparams = alglib::xdefault);
-double errorfunctionc(const double x, const xparams _xparams = alglib::xdefault);
-double normaldistribution(const double x, const xparams _xparams = alglib::xdefault);
-double normalpdf(const double x, const xparams _xparams = alglib::xdefault);
-double normalcdf(const double x, const xparams _xparams = alglib::xdefault);
-double inverf(const double e, const xparams _xparams = alglib::xdefault);
-double invnormaldistribution(const double y0, const xparams _xparams = alglib::xdefault);
-double invnormalcdf(const double y0, const xparams _xparams = alglib::xdefault);
-double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = alglib::xdefault);
-double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = alglib::xdefault);
+double errorfunction(const double x, const xparams _xparams = xdefault);
+double errorfunctionc(const double x, const xparams _xparams = xdefault);
+double normaldistribution(const double x, const xparams _xparams = xdefault);
+double normalpdf(const double x, const xparams _xparams = xdefault);
+double normalcdf(const double x, const xparams _xparams = xdefault);
+double inverf(const double e, const xparams _xparams = xdefault);
+double invnormaldistribution(const double y0, const xparams _xparams = xdefault);
+double invnormalcdf(const double y0, const xparams _xparams = xdefault);
+double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
+double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
 
 // === IBETAF Package ===
-double incompletebeta(const double a, const double b, const double x, const xparams _xparams = alglib::xdefault);
-double invincompletebeta(const double a, const double b, const double y, const xparams _xparams = alglib::xdefault);
+double incompletebeta(const double a, const double b, const double x, const xparams _xparams = xdefault);
+double invincompletebeta(const double a, const double b, const double y, const xparams _xparams = xdefault);
 
 // === STUDENTTDISTR Package ===
-double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams = alglib::xdefault);
-double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams = alglib::xdefault);
+double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams = xdefault);
+double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams = xdefault);
 
 // === FDISTR Package ===
-double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = alglib::xdefault);
-double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = alglib::xdefault);
-double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams = alglib::xdefault);
+double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = xdefault);
+double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = xdefault);
+double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams = xdefault);
 
 // === IGAMMAF Package ===
-double incompletegamma(const double a, const double x, const xparams _xparams = alglib::xdefault);
-double incompletegammac(const double a, const double x, const xparams _xparams = alglib::xdefault);
-double invincompletegammac(const double a, const double y0, const xparams _xparams = alglib::xdefault);
+double incompletegamma(const double a, const double x, const xparams _xparams = xdefault);
+double incompletegammac(const double a, const double x, const xparams _xparams = xdefault);
+double invincompletegammac(const double a, const double y0, const xparams _xparams = xdefault);
 
 // === CHISQUAREDISTR Package ===
-double chisquaredistribution(const double v, const double x, const xparams _xparams = alglib::xdefault);
-double chisquarecdistribution(const double v, const double x, const xparams _xparams = alglib::xdefault);
-double invchisquaredistribution(const double v, const double y, const xparams _xparams = alglib::xdefault);
+double chisquaredistribution(const double v, const double x, const xparams _xparams = xdefault);
+double chisquarecdistribution(const double v, const double x, const xparams _xparams = xdefault);
+double invchisquaredistribution(const double v, const double y, const xparams _xparams = xdefault);
 
 // === BINOMIALDISTR Package ===
-double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = alglib::xdefault);
-double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = alglib::xdefault);
-double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams = alglib::xdefault);
+double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = xdefault);
+double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = xdefault);
+double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams = xdefault);
 
 // === EXPINTEGRALS Package ===
-double exponentialintegralei(const double x, const xparams _xparams = alglib::xdefault);
-double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams = alglib::xdefault);
+double exponentialintegralei(const double x, const xparams _xparams = xdefault);
+double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams = xdefault);
 
 // === JACOBIANELLIPTIC Package ===
-void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams = alglib::xdefault);
+void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams = xdefault);
 
 // === TRIGINTEGRALS Package ===
-void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams = alglib::xdefault);
-void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams = alglib::xdefault);
+void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams = xdefault);
+void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams = xdefault);
 
 // === CHEBYSHEV Package ===
-double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
-void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = alglib::xdefault);
+double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = xdefault);
 
 // === POISSONDISTR Package ===
-double poissondistribution(const ae_int_t k, const double m, const xparams _xparams = alglib::xdefault);
-double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams = alglib::xdefault);
-double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams = alglib::xdefault);
+double poissondistribution(const ae_int_t k, const double m, const xparams _xparams = xdefault);
+double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams = xdefault);
+double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams = xdefault);
 
 // === BETAF Package ===
-double beta(const double a, const double b, const xparams _xparams = alglib::xdefault);
+double beta(const double a, const double b, const xparams _xparams = xdefault);
 
 // === FRESNEL Package ===
-void fresnelintegral(const double x, double &c, double &s, const xparams _xparams = alglib::xdefault);
+void fresnelintegral(const double x, double &c, double &s, const xparams _xparams = xdefault);
 
 // === PSIF Package ===
-double psi(const double x, const xparams _xparams = alglib::xdefault);
+double psi(const double x, const xparams _xparams = xdefault);
 
 // === AIRYF Package ===
-void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams = alglib::xdefault);
+void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams = xdefault);
 
 // === DAWSON Package ===
-double dawsonintegral(const double x, const xparams _xparams = alglib::xdefault);
+double dawsonintegral(const double x, const xparams _xparams = xdefault);
 
 // === HERMITE Package ===
-double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
+double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 
 // === LEGENDRE Package ===
-double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
+double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 
 // === BESSEL Package ===
-double besselj0(const double x, const xparams _xparams = alglib::xdefault);
-double besselj1(const double x, const xparams _xparams = alglib::xdefault);
-double besseljn(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double bessely0(const double x, const xparams _xparams = alglib::xdefault);
-double bessely1(const double x, const xparams _xparams = alglib::xdefault);
-double besselyn(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double besseli0(const double x, const xparams _xparams = alglib::xdefault);
-double besseli1(const double x, const xparams _xparams = alglib::xdefault);
-double besselk0(const double x, const xparams _xparams = alglib::xdefault);
-double besselk1(const double x, const xparams _xparams = alglib::xdefault);
-double besselkn(const ae_int_t nn, const double x, const xparams _xparams = alglib::xdefault);
+double besselj0(const double x, const xparams _xparams = xdefault);
+double besselj1(const double x, const xparams _xparams = xdefault);
+double besseljn(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double bessely0(const double x, const xparams _xparams = xdefault);
+double bessely1(const double x, const xparams _xparams = xdefault);
+double besselyn(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double besseli0(const double x, const xparams _xparams = xdefault);
+double besseli1(const double x, const xparams _xparams = xdefault);
+double besselk0(const double x, const xparams _xparams = xdefault);
+double besselk1(const double x, const xparams _xparams = xdefault);
+double besselkn(const ae_int_t nn, const double x, const xparams _xparams = xdefault);
 
 // === LAGUERRE Package ===
-double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
+double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 
 // === ELLIPTIC Package ===
-double ellipticintegralk(const double m, const xparams _xparams = alglib::xdefault);
-double ellipticintegralkhighprecision(const double m1, const xparams _xparams = alglib::xdefault);
-double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = alglib::xdefault);
-double ellipticintegrale(const double m, const xparams _xparams = alglib::xdefault);
-double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = alglib::xdefault);
+double ellipticintegralk(const double m, const xparams _xparams = xdefault);
+double ellipticintegralkhighprecision(const double m1, const xparams _xparams = xdefault);
+double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = xdefault);
+double ellipticintegrale(const double m, const xparams _xparams = xdefault);
+double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
-// Declarations for the computational core: functions.
 namespace alglib_impl {
 // === GAMMAFUNC Package ===
 double gammafunction(double x, ae_state *_state);

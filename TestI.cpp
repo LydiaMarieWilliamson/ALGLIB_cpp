@@ -30,7 +30,7 @@ bool doc_test_real(double v, double t, double _threshold) {
 }
 
 bool doc_test_complex(complex v, complex t, double _threshold) {
-   double s = _threshold >= 0 ? 1.0 : alglib::abscomplex(t);
+   double s = _threshold >= 0 ? 1.0 : abscomplex(t);
    double threshold = fabs(_threshold);
    return abscomplex(v - t) / s <= threshold;
 }
@@ -115,7 +115,7 @@ bool doc_test_complex_vector(const complex_1d_array &v, const complex_1d_array &
    if (v.length() != t.length())
       return false;
    for (i = 0; i < v.length(); i++) {
-      double s = _threshold >= 0 ? 1.0 : alglib::abscomplex(t(i));
+      double s = _threshold >= 0 ? 1.0 : abscomplex(t(i));
       double threshold = fabs(_threshold);
       if (abscomplex(v(i) - t(i)) / s > threshold)
          return false;
@@ -131,7 +131,7 @@ bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &
       return false;
    for (i = 0; i < v.rows(); i++)
       for (j = 0; j < v.cols(); j++) {
-         double s = _threshold >= 0 ? 1.0 : alglib::abscomplex(t(i, j));
+         double s = _threshold >= 0 ? 1.0 : abscomplex(t(i, j));
          double threshold = fabs(_threshold);
          if (abscomplex(v(i, j) - t(i, j)) / s > threshold)
             return false;
@@ -377,8 +377,8 @@ void nsfunc1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 // and Jacobian matrix J = [df0/dx0 df0/dx1]
 //
    fi[0] = 2 * fabs(double (x[0])) + fabs(double (x[1]));
-   jac[0][0] = 2 * alglib::sign(x[0]);
-   jac[0][1] = alglib::sign(x[1]);
+   jac[0][0] = 2 * sign(x[0]);
+   jac[0][1] = sign(x[1]);
 }
 void nsfunc1_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
 //
@@ -403,8 +403,8 @@ void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 //         [ df2/dx0   df2/dx1 ]
 //
    fi[0] = 2 * fabs(double (x[0])) + fabs(double (x[1]));
-   jac[0][0] = 2 * alglib::sign(x[0]);
-   jac[0][1] = alglib::sign(x[1]);
+   jac[0][0] = 2 * sign(x[0]);
+   jac[0][1] = sign(x[1]);
    fi[1] = x[0] - 1;
    jac[1][0] = 1;
    jac[1][1] = 0;
@@ -535,7 +535,7 @@ int main() {
       return 1;
    }
    {
-      alglib::real_2d_array a("[[1,2],[3,4]]");
+      real_2d_array a("[[1,2],[3,4]]");
       ae_int_t _static_pool_used2 = 0, _static_pool_free2 = 0;
       alglib_impl::memory_pool_stats(&_static_pool_used2, &_static_pool_free2);
       if (_static_pool_used2 <= _static_pool_used || _static_pool_free2 >= _static_pool_free || _static_pool_used + _static_pool_free != _static_pool_used2 + _static_pool_free2) {
@@ -555,7 +555,7 @@ int main() {
    }
    {
       {
-         alglib::real_1d_array x;
+         real_1d_array x;
          x.setlength(1);
          if (alglib_impl::_alloc_counter == 0)
             printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\n");
@@ -1508,7 +1508,7 @@ int main() {
          // Optimize and examine results.
          //
             minlbfgsreport rep;
-            alglib::minlbfgsoptimize(state, function1_grad);
+            minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -1614,7 +1614,7 @@ int main() {
             minlbfgsoptguardgradient(state, 0.001);
 
          // first run
-            alglib::minlbfgsoptimize(state, function1_grad);
+            minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -1627,7 +1627,7 @@ int main() {
             if (_spoil_scenario == 20)
                spoil_vector_by_neginf(x);
             minlbfgsrestartfrom(state, x);
-            alglib::minlbfgsoptimize(state, function1_grad);
+            minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -1704,7 +1704,7 @@ int main() {
 
             minlbfgscreatef(1, x, diffstep, state);
             minlbfgssetcond(state, epsg, epsf, epsx, maxits);
-            alglib::minlbfgsoptimize(state, function1_func);
+            minlbfgsoptimize(state, function1_func);
             minlbfgsresults(state, x, rep);
 
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
@@ -1830,7 +1830,7 @@ int main() {
          // Optimize and evaluate results
          //
             minbleicreport rep;
-            alglib::minbleicoptimize(state, function1_grad);
+            minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
@@ -1973,7 +1973,7 @@ int main() {
          // Optimize and evaluate results
          //
             minbleicreport rep;
-            alglib::minbleicoptimize(state, function1_grad);
+            minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
             _TestResult = _TestResult && doc_test_real_vector(x, "[2,4]", 0.005);
@@ -2109,7 +2109,7 @@ int main() {
          // Optimize and evaluate results
          //
             minbleicreport rep;
-            alglib::minbleicoptimize(state, function1_func);
+            minbleicoptimize(state, function1_func);
             minbleicresults(state, x, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
@@ -2879,7 +2879,7 @@ int main() {
          //
          // Optimize
          //
-            alglib::minlmoptimize(state, function1_fvec);
+            minlmoptimize(state, function1_fvec);
 
          //
          // Test optimization results
@@ -2974,7 +2974,7 @@ int main() {
          //
          // Optimize
          //
-            alglib::minlmoptimize(state, function1_fvec, function1_jac);
+            minlmoptimize(state, function1_fvec, function1_jac);
 
          //
          // Test optimization results
@@ -3047,7 +3047,7 @@ int main() {
 
             minlmcreatefgh(x, state);
             minlmsetcond(state, epsx, maxits);
-            alglib::minlmoptimize(state, function1_func, function1_grad, function1_hess);
+            minlmoptimize(state, function1_func, function1_grad, function1_hess);
             minlmresults(state, x, rep);
 
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
@@ -3137,7 +3137,7 @@ int main() {
          //
          // Optimize
          //
-            alglib::minlmoptimize(state, function1_fvec);
+            minlmoptimize(state, function1_fvec);
 
          //
          // Test optimization results
@@ -3201,7 +3201,7 @@ int main() {
                spoil_vector_by_neginf(x);
             minlmcreatev(2, x, 0.0001, state);
             minlmsetcond(state, epsx, maxits);
-            alglib::minlmoptimize(state, function1_fvec);
+            minlmoptimize(state, function1_fvec);
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
 
@@ -3220,7 +3220,7 @@ int main() {
             if (_spoil_scenario == 8)
                spoil_vector_by_neginf(x);
             minlmrestartfrom(state, x);
-            alglib::minlmoptimize(state, function2_fvec);
+            minlmoptimize(state, function2_fvec);
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[0,1]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -3261,7 +3261,7 @@ int main() {
             minlmreport rep;
             minlmcreatefj(2, x, state);
             minlmsetcond(state, epsx, maxits);
-            alglib::minlmoptimize(state, function1_func, function1_jac);
+            minlmoptimize(state, function1_func, function1_jac);
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -3302,7 +3302,7 @@ int main() {
             minlmreport rep;
             minlmcreatefgj(2, x, state);
             minlmsetcond(state, epsx, maxits);
-            alglib::minlmoptimize(state, function1_func, function1_grad, function1_jac);
+            minlmoptimize(state, function1_func, function1_grad, function1_jac);
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -3406,7 +3406,7 @@ int main() {
          // Optimize and evaluate results
          //
             mincgreport rep;
-            alglib::mincgoptimize(state, function1_grad);
+            mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -3512,7 +3512,7 @@ int main() {
             mincgoptguardgradient(state, 0.001);
 
          // first run
-            alglib::mincgoptimize(state, function1_grad);
+            mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -3525,7 +3525,7 @@ int main() {
             if (_spoil_scenario == 20)
                spoil_vector_by_neginf(x);
             mincgrestartfrom(state, x);
-            alglib::mincgoptimize(state, function1_grad);
+            mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -3635,7 +3635,7 @@ int main() {
          // Now we are ready to run the optimization
          //
             mincgreport rep;
-            alglib::mincgoptimize(state, function1_func);
+            mincgoptimize(state, function1_func);
             mincgresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
 
@@ -3937,7 +3937,7 @@ int main() {
          //
             minnlcreport rep;
             real_1d_array x1;
-            alglib::minnlcoptimize(state, nlcfunc1_jac);
+            minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
 
@@ -4114,7 +4114,7 @@ int main() {
          //
             minnlcreport rep;
             real_1d_array x1;
-            alglib::minnlcoptimize(state, nlcfunc1_jac);
+            minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[0.70710,-0.70710]", 0.005);
 
@@ -4298,7 +4298,7 @@ int main() {
          // constraints is specified by minnlcsetnlc(), with equality ones always
          // being first, inequality ones being last.
          //
-            alglib::minnlcoptimize(state, nlcfunc2_jac);
+            minnlcoptimize(state, nlcfunc2_jac);
             minnlcresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[-0.70710,-0.70710,0.49306]", 0.005);
 
@@ -4447,7 +4447,7 @@ int main() {
          //       you solve nonsmooth optimization problems. Visual inspection of
          //       results is essential.
          //
-            alglib::minnsoptimize(state, nsfunc1_jac);
+            minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -4563,7 +4563,7 @@ int main() {
          //
          //     {f0} = { 2*|x0|+|x1| }
          //
-            alglib::minnsoptimize(state, nsfunc1_fvec);
+            minnsoptimize(state, nsfunc1_fvec);
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -4723,7 +4723,7 @@ int main() {
          //       results is essential.
          //
          //
-            alglib::minnsoptimize(state, nsfunc1_jac);
+            minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -4887,7 +4887,7 @@ int main() {
          //       you solve nonsmooth optimization problems. Visual inspection of
          //       results is essential.
          //
-            alglib::minnsoptimize(state, nsfunc2_jac);
+            minnsoptimize(state, nsfunc2_jac);
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -5011,7 +5011,7 @@ int main() {
          // Optimize and evaluate results
          //
             minbcreport rep;
-            alglib::minbcoptimize(state, function1_grad);
+            minbcoptimize(state, function1_grad);
             minbcresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
 
@@ -5148,7 +5148,7 @@ int main() {
          // Optimize and evaluate results
          //
             minbcreport rep;
-            alglib::minbcoptimize(state, function1_func);
+            minbcoptimize(state, function1_func);
             minbcresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
 
@@ -5286,8 +5286,8 @@ int main() {
          // Build tree and serialize it
          //
             kdtreebuild(a, nx, ny, normtype, kdt0);
-            alglib::kdtreeserialize(kdt0, s);
-            alglib::kdtreeunserialize(s, kdt1);
+            kdtreeserialize(kdt0, s);
+            kdtreeunserialize(s, kdt1);
 
          //
          // Compare results from KNN queries
@@ -5355,7 +5355,7 @@ int main() {
             real_2d_array ytbl;
             odesolverreport rep;
             odesolverrkck(y, x, eps, h, s);
-            alglib::odesolversolve(s, ode_function_1_diff);
+            odesolversolve(s, ode_function_1_diff);
             odesolverresults(s, m, xtbl, ytbl, rep);
             _TestResult = _TestResult && doc_test_int(m, 4);
             _TestResult = _TestResult && doc_test_real_vector(xtbl, "[0, 1, 2, 3]", 0.005);
@@ -5803,7 +5803,7 @@ int main() {
             autogkreport rep;
 
             autogksmooth(a, b, s);
-            alglib::autogkintegrate(s, int_function_1_func);
+            autogkintegrate(s, int_function_1_func);
             autogkresults(s, v, rep);
 
             _TestResult = _TestResult && doc_test_real(v, 1.7182, 0.005);
@@ -6640,8 +6640,8 @@ int main() {
          // Serialization + unserialization to a different instance
          // of the model class.
          //
-            alglib::idwserialize(model, s);
-            alglib::idwunserialize(s, model2);
+            idwserialize(model, s);
+            idwunserialize(s, model2);
 
          //
          // Evaluate unserialized model at the same point
@@ -7902,7 +7902,7 @@ int main() {
          //
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func);
+            lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -7924,7 +7924,7 @@ int main() {
                spoil_vector_by_deleting_element(w);
             lsfitcreatewf(x, y, w, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func);
+            lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -7998,7 +7998,7 @@ int main() {
          //
             lsfitcreatefg(x, y, c, true, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func, function_cx_1_grad);
+            lsfitfit(state, function_cx_1_func, function_cx_1_grad);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -8020,7 +8020,7 @@ int main() {
                spoil_vector_by_deleting_element(w);
             lsfitcreatewfg(x, y, w, c, true, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func, function_cx_1_grad);
+            lsfitfit(state, function_cx_1_func, function_cx_1_grad);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -8094,7 +8094,7 @@ int main() {
          //
             lsfitcreatefgh(x, y, c, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
+            lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -8116,7 +8116,7 @@ int main() {
                spoil_vector_by_deleting_element(w);
             lsfitcreatewfgh(x, y, w, c, state);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
+            lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
@@ -8214,7 +8214,7 @@ int main() {
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetbc(state, bndl, bndu);
             lsfitsetcond(state, epsx, maxits);
-            alglib::lsfitfit(state, function_cx_1_func);
+            lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.0]", 0.05);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -8333,7 +8333,7 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitsetbc(state, bndl, bndu);
             lsfitsetscale(state, s);
-            alglib::lsfitfit(state, function_debt_func);
+            lsfitfit(state, function_debt_func);
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[4.142560e+12, 0.434240, 0.565376]", -0.005);
@@ -10242,8 +10242,8 @@ int main() {
          // Serialization - it looks easy,
          // but you should carefully read next section.
          //
-            alglib::rbfserialize(model0, s);
-            alglib::rbfunserialize(s, model1);
+            rbfserialize(model0, s);
+            rbfunserialize(s, model1);
 
          // both models return same value
             v = rbfcalc2(model0, 0.0, 0.0);
@@ -12524,14 +12524,14 @@ int main() {
          //    portable across different systems without OS-specific tuning.
          // 3) Tell ALGLIB that you want it to use multithreading by means of
          //    setnworkers() call:
-         //          * alglib::setnworkers(0)  = use all cores
-         //          * alglib::setnworkers(-1) = leave one core unused
-         //          * alglib::setnworkers(-2) = leave two cores unused
-         //          * alglib::setnworkers(+2) = use 2 cores (even if you have more)
+         //          * setnworkers(0)  = use all cores
+         //          * setnworkers(-1) = leave one core unused
+         //          * setnworkers(-2) = leave two cores unused
+         //          * setnworkers(+2) = use 2 cores (even if you have more)
          //    During runtime ALGLIB will automatically determine whether it is
          //    feasible to start worker threads and split your task between cores.
          //
-            alglib::setnworkers(+2);
+            setnworkers(+2);
 
          //
          // First, we perform parallel training of individual network with 5
