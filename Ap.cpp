@@ -5078,6 +5078,8 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 } // end of namespace alglib_impl
 
 namespace alglib {
+// Declarations for C++-related functionality.
+
 // Exception handling.
 #if !defined AE_NO_EXCEPTIONS
 ap_error::ap_error() { msg = alglib_impl::CurMsg; }
