@@ -132,8 +132,6 @@ static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t least
 static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state);
 static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state);
 
-// === ALGLIBBASICS Package ===
-
 // === APSERV Package ===
 // Internally calls SetErrorFlag() with condition:
 //
