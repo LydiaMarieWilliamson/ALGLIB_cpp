@@ -35,13 +35,13 @@ namespace alglib_impl {
 //     P(x) = a0 + a1*x + a2*x^2 + ... + an*x^n
 // Both real and complex roots are returned (see below).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   array[N+1], polynomial coefficients:
 //                 * A[0] is constant term
 //                 * A[N] is a coefficient of X^N
 //     N       -   polynomial degree
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array of complex roots:
 //                 * for isolated real root, X[I] is strictly real: IMAGE(X[I])=0
 //                 * complex roots are always returned in pairs - roots occupy
@@ -248,12 +248,12 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, RMatrixSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -308,12 +308,12 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
 // If you need condition number estimation or iterative refinement, use  more
 // feature-rich version - RMatrixSolve().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -389,7 +389,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, RMatrixSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
@@ -400,7 +400,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
 //                 * False - refinement is not used.
 //                   More performance, less precision.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is ill conditioned or singular.
 //                         X is filled by zeros in such cases.
@@ -466,7 +466,7 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 // * O(N^3+M*N^2) complexity
 // * no additional functionality, highest performance
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
@@ -477,7 +477,7 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 //                 * False - refinement is not used.
 //                   More performance, less precision.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -575,13 +575,13 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! RMatrixLUSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[N,N], LU decomposition, RMatrixLU result
 //     P       -   array[N], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[N], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -633,13 +633,13 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
 // * O(N^2) complexity
 // * fast algorithm without ANY additional checks, just triangular solver
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -705,14 +705,14 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! RMatrixLUSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[N,N], LU decomposition, RMatrixLU result
 //     P       -   array[N], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                         X is filled by zeros in such cases.
@@ -761,14 +761,14 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
 // * O(M*N^2) complexity
 // * fast algorithm without ANY additional checks, just triangular solver
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -831,14 +831,14 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 // * iterative refinement
 // * O(N^2) complexity
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -890,7 +890,7 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 // * iterative refinement
 // * O(M*N^2) complexity
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
@@ -898,7 +898,7 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -954,7 +954,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, CMatrixSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
@@ -965,7 +965,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 //                 * False - refinement is not used.
 //                   More performance, less precision.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                         X is filled by zeros in such cases.
@@ -1028,13 +1028,13 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 // * O(N^3+M*N^2) complexity
 // * no additional time consuming functions
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -1123,12 +1123,12 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, CMatrixSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -1176,12 +1176,12 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
 // * O(N^3) complexity
 // * no additional time consuming features, just triangular solver
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -1255,14 +1255,14 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! CMatrixLUSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -1306,14 +1306,14 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
 // * O(M*N^2) complexity
 // * no additional time-consuming features
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
 //     P       -   array[0..N-1], pivots array, RMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -1393,13 +1393,13 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! CMatrixLUSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, CMatrixLU result
 //     P       -   array[0..N-1], pivots array, CMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -1449,13 +1449,13 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
 // * O(N^2) complexity
 // * no additional time-consuming features, just triangular solver
 //
-// INPUT PARAMETERS
+// Inputs:
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, CMatrixLU result
 //     P       -   array[0..N-1], pivots array, CMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
@@ -1502,7 +1502,7 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
 // * iterative refinement
 // * O(M*N^2) complexity
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, CMatrixLU result
 //     P       -   array[0..N-1], pivots array, CMatrixLU result
@@ -1510,7 +1510,7 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -1547,14 +1547,14 @@ void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatri
 // * iterative refinement
 // * O(N^2) complexity
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     LUA     -   array[0..N-1,0..N-1], LU decomposition, CMatrixLU result
 //     P       -   array[0..N-1], pivots array, CMatrixLU result
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                 * -1    N<=0 was passed
@@ -1624,14 +1624,14 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, SPDMatrixSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or non-SPD.
 //                 * -1    N<=0 was passed
@@ -1706,14 +1706,14 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
 // * matrix is represented by its upper or lower triangle
 // * no additional time consuming features
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular
 //                 * -1    N<=0 was passed
@@ -1791,13 +1791,13 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, SPDMatrixSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or non-SPD.
 //                 * -1    N<=0 was passed
@@ -1847,13 +1847,13 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
 // * matrix is represented by its upper or lower triangle
 // * no additional time consuming features like condition number estimation
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or non-SPD
 //                 * -1    N<=0 was passed
@@ -1924,7 +1924,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[0..N-1,0..N-1], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of CHA
@@ -1932,7 +1932,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or badly conditioned
 //                         X is filled by zeros in such cases.
@@ -1978,7 +1978,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b,
 // * matrix is represented by its upper or lower triangle
 // * no additional functionality
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of CHA
@@ -1986,7 +1986,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b,
 //     B       -   array[N,M], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or badly conditioned
 //                         X is filled by zeros in such cases.
@@ -2059,14 +2059,14 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of A
 //     IsUpper -   what half of CHA is provided
 //     B       -   array[N], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
@@ -2116,14 +2116,14 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, 
 // * matrix is represented by its upper or lower triangle
 // * no additional features
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of A
 //     IsUpper -   what half of CHA is provided
 //     B       -   array[N], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
@@ -2186,14 +2186,14 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixSolveMFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   same as in RMatrixSolve.
 //                 Returns -3 for non-HPD matrices.
 //     Rep     -   same as in RMatrixSolve
@@ -2260,14 +2260,14 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
 // * matrix is represented by its upper or lower triangle
 // * no additional time consuming features like condition number estimation
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1,0..M-1], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly  singular or is not positive definite.
 //                         B is filled by zeros in such cases.
@@ -2346,13 +2346,13 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
 //            ! that your system is well conditioned, we  strongly  recommend
 //            ! you to use faster solver, HPDMatrixSolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   same as in RMatrixSolve
 //                 Returns -3 for non-HPD matrices.
 //     Rep     -   same as in RMatrixSolve
@@ -2395,13 +2395,13 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
 // * matrix is represented by its upper or lower triangle
 // * no additional time consuming functions
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     IsUpper -   what half of A is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or not positive definite
 //                         X is filled by zeros in such cases.
@@ -2475,7 +2475,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 //            ! HPDMatrixCholeskySolveMFast() function.
 //
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 HPDMatrixCholesky result
 //     N       -   size of CHA
@@ -2483,7 +2483,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 //     B       -   array[N,M], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is singular, or VERY close to singular.
 //                         X is filled by zeros in such cases.
@@ -2530,7 +2530,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b,
 // * matrix is represented by its upper or lower triangle
 // * no additional time-consuming features
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 HPDMatrixCholesky result
 //     N       -   size of CHA
@@ -2538,7 +2538,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b,
 //     B       -   array[N,M], right part
 //     M       -   right part size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is singular, or VERY close to singular.
 //                         X is filled by zeros in such cases.
@@ -2611,14 +2611,14 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveFast() function.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[0..N-1,0..N-1], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of A
 //     IsUpper -   what half of CHA is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
@@ -2668,14 +2668,14 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, 
 // * matrix is represented by its upper or lower triangle
 // * no additional time-consuming features
 //
-// INPUT PARAMETERS
+// Inputs:
 //     CHA     -   array[0..N-1,0..N-1], Cholesky decomposition,
 //                 SPDMatrixCholesky result
 //     N       -   size of A
 //     IsUpper -   what half of CHA is provided
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         B is filled by zeros in such cases.
@@ -2721,7 +2721,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 // * iterative refinement
 // * O(N^3) complexity
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..NRows-1,0..NCols-1], system matrix
 //     NRows   -   vertical size of A
 //     NCols   -   horizontal size of A
@@ -2731,7 +2731,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 //                 what it means, so the solver will choose good value on its
 //                 own.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Info    -   return code:
 //                 * -4    SVD subroutine failed
 //                 * -1    if NRows<=0 or NCols<=0 or Threshold<0 was passed
@@ -4332,12 +4332,12 @@ namespace alglib_impl {
 // bandwidth matrices) and uses sparse triangular solvers to get solution  of
 // the original system.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   sparse matrix, must be NxN exactly
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
@@ -4397,12 +4397,12 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
 // reducing ordering and uses sparse triangular solver to get solution of the
 // original system.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   sparse matrix, must be NxN exactly
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[N], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
@@ -4473,13 +4473,13 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
 //            or CRS (compressed row storage) format. An  exception  will  be
 //            generated if you pass matrix in some other format.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   sparse NxN matrix stored in CRs or SKS format, must be NxN
 //                 exactly
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[N], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
@@ -4532,12 +4532,12 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
 // This solver converts input matrix to CRS format, performs LU factorization
 // and uses sparse triangular solvers to get solution of the original system.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   sparse matrix, must be NxN exactly, any storage format
 //     N       -   size of A, N>0
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
@@ -4611,14 +4611,14 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
 //            storage format. An exception will  be  generated  if  you  pass
 //            matrix in some other format (HASH or SKS).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   LU factorization of the sparse matrix, must be NxN exactly
 //                 in CRS storage format
 //     P, Q    -   pivot indexes from LU factorization
 //     N       -   size of A, N>0
 //     B       -   array[0..N-1], right part
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
@@ -4846,7 +4846,7 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
 // by SparseSolverState class. Use SparseSolver  API  if  you  need  advanced
 // functions like providing initial point, using out-of-core API and so on.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   sparse symmetric NxN matrix in any sparse storage  format.
 //                 Using CRS format is recommended because it avoids internal
 //                 conversion.
@@ -4871,7 +4871,7 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
 // NOTE: having both EpsF=0 and MaxIts=0 means that stopping criteria will be
 //       chosen automatically.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], the solution
 //     Rep     -   solution report:
 //                 * Rep.TerminationType completion code:
@@ -4940,7 +4940,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 // by SparseSolverState class. Use SparseSolver  API  if  you  need  advanced
 // functions like providing initial point, using out-of-core API and so on.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   sparse NxN matrix in any sparse storage format. Using  CRS
 //                 format   is   recommended   because   it  avoids  internal
 //                 conversion.
@@ -4960,7 +4960,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 // NOTE: having both EpsF=0 and MaxIts=0 means that stopping criteria will be
 //       chosen automatically.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], the solution
 //     Rep     -   solution report:
 //                 * Rep.TerminationType completion code:
@@ -5075,10 +5075,10 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
 //         >     alglib.sparsesolveroocsendresult(state, in Y)
 //         > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   problem dimensionality (fixed at start-up)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state, const xparams _xparams = xdefault);
@@ -5110,7 +5110,7 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) 
 //       you   may   use   convenience   functions   SparseSolveGMRES()   and
 //       SparseSolveSymmetricGMRES().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     K       -   GMRES parameter, K>=0:
 //                 * recommended values are in 10..100 range
@@ -5135,11 +5135,11 @@ void sparsesolversetalgogmres(sparsesolverstate *state, ae_int_t k, ae_state *_s
 // This function sets starting point.
 // By default, zero starting point is used.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     X       -   starting point, array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   new starting point was set
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolversetstartingpoint(const sparsesolverstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
@@ -5152,13 +5152,13 @@ void sparsesolversetstartingpoint(sparsesolverstate *state, RVector *x, ae_state
 
 // This function sets stopping criteria.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     EpsF    -   algorithm will be stopped if norm of residual is less than
 //                 EpsF*||b||.
 //     MaxIts  -   algorithm will be stopped if number of iterations is  more
 //                 than MaxIts.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 // NOTES:
@@ -5191,7 +5191,7 @@ void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits,
 //       desired precision (sometimes, rarely)  or  return  with  error  code
 //       signalling violation of underlying assumptions.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //     A       -   sparse symmetric NxN matrix in any sparse storage  format.
 //                 Using CRS format is recommended because it avoids internal
@@ -5206,7 +5206,7 @@ void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits,
 //                                    triangle is not referenced at all
 //     B       -   right part, array[N]
 //
-// RESULT:
+// Result:
 //     This function returns no result.
 //     You can get the solution by calling SparseSolverResults()
 // ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
@@ -5250,7 +5250,7 @@ void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool 
 //            terminate with error code signalling  violation  of  underlying
 //            assumptions.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //     A       -   sparse NxN matrix in any sparse storage  format.
 //                 Using CRS format is recommended because it avoids internal
@@ -5260,7 +5260,7 @@ void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool 
 //                 creation).
 //     B       -   right part, array[N]
 //
-// RESULT:
+// Result:
 //     This function returns no result.
 //     You can get the solution by calling SparseSolverResults()
 // ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
@@ -5300,10 +5300,10 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b, ae
 // This function must be called after calling one of the SparseSolverSolve()
 // functions.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], solution
 //     Rep     -   solution report:
 //                 * Rep.TerminationType completion code:
@@ -5348,7 +5348,7 @@ void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverrepor
 // NOTE: when used with GMRES(k), this function reports progress  every  k-th
 //       iteration.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     NeedXRep-   whether iteration reports are needed or not
 // ALGLIB: Copyright 01.10.2021 by Sergey Bochkanov
@@ -5371,7 +5371,7 @@ void sparsesolversetxrep(sparsesolverstate *state, bool needxrep, ae_state *_sta
 // >     alglib.sparsesolveroocsendresult(state, in Y)
 // > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State       -   solver object
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolveroocstart(const sparsesolverstate &state, const real_1d_array &b, const xparams _xparams = xdefault);
@@ -5431,10 +5431,10 @@ bool sparsesolverooccontinue(sparsesolverstate *state, ae_state *_state) {
 // >     alglib.sparsesolveroocsendresult(state, in Y)
 // > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State           -   solver running in out-of-core mode
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     RequestType     -   type of the request to process:
 //                         * 0   for matrix-vector product A*x, with A  being
 //                           NxN system matrix  and X being N-dimensional
@@ -5467,13 +5467,13 @@ void sparsesolveroocgetrequestinfo(sparsesolverstate *state, ae_int_t *requestty
 // >     alglib.sparsesolveroocsendresult(state, in Y)
 // > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State           -   solver running in out-of-core mode
 //     X               -   possibly  preallocated   storage;  reallocated  if
 //                         needed, left unchanged, if large enough  to  store
 //                         request data.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X               -   array[N] or larger, leading N elements are  filled
 //                         with vector X.
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
@@ -5489,10 +5489,10 @@ void sparsesolveroocgetrequestdata(sparsesolverstate *state, RVector *x, ae_stat
 // this function is used to retrieve squared residual  norm  during  progress
 // reports.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State           -   solver running in out-of-core mode
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     V               -   scalar value associated with the current request
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolveroocgetrequestdata1(const sparsesolverstate &state, double &v, const xparams _xparams = xdefault);
@@ -5519,7 +5519,7 @@ void sparsesolveroocgetrequestdata1(sparsesolverstate *state, double *v, ae_stat
 // >     alglib.sparsesolveroocsendresult(state, in Y)
 // > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State           -   solver running in out-of-core mode
 //     AX              -   array[N] or larger, leading N elements contain A*x
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
@@ -5544,10 +5544,10 @@ void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax, ae_state *
 // >     alglib.sparsesolveroocsendresult(state, in Y)
 // > alglib.sparsesolveroocstop(state, out X, out Report)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State       -   solver state
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], the solution.
 //                 Zero-filled on the failure (Rep.TerminationType<0).
 //     Rep     -   report with additional info:
@@ -5592,7 +5592,7 @@ void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverrepor
 // termination).  Such   termination   is  a smooth  process  which  properly
 // deallocates all temporaries.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   solver structure
 //
 // NOTE: calling this function on solver which is NOT running  will  have  no
@@ -6282,10 +6282,10 @@ static void lincg_updateitersdata(lincgstate *state, ae_state *_state);
 //    problem  with different matrix and/or right part without reinitializing
 //    LinCGState structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   problem dimension, N>0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 // API: void lincgcreate(const ae_int_t n, lincgstate &state, const xparams _xparams = xdefault);
@@ -6337,10 +6337,10 @@ void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
 // This function sets starting point.
 // By default, zero starting point is used.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   starting point, array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 // API: void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
@@ -6354,10 +6354,10 @@ void lincgsetstartingpoint(lincgstate *state, RVector *x, ae_state *_state) {
 
 // This function sets right part. By default, right part is zero.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B       -   right part, array[N].
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetb(lincgstate *state, RVector *b, ae_state *_state) {
@@ -6373,7 +6373,7 @@ void lincgsetb(lincgstate *state, RVector *b, ae_state *_state) {
 // you want to use solver without preconditioning, you can call this function
 // which forces solver to use unit matrix for preconditioning.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 // API: void lincgsetprecunit(const lincgstate &state, const xparams _xparams = xdefault);
@@ -6387,7 +6387,7 @@ void lincgsetprecunit(lincgstate *state, ae_state *_state) {
 // function.  LinCGSolveSparse() will use diagonal of the  system  matrix  as
 // preconditioner. This preconditioning mode is active by default.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 // API: void lincgsetprecdiag(const lincgstate &state, const xparams _xparams = xdefault);
@@ -6399,13 +6399,13 @@ void lincgsetprecdiag(lincgstate *state, ae_state *_state) {
 
 // This function sets stopping criteria.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     EpsF    -   algorithm will be stopped if norm of residual is less than
 //                 EpsF*||b||.
 //     MaxIts  -   algorithm will be stopped if number of iterations is  more
 //                 than MaxIts.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 // NOTES:
@@ -6777,7 +6777,7 @@ lbl_rcomm:
 
 // Procedure for solution of A*x=b with sparse A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //     A       -   sparse matrix in the CRS format (you MUST contvert  it  to
 //                 CRS format by calling SparseConvertToCRS() function).
@@ -6788,7 +6788,7 @@ lbl_rcomm:
 //                                    triangle is not referenced at all
 //     B       -   right part, array[N]
 //
-// RESULT:
+// Result:
 //     This function returns no result.
 //     You can get solution by calling LinCGResults()
 //
@@ -6858,10 +6858,10 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 //
 // This function must be called after LinCGSolve
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], solution
 //     Rep     -   optimization report:
 //                 * Rep.TerminationType completetion code:
@@ -6914,7 +6914,7 @@ void lincgsetrestartfreq(lincgstate *state, ae_int_t srf, ae_state *_state) {
 // algorithm a bit more robust against numerical errors. However, you may
 // change it
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Freq    -   desired update frequency, Freq>=0.
 //                 Zero value means that no updates will be done.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
@@ -6928,7 +6928,7 @@ void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq, ae_state *_state) {
 
 // This function turns on/off reporting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     NeedXRep-   whether iteration reports are needed or not
 //
@@ -7325,11 +7325,11 @@ static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state);
 //    problem  with different matrix and/or right part without reinitializing
 //    LinLSQRState structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   number of rows in A
 //     N       -   number of variables, N>0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 // NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
@@ -7349,11 +7349,11 @@ void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state
 // functionality as linlsqrcreate(), but reuses  previously  allocated  space
 // as much as possible.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   number of rows in A
 //     N       -   number of variables, N>0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 14.11.2018 by Sergey Bochkanov
 // API: void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state, const xparams _xparams = xdefault);
@@ -7404,10 +7404,10 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
 
 // This function sets right part. By default, right part is zero.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B       -   right part, array[N].
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrsetb(linlsqrstate *state, RVector *b, ae_state *_state) {
@@ -7428,7 +7428,7 @@ void linlsqrsetb(linlsqrstate *state, RVector *b, ae_state *_state) {
 // you want to use solver without preconditioning, you can call this function
 // which forces solver to use unit matrix for preconditioning.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 // API: void linlsqrsetprecunit(const linlsqrstate &state, const xparams _xparams = xdefault);
@@ -7442,7 +7442,7 @@ void linlsqrsetprecunit(linlsqrstate *state, ae_state *_state) {
 // function.  LinCGSolveSparse() will use diagonal of the  system  matrix  as
 // preconditioner. This preconditioning mode is active by default.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 // API: void linlsqrsetprecdiag(const linlsqrstate &state, const xparams _xparams = xdefault);
@@ -7455,10 +7455,10 @@ void linlsqrsetprecdiag(linlsqrstate *state, ae_state *_state) {
 // This function sets optional Tikhonov regularization coefficient.
 // It is zero by default.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     LambdaI -   regularization factor, LambdaI>=0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 // API: void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai, const xparams _xparams = xdefault);
@@ -7839,14 +7839,14 @@ lbl_rcomm:
 
 // Procedure for solution of A*x=b with sparse A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //     A       -   sparse M*N matrix in the CRS format (you MUST contvert  it
 //                 to CRS format  by  calling  SparseConvertToCRS()  function
 //                 BEFORE you pass it to this function).
 //     B       -   right part, array[M]
 //
-// RESULT:
+// Result:
 //     This function returns no result.
 //     You can get solution by calling LinCGResults()
 //
@@ -7930,13 +7930,13 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
 
 // This function sets stopping criteria.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     EpsA    -   algorithm will be stopped if ||A^T*Rk||/(||A||*||Rk||)<=EpsA.
 //     EpsB    -   algorithm will be stopped if ||Rk||<=EpsB*||B||
 //     MaxIts  -   algorithm will be stopped if number of iterations
 //                 more than MaxIts.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 // NOTE: if EpsA,EpsB,EpsC and MaxIts are zero then these variables will
@@ -7964,10 +7964,10 @@ void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxi
 //
 // This function must be called after LinLSQRSolve
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], solution
 //     Rep     -   optimization report:
 //                 * Rep.TerminationType completetion code:
@@ -8000,7 +8000,7 @@ void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_stat
 
 // This function turns on/off reporting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     NeedXRep-   whether iteration reports are needed or not
 //
@@ -8027,10 +8027,10 @@ void linlsqrrestart(linlsqrstate *state, ae_state *_state) {
 // This function is used to peek into LSQR solver and get  current  iteration
 // counter. You can safely "peek" into the solver from another thread.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S           -   solver object
 //
-// RESULT:
+// Result:
 //     iteration counter, in [0,INF)
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 // API: ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s, const xparams _xparams = xdefault);
@@ -8051,7 +8051,7 @@ ae_int_t linlsqrpeekiterationscount(linlsqrstate *s, ae_state *_state) {
 // termination).  Such   termination   is  a smooth  process  which  properly
 // deallocates all temporaries.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   solver structure
 //
 // NOTE: calling this function on solver which is NOT running  will  have  no
@@ -8505,7 +8505,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
 //    structure.
 //
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   space dimension, N>1:
 //                 * if provided, only leading N elements of X are used
 //                 * if not provided, determined automatically from size of X
@@ -8513,7 +8513,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
 //     X       -   starting point
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 //
@@ -8557,7 +8557,7 @@ void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state
 
 // This function sets stopping conditions for the nonlinear solver
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     EpsF    -   >=0
 //                 The subroutine finishes  its work if on k+1-th iteration
@@ -8585,7 +8585,7 @@ void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits, ae_state *_stat
 
 // This function turns on/off reporting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     NeedXRep-   whether iteration reports are needed or not
 //
@@ -8600,7 +8600,7 @@ void nleqsetxrep(nleqstate *state, bool needxrep, ae_state *_state) {
 
 // This function sets maximum step length
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
@@ -8879,10 +8879,10 @@ lbl_rcomm:
 
 // NLEQ solver results
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[0..N-1], solution
 //     Rep     -   optimization report:
 //                 * Rep.TerminationType completetion code:
@@ -8933,7 +8933,7 @@ void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_st
 // This  function  allows  to  solve multiple  optimization  problems  (which
 // must have same number of dimensions) without object reallocation penalty.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure used for reverse communication previously
 //                 allocated with MinCGCreate call.
 //     X       -   new starting point.

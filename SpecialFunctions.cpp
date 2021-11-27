@@ -32,7 +32,7 @@ static double gammafunc_gammastirf(double x, ae_state *_state);
 
 // Gamma function
 //
-// Input parameters:
+// Inputs:
 //     X   -   argument
 //
 // Domain:
@@ -133,13 +133,13 @@ double gammafunction(double x, ae_state *_state) {
 
 // Natural logarithm of gamma function
 //
-// Input parameters:
+// Inputs:
 //     X       -   argument
 //
 // Result:
 //     logarithm of the absolute value of the Gamma(X).
 //
-// Output parameters:
+// Outputs:
 //     SgnGam  -   sign(Gamma(X))
 //
 // Domain:
@@ -4170,10 +4170,10 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 
 // Representation of Tn as C[0] + C[1]*X + ... + C[N]*X^N
 //
-// Input parameters:
+// Inputs:
 //     N   -   polynomial degree, n>=0
 //
-// Output parameters:
+// Outputs:
 //     C   -   coefficients
 // API: void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
@@ -4200,11 +4200,11 @@ void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 // Represents A[0]*T0(x) + A[1]*T1(x) + ... + A[N]*Tn(x) as
 // B[0] + B[1]*X + ... + B[N]*X^N.
 //
-// Input parameters:
+// Inputs:
 //     A   -   Chebyshev series coefficients
 //     N   -   degree, N>=0
 //
-// Output parameters
+// Outputs:
 //     B   -   power series coefficients
 // API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = xdefault);
 void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
@@ -5458,10 +5458,10 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 
 // Representation of Hn as C[0] + C[1]*X + ... + C[N]*X^N
 //
-// Input parameters:
+// Inputs:
 //     N   -   polynomial degree, n>=0
 //
-// Output parameters:
+// Outputs:
 //     C   -   coefficients
 // API: void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
@@ -5609,10 +5609,10 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 
 // Representation of Pn as C[0] + C[1]*X + ... + C[N]*X^N
 //
-// Input parameters:
+// Inputs:
 //     N   -   polynomial degree, n>=0
 //
-// Output parameters:
+// Outputs:
 //     C   -   coefficients
 // API: void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
@@ -7042,10 +7042,10 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 
 // Representation of Ln as C[0] + C[1]*X + ... + C[N]*X^N
 //
-// Input parameters:
+// Inputs:
 //     N   -   polynomial degree, n>=0
 //
-// Output parameters:
+// Outputs:
 //     C   -   coefficients
 // API: void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {

@@ -560,9 +560,9 @@ void ablasf_dotblkh_fma(const double *src_a, const double *src_b, ae_int_t round
 // Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
 // RHS storage format.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
    ae_int_t k;

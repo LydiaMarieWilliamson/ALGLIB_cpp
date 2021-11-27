@@ -35,7 +35,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b, ae_state *_st
 //
 // F(t) = SUM(i=0,n-1,w[i]*f[i]/(t-x[i])) / SUM(i=0,n-1,w[i]/(t-x[i]))
 //
-// Input parameters:
+// Inputs:
 //     B   -   barycentric interpolant built with one of model building
 //             subroutines.
 //     T   -   interpolation point
@@ -98,12 +98,12 @@ double barycentriccalc(barycentricinterpolant *b, double t, ae_state *_state) {
 // provided with values too close to MaxRealNumber  (usually  MaxRealNumber/N
 // or greater will overflow).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B   -   barycentric interpolant built with one of model building
 //             subroutines.
 //     T   -   interpolation point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   barycentric interpolant at T
 //     DF  -   first derivative
 //
@@ -218,12 +218,12 @@ void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df
 
 // Differentiation of barycentric interpolant: first/second derivatives.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B   -   barycentric interpolant built with one of model building
 //             subroutines.
 //     T   -   interpolation point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   barycentric interpolant at T
 //     DF  -   first derivative
 //     D2F -   second derivative
@@ -330,11 +330,11 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
 
 // This subroutine performs linear transformation of the argument.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B       -   rational interpolant in barycentric form
 //     CA, CB  -   transformation coefficients: x = CA*t + CB
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B       -   transformed interpolant with X replaced by T
 // ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 // API: void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
@@ -381,11 +381,11 @@ void barycentriclintransx(barycentricinterpolant *b, double ca, double cb, ae_st
 // This  subroutine   performs   linear  transformation  of  the  barycentric
 // interpolant.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B       -   rational interpolant in barycentric form
 //     CA, CB  -   transformation coefficients: B2(x) = CA*B(x) + CB
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B       -   transformed interpolant
 // ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 // API: void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
@@ -408,10 +408,10 @@ void barycentriclintransy(barycentricinterpolant *b, double ca, double cb, ae_st
 
 // Extracts X/Y/W arrays from rational interpolant
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B   -   barycentric interpolant
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     N   -   nodes count, N>0
 //     X   -   interpolation nodes, array[0..N-1]
 //     F   -   function values, array[0..N-1]
@@ -440,13 +440,13 @@ void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVect
 //
 // F(t) = SUM(i=0,n-1,w[i]*f[i]/(t-x[i])) / SUM(i=0,n-1,w[i]/(t-x[i]))
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   interpolation nodes, array[0..N-1]
 //     F   -   function values, array[0..N-1]
 //     W   -   barycentric weights, array[0..N-1]
 //     N   -   nodes count, N>0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B   -   barycentric interpolant built from (X, Y, W)
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 // API: void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b, const xparams _xparams = xdefault);
@@ -476,7 +476,7 @@ void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycen
 // rates of approximation', Michael S. Floater. and  Kai  Hormann,  for  more
 // information on this subject).
 //
-// Input parameters:
+// Inputs:
 //     X   -   interpolation nodes, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     N   -   number of nodes, N>0.
@@ -485,7 +485,7 @@ void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycen
 //             D>=N it will be replaced with D=N-1.
 //             if you don't know what D to choose, use small value about 3-5.
 //
-// Output parameters:
+// Outputs:
 //     B   -   barycentric interpolant.
 //
 // Note:
@@ -577,10 +577,10 @@ void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t
 
 // Copying of the barycentric interpolant (for internal use only)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     B   -   barycentric interpolant
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B2  -   copy(B1)
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_state *_state) {
@@ -882,10 +882,10 @@ static void idw_errormetricsviacalc(idwbuilder *state, idwmodel *model, idwrepor
 // * call idwtscalcbuf() from different threads,  with  each  thread  working
 //   with its own copy of buffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S           -   IDW model
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf         -   external buffer.
 //
 //
@@ -933,13 +933,13 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state) {
 //   * idwbuildersetalgotextbookmodshepard()-textbook modified Shepard algorithm
 // * finally, model construction is performed with idwfit() function.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     NX  -   dimensionality of the argument, NX>=1
 //     NY  -   dimensionality of the function being modeled, NY>=1;
 //             NY=1 corresponds to classic scalar function, NY>=1 corresponds
 //             to vector-valued function.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State-  builder object
 // ALGLIB Project: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams = xdefault);
@@ -986,7 +986,7 @@ void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_st
 // The default number of layers is 16, which allows you to reproduce  details
 // at distance down to SRad/65536. You will rarely need to change it.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //     NLayers -   NLayers>=1, the number of layers used by the model.
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
@@ -1002,7 +1002,7 @@ void idwbuildersetnlayers(idwbuilder *state, ae_int_t nlayers, ae_state *_state)
 // This function overrides results of the previous calls, i.e. multiple calls
 // of this function will result in only the last set being added.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //     XY      -   points, array[N,NX+NY]. One row  corresponds to  one point
 //                 in the dataset. First NX elements  are  coordinates,  next
@@ -1060,7 +1060,7 @@ void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n, ae_state *_
 // it is easy to use and robust, which makes it a good first step.
 //
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //     SRad    -   initial search radius, SRad>0 is required. A model  value
 //                 is obtained by "smart" averaging  of  the  dataset  points
@@ -1132,7 +1132,7 @@ void idwbuildersetalgomstab(idwbuilder *state, double srad, ae_state *_state) {
 // IMPORTANT: we do NOT recommend using textbook IDW algorithms because  they
 //            have terrible interpolation properties. Use MSTAB in all cases.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //     P       -   power parameter, P>0; good value to start with is 2.0
 //
@@ -1157,7 +1157,7 @@ void idwbuildersetalgotextbookshepard(idwbuilder *state, double p, ae_state *_st
 // IMPORTANT: we do NOT recommend using textbook IDW algorithms because  they
 //            have terrible interpolation properties. Use MSTAB in all cases.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //     R       -   search radius
 //
@@ -1179,7 +1179,7 @@ void idwbuildersetalgotextbookmodshepard(idwbuilder *state, double r, ae_state *
 // This function sets prior term (model value at infinity) as  user-specified
 // value.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 //     V       -   value for user-defined prior
 //
@@ -1201,7 +1201,7 @@ void idwbuildersetuserterm(idwbuilder *state, double v, ae_state *_state) {
 //
 // Constant prior term is determined as mean value over dataset.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 // ALGLIB: Copyright 29.10.2018 by Sergey Bochkanov
 // API: void idwbuildersetconstterm(const idwbuilder &state, const xparams _xparams = xdefault);
@@ -1212,7 +1212,7 @@ void idwbuildersetconstterm(idwbuilder *state, ae_state *_state) {
 
 // This function sets zero prior term (model value at infinity).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 // ALGLIB: Copyright 29.10.2018 by Sergey Bochkanov
 // API: void idwbuildersetzeroterm(const idwbuilder &state, const xparams _xparams = xdefault);
@@ -1228,7 +1228,7 @@ void idwbuildersetzeroterm(idwbuilder *state, ae_state *_state) {
 //       evaluation from the multiple threads, use idwtscalcbuf()  with  per-
 //       thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S   -   IDW interpolant built with IDW builder
 //     X0  -   argument value
 //
@@ -1255,7 +1255,7 @@ double idwcalc1(idwmodel *s, double x0, ae_state *_state) {
 //       evaluation from the multiple threads, use idwtscalcbuf()  with  per-
 //       thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   IDW interpolant built with IDW builder
 //     X0, X1  -   argument value
 //
@@ -1284,7 +1284,7 @@ double idwcalc2(idwmodel *s, double x0, double x1, ae_state *_state) {
 //       evaluation from the multiple threads, use idwtscalcbuf()  with  per-
 //       thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   IDW interpolant built with IDW builder
 //     X0,X1,X2-   argument value
 //
@@ -1320,12 +1320,12 @@ double idwcalc3(idwmodel *s, double x0, double x1, double x2, ae_state *_state) 
 //       evaluation from the multiple threads, use idwtscalcbuf()  with  per-
 //       thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   IDW model
 //     X       -   coordinates, array[NX]. X may have more than NX  elements,
 //                 in this case only leading NX will be used.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is out-parameter and will  be
 //                 reallocated after call to this function. In case you  want
 //                 to reuse previously allocated Y, you may use idwcalcbuf(),
@@ -1349,13 +1349,13 @@ void idwcalc(idwmodel *s, RVector *x, RVector *y, ae_state *_state) {
 //       evaluation from the multiple threads, use idwtscalcbuf()  with  per-
 //       thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   IDW model
 //     X       -   coordinates, array[NX]. X may have more than NX  elements,
 //                 in this case only leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
@@ -1373,7 +1373,7 @@ void idwcalcbuf(idwmodel *s, RVector *x, RVector *y, ae_state *_state) {
 // assuming  that  different   threads  use different instances of the buffer
 // structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   IDW model, may be shared between different threads
 //     Buf     -   buffer object created for this particular instance of  IDW
 //                 model with idwcreatecalcbuffer().
@@ -1381,7 +1381,7 @@ void idwcalcbuf(idwmodel *s, RVector *x, RVector *y, ae_state *_state) {
 //                 in this case only  leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -1610,10 +1610,10 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y, ae_st
 // This function fits IDW model to the dataset using current IDW construction
 // algorithm. A model being built and fitting report are returned.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   builder object
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Model   -   an IDW model built with current algorithm
 //     Rep     -   model fitting report, fields of this structure contain
 //                 information about average fitting errors.
@@ -3205,12 +3205,12 @@ namespace alglib_impl {
 // Conversion from barycentric representation to Chebyshev basis.
 // This function has O(N^2) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   polynomial in barycentric form
 //     A,B -   base interval for Chebyshev polynomials (see below)
 //             A<>B
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     T   -   coefficients of Chebyshev representation;
 //             P(x) = sum { T[i]*Ti(2*(x-A)/(B-A)-1), i=0..N-1 },
 //             where Ti - I-th Chebyshev polynomial.
@@ -3300,7 +3300,7 @@ void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *
 // Conversion from Chebyshev basis to barycentric representation.
 // This function has O(N^2) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     T   -   coefficients of Chebyshev representation;
 //             P(x) = sum { T[i]*Ti(2*(x-A)/(B-A)-1), i=0..N },
 //             where Ti - I-th Chebyshev polynomial.
@@ -3310,7 +3310,7 @@ void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *
 //     A,B -   base interval for Chebyshev polynomials (see above)
 //             A<B
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   polynomial in barycentric form
 // ALGLIB: Copyright 30.09.2010 by Sergey Bochkanov
 // API: void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p, const xparams _xparams = xdefault);
@@ -3364,12 +3364,12 @@ void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentrici
 // Conversion from barycentric representation to power basis.
 // This function has O(N^2) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   polynomial in barycentric form
 //     C   -   offset (see below); 0.0 is used as default value.
 //     S   -   scale (see below);  1.0 is used as default value. S<>0.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   coefficients, P(x) = sum { A[i]*((X-C)/S)^i, i=0..N-1 }
 //     N   -   number of coefficients (polynomial degree plus 1)
 //
@@ -3606,7 +3606,7 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
 // Conversion from power basis to barycentric representation.
 // This function has O(N^2) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   coefficients, P(x) = sum { A[i]*((X-C)/S)^i, i=0..N-1 }
 //     N   -   number of coefficients (polynomial degree plus 1)
 //             * if given, only leading N elements of A are used
@@ -3614,7 +3614,7 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
 //     C   -   offset (see below); 0.0 is used as default value.
 //     S   -   scale (see below);  1.0 is used as default value. S<>0.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   polynomial in barycentric form
 //
 //
@@ -3681,12 +3681,12 @@ void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricin
 // Lagrange intepolant: generation of the model on the general grid.
 // This function has O(N^2) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   abscissas, array[0..N-1]
 //     Y   -   function values, array[0..N-1]
 //     N   -   number of points, N>=1
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
@@ -3767,14 +3767,14 @@ void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant 
 // Lagrange intepolant: generation of the model on equidistant grid.
 // This function has O(N) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1]
 //     N   -   number of points, N>=1
 //             for N=1 a constant model is constructed.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
@@ -3830,7 +3830,7 @@ void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentr
 // Lagrange intepolant on Chebyshev grid (first kind).
 // This function has O(N) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1],
@@ -3838,7 +3838,7 @@ void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentr
 //     N   -   number of points, N>=1
 //             for N=1 a constant model is constructed.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
@@ -3894,7 +3894,7 @@ void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentri
 // Lagrange intepolant on Chebyshev grid (second kind).
 // This function has O(N) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1],
@@ -3902,7 +3902,7 @@ void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentri
 //     N   -   number of points, N>=1
 //             for N=1 a constant model is constructed.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
@@ -3959,7 +3959,7 @@ void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentri
 
 // Fast equidistant polynomial interpolation function with O(N) complexity
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     F   -   function values, array[0..N-1]
@@ -3967,7 +3967,7 @@ void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentri
 //             for N=1 a constant model is constructed.
 //     T   -   position where P(x) is calculated
 //
-// RESULT
+// Result:
 //     value of the Lagrange interpolant at T
 //
 // IMPORTANT
@@ -4057,7 +4057,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
 // Fast polynomial interpolation function on Chebyshev points (first kind)
 // with O(N) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     F   -   function values, array[0..N-1]
@@ -4066,7 +4066,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
 //             for N=1 a constant model is constructed.
 //     T   -   position where P(x) is calculated
 //
-// RESULT
+// Result:
 //     value of the Lagrange interpolant at T
 //
 // IMPORTANT
@@ -4209,7 +4209,7 @@ double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t,
 // Fast polynomial interpolation function on Chebyshev points (second kind)
 // with O(N) complexity.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     F   -   function values, array[0..N-1]
@@ -4218,7 +4218,7 @@ double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t,
 //             for N=1 a constant model is constructed.
 //     T   -   position where P(x) is calculated
 //
-// RESULT
+// Result:
 //     value of the Lagrange interpolant at T
 //
 // IMPORTANT
@@ -4800,7 +4800,7 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 
 // This subroutine builds linear spline interpolant
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   spline nodes, array[0..N-1]
 //     Y   -   function values, array[0..N-1]
 //     N   -   points count (optional):
@@ -4809,7 +4809,7 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //             * if not given, automatically detected from X/Y sizes
 //               (len(X) must be equal to len(Y))
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   spline interpolant
 //
 //
@@ -4867,11 +4867,11 @@ void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant
 
 // This subroutine builds cubic spline interpolant.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes, array[0..N-1].
 //     Y           -   function values, array[0..N-1].
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points are used to build spline
@@ -4884,7 +4884,7 @@ void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C           -   spline interpolant
 //
 // ORDER OF POINTS
@@ -4998,11 +4998,11 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 // sequence of Spline1DDiff() calls, but it can be several times faster  when
 // called for ordered X[] and X2[].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes
 //     Y           -   function values
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points are used
@@ -5015,7 +5015,7 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     D           -   derivative values at X[]
 //
 // ORDER OF POINTS
@@ -5132,11 +5132,11 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // sequence of Spline1DDiff() calls, but it can be several times faster  when
 // called for ordered X[] and X2[].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes
 //     Y           -   function values
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points are used
@@ -5149,7 +5149,7 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     D1          -   S' values at X[]
 //     D2          -   S'' values at X[]
 //
@@ -5302,12 +5302,12 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 // sequence of Spline1DDiff() calls, but it can be several times faster  when
 // called for ordered X[] and X2[].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   old spline nodes
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points from X/Y are used
@@ -5324,7 +5324,7 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F2          -   function values at X2[]
 //
 // ORDER OF POINTS
@@ -5476,12 +5476,12 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 // sequence of Spline1DDiff() calls, but it can be several times faster  when
 // called for ordered X[] and X2[].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   old spline nodes
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points from X/Y are used
@@ -5498,7 +5498,7 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F2          -   function values at X2[]
 //     D2          -   first derivatives at X2[]
 //
@@ -5654,12 +5654,12 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // sequence of Spline1DDiff() calls, but it can be several times faster  when
 // called for ordered X[] and X2[].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   old spline nodes
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points from X/Y are used
@@ -5676,7 +5676,7 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F2          -   function values at X2[]
 //     D2          -   first derivatives at X2[]
 //     DD2         -   second derivatives at X2[]
@@ -5828,11 +5828,11 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 
 // This subroutine builds Catmull-Rom spline interpolant.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes, array[0..N-1].
 //     Y           -   function values, array[0..N-1].
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N>=2
 //                     * if given, only first N points are used to build spline
@@ -5845,7 +5845,7 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //                     * tension=0   corresponds to classic Catmull-Rom spline (default)
 //                     * 0<tension<1 corresponds to more general form - cardinal spline
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C           -   spline interpolant
 //
 //
@@ -5945,7 +5945,7 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 
 // This subroutine builds Hermite spline interpolant.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes, array[0..N-1]
 //     Y           -   function values, array[0..N-1]
 //     D           -   derivatives, array[0..N-1]
@@ -5955,7 +5955,7 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C           -   spline interpolant.
 //
 //
@@ -6025,7 +6025,7 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 
 // This subroutine builds Akima spline interpolant
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes, array[0..N-1]
 //     Y           -   function values, array[0..N-1]
 //     N           -   points count (optional):
@@ -6034,7 +6034,7 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C           -   spline interpolant
 //
 //
@@ -6115,7 +6115,7 @@ void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant 
 
 // This subroutine calculates the value of the spline at the given point X.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant
 //     X   -   point
 //
@@ -6163,7 +6163,7 @@ double spline1dcalc(spline1dinterpolant *c, double x, ae_state *_state) {
 
 // This subroutine differentiates the spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X   -   point
 //
@@ -6219,7 +6219,7 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
 
 // This subroutine makes the copy of the spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //
 // Result:
@@ -6243,11 +6243,11 @@ void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc, ae_state *_st
 
 // This subroutine unpacks the spline into the coefficients table.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X   -   point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Tbl -   coefficients table, unpacked format, array[0..N-2, 0..5].
 //             For I = 0...N-2:
 //                 Tbl[I,0] = X[i]
@@ -6288,7 +6288,7 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl, ae_state 
 
 // This subroutine performs linear transformation of the spline argument.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     A, B-   transformation coefficients: x = A*t + B
 // Result:
@@ -6358,7 +6358,7 @@ void spline1dlintransx(spline1dinterpolant *c, double a, double b, ae_state *_st
 
 // This subroutine performs linear transformation of the spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     A, B-   transformation coefficients: S2(x) = A*S(x) + B
 // Result:
@@ -6384,7 +6384,7 @@ void spline1dlintransy(spline1dinterpolant *c, double a, double b, ae_state *_st
 
 // This subroutine integrates the spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X   -   right bound of the integration interval [a, x],
 //             here 'a' denotes min(x[])
@@ -6497,7 +6497,7 @@ double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state) {
 // NOTE: it is OK to run this function with both M<<N and M>>N;  say,  it  is
 //       possible to process 100 points with 1000-node spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   points, array[0..N-1].
 //     Y           -   function values, array[0..N-1].
 //     N           -   number of points (optional):
@@ -6509,7 +6509,7 @@ double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state) {
 //                     It penalizes nonlinearity in the regression spline.
 //                     Possible values to start from are 0.00001, 0.1, 1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S   -   spline interpolant.
 //     Rep -   Following fields are set:
 //             * RMSError      rms error on the (X,Y).
@@ -6867,7 +6867,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
 //
 // Converts from Hermite spline given by grid XOld to new grid X2
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XOld    -   old grid
 //     YOld    -   values at old grid
 //     DOld    -   first derivative at old grid
@@ -6987,10 +6987,10 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
 // of [A,B] will not be found. It returns all isolated (including  multiple)
 // roots and extrema.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     C           -   spline interpolant
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R           -   array[NR], contains roots of the spline.
 //                     In case there is no roots, this array has zero length.
 //     NR          -   number of roots, >=0
@@ -7452,13 +7452,13 @@ void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n, ae_state *_
 
 // This procedure search roots of an quadratic equation inside [0;1] and it number of roots.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P0   -   value of a function at 0
 //     M0   -   value of a derivative at 0
 //     P1   -   value of a function at 1
 //     M1   -   value of a derivative at 1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X0   -  first root of an equation
 //     X1   -  second root of an equation
 //     NR   -  number of roots
@@ -7663,7 +7663,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
 // This procedure search roots of an cubic equation inside [A;B], it number of roots
 // and number of extremums.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     pA   -   value of a function at A
 //     mA   -   value of a derivative at A
 //     pB   -   value of a function at B
@@ -7671,7 +7671,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
 //     A0   -   left border [A0;B0]
 //     B0   -   right border [A0;B0]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X0   -  first root of an equation
 //     X1   -  second root of an equation
 //     X2   -  third root of an equation
@@ -7913,7 +7913,7 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
 // Function for searching a root at [A;B] by bisection method and return number of roots
 // (0 or 1)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     pA   -   value of a function at A
 //     mA   -   value of a derivative at A
 //     pB   -   value of a function at B
@@ -8018,13 +8018,13 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
 // monotonic.  Say, for x=(0,1,2,3,4)  and  y=(0,1,2,1,0)  interpolant  will
 // monotonically grow at [0..2] and monotonically decrease at [2..4].
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X           -   spline nodes, array[0..N-1]. Subroutine automatically
 //                     sorts points, so caller may pass unsorted array.
 //     Y           -   function values, array[0..N-1]
 //     N           -   the number of points(N>=2).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C           -   spline interpolant.
 // ALGLIB Project: Copyright 21.06.2012 by Sergey Bochkanov
 // API: void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
@@ -8444,14 +8444,14 @@ static double spline1d_diffthreepoint(double t, double x0, double f0, double x1,
 // Procedure for calculating value of a function is providet in the form of
 // Hermite polinom
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P0   -   value of a function at 0
 //     M0   -   value of a derivative at 0
 //     P1   -   value of a function at 1
 //     M1   -   value of a derivative at 1
 //     T    -   point inside [0;1]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S    -   value of a function at T
 //     B0   -   value of a derivative function at T
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
@@ -8466,7 +8466,7 @@ static void spline1d_hermitecalc(double p0, double m0, double p1, double m1, dou
 
 // Function for mapping from [A0;B0] to [A1;B1]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A0   -   left border [A0;B0]
 //     B0   -   right border [A0;B0]
 //     A1   -   left border [A1;B1]
@@ -8478,7 +8478,7 @@ static void spline1d_hermitecalc(double p0, double m0, double p1, double m1, dou
 // We assume, that B0>A0 and B1>A1. But we chech, that T is inside [A0;B0],
 // and if T<A0 then T become A1, if T>B0 then T - B1.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //         A0   -   left border for segment [A0;B0] from 'T' is converted to [A1;B1]
 //         B0   -   right border for segment [A0;B0] from 'T' is converted to [A1;B1]
 //         A1   -   left border for segment [A1;B1] to 'T' is converted from [A0;B0]
@@ -9275,7 +9275,7 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
 //   ParametricRDPFixed() function provided  by  "Parametric"  subpackage  of
 //   "Interpolation" package.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array of X-coordinates:
 //                 * at least N elements
 //                 * can be unordered (points are automatically sorted)
@@ -9289,7 +9289,7 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
 //                 * less than M sections can be generated if we have N<M
 //                   (or some X are non-distinct).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X2      -   X-values of corner points for piecewise approximation,
 //                 has length NSections+1 or zero (for NSections=0).
 //     Y2      -   Y-values of corner points,
@@ -9471,7 +9471,7 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
 //   ParametricRDPFixed() function provided  by  "Parametric"  subpackage  of
 //   "Interpolation" package.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array of X-coordinates:
 //                 * at least N elements
 //                 * can be unordered (points are automatically sorted)
@@ -9483,7 +9483,7 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
 //     Eps     -   positive number, desired precision.
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X2      -   X-values of corner points for piecewise approximation,
 //                 has length NSections+1 or zero (for NSections=0).
 //     Y2      -   Y-values of corner points,
@@ -9603,7 +9603,7 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
 //     basis with PolynomialBar2Pow() or PolynomialBar2Cheb() functions  from
 //     POLINT subpackage.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     N   -   number of points, N>0
@@ -9611,7 +9611,7 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
 //             * if not given, automatically determined from sizes of X/Y
 //     M   -   number of basis functions (= polynomial_degree + 1), M>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -9679,7 +9679,7 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 //     basis with PolynomialBar2Pow() or PolynomialBar2Cheb() functions  from
 //     POLINT subpackage.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     W   -   weights, array[0..N-1]
@@ -9701,7 +9701,7 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
 //     M   -   number of basis functions (= polynomial_degree + 1), M>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -9903,7 +9903,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 //
 //     F(x|A,B,C,D) = D+(A-D)/(1+Power(x/C,B))
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   current point, X>=0:
 //                 * zero X is correctly handled even for B<=0
 //                 * negative X results in exception.
@@ -9914,7 +9914,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 //                 * C>0, non-positive value results in exception
 //                 * D is unconstrained
 //
-// RESULT:
+// Result:
 //     model value at X
 //
 // NOTE: if B=0, denominator is assumed to be equal to 2.0 even  for  zero  X
@@ -9963,7 +9963,7 @@ double logisticcalc4(double x, double a, double b, double c, double d, ae_state 
 //
 //     F(x|A,B,C,D,G) = D+(A-D)/Power(1+Power(x/C,B),G)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   current point, X>=0:
 //                 * zero X is correctly handled even for B<=0
 //                 * negative X results in exception.
@@ -9975,7 +9975,7 @@ double logisticcalc4(double x, double a, double b, double c, double d, ae_state 
 //                 * D is unconstrained
 //                 * G>0, non-positive value results in exception
 //
-// RESULT:
+// Result:
 //     model value at X
 //
 // NOTE: if B=0, denominator is assumed to be equal to Power(2.0,G) even  for
@@ -10056,7 +10056,7 @@ double logisticcalc5(double x, double a, double b, double c, double d, double g,
 // Furthermore, it automatically scales when input data have  very  large  or
 // very small range.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N], stores X-values.
 //                 MUST include only non-negative numbers  (but  may  include
 //                 zero values). Can be unsorted.
@@ -10064,7 +10064,7 @@ double logisticcalc5(double x, double a, double b, double c, double d, double g,
 //     N       -   number of points. If N is less than  length  of  X/Y, only
 //                 leading N elements are used.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A, B, C, D- parameters of 4PL model
 //     Rep     -   fitting report. This structure has many fields,  but  ONLY
 //                 ONES LISTED BELOW ARE SET:
@@ -10154,7 +10154,7 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // Furthermore, it automatically scales when input data have  very  large  or
 // very small range.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N], stores X-values.
 //                 MUST include only non-negative numbers  (but  may  include
 //                 zero values). Can be unsorted.
@@ -10175,7 +10175,7 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A, B, C, D- parameters of 4PL model
 //     Rep     -   fitting report. This structure has many fields,  but  ONLY
 //                 ONES LISTED BELOW ARE SET:
@@ -10279,7 +10279,7 @@ void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // Furthermore, it automatically scales when input data have  very  large  or
 // very small range.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N], stores X-values.
 //                 MUST include only non-negative numbers  (but  may  include
 //                 zero values). Can be unsorted.
@@ -10287,7 +10287,7 @@ void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //     N       -   number of points. If N is less than  length  of  X/Y, only
 //                 leading N elements are used.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A,B,C,D,G-  parameters of 5PL model
 //     Rep     -   fitting report. This structure has many fields,  but  ONLY
 //                 ONES LISTED BELOW ARE SET:
@@ -10380,7 +10380,7 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // Furthermore, it automatically scales when input data have  very  large  or
 // very small range.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N], stores X-values.
 //                 MUST include only non-negative numbers  (but  may  include
 //                 zero values). Can be unsorted.
@@ -10401,7 +10401,7 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A,B,C,D,G-  parameters of 5PL model
 //     Rep     -   fitting report. This structure has many fields,  but  ONLY
 //                 ONES LISTED BELOW ARE SET:
@@ -10492,7 +10492,7 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //     * C>0
 //     * G>0 (if present)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N], stores X-values.
 //                 MUST include only non-negative numbers  (but  may  include
 //                 zero values). Can be unsorted.
@@ -10526,7 +10526,7 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //                 Zero value means that function automatically choose  small
 //                 amount of restarts (recommended).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A, B, C, D- parameters of 4PL model
 //     G       -   parameter of 5PL model; for Is4PL=True, G=1 is returned.
 //     Rep     -   fitting report. This structure has many fields,  but  ONLY
@@ -11015,7 +11015,7 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // * BarycentricFitFloaterHormann(), "lightweight" fitting without invididual
 //   weights and constraints.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     W   -   weights, array[0..N-1]
@@ -11035,7 +11035,7 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
 //     M   -   number of basis functions ( = number_of_nodes), M>=2.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -11168,13 +11168,13 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
 // is used. Complexity  of  this  computational  scheme is  O(N*M^2)  (mostly
 // dominated by the least squares solver).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     N   -   number of points, N>0.
 //     M   -   number of basis functions ( = number_of_nodes), M>=2.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -11244,7 +11244,7 @@ void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m
 //     Spline1DFitCubic()      -   "lightweight" fitting  by  cubic  splines,
 //                                 without invididual weights and constraints
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     W   -   weights, array[0..N-1]
@@ -11270,7 +11270,7 @@ void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m
 //             * if not given, automatically determined from XC/YC/DC
 //     M   -   number of basis functions ( = number_of_nodes+2), M>=4.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -11366,7 +11366,7 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 //     Spline1DFitHermite()    -   "lightweight" Hermite fitting, without
 //                                 invididual weights and constraints
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     W   -   weights, array[0..N-1]
@@ -11394,7 +11394,7 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 //             M>=4,
 //             M IS EVEN!
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -11581,7 +11581,7 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 //            stability  issues  which  arise  when   you   fit   high-degree
 //            polynomials to your data.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Y       -   array[0..N-1] Function values in  N  points.
 //     W       -   array[0..N-1]  Weights  corresponding to function  values.
 //                 Each summand in square  sum  of  approximation  deviations
@@ -11592,7 +11592,7 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 //     N       -   number of points used. N>=1.
 //     M       -   number of basis functions, M>=1.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   error code:
 //                 * -4    internal SVD decomposition subroutine failed (very
 //                         rare and for degenerate systems only)
@@ -11678,7 +11678,7 @@ void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t
 //            stability  issues  which  arise  when   you   fit   high-degree
 //            polynomials to your data.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Y       -   array[0..N-1] Function values in  N  points.
 //     W       -   array[0..N-1]  Weights  corresponding to function  values.
 //                 Each summand in square  sum  of  approximation  deviations
@@ -11694,7 +11694,7 @@ void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t
 //     K       -   number of constraints, 0 <= K < M
 //                 K=0 corresponds to absence of constraints.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   error code:
 //                 * -4    internal SVD decomposition subroutine failed (very
 //                         rare and for degenerate systems only)
@@ -11885,14 +11885,14 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
 //            stability  issues  which  arise  when   you   fit   high-degree
 //            polynomials to your data.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Y       -   array[0..N-1] Function values in  N  points.
 //     FMatrix -   a table of basis functions values, array[0..N-1, 0..M-1].
 //                 FMatrix[I, J] - value of J-th basis function in I-th point.
 //     N       -   number of points used. N>=1.
 //     M       -   number of basis functions, M>=1.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   error code:
 //                 * -4    internal SVD decomposition subroutine failed (very
 //                         rare and for degenerate systems only)
@@ -11986,7 +11986,7 @@ void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t 
 //            stability  issues  which  arise  when   you   fit   high-degree
 //            polynomials to your data.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Y       -   array[0..N-1] Function values in  N  points.
 //     FMatrix -   a table of basis functions values, array[0..N-1, 0..M-1].
 //                 FMatrix[I,J] - value of J-th basis function in I-th point.
@@ -11998,7 +11998,7 @@ void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t 
 //     K       -   number of constraints, 0 <= K < M
 //                 K=0 corresponds to absence of constraints.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   error code:
 //                 * -4    internal SVD decomposition subroutine failed (very
 //                         rare and for degenerate systems only)
@@ -12116,7 +12116,7 @@ void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae
 //
 // This subroutine uses only f(c,x[i]).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     W       -   weights, array[0..N-1]
@@ -12129,7 +12129,7 @@ void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae
 //                 large = loss of accuracy
 //                 small = growth of round-off errors
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 18.10.2008 by Sergey Bochkanov
 // API: void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
@@ -12215,7 +12215,7 @@ void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, a
 //
 // This subroutine uses only f(c,x[i]).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     C       -   array[0..K-1], initial approximation to the solution,
@@ -12227,7 +12227,7 @@ void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, a
 //                 large = loss of accuracy
 //                 small = growth of round-off errors
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 18.10.2008 by Sergey Bochkanov
 // API: void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
@@ -12308,7 +12308,7 @@ void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae
 //
 // This subroutine uses only f(c,x[i]) and its gradient.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     W       -   weights, array[0..N-1]
@@ -12325,7 +12325,7 @@ void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae
 //                         Standard Jacibian-bases  Levenberg-Marquardt  algo
 //                         will be used (FJ scheme).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 //
 // See also:
@@ -12417,7 +12417,7 @@ void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, 
 //
 // This subroutine uses only f(c,x[i]) and its gradient.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     C       -   array[0..K-1], initial approximation to the solution,
@@ -12433,7 +12433,7 @@ void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, 
 //                         Standard Jacibian-bases  Levenberg-Marquardt  algo
 //                         will be used (FJ scheme).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 // API: void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
@@ -12517,7 +12517,7 @@ void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, a
 //
 // This subroutine uses f(c,x[i]), its gradient and its Hessian.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     W       -   weights, array[0..N-1]
@@ -12526,7 +12526,7 @@ void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, a
 //     M       -   dimension of space
 //     K       -   number of parameters being fitted
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 // API: void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
@@ -12609,7 +12609,7 @@ void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n,
 //
 // This subroutine uses f(c,x[i]), its gradient and its Hessian.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[0..N-1,0..M-1], points (one row = one point)
 //     Y       -   array[0..N-1], function values.
 //     C       -   array[0..K-1], initial approximation to the solution,
@@ -12617,7 +12617,7 @@ void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n,
 //     M       -   dimension of space
 //     K       -   number of parameters being fitted
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 // API: void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
@@ -12682,7 +12682,7 @@ void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, 
 
 // Stopping conditions for nonlinear least squares fitting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     EpsX    -   >=0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
@@ -12714,7 +12714,7 @@ void lsfitsetcond(lsfitstate *state, double epsx, ae_int_t maxits, ae_state *_st
 
 // This function sets maximum step length
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
@@ -12738,7 +12738,7 @@ void lsfitsetstpmax(lsfitstate *state, double stpmax, ae_state *_state) {
 
 // This function turns on/off reporting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure which stores algorithm state
 //     NeedXRep-   whether iteration reports are needed or not
 //
@@ -12769,7 +12769,7 @@ void lsfitsetxrep(lsfitstate *state, bool needxrep, ae_state *_state) {
 // stopping is possible when very badly scalled variables are  combined  with
 // relaxed stopping conditions).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
@@ -12791,7 +12791,7 @@ void lsfitsetscale(lsfitstate *state, RVector *s, ae_state *_state) {
 // Boundary constraints are inactive by default (after initial creation).
 // They are preserved until explicitly turned off with another SetBC() call.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure stores algorithm state
 //     BndL    -   lower bounds, array[K].
 //                 If some (all) variables are unbounded, you may specify
@@ -12834,7 +12834,7 @@ void lsfitsetbc(lsfitstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 // Linear constraints are inactive by default (after initial creation).
 // They are preserved until explicitly turned off with another SetLC() call.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   structure stores algorithm state
 //     C       -   linear constraints, array[K,N+1].
 //                 Each row of C represents one constraint, either equality
@@ -13478,10 +13478,10 @@ lbl_rcomm:
 //
 // Called after return from LSFitFit().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info    -   completion code:
 //                     * -8    optimizer   detected  NAN/INF  in  the  target
 //                             function and/or gradient
@@ -13624,7 +13624,7 @@ void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *re
 // NOTE 4: this function works only for optimizers created with LSFitCreateWFG()
 //         or LSFitCreateFG() constructors.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step:
 //                     * TestStep=0 turns verification off
@@ -13643,12 +13643,12 @@ void lsfitsetgradientcheck(lsfitstate *state, double teststep, ae_state *_state)
 // worst deviation from linear model (non-parametric version which sees curve
 // as Y(x)).
 //
-// Input parameters:
+// Inputs:
 //     X, Y        -   SORTED arrays.
 //     I0,I1       -   interval (boundaries included) to process
 //     Eps         -   desired precision
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     WorstIdx    -   index of worst point
 //     WorstError  -   error at worst point
 //
@@ -13691,7 +13691,7 @@ static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_
 // Recursive splitting of interval [I0,I1] (right boundary included) with RDP
 // algorithm (non-parametric version which sees curve as Y(x)).
 //
-// Input parameters:
+// Inputs:
 //     X, Y        -   SORTED arrays.
 //     I0,I1       -   interval (boundaries included) to process
 //     Eps         -   desired precision
@@ -13700,7 +13700,7 @@ static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_
 //                     curve
 //     NOut        -   must contain 2 on input
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XOut, YOut  -   curve generated by RDP algorithm, UNSORTED
 //     NOut        -   number of points in curve
 // ALGLIB Project: Copyright 02.10.2014 by Sergey Bochkanov
@@ -14510,7 +14510,7 @@ static void lsfit_barycentriccalcbasis(barycentricinterpolant *b, double t, RVec
 // This function is used to fit general (shifted) Chebyshev models, power
 // basis models or barycentric models.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     W   -   weights, array[0..N-1]
@@ -14525,7 +14525,7 @@ static void lsfit_barycentriccalcbasis(barycentricinterpolant *b, double t, RVec
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
 //     M   -   number of basis functions (= polynomial_degree + 1), M>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
 //             * Info<=0   an error occured:
@@ -14937,7 +14937,7 @@ static void lsfit_clearreport(lsfitreport *rep, ae_state *_state) {
 // It has a bit awkward interface, but it can be used  for  both  linear  and
 // nonlinear problems.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     F1  -   array[0..N-1,0..K-1]:
 //             * for linear problems - matrix of function values
 //             * for nonlinear problems - Jacobian matrix
@@ -14977,7 +14977,7 @@ static void lsfit_clearreport(lsfitreport *rep, ae_state *_state) {
 //                                 It should not be changed by algorithm.
 //     ZKind-  contents of Z
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //
 // * Rep.CovPar        covariance matrix for parameters, array[K,K].
 // * Rep.ErrPar        errors in parameters, array[K],
@@ -16825,13 +16825,13 @@ namespace alglib_impl {
 // from points to the center and  some  "candidate"  radius,  which  is  also
 // fitted to the data.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
 //     NX      -   space dimensionality, NX>0 (1, 2, 3, 4, 5 and so on)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     R       -   radius
 // ALGLIB: Copyright 07.05.2018 by Sergey Bochkanov
@@ -16848,13 +16848,13 @@ void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // Fits minimum circumscribed (MC) circle (or NX-dimensional sphere) to  data
 // (a set of points in NX-dimensional space).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
 //     NX      -   space dimensionality, NX>0 (1, 2, 3, 4, 5 and so on)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     RHi     -   radius
 //
@@ -16882,13 +16882,13 @@ void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // Fits maximum inscribed circle (or NX-dimensional sphere) to data (a set of
 // points in NX-dimensional space).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
 //     NX      -   space dimensionality, NX>0 (1, 2, 3, 4, 5 and so on)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     RLo     -   radius
 //
@@ -16916,13 +16916,13 @@ void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // Fits minimum zone circle (or NX-dimensional sphere)  to  data  (a  set  of
 // points in NX-dimensional space).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
 //     NX      -   space dimensionality, NX>0 (1, 2, 3, 4, 5 and so on)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     RLo     -   radius of inscribed circle
 //     RHo     -   radius of circumscribed circle
@@ -16968,7 +16968,7 @@ void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // such unusual fitting problem,  its  stability,  drawbacks  of  alternative
 // methods, and convergence properties.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
@@ -17002,7 +17002,7 @@ void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 //                 * generally, default value is good enough
 //                 Ignored for ProblemType=0.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     RLo     -   radius:
 //                 * for ProblemType=2,3, radius of the inscribed sphere
@@ -17119,7 +17119,7 @@ void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype
 //
 // Internal computational function.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NX] (or larger), contains dataset.
 //                 One row = one point in NX-dimensional space.
 //     NPoints -   dataset size, NPoints>0
@@ -17168,7 +17168,7 @@ void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype
 //                 * ignored by SLP optimizer
 //                 Ignored for ProblemType=0.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CX      -   central point for a sphere
 //     RLo     -   radius:
 //                 * for ProblemType=2,3, radius of the inscribed sphere
@@ -17769,7 +17769,7 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
 // This function  builds  non-periodic 2-dimensional parametric spline  which
 // starts at (X[0],Y[0]) and ends at (X[N-1],Y[N-1]).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY  -   points, array[0..N-1,0..1].
 //             XY[I,0:1] corresponds to the Ith point.
 //             Order of points is important!
@@ -17784,7 +17784,7 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
 //             * 1     chord length
 //             * 2     centripetal
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     P   -   parametric spline interpolant
 //
 //
@@ -17916,7 +17916,7 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 // starts at (X[0],Y[0]), goes through all points to (X[N-1],Y[N-1]) and then
 // back to (X[0],Y[0]).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY  -   points, array[0..N-1,0..1].
 //             XY[I,0:1] corresponds to the Ith point.
 //             XY[N-1,0:1] must be different from XY[0,0:1].
@@ -17930,7 +17930,7 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 //             * 1     chord length
 //             * 2     centripetal
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     P   -   parametric spline interpolant
 //
 //
@@ -18063,10 +18063,10 @@ void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, ps
 //     (X[2],Y[2]) = PSpline2Calc(P,U[2]),
 //     ...
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     N   -   array size
 //     T   -   array[0..N-1]
 //
@@ -18114,7 +18114,7 @@ void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t, ae
 // This function  calculates  the value of the parametric spline for a  given
 // value of parameter T
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18123,7 +18123,7 @@ void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t, ae
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-position
 //     Y   -   Y-position
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
@@ -18143,7 +18143,7 @@ void pspline2calc(pspline2interpolant *p, double t, double *x, double *y, ae_sta
 // This function  calculates  the value of the parametric spline for a  given
 // value of parameter T.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18152,7 +18152,7 @@ void pspline2calc(pspline2interpolant *p, double t, double *x, double *y, ae_sta
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-position
 //     Y   -   Y-position
 //     Z   -   Z-position
@@ -18174,7 +18174,7 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
 
 // This function  calculates  tangent vector for a given value of parameter T
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18183,7 +18183,7 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X    -   X-component of tangent vector (normalized)
 //     Y    -   Y-component of tangent vector (normalized)
 //
@@ -18215,7 +18215,7 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y, ae_
 
 // This function  calculates  tangent vector for a given value of parameter T
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18224,7 +18224,7 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y, ae_
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X    -   X-component of tangent vector (normalized)
 //     Y    -   Y-component of tangent vector (normalized)
 //     Z    -   Z-component of tangent vector (normalized)
@@ -18257,7 +18257,7 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
 
 // This function calculates derivative, i.e. it returns (dX/dT,dY/dT).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18266,7 +18266,7 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-value
 //     DX  -   X-derivative
 //     Y   -   Y-value
@@ -18290,7 +18290,7 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
 
 // This function calculates derivative, i.e. it returns (dX/dT,dY/dT,dZ/dT).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18299,7 +18299,7 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-value
 //     DX  -   X-derivative
 //     Y   -   Y-value
@@ -18328,7 +18328,7 @@ void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, doubl
 
 // This function calculates first and second derivative with respect to T.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18337,7 +18337,7 @@ void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, doubl
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-value
 //     DX  -   derivative
 //     D2X -   second derivative
@@ -18364,7 +18364,7 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
 
 // This function calculates first and second derivative with respect to T.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     T   -   point:
 //             * T in [0,1] corresponds to interval spanned by points
@@ -18373,7 +18373,7 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
 //             * for periodic splines T<0 (or T>1) are projected  into  [0,1]
 //               by making T=T-floor(T).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X   -   X-value
 //     DX  -   derivative
 //     D2X -   second derivative
@@ -18408,13 +18408,13 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
 // This function  calculates  arc length, i.e. length of  curve  between  t=a
 // and t=b.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     A,B -   parameter values corresponding to arc ends:
 //             * B>A will result in positive length returned
 //             * B<A will result in negative length returned
 //
-// RESULT:
+// Result:
 //     length of arc starting at T=A and ending at T=B.
 // ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 // API: double pspline2arclength(const pspline2interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
@@ -18451,13 +18451,13 @@ double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_
 // This function  calculates  arc length, i.e. length of  curve  between  t=a
 // and t=b.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     P   -   parametric spline interpolant
 //     A,B -   parameter values corresponding to arc ends:
 //             * B>A will result in positive length returned
 //             * B<A will result in negative length returned
 //
-// RESULT:
+// Result:
 //     length of arc starting at T=A and ending at T=B.
 // ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 // API: double pspline3arclength(const pspline3interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
@@ -18506,7 +18506,7 @@ double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_
 // X(t) with desired precision (or has specified number of sections).
 //
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array of multidimensional points:
 //                 * at least N elements, leading N elements are used if more
 //                   than N elements were specified
@@ -18526,7 +18526,7 @@ double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_
 //                 * zero Eps means that algorithm does not stop after
 //                   achieving some pre-specified precision
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X2      -   array of corner points for piecewise approximation,
 //                 has length NSections+1 or zero (for NSections=0).
 //     Idx2    -   array of indexes (parameter values):
@@ -18768,12 +18768,12 @@ static void parametric_pspline3par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector
 // worst deviation from linear model (PARAMETRIC version which sees curve
 // as X(t) with vector X).
 //
-// Input parameters:
+// Inputs:
 //     XY          -   array
 //     I0,I1       -   interval (boundaries included) to process
 //     D           -   number of dimensions
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     WorstIdx    -   index of worst point
 //     WorstError  -   error at worst point
 //
@@ -19294,11 +19294,11 @@ static void rbfv1_buildrbfmlayersmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, 
 // This function creates RBF  model  for  a  scalar (NY=1)  or  vector (NY>1)
 // function in a NX-dimensional space (NX=2 or NX=3).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     NX      -   dimension of the space, NX=2 or NX=3
 //     NY      -   function dimension, NY>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S       -   RBF model (initially equals to zero)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state) {
@@ -19341,10 +19341,10 @@ void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state) {
 // * call rbftscalcbuf() from different threads,  with  each  thread  working
 //   with its own copy of buffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S           -   RBF model
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf         -   external buffer.
 //
 //
@@ -19379,7 +19379,7 @@ void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state
 // After you called this function you can call RBFCalc(),  RBFGridCalc()  and
 // other model calculation functions.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     Rep     -   report:
 //                 * Rep.TerminationType:
@@ -19720,12 +19720,12 @@ void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state) {
 // * NX<>2
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfv1calc2(rbfv1model *s, double x0, double x1, ae_state *_state) {
@@ -19785,13 +19785,13 @@ double rbfv1calc2(rbfv1model *s, double x0, double x1, ae_state *_state) {
 // * NX<>3
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //     X2      -   third coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2, ae_state *_state) {
@@ -19844,14 +19844,14 @@ double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2, ae_state *_sta
 // Same as RBFCalc(), but does not reallocate Y when in is large enough to
 // store function values.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X       -   coordinates, array[NX].
 //                 X may have more than NX elements, in this case only
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -19911,7 +19911,7 @@ void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y, ae_state *_state) {
 // assuming  that  different   threads  use  different  instances  of  buffer
 // structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, may be shared between different threads
 //     Buf     -   buffer object created for this particular instance of  RBF
 //                 model with rbfcreatecalcbuffer().
@@ -19920,7 +19920,7 @@ void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y, ae_state *_state) {
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -19981,14 +19981,14 @@ void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y,
 // * NX<>2
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   array of grid nodes, first coordinates, array[N0]
 //     N0      -   grid size (number of nodes) in the first dimension
 //     X1      -   array of grid nodes, second coordinates, array[N1]
 //     N1      -   grid size (number of nodes) in the second dimension
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[N0,N1]. Y is out-variable and
 //                 is reallocated by this function.
 //
@@ -20394,10 +20394,10 @@ bool _trypexec_rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVect
 
 // This function "unpacks" RBF model by extracting its coefficients.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     NX      -   dimensionality of argument
 //     NY      -   dimensionality of the target function
 //     XWR     -   model information, array[NC,NX+NY+1].
@@ -21323,7 +21323,7 @@ static void spline2d_xdesignblockata(spline2dxdesignmatrix *a, RMatrix *blockata
 // This subroutine calculates the value of the bilinear or bicubic spline  at
 // the given point X.
 //
-// Input parameters:
+// Inputs:
 //     C   -   2D spline object.
 //             Built by spline2dbuildbilinearv or spline2dbuildbicubicv.
 //     X, Y-   point
@@ -21451,11 +21451,11 @@ double spline2dcalc(spline2dinterpolant *c, double x, double y, ae_state *_state
 // This subroutine calculates the value of the bilinear or bicubic spline  at
 // the given point X and its derivatives.
 //
-// Input parameters:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y-   point
 //
-// Output parameters:
+// Outputs:
 //     F   -   S(x,y)
 //     FX  -   dS(x,y)/dX
 //     FY  -   dS(x,y)/dY
@@ -21649,14 +21649,14 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
 // If you need just some specific component of vector-valued spline, you  can
 // use spline2dcalcvi() function.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y-   point
 //     F   -   output buffer, possibly preallocated array. In case array size
 //             is large enough to store result, it is not reallocated.  Array
 //             which is too short will be reallocated
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   array[D] (or larger) which stores function values
 // ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 // API: void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
@@ -21790,13 +21790,13 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f, ae
 // This subroutine calculates specific component of vector-valued bilinear or
 // bicubic spline at the given point (X,Y).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y-   point
 //     I   -   component index, in [0,D). An exception is generated for out
 //             of range values.
 //
-// RESULT:
+// Result:
 //     value of I-th component
 // ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 // API: double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, const xparams _xparams = xdefault);
@@ -21925,11 +21925,11 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i, ae
 // This subroutine calculates bilinear or bicubic vector-valued spline at the
 // given point (X,Y).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y-   point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   array[D] which stores function values.  F is out-parameter and
 //             it  is  reallocated  after  call to this function. In case you
 //             want  to    reuse  previously  allocated  F,   you   may   use
@@ -21949,12 +21949,12 @@ void spline2dcalcv(spline2dinterpolant *c, double x, double y, RVector *f, ae_st
 // This subroutine calculates value of  specific  component  of  bilinear  or
 // bicubic vector-valued spline and its derivatives.
 //
-// Input parameters:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y-   point
 //     I   -   component index, in [0,D)
 //
-// Output parameters:
+// Outputs:
 //     F   -   S(x,y)
 //     FX  -   dS(x,y)/dX
 //     FY  -   dS(x,y)/dY
@@ -22145,7 +22145,7 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
 
 // This subroutine performs linear transformation of the spline argument.
 //
-// Input parameters:
+// Inputs:
 //     C       -   spline interpolant
 //     AX, BX  -   transformation coefficients: x = A*t + B
 //     AY, BY  -   transformation coefficients: y = A*u + B
@@ -22248,11 +22248,11 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
 
 // This subroutine performs linear transformation of the spline.
 //
-// Input parameters:
+// Inputs:
 //     C   -   spline interpolant.
 //     A, B-   transformation coefficients: S2(x,y) = A*S(x,y) + B
 //
-// Output parameters:
+// Outputs:
 //     C   -   transformed spline
 // ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 // API: void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
@@ -22296,10 +22296,10 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b, ae_state *_st
 
 // This subroutine makes the copy of the spline model.
 //
-// Input parameters:
+// Inputs:
 //     C   -   spline interpolant
 //
-// Output parameters:
+// Outputs:
 //     CC  -   spline copy
 // ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 // API: void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc, const xparams _xparams = xdefault);
@@ -22331,7 +22331,7 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc, ae_state *_st
 
 // Bicubic spline resampling
 //
-// Input parameters:
+// Inputs:
 //     A           -   function values at the old grid,
 //                     array[0..OldHeight-1, 0..OldWidth-1]
 //     OldHeight   -   old grid height, OldHeight>1
@@ -22339,7 +22339,7 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc, ae_state *_st
 //     NewHeight   -   new grid height, NewHeight>1
 //     NewWidth    -   new grid width, NewWidth>1
 //
-// Output parameters:
+// Outputs:
 //     B           -   function values at the new grid,
 //                     array[0..NewHeight-1, 0..NewWidth-1]
 // ALGLIB Routine: Copyright 15 May, 2007 by Sergey Bochkanov
@@ -22413,7 +22413,7 @@ void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, 
 
 // Bilinear spline resampling
 //
-// Input parameters:
+// Inputs:
 //     A           -   function values at the old grid,
 //                     array[0..OldHeight-1, 0..OldWidth-1]
 //     OldHeight   -   old grid height, OldHeight>1
@@ -22421,7 +22421,7 @@ void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, 
 //     NewHeight   -   new grid height, NewHeight>1
 //     NewWidth    -   new grid width, NewWidth>1
 //
-// Output parameters:
+// Outputs:
 //     B           -   function values at the new grid,
 //                     array[0..NewHeight-1, 0..NewWidth-1]
 // ALGLIB Routine: Copyright 09.07.2007 by Sergey Bochkanov
@@ -22458,7 +22458,7 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
 
 // This subroutine builds bilinear vector-valued spline.
 //
-// Input parameters:
+// Inputs:
 //     X   -   spline abscissas, array[0..N-1]
 //     Y   -   spline ordinates, array[0..M-1]
 //     F   -   function values, array[0..M*N*D-1]:
@@ -22469,7 +22469,7 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
 //     M,N -   grid size, M>=2, N>=2
 //     D   -   vector dimension, D>=1
 //
-// Output parameters:
+// Outputs:
 //     C   -   spline interpolant
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
@@ -22554,7 +22554,7 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
 
 // This subroutine builds bicubic vector-valued spline.
 //
-// Input parameters:
+// Inputs:
 //     X   -   spline abscissas, array[0..N-1]
 //     Y   -   spline ordinates, array[0..M-1]
 //     F   -   function values, array[0..M*N*D-1]:
@@ -22565,7 +22565,7 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
 //     M,N -   grid size, M>=2, N>=2
 //     D   -   vector dimension, D>=1
 //
-// Output parameters:
+// Outputs:
 //     C   -   spline interpolant
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
@@ -22693,7 +22693,7 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
 
 // This subroutine unpacks two-dimensional spline into the coefficients table
 //
-// Input parameters:
+// Inputs:
 //     C   -   spline interpolant.
 //
 // Result:
@@ -23144,11 +23144,11 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
 // * spline2dbuildersetgrid() to tell how many nodes you need
 // * spline2dfit() to perform fit
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     D   -   positive number, number of Y-components: D=1 for simple scalar
 //             fit, D>1 for vector-valued spline fitting.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S   -   solver object
 // ALGLIB Project: Copyright 29.01.2018 by Sergey Bochkanov
 // API: void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xparams _xparams = xdefault);
@@ -23188,7 +23188,7 @@ void spline2dbuildercreate(ae_int_t d, spline2dbuilder *state, ae_state *_state)
 //
 // Constant prior term is determined by least squares fitting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 //     V       -   value for user-defined prior
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
@@ -23206,7 +23206,7 @@ void spline2dbuildersetuserterm(spline2dbuilder *state, double v, ae_state *_sta
 //
 // Linear prior term is determined by least squares fitting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 // API: void spline2dbuildersetlinterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
@@ -23221,7 +23221,7 @@ void spline2dbuildersetlinterm(spline2dbuilder *state, ae_state *_state) {
 //
 // Constant prior term is determined by least squares fitting.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 // API: void spline2dbuildersetconstterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
@@ -23234,7 +23234,7 @@ void spline2dbuildersetconstterm(spline2dbuilder *state, ae_state *_state) {
 // global  prior,  which  can  be  linear, constant, user-defined constant or
 // zero).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline builder
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 // API: void spline2dbuildersetzeroterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
@@ -23248,7 +23248,7 @@ void spline2dbuildersetzeroterm(spline2dbuilder *state, ae_state *_state) {
 // This function overrides results of the previous calls, i.e. multiple calls
 // of this function will result in only the last set being added.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     XY      -   points, array[N,2+D]. One  row  corresponds to  one  point
 //                 in the dataset. First 2  elements  are  coordinates,  next
@@ -23280,7 +23280,7 @@ void spline2dbuildersetpoints(spline2dbuilder *state, RMatrix *xy, ae_int_t n, a
 // This function sets area where 2D spline interpolant is built. "Auto" means
 // that area extent is determined automatically from dataset extent.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 // API: void spline2dbuildersetareaauto(const spline2dbuilder &state, const xparams _xparams = xdefault);
@@ -23292,7 +23292,7 @@ void spline2dbuildersetareaauto(spline2dbuilder *state, ae_state *_state) {
 // This  function  sets  area  where  2D  spline  interpolant  is   built  to
 // user-defined one: [XA,XB]*[YA,YB]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     XA,XB   -   spatial extent in the first (X) dimension, XA<XB
 //     YA,YB   -   spatial extent in the second (Y) dimension, YA<YB
@@ -23317,7 +23317,7 @@ void spline2dbuildersetarea(spline2dbuilder *state, double xa, double xb, double
 // performed on area defined with one of the "setarea"  functions;  this  one
 // sets number of nodes placed upon the fitting area.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     KX      -   nodes count for the first (X) dimension; fitting  interval
 //                 [XA,XB] is separated into KX-1 subintervals, with KX nodes
@@ -23384,7 +23384,7 @@ void spline2dbuildersetgrid(spline2dbuilder *state, ae_int_t kx, ae_int_t ky, ae
 //   model becoming more global, which somewhat  reduces  efficiency  of  the
 //   parallel code.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     NLayers -   number of layers in the model:
 //                 * NLayers>=1 means that up  to  chosen  number  of  bottom
@@ -23445,7 +23445,7 @@ void spline2dbuildersetalgofastddm(spline2dbuilder *state, ae_int_t nlayers, dou
 // * parallelism potential: limited. You may get some sublinear gain when
 //   working with large grids (K's in 256..512 range)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     LambdaNS-   non-negative value:
 //                 * positive value means that some smoothing is applied
@@ -23480,7 +23480,7 @@ void spline2dbuildersetalgoblocklls(spline2dbuilder *state, double lambdans, ae_
 // * when compared with BlockLLS,  NaiveLLS  has ~K  larger memory demand and
 //   ~K^2  larger running time.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   spline 2D builder object
 //     LambdaNS-   nonsmoothness penalty
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
@@ -23496,10 +23496,10 @@ void spline2dbuildersetalgonaivells(spline2dbuilder *state, double lambdans, ae_
 // This function fits bicubic spline to current dataset, using current  area/
 // grid and current LLS solver.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   spline 2D builder object
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S       -   2D spline, fit result
 //     Rep     -   fitting report, which provides some additional info  about
 //                 errors, R2 coefficient and so on.
@@ -24086,7 +24086,7 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
 // This function generates design matrix for the problem (in fact, two design
 // matrices are generated: "vertical" one and transposed (horizontal) one.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY          -   array[NPoints*(2+D)]; dataset after scaling  in  such
 //                     way that grid step is equal to 1.0 in both dimensions.
 //     NPoints     -   dataset size, NPoints>=1
@@ -24096,7 +24096,7 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
 //     Basis1      -   basis spline, expected to be non-zero only at [-2,+2]
 //     AV, AH      -   possibly preallocated buffers
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     AV          -   sparse matrix[ARows,KX*KY]; design matrix
 //     AH          -   transpose of AV
 //     ARows       -   number of rows in design matrix
@@ -24326,7 +24326,7 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
 // This function performs fitting with FastDDM solver.
 // Internal function, never use it directly.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY          -   array[NPoints*(2+D)], dataset; destroyed in process
 //     KX, KY      -   grid size
 //     TileSize    -   tile size
@@ -24348,7 +24348,7 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
 //     TSS         -   total sum of squares; used to calculate R2
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY          -   destroyed in process
 //     Z           -   array[KX*KY*D], filled by solution; KX*KY coefficients
 //                     corresponding to each of D dimensions are stored contiguously.
@@ -24703,7 +24703,7 @@ bool _trypexec_spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalex
 //            Thus, if you have large KY and small KX,  simple  transposition
 //            of your dataset may give you great speedup.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     AV      -   sparse matrix, [ARows,KX*KY] in size.  "Vertical"  version
 //                 of design matrix, rows [0,NPoints) contain values of basis
 //                 functions at dataset  points.  Other  rows  are  used  for
@@ -24727,7 +24727,7 @@ bool _trypexec_spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalex
 //     TSS     -   total sum of squares; used to calculate R2
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   destroyed in process
 //     Z       -   array[KX*KY*D], filled by solution; KX*KY coefficients
 //                 corresponding to each of D dimensions are stored contiguously.
@@ -24896,7 +24896,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
 // This function performs fitting with  NaiveLLS solver.  Internal  function,
 // never use it directly.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     AV      -   sparse matrix, [ARows,KX*KY] in size.  "Vertical"  version
 //                 of design matrix, rows [0,NPoints] contain values of basis
 //                 functions at dataset  points.  Other  rows  are  used  for
@@ -24920,7 +24920,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
 //     TSS     -   total sum of squares; used to calculate R2
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   destroyed in process
 //     Z       -   array[KX*KY*D], filled by solution; KX*KY coefficients
 //                 corresponding to each of D dimensions are stored contiguously.
@@ -25232,7 +25232,7 @@ static void spline2d_flushtozerocell(ae_int_t kx, ae_int_t ky, ae_int_t blockban
 // Every "tower" is a sequence of BlockBandwidth+1 cells,
 // each of them being KX*KX in size.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     AH      -   sparse matrix, [KX*KY,ARows] in size. "Horizontal" version
 //                 of design matrix, cols [0,NPoints] contain values of basis
 //                 functions at dataset  points.  Other  cols  are  used  for
@@ -25244,7 +25244,7 @@ static void spline2d_flushtozerocell(ae_int_t kx, ae_int_t ky, ae_int_t blockban
 //                 for output matrix in compressed block band format
 //     MXATA   -   on entry MUST be zero
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     BlockATA-   AH*AH', stored in compressed block band format
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_t ky1, ae_int_t kx, ae_int_t ky, RMatrix *blockata, sreal *mxata, ae_state *_state) {
@@ -25358,7 +25358,7 @@ bool _trypexec_spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_i
 // This function performs Cholesky decomposition of squared design matrix
 // stored in block band format.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     BlockATA        -   array[KY*(BlockBandwidth+1)*KX,KX], matrix in compressed
 //                         block band format
 //     KX, KY          -   grid size
@@ -25367,7 +25367,7 @@ bool _trypexec_spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_i
 //     CholBuf1        -   buffers; reused by this function on subsequent calls,
 //                         automatically preallocated on the first call
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     BlockATA-   Cholesky factor, in compressed block band format
 //
 // Result:
@@ -25433,14 +25433,14 @@ static bool spline2d_blockllscholesky(RMatrix *blockata, ae_int_t kx, ae_int_t k
 // This function performs TRSV on upper triangular Cholesky factor U, solving
 // either U*x=b or U'*x=b.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     BlockATA        -   array[KY*(BlockBandwidth+1)*KX,KX], matrix U
 //                         in compressed block band format
 //     KX, KY          -   grid size
 //     TransU          -   whether to transpose U or not
 //     B               -   array[KX*KY], on entry - stores right part B
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B               -   replaced by X
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_blockllstrsv(RMatrix *blockata, ae_int_t kx, ae_int_t ky, bool transu, RVector *b, ae_state *_state) {
@@ -25563,7 +25563,7 @@ bool _trypexec_spline2d_computeresidualsfromscratchrec(RVector *xy, RVector *yra
 // * dataset index, array[(KX-1)*(KY-1)+1], is generated. Points of cell I
 //   now have indexes XYIndex[I]..XYIndex[I+1]-1;
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY              -   array[NPoints*(2+D)], dataset
 //     KX, KY, D       -   grid size and dimensionality of the outputs
 //     Shadow          -   shadow array[NPoints*NS], which is sorted together
@@ -25572,7 +25572,7 @@ bool _trypexec_spline2d_computeresidualsfromscratchrec(RVector *xy, RVector *yra
 //     BufI            -   possibly preallocated temporary buffer; resized if
 //                         needed.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY              -   reordered
 //     XYIndex         -   array[(KX-1)*(KY-1)+1], dataset index
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
@@ -25602,7 +25602,7 @@ static void spline2d_reorderdatasetandbuildindex(RVector *xy, ae_int_t npoints, 
 // This function multiplies all points in dataset by 2.0 and rebuilds  index,
 // given previous index built for KX_prev=(KX-1)/2 and KY_prev=(KY-1)/2
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY              -   array[NPoints*(2+D)], dataset BEFORE scaling
 //     NPoints, D      -   dataset size and dimensionality of the outputs
 //     Shadow          -   shadow array[NPoints*NS], which is sorted together
@@ -25613,7 +25613,7 @@ static void spline2d_reorderdatasetandbuildindex(RVector *xy, ae_int_t npoints, 
 //     BufI            -   possibly preallocated temporary buffer; resized if
 //                         needed.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY              -   reordered and multiplied by 2.0
 //     XYIndex         -   array[(KX-1)*(KY-1)+1], dataset index
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
@@ -25762,7 +25762,7 @@ bool _trypexec_spline2d_reorderdatasetandbuildindexrec(RVector *xy, ae_int_t d, 
 // This function performs fitting with  BlockLLS solver.  Internal  function,
 // never use it directly.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   dataset, array[NPoints,2+D]
 //     XYIndex -   dataset index, see ReorderDatasetAndBuildIndex() for more info
 //     KX0, KX1-   X-indices of basis functions to select and fit;
@@ -25778,7 +25778,7 @@ bool _trypexec_spline2d_reorderdatasetandbuildindexrec(RVector *xy, ae_int_t d, 
 //     Basis1  -   single-dimensional B-spline
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   design matrix
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0, ae_int_t kx1, ae_int_t kxtotal, ae_int_t ky0, ae_int_t ky1, ae_int_t kytotal, ae_int_t d, double lambdareg, double lambdans, spline1dinterpolant *basis1, spline2dxdesignmatrix *a, ae_state *_state) {
@@ -25977,14 +25977,14 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
 // This function performs matrix-vector product of design matrix and dense
 // vector.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   design matrix, (a.nrows) X (a.kx*a.ky);
 //                 some fields of A are used for temporaries,
 //                 so it is non-constant.
 //     X       -   array[A.KX*A.KY]
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   product, array[A.NRows], automatically allocated
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_xdesignmv(spline2dxdesignmatrix *a, RVector *x, RVector *y, ae_state *_state) {
@@ -26045,14 +26045,14 @@ static void spline2d_xdesignmv(spline2dxdesignmatrix *a, RVector *x, RVector *y,
 // This function performs matrix-vector product of transposed design matrix and dense
 // vector.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   design matrix, (a.nrows) X (a.kx*a.ky);
 //                 some fields of A are used for temporaries,
 //                 so it is non-constant.
 //     X       -   array[A.NRows]
 //
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   product, array[A.KX*A.KY], automatically allocated
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_xdesignmtv(spline2dxdesignmatrix *a, RVector *x, RVector *y, ae_state *_state) {
@@ -26122,12 +26122,12 @@ static void spline2d_xdesignmtv(spline2dxdesignmatrix *a, RVector *x, RVector *y
 // other, in BlockATA matrix. Every "tower" is a sequence of BlockBandwidth+1
 // cells, each of them being KX*KX in size.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   design matrix; some of its fields are used for temporaries
 //     BlockATA-   array[KY*(BlockBandwidth+1)*KX,KX],  preallocated  storage
 //                 for output matrix in compressed block band format
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     BlockATA-   AH*AH', stored in compressed block band format
 //     MXATA   -   max(|AH*AH'|), elementwise
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
@@ -27228,11 +27228,11 @@ static void rbfv2_zerofill(rbfv2model *s, ae_int_t nx, ae_int_t ny, ae_int_t bf,
 // This function creates RBF  model  for  a  scalar (NY=1)  or  vector (NY>1)
 // function in a NX-dimensional space (NX=2 or NX=3).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     NX      -   dimension of the space, NX=2 or NX=3
 //     NY      -   function dimension, NY>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S       -   RBF model (initially equals to zero)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state) {
@@ -27282,10 +27282,10 @@ void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state) {
 // * call rbftscalcbuf() from different threads,  with  each  thread  working
 //   with its own copy of buffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S           -   RBF model
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf         -   external buffer.
 //
 //
@@ -27311,7 +27311,7 @@ void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf, ae_state *_state
 
 // This   function  builds hierarchical RBF model.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array[N,S.NX], X-values
 //     Y       -   array[N,S.NY], Y-values
 //     ScaleVec-   array[S.NX], vector of per-dimension scales
@@ -27340,7 +27340,7 @@ void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf, ae_state *_state
 //                 and will terminate model construction shortly upon discovering
 //                 that termination was requested.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S       -   updated model (for rep.terminationtype>0, unchanged otherwise)
 //     Rep     -   report:
 //                 * Rep.TerminationType:
@@ -28066,11 +28066,11 @@ void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *
 // * NX<>1
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   X-coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfv2calc1(rbfv2model *s, double x0, ae_state *_state) {
@@ -28108,12 +28108,12 @@ double rbfv2calc1(rbfv2model *s, double x0, ae_state *_state) {
 // * NX<>2
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfv2calc2(rbfv2model *s, double x0, double x1, ae_state *_state) {
@@ -28149,13 +28149,13 @@ double rbfv2calc2(rbfv2model *s, double x0, double x1, ae_state *_state) {
 // * NX<>3
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //     X2      -   third coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2, ae_state *_state) {
@@ -28186,14 +28186,14 @@ double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2, ae_state *_sta
 // Same as RBFCalc(), but does not reallocate Y when in is large enough to
 // store function values.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X       -   coordinates, array[NX].
 //                 X may have more than NX elements, in this case only
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -28210,7 +28210,7 @@ void rbfv2calcbuf(rbfv2model *s, RVector *x, RVector *y, ae_state *_state) {
 // assuming  that  different   threads  use  different  instances  of  buffer
 // structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, may be shared between different threads
 //     Buf     -   buffer object created for this particular instance of  RBF
 //                 model with rbfcreatecalcbuffer().
@@ -28219,7 +28219,7 @@ void rbfv2calcbuf(rbfv2model *s, RVector *x, RVector *y, ae_state *_state) {
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -28289,14 +28289,14 @@ void rbfv2tscalcbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y,
 // * NX<>2
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   array of grid nodes, first coordinates, array[N0]
 //     N0      -   grid size (number of nodes) in the first dimension
 //     X1      -   array of grid nodes, second coordinates, array[N1]
 //     N1      -   grid size (number of nodes) in the second dimension
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[N0,N1]. Y is out-variable and
 //                 is reallocated by this function.
 //
@@ -28845,10 +28845,10 @@ bool _trypexec_rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, 
 
 // This function "unpacks" RBF model by extracting its coefficients.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     NX      -   dimensionality of argument
 //     NY      -   dimensionality of the target function
 //     XWR     -   model information, array[NC,NX+NY+1].
@@ -29184,7 +29184,7 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
 // evaluation point X and partially computed value Y, it updates Y by  values
 // computed using part of multi-tree given by RootIdx.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   V2 model
 //     Buf     -   calc-buffer, this function uses following fields:
 //                 * Buf.CurBoxMin - should be set by caller
@@ -29197,7 +29197,7 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
 //     X       -   evaluation point, array[NX]
 //     Y       -   partial value, array[NY]
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Y       -   updated partial value
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static void rbfv2_partialcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_t rootidx, double invr2, double queryr2, RVector *x, RVector *y, ae_state *_state) {
@@ -29348,7 +29348,7 @@ static void rbfv2_partialcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_t r
 //   inefficient for larger spreads).
 // * set of YFlag values stored in RF
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   V2 model
 //     Buf     -   calc-buffer, this function uses following fields:
 //                 * Buf.CurBoxMin - should be set by caller
@@ -29369,7 +29369,7 @@ static void rbfv2_partialcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_t r
 //     RowSize -   row size in elements
 //     RY      -   input partial value, array[NY]
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     RY      -   updated partial value (function adds its results to RY)
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static void rbfv2_partialrowcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_t rootidx, double invr2, double rquery2, double rfar2, RVector *cx, RVector *rx, BVector *rf, ae_int_t rowsize, RVector *ry, ae_state *_state) {
@@ -29511,7 +29511,7 @@ static void rbfv2_partialrowcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_
 
 // This function prepares partial query
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   query point
 //     kdBoxMin, kdBoxMax - current bounding box
 //     NX      -   problem size
@@ -29521,7 +29521,7 @@ static void rbfv2_partialrowcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_
 //                 convenience, and to remember about necessity to zero counter
 //                 prior to calling partialqueryrec().
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf     -   calc-buffer:
 //                 * Buf.CurBoxMin - current box
 //                 * Buf.CurBoxMax - current box
@@ -29550,7 +29550,7 @@ static void rbfv2_preparepartialquery(RVector *x, RVector *kdboxmin, RVector *kd
 // for neighbors located in R-sphere around X. It returns  squared  distances
 // from X to points and offsets in S.CW[] array for points being found.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     kdNodes, kdSplits, CW, NX, NY - corresponding fields of V2 model
 //     Buf     -   calc-buffer, this function uses following fields:
 //                 * Buf.CurBoxMin - should be set by caller
@@ -29570,7 +29570,7 @@ static void rbfv2_preparepartialquery(RVector *x, RVector *kdboxmin, RVector *kd
 //                 not set. So, any no-zero value will result in the incorrect
 //                 points count being returned.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R2      -   squared distances in first K elements
 //     Offs    -   offsets in S.CW in first K elements
 //     K       -   points count
@@ -29686,7 +29686,7 @@ static void rbfv2_partialqueryrec(ZVector *kdnodes, RVector *kdsplits, RVector *
 // not  use   approximate   algorithms,  but  rounding  errors  may  give  us
 // inconsistent results in just-at-the-boundary cases).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     kdNodes, kdSplits, CW, NX, NY - corresponding fields of V2 model
 //     Buf     -   calc-buffer, this function uses following fields:
 //                 * Buf.CurBoxMin - should be set by caller
@@ -29699,7 +29699,7 @@ static void rbfv2_partialqueryrec(ZVector *kdnodes, RVector *kdsplits, RVector *
 //     QueryR2 -   squared query radius
 //     X       -   array[NX], point being queried
 //
-// RESULT:
+// Result:
 //     points count
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static ae_int_t rbfv2_partialcountrec(ZVector *kdnodes, RVector *kdsplits, RVector *cw, ae_int_t nx, ae_int_t ny, rbfv2calcbuffer *buf, ae_int_t rootidx, double queryr2, RVector *x, ae_state *_state) {
@@ -29811,7 +29811,7 @@ static ae_int_t rbfv2_partialcountrec(ZVector *kdnodes, RVector *kdsplits, RVect
 // for RBF model. It appends center coordinates,  weights  and  per-dimension
 // radii (according to current scaling) to preallocated output array.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     kdNodes, kdSplits, CW, S, NX, NY - corresponding fields of V2 model
 //     RootIdx -   offset of partial kd-tree
 //     R       -   radius for current partial tree
@@ -29820,7 +29820,7 @@ static ae_int_t rbfv2_partialcountrec(ZVector *kdnodes, RVector *kdsplits, RVect
 //                 already occupied.
 //     K       -   number of already occupied rows in XWR.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     XWR     -   updated XWR
 //     K       -   updated rows count
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
@@ -29876,7 +29876,7 @@ static void rbfv2_partialunpackrec(ZVector *kdnodes, RVector *kdsplits, RVector 
 //   value for multilevel model (all levels of hierarchy in single matrix,
 //   like one used by nonnegative RBF)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     kdNodes, kdSplits, CW, Ri, kdRoots, kdBoxMin, kdBoxMax, NX, NY, NH - corresponding fields of V2 model
 //     Level   -   value in [0,NH) for single-level design matrix, negative
 //                 value for multilevel design matrix
@@ -29884,7 +29884,7 @@ static void rbfv2_partialunpackrec(ZVector *kdnodes, RVector *kdsplits, RVector 
 //     X0      -   query point
 //     CalcBuf -   buffer for PreparePartialQuery(), allocated by caller
 //
-// RESULT:
+// Result:
 //     row size
 // ALGLIB: Copyright 28.09.2016 by Sergey Bochkanov
 static ae_int_t rbfv2_designmatrixrowsize(ZVector *kdnodes, RVector *kdsplits, RVector *cw, RVector *ri, ZVector *kdroots, RVector *kdboxmin, RVector *kdboxmax, ae_int_t nx, ae_int_t ny, ae_int_t nh, ae_int_t level, double rcoeff, RVector *x0, rbfv2calcbuffer *calcbuf, ae_state *_state) {
@@ -29918,7 +29918,7 @@ static ae_int_t rbfv2_designmatrixrowsize(ZVector *kdnodes, RVector *kdsplits, R
 //   value for multilevel model (all levels of hierarchy in single matrix,
 //   like one used by nonnegative RBF)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     kdNodes, kdSplits, CW, Ri, kdRoots, kdBoxMin, kdBoxMax, NX, NY, NH - corresponding fields of V2 model
 //
 //     CWRange -   internal array[NH+1] used by RBF construction function,
@@ -29945,7 +29945,7 @@ static ae_int_t rbfv2_designmatrixrowsize(ZVector *kdnodes, RVector *kdsplits, R
 //     RowIdx  -   preallocated array, at least RowSize elements
 //     RowVal  -   preallocated array, at least RowSize*RowsPerPoint elements
 //
-// RESULT:
+// Result:
 //     RowIdx  -   RowSize elements are filled with column indexes of non-zero
 //                 design matrix entries
 //     RowVal  -   RowSize*RowsPerPoint elements are filled with design matrix
@@ -30228,7 +30228,7 @@ static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, do
 // This subroutine calculates the value of the trilinear or tricubic spline at
 // the given point (X,Y,Z).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   coefficients table.
 //             Built by BuildBilinearSpline or BuildBicubicSpline.
 //     X, Y,
@@ -30258,13 +30258,13 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z, ae_sta
 
 // This subroutine performs linear transformation of the spline argument.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C       -   spline interpolant
 //     AX, BX  -   transformation coefficients: x = A*u + B
 //     AY, BY  -   transformation coefficients: y = A*v + B
 //     AZ, BZ  -   transformation coefficients: z = A*w + B
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   transformed spline
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz, const xparams _xparams = xdefault);
@@ -30438,11 +30438,11 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
 
 // This subroutine performs linear transformation of the spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     A, B-   transformation coefficients: S2(x,y) = A*S(x,y,z) + B
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   transformed spline
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
@@ -30490,10 +30490,10 @@ void spline3dlintransf(spline3dinterpolant *c, double a, double b, ae_state *_st
 
 // This subroutine makes the copy of the spline model.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     CC  -   spline copy
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc, ae_state *_state) {
@@ -30521,7 +30521,7 @@ void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc, ae_state *_st
 
 // Trilinear spline resampling
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A           -   array[0..OldXCount*OldYCount*OldZCount-1], function
 //                     values at the old grid, :
 //                         A[0]        x=0,y=0,z=0
@@ -30538,7 +30538,7 @@ void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc, ae_state *_st
 //     NewYCount   -   new Y-count, NewYCount>1
 //     NewXCount   -   new X-count, NewXCount>1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B           -   array[0..NewXCount*NewYCount*NewZCount-1], function
 //                     values at the new grid:
 //                         B[0]        x=0,y=0,z=0
@@ -30603,7 +30603,7 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
 
 // This subroutine builds trilinear vector-valued spline.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   spline abscissas,  array[0..N-1]
 //     Y   -   spline ordinates,  array[0..M-1]
 //     Z   -   spline applicates, array[0..L-1]
@@ -30626,7 +30626,7 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
 //     L   -   grid size, M>=2, N>=2, L>=2
 //     D   -   vector dimension, D>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   spline interpolant
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c, const xparams _xparams = xdefault);
@@ -30750,7 +30750,7 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
 // This subroutine calculates bilinear or bicubic vector-valued spline at the
 // given point (X,Y,Z).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y,
 //     Z   -   point
@@ -30758,7 +30758,7 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
 //             is large enough to store result, it is not reallocated.  Array
 //             which is too short will be reallocated
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   array[D] (or larger) which stores function values
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
@@ -30841,12 +30841,12 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
 // This subroutine calculates trilinear or tricubic vector-valued spline at the
 // given point (X,Y,Z).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //     X, Y,
 //     Z   -   point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   array[D] which stores function values.  F is out-parameter and
 //             it  is  reallocated  after  call to this function. In case you
 //             want  to    reuse  previously  allocated  F,   you   may   use
@@ -30866,7 +30866,7 @@ void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector
 
 // This subroutine unpacks tri-dimensional spline into the coefficients table
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C   -   spline interpolant.
 //
 // Result:
@@ -30987,11 +30987,11 @@ void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t 
 // will be later) spline  at the given point X(and its derivatives; possible
 // will be later).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     C       -   spline interpolant.
 //     X, Y, Z -   point
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     F   -   S(x,y,z)
 //     FX  -   dS(x,y,z)/dX
 //     FY  -   dS(x,y,z)/dY
@@ -31895,11 +31895,11 @@ static void rbf_clearreportfields(rbfreport *rep, ae_state *_state);
 //            be unable to load it in pre-3.11 ALGLIB. Other model types (QNN
 //            and RBF-ML) are still backward-compatible.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     NX      -   dimension of the space, NX>=1
 //     NY      -   function dimension, NY>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     S       -   RBF model (initially equals to zero)
 //
 // NOTE 1: memory requirements. RBF models require amount of memory  which is
@@ -31974,10 +31974,10 @@ void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s, ae_state *_state) {
 // * call rbftscalcbuf() from different threads,  with  each  thread  working
 //   with its own copy of buffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S           -   RBF model
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf         -   external buffer.
 //
 //
@@ -32024,7 +32024,7 @@ void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf, ae_state *_state) {
 //            You should call rbfsetpointsandscales() function  to  use  this
 //            feature.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by rbfcreate() call.
 //     XY      -   points, array[N,NX+NY]. One row corresponds to  one  point
 //                 in the dataset. First NX elements  are  coordinates,  next
@@ -32092,7 +32092,7 @@ void rbfsetpoints(rbfmodel *s, RMatrix *xy, ae_int_t n, ae_state *_state) {
 //            will result  in  -3  error  code   being   returned  (incorrect
 //            algorithm).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     R       -   RBF model, initialized by rbfcreate() call.
 //     XY      -   points, array[N,NX+NY]. One row corresponds to  one  point
 //                 in the dataset. First NX elements  are  coordinates,  next
@@ -32192,7 +32192,7 @@ void rbfsetpointsandscales(rbfmodel *r, RMatrix *xy, ae_int_t n, RVector *s, ae_
 //   within reasonable amount of iterations. It is possible to set such large
 //   Q, but it is advised not to do so.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     Q       -   Q parameter, Q>0, recommended value - 1.0
 //     Z       -   Z parameter, Z>0, recommended value - 5.0
@@ -32243,7 +32243,7 @@ void rbfsetalgoqnn(rbfmodel *s, double q, double z, ae_state *_state) {
 // 3. noisy problems where  we  want  to  apply  some  controlled  amount  of
 //    smoothing.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     RBase   -   RBase parameter, RBase>0
 //     NLayers -   NLayers parameter, NLayers>0, recommended value  to  start
@@ -32350,7 +32350,7 @@ void rbfsetalgomultilayer(rbfmodel *s, double rbase, ae_int_t nlayers, double la
 //            versions of ALGLIB. You can  not  unserialize  models  produced
 //            with this function in ALGLIB 3.10 or earlier.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by rbfcreate() call
 //     RBase   -   RBase parameter, RBase>0
 //     NLayers -   NLayers parameter, NLayers>0, recommended value  to  start
@@ -32425,7 +32425,7 @@ void rbfsetalgohierarchical(rbfmodel *s, double rbase, ae_int_t nlayers, double 
 // plus linear polynomial). This function won't have effect until  next  call
 // to RBFBuildModel().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
@@ -32442,7 +32442,7 @@ void rbfsetlinterm(rbfmodel *s, ae_state *_state) {
 // plus constant).  This  function  won't  have  effect  until  next  call to
 // RBFBuildModel().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
@@ -32459,7 +32459,7 @@ void rbfsetconstterm(rbfmodel *s, ae_state *_state) {
 // without polynomial term). This function won't have effect until next  call
 // to RBFBuildModel().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
@@ -32477,7 +32477,7 @@ void rbfsetzeroterm(rbfmodel *s, ae_state *_state) {
 // * 1 for fast and compact bell-like basis function, which  becomes  exactly
 //   zero at distance equal to 3*R (default option).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     BF      -   basis function type:
 //                 * 0 - classic Gaussian
@@ -32493,7 +32493,7 @@ void rbfsetv2bf(rbfmodel *s, ae_int_t bf, ae_state *_state) {
 // This function sets stopping criteria of the underlying linear  solver  for
 // hierarchical (version 2) RBF constructor.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     MaxIts  -   this criterion will stop algorithm after MaxIts iterations.
 //                 Typically a few hundreds iterations is required,  with 400
@@ -32521,7 +32521,7 @@ void rbfsetv2its(rbfmodel *s, ae_int_t maxits, ae_state *_state) {
 // radius  is, the faster model  construction  AND  evaluation are.  However,
 // too large values result in "bumpy" models.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     R       -   support radius coefficient, >=0.
 //                 Recommended values are [0.1,0.4] range, with 0.1 being
@@ -32537,7 +32537,7 @@ void rbfsetv2supportr(rbfmodel *s, double r, ae_state *_state) {
 
 // This function sets stopping criteria of the underlying linear solver.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     EpsOrt  -   orthogonality stopping criterion, EpsOrt>=0. Algorithm will
 //                 stop when ||A'*r||<=EpsOrt where A' is a transpose of  the
@@ -32596,7 +32596,7 @@ void rbfsetcond(rbfmodel *s, double epsort, double epserr, ae_int_t maxits, ae_s
 // After you called this function you can call RBFCalc(),  RBFGridCalc()  and
 // other model calculation functions.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
 //     Rep     -   report:
 //                 * Rep.TerminationType:
@@ -32761,11 +32761,11 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep, ae_state *_state) {
 // * NX<>1
 // * NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   X-coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 // API: double rbfcalc1(const rbfmodel &s, const double x0, const xparams _xparams = xdefault);
@@ -32808,12 +32808,12 @@ double rbfcalc1(rbfmodel *s, double x0, ae_state *_state) {
 // * NX<>2
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 // API: double rbfcalc2(const rbfmodel &s, const double x0, const double x1, const xparams _xparams = xdefault);
@@ -32857,13 +32857,13 @@ double rbfcalc2(rbfmodel *s, double x0, double x1, ae_state *_state) {
 // * NX<>3
 //  *NY<>1
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X0      -   first coordinate, finite number
 //     X1      -   second coordinate, finite number
 //     X2      -   third coordinate, finite number
 //
-// RESULT:
+// Result:
 //     value of the model or 0.0 (as defined above)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 // API: double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2, const xparams _xparams = xdefault);
@@ -32901,13 +32901,13 @@ double rbfcalc3(rbfmodel *s, double x0, double x1, double x2, ae_state *_state) 
 //
 // This function returns 0.0 when model is not initialized.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X       -   coordinates, array[NX].
 //                 X may have more than NX elements, in this case only
 //                 leading NX will be used.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is out-parameter and
 //                 reallocated after call to this function. In case you  want
 //                 to reuse previously allocated Y, you may use RBFCalcBuf(),
@@ -32931,14 +32931,14 @@ void rbfcalc(rbfmodel *s, RVector *x, RVector *y, ae_state *_state) {
 // If you want to perform parallel model evaluation  from  multiple  threads,
 // use rbftscalcbuf() with per-thread buffer object.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //     X       -   coordinates, array[NX].
 //                 X may have more than NX elements, in this case only
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -32973,7 +32973,7 @@ void rbfcalcbuf(rbfmodel *s, RVector *x, RVector *y, ae_state *_state) {
 // assuming  that  different   threads  use  different  instances  of  buffer
 // structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, may be shared between different threads
 //     Buf     -   buffer object created for this particular instance of  RBF
 //                 model with rbfcreatecalcbuffer().
@@ -32982,7 +32982,7 @@ void rbfcalcbuf(rbfmodel *s, RVector *x, RVector *y, ae_state *_state) {
 //                 leading NX will be used.
 //     Y       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
@@ -33068,7 +33068,7 @@ void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, used in read-only mode, can be  shared  between
 //                 multiple   invocations  of  this  function  from  multiple
 //                 threads.
@@ -33083,7 +33083,7 @@ void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n
 //                 if the array is not correctly ordered.
 //     N1      -   grid size (number of nodes) in the second dimension
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[NY*N0*N1], where NY is a  number of
 //                 "output" vector values (this  function   supports  vector-
 //                 valued RBF models). Y is out-variable and  is  reallocated
@@ -33147,7 +33147,7 @@ void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, used in read-only mode, can be  shared  between
 //                 multiple   invocations  of  this  function  from  multiple
 //                 threads.
@@ -33168,7 +33168,7 @@ void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 //                   which are NOT calculated, and True for nodes  which  are
 //                   required.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[NY*N0*N1*N2], where NY is a  number
 //                 of "output" vector values (this function  supports vector-
 //                 valued RBF models):
@@ -33227,7 +33227,7 @@ void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, used in read-only mode, can be  shared  between
 //                 multiple   invocations  of  this  function  from  multiple
 //                 threads.
@@ -33247,7 +33247,7 @@ void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_
 //                 if the array is not correctly ordered.
 //     N2      -   grid size (number of nodes) in the third dimension
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[NY*N0*N1*N2], where NY is a  number
 //                 of "output" vector values (this function  supports vector-
 //                 valued RBF models). Y is out-variable and  is  reallocated
@@ -33318,7 +33318,7 @@ void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model, used in read-only mode, can be  shared  between
 //                 multiple   invocations  of  this  function  from  multiple
 //                 threads.
@@ -33344,7 +33344,7 @@ void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 //                   which are NOT calculated, and True for nodes  which  are
 //                   required.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   function values, array[NY*N0*N1*N2], where NY is a  number
 //                 of "output" vector values (this function  supports vector-
 //                 valued RBF models):
@@ -33666,10 +33666,10 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
 
 // This function "unpacks" RBF model by extracting its coefficients.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     NX      -   dimensionality of argument
 //     NY      -   dimensionality of the target function
 //     XWR     -   model information, array[NC,NX+NY+1].
@@ -33718,10 +33718,10 @@ void rbfunpack(rbfmodel *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *
 
 // This function returns model version.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S       -   RBF model
 //
-// RESULT:
+// Result:
 //     * 1 - for models created by QNN and RBF-ML algorithms,
 //       compatible with ALGLIB 3.10 or earlier.
 //     * 2 - for models created by HierarchicalRBF, requires
@@ -33743,10 +33743,10 @@ ae_int_t rbfgetmodelversion(rbfmodel *s, ae_state *_state) {
 //            indicator. Legacy RBF-ML and RBF-QNN do  not  support  it.  You
 //            will always get 0 value.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S           -   RBF model object
 //
-// RESULT:
+// Result:
 //     progress value, in [0,1]
 // ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
 // API: double rbfpeekprogress(const rbfmodel &s, const xparams _xparams = xdefault);
@@ -33773,7 +33773,7 @@ double rbfpeekprogress(rbfmodel *s, ae_state *_state) {
 //            silently ignored - only ones submitted AFTER  construction  has
 //            actually began will be handled.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     S           -   RBF model object
 // ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
 // API: void rbfrequesttermination(const rbfmodel &s, const xparams _xparams = xdefault);

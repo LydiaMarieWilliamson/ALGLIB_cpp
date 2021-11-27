@@ -39,7 +39,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
 // (here Y may be single variable or vector of N variables).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Y       -   initial conditions, array[0..N-1].
 //                 contains values of Y[] at X[0]
 //     N       -   system size
@@ -67,7 +67,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 //                 automatically  (usualy  it  will  be  equal  to  0.001  of
 //                 min(x[i]-x[j])).
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     State   -   structure which stores algorithm state between  subsequent
 //                 calls of OdeSolverIteration. Used for reverse communication.
 //                 This structure should be passed  to the OdeSolverIteration
@@ -379,10 +379,10 @@ lbl_rcomm:
 //
 // Called after OdeSolverIteration returned False.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     State   -   algorithm state (used by OdeSolverIteration).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     M       -   number of tabulated values, M>=1
 //     XTbl    -   array[0..M-1], values of X
 //     YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]

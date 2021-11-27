@@ -37,13 +37,13 @@ bool _trypexec_basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, 
 
 // Calculation of the distribution moments: mean, variance, skewness, kurtosis.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample
 //     N       -   N>=0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Mean    -   mean.
 //     Variance-   variance.
 //     Skewness-   skewness (if variance<>0; zero otherwise).
@@ -116,7 +116,7 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 
 // Calculation of the mean.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample
 //     N       -   N>=0, sample size:
 //                 * if given, only leading N elements of X are processed
@@ -143,7 +143,7 @@ double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
 
 // Calculation of the variance.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample
 //     N       -   N>=0, sample size:
 //                 * if given, only leading N elements of X are processed
@@ -170,7 +170,7 @@ double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
 
 // Calculation of the skewness.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample
 //     N       -   N>=0, sample size:
 //                 * if given, only leading N elements of X are processed
@@ -197,7 +197,7 @@ double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
 
 // Calculation of the kurtosis.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample
 //     N       -   N>=0, sample size:
 //                 * if given, only leading N elements of X are processed
@@ -224,13 +224,13 @@ double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
 
 // ADev
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample
 //     N   -   N>=0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
 //
-// Output parameters:
+// Outputs:
 //     ADev-   ADev
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams = xdefault);
@@ -266,13 +266,13 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
 
 // Median calculation.
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample (array indexes: [0..N-1])
 //     N   -   N>=0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
 //
-// Output parameters:
+// Outputs:
 //     Median
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams = xdefault);
@@ -398,14 +398,14 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 
 // Percentile calculation.
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample (array indexes: [0..N-1])
 //     N   -   N>=0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
 //     P   -   percentile (0<=P<=1)
 //
-// Output parameters:
+// Outputs:
 //     V   -   percentile
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 // API: void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams = xdefault);
@@ -450,7 +450,7 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
 
 // 2-sample covariance
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
 //     N       -   N>=0, sample size:
@@ -525,7 +525,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 
 // Pearson product-moment correlation coefficient
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
 //     N       -   N>=0, sample size:
@@ -615,7 +615,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 
 // Spearman's rank correlation coefficient
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
 //     N       -   N>=0, sample size:
@@ -666,7 +666,7 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 
 // Covariance matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -677,7 +677,7 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
@@ -760,7 +760,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 
 // Pearson product-moment correlation matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -771,7 +771,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
@@ -813,7 +813,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
 
 // Spearman's rank correlation matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -824,7 +824,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
@@ -936,7 +936,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 
 // Cross-covariance matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M1], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -953,7 +953,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
@@ -1074,7 +1074,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 
 // Pearson product-moment cross-correlation matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M1], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -1091,7 +1091,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
@@ -1253,7 +1253,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 
 // Spearman's rank cross-correlation matrix
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X   -   array[N,M1], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
@@ -1270,7 +1270,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
@@ -1435,12 +1435,12 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 // * ranking starts from 0, ends at NFeatures-1
 // * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NFeatures], dataset
 //     NPoints -   number of points
 //     NFeatures-  number of features
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
@@ -1501,12 +1501,12 @@ bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_st
 // * centering is performed by subtracting mean from each row, i.e it changes
 //   mean value, but does NOT change higher moments
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NFeatures], dataset
 //     NPoints -   number of points
 //     NFeatures-  number of features
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
@@ -1581,7 +1581,7 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_st
 // Recurrent code for RankData(), splits problem into  subproblems  or  calls
 // basecase code (depending on problem complexity).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NFeatures], dataset
 //     I0      -   index of first row to process
 //     I1      -   index of past-the-last row to process;
@@ -1595,7 +1595,7 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_st
 //                 (APBuffers structure)
 //     BasecaseCost-minimum cost of the problem which will be split
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
@@ -1649,7 +1649,7 @@ bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_in
 // Basecase code for RankData(), performs actual work on subset of data using
 // temporary buffer passed as parameter.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     XY      -   array[NPoints,NFeatures], dataset
 //     I0      -   index of first row to process
 //     I1      -   index of past-the-last row to process;
@@ -1664,7 +1664,7 @@ bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_in
 //     Buf1    -   temporary buffers, may be empty (this function automatically
 //                 allocates/reuses buffers).
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
@@ -2527,11 +2527,11 @@ static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_sta
 //     * the number of elements in each sample is not less than 5
 //     * normality of distributions of X and Y.
 //
-// Input parameters:
+// Inputs:
 //     R   -   Pearson's correlation coefficient for X and Y
 //     N   -   number of elements in samples, N>=5.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -2597,11 +2597,11 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
 // The test is non-parametric and doesn't require distributions X and Y to be
 // normal.
 //
-// Input parameters:
+// Inputs:
 //     R   -   Spearman's rank correlation coefficient for X and Y
 //     N   -   number of elements in samples, N>=5.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -3130,11 +3130,11 @@ static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, doubl
 // Requirements:
 //     * the number of elements in the sample is not less than 5.
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample. Array whose index goes from 0 to N-1.
 //     N   -   size of the sample. N>=5
 //
-// Output parameters:
+// Outputs:
 //     P           -   p-value for the test
 //
 // Accuracy of the approximation used (5<=N<=1951):
@@ -5089,13 +5089,13 @@ namespace alglib_impl {
 //     * the given samples have normal distributions
 //     * the samples are independent.
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample 1. Array whose index goes from 0 to N-1.
 //     N   -   sample size.
 //     Y   -   sample 2. Array whose index goes from 0 to M-1.
 //     M   -   sample size.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -5179,12 +5179,12 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 // Test is based on the following assumptions:
 //     * the given sample has a normal distribution.
 //
-// Input parameters:
+// Inputs:
 //     X           -   sample 1. Array whose index goes from 0 to N-1.
 //     N           -   size of the sample.
 //     Variance    -   dispersion value to compare with.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -5339,12 +5339,12 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state);
 //
 // The test is non-parametric and doesn't require distribution X to be normal
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample. Array whose index goes from 0 to N-1.
 //     N       -   size of the sample.
 //     Median  -   assumed median value.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -10223,13 +10223,13 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //
 // The test is non-parametric and doesn't require distributions to be normal.
 //
-// Input parameters:
+// Inputs:
 //     X   -   sample 1. Array whose index goes from 0 to N-1.
 //     N   -   size of the sample. N>=5
 //     Y   -   sample 2. Array whose index goes from 0 to M-1.
 //     M   -   size of the sample. M>=5
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -13976,12 +13976,12 @@ namespace alglib_impl {
 //
 // The test is non-parametric and doesn't require distribution X to be normal
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample. Array whose index goes from 0 to N-1.
 //     N       -   size of the sample.
 //     Median  -   assumed median value.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -14079,12 +14079,12 @@ namespace alglib_impl {
 // distribution and  an  unknown  dispersion.  If  the  distribution  sharply
 // differs from normal, the test will work incorrectly.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   sample. Array whose index goes from 0 to N-1.
 //     N       -   size of sample, N>=0
 //     Mean    -   assumed value of the mean.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -14200,13 +14200,13 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
 //     * dispersions are equal
 //     * samples are independent.
 //
-// Input parameters:
+// Inputs:
 //     X       -   sample 1. Array whose index goes from 0 to N-1.
 //     N       -   size of sample.
 //     Y       -   sample 2. Array whose index goes from 0 to M-1.
 //     M       -   size of sample.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.
@@ -14326,13 +14326,13 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
 //     * samples are independent.
 // Equality of variances is NOT required.
 //
-// Input parameters:
+// Inputs:
 //     X - sample 1. Array whose index goes from 0 to N-1.
 //     N - size of the sample.
 //     Y - sample 2. Array whose index goes from 0 to M-1.
 //     M - size of the sample.
 //
-// Output parameters:
+// Outputs:
 //     BothTails   -   p-value for two-tailed test.
 //                     If BothTails is less than the given significance level
 //                     the null hypothesis is rejected.

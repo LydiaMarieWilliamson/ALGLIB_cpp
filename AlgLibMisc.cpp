@@ -331,7 +331,7 @@ double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
 // This function generates  random number from discrete distribution given by
 // finite sample X.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     State   -   high quality random number generator, must be
 //                 initialized with HQRNDRandomize() or HQRNDSeed().
 //         X   -   finite sample
@@ -353,7 +353,7 @@ double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state
 // This function generates random number from continuous  distribution  given
 // by finite sample X.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     State   -   high quality random number generator, must be
 //                 initialized with HQRNDRandomize() or HQRNDSeed().
 //         X   -   finite sample, array[N] (can be larger, in this  case only
@@ -2172,7 +2172,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
 //
 // This subroutine creates KD-tree from set of X-values and optional Y-values
 //
-// INPUT PARAMETERS
+// Inputs:
 //     XY      -   dataset, array[0..N-1,0..NX+NY-1].
 //                 one row corresponds to one point.
 //                 first NX columns contain X-values, next NY (NY may be zero)
@@ -2185,7 +2185,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
 //                 * 1 denotes 1-norm
 //                 * 2 denotes 2-norm (Euclidean norm)
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     KDT     -   KD-tree
 //
 //
@@ -2234,7 +2234,7 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
 // This  subroutine  creates  KD-tree  from set of X-values, integer tags and
 // optional Y-values
 //
-// INPUT PARAMETERS
+// Inputs:
 //     XY      -   dataset, array[0..N-1,0..NX+NY-1].
 //                 one row corresponds to one point.
 //                 first NX columns contain X-values, next NY (NY may be zero)
@@ -2249,7 +2249,7 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
 //                 * 1 denotes 1-norm
 //                 * 2 denotes 2-norm (Euclidean norm)
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     KDT     -   KD-tree
 //
 // NOTES
@@ -2333,10 +2333,10 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 //
 // This function is used to initialize external buffer.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree which is associated with newly created buffer
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Buf         -   external buffer.
 //
 //
@@ -2370,7 +2370,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *
 //            parallel requests, use function  which  uses  external  request
 //            buffer: KDTreeTsQueryKNN() ("Ts" stands for "thread-safe").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
 //     K           -   number of neighbors to return, K>=1
@@ -2410,7 +2410,7 @@ ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, ae_
 // assuming that different instances of buffer object are passed to different
 // threads.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   kd-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -2466,7 +2466,7 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_
 //            parallel requests, use function  which  uses  external  request
 //            buffer: kdtreetsqueryrnn() ("Ts" stands for "thread-safe").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
 //     R           -   radius of sphere (in corresponding norm), R>0
@@ -2510,7 +2510,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_st
 //            parallel requests, use function  which  uses  external  request
 //            buffer: kdtreetsqueryrnn() ("Ts" stands for "thread-safe").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
 //     R           -   radius of sphere (in corresponding norm), R>0
@@ -2557,7 +2557,7 @@ ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_s
 //       of kdtreequeryrnnu() and kdtreetsqueryrnnu() functions. Such queries
 //       are faster because we do not have to use heap structure for sorting.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -2608,7 +2608,7 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, dou
 // assuming that different instances of buffer object are passed to different
 // threads.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -2661,7 +2661,7 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, do
 //            parallel requests, use function  which  uses  external  request
 //            buffer: KDTreeTsQueryAKNN() ("Ts" stands for "thread-safe").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
 //     K           -   number of neighbors to return, K>=1
@@ -2705,7 +2705,7 @@ ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, do
 // assuming that different instances of buffer object are passed to different
 // threads.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -2803,7 +2803,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
 //            parallel requests, use function  which  uses  external  request
 //            buffer: KDTreeTsQueryBox() ("Ts" stands for "thread-safe").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     BoxMin      -   lower bounds, array[0..NX-1].
 //     BoxMax      -   upper bounds, array[0..NX-1].
@@ -2839,7 +2839,7 @@ ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state 
 // assuming that different instances of buffer object are passed to different
 // threads.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -2913,13 +2913,13 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - kdtreetsqueryresultsx().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     X       -   possibly pre-allocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   rows are filled with X-values
 //
 // NOTES
@@ -2949,13 +2949,13 @@ void kdtreequeryresultsx(kdtree *kdt, RMatrix *x, ae_state *_state) {
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - kdtreetsqueryresultsxy().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     XY      -   possibly pre-allocated buffer. If XY is too small to store
 //                 result, it is resized. If size(XY) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     XY      -   rows are filled with points: first NX columns with
 //                 X-values, next NY columns - with Y-values.
 //
@@ -2986,13 +2986,13 @@ void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - kdtreetsqueryresultstags().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     Tags    -   possibly pre-allocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Tags    -   filled with tags associated with points,
 //                 or, when no tags were supplied, with zeros
 //
@@ -3023,13 +3023,13 @@ void kdtreequeryresultstags(kdtree *kdt, ZVector *tags, ae_state *_state) {
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - kdtreetsqueryresultsdistances().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     R       -   possibly pre-allocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   filled with distances (in corresponding norm)
 //
 // NOTES
@@ -3054,7 +3054,7 @@ void kdtreequeryresultsdistances(kdtree *kdt, RVector *r, ae_state *_state) {
 
 // X-values from last query associated with kdtreerequestbuffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
@@ -3062,7 +3062,7 @@ void kdtreequeryresultsdistances(kdtree *kdt, RVector *r, ae_state *_state) {
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   rows are filled with X-values
 //
 // NOTES
@@ -3098,7 +3098,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x, ae
 
 // X- and Y-values from last query associated with kdtreerequestbuffer object.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
@@ -3106,7 +3106,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x, ae
 //                 result, it is resized. If size(XY) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     XY      -   rows are filled with points: first NX columns with
 //                 X-values, next NY columns - with Y-values.
 //
@@ -3148,7 +3148,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy, 
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - KDTreeTsqueryresultstags().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
@@ -3156,7 +3156,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy, 
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     Tags    -   filled with tags associated with points,
 //                 or, when no tags were supplied, with zeros
 //
@@ -3198,7 +3198,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
 // kdtreerequestbuffer class), you  should  call  buffered  version  of  this
 // function - KDTreeTsqueryresultsdistances().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
@@ -3206,7 +3206,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   filled with distances (in corresponding norm)
 //
 // NOTES
@@ -3552,7 +3552,7 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
 //       of kdtreequeryrnnu() and kdtreetsqueryrnnu() functions. Such queries
 //       are faster because we do not have to use heap structure for sorting.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     KDT         -   KD-tree
 //     Buf         -   request buffer  object  created  for  this  particular
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
@@ -3685,7 +3685,7 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
 
 // Recursive kd-tree generation subroutine.
 //
-// PARAMETERS
+// Parameters:
 //     KDT         tree
 //     NodesOffs   unused part of Nodes[] which must be filled by tree
 //     SplitsOffs  unused part of Splits[]

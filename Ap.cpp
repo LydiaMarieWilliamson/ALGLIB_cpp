@@ -3539,7 +3539,7 @@ void _ae_free_lock_raw(_lock *p) {
 
 // This function initializes ae_lock structure.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     lock                -   pointer to lock structure, must be zero-filled
 //     state               -   pointer to state structure, used for exception
 //                             handling and management of automatic objects.
@@ -3574,7 +3574,7 @@ void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic) {
 // counters.  Errors  during  allocation  of eternal  locks  are  considered
 // critical exceptions and handled by calling abort().
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     lock                -   pointer to lock structure, must be zero-filled
 //     state               -   pointer to state structure, used for exception
 //                             handling and management of automatic objects;
@@ -7457,12 +7457,12 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
 
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     Y       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     (X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
@@ -7484,13 +7484,13 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 
 // Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     A       -   array[?,N], matrix to process
 //     I       -   row index
 //
-// RESULT:
+// Result:
 //     (X,Ai)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -7510,13 +7510,13 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
 
 // Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     A       -   array[?,N], matrix to process
 //     I       -   row index
 //
-// RESULT:
+// Result:
 //     (X,Ai)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state) {
@@ -7536,11 +7536,11 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
 
 // Computes dot product (X,X) for elements [0,N) of X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     (X,X)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
@@ -7562,12 +7562,12 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 //
 //
@@ -7587,13 +7587,13 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 
 // Copies vector X[] to row I of A[,]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     A       -   preallocated 2D array large enough to store result
 //     I       -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of I-th row are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -7610,13 +7610,13 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
 
 // Copies row I of A[,] to vector X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     A       -   2D array, source
 //     I       -   source row index
 //     X       -   preallocated destination
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], destination
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
@@ -7635,14 +7635,14 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
 //
 // A[i,...] and B[k,...] may overlap.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     A       -   2D array, source
 //     I       -   source row index
 //     B       -   preallocated destination
 //     K       -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B       -   row K overwritten
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state) {
@@ -7659,13 +7659,13 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
 
 // Performs copying with multiplication of V*X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   multiplier
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   array[N], Y = V*X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
@@ -7682,14 +7682,14 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
 
 // Performs copying with multiplication of V*X[] to Y[I,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   multiplier
 //     X       -   array[N], source
 //     Y       -   preallocated array[?,N]
 //     RIdx    -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   Y[RIdx,...] = V*X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state) {
@@ -7706,12 +7706,12 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
 
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   X copied to Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
@@ -7728,12 +7728,12 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 //
 //
@@ -7753,12 +7753,12 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
@@ -7775,13 +7775,13 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 
 // Sets row I of A[,] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     A       -   array[N,N] or larger
 //     I       -   row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of I-th row are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -7798,12 +7798,12 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
 
 // Sets X[OffsX:OffsX+N-1] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   subvector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   X[OffsX:OffsX+N-1] is replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -7820,12 +7820,12 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 
 // Sets matrix A[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M, N    -   rows/cols count
 //     V       -   value to set
 //     A       -   array[M,N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading M rows, N cols are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state *_state) {
@@ -7859,12 +7859,12 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
 
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
@@ -7881,12 +7881,12 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
@@ -7903,12 +7903,12 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 
 // Performs inplace multiplication of X[] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements 0...N-1 multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
@@ -7925,12 +7925,12 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 
 // Performs inplace multiplication of X[] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   row length
 //     X       -   array[?,N], row to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements 0...N-1 of row RowIdx are multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -7947,12 +7947,12 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
 
 // Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   subvector length
 //     X       -   vector to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements OffsX:OffsX+N-1 multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -7969,13 +7969,13 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 
 // Performs inplace addition of Y[] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[N], vector to process
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
@@ -7992,13 +7992,13 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 
 // Performs inplace addition of vector Y[] to row X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   vector to add
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -8015,14 +8015,14 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
 
 // Performs inplace addition of Y[RIdx,...] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[?,N], matrix whose RIdx-th row is added
 //     RIdx    -   row index
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
@@ -8039,7 +8039,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 
 // Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
@@ -8047,7 +8047,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 //     X       -   array[?,N], matrix whose RIdxDst-th row is target
 //     RIdxDst -   destination row index
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
@@ -8064,7 +8064,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 
 // Performs inplace addition of Y[] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   source vector
@@ -8072,7 +8072,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 //     X       -   destination vector
 //     OffsX   -   destination offset
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -8089,12 +8089,12 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
 
 // Performs componentwise multiplication of vector X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -8111,12 +8111,12 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -8133,12 +8133,12 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
@@ -8155,12 +8155,12 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
 
 // Performs componentwise max of vector X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -8177,12 +8177,12 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 
 // Performs componentwise max of row X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -8199,12 +8199,12 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 
 // Performs componentwise max of row X[I] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix, I-th row is source
 //     rowidx  -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     Y := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
@@ -8221,12 +8221,12 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 
 // Performs componentwise min of vector X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   source vector
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -8243,12 +8243,12 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 
 // Performs componentwise max of row X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -8265,12 +8265,12 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 
 // Performs componentwise max of row X[I] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix, I-th row is source
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
@@ -8287,11 +8287,11 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 
 // Returns maximum X
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(X[i])
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -8319,11 +8319,11 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
 
 // Returns maximum X
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix to process, RowIdx-th row is processed
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(X[RowIdx,i])
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -8350,11 +8350,11 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 
 // Returns maximum |X|
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(|X[i]|)
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -8379,11 +8379,11 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
 
 // Returns maximum |X|
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix to process, RowIdx-th row is processed
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(|X[RowIdx,i]|)
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -8408,14 +8408,14 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 
 // Copies vector X[] to Y[], extended version
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     OffsX   -   source offset
 //     Y       -   preallocated array[N]
 //     OffsY   -   destination offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
@@ -8434,14 +8434,14 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
 
 // Copies vector X[] to Y[], extended version
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     OffsX   -   source offset
 //     Y       -   preallocated array[N]
 //     OffsY   -   destination offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
@@ -8464,7 +8464,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, x, y.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows of op(A)
 //     N   -   number of columns of op(A)
 //     Alpha-  coefficient
@@ -8476,7 +8476,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 //     Beta-   coefficient
 //     Y   -   preallocated output array, has at least M elements
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y   -   vector which stores result
 //
 // HANDLING OF SPECIAL CASES:
@@ -8548,7 +8548,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, x, y.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows of op(A)
 //     N   -   number of columns of op(A)
 //     Alpha-  coefficient
@@ -8564,7 +8564,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //     Y   -   preallocated output array, has at least M+IY elements
 //     IY  -   subvector offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y   -   vector which stores result
 //
 // HANDLING OF SPECIAL CASES:
@@ -8634,7 +8634,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, u, v.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows
 //     N   -   number of columns
 //     A   -   target MxN matrix
@@ -8669,7 +8669,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //            * no integrity checks for operand sizes, out-of-bounds accesses
 //              and so on is performed
 //
-// INPUT PARAMETERS
+// Inputs:
 //     N   -   matrix size, N>=0
 //     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
 //     IA      -   submatrix offset
@@ -8682,7 +8682,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //     X       -   right part, actual vector is stored in X[IX:IX+N-1]
 //     IX      -   offset
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   solution replaces elements X[IX:IX+N-1]
 // ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
@@ -8848,9 +8848,9 @@ ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state) {
 // Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
 // RHS storage format.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
    ae_int_t i;
@@ -8912,7 +8912,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 // * Uc' is a B*C matrix, with C<=A
 // * scatter() scatters rows and columns of U*Uc'
 //
-// Return value:
+// Return Value:
 // * True if update was applied
 // * False if kernel refused to perform an update (quick exit for unsupported
 //   combinations of input sizes)
@@ -9149,7 +9149,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
 // * scatter() scatters rows of U*Uc', but does not scatter columns (they are
 //   densely packed).
 //
-// Return value:
+// Return Value:
 // * True if update was applied
 // * False if kernel refused to perform an update.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov

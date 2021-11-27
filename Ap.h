@@ -1934,7 +1934,7 @@ public:
 //   will automatically adapt to chosen convention
 // * escaped fields (ones in double quotes) are not supported
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     filename        relative/absolute path
 //     separator       character used to separate fields.  May  be  ' ',
 //                     ',', '\t'. Other separators are possible too.
@@ -1946,7 +1946,7 @@ public:
 //                     If no flags are specified, default value 0x0  (or
 //                     CSV_DEFAULT, which is same) should be used.
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     out             2D matrix, CSV file parsed with atof()
 //
 // HANDLING OF SPECIAL CASES:

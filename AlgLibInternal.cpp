@@ -2437,12 +2437,12 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     Y       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     (X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
@@ -2460,13 +2460,13 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     A       -   array[?,N], matrix to process
 //     I       -   row index
 //
-// RESULT:
+// Result:
 //     (X,Ai)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -2484,13 +2484,13 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     A       -   array[?,N], matrix to process
 //     I       -   row index
 //
-// RESULT:
+// Result:
 //     (X,Ai)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state) {
@@ -2508,11 +2508,11 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,X) for elements [0,N) of X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     (X,X)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
@@ -2532,13 +2532,13 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[N], vector to process
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
@@ -2553,7 +2553,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   source vector
@@ -2561,7 +2561,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 //     X       -   destination vector
 //     OffsX   -   destination offset
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -2575,13 +2575,13 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
 
 // Performs inplace addition of vector Y[] to column X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   vector to add
 //     X       -   target column ColIdx
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx, ae_state *_state) {
@@ -2595,13 +2595,13 @@ void raddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx, a
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of vector Y[] to row X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   vector to add
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -2616,12 +2616,12 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of vector X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -2636,12 +2636,12 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -2656,12 +2656,12 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise(X*Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
@@ -2676,12 +2676,12 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of vector X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -2696,12 +2696,12 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -2716,12 +2716,12 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[I] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix, I-th row is source
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     Y := componentwise_max(Y,X)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
@@ -2736,12 +2736,12 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of vector X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target vector
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
@@ -2756,12 +2756,12 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Y       -   vector to multiply by
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -2776,12 +2776,12 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[I] and vector Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix, I-th row is source
 //     X       -   target row RowIdx
 //
-// RESULT:
+// Result:
 //     X := componentwise_max(X,Y)
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
@@ -2796,14 +2796,14 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[RIdx,...] to X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[?,N], matrix whose RIdx-th row is added
 //     RIdx    -   row index
 //     X       -   array[N], vector to process
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
@@ -2818,7 +2818,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     Alpha   -   multiplier
 //     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
@@ -2826,7 +2826,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 //     X       -   array[?,N], matrix whose RIdxDst-th row is target
 //     RIdxDst -   destination row index
 //
-// RESULT:
+// Result:
 //     X := X + alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
@@ -2841,12 +2841,12 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements 0...N-1 multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
@@ -2861,12 +2861,12 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   row length
 //     X       -   array[?,N], row to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements 0...N-1 of row RowIdx are multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
@@ -2881,12 +2881,12 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   subvector length
 //     X       -   vector to process
 //     V       -   multiplier
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   elements OffsX:OffsX+N-1 multiplied by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -2901,11 +2901,11 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum X
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(X[i])
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -2932,11 +2932,11 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum |X|
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], vector to process
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(|X[i]|)
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -2959,11 +2959,11 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum X
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix to process, RowIdx-th row is processed
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(X[RowIdx,i])
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -2990,11 +2990,11 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum |X|
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   matrix to process, RowIdx-th row is processed
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     max(|X[RowIdx,i]|)
 //     zero for N=0
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -3017,12 +3017,12 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
@@ -3037,12 +3037,12 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets X[OffsX:OffsX+N-1] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   subvector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   X[OffsX:OffsX+N-1] is replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
@@ -3057,12 +3057,12 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
@@ -3077,12 +3077,12 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
@@ -3097,12 +3097,12 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets matrix A[] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M, N    -   rows/cols count
 //     V       -   value to set
 //     A       -   array[M,N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading M rows, N cols are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
@@ -3119,12 +3119,12 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
 
 // Sets vector X[] to V, reallocating X[] if too small
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V; array is reallocated
 //                 if its length is less than N.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -3138,13 +3138,13 @@ void rsetallocv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 
 // Sets vector A[] to V, reallocating A[] if too small.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   rows count
 //     N       -   cols count
 //     V       -   value to set
 //     A       -   possibly preallocated matrix
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading M rows, N cols are replaced by V; the matrix is
 //                 reallocated if its rows/cols count is less than M/N.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -3159,11 +3159,11 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) 
 // Reallocates X[] if its length is less than required value. Does not change
 // its length and contents if it is large enough.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   desired vector length
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   length(X)>=N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
@@ -3176,11 +3176,11 @@ void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
 // Reallocates X[] if its length is less than required value. Does not change
 // its length and contents if it is large enough.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   desired vector length
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   length(X)>=N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void iallocv(ae_int_t n, ZVector *x, ae_state *_state) {
@@ -3193,11 +3193,11 @@ void iallocv(ae_int_t n, ZVector *x, ae_state *_state) {
 // Reallocates X[] if its length is less than required value. Does not change
 // its length and contents if it is large enough.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   desired vector length
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   length(X)>=N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void ballocv(ae_int_t n, BVector *x, ae_state *_state) {
@@ -3210,12 +3210,12 @@ void ballocv(ae_int_t n, BVector *x, ae_state *_state) {
 // Reallocates matrix if its rows or cols count is less than  required.  Does
 // not change its size if it is exactly that size or larger.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   rows count
 //     N       -   cols count
 //     A       -   possibly preallocated matrix
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   size is at least M*N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rallocm(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
@@ -3227,12 +3227,12 @@ void rallocm(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
 
 // Sets vector X[] to V, reallocating X[] if too small
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V; array is reallocated
 //                 if its length is less than N.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -3246,12 +3246,12 @@ void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 
 // Sets vector X[] to V, reallocating X[] if too small
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     X       -   possibly preallocated array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   leading N elements are replaced by V; array is reallocated
 //                 if its length is less than N.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
@@ -3266,13 +3266,13 @@ void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Sets row I of A[,] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     A       -   array[N,N] or larger
 //     I       -   row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of I-th row are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -3286,13 +3286,13 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
 
 // Sets col J of A[,] to V
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   value to set
 //     A       -   array[N,N] or larger
 //     J       -   col index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of I-th col are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j, ae_state *_state) {
@@ -3306,12 +3306,12 @@ void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 //
 //
@@ -3329,12 +3329,12 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 //
 //
@@ -3352,14 +3352,14 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[], extended version
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     OffsX   -   source offset
 //     Y       -   preallocated array[N]
 //     OffsY   -   destination offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
@@ -3375,12 +3375,12 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   possibly preallocated array[N] (resized if needed)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyallocv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
@@ -3394,13 +3394,13 @@ void rcopyallocv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 // Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
 // Y[] are increased - but not decreased.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   rows count
 //     N       -   cols count
 //     X       -   array[M,N], source
 //     Y       -   possibly preallocated array[M,N] (resized if needed)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading [M,N] elements are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state) {
@@ -3420,13 +3420,13 @@ void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state) {
 // Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
 // Y[] are increased - but not decreased.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M       -   rows count
 //     N       -   cols count
 //     X       -   array[M,N], source
 //     Y       -   possibly preallocated array[M,N] (resized if needed)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading [M,N] elements are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state) {
@@ -3442,12 +3442,12 @@ void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_stat
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   possibly preallocated array[N] (resized if needed)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
@@ -3460,12 +3460,12 @@ void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     Y       -   possibly preallocated array[N] (resized if needed)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   leading N elements are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
@@ -3479,12 +3479,12 @@ void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   X copied to Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
@@ -3499,14 +3499,14 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[], extended version
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   source array
 //     OffsX   -   source offset
 //     Y       -   preallocated array[N]
 //     OffsY   -   destination offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
 //
 // NOTE: destination and source should NOT overlap
@@ -3577,13 +3577,13 @@ void rgrowv(ae_int_t newn, RVector *x, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs copying with multiplication of V*X[] to Y[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   multiplier
 //     X       -   array[N], source
 //     Y       -   preallocated array[N]
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   array[N], Y = V*X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
@@ -3598,14 +3598,14 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Performs copying with multiplication of V*X[] to Y[I,*]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   multiplier
 //     X       -   array[N], source
 //     Y       -   preallocated array[?,N]
 //     RIdx    -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   Y[RIdx,...] = V*X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state) {
@@ -3619,14 +3619,14 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
 
 // Performs copying with multiplication of V*X[] to Y[*,J]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     V       -   multiplier
 //     X       -   array[N], source
 //     Y       -   preallocated array[N,?]
 //     CIdx    -   destination rocol index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y       -   Y[RIdx,...] = V*X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t cidx, ae_state *_state) {
@@ -3640,13 +3640,13 @@ void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t cidx, ae_
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to row I of A[,]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     A       -   preallocated 2D array large enough to store result
 //     I       -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of I-th row are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
@@ -3661,13 +3661,13 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Copies row I of A[,] to vector X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     A       -   2D array, source
 //     I       -   source row index
 //     X       -   preallocated destination
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   array[N], destination
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
@@ -3684,14 +3684,14 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
 //
 // A[i,...] and B[k,...] may overlap.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     A       -   2D array, source
 //     I       -   source row index
 //     B       -   preallocated destination
 //     K       -   destination row index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     B       -   row K overwritten
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state) {
@@ -3705,13 +3705,13 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
 
 // Copies vector X[] to column J of A[,]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     X       -   array[N], source
 //     A       -   preallocated 2D array large enough to store result
 //     J       -   destination col index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A       -   leading N elements of J-th column are replaced by X
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j, ae_state *_state) {
@@ -3724,12 +3724,12 @@ void rcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j, ae_state *_state) {
 
 // Copies column J of A[,] to vector X[]
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   vector length
 //     A       -   source 2D array
 //     J       -   source col index
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     X       -   preallocated array[N], destination
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x, ae_state *_state) {
@@ -3747,7 +3747,7 @@ void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x, ae_state *_state) {
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, x, y.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows of op(A)
 //     N   -   number of columns of op(A)
 //     Alpha-  coefficient
@@ -3759,7 +3759,7 @@ void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x, ae_state *_state) {
 //     Beta-   coefficient
 //     Y   -   preallocated output array, has at least M elements
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y   -   vector which stores result
 //
 // HANDLING OF SPECIAL CASES:
@@ -3829,7 +3829,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, x, y.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows of op(A)
 //     N   -   number of columns of op(A)
 //     Alpha-  coefficient
@@ -3845,7 +3845,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //     Y   -   preallocated output array, has at least M+IY elements
 //     IY  -   subvector offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Y   -   vector which stores result
 //
 // HANDLING OF SPECIAL CASES:
@@ -3913,7 +3913,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
 //       checks is performed for sizes of A, u, v.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     M   -   number of rows
 //     N   -   number of columns
 //     A   -   target MxN matrix
@@ -3950,7 +3950,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //            * no integrity checks for operand sizes, out-of-bounds accesses
 //              and so on is performed
 //
-// INPUT PARAMETERS
+// Inputs:
 //     N   -   matrix size, N>=0
 //     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
 //     IA      -   submatrix offset
@@ -3963,7 +3963,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //     X       -   right part, actual vector is stored in X[IX:IX+N-1]
 //     IX      -   offset
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     X       -   solution replaces elements X[IX:IX+N-1]
 // ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
@@ -4186,7 +4186,7 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 // by caller prior to calling this function. In case C does not have  enough
 // space to store result, exception will be generated.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -4470,7 +4470,7 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 // by caller prior to calling this function. In case C does not have  enough
 // space to store result, exception will be generated.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -4548,7 +4548,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 // Additional info:
 // * this function requires that Alpha<>0 (assertion is thrown otherwise)
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -4757,7 +4757,7 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // Additional info:
 // * this function requires that Alpha<>0 (assertion is thrown otherwise)
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -4964,7 +4964,7 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // Additional info:
 // * this function requires that Alpha<>0 (assertion is thrown otherwise)
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -5172,7 +5172,7 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // Additional info:
 // * this function requires that Alpha<>0 (assertion is thrown otherwise)
 //
-// INPUT PARAMETERS
+// Inputs:
 //     M       -   matrix size, M>0
 //     N       -   matrix size, N>0
 //     K       -   matrix size, K>0
@@ -5502,11 +5502,11 @@ namespace alglib_impl {
 //
 // where the first component of vector V equals 1.
 //
-// Input parameters:
+// Inputs:
 //     X   -   vector. Array with elements [1..N].
 //     N   -   reflection order.
 //
-// Output parameters:
+// Outputs:
 //     X   -   components from 2 to N are replaced by vector V.
 //             The first component is replaced with parameter Beta.
 //     Tau -   scalar value Tau.
@@ -5607,7 +5607,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau, ae_state
 // Note: the matrix is multiplied by H, not by H'.   If  it  is  required  to
 // multiply the matrix by H', it is necessary to pass Conj(Tau) instead of Tau.
 //
-// Input parameters:
+// Inputs:
 //     C       -   matrix to be transformed.
 //     Tau     -   scalar defining transformation.
 //     V       -   column defining transformation.
@@ -5616,7 +5616,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau, ae_state
 //     N1, N2  -   range of columns to be transformed.
 //     WORK    -   working array whose index goes from N1 to N2.
 //
-// Output parameters:
+// Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
 //                 If N1>N2 or M1>M2, C is not modified.
@@ -5656,7 +5656,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, a
 // part  of  it  is  transformed (rows from M1 to M2, columns from N1 to N2).
 // Only the elements of this submatrix are changed.
 //
-// Input parameters:
+// Inputs:
 //     C       -   matrix to be transformed.
 //     Tau     -   scalar defining transformation.
 //     V       -   column defining transformation.
@@ -5665,7 +5665,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, a
 //     N1, N2  -   range of columns to be transformed.
 //     WORK    -   working array whose index goes from M1 to M2.
 //
-// Output parameters:
+// Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
 //                 If N1>N2 or M1>M2, C is not modified.
@@ -6371,11 +6371,11 @@ static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_
 // * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
 //   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A       -   unsorted array
 //     N       -   array size
 //
-// OUPUT PARAMETERS:
+// Outputs:
 //     A       -   sorted array
 //     P1, P2  -   permutation tables, array[N]
 //
@@ -6874,7 +6874,7 @@ void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state) {
 
 // Heap operations: adds element to the heap
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -6928,7 +6928,7 @@ void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb, a
 // Heap operations: replaces top element with new element
 // (which is moved down)
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N-1]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -7010,7 +7010,7 @@ void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t 
 
 // Heap operations: pops top element from the heap
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N-1]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -7043,12 +7043,12 @@ void tagheappopi(RVector *a, ZVector *b, ae_int_t *n, ae_state *_state) {
 
 // Search first element less than T in sorted array.
 //
-// PARAMETERS:
+// Parameters:
 //     A - sorted array by ascending from 0 to N-1
 //     N - number of elements in array
 //     T - the desired element
 //
-// RESULT:
+// Result:
 //     The very first element's index, which isn't less than T.
 // In the case when there aren't such elements, returns N.
 ae_int_t lowerbound(RVector *a, ae_int_t n, double t, ae_state *_state) {
@@ -7076,12 +7076,12 @@ ae_int_t lowerbound(RVector *a, ae_int_t n, double t, ae_state *_state) {
 
 // Search first element more than T in sorted array.
 //
-// PARAMETERS:
+// Parameters:
 //     A - sorted array by ascending from 0 to N-1
 //     N - number of elements in array
 //     T - the desired element
 //
-//     RESULT:
+// Result:
 //     The very first element's index, which more than T.
 // In the case when there aren't such elements, returns N.
 ae_int_t upperbound(RVector *a, ae_int_t n, double t, ae_state *_state) {
@@ -7849,7 +7849,7 @@ namespace alglib_impl {
 // Not the whole matrix but only a part of it is transformed (rows from M1 to
 // M2, columns from N1 to N2). Only the elements of this submatrix are changed.
 //
-// Input parameters:
+// Inputs:
 //     IsForward   -   the sequence of the rotation application.
 //     M1,M2       -   the range of rows to be transformed.
 //     N1, N2      -   the range of columns to be transformed.
@@ -7858,7 +7858,7 @@ namespace alglib_impl {
 //     A           -   processed matrix.
 //     WORK        -   working array whose index ranges within [N1..N2].
 //
-// Output parameters:
+// Outputs:
 //     A           -   transformed matrix.
 //
 // Utility subroutine.
@@ -7944,7 +7944,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
 // Not the whole matrix but only a part of it is transformed (rows from M1
 // to M2, columns from N1 to N2). Only the elements of this submatrix are changed.
 //
-// Input parameters:
+// Inputs:
 //     IsForward   -   the sequence of the rotation application.
 //     M1,M2       -   the range of rows to be transformed.
 //     N1, N2      -   the range of columns to be transformed.
@@ -7953,7 +7953,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
 //     A           -   processed matrix.
 //     WORK        -   working array whose index ranges within [M1..M2].
 //
-// Output parameters:
+// Outputs:
 //     A           -   transformed matrix.
 //
 // Utility subroutine.
@@ -8074,7 +8074,7 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r, ae_
 namespace alglib_impl {
 // Internal tied ranking subroutine.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array to rank
 //     N       -   array size
 //     IsCentered- whether ranks are centered or not:
@@ -8154,7 +8154,7 @@ void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf, ae_state *_s
 
 // Internal untied ranking subroutine.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     X       -   array to rank
 //     N       -   array size
 //     Buf     -   temporary buffers
@@ -8206,7 +8206,7 @@ namespace alglib_impl {
 // matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
 // (where A' is a transposed matrix A).
 //
-// Input parameters:
+// Inputs:
 //     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
 //     N       -   size of matrix A.
 //     X       -   right-hand member of a system.
@@ -8221,7 +8221,7 @@ namespace alglib_impl {
 //                 in the calculation process), otherwise the matrix is considered
 //                 to be a general triangular matrix.
 //
-// Output parameters:
+// Outputs:
 //     X       -   solution. Array whose index ranges within [0..N-1].
 //     S       -   scaling factor.
 //
@@ -9294,13 +9294,13 @@ static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state);
 //     MX = max( |a[i]*b[i]| )
 //     V  = |(a,b)|
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
 //     N       -   vectors length, N<2^29.
 //     Temp    -   array[0..N-1], pre-allocated temporary storage
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   (A,B)
 //     RErr    -   estimate of error. This estimate accounts for both  errors
 //                 during  calculation  of  (A,B)  and  errors  introduced by
@@ -9340,13 +9340,13 @@ void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *
 //     MX = max( |a[i]*b[i]| )
 //     V  = |(a,b)|
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
 //     N       -   vectors length, N<2^29.
 //     Temp    -   array[0..2*N-1], pre-allocated temporary storage
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   (A,B)
 //     RErr    -   estimate of error. This estimate accounts for both  errors
 //                 during  calculation  of  (A,B)  and  errors  introduced by
@@ -9414,13 +9414,13 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, dou
 
 // Internal subroutine for extra-precise calculation of SUM(w[i]).
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     W   -   array[0..N-1], values to be added
 //             W is modified during calculations.
 //     MX  -   max(W[i])
 //     N   -   array size
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     R   -   SUM(w[i])
 //     RErr-   error estimate for R
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
@@ -9921,7 +9921,7 @@ void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *s
 // * ArmijoIteration is subsequently called
 // * ArmijoResults returns results
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   problem size
 //     X       -   array[N], starting point
 //     F       -   F(X+S*STP)
@@ -10130,7 +10130,7 @@ lbl_rcomm:
 
 // Results of Armijo search
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     INFO    -   on output it is set to one of the return codes:
 //                 * 0     improper input params
 //                 * 1     optimum step is found with at most FMAX evaluations
@@ -10778,11 +10778,11 @@ static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t least
 
 // This subroutine generates FFT plan for K complex FFT's with length N each.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N           -   FFT length (in complex numbers), N>=1
 //     K           -   number of repetitions, K>=1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   plan
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state) {
@@ -10845,14 +10845,14 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state 
 
 // This subroutine applies transformation plan to input/output array A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   transformation plan
 //     A           -   array, must be large enough for plan to work
 //     OffsA       -   offset of the subarray to process
 //     RepCnt      -   repetition count (transformation is repeatedly applied
 //                     to subsequent subarrays)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   plan (temporary buffers can be modified, plan itself
 //                     is unchanged and can be reused)
 //     A           -   transformed array
@@ -10981,12 +10981,12 @@ double ftbasegetflopestimate(ae_int_t n, ae_state *_state) {
 // FFTs employed by this unit, so every time algorithm is changed this function
 // has to be rewritten.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N           -   transform length
 //     PrecRSize   -   must be set to zero
 //     PrecISize   -   must be set to zero
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     PrecRSize   -   number of real temporaries required for transformation
 //     PrecISize   -   number of integer temporaries required for transformation
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
@@ -11032,7 +11032,7 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 // Recurrent function called by FTComplexFFTPlan() and other functions. It
 // recursively builds transformation plan
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N           -   FFT length (in complex numbers), N>=1
 //     K           -   number of repetitions, K>=1
 //     ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
@@ -11060,7 +11060,7 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 //                       space before calling this function
 //     Plan        -   plan (generated so far)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     RowPtr      -   updated pointer (advanced by number of entries generated
 //                     by function)
 //     BluesteinSize-  updated amount
@@ -11273,7 +11273,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
 // This function pushes one more entry to the plan. It resizes Entries matrix
 // if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   plan (generated so far)
 //     RowPtr      -   index which points to past-the-last entry generated so far
 //     EType       -   entry type
@@ -11282,7 +11282,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
 //     EMcvSize    -   microvector size
 //     EParam0     -   parameter 0
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   updated plan
 //     RowPtr      -   updated pointer
 //
@@ -11297,7 +11297,7 @@ static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int
 // This function pushes one more entry to the plan. It resized Entries matrix
 // if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   plan (generated so far)
 //     RowPtr      -   index which points to past-the-last entry generated so far
 //     EType       -   entry type
@@ -11307,7 +11307,7 @@ static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int
 //     EParam0     -   parameter 0
 //     EParam1     -   parameter 1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   updated plan
 //     RowPtr      -   updated pointer
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
@@ -11331,7 +11331,7 @@ static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 // This function pushes one more entry to the plan. It resized Entries matrix
 // if needed.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   plan (generated so far)
 //     RowPtr      -   index which points to past-the-last entry generated so far
 //     EType       -   entry type
@@ -11343,7 +11343,7 @@ static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 //     EParam2     -   parameter 2
 //     EParam3     -   parameter 3
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   updated plan
 //     RowPtr      -   updated pointer
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
@@ -11365,7 +11365,7 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 
 // This subroutine applies subplan to input/output array A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   transformation plan
 //     SubPlan     -   subplan index
 //     A           -   array, must be large enough for plan to work
@@ -11380,7 +11380,7 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 //     RepCnt      -   repetition count (transformation is repeatedly applied
 //                     to subsequent subarrays)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     Plan        -   plan (temporary buffers can be modified, plan itself
 //                     is unchanged and can be reused)
 //     A           -   transformed array
@@ -11530,7 +11530,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
 //
 // VERY SLOW OPERATION, do not use it in real life plans :)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A           -   array, must be large enough for plan to work
 //     Offs        -   offset of the subarray to process
 //     OperandsCnt -   operands count (see description of FastTransformPlan)
@@ -11538,7 +11538,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
 //     MicrovectorSize-microvector size (see description of FastTransformPlan)
 //     Buf         -   temporary array, must be at least OperandsCnt*OperandSize*MicrovectorSize
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector *buf, ae_state *_state) {
@@ -11580,14 +11580,14 @@ static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t oper
 
 // This subroutine applies complex codelet FFT to input/output array A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A           -   array, must be large enough for plan to work
 //     Offs        -   offset of the subarray to process
 //     OperandsCnt -   operands count (see description of FastTransformPlan)
 //     OperandSize -   operand size (see description of FastTransformPlan)
 //     MicrovectorSize-microvector size, must be 2
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state) {
@@ -11885,14 +11885,14 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
 // * it performs inlined multiplication by twiddle factors of Cooley-Tukey
 //   FFT with N2=MicrovectorSize/2.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A           -   array, must be large enough for plan to work
 //     Offs        -   offset of the subarray to process
 //     OperandsCnt -   operands count (see description of FastTransformPlan)
 //     OperandSize -   operand size (see description of FastTransformPlan)
 //     MicrovectorSize-microvector size, must be 1
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state) {
@@ -12389,13 +12389,13 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_
 // them to array PrecR[] at specified offset. It  is  responsibility  of  the
 // caller to make sure that PrecR[] is large enough.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N           -   original size of the transform
 //     M           -   size of the "padded" Bluestein's transform
 //     PrecR       -   preallocated array
 //     Offs        -   offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     PrecR       -   data at Offs:Offs+4*M-1 are modified:
 //                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
 //                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
@@ -12439,7 +12439,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *pr
 
 // This subroutine applies complex Bluestein's FFT to input/output array A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     Plan        -   transformation plan
 //     A           -   array, must be large enough for plan to work
 //     ABase       -   base offset in array A, this value points to start of
@@ -12458,7 +12458,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *pr
 //     BufC        -   temporary buffer, at least 2*M elements
 //     BufD        -   temporary buffer, at least 2*M elements
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state) {
@@ -12540,14 +12540,14 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t
 // to array PrecR[] at specified offset. It  is  responsibility of the caller
 // to make sure that PrecR[] is large enough.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N           -   original size of the transform (before reduction to N-1)
 //     RQ          -   primitive root modulo N
 //     RIQ         -   inverse of primitive root modulo N
 //     PrecR       -   preallocated array
 //     Offs        -   offset
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
 //                     other parts of PrecR are unchanged.
 //
@@ -12580,7 +12580,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 
 // This subroutine applies complex Rader's FFT to input/output array A.
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     A           -   array, must be large enough for plan to work
 //     ABase       -   base offset in array A, this value points to start of
 //                     subarray whose length is equal to length of the plan
@@ -12596,7 +12596,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 //     PrecOffs    -   offset of the precomputed data for the plan
 //     Buf         -   temporary array
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state) {
@@ -12695,11 +12695,11 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t aba
 
 // Factorizes task size N into product of two smaller sizes N1 and N2
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   task size, N>0
 //     IsRoot  -   whether taks is root task (first one in a sequence)
 //
-// OUTPUT PARAMETERS:
+// Outputs:
 //     N1, N2  -   such numbers that:
 //                 * for prime N:                  N1=N2=0
 //                 * for composite N<=MaxRadix:    N1=N2=0
@@ -12765,10 +12765,10 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
 
 // Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
 //
-// INPUT PARAMETERS:
+// Inputs:
 //     N       -   task size, N>0
 //
-// RESULU:
+// Result:
 //     cost in UNITs, rounded down to nearest integer
 //
 // NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.

@@ -45,11 +45,11 @@ namespace alglib_impl {
 //
 // Algorithm has O(N*logN) complexity for any N (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..N-1] - complex function to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
@@ -107,11 +107,11 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
 //
 // See FFTC1D() description for more information about algorithm performance.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..N-1] - complex array to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   inverse DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
@@ -143,11 +143,11 @@ void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
 //
 // Algorithm has O(N*logN) complexity for any N (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..N-1] - real function to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     F   -   DFT of a input array, array[0..N-1]
 //             F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 //
@@ -243,11 +243,11 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
 //
 // Algorithm has O(N*logN) complexity for any N (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     F   -   array[0..floor(N/2)] - frequencies from forward real FFT
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   inverse DFT of a input array, array[0..N-1]
 //
 // NOTE:
@@ -587,11 +587,11 @@ namespace alglib_impl {
 //
 // Algorithm has O(N*logN) complexity for any N (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..N-1] - real function to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   FHT of a input array, array[0..N-1],
 //             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
 // ALGLIB: Copyright 04.06.2009 by Sergey Bochkanov
@@ -625,11 +625,11 @@ void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
 //
 // Algorithm has O(N*logN) complexity for any N (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..N-1] - complex array to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     A   -   inverse FHT of a input array, array[0..N-1]
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 // API: void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
@@ -709,13 +709,13 @@ namespace alglib_impl {
 //
 // Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - complex function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex function to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
@@ -743,13 +743,13 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_stat
 //
 // Algorithm has M*log(M)) complexity for any M (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - response
 //     N   -   response length, N<=M
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   deconvolved signal. array[0..M-N].
 //
 // NOTE:
@@ -835,13 +835,13 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
 // signal,  periodic function, and another - R - is a response,  non-periodic
 // function with limited length.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S   -   array[0..M-1] - complex periodic signal
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex non-periodic response
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
@@ -890,13 +890,13 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
 //
 // Algorithm has M*log(M)) complexity for any M (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - non-periodic response
 //     N   -   response length
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   deconvolved signal. array[0..M-1].
 //
 // NOTE:
@@ -996,13 +996,13 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 //
 // Analogous to ConvC1D(), see ConvC1D() comments for more details.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - real function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - real function to be transformed
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
@@ -1030,13 +1030,13 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
 //
 // Algorithm has M*log(M)) complexity for any M (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - response
 //     N   -   response length, N<=M
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   deconvolved signal. array[0..M-N].
 //
 // NOTE:
@@ -1109,13 +1109,13 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
 //
 // Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
 //
-// INPUT PARAMETERS
+// Inputs:
 //     S   -   array[0..M-1] - real signal
 //     M   -   problem size
 //     B   -   array[0..N-1] - real response
 //     N   -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
@@ -1165,13 +1165,13 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
 //
 // Algorithm has M*log(M)) complexity for any M (composite or prime).
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - response
 //     N   -   response length
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   deconvolved signal. array[0..M-N].
 //
 // NOTE:
@@ -1287,7 +1287,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 // Extended subroutine which allows to choose convolution algorithm.
 // Intended for internal use, ALGLIB users should call ConvC1D()/ConvC1DCircular().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - complex function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex function to be transformed
@@ -1300,7 +1300,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 //             * 2     overlap-add with length Q
 //     Q   -   length for overlap-add
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..N+M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r, ae_state *_state) {
@@ -1650,7 +1650,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 // Extended subroutine which allows to choose convolution algorithm.
 // Intended for internal use, ALGLIB users should call ConvR1D().
 //
-// INPUT PARAMETERS
+// Inputs:
 //     A   -   array[0..M-1] - complex function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex function to be transformed
@@ -1663,7 +1663,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //             * 2     overlap-add with length Q
 //     Q   -   length for overlap-add
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..N+M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r, ae_state *_state) {
@@ -2158,7 +2158,7 @@ namespace alglib_impl {
 //     order: CorrC1D(Signal, Pattern) = Pattern x Signal (using  traditional
 //     definition of cross-correlation, denoting cross-correlation as "x").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     Signal  -   array[0..N-1] - complex function to be transformed,
 //                 signal containing pattern
 //     N       -   problem size
@@ -2166,7 +2166,7 @@ namespace alglib_impl {
 //                 pattern to search withing signal
 //     M       -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   cross-correlation, array[0..N+M-2]:
 //                 * positive lags are stored in R[0..N-1],
 //                   R[i] = sum(conj(pattern[j])*signal[i+j]
@@ -2216,7 +2216,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 //     traditional definition of cross-correlation, denoting cross-correlation
 //     as "x").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     Signal  -   array[0..N-1] - complex function to be transformed,
 //                 periodic signal containing pattern
 //     N       -   problem size
@@ -2224,7 +2224,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 //                 non-periodic pattern to search withing signal
 //     M       -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams = xdefault);
@@ -2291,7 +2291,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 //     order: CorrR1D(Signal, Pattern) = Pattern x Signal (using  traditional
 //     definition of cross-correlation, denoting cross-correlation as "x").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     Signal  -   array[0..N-1] - real function to be transformed,
 //                 signal containing pattern
 //     N       -   problem size
@@ -2299,7 +2299,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 //                 pattern to search withing signal
 //     M       -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R       -   cross-correlation, array[0..N+M-2]:
 //                 * positive lags are stored in R[0..N-1],
 //                   R[i] = sum(pattern[j]*signal[i+j]
@@ -2349,7 +2349,7 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 //     traditional definition of cross-correlation, denoting cross-correlation
 //     as "x").
 //
-// INPUT PARAMETERS
+// Inputs:
 //     Signal  -   array[0..N-1] - real function to be transformed,
 //                 periodic signal containing pattern
 //     N       -   problem size
@@ -2357,7 +2357,7 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 //                 non-periodic pattern to search withing signal
 //     M       -   problem size
 //
-// OUTPUT PARAMETERS
+// Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
