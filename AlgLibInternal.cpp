@@ -26,113 +26,8 @@
 #   pragma warning(disable:4996)
 #endif
 
+// === APSERV Package ===
 namespace alglib_impl {
-// === APSERV Package ===
-
-// === ABLASF Package ===
-#ifdef ALGLIB_NO_FAST_KERNELS
-static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-#endif
-
-// === HBLAS Package ===
-
-// === CREFLECTIONS Package ===
-
-// === SBLAS Package ===
-
-// === ABLASMKL Package ===
-
-// === SCODES Package ===
-
-// === TSORT Package ===
-static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
-static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
-static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2, ae_state *_state);
-
-// === BLAS Package ===
-
-// === ROTATIONS Package ===
-
-// === BASICSTATOPS Package ===
-
-// === TRLINSOLVE Package ===
-
-// === SAFESOLVE Package ===
-static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x, ae_state *_state);
-
-// === XBLAS Package ===
-static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr, ae_state *_state);
-static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state);
-
-// === LINMIN Package ===
-static double linmin_ftol = 0.001;
-static double linmin_xtol = 100 * ae_machineepsilon;
-static ae_int_t linmin_maxfev = 20;
-static double linmin_stpmin = 1.0E-50;
-static double linmin_defstpmax = 1.0E+50;
-static double linmin_armijofactor = 1.3;
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info, ae_state *_state);
-
-// === NEARUNITYUNIT Package ===
-
-// === NTHEORY Package ===
-static bool ntheory_isprime(ae_int_t n, ae_state *_state);
-static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
-static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
-
-// === FTBASE Package ===
-static ae_int_t ftbase_coltype = 0;
-static ae_int_t ftbase_coloperandscnt = 1;
-static ae_int_t ftbase_coloperandsize = 2;
-static ae_int_t ftbase_colmicrovectorsize = 3;
-static ae_int_t ftbase_colparam0 = 4;
-static ae_int_t ftbase_colparam1 = 5;
-static ae_int_t ftbase_colparam2 = 6;
-static ae_int_t ftbase_colparam3 = 7;
-static ae_int_t ftbase_colscnt = 8;
-static ae_int_t ftbase_opend = 0;
-static ae_int_t ftbase_opcomplexreffft = 1;
-static ae_int_t ftbase_opbluesteinsfft = 2;
-static ae_int_t ftbase_opcomplexcodeletfft = 3;
-static ae_int_t ftbase_opcomplexcodelettwfft = 4;
-static ae_int_t ftbase_opradersfft = 5;
-static ae_int_t ftbase_opcomplextranspose = -1;
-static ae_int_t ftbase_opcomplexfftfactors = -2;
-static ae_int_t ftbase_opstart = -3;
-static ae_int_t ftbase_opjmp = -4;
-static ae_int_t ftbase_opparallelcall = -5;
-static ae_int_t ftbase_maxradix = 6;
-static ae_int_t ftbase_updatetw = 16;
-static ae_int_t ftbase_recursivethreshold = 1024;
-static ae_int_t ftbase_raderthreshold = 19;
-static ae_int_t ftbase_ftbasecodeletrecommended = 5;
-static double ftbase_ftbaseinefficiencyfactor = 1.3;
-static ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
-static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize, ae_state *_state);
-static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state);
-static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_state *_state);
-static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_state *_state);
-static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3, ae_state *_state);
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state);
-static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector *buf, ae_state *_state);
-static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
-static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs, ae_state *_state);
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state);
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state);
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state);
-static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
-static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state);
-static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2, ae_state *_state);
-static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf, ae_state *_state);
-static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state);
-static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best, ae_state *_state);
-
-// === HPCCORES Package ===
-static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state);
-static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state);
-
-// === APSERV Package ===
 // Internally calls SetErrorFlag() with condition:
 //
 //     Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
@@ -2531,8 +2426,14 @@ void _scomplexarray_destroy(void *_p) {
    ae_touch_ptr((void *)p);
    ae_vector_destroy(&p->val);
 }
+} // end of namespace alglib_impl
 
 // === ABLASF Package ===
+namespace alglib_impl {
+#ifdef ALGLIB_NO_FAST_KERNELS
+static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+#endif
+
 #ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
@@ -5483,8 +5384,10 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
    return result;
 }
 #endif
+} // end of namespace alglib_impl
 
 // === HBLAS Package ===
+namespace alglib_impl {
 void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y, ae_state *_state) {
    ae_int_t i;
    ae_int_t ba1;
@@ -5578,8 +5481,10 @@ void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CV
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === CREFLECTIONS Package ===
+namespace alglib_impl {
 // Generation of an elementary complex reflection transformation
 //
 // The subroutine generates elementary complex reflection H of  order  N,  so
@@ -5792,8 +5697,10 @@ void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, 
    }
    ae_v_cmove(&v->ptr.p_complex[1], 1, &v->ptr.p_complex[1], 1, "Conj", ae_v_len(1, vm));
 }
+} // end of namespace alglib_impl
 
 // === SBLAS Package ===
+namespace alglib_impl {
 void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y, ae_state *_state) {
    ae_int_t i;
    ae_int_t ba1;
@@ -5895,8 +5802,10 @@ void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RV
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === ABLASMKL Package ===
+namespace alglib_impl {
 // MKL-based kernel
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
 bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state) {
@@ -6367,8 +6276,10 @@ bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha
    return _ialglib_i_sparsegemvcrsmkl(opa, arows, acols, alpha, vals, cidx, ridx, x, ix, beta, y, iy);
 #endif
 }
+} // end of namespace alglib_impl
 
 // === SCODES Package ===
+namespace alglib_impl {
 ae_int_t getrdfserializationcode(ae_state *_state) {
    ae_int_t result;
 
@@ -6438,8 +6349,14 @@ ae_int_t getlptestserializationcode(ae_state *_state) {
    result = 200;
    return result;
 }
+} // end of namespace alglib_impl
 
 // === TSORT Package ===
+namespace alglib_impl {
+static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
+static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
+static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2, ae_state *_state);
+
 // This function sorts array of real keys by ascending.
 //
 // Its results are:
@@ -7570,8 +7487,10 @@ static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_
    tsort_tagsortfastrec(a, bufa, i1, i1 + cntless - 1, _state);
    tsort_tagsortfastrec(a, bufa, i1 + cntless + cnteq, i2, _state);
 }
+} // end of namespace alglib_impl
 
 // === BLAS Package ===
+namespace alglib_impl {
 double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2, ae_state *_state) {
    ae_int_t n;
    ae_int_t ix;
@@ -7914,8 +7833,10 @@ void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, 
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === ROTATIONS Package ===
+namespace alglib_impl {
 // Application of a sequence of  elementary rotations to a matrix
 //
 // The algorithm pre-multiplies the matrix by a sequence of rotation
@@ -8144,8 +8065,10 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r, ae_
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === BASICSTATOPS Package ===
+namespace alglib_impl {
 // Internal tied ranking subroutine.
 //
 // INPUT PARAMETERS:
@@ -8260,8 +8183,10 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf, ae_state *_state) {
       x->ptr.p_double[buf->ia1.ptr.p_int[i]] = (double)(i);
    }
 }
+} // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===
+namespace alglib_impl {
 // Utility subroutine performing the "safe" solution of system of linear
 // equations with triangular coefficient matrices.
 //
@@ -8898,8 +8823,12 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       ae_v_muld(&cnorm->ptr.p_double[1], 1, ae_v_len(1, n), v);
    }
 }
+} // end of namespace alglib_impl
 
 // === SAFESOLVE Package ===
+namespace alglib_impl {
+static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x, ae_state *_state);
+
 // Real implementation of CMatrixScaledTRSafeSolve
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
 bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth, ae_state *_state) {
@@ -9350,8 +9279,13 @@ static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, do
    result = true;
    return result;
 }
+} // end of namespace alglib_impl
 
 // === XBLAS Package ===
+namespace alglib_impl {
+static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr, ae_state *_state);
+static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state);
+
 // More precise dot-product. Absolute error of  subroutine  result  is  about
 // 1 ulp of max(MX,V), where:
 //     MX = max( |a[i]*b[i]| )
@@ -9605,8 +9539,18 @@ static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state) {
    }
    return result;
 }
+} // end of namespace alglib_impl
 
 // === LINMIN Package ===
+namespace alglib_impl {
+static double linmin_ftol = 0.001;
+static double linmin_xtol = 100 * ae_machineepsilon;
+static ae_int_t linmin_maxfev = 20;
+static double linmin_stpmin = 1.0E-50;
+static double linmin_defstpmax = 1.0E+50;
+static double linmin_armijofactor = 1.3;
+static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info, ae_state *_state);
+
 // Normalizes direction/step pair: makes |D|=1, scales Stp.
 // If |D|=0, it returns, leavind D/Stp unchanged.
 // ALGLIB: Copyright 01.04.2010 by Sergey Bochkanov
@@ -10471,8 +10415,10 @@ void _armijostate_destroy(void *_p) {
    ae_vector_destroy(&p->s);
    _rcommstate_destroy(&p->rstate);
 }
+} // end of namespace alglib_impl
 
 // === NEARUNITYUNIT Package ===
+namespace alglib_impl {
 double nulog1p(double x, ae_state *_state) {
    double z;
    double lp;
@@ -10549,8 +10495,14 @@ double nucosm1(double x, ae_state *_state) {
    result = -0.5 * xx + xx * xx * c;
    return result;
 }
+} // end of namespace alglib_impl
 
 // === NTHEORY Package ===
+namespace alglib_impl {
+static bool ntheory_isprime(ae_int_t n, ae_state *_state);
+static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
+static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
+
 void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot, ae_state *_state) {
    ae_int_t candroot;
    ae_int_t phin;
@@ -10766,8 +10718,60 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_st
    }
    return result;
 }
+} // end of namespace alglib_impl
 
 // === FTBASE Package ===
+namespace alglib_impl {
+static ae_int_t ftbase_coltype = 0;
+static ae_int_t ftbase_coloperandscnt = 1;
+static ae_int_t ftbase_coloperandsize = 2;
+static ae_int_t ftbase_colmicrovectorsize = 3;
+static ae_int_t ftbase_colparam0 = 4;
+static ae_int_t ftbase_colparam1 = 5;
+static ae_int_t ftbase_colparam2 = 6;
+static ae_int_t ftbase_colparam3 = 7;
+static ae_int_t ftbase_colscnt = 8;
+static ae_int_t ftbase_opend = 0;
+static ae_int_t ftbase_opcomplexreffft = 1;
+static ae_int_t ftbase_opbluesteinsfft = 2;
+static ae_int_t ftbase_opcomplexcodeletfft = 3;
+static ae_int_t ftbase_opcomplexcodelettwfft = 4;
+static ae_int_t ftbase_opradersfft = 5;
+static ae_int_t ftbase_opcomplextranspose = -1;
+static ae_int_t ftbase_opcomplexfftfactors = -2;
+static ae_int_t ftbase_opstart = -3;
+static ae_int_t ftbase_opjmp = -4;
+static ae_int_t ftbase_opparallelcall = -5;
+static ae_int_t ftbase_maxradix = 6;
+static ae_int_t ftbase_updatetw = 16;
+static ae_int_t ftbase_recursivethreshold = 1024;
+static ae_int_t ftbase_raderthreshold = 19;
+static ae_int_t ftbase_ftbasecodeletrecommended = 5;
+static double ftbase_ftbaseinefficiencyfactor = 1.3;
+static ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
+static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize, ae_state *_state);
+static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state);
+static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_state *_state);
+static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_state *_state);
+static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3, ae_state *_state);
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state);
+static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector *buf, ae_state *_state);
+static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
+static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
+static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs, ae_state *_state);
+static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state);
+static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state);
+static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state);
+static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
+static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state);
+static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2, ae_state *_state);
+static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf, ae_state *_state);
+static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state);
+#if 0
+static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state);
+#endif
+static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best, ae_state *_state);
+
 // This subroutine generates FFT plan for K complex FFT's with length N each.
 //
 // INPUT PARAMETERS:
@@ -12991,6 +12995,63 @@ static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVe
    }
 }
 
+#if 0
+// Recurrent subroutine for a (non-existent) InternalRealLinTranspose
+//
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t idx1;
+   ae_int_t idx2;
+   ae_int_t m1;
+   ae_int_t n1;
+
+   if (m == 0 || n == 0) {
+      return;
+   }
+   if (ae_maxint(m, n, _state) <= 8) {
+      for (i = 0; i <= m - 1; i++) {
+         idx1 = bstart + i;
+         idx2 = astart + i * astride;
+         for (j = 0; j <= n - 1; j++) {
+            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
+            idx1 = idx1 + bstride;
+            idx2 = idx2 + 1;
+         }
+      }
+      return;
+   }
+   if (n > m) {
+
+   // New partition:
+   //
+   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
+   //                                  ( B2 )
+      n1 = n / 2;
+      if (n - n1 >= 8 && n1 % 8 != 0) {
+         n1 = n1 + (8 - n1 % 8);
+      }
+      ae_assert(n - n1 > 0, "Assertion failed", _state);
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n1, _state);
+      ftbase_fftirltrec(a, astart + n1, astride, b, bstart + n1 * bstride, bstride, m, n - n1, _state);
+   } else {
+
+   // New partition:
+   //
+   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
+   //                     ( A2 )
+      m1 = m / 2;
+      if (m - m1 >= 8 && m1 % 8 != 0) {
+         m1 = m1 + (8 - m1 % 8);
+      }
+      ae_assert(m - m1 > 0, "Assertion failed", _state);
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m1, n, _state);
+      ftbase_fftirltrec(a, astart + m1 * astride, astride, b, bstart + m1, bstride, m - m1, n, _state);
+   }
+}
+#endif
+
 // recurrent subroutine for FFTFindSmoothRec
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best, ae_state *_state) {
@@ -13050,8 +13111,13 @@ void _fasttransformplan_destroy(void *_p) {
    ae_vector_destroy(&p->preci);
    ae_shared_pool_destroy(&p->bluesteinpool);
 }
+} // end of namespace alglib_impl
 
 // === HPCCORES Package ===
+namespace alglib_impl {
+static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state);
+static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state);
+
 // Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
 // You  have to call this function  before  calling  HPCChunkedGradient() for
 // a new set of weights. You have to call it only once, see example below:

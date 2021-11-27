@@ -17,42 +17,34 @@
 #include "LinAlg.h"
 #include "SpecialFunctions.h"
 
-namespace alglib_impl {
 // === BASESTAT Package ===
-
-// === CORRELATIONTESTS Package ===
-
-// === JARQUEBERA Package ===
-
-// === VARIANCETESTS Package ===
-
-// === WSR Package ===
-
-// === MANNWHITNEYU Package ===
-
-// === STEST Package ===
-
-// === STUDENTTTESTS Package ===
+namespace alglib_impl {
+void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis, ae_state *_state);
+double samplemean(RVector *x, ae_int_t n, ae_state *_state);
+double samplevariance(RVector *x, ae_int_t n, ae_state *_state);
+double sampleskewness(RVector *x, ae_int_t n, ae_state *_state);
+double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state);
+void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state);
+void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state);
+void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_state);
+double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
+void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
+void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
+void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
+void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
+void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-// === BASESTAT Package ===
-
-// === CORRELATIONTESTS Package ===
-
-// === JARQUEBERA Package ===
-
-// === VARIANCETESTS Package ===
-
-// === WSR Package ===
-
-// === MANNWHITNEYU Package ===
-
-// === STEST Package ===
-
-// === STUDENTTTESTS Package ===
-
-// === BASESTAT Package ===
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
 double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
@@ -93,83 +85,77 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
 void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-
-// === CORRELATIONTESTS Package ===
-void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-
-// === JARQUEBERA Package ===
-void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
-
-// === VARIANCETESTS Package ===
-void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-
-// === WSR Package ===
-void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-
-// === MANNWHITNEYU Package ===
-void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-
-// === STEST Package ===
-void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-
-// === STUDENTTTESTS Package ===
-void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
-namespace alglib_impl {
-// === BASESTAT Package ===
-void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis, ae_state *_state);
-double samplemean(RVector *x, ae_int_t n, ae_state *_state);
-double samplevariance(RVector *x, ae_int_t n, ae_state *_state);
-double sampleskewness(RVector *x, ae_int_t n, ae_state *_state);
-double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state);
-void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state);
-void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state);
-void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_state);
-double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
-void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
-void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state);
-void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
-void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
-void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
-void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-
 // === CORRELATIONTESTS Package ===
+namespace alglib_impl {
 void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
 void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === JARQUEBERA Package ===
+namespace alglib_impl {
 void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === VARIANCETESTS Package ===
+namespace alglib_impl {
 void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
 void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === WSR Package ===
+namespace alglib_impl {
 void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === MANNWHITNEYU Package ===
+namespace alglib_impl {
 void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === STEST Package ===
+namespace alglib_impl {
 void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === STUDENTTTESTS Package ===
+namespace alglib_impl {
 void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
 void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
 void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state);
 } // end of namespace alglib_impl
+
+namespace alglib {
+void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 #endif // OnceOnly

@@ -17,8 +17,8 @@
 #include "Integration.h"
 #include "Optimization.h"
 
-namespace alglib_impl {
 // === RATINT Package ===
+namespace alglib_impl {
 typedef struct {
    ae_int_t n;
    double sy;
@@ -27,7 +27,36 @@ typedef struct {
    ae_vector w;
 } barycentricinterpolant;
 
+double barycentriccalc(barycentricinterpolant *b, double t, ae_state *_state);
+void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df, ae_state *_state);
+void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df, double *d2f, ae_state *_state);
+void barycentriclintransx(barycentricinterpolant *b, double ca, double cb, ae_state *_state);
+void barycentriclintransy(barycentricinterpolant *b, double ca, double cb, ae_state *_state);
+void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVector *y, RVector *w, ae_state *_state);
+void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b, ae_state *_state);
+void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b, ae_state *_state);
+void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_state *_state);
+void _barycentricinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void _barycentricinterpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _barycentricinterpolant_clear(void *_p);
+void _barycentricinterpolant_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(barycentricinterpolant, EndD);
+
+double barycentriccalc(const barycentricinterpolant &b, const double t, const xparams _xparams = xdefault);
+void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df, const xparams _xparams = xdefault);
+void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f, const xparams _xparams = xdefault);
+void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
+void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
+void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w, const xparams _xparams = xdefault);
+void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b, const xparams _xparams = xdefault);
+void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === IDW Package ===
+namespace alglib_impl {
 typedef struct {
    ae_vector x;
    ae_vector y;
@@ -86,11 +115,122 @@ typedef struct {
    double r2;
 } idwreport;
 
+void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state);
+void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_state);
+void idwbuildersetnlayers(idwbuilder *state, ae_int_t nlayers, ae_state *_state);
+void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n, ae_state *_state);
+void idwbuildersetalgomstab(idwbuilder *state, double srad, ae_state *_state);
+void idwbuildersetalgotextbookshepard(idwbuilder *state, double p, ae_state *_state);
+void idwbuildersetalgotextbookmodshepard(idwbuilder *state, double r, ae_state *_state);
+void idwbuildersetuserterm(idwbuilder *state, double v, ae_state *_state);
+void idwbuildersetconstterm(idwbuilder *state, ae_state *_state);
+void idwbuildersetzeroterm(idwbuilder *state, ae_state *_state);
+double idwcalc1(idwmodel *s, double x0, ae_state *_state);
+double idwcalc2(idwmodel *s, double x0, double x1, ae_state *_state);
+double idwcalc3(idwmodel *s, double x0, double x1, double x2, ae_state *_state);
+void idwcalc(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
+void idwcalcbuf(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
+void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y, ae_state *_state);
+void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep, ae_state *_state);
+void idwalloc(ae_serializer *s, idwmodel *model, ae_state *_state);
+void idwserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
+void idwunserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
+void _idwcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void _idwcalcbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _idwcalcbuffer_clear(void *_p);
+void _idwcalcbuffer_destroy(void *_p);
+void _idwmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void _idwmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _idwmodel_clear(void *_p);
+void _idwmodel_destroy(void *_p);
+void _idwbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void _idwbuilder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _idwbuilder_clear(void *_p);
+void _idwbuilder_destroy(void *_p);
+void _idwreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _idwreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _idwreport_clear(void *_p);
+void _idwreport_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(idwcalcbuffer, EndD);
+DecClass(idwmodel, EndD);
+DecClass(idwbuilder, EndD);
+DecClass(idwreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
+
+void idwserialize(idwmodel &obj, std::string &s_out);
+void idwunserialize(const std::string &s_in, idwmodel &obj);
+void idwserialize(idwmodel &obj, std::ostream &s_out);
+void idwunserialize(const std::istream &s_in, idwmodel &obj);
+void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _xparams = xdefault);
+void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams = xdefault);
+void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const xparams _xparams = xdefault);
+void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
+void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const xparams _xparams = xdefault);
+void idwbuildersetalgomstab(const idwbuilder &state, const double srad, const xparams _xparams = xdefault);
+void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p, const xparams _xparams = xdefault);
+void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r, const xparams _xparams = xdefault);
+void idwbuildersetuserterm(const idwbuilder &state, const double v, const xparams _xparams = xdefault);
+void idwbuildersetconstterm(const idwbuilder &state, const xparams _xparams = xdefault);
+void idwbuildersetzeroterm(const idwbuilder &state, const xparams _xparams = xdefault);
+double idwcalc1(const idwmodel &s, const double x0, const xparams _xparams = xdefault);
+double idwcalc2(const idwmodel &s, const double x0, const double x1, const xparams _xparams = xdefault);
+double idwcalc3(const idwmodel &s, const double x0, const double x1, const double x2, const xparams _xparams = xdefault);
+void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === INTFITSERV Package ===
+namespace alglib_impl {
+void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, double *xa, double *xb, double *sa, double *sb, RVector *xoriginal, RVector *yoriginal, ae_state *_state);
+void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v, ae_state *_state);
+void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === POLINT Package ===
+namespace alglib_impl {
+void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *t, ae_state *_state);
+void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentricinterpolant *p, ae_state *_state);
+void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a, ae_state *_state);
+void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricinterpolant *p, ae_state *_state);
+void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
+void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
+void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
+void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
+double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
+double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
+double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t, const xparams _xparams = xdefault);
+void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a, const xparams _xparams = xdefault);
+void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a, const xparams _xparams = xdefault);
+void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
+void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
+double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
+double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
+double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
+double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
+double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
+double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === SPLINE1D Package ===
+namespace alglib_impl {
 typedef struct {
    bool periodic;
    ae_int_t n;
@@ -107,7 +247,79 @@ typedef struct {
    double maxerror;
 } spline1dfitreport;
 
+void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
+void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, spline1dinterpolant *c, ae_state *_state);
+void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, ae_state *_state);
+void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d1, RVector *d2, ae_state *_state);
+void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, ae_state *_state);
+void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, ae_state *_state);
+void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, RVector *dd2, ae_state *_state);
+void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundtype, double tension, spline1dinterpolant *c, ae_state *_state);
+void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
+void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
+double spline1dcalc(spline1dinterpolant *c, double x, ae_state *_state);
+void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, double *d2s, ae_state *_state);
+void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc, ae_state *_state);
+void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl, ae_state *_state);
+void spline1dlintransx(spline1dinterpolant *c, double a, double b, ae_state *_state);
+void spline1dlintransy(spline1dinterpolant *c, double a, double b, ae_state *_state);
+double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state);
+void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_int_t n, RVector *x2, ae_int_t n2, RVector *y, bool needy, RVector *d1, bool needd1, RVector *d2, bool needd2, ae_state *_state);
+void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, bool *dr, RVector *e, ZVector *et, ae_int_t *ne, bool *de, ae_state *_state);
+void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n, ae_state *_state);
+void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, double *x1, ae_int_t *nr, ae_state *_state);
+void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata, ae_state *_state);
+ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, double b, double *x, ae_state *_state);
+void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
+void _spline1dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void _spline1dinterpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _spline1dinterpolant_clear(void *_p);
+void _spline1dinterpolant_destroy(void *_p);
+void _spline1dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _spline1dfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _spline1dfitreport_clear(void *_p);
+void _spline1dfitreport_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(spline1dinterpolant, EndD);
+DecClass(spline1dfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
+
+void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d, const xparams _xparams = xdefault);
+void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d, const xparams _xparams = xdefault);
+void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d1, real_1d_array &d2, const xparams _xparams = xdefault);
+void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2, const xparams _xparams = xdefault);
+void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, const xparams _xparams = xdefault);
+void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, const xparams _xparams = xdefault);
+void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams = xdefault);
+void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams = xdefault);
+void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams = xdefault);
+void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams = xdefault);
+void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundtype, const double tension, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
+double spline1dcalc(const spline1dinterpolant &c, const double x, const xparams _xparams = xdefault);
+void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, double &ds, double &d2s, const xparams _xparams = xdefault);
+void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tbl, const xparams _xparams = xdefault);
+void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
+void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
+double spline1dintegrate(const spline1dinterpolant &c, const double x, const xparams _xparams = xdefault);
+void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
+void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === LSFIT Package ===
+namespace alglib_impl {
 typedef struct {
    double taskrcond;
    double rmserror;
@@ -197,13 +409,153 @@ typedef struct {
    rcommstate rstate;
 } lsfitstate;
 
+void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t m, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
+void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
+void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state);
+void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state);
+double logisticcalc4(double x, double a, double b, double c, double d, ae_state *_state);
+double logisticcalc5(double x, double a, double b, double c, double d, double g, ae_state *_state);
+void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state);
+void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state);
+void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
+void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
+void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, bool is4pl, double lambdav, double epsx, ae_int_t rscnt, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
+void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state);
+void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state);
+void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
+void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
+void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
+void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
+void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state);
+void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state);
+void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state);
+void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state);
+void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state);
+void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state);
+void lsfitsetcond(lsfitstate *state, double epsx, ae_int_t maxits, ae_state *_state);
+void lsfitsetstpmax(lsfitstate *state, double stpmax, ae_state *_state);
+void lsfitsetxrep(lsfitstate *state, bool needxrep, ae_state *_state);
+void lsfitsetscale(lsfitstate *state, RVector *s, ae_state *_state);
+void lsfitsetbc(lsfitstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
+void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
+bool lsfititeration(lsfitstate *state, ae_state *_state);
+void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
+void lsfitsetgradientcheck(lsfitstate *state, double teststep, ae_state *_state);
+void _polynomialfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _polynomialfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _polynomialfitreport_clear(void *_p);
+void _polynomialfitreport_destroy(void *_p);
+void _barycentricfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _barycentricfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _barycentricfitreport_clear(void *_p);
+void _barycentricfitreport_destroy(void *_p);
+void _lsfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _lsfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _lsfitreport_clear(void *_p);
+void _lsfitreport_destroy(void *_p);
+void _lsfitstate_init(void *_p, ae_state *_state, bool make_automatic);
+void _lsfitstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _lsfitstate_clear(void *_p);
+void _lsfitstate_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(polynomialfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
+DecClass(barycentricfitreport, double &taskrcond; ae_int_t &dbest; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
+DecClass(lsfitreport, double &taskrcond; ae_int_t &iterationscount; ae_int_t &varidx; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror; double &wrmserror; real_2d_array covpar; real_1d_array errpar; real_1d_array errcurve; real_1d_array noise; double &r2;);
+DecClass(lsfitstate, bool &needf; bool &needfg; bool &needfgh; bool &xupdated; real_1d_array c; double &f; real_1d_array g; real_2d_array h; real_1d_array x;);
+
+void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
+void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
+void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
+void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
+void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
+void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
+double logisticcalc4(const double x, const double a, const double b, const double c, const double d, const xparams _xparams = xdefault);
+double logisticcalc5(const double x, const double a, const double b, const double c, const double d, const double g, const xparams _xparams = xdefault);
+void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
+void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
+void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
+void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
+void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
+void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams = xdefault);
+void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
+void lsfitsetstpmax(const lsfitstate &state, const double stpmax, const xparams _xparams = xdefault);
+void lsfitsetxrep(const lsfitstate &state, const bool needxrep, const xparams _xparams = xdefault);
+void lsfitsetscale(const lsfitstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
+void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
+void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
+void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
+bool lsfititeration(const lsfitstate &state, const xparams _xparams = xdefault);
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
+void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
+void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === FITSPHERE Package ===
+namespace alglib_impl {
 typedef struct {
    ae_int_t nfev;
    ae_int_t iterationscount;
 } fitsphereinternalreport;
 
+void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r, ae_state *_state);
+void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state);
+void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state);
+void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state);
+void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state);
+void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep, ae_state *_state);
+void _fitsphereinternalreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _fitsphereinternalreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _fitsphereinternalreport_clear(void *_p);
+void _fitsphereinternalreport_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r, const xparams _xparams = xdefault);
+void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams = xdefault);
+void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams = xdefault);
+void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
+void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === PARAMETRIC Package ===
+namespace alglib_impl {
 typedef struct {
    ae_int_t n;
    bool periodic;
@@ -220,7 +572,58 @@ typedef struct {
    spline1dinterpolant z;
 } pspline3interpolant;
 
+void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state);
+void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state);
+void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state);
+void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state);
+void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t, ae_state *_state);
+void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t, ae_state *_state);
+void pspline2calc(pspline2interpolant *p, double t, double *x, double *y, ae_state *_state);
+void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z, ae_state *_state);
+void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y, ae_state *_state);
+void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, double *z, ae_state *_state);
+void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy, ae_state *_state);
+void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz, ae_state *_state);
+void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, ae_state *_state);
+void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z, ae_state *_state);
+double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_state);
+double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_state);
+void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, double stopeps, RMatrix *x2, ZVector *idx2, ae_int_t *nsections, ae_state *_state);
+void _pspline2interpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void _pspline2interpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _pspline2interpolant_clear(void *_p);
+void _pspline2interpolant_destroy(void *_p);
+void _pspline3interpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void _pspline3interpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _pspline3interpolant_clear(void *_p);
+void _pspline3interpolant_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(pspline2interpolant, EndD);
+DecClass(pspline3interpolant, EndD);
+
+void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
+void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
+void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
+void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
+void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams = xdefault);
+void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams = xdefault);
+void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams = xdefault);
+void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams = xdefault);
+void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams = xdefault);
+void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams = xdefault);
+void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy, const xparams _xparams = xdefault);
+void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz, const xparams _xparams = xdefault);
+void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, const xparams _xparams = xdefault);
+void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z, const xparams _xparams = xdefault);
+double pspline2arclength(const pspline2interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
+double pspline3arclength(const pspline3interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
+void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections, const xparams _xparams = xdefault);
+} // end of namespace alglib
+
 // === RBFV1 Package ===
+namespace alglib_impl {
 typedef struct {
    ae_vector calcbufxcx;
    ae_matrix calcbufx;
@@ -265,7 +668,40 @@ typedef struct {
    ae_int_t terminationtype;
 } rbfv1report;
 
+void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state);
+void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state);
+void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep, ae_state *_state);
+void rbfv1alloc(ae_serializer *s, rbfv1model *model, ae_state *_state);
+void rbfv1serialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
+void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
+double rbfv1calc2(rbfv1model *s, double x0, double x1, ae_state *_state);
+double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2, ae_state *_state);
+void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y, ae_state *_state);
+void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y, ae_state *_state);
+void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y, ae_state *_state);
+void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
+bool _trypexec_rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
+void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v, ae_state *_state);
+void _rbfv1calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void _rbfv1calcbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _rbfv1calcbuffer_clear(void *_p);
+void _rbfv1calcbuffer_destroy(void *_p);
+void _rbfv1model_init(void *_p, ae_state *_state, bool make_automatic);
+void _rbfv1model_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _rbfv1model_clear(void *_p);
+void _rbfv1model_destroy(void *_p);
+void _gridcalc3v1buf_init(void *_p, ae_state *_state, bool make_automatic);
+void _gridcalc3v1buf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _gridcalc3v1buf_clear(void *_p);
+void _gridcalc3v1buf_destroy(void *_p);
+void _rbfv1report_init(void *_p, ae_state *_state, bool make_automatic);
+void _rbfv1report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void _rbfv1report_clear(void *_p);
+void _rbfv1report_destroy(void *_p);
+} // end of namespace alglib_impl
+
 // === SPLINE2D Package ===
+namespace alglib_impl {
 typedef struct {
    ae_int_t stype;
    ae_int_t n;
@@ -343,665 +779,6 @@ typedef struct {
    spline2dblockllsbuf blockllsbuf;
 } spline2dfastddmbuf;
 
-// === RBFV2 Package ===
-typedef struct {
-   ae_vector x;
-   ae_vector curboxmin;
-   ae_vector curboxmax;
-   double curdist2;
-   ae_vector x123;
-   ae_vector y123;
-} rbfv2calcbuffer;
-typedef struct {
-   ae_int_t ny;
-   ae_int_t nx;
-   ae_int_t bf;
-   ae_int_t nh;
-   ae_vector ri;
-   ae_vector s;
-   ae_vector kdroots;
-   ae_vector kdnodes;
-   ae_vector kdsplits;
-   ae_vector kdboxmin;
-   ae_vector kdboxmax;
-   ae_vector cw;
-   ae_matrix v;
-   double lambdareg;
-   ae_int_t maxits;
-   double supportr;
-   ae_int_t basisfunction;
-   rbfv2calcbuffer calcbuf;
-} rbfv2model;
-typedef struct {
-   rbfv2calcbuffer calcbuf;
-   ae_vector cx;
-   ae_vector rx;
-   ae_vector ry;
-   ae_vector tx;
-   ae_vector ty;
-   ae_vector rf;
-} rbfv2gridcalcbuffer;
-typedef struct {
-   ae_int_t terminationtype;
-   double maxerror;
-   double rmserror;
-} rbfv2report;
-
-// === SPLINE3D Package ===
-typedef struct {
-   ae_int_t k;
-   ae_int_t stype;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t l;
-   ae_int_t d;
-   ae_vector x;
-   ae_vector y;
-   ae_vector z;
-   ae_vector f;
-} spline3dinterpolant;
-
-// === INTCOMP Package ===
-
-// === RBF Package ===
-typedef struct {
-   ae_int_t modelversion;
-   rbfv1calcbuffer bufv1;
-   rbfv2calcbuffer bufv2;
-} rbfcalcbuffer;
-typedef struct {
-   ae_int_t nx;
-   ae_int_t ny;
-   ae_int_t modelversion;
-   rbfv1model model1;
-   rbfv2model model2;
-   double lambdav;
-   double radvalue;
-   double radzvalue;
-   ae_int_t nlayers;
-   ae_int_t aterm;
-   ae_int_t algorithmtype;
-   double epsort;
-   double epserr;
-   ae_int_t maxits;
-   ae_int_t nnmaxits;
-   ae_int_t n;
-   ae_matrix x;
-   ae_matrix y;
-   bool hasscale;
-   ae_vector s;
-   ae_int_t progress10000;
-   bool terminationrequest;
-} rbfmodel;
-typedef struct {
-   double rmserror;
-   double maxerror;
-   ae_int_t arows;
-   ae_int_t acols;
-   ae_int_t annz;
-   ae_int_t iterationscount;
-   ae_int_t nmv;
-   ae_int_t terminationtype;
-} rbfreport;
-} // end of namespace alglib_impl
-
-namespace alglib {
-// === RATINT Package ===
-DecClass(barycentricinterpolant, EndD);
-
-// === IDW Package ===
-DecClass(idwcalcbuffer, EndD);
-DecClass(idwmodel, EndD);
-DecClass(idwbuilder, EndD);
-DecClass(idwreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
-
-// === INTFITSERV Package ===
-
-// === POLINT Package ===
-
-// === SPLINE1D Package ===
-DecClass(spline1dinterpolant, EndD);
-DecClass(spline1dfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
-
-// === LSFIT Package ===
-DecClass(polynomialfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
-DecClass(barycentricfitreport, double &taskrcond; ae_int_t &dbest; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
-DecClass(lsfitreport, double &taskrcond; ae_int_t &iterationscount; ae_int_t &varidx; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror; double &wrmserror; real_2d_array covpar; real_1d_array errpar; real_1d_array errcurve; real_1d_array noise; double &r2;);
-DecClass(lsfitstate, bool &needf; bool &needfg; bool &needfgh; bool &xupdated; real_1d_array c; double &f; real_1d_array g; real_2d_array h; real_1d_array x;);
-
-// === FITSPHERE Package ===
-
-// === PARAMETRIC Package ===
-DecClass(pspline2interpolant, EndD);
-DecClass(pspline3interpolant, EndD);
-
-// === RBFV1 Package ===
-
-// === SPLINE2D Package ===
-DecClass(spline2dinterpolant, EndD);
-DecClass(spline2dbuilder, EndD);
-DecClass(spline2dfitreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
-
-// === RBFV2 Package ===
-
-// === SPLINE3D Package ===
-DecClass(spline3dinterpolant, EndD);
-
-// === INTCOMP Package ===
-
-// === RBF Package ===
-DecClass(rbfcalcbuffer, EndD);
-DecClass(rbfmodel, EndD);
-DecClass(rbfreport, double &rmserror; double &maxerror; ae_int_t &arows; ae_int_t &acols; ae_int_t &annz; ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
-
-// === RATINT Package ===
-double barycentriccalc(const barycentricinterpolant &b, const double t, const xparams _xparams = xdefault);
-void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df, const xparams _xparams = xdefault);
-void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f, const xparams _xparams = xdefault);
-void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
-void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams = xdefault);
-void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w, const xparams _xparams = xdefault);
-void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b, const xparams _xparams = xdefault);
-void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b, const xparams _xparams = xdefault);
-
-// === IDW Package ===
-void idwserialize(idwmodel &obj, std::string &s_out);
-void idwunserialize(const std::string &s_in, idwmodel &obj);
-void idwserialize(idwmodel &obj, std::ostream &s_out);
-void idwunserialize(const std::istream &s_in, idwmodel &obj);
-void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _xparams = xdefault);
-void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams = xdefault);
-void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const xparams _xparams = xdefault);
-void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
-void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const xparams _xparams = xdefault);
-void idwbuildersetalgomstab(const idwbuilder &state, const double srad, const xparams _xparams = xdefault);
-void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p, const xparams _xparams = xdefault);
-void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r, const xparams _xparams = xdefault);
-void idwbuildersetuserterm(const idwbuilder &state, const double v, const xparams _xparams = xdefault);
-void idwbuildersetconstterm(const idwbuilder &state, const xparams _xparams = xdefault);
-void idwbuildersetzeroterm(const idwbuilder &state, const xparams _xparams = xdefault);
-double idwcalc1(const idwmodel &s, const double x0, const xparams _xparams = xdefault);
-double idwcalc2(const idwmodel &s, const double x0, const double x1, const xparams _xparams = xdefault);
-double idwcalc3(const idwmodel &s, const double x0, const double x1, const double x2, const xparams _xparams = xdefault);
-void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xparams _xparams = xdefault);
-
-// === INTFITSERV Package ===
-
-// === POLINT Package ===
-void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t, const xparams _xparams = xdefault);
-void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a, const xparams _xparams = xdefault);
-void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a, const xparams _xparams = xdefault);
-void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams = xdefault);
-void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
-double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
-double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
-double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
-double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
-double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams = xdefault);
-double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams = xdefault);
-
-// === SPLINE1D Package ===
-void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d, const xparams _xparams = xdefault);
-void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d, const xparams _xparams = xdefault);
-void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d1, real_1d_array &d2, const xparams _xparams = xdefault);
-void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2, const xparams _xparams = xdefault);
-void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, const xparams _xparams = xdefault);
-void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, const xparams _xparams = xdefault);
-void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams = xdefault);
-void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams = xdefault);
-void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams = xdefault);
-void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams = xdefault);
-void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundtype, const double tension, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
-double spline1dcalc(const spline1dinterpolant &c, const double x, const xparams _xparams = xdefault);
-void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, double &ds, double &d2s, const xparams _xparams = xdefault);
-void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tbl, const xparams _xparams = xdefault);
-void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
-void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
-double spline1dintegrate(const spline1dinterpolant &c, const double x, const xparams _xparams = xdefault);
-void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams = xdefault);
-void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
-
-// === LSFIT Package ===
-void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
-void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
-void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
-void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
-void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
-void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
-double logisticcalc4(const double x, const double a, const double b, const double c, const double d, const xparams _xparams = xdefault);
-double logisticcalc5(const double x, const double a, const double b, const double c, const double d, const double g, const xparams _xparams = xdefault);
-void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
-void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
-void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
-void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
-void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
-void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams = xdefault);
-void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
-void lsfitsetstpmax(const lsfitstate &state, const double stpmax, const xparams _xparams = xdefault);
-void lsfitsetxrep(const lsfitstate &state, const bool needxrep, const xparams _xparams = xdefault);
-void lsfitsetscale(const lsfitstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
-void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
-void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
-void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
-bool lsfititeration(const lsfitstate &state, const xparams _xparams = xdefault);
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
-void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const xparams _xparams = xdefault);
-
-// === FITSPHERE Package ===
-void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r, const xparams _xparams = xdefault);
-void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams = xdefault);
-void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams = xdefault);
-void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
-void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
-
-// === PARAMETRIC Package ===
-void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
-void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
-void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
-void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
-void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams = xdefault);
-void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams = xdefault);
-void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams = xdefault);
-void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams = xdefault);
-void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams = xdefault);
-void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams = xdefault);
-void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy, const xparams _xparams = xdefault);
-void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz, const xparams _xparams = xdefault);
-void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, const xparams _xparams = xdefault);
-void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z, const xparams _xparams = xdefault);
-double pspline2arclength(const pspline2interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
-double pspline3arclength(const pspline3interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
-void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections, const xparams _xparams = xdefault);
-
-// === RBFV1 Package ===
-
-// === SPLINE2D Package ===
-void spline2dserialize(spline2dinterpolant &obj, std::string &s_out);
-void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj);
-void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out);
-void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj);
-double spline2dcalc(const spline2dinterpolant &c, const double x, const double y, const xparams _xparams = xdefault);
-void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy, const xparams _xparams = xdefault);
-void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
-double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, const xparams _xparams = xdefault);
-void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
-void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, double &f, double &fx, double &fy, double &fxy, const xparams _xparams = xdefault);
-void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by, const xparams _xparams = xdefault);
-void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
-void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc, const xparams _xparams = xdefault);
-void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams = xdefault);
-void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams = xdefault);
-void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
-void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
-void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_int_t &d, real_2d_array &tbl, const xparams _xparams = xdefault);
-void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams = xdefault);
-void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams = xdefault);
-void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real_2d_array &tbl, const xparams _xparams = xdefault);
-void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xparams _xparams = xdefault);
-void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v, const xparams _xparams = xdefault);
-void spline2dbuildersetlinterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
-void spline2dbuildersetconstterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
-void spline2dbuildersetzeroterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
-void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
-void spline2dbuildersetareaauto(const spline2dbuilder &state, const xparams _xparams = xdefault);
-void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const double xb, const double ya, const double yb, const xparams _xparams = xdefault);
-void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, const ae_int_t ky, const xparams _xparams = xdefault);
-void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav, const xparams _xparams = xdefault);
-void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double lambdans, const xparams _xparams = xdefault);
-void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double lambdans, const xparams _xparams = xdefault);
-void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep, const xparams _xparams = xdefault);
-
-// === RBFV2 Package ===
-
-// === SPLINE3D Package ===
-double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z, const xparams _xparams = xdefault);
-void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz, const xparams _xparams = xdefault);
-void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
-void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b, const xparams _xparams = xdefault);
-void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c, const xparams _xparams = xdefault);
-void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
-void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
-void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl, const xparams _xparams = xdefault);
-
-// === INTCOMP Package ===
-void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams = xdefault);
-void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams = xdefault);
-void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
-void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
-
-// === RBF Package ===
-void rbfserialize(rbfmodel &obj, std::string &s_out);
-void rbfunserialize(const std::string &s_in, rbfmodel &obj);
-void rbfserialize(rbfmodel &obj, std::ostream &s_out);
-void rbfunserialize(const std::istream &s_in, rbfmodel &obj);
-void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams _xparams = xdefault);
-void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _xparams = xdefault);
-void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
-void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const xparams _xparams = xdefault);
-void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s, const xparams _xparams = xdefault);
-void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const real_1d_array &s, const xparams _xparams = xdefault);
-void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z, const xparams _xparams = xdefault);
-void rbfsetalgoqnn(const rbfmodel &s, const xparams _xparams = xdefault);
-void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav, const xparams _xparams = xdefault);
-void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const xparams _xparams = xdefault);
-void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans, const xparams _xparams = xdefault);
-void rbfsetlinterm(const rbfmodel &s, const xparams _xparams = xdefault);
-void rbfsetconstterm(const rbfmodel &s, const xparams _xparams = xdefault);
-void rbfsetzeroterm(const rbfmodel &s, const xparams _xparams = xdefault);
-void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf, const xparams _xparams = xdefault);
-void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits, const xparams _xparams = xdefault);
-void rbfsetv2supportr(const rbfmodel &s, const double r, const xparams _xparams = xdefault);
-void rbfbuildmodel(const rbfmodel &s, rbfreport &rep, const xparams _xparams = xdefault);
-double rbfcalc1(const rbfmodel &s, const double x0, const xparams _xparams = xdefault);
-double rbfcalc2(const rbfmodel &s, const double x0, const double x1, const xparams _xparams = xdefault);
-double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2, const xparams _xparams = xdefault);
-void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y, const xparams _xparams = xdefault);
-void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams = xdefault);
-void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion, const xparams _xparams = xdefault);
-ae_int_t rbfgetmodelversion(const rbfmodel &s, const xparams _xparams = xdefault);
-double rbfpeekprogress(const rbfmodel &s, const xparams _xparams = xdefault);
-void rbfrequesttermination(const rbfmodel &s, const xparams _xparams = xdefault);
-} // end of namespace alglib
-
-namespace alglib_impl {
-// === RATINT Package ===
-double barycentriccalc(barycentricinterpolant *b, double t, ae_state *_state);
-void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df, ae_state *_state);
-void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df, double *d2f, ae_state *_state);
-void barycentriclintransx(barycentricinterpolant *b, double ca, double cb, ae_state *_state);
-void barycentriclintransy(barycentricinterpolant *b, double ca, double cb, ae_state *_state);
-void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVector *y, RVector *w, ae_state *_state);
-void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b, ae_state *_state);
-void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b, ae_state *_state);
-void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_state *_state);
-void _barycentricinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void _barycentricinterpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _barycentricinterpolant_clear(void *_p);
-void _barycentricinterpolant_destroy(void *_p);
-
-// === IDW Package ===
-void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state);
-void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_state);
-void idwbuildersetnlayers(idwbuilder *state, ae_int_t nlayers, ae_state *_state);
-void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n, ae_state *_state);
-void idwbuildersetalgomstab(idwbuilder *state, double srad, ae_state *_state);
-void idwbuildersetalgotextbookshepard(idwbuilder *state, double p, ae_state *_state);
-void idwbuildersetalgotextbookmodshepard(idwbuilder *state, double r, ae_state *_state);
-void idwbuildersetuserterm(idwbuilder *state, double v, ae_state *_state);
-void idwbuildersetconstterm(idwbuilder *state, ae_state *_state);
-void idwbuildersetzeroterm(idwbuilder *state, ae_state *_state);
-double idwcalc1(idwmodel *s, double x0, ae_state *_state);
-double idwcalc2(idwmodel *s, double x0, double x1, ae_state *_state);
-double idwcalc3(idwmodel *s, double x0, double x1, double x2, ae_state *_state);
-void idwcalc(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
-void idwcalcbuf(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
-void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y, ae_state *_state);
-void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep, ae_state *_state);
-void idwalloc(ae_serializer *s, idwmodel *model, ae_state *_state);
-void idwserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
-void idwunserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
-void _idwcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void _idwcalcbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _idwcalcbuffer_clear(void *_p);
-void _idwcalcbuffer_destroy(void *_p);
-void _idwmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _idwmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _idwmodel_clear(void *_p);
-void _idwmodel_destroy(void *_p);
-void _idwbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void _idwbuilder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _idwbuilder_clear(void *_p);
-void _idwbuilder_destroy(void *_p);
-void _idwreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _idwreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _idwreport_clear(void *_p);
-void _idwreport_destroy(void *_p);
-
-// === INTFITSERV Package ===
-void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, double *xa, double *xb, double *sa, double *sb, RVector *xoriginal, RVector *yoriginal, ae_state *_state);
-void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v, ae_state *_state);
-void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v, ae_state *_state);
-
-// === POLINT Package ===
-void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *t, ae_state *_state);
-void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentricinterpolant *p, ae_state *_state);
-void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a, ae_state *_state);
-void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricinterpolant *p, ae_state *_state);
-void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
-void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
-void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
-void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state);
-double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
-double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
-double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t, ae_state *_state);
-
-// === SPLINE1D Package ===
-void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
-void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, spline1dinterpolant *c, ae_state *_state);
-void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, ae_state *_state);
-void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d1, RVector *d2, ae_state *_state);
-void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, ae_state *_state);
-void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, ae_state *_state);
-void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, RVector *dd2, ae_state *_state);
-void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundtype, double tension, spline1dinterpolant *c, ae_state *_state);
-void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
-void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
-double spline1dcalc(spline1dinterpolant *c, double x, ae_state *_state);
-void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, double *d2s, ae_state *_state);
-void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc, ae_state *_state);
-void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl, ae_state *_state);
-void spline1dlintransx(spline1dinterpolant *c, double a, double b, ae_state *_state);
-void spline1dlintransy(spline1dinterpolant *c, double a, double b, ae_state *_state);
-double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state);
-void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
-void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_int_t n, RVector *x2, ae_int_t n2, RVector *y, bool needy, RVector *d1, bool needd1, RVector *d2, bool needd2, ae_state *_state);
-void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, bool *dr, RVector *e, ZVector *et, ae_int_t *ne, bool *de, ae_state *_state);
-void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n, ae_state *_state);
-void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, double *x1, ae_int_t *nr, ae_state *_state);
-void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata, ae_state *_state);
-ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, double b, double *x, ae_state *_state);
-void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
-void _spline1dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void _spline1dinterpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _spline1dinterpolant_clear(void *_p);
-void _spline1dinterpolant_destroy(void *_p);
-void _spline1dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _spline1dfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _spline1dfitreport_clear(void *_p);
-void _spline1dfitreport_destroy(void *_p);
-
-// === LSFIT Package ===
-void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t m, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
-void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
-void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state);
-void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state);
-double logisticcalc4(double x, double a, double b, double c, double d, ae_state *_state);
-double logisticcalc5(double x, double a, double b, double c, double d, double g, ae_state *_state);
-void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state);
-void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state);
-void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
-void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
-void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, bool is4pl, double lambdav, double epsx, ae_int_t rscnt, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state);
-void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state);
-void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state);
-void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
-void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
-void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
-void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
-void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
-void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
-void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
-void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
-void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state);
-void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state);
-void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state);
-void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state);
-void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state);
-void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state);
-void lsfitsetcond(lsfitstate *state, double epsx, ae_int_t maxits, ae_state *_state);
-void lsfitsetstpmax(lsfitstate *state, double stpmax, ae_state *_state);
-void lsfitsetxrep(lsfitstate *state, bool needxrep, ae_state *_state);
-void lsfitsetscale(lsfitstate *state, RVector *s, ae_state *_state);
-void lsfitsetbc(lsfitstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
-void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
-bool lsfititeration(lsfitstate *state, ae_state *_state);
-void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
-void lsfitsetgradientcheck(lsfitstate *state, double teststep, ae_state *_state);
-void _polynomialfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _polynomialfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _polynomialfitreport_clear(void *_p);
-void _polynomialfitreport_destroy(void *_p);
-void _barycentricfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _barycentricfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _barycentricfitreport_clear(void *_p);
-void _barycentricfitreport_destroy(void *_p);
-void _lsfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _lsfitreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lsfitreport_clear(void *_p);
-void _lsfitreport_destroy(void *_p);
-void _lsfitstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _lsfitstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lsfitstate_clear(void *_p);
-void _lsfitstate_destroy(void *_p);
-
-// === FITSPHERE Package ===
-void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r, ae_state *_state);
-void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state);
-void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state);
-void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state);
-void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state);
-void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep, ae_state *_state);
-void _fitsphereinternalreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _fitsphereinternalreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _fitsphereinternalreport_clear(void *_p);
-void _fitsphereinternalreport_destroy(void *_p);
-
-// === PARAMETRIC Package ===
-void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state);
-void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state);
-void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state);
-void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state);
-void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t, ae_state *_state);
-void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t, ae_state *_state);
-void pspline2calc(pspline2interpolant *p, double t, double *x, double *y, ae_state *_state);
-void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z, ae_state *_state);
-void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y, ae_state *_state);
-void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, double *z, ae_state *_state);
-void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy, ae_state *_state);
-void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz, ae_state *_state);
-void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, ae_state *_state);
-void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z, ae_state *_state);
-double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_state);
-double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_state);
-void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, double stopeps, RMatrix *x2, ZVector *idx2, ae_int_t *nsections, ae_state *_state);
-void _pspline2interpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void _pspline2interpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _pspline2interpolant_clear(void *_p);
-void _pspline2interpolant_destroy(void *_p);
-void _pspline3interpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void _pspline3interpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _pspline3interpolant_clear(void *_p);
-void _pspline3interpolant_destroy(void *_p);
-
-// === RBFV1 Package ===
-void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state);
-void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state);
-void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep, ae_state *_state);
-void rbfv1alloc(ae_serializer *s, rbfv1model *model, ae_state *_state);
-void rbfv1serialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
-void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
-double rbfv1calc2(rbfv1model *s, double x0, double x1, ae_state *_state);
-double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2, ae_state *_state);
-void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y, ae_state *_state);
-void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y, ae_state *_state);
-void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y, ae_state *_state);
-void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
-bool _trypexec_rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
-void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v, ae_state *_state);
-void _rbfv1calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void _rbfv1calcbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _rbfv1calcbuffer_clear(void *_p);
-void _rbfv1calcbuffer_destroy(void *_p);
-void _rbfv1model_init(void *_p, ae_state *_state, bool make_automatic);
-void _rbfv1model_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _rbfv1model_clear(void *_p);
-void _rbfv1model_destroy(void *_p);
-void _gridcalc3v1buf_init(void *_p, ae_state *_state, bool make_automatic);
-void _gridcalc3v1buf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _gridcalc3v1buf_clear(void *_p);
-void _gridcalc3v1buf_destroy(void *_p);
-void _rbfv1report_init(void *_p, ae_state *_state, bool make_automatic);
-void _rbfv1report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _rbfv1report_clear(void *_p);
-void _rbfv1report_destroy(void *_p);
-
-// === SPLINE2D Package ===
 double spline2dcalc(spline2dinterpolant *c, double x, double y, ae_state *_state);
 void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double *fx, double *fy, double *fxy, ae_state *_state);
 void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f, ae_state *_state);
@@ -1059,8 +836,94 @@ void _spline2dfastddmbuf_init(void *_p, ae_state *_state, bool make_automatic);
 void _spline2dfastddmbuf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _spline2dfastddmbuf_clear(void *_p);
 void _spline2dfastddmbuf_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(spline2dinterpolant, EndD);
+DecClass(spline2dbuilder, EndD);
+DecClass(spline2dfitreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
+
+void spline2dserialize(spline2dinterpolant &obj, std::string &s_out);
+void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj);
+void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out);
+void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj);
+double spline2dcalc(const spline2dinterpolant &c, const double x, const double y, const xparams _xparams = xdefault);
+void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy, const xparams _xparams = xdefault);
+void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
+double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, const xparams _xparams = xdefault);
+void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
+void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, double &f, double &fx, double &fy, double &fxy, const xparams _xparams = xdefault);
+void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by, const xparams _xparams = xdefault);
+void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
+void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc, const xparams _xparams = xdefault);
+void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams = xdefault);
+void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams = xdefault);
+void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
+void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
+void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_int_t &d, real_2d_array &tbl, const xparams _xparams = xdefault);
+void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams = xdefault);
+void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams = xdefault);
+void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real_2d_array &tbl, const xparams _xparams = xdefault);
+void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xparams _xparams = xdefault);
+void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v, const xparams _xparams = xdefault);
+void spline2dbuildersetlinterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
+void spline2dbuildersetconstterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
+void spline2dbuildersetzeroterm(const spline2dbuilder &state, const xparams _xparams = xdefault);
+void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
+void spline2dbuildersetareaauto(const spline2dbuilder &state, const xparams _xparams = xdefault);
+void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const double xb, const double ya, const double yb, const xparams _xparams = xdefault);
+void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, const ae_int_t ky, const xparams _xparams = xdefault);
+void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav, const xparams _xparams = xdefault);
+void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double lambdans, const xparams _xparams = xdefault);
+void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double lambdans, const xparams _xparams = xdefault);
+void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === RBFV2 Package ===
+namespace alglib_impl {
+typedef struct {
+   ae_vector x;
+   ae_vector curboxmin;
+   ae_vector curboxmax;
+   double curdist2;
+   ae_vector x123;
+   ae_vector y123;
+} rbfv2calcbuffer;
+typedef struct {
+   ae_int_t ny;
+   ae_int_t nx;
+   ae_int_t bf;
+   ae_int_t nh;
+   ae_vector ri;
+   ae_vector s;
+   ae_vector kdroots;
+   ae_vector kdnodes;
+   ae_vector kdsplits;
+   ae_vector kdboxmin;
+   ae_vector kdboxmax;
+   ae_vector cw;
+   ae_matrix v;
+   double lambdareg;
+   ae_int_t maxits;
+   double supportr;
+   ae_int_t basisfunction;
+   rbfv2calcbuffer calcbuf;
+} rbfv2model;
+typedef struct {
+   rbfv2calcbuffer calcbuf;
+   ae_vector cx;
+   ae_vector rx;
+   ae_vector ry;
+   ae_vector tx;
+   ae_vector ty;
+   ae_vector rf;
+} rbfv2gridcalcbuffer;
+typedef struct {
+   ae_int_t terminationtype;
+   double maxerror;
+   double rmserror;
+} rbfv2report;
+
 void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state);
 void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf, ae_state *_state);
 void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scalevec, ae_int_t aterm, ae_int_t nh, double rbase, double lambdans, rbfv2model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv2report *rep, ae_state *_state);
@@ -1097,8 +960,23 @@ void _rbfv2report_init(void *_p, ae_state *_state, bool make_automatic);
 void _rbfv2report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _rbfv2report_clear(void *_p);
 void _rbfv2report_destroy(void *_p);
+} // end of namespace alglib_impl
 
 // === SPLINE3D Package ===
+namespace alglib_impl {
+typedef struct {
+   ae_int_t k;
+   ae_int_t stype;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t l;
+   ae_int_t d;
+   ae_vector x;
+   ae_vector y;
+   ae_vector z;
+   ae_vector f;
+} spline3dinterpolant;
+
 double spline3dcalc(spline3dinterpolant *c, double x, double y, double z, ae_state *_state);
 void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz, ae_state *_state);
 void spline3dlintransf(spline3dinterpolant *c, double a, double b, ae_state *_state);
@@ -1112,16 +990,84 @@ void _spline3dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
 void _spline3dinterpolant_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _spline3dinterpolant_clear(void *_p);
 void _spline3dinterpolant_destroy(void *_p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(spline3dinterpolant, EndD);
+
+double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z, const xparams _xparams = xdefault);
+void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz, const xparams _xparams = xdefault);
+void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
+void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b, const xparams _xparams = xdefault);
+void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c, const xparams _xparams = xdefault);
+void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
+void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
+void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === INTCOMP Package ===
+namespace alglib_impl {
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state);
 void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state);
 void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state);
 void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state);
 void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
 void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams = xdefault);
+void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams = xdefault);
+void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
+void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 // === RBF Package ===
+namespace alglib_impl {
+typedef struct {
+   ae_int_t modelversion;
+   rbfv1calcbuffer bufv1;
+   rbfv2calcbuffer bufv2;
+} rbfcalcbuffer;
+typedef struct {
+   ae_int_t nx;
+   ae_int_t ny;
+   ae_int_t modelversion;
+   rbfv1model model1;
+   rbfv2model model2;
+   double lambdav;
+   double radvalue;
+   double radzvalue;
+   ae_int_t nlayers;
+   ae_int_t aterm;
+   ae_int_t algorithmtype;
+   double epsort;
+   double epserr;
+   ae_int_t maxits;
+   ae_int_t nnmaxits;
+   ae_int_t n;
+   ae_matrix x;
+   ae_matrix y;
+   bool hasscale;
+   ae_vector s;
+   ae_int_t progress10000;
+   bool terminationrequest;
+} rbfmodel;
+typedef struct {
+   double rmserror;
+   double maxerror;
+   ae_int_t arows;
+   ae_int_t acols;
+   ae_int_t annz;
+   ae_int_t iterationscount;
+   ae_int_t nmv;
+   ae_int_t terminationtype;
+} rbfreport;
+
 void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s, ae_state *_state);
 void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf, ae_state *_state);
 void rbfsetpoints(rbfmodel *s, RMatrix *xy, ae_int_t n, ae_state *_state);
@@ -1170,5 +1116,49 @@ void _rbfreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 void _rbfreport_clear(void *_p);
 void _rbfreport_destroy(void *_p);
 } // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(rbfcalcbuffer, EndD);
+DecClass(rbfmodel, EndD);
+DecClass(rbfreport, double &rmserror; double &maxerror; ae_int_t &arows; ae_int_t &acols; ae_int_t &annz; ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
+
+void rbfserialize(rbfmodel &obj, std::string &s_out);
+void rbfunserialize(const std::string &s_in, rbfmodel &obj);
+void rbfserialize(rbfmodel &obj, std::ostream &s_out);
+void rbfunserialize(const std::istream &s_in, rbfmodel &obj);
+void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams _xparams = xdefault);
+void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _xparams = xdefault);
+void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
+void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const xparams _xparams = xdefault);
+void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s, const xparams _xparams = xdefault);
+void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const real_1d_array &s, const xparams _xparams = xdefault);
+void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z, const xparams _xparams = xdefault);
+void rbfsetalgoqnn(const rbfmodel &s, const xparams _xparams = xdefault);
+void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav, const xparams _xparams = xdefault);
+void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const xparams _xparams = xdefault);
+void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans, const xparams _xparams = xdefault);
+void rbfsetlinterm(const rbfmodel &s, const xparams _xparams = xdefault);
+void rbfsetconstterm(const rbfmodel &s, const xparams _xparams = xdefault);
+void rbfsetzeroterm(const rbfmodel &s, const xparams _xparams = xdefault);
+void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf, const xparams _xparams = xdefault);
+void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits, const xparams _xparams = xdefault);
+void rbfsetv2supportr(const rbfmodel &s, const double r, const xparams _xparams = xdefault);
+void rbfbuildmodel(const rbfmodel &s, rbfreport &rep, const xparams _xparams = xdefault);
+double rbfcalc1(const rbfmodel &s, const double x0, const xparams _xparams = xdefault);
+double rbfcalc2(const rbfmodel &s, const double x0, const double x1, const xparams _xparams = xdefault);
+double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2, const xparams _xparams = xdefault);
+void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y, const xparams _xparams = xdefault);
+void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams = xdefault);
+void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion, const xparams _xparams = xdefault);
+ae_int_t rbfgetmodelversion(const rbfmodel &s, const xparams _xparams = xdefault);
+double rbfpeekprogress(const rbfmodel &s, const xparams _xparams = xdefault);
+void rbfrequesttermination(const rbfmodel &s, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 #endif // OnceOnly

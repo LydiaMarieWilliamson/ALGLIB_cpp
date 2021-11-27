@@ -26,4729 +26,8 @@
 #   pragma warning(disable:4996)
 #endif
 
-namespace alglib {
 // === ABLAS Package ===
-
-// === ORTFAC Package ===
-
-// === MATGEN Package ===
-
-// === SPARSE Package ===
-
-// === HSSCHUR Package ===
-
-// === EVD Package ===
-
-// === DLU Package ===
-
-// === SPTRF Package ===
-
-// === AMDORDERING Package ===
-
-// === SPCHOL Package ===
-
-// === TRFAC Package ===
-
-// === BDSVD Package ===
-
-// === SVD Package ===
-
-// === RCOND Package ===
-
-// === FBLS Package ===
-
-// === NORMESTIMATOR Package ===
-
-// === MATINV Package ===
-
-// === INVERSEUPDATE Package ===
-
-// === SCHUR Package ===
-
-// === SPDGEVD Package ===
-
-// === MATDET Package ===
-
-// === ABLAS Package ===
-void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixtranspose(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixtranspose(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixenforcesymmetricity(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixcopy(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rvectorcopy(n, const_cast < alglib_impl::ae_vector * >(a.c_ptr()), ia, const_cast < alglib_impl::ae_vector * >(b.c_ptr()), ib, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixcopy(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixgencopy(m, n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, beta, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixger(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, alpha, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrank1(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrank1(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixgemv(m, n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixmv(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixmv(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixsymv(n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixsyvmv(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(tmp.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixtrsv(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrighttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixlefttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrighttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixlefttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixherk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixsyrk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixgemm(m, n, k, *alpha.c_ptr(), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, optypeb, *beta.c_ptr(), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixgemm(m, n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, optypeb, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixsyrk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === ORTFAC Package ===
-void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixqr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixlq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixqr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixlq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixqrunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixqrunpackr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixlqunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qrows, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixlqunpackl(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(l.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixqrunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixqrunpackr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixlqunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qrows, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixlqunpackl(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(l.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbdunpackq(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbdmultiplybyq(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbdunpackpt(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), ptrows, const_cast < alglib_impl::ae_matrix * >(pt.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbdmultiplybyp(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixbdunpackdiagonals(const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), m, n, &isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixhessenberg(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixhessenbergunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixhessenbergunpackh(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::smatrixtd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::smatrixtdunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hmatrixtd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hmatrixtdunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MATGEN Package ===
-void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrndorthogonal(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrndorthogonal(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::smatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hpdmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrndorthogonalfromtheright(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixrndorthogonalfromtheleft(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrndorthogonalfromtheright(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixrndorthogonalfromtheleft(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void smatrixrndmultiply(real_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::smatrixrndmultiply(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hmatrixrndmultiply(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === SPARSE Package ===
-// Sparse matrix structure.
-//
-// You should use ALGLIB functions to work with sparse matrix. Never  try  to
-// access its fields directly!
-//
-// NOTES ON THE SPARSE STORAGE FORMATS
-//
-// Sparse matrices can be stored using several formats:
-// * Hash-Table representation
-// * Compressed Row Storage (CRS)
-// * Skyline matrix storage (SKS)
-//
-// Each of the formats has benefits and drawbacks:
-// * Hash-table is good for dynamic operations (insertion of new elements),
-//   but does not support linear algebra operations
-// * CRS is good for operations like matrix-vector or matrix-matrix products,
-//   but its initialization is less convenient - you have to tell row   sizes
-//   at the initialization, and you have to fill  matrix  only  row  by  row,
-//   from left to right.
-// * SKS is a special format which is used to store triangular  factors  from
-//   Cholesky factorization. It does not support  dynamic  modification,  and
-//   support for linear algebra operations is very limited.
-//
-// Tables below outline information about these two formats:
-//
-//     OPERATIONS WITH MATRIX      HASH        CRS         SKS
-//     creation                    +           +           +
-//     SparseGet                   +           +           +
-//     SparseExists                +           +           +
-//     SparseRewriteExisting       +           +           +
-//     SparseSet                   +           +           +
-//     SparseAdd                   +
-//     SparseGetRow                            +           +
-//     SparseGetCompressedRow                  +           +
-//     sparse-dense linear algebra             +           +
-DefClass(sparsematrix, EndD)
-
-// Temporary buffers for sparse matrix operations.
-//
-// You should pass an instance of this structure to factorization  functions.
-// It allows to reuse memory during repeated sparse  factorizations.  You  do
-// not have to call some initialization function - simply passing an instance
-// to factorization function is enough.
-DefClass(sparsebuffers, EndD)
-
-void sparseserialize(sparsematrix &obj, std::string &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-   alglib_impl::ae_int_t ssize;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_alloc_start(&serializer);
-   alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
-   s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
-   alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
-   alglib_impl::sparseserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-void sparseserialize(sparsematrix &obj, std::ostream &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_alloc_start(&serializer);
-   alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
-   alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
-   alglib_impl::sparseserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-
-void sparseunserialize(const std::string &s_in, sparsematrix &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
-   alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-void sparseunserialize(const std::istream &s_in, sparsematrix &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
-   alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-
-void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreate(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-
-   k = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreate(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatebuf(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-
-   k = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatebuf(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatecrs(m, n, const_cast < alglib_impl::ae_vector * >(ner.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatecrsbuf(m, n, const_cast < alglib_impl::ae_vector * >(ner.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatesks(m, n, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatesksbuf(m, n, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatesksband(m, n, bw, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecreatesksbandbuf(m, n, bw, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopy(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopy(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopybuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseswap(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseswap(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseadd(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseset(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::sparseget(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparseexists(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::sparsegetdiagonal(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemtv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsegemv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), alpha, ops, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemv2(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y0.c_ptr()), const_cast < alglib_impl::ae_vector * >(y1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsesmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::sparsevsmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemtm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsemm2(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b0.c_ptr()), const_cast < alglib_impl::ae_matrix * >(b1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsesmm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsetrmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsetrsv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsesymmpermtbl(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsesymmpermtblbuf(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseresizematrix(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseresizematrix(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparseenumerate(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &t0, &t1, &i, &j, &v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparserewriteexisting(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsegetrow(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, const_cast < alglib_impl::ae_vector * >(irow.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsegetcompressedrow(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, const_cast < alglib_impl::ae_vector * >(colidx.c_ptr()), const_cast < alglib_impl::ae_vector * >(vals.c_ptr()), &nzcnt, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsetransposesks(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsetransposesks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsetransposecrs(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsetransposecrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytransposecrs(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytransposecrsbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseconvertto(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), fmt, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytobuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), fmt, const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseconverttohash(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseconverttohash(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytohash(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytohashbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseconverttocrs(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseconverttocrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytocrs(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytocrsbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparseconverttosks(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparseconverttosks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytosks(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecopytosksbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-ae_int_t sparsegetmatrixtype(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::sparsegetmatrixtype(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
-}
-
-bool sparseishash(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparseishash(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparseiscrs(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparseiscrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparseissks(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparseissks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-void sparsefree(sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsefree(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-ae_int_t sparsegetnrows(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::sparsegetnrows(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
-}
-
-ae_int_t sparsegetncols(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::sparsegetncols(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
-}
-
-ae_int_t sparsegetuppercount(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::sparsegetuppercount(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
-}
-
-ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::sparsegetlowercount(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
-}
-
-// === HSSCHUR Package ===
-
-// === EVD Package ===
-// This object stores state of the subspace iteration algorithm.
-//
-// You should use ALGLIB functions to work with this object.
-DefClass(eigsubspacestate, EndD)
-
-// This object stores state of the subspace iteration algorithm.
-//
-// You should use ALGLIB functions to work with this object.
-DefClass(eigsubspacereport, AndD DecVal(iterationscount))
-
-void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacecreate(n, k, const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacecreatebuf(n, k, const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacesetcond(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), eps, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacesetwarmstart(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), usewarmstart, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspaceoocstart(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), mtype, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool eigsubspaceooccontinue(const eigsubspacestate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::eigsubspaceooccontinue(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspaceoocgetrequestinfo(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &requesttype, &requestsize, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspaceoocgetrequestdata(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspaceoocsendresult(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(ax.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspaceoocstop(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacesolvedenses(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::eigsubspacesolvesparses(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixevdr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, b1, b2, &m, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixevdi(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, i1, i2, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::hmatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::hmatrixevdr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, b1, b2, &m, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::hmatrixevdi(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, i1, i2, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixtdevd(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixtdevdr(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, a, b, &m, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixtdevdi(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, i1, i2, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::rmatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, vneeded, const_cast < alglib_impl::ae_vector * >(wr.c_ptr()), const_cast < alglib_impl::ae_vector * >(wi.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vl.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vr.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// === DLU Package ===
-
-// === SPTRF Package ===
-
-// === AMDORDERING Package ===
-
-// === SPCHOL Package ===
-
-// === TRFAC Package ===
-// An analysis of the sparse matrix decomposition, performed prior to  actual
-// numerical factorization. You should not directly  access  fields  of  this
-// object - use appropriate ALGLIB functions to work with this object.
-DefClass(sparsedecompositionanalysis, EndD)
-
-void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixlu(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixlu(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::hpdmatrixcholesky(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::spdmatrixcholesky(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyupdateadd1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyupdatefix(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(fix.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyupdateadd1buf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyupdatefixbuf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(fix.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparselu(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), pivottype, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(q.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparsecholeskyskyline(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparsecholesky(const sparsematrix &a, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparsecholesky(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparsecholeskyp(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparsecholeskyanalyze(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, facttype, permtype, const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::sparsecholeskyfactorize(const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), needupper, const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(p.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sparsecholeskyreload(const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === BDSVD Package ===
-bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::rmatrixbdsvd(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, isupper, isfractionalaccuracyrequired, const_cast < alglib_impl::ae_matrix * >(u.c_ptr()), nru, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ncc, const_cast < alglib_impl::ae_matrix * >(vt.c_ptr()), ncvt, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// === SVD Package ===
-bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::rmatrixsvd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, uneeded, vtneeded, additionalmemory, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(u.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vt.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// === RCOND Package ===
-double rmatrixrcond1(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixtrrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixtrrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::hpdmatrixrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixlurcond1(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixlurcondinf(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixcholeskyrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::hpdmatrixcholeskyrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixlurcond1(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixlurcondinf(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixtrrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::cmatrixtrrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === FBLS Package ===
-
-// === NORMESTIMATOR Package ===
-// This object stores state of the iterative norm estimation algorithm.
-//
-// You should use ALGLIB functions to work with this object.
-DefClass(normestimatorstate, EndD)
-
-void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::normestimatorcreate(m, n, nstart, nits, const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::normestimatorsetseed(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), seedval, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::normestimatorestimatesparse(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void normestimatorresults(const normestimatorstate &state, double &nrm, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::normestimatorresults(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), &nrm, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MATINV Package ===
-// Matrix inverse report:
-// * R1    reciprocal of condition number in 1-norm
-// * RInf  reciprocal of condition number in inf-norm
-DefClass(matinvreport, AndD DecVal(r1) AndD DecVal(rinf))
-
-void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.cols() != a.rows()) || (a.cols() != pivots.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.cols() != a.rows()) || (a.cols() != pivots.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isupper;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isupper;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
-   n = a.cols();
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   if (!alglib_impl::ae_force_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("Internal error while forcing symmetricity of 'a' parameter");
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hpdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isupper;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hpdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hpdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isupper;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_hermitian(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("'a' parameter is not Hermitian matrix");
-   n = a.cols();
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hpdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   if (!alglib_impl::ae_force_hermitian(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("Internal error while forcing Hermitian properties of 'a' parameter");
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isunit;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   isunit = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isunit;
-   if ((a.cols() != a.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
-   n = a.cols();
-   isunit = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::cmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-// === INVERSEUPDATE Package ===
-void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinvupdatesimple(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updrow, updcolumn, updval, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinvupdaterow(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updrow, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinvupdatecolumn(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updcolumn, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rmatrixinvupdateuv(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::ae_vector * >(v.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === SCHUR Package ===
-bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::rmatrixschur(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_matrix * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// === SPDGEVD Package ===
-bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixgevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isuppera, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), isupperb, zneeded, problemtype, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::smatrixgevdreduce(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isuppera, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), isupperb, problemtype, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &isupperr, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// === MATDET Package ===
-double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.rows() != a.cols()) || (a.rows() != pivots.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
-   n = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#endif
-
-double rmatrixdet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-double rmatrixdet(const real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.rows() != a.cols()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
-   n = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#endif
-
-complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex result = alglib_impl::cmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < complex *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.rows() != a.cols()) || (a.rows() != pivots.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
-   n = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex result = alglib_impl::cmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < complex *>(&result));
-}
-#endif
-
-complex cmatrixdet(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex result = alglib_impl::cmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < complex *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-complex cmatrixdet(const complex_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.rows() != a.cols()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
-   n = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex result = alglib_impl::cmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < complex *>(&result));
-}
-#endif
-
-double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixcholeskydet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-double spdmatrixcholeskydet(const real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((a.rows() != a.cols()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
-   n = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixcholeskydet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#endif
-
-double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#if !defined(AE_NO_EXCEPTIONS)
-double spdmatrixdet(const real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   bool isupper;
-   if ((a.rows() != a.cols()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");
-   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
-   n = a.rows();
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spdmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-#endif
-} // end of namespace alglib
-
 namespace alglib_impl {
-// === ABLAS Package ===
 static ae_int_t ablas_blas2minvendorkernelsize = 8;
 static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
 static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
@@ -4762,210 +41,6 @@ bool _trypexec_ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, ae_compl
 static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 bool _trypexec_ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 
-// === ORTFAC Package ===
-static void ortfac_cmatrixqrbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
-static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
-static void ortfac_rmatrixblockreflector(RMatrix *a, RVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, RMatrix *t, RVector *work, ae_state *_state);
-static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, CMatrix *t, CVector *work, ae_state *_state);
-
-// === MATGEN Package ===
-
-// === SPARSE Package ===
-static double sparse_desiredloadfactor = 0.66;
-static double sparse_maxloadfactor = 0.75;
-static double sparse_growfactor = 2.00;
-static ae_int_t sparse_additional = 10;
-static ae_int_t sparse_linalgswitch = 16;
-static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize, ae_state *_state);
-
-// === HSSCHUR Package ===
-static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_t ilo, ae_int_t ihi, RMatrix *h, RVector *wr, RVector *wi, ae_int_t iloz, ae_int_t ihiz, RMatrix *z, RVector *work, RVector *workv3, RVector *workc1, RVector *works1, ae_int_t *info, ae_state *_state);
-static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, double *rt1r, double *rt1i, double *rt2r, double *rt2i, double *cs, double *sn, ae_state *_state);
-static double hsschur_extschursign(double a, double b, ae_state *_state);
-static ae_int_t hsschur_extschursigntoone(double b, ae_state *_state);
-
-// === EVD Package ===
-static ae_int_t evd_stepswithintol = 2;
-static void evd_clearrfields(eigsubspacestate *state, ae_state *_state);
-static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, ae_state *_state);
-static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2, ae_state *_state);
-static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2, double *cs1, double *sn1, ae_state *_state);
-static double evd_tdevdpythag(double a, double b, ae_state *_state);
-static double evd_tdevdextsign(double a, double b, ae_state *_state);
-static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n, ae_int_t irange, ae_int_t iorder, double vl, double vu, ae_int_t il, ae_int_t iu, double abstol, RVector *w, ae_int_t *m, ae_int_t *nsplit, ZVector *iblock, ZVector *isplit, ae_int_t *errorcode, ae_state *_state);
-static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, RVector *w, ZVector *iblock, ZVector *isplit, RMatrix *z, ZVector *ifail, ae_int_t *info, ae_state *_state);
-static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVector *b, RVector *c, double tol, RVector *d, ZVector *iin, ae_int_t *info, ae_state *_state);
-static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *c, RVector *d, ZVector *iin, RVector *y, double *tol, ae_int_t *info, ae_state *_state);
-static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_int_t mmax, ae_int_t minp, double abstol, double reltol, double pivmin, RVector *d, RVector *e, RVector *e2, ZVector *nval, RMatrix *ab, RVector *c, ae_int_t *mout, ZMatrix *nab, RVector *work, ZVector *iwork, ae_int_t *info, ae_state *_state);
-static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state);
-static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state);
-static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double smin, double ca, RMatrix *a, double d1, double d2, RMatrix *b, double wr, double wi, BVector *rswap4, BVector *zswap4, ZMatrix *ipivot44, RVector *civ4, RVector *crv4, RMatrix *x, double *scl, double *xnorm, ae_int_t *info, ae_state *_state);
-static void evd_internalhsevdladiv(double a, double b, double c, double d, double *p, double *q, ae_state *_state);
-
-// === DLU Package ===
-static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
-static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
-static void dlu_cmatrixplu2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
-static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
-
-// === SPTRF Package ===
-static double sptrf_densebnd = 0.10;
-static ae_int_t sptrf_slswidth = 8;
-static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a, ae_state *_state);
-static void sptrf_sluv2list1swap(sluv2list1matrix *a, ae_int_t i, ae_int_t j, ae_state *_state);
-static void sptrf_sluv2list1dropsequence(sluv2list1matrix *a, ae_int_t i, ae_state *_state);
-static void sptrf_sluv2list1appendsequencetomatrix(sluv2list1matrix *a, ae_int_t src, bool hasdiagonal, double d, ae_int_t nzmax, sparsematrix *s, ae_int_t dst, ae_state *_state);
-static void sptrf_sluv2list1pushsparsevector(sluv2list1matrix *a, ZVector *si, RVector *sv, ae_int_t nz, ae_state *_state);
-static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n, ae_state *_state);
-static void sptrf_densetrailappendcolumn(sluv2densetrail *d, RVector *x, ae_int_t id, ae_state *_state);
-static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a, ae_state *_state);
-static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, ae_int_t *ipiv, ae_int_t *jpiv, ae_state *_state);
-static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int_t jpiv, double *uu, ZVector *v0i, RVector *v0r, ae_int_t *nz0, ZVector *v1i, RVector *v1r, ae_int_t *nz1, ae_state *_state);
-static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list1matrix *bupper, sluv2densetrail *dtrail, ae_state *_state);
-static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *v0r, ae_int_t nz0, ZVector *v1i, RVector *v1r, ae_int_t nz1, sluv2list1matrix *bupper, sluv2densetrail *dtrail, bool densificationsupported, ae_state *_state);
-
-// === AMDORDERING Package ===
-static ae_int_t amdordering_knsheadersize = 2;
-static ae_int_t amdordering_llmentrysize = 6;
-static void amdordering_nsinitemptyslow(ae_int_t n, amdnset *sa, ae_state *_state);
-static void amdordering_nscopy(amdnset *ssrc, amdnset *sdst, ae_state *_state);
-static void amdordering_nsaddelement(amdnset *sa, ae_int_t k, ae_state *_state);
-static void amdordering_nsaddkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
-static void amdordering_nssubtract1(amdnset *sa, amdnset *src, ae_state *_state);
-static void amdordering_nssubtractkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
-static void amdordering_nsclear(amdnset *sa, ae_state *_state);
-static ae_int_t amdordering_nscount(amdnset *sa, ae_state *_state);
-static ae_int_t amdordering_nscountnotkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
-static ae_int_t amdordering_nscountandkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
-static bool amdordering_nsequal(amdnset *s0, amdnset *s1, ae_state *_state);
-static void amdordering_nsstartenumeration(amdnset *sa, ae_state *_state);
-static bool amdordering_nsenumerate(amdnset *sa, ae_int_t *i, ae_state *_state);
-static void amdordering_knscompressstorage(amdknset *sa, ae_state *_state);
-static void amdordering_knsreallocate(amdknset *sa, ae_int_t setidx, ae_int_t newallocated, ae_state *_state);
-static void amdordering_knsinit(ae_int_t k, ae_int_t n, ae_int_t kprealloc, amdknset *sa, ae_state *_state);
-static void amdordering_knsinitfroma(sparsematrix *a, ae_int_t n, amdknset *sa, ae_state *_state);
-static void amdordering_knsstartenumeration(amdknset *sa, ae_int_t i, ae_state *_state);
-static bool amdordering_knsenumerate(amdknset *sa, ae_int_t *i, ae_state *_state);
-static void amdordering_knsdirectaccess(amdknset *sa, ae_int_t k, ae_int_t *idxbegin, ae_int_t *idxend, ae_state *_state);
-static void amdordering_knsaddnewelement(amdknset *sa, ae_int_t i, ae_int_t k, ae_state *_state);
-static void amdordering_knssubtract1(amdknset *sa, ae_int_t i, amdnset *src, ae_state *_state);
-static void amdordering_knsaddkthdistinct(amdknset *sa, ae_int_t i, amdknset *src, ae_int_t k, ae_state *_state);
-static ae_int_t amdordering_knscountkth(amdknset *s0, ae_int_t k, ae_state *_state);
-static ae_int_t amdordering_knscountnot(amdknset *s0, ae_int_t i, amdnset *s1, ae_state *_state);
-static ae_int_t amdordering_knscountnotkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k, ae_state *_state);
-static ae_int_t amdordering_knscountandkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k, ae_state *_state);
-static ae_int_t amdordering_knssumkth(amdknset *s0, ae_int_t i, ae_state *_state);
-static void amdordering_knsclearkthnoreclaim(amdknset *sa, ae_int_t k, ae_state *_state);
-static void amdordering_knsclearkthreclaim(amdknset *sa, ae_int_t k, ae_state *_state);
-static void amdordering_mtxinit(ae_int_t n, amdllmatrix *a, ae_state *_state);
-static void amdordering_mtxaddcolumnto(amdllmatrix *a, ae_int_t j, amdnset *s, ae_state *_state);
-static void amdordering_mtxinsertnewelement(amdllmatrix *a, ae_int_t i, ae_int_t j, ae_state *_state);
-static ae_int_t amdordering_mtxcountcolumnnot(amdllmatrix *a, ae_int_t j, amdnset *s, ae_state *_state);
-static ae_int_t amdordering_mtxcountcolumn(amdllmatrix *a, ae_int_t j, ae_state *_state);
-static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol, ae_state *_state);
-static void amdordering_mtxclearcolumn(amdllmatrix *a, ae_int_t j, ae_state *_state);
-static void amdordering_mtxclearrow(amdllmatrix *a, ae_int_t j, ae_state *_state);
-static void amdordering_vtxinit(sparsematrix *a, ae_int_t n, bool checkexactdegrees, amdvertexset *s, ae_state *_state);
-static void amdordering_vtxremovevertex(amdvertexset *s, ae_int_t p, ae_state *_state);
-static ae_int_t amdordering_vtxgetapprox(amdvertexset *s, ae_int_t p, ae_state *_state);
-static ae_int_t amdordering_vtxgetexact(amdvertexset *s, ae_int_t p, ae_state *_state);
-static ae_int_t amdordering_vtxgetapproxmindegree(amdvertexset *s, ae_state *_state);
-static void amdordering_vtxupdateapproximatedegree(amdvertexset *s, ae_int_t p, ae_int_t dnew, ae_state *_state);
-static void amdordering_vtxupdateexactdegree(amdvertexset *s, ae_int_t p, ae_int_t d, ae_state *_state);
-static void amdordering_amdselectpivotelement(amdbuffer *buf, ae_int_t k, ae_int_t *p, ae_int_t *nodesize, ae_state *_state);
-static void amdordering_amdcomputelp(amdbuffer *buf, ae_int_t p, ae_state *_state);
-static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t k, ae_int_t tau, ae_state *_state);
-static void amdordering_amddetectsupernodes(amdbuffer *buf, ae_state *_state);
-
-// === SPCHOL Package ===
-static ae_int_t spchol_maxsupernode = 4;
-static double spchol_maxmergeinefficiency = 0.25;
-static ae_int_t spchol_smallfakestolerance = 2;
-static ae_int_t spchol_maxfastkernel = 4;
-static bool spchol_relaxedsupernodes = true;
-#ifdef ALGLIB_NO_FAST_KERNELS
-static ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
-static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state);
-#endif
-static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_state *_state);
-static void spchol_buildunorderedetree(sparsematrix *a, ae_int_t n, ZVector *parent, ZVector *tabove, ae_state *_state);
-static void spchol_fromparenttochildren(ZVector *parent, ae_int_t n, ZVector *childrenr, ZVector *childreni, ZVector *ttmp0, ae_state *_state);
-static void spchol_buildorderedetree(sparsematrix *a, ae_int_t n, ZVector *parent, ZVector *supernodalpermutation, ZVector *invsupernodalpermutation, ZVector *trawparentofrawnode, ZVector *trawparentofreorderednode, ZVector *ttmp, BVector *tflagarray, ae_state *_state);
-static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, ae_int_t n, spcholanalysis *analysis, ZVector *node2supernode, ZVector *tchildrenr, ZVector *tchildreni, ZVector *tparentnodeofsupernode, ZVector *tfakenonzeros, ZVector *ttmp0, BVector *tflagarray, ae_state *_state);
-static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, sparsematrix *rawa, ZVector *node2supernode, ae_int_t n, ZVector *ttmp0, ZVector *ttmp1, BVector *tflagarray, ae_state *_state);
-static void spchol_loadmatrix(spcholanalysis *analysis, sparsematrix *at, ae_state *_state);
-static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVector *strides, RVector *rowstorage, RVector *diagd, ae_int_t n, sparsematrix *a, RVector *d, ZVector *p, ZVector *tmpp, ae_state *_state);
-static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int_t tail, sparsematrix *atail, ZVector *tmpparent, ZVector *tmpchildrenr, ZVector *tmpchildreni, ZVector *tmp1, BVector *flagarray, sparsematrix *tmpbottomt, sparsematrix *tmpupdatet, sparsematrix *tmpupdate, sparsematrix *tmpnewtailt, ae_state *_state);
-static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsematrix *b, ae_state *_state);
-static ae_int_t spchol_computenonzeropattern(sparsematrix *wrkat, ae_int_t columnidx, ae_int_t n, ZVector *superrowridx, ZVector *superrowidx, ae_int_t nsuper, ZVector *childrennodesr, ZVector *childrennodesi, ZVector *node2supernode, BVector *truearray, ZVector *tmp0, ae_state *_state);
-static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t uidx, ae_int_t wrkrow, RVector *diagd, ae_int_t offsd, ae_state *_state);
-static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_state *_state);
-static ae_int_t spchol_recommendedstridefor(ae_int_t rowsize, ae_state *_state);
-static ae_int_t spchol_alignpositioninarray(ae_int_t offs, ae_state *_state);
-#ifdef ALGLIB_NO_FAST_KERNELS
-static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
-static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-#endif
-static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_t n, ae_int_t tail, sparsematrix *referencetaila, ae_state *_state);
-static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, ae_state *_state);
-
-// === TRFAC Package ===
-static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
-static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
-static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp, ae_state *_state);
-
-// === BDSVD Package ===
-static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *uu, ae_int_t ustart, ae_int_t nru, RMatrix *c, ae_int_t cstart, ae_int_t ncc, RMatrix *vt, ae_int_t vstart, ae_int_t ncvt, ae_state *_state);
-static double bdsvd_extsignbdsqr(double a, double b, ae_state *_state);
-static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ssmax, ae_state *_state);
-static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *ssmax, double *snr, double *csr, double *snl, double *csl, ae_state *_state);
-
-// === SVD Package ===
-
-// === RCOND Package ===
-static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
-static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
-static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc, ae_state *_state);
-static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc, ae_state *_state);
-static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state);
-static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state);
-static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVector *isgn, double *est, ae_int_t *kase, ae_state *_state);
-static void rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double *est, ae_int_t *kase, ZVector *isave, RVector *rsave, ae_state *_state);
-static double rcond_internalcomplexrcondscsum1(CVector *x, ae_int_t n, ae_state *_state);
-static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n, ae_state *_state);
-static void rcond_internalcomplexrcondsaveall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp, ae_state *_state);
-static void rcond_internalcomplexrcondloadall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp, ae_state *_state);
-
-// === FBLS Package ===
-
-// === NORMESTIMATOR Package ===
-
-// === MATINV Package ===
-static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
-bool _trypexec_matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
-static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, CVector *tmp, sinteger *info, ae_state *_state);
-bool _trypexec_matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, CVector *tmp, sinteger *info, ae_state *_state);
-static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RVector *work, sinteger *info, matinvreport *rep, ae_state *_state);
-bool _trypexec_matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RVector *work, sinteger *info, matinvreport *rep, ae_state *_state);
-static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, sinteger *ssinfo, matinvreport *rep, ae_state *_state);
-bool _trypexec_matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, sinteger *ssinfo, matinvreport *rep, ae_state *_state);
-static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
-
-// === INVERSEUPDATE Package ===
-
-// === SCHUR Package ===
-
-// === SPDGEVD Package ===
-
-// === MATDET Package ===
-
-// === ABLAS Package ===
 // Splits matrix length in two parts, left part should match ABLAS block size
 //
 // INPUT PARAMETERS
@@ -7673,8 +2748,517 @@ static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 bool _trypexec_ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
    return false;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixtranspose(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixtranspose(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixenforcesymmetricity(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixcopy(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rvectorcopy(n, const_cast < alglib_impl::ae_vector * >(a.c_ptr()), ia, const_cast < alglib_impl::ae_vector * >(b.c_ptr()), ib, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixcopy(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixgencopy(m, n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, beta, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixger(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, alpha, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrank1(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrank1(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), iu, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), iv, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixgemv(m, n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixmv(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixmv(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, opa, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixsymv(n, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixsyvmv(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, const_cast < alglib_impl::ae_vector * >(tmp.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixtrsv(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrighttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixlefttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrighttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixlefttrsm(m, n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), i1, j1, isupper, isunit, optype, const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), i2, j2, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixherk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixsyrk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixgemm(m, n, k, *alpha.c_ptr(), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, optypeb, *beta.c_ptr(), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixgemm(m, n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), ib, jb, optypeb, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixsyrk(n, k, alpha, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), ia, ja, optypea, beta, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ic, jc, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === ORTFAC Package ===
+namespace alglib_impl {
+static void ortfac_cmatrixqrbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
+static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
+static void ortfac_rmatrixblockreflector(RMatrix *a, RVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, RMatrix *t, RVector *work, ae_state *_state);
+static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, CMatrix *t, CVector *work, ae_state *_state);
+
 // QR decomposition of a rectangular matrix of size MxN
 //
 // Input parameters:
@@ -10334,8 +5918,512 @@ static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwi
       }
    }
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixqr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixlq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixqr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixlq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixqrunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixqrunpackr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixlqunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qrows, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixlqunpackl(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(l.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixqrunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixqrunpackr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixlqunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), qrows, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixlqunpackl(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_matrix * >(l.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbdunpackq(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), qcolumns, const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbdmultiplybyq(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(tauq.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbdunpackpt(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), ptrows, const_cast < alglib_impl::ae_matrix * >(pt.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbdmultiplybyp(const_cast < alglib_impl::ae_matrix * >(qp.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(taup.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixbdunpackdiagonals(const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), m, n, &isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixhessenberg(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixhessenbergunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixhessenbergunpackh(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::smatrixtd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::smatrixtdunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hmatrixtd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hmatrixtdunpackq(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(tau.c_ptr()), const_cast < alglib_impl::ae_matrix * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MATGEN Package ===
+namespace alglib_impl {
 // Generation of a random uniformly distributed (Haar) orthogonal matrix
 //
 // INPUT PARAMETERS:
@@ -11191,8 +7279,299 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n, ae_state *_state) {
    }
    ae_frame_leave(_state);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrndorthogonal(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrndorthogonal(n, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::smatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hpdmatrixrndcond(n, c, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrndorthogonalfromtheright(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixrndorthogonalfromtheleft(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrndorthogonalfromtheright(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixrndorthogonalfromtheleft(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void smatrixrndmultiply(real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::smatrixrndmultiply(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hmatrixrndmultiply(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === SPARSE Package ===
+namespace alglib_impl {
+static double sparse_desiredloadfactor = 0.66;
+static double sparse_maxloadfactor = 0.75;
+static double sparse_growfactor = 2.00;
+static ae_int_t sparse_additional = 10;
+static ae_int_t sparse_linalgswitch = 16;
+static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize, ae_state *_state);
+
 // This function creates sparse matrix in a Hash-Table format.
 //
 // This function creates Hast-Table matrix, which can be  converted  to  CRS
@@ -16446,8 +12825,1380 @@ void _sparsebuffers_destroy(void *_p) {
    ae_vector_destroy(&p->u);
    _sparsematrix_destroy(&p->s);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// Sparse matrix structure.
+//
+// You should use ALGLIB functions to work with sparse matrix. Never  try  to
+// access its fields directly!
+//
+// NOTES ON THE SPARSE STORAGE FORMATS
+//
+// Sparse matrices can be stored using several formats:
+// * Hash-Table representation
+// * Compressed Row Storage (CRS)
+// * Skyline matrix storage (SKS)
+//
+// Each of the formats has benefits and drawbacks:
+// * Hash-table is good for dynamic operations (insertion of new elements),
+//   but does not support linear algebra operations
+// * CRS is good for operations like matrix-vector or matrix-matrix products,
+//   but its initialization is less convenient - you have to tell row   sizes
+//   at the initialization, and you have to fill  matrix  only  row  by  row,
+//   from left to right.
+// * SKS is a special format which is used to store triangular  factors  from
+//   Cholesky factorization. It does not support  dynamic  modification,  and
+//   support for linear algebra operations is very limited.
+//
+// Tables below outline information about these two formats:
+//
+//     OPERATIONS WITH MATRIX      HASH        CRS         SKS
+//     creation                    +           +           +
+//     SparseGet                   +           +           +
+//     SparseExists                +           +           +
+//     SparseRewriteExisting       +           +           +
+//     SparseSet                   +           +           +
+//     SparseAdd                   +
+//     SparseGetRow                            +           +
+//     SparseGetCompressedRow                  +           +
+//     sparse-dense linear algebra             +           +
+DefClass(sparsematrix, EndD)
+
+// Temporary buffers for sparse matrix operations.
+//
+// You should pass an instance of this structure to factorization  functions.
+// It allows to reuse memory during repeated sparse  factorizations.  You  do
+// not have to call some initialization function - simply passing an instance
+// to factorization function is enough.
+DefClass(sparsebuffers, EndD)
+
+void sparseserialize(sparsematrix &obj, std::string &s_out) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+   alglib_impl::ae_int_t ssize;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
+   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   s_out.clear();
+   s_out.reserve((size_t)(ssize + 1));
+   alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
+   alglib_impl::sparseserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+void sparseserialize(sparsematrix &obj, std::ostream &s_out) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
+   alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
+   alglib_impl::sparseserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+
+void sparseunserialize(const std::string &s_in, sparsematrix &obj) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
+   alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+void sparseunserialize(const std::istream &s_in, sparsematrix &obj) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
+   alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+
+void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreate(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+
+   k = 0;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreate(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatebuf(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+
+   k = 0;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatebuf(m, n, k, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatecrs(m, n, const_cast < alglib_impl::ae_vector * >(ner.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatecrsbuf(m, n, const_cast < alglib_impl::ae_vector * >(ner.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatesks(m, n, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatesksbuf(m, n, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatesksband(m, n, bw, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecreatesksbandbuf(m, n, bw, const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopy(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopy(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopybuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseswap(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseswap(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseadd(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseset(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::sparseget(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparseexists(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::sparsegetdiagonal(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemtv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsegemv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), alpha, ops, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), ix, beta, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), iy, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemv2(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y0.c_ptr()), const_cast < alglib_impl::ae_vector * >(y1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsesmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::sparsevsmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemtm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsemm2(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b0.c_ptr()), const_cast < alglib_impl::ae_matrix * >(b1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsesmm(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), k, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsetrmv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsetrsv(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), isupper, isunit, optype, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsesymmpermtbl(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsesymmpermtblbuf(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseresizematrix(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseresizematrix(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparseenumerate(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &t0, &t1, &i, &j, &v, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparserewriteexisting(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, j, v, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsegetrow(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, const_cast < alglib_impl::ae_vector * >(irow.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsegetcompressedrow(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), i, const_cast < alglib_impl::ae_vector * >(colidx.c_ptr()), const_cast < alglib_impl::ae_vector * >(vals.c_ptr()), &nzcnt, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsetransposesks(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsetransposesks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsetransposecrs(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsetransposecrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytransposecrs(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytransposecrsbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseconvertto(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), fmt, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytobuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), fmt, const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseconverttohash(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseconverttohash(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytohash(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytohashbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseconverttocrs(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseconverttocrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytocrs(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytocrsbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparseconverttosks(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparseconverttosks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytosks(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecopytosksbuf(const_cast < alglib_impl::sparsematrix * >(s0.c_ptr()), const_cast < alglib_impl::sparsematrix * >(s1.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+ae_int_t sparsegetmatrixtype(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_int_t result = alglib_impl::sparsegetmatrixtype(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < ae_int_t * >(&result));
+}
+
+bool sparseishash(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparseishash(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparseiscrs(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparseiscrs(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparseissks(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparseissks(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+void sparsefree(sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsefree(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+ae_int_t sparsegetnrows(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_int_t result = alglib_impl::sparsegetnrows(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < ae_int_t * >(&result));
+}
+
+ae_int_t sparsegetncols(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_int_t result = alglib_impl::sparsegetncols(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < ae_int_t * >(&result));
+}
+
+ae_int_t sparsegetuppercount(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_int_t result = alglib_impl::sparsegetuppercount(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < ae_int_t * >(&result));
+}
+
+ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_int_t result = alglib_impl::sparsegetlowercount(const_cast < alglib_impl::sparsematrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < ae_int_t * >(&result));
+}
+} // end of namespace alglib
 
 // === HSSCHUR Package ===
+namespace alglib_impl {
+static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_t ilo, ae_int_t ihi, RMatrix *h, RVector *wr, RVector *wi, ae_int_t iloz, ae_int_t ihiz, RMatrix *z, RVector *work, RVector *workv3, RVector *workc1, RVector *works1, ae_int_t *info, ae_state *_state);
+static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, double *rt1r, double *rt1i, double *rt2r, double *rt2i, double *cs, double *sn, ae_state *_state);
+static double hsschur_extschursign(double a, double b, ae_state *_state);
+static ae_int_t hsschur_extschursigntoone(double b, ae_state *_state);
+
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -17537,8 +15288,27 @@ static ae_int_t hsschur_extschursigntoone(double b, ae_state *_state) {
    }
    return result;
 }
+} // end of namespace alglib_impl
 
 // === EVD Package ===
+namespace alglib_impl {
+static ae_int_t evd_stepswithintol = 2;
+static void evd_clearrfields(eigsubspacestate *state, ae_state *_state);
+static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, ae_state *_state);
+static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2, ae_state *_state);
+static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2, double *cs1, double *sn1, ae_state *_state);
+static double evd_tdevdpythag(double a, double b, ae_state *_state);
+static double evd_tdevdextsign(double a, double b, ae_state *_state);
+static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n, ae_int_t irange, ae_int_t iorder, double vl, double vu, ae_int_t il, ae_int_t iu, double abstol, RVector *w, ae_int_t *m, ae_int_t *nsplit, ZVector *iblock, ZVector *isplit, ae_int_t *errorcode, ae_state *_state);
+static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, RVector *w, ZVector *iblock, ZVector *isplit, RMatrix *z, ZVector *ifail, ae_int_t *info, ae_state *_state);
+static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVector *b, RVector *c, double tol, RVector *d, ZVector *iin, ae_int_t *info, ae_state *_state);
+static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *c, RVector *d, ZVector *iin, RVector *y, double *tol, ae_int_t *info, ae_state *_state);
+static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_int_t mmax, ae_int_t minp, double abstol, double reltol, double pivmin, RVector *d, RVector *e, RVector *e2, ZVector *nval, RMatrix *ab, RVector *c, ae_int_t *mout, ZMatrix *nab, RVector *work, ZVector *iwork, ae_int_t *info, ae_state *_state);
+static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state);
+static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state);
+static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double smin, double ca, RMatrix *a, double d1, double d2, RMatrix *b, double wr, double wi, BVector *rswap4, BVector *zswap4, ZMatrix *ipivot44, RVector *civ4, RVector *crv4, RMatrix *x, double *scl, double *xnorm, ae_int_t *info, ae_state *_state);
+static void evd_internalhsevdladiv(double a, double b, double c, double d, double *p, double *q, ae_state *_state);
+
 // This function initializes subspace iteration solver. This solver  is  used
 // to solve symmetric real eigenproblems where just a few (top K) eigenvalues
 // and corresponding eigenvectors is required.
@@ -23166,8 +20936,467 @@ void _eigsubspacereport_destroy(void *_p) {
    eigsubspacereport *p = (eigsubspacereport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores state of the subspace iteration algorithm.
+//
+// You should use ALGLIB functions to work with this object.
+DefClass(eigsubspacestate, EndD)
+
+// This object stores state of the subspace iteration algorithm.
+//
+// You should use ALGLIB functions to work with this object.
+DefClass(eigsubspacereport, AndD DecVal(iterationscount))
+
+void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacecreate(n, k, const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacecreatebuf(n, k, const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacesetcond(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), eps, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacesetwarmstart(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), usewarmstart, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspaceoocstart(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), mtype, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool eigsubspaceooccontinue(const eigsubspacestate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::eigsubspaceooccontinue(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspaceoocgetrequestinfo(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), &requesttype, &requestsize, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspaceoocgetrequestdata(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspaceoocsendresult(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(ax.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspaceoocstop(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacesolvedenses(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::eigsubspacesolvesparses(const_cast < alglib_impl::eigsubspacestate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), const_cast < alglib_impl::eigsubspacereport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixevdr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, b1, b2, &m, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixevdi(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, i1, i2, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::hmatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::hmatrixevdr(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, b1, b2, &m, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::hmatrixevdi(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, zneeded, isupper, i1, i2, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixtdevd(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixtdevdr(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, a, b, &m, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixtdevdi(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, zneeded, i1, i2, const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::rmatrixevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, vneeded, const_cast < alglib_impl::ae_vector * >(wr.c_ptr()), const_cast < alglib_impl::ae_vector * >(wi.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vl.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vr.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+} // end of namespace alglib
 
 // === DLU Package ===
+namespace alglib_impl {
+static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
+static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
+static void dlu_cmatrixplu2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
+static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
+
 // Recurrent complex LU subroutine.
 // Never call it directly.
 // ALGLIB Routine: Copyright 04.01.2010 by Sergey Bochkanov
@@ -23532,8 +21761,25 @@ static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === SPTRF Package ===
+namespace alglib_impl {
+static double sptrf_densebnd = 0.10;
+static ae_int_t sptrf_slswidth = 8;
+static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a, ae_state *_state);
+static void sptrf_sluv2list1swap(sluv2list1matrix *a, ae_int_t i, ae_int_t j, ae_state *_state);
+static void sptrf_sluv2list1dropsequence(sluv2list1matrix *a, ae_int_t i, ae_state *_state);
+static void sptrf_sluv2list1appendsequencetomatrix(sluv2list1matrix *a, ae_int_t src, bool hasdiagonal, double d, ae_int_t nzmax, sparsematrix *s, ae_int_t dst, ae_state *_state);
+static void sptrf_sluv2list1pushsparsevector(sluv2list1matrix *a, ZVector *si, RVector *sv, ae_int_t nz, ae_state *_state);
+static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n, ae_state *_state);
+static void sptrf_densetrailappendcolumn(sluv2densetrail *d, RVector *x, ae_int_t id, ae_state *_state);
+static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a, ae_state *_state);
+static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, ae_int_t *ipiv, ae_int_t *jpiv, ae_state *_state);
+static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int_t jpiv, double *uu, ZVector *v0i, RVector *v0r, ae_int_t *nz0, ZVector *v1i, RVector *v1r, ae_int_t *nz1, ae_state *_state);
+static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list1matrix *bupper, sluv2densetrail *dtrail, ae_state *_state);
+static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *v0r, ae_int_t nz0, ZVector *v1i, RVector *v1r, ae_int_t nz1, sluv2list1matrix *bupper, sluv2densetrail *dtrail, bool densificationsupported, ae_state *_state);
+
 // Sparse LU for square NxN CRS matrix with both row and column permutations.
 //
 // Represents A as Pr*L*U*Pc, where:
@@ -24913,8 +23159,62 @@ void _sluv2buffer_destroy(void *_p) {
    ae_vector_destroy(&p->tmpi);
    ae_vector_destroy(&p->tmpp);
 }
+} // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
+namespace alglib_impl {
+static ae_int_t amdordering_knsheadersize = 2;
+static ae_int_t amdordering_llmentrysize = 6;
+static void amdordering_nsinitemptyslow(ae_int_t n, amdnset *sa, ae_state *_state);
+static void amdordering_nscopy(amdnset *ssrc, amdnset *sdst, ae_state *_state);
+static void amdordering_nsaddelement(amdnset *sa, ae_int_t k, ae_state *_state);
+static void amdordering_nsaddkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
+static void amdordering_nssubtract1(amdnset *sa, amdnset *src, ae_state *_state);
+static void amdordering_nssubtractkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
+static void amdordering_nsclear(amdnset *sa, ae_state *_state);
+static ae_int_t amdordering_nscount(amdnset *sa, ae_state *_state);
+static ae_int_t amdordering_nscountnotkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
+static ae_int_t amdordering_nscountandkth(amdnset *sa, amdknset *src, ae_int_t k, ae_state *_state);
+static bool amdordering_nsequal(amdnset *s0, amdnset *s1, ae_state *_state);
+static void amdordering_nsstartenumeration(amdnset *sa, ae_state *_state);
+static bool amdordering_nsenumerate(amdnset *sa, ae_int_t *i, ae_state *_state);
+static void amdordering_knscompressstorage(amdknset *sa, ae_state *_state);
+static void amdordering_knsreallocate(amdknset *sa, ae_int_t setidx, ae_int_t newallocated, ae_state *_state);
+static void amdordering_knsinit(ae_int_t k, ae_int_t n, ae_int_t kprealloc, amdknset *sa, ae_state *_state);
+static void amdordering_knsinitfroma(sparsematrix *a, ae_int_t n, amdknset *sa, ae_state *_state);
+static void amdordering_knsstartenumeration(amdknset *sa, ae_int_t i, ae_state *_state);
+static bool amdordering_knsenumerate(amdknset *sa, ae_int_t *i, ae_state *_state);
+static void amdordering_knsdirectaccess(amdknset *sa, ae_int_t k, ae_int_t *idxbegin, ae_int_t *idxend, ae_state *_state);
+static void amdordering_knsaddnewelement(amdknset *sa, ae_int_t i, ae_int_t k, ae_state *_state);
+static void amdordering_knssubtract1(amdknset *sa, ae_int_t i, amdnset *src, ae_state *_state);
+static void amdordering_knsaddkthdistinct(amdknset *sa, ae_int_t i, amdknset *src, ae_int_t k, ae_state *_state);
+static ae_int_t amdordering_knscountkth(amdknset *s0, ae_int_t k, ae_state *_state);
+static ae_int_t amdordering_knscountnot(amdknset *s0, ae_int_t i, amdnset *s1, ae_state *_state);
+static ae_int_t amdordering_knscountnotkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k, ae_state *_state);
+static ae_int_t amdordering_knscountandkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k, ae_state *_state);
+static ae_int_t amdordering_knssumkth(amdknset *s0, ae_int_t i, ae_state *_state);
+static void amdordering_knsclearkthnoreclaim(amdknset *sa, ae_int_t k, ae_state *_state);
+static void amdordering_knsclearkthreclaim(amdknset *sa, ae_int_t k, ae_state *_state);
+static void amdordering_mtxinit(ae_int_t n, amdllmatrix *a, ae_state *_state);
+static void amdordering_mtxaddcolumnto(amdllmatrix *a, ae_int_t j, amdnset *s, ae_state *_state);
+static void amdordering_mtxinsertnewelement(amdllmatrix *a, ae_int_t i, ae_int_t j, ae_state *_state);
+static ae_int_t amdordering_mtxcountcolumnnot(amdllmatrix *a, ae_int_t j, amdnset *s, ae_state *_state);
+static ae_int_t amdordering_mtxcountcolumn(amdllmatrix *a, ae_int_t j, ae_state *_state);
+static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol, ae_state *_state);
+static void amdordering_mtxclearcolumn(amdllmatrix *a, ae_int_t j, ae_state *_state);
+static void amdordering_mtxclearrow(amdllmatrix *a, ae_int_t j, ae_state *_state);
+static void amdordering_vtxinit(sparsematrix *a, ae_int_t n, bool checkexactdegrees, amdvertexset *s, ae_state *_state);
+static void amdordering_vtxremovevertex(amdvertexset *s, ae_int_t p, ae_state *_state);
+static ae_int_t amdordering_vtxgetapprox(amdvertexset *s, ae_int_t p, ae_state *_state);
+static ae_int_t amdordering_vtxgetexact(amdvertexset *s, ae_int_t p, ae_state *_state);
+static ae_int_t amdordering_vtxgetapproxmindegree(amdvertexset *s, ae_state *_state);
+static void amdordering_vtxupdateapproximatedegree(amdvertexset *s, ae_int_t p, ae_int_t dnew, ae_state *_state);
+static void amdordering_vtxupdateexactdegree(amdvertexset *s, ae_int_t p, ae_int_t d, ae_state *_state);
+static void amdordering_amdselectpivotelement(amdbuffer *buf, ae_int_t k, ae_int_t *p, ae_int_t *nodesize, ae_state *_state);
+static void amdordering_amdcomputelp(amdbuffer *buf, ae_int_t p, ae_state *_state);
+static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t k, ae_int_t tau, ae_state *_state);
+static void amdordering_amddetectsupernodes(amdbuffer *buf, ae_state *_state);
+
 // This function generates approximate minimum degree ordering
 //
 // INPUT PARAMETERS
@@ -26985,8 +25285,47 @@ void _amdbuffer_destroy(void *_p) {
    ae_vector_destroy(&p->arrwe);
    ae_matrix_destroy(&p->dbga);
 }
+} // end of namespace alglib_impl
 
 // === SPCHOL Package ===
+namespace alglib_impl {
+static ae_int_t spchol_maxsupernode = 4;
+static double spchol_maxmergeinefficiency = 0.25;
+static ae_int_t spchol_smallfakestolerance = 2;
+static ae_int_t spchol_maxfastkernel = 4;
+static bool spchol_relaxedsupernodes = true;
+#ifdef ALGLIB_NO_FAST_KERNELS
+static ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
+#endif
+#ifdef ALGLIB_NO_FAST_KERNELS
+static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state);
+#endif
+static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_state *_state);
+static void spchol_buildunorderedetree(sparsematrix *a, ae_int_t n, ZVector *parent, ZVector *tabove, ae_state *_state);
+static void spchol_fromparenttochildren(ZVector *parent, ae_int_t n, ZVector *childrenr, ZVector *childreni, ZVector *ttmp0, ae_state *_state);
+static void spchol_buildorderedetree(sparsematrix *a, ae_int_t n, ZVector *parent, ZVector *supernodalpermutation, ZVector *invsupernodalpermutation, ZVector *trawparentofrawnode, ZVector *trawparentofreorderednode, ZVector *ttmp, BVector *tflagarray, ae_state *_state);
+static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, ae_int_t n, spcholanalysis *analysis, ZVector *node2supernode, ZVector *tchildrenr, ZVector *tchildreni, ZVector *tparentnodeofsupernode, ZVector *tfakenonzeros, ZVector *ttmp0, BVector *tflagarray, ae_state *_state);
+static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, sparsematrix *rawa, ZVector *node2supernode, ae_int_t n, ZVector *ttmp0, ZVector *ttmp1, BVector *tflagarray, ae_state *_state);
+static void spchol_loadmatrix(spcholanalysis *analysis, sparsematrix *at, ae_state *_state);
+static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVector *strides, RVector *rowstorage, RVector *diagd, ae_int_t n, sparsematrix *a, RVector *d, ZVector *p, ZVector *tmpp, ae_state *_state);
+static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int_t tail, sparsematrix *atail, ZVector *tmpparent, ZVector *tmpchildrenr, ZVector *tmpchildreni, ZVector *tmp1, BVector *flagarray, sparsematrix *tmpbottomt, sparsematrix *tmpupdatet, sparsematrix *tmpupdate, sparsematrix *tmpnewtailt, ae_state *_state);
+static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsematrix *b, ae_state *_state);
+static ae_int_t spchol_computenonzeropattern(sparsematrix *wrkat, ae_int_t columnidx, ae_int_t n, ZVector *superrowridx, ZVector *superrowidx, ae_int_t nsuper, ZVector *childrennodesr, ZVector *childrennodesi, ZVector *node2supernode, BVector *truearray, ZVector *tmp0, ae_state *_state);
+static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t uidx, ae_int_t wrkrow, RVector *diagd, ae_int_t offsd, ae_state *_state);
+static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_state *_state);
+static ae_int_t spchol_recommendedstridefor(ae_int_t rowsize, ae_state *_state);
+static ae_int_t spchol_alignpositioninarray(ae_int_t offs, ae_state *_state);
+#ifdef ALGLIB_NO_FAST_KERNELS
+static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+#endif
+#ifdef ALGLIB_NO_FAST_KERNELS
+static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+#endif
+static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_t n, ae_int_t tail, sparsematrix *referencetaila, ae_state *_state);
+static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, ae_state *_state);
+
 // Informational function, useful for debugging
 ae_int_t spsymmgetmaxfastkernel(ae_state *_state) {
    ae_int_t result;
@@ -30383,8 +28722,14 @@ void _spcholanalysis_destroy(void *_p) {
    ae_vector_destroy(&p->tmpx);
    ae_vector_destroy(&p->simdbuf);
 }
+} // end of namespace alglib_impl
 
 // === TRFAC Package ===
+namespace alglib_impl {
+static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
+static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
+static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp, ae_state *_state);
+
 // LU decomposition of a general real matrix with row pivoting
 //
 // A is represented as A = P*L*U, where:
@@ -32266,8 +30611,322 @@ void _sparsedecompositionanalysis_destroy(void *_p) {
    _sparsematrix_destroy(&p->crsa);
    _sparsematrix_destroy(&p->crsat);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// An analysis of the sparse matrix decomposition, performed prior to  actual
+// numerical factorization. You should not directly  access  fields  of  this
+// object - use appropriate ALGLIB functions to work with this object.
+DefClass(sparsedecompositionanalysis, EndD)
+
+void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixlu(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixlu(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::hpdmatrixcholesky(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::spdmatrixcholesky(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyupdateadd1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyupdatefix(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(fix.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyupdateadd1buf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyupdatefixbuf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, const_cast < alglib_impl::ae_vector * >(fix.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparselu(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), pivottype, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(q.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparsecholeskyskyline(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparsecholesky(const sparsematrix &a, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparsecholesky(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparsecholeskyp(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, const_cast < alglib_impl::ae_vector * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparsecholeskyanalyze(const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, facttype, permtype, const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::sparsecholeskyfactorize(const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), needupper, const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sparsecholeskyreload(const_cast < alglib_impl::sparsedecompositionanalysis * >(analysis.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === BDSVD Package ===
+namespace alglib_impl {
+static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *uu, ae_int_t ustart, ae_int_t nru, RMatrix *c, ae_int_t cstart, ae_int_t ncc, RMatrix *vt, ae_int_t vstart, ae_int_t ncvt, ae_state *_state);
+static double bdsvd_extsignbdsqr(double a, double b, ae_state *_state);
+static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ssmax, ae_state *_state);
+static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *ssmax, double *snr, double *csr, double *snl, double *csl, ae_state *_state);
+
 // Singular value decomposition of a bidiagonal matrix (extended algorithm)
 //
 // The algorithm performs the singular value decomposition  of  a  bidiagonal
@@ -33283,8 +31942,32 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
    *ssmax = bdsvd_extsignbdsqr(*ssmax, tsign, _state);
    *ssmin = bdsvd_extsignbdsqr(*ssmin, tsign * bdsvd_extsignbdsqr((double)(1), f, _state) * bdsvd_extsignbdsqr((double)(1), h, _state), _state);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::rmatrixbdsvd(const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_vector * >(e.c_ptr()), n, isupper, isfractionalaccuracyrequired, const_cast < alglib_impl::ae_matrix * >(u.c_ptr()), nru, const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), ncc, const_cast < alglib_impl::ae_matrix * >(vt.c_ptr()), ncvt, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+} // end of namespace alglib
 
 // === SVD Package ===
+namespace alglib_impl {
 // Singular value decomposition of a rectangular matrix.
 //
 // The algorithm calculates the singular value decomposition of a matrix of
@@ -33547,8 +32230,45 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    ae_frame_leave(_state);
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::rmatrixsvd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), m, n, uneeded, vtneeded, additionalmemory, const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(u.c_ptr()), const_cast < alglib_impl::ae_matrix * >(vt.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+} // end of namespace alglib
 
 // === RCOND Package ===
+namespace alglib_impl {
+static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
+static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
+static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc, ae_state *_state);
+static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc, ae_state *_state);
+static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state);
+static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state);
+static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVector *isgn, double *est, ae_int_t *kase, ae_state *_state);
+static void rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double *est, ae_int_t *kase, ZVector *isave, RVector *rsave, ae_state *_state);
+static double rcond_internalcomplexrcondscsum1(CVector *x, ae_int_t n, ae_state *_state);
+static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n, ae_state *_state);
+static void rcond_internalcomplexrcondsaveall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp, ae_state *_state);
+static void rcond_internalcomplexrcondloadall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp, ae_state *_state);
+
 // Estimate of a matrix condition number (1-norm)
 //
 // The algorithm calculates a lower bound of the condition number. In this case,
@@ -35732,8 +34452,332 @@ static void rcond_internalcomplexrcondloadall(ZVector *isave, RVector *rsave, ae
    *estold = rsave->ptr.p_double[2];
    *temp = rsave->ptr.p_double[3];
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double rmatrixrcond1(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixtrrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixtrrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::hpdmatrixrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixlurcond1(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixlurcondinf(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixcholeskyrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::hpdmatrixcholeskyrcond(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixlurcond1(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixlurcondinf(const_cast < alglib_impl::ae_matrix * >(lua.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixtrrcond1(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::cmatrixtrrcondinf(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === FBLS Package ===
+namespace alglib_impl {
 // Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
 //
 // This subroutine assumes that:
@@ -36653,8 +35697,10 @@ void _fblsgmresstate_destroy(void *_p) {
    ae_vector_destroy(&p->tmp1);
    _rcommstate_destroy(&p->rstate);
 }
+} // end of namespace alglib_impl
 
 // === NORMESTIMATOR Package ===
+namespace alglib_impl {
 // This procedure initializes matrix norm estimator.
 //
 // USAGE:
@@ -36995,8 +36041,107 @@ void _normestimatorstate_destroy(void *_p) {
    ae_vector_destroy(&p->mtv);
    _rcommstate_destroy(&p->rstate);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores state of the iterative norm estimation algorithm.
+//
+// You should use ALGLIB functions to work with this object.
+DefClass(normestimatorstate, EndD)
+
+void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::normestimatorcreate(m, n, nstart, nits, const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::normestimatorsetseed(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), seedval, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::normestimatorestimatesparse(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void normestimatorresults(const normestimatorstate &state, double &nrm, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::normestimatorresults(const_cast < alglib_impl::normestimatorstate * >(state.c_ptr()), &nrm, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MATINV Package ===
+namespace alglib_impl {
+static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
+bool _trypexec_matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
+static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, CVector *tmp, sinteger *info, ae_state *_state);
+bool _trypexec_matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, CVector *tmp, sinteger *info, ae_state *_state);
+static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RVector *work, sinteger *info, matinvreport *rep, ae_state *_state);
+bool _trypexec_matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RVector *work, sinteger *info, matinvreport *rep, ae_state *_state);
+static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, sinteger *ssinfo, matinvreport *rep, ae_state *_state);
+bool _trypexec_matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, sinteger *ssinfo, matinvreport *rep, ae_state *_state);
+static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
+
 // Inversion of a matrix given by its LU decomposition.
 //
 // INPUT PARAMETERS:
@@ -38488,8 +37633,435 @@ void _matinvreport_destroy(void *_p) {
    matinvreport *p = (matinvreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// Matrix inverse report:
+// * R1    reciprocal of condition number in 1-norm
+// * RInf  reciprocal of condition number in inf-norm
+DefClass(matinvreport, AndD DecVal(r1) AndD DecVal(rinf))
+
+void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.cols() != a.rows()) || (a.cols() != pivots.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.cols() != a.rows()) || (a.cols() != pivots.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixluinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isupper;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isupper;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
+   n = a.cols();
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::spdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   if (!alglib_impl::ae_force_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("Internal error while forcing symmetricity of 'a' parameter");
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hpdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isupper;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hpdmatrixcholeskyinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hpdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isupper;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_hermitian(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("'a' parameter is not Hermitian matrix");
+   n = a.cols();
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hpdmatrixinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   if (!alglib_impl::ae_force_hermitian(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("Internal error while forcing Hermitian properties of 'a' parameter");
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isunit;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   isunit = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isunit;
+   if ((a.cols() != a.rows()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
+   n = a.cols();
+   isunit = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::cmatrixtrinverse(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, isunit, &info, const_cast < alglib_impl::matinvreport * >(rep.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+} // end of namespace alglib
 
 // === INVERSEUPDATE Package ===
+namespace alglib_impl {
 // Inverse matrix update by the Sherman-Morrison formula
 //
 // The algorithm updates matrix A^-1 when adding a number to an element
@@ -38711,8 +38283,92 @@ void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v, ae_st
    }
    ae_frame_leave(_state);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinvupdatesimple(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updrow, updcolumn, updval, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinvupdaterow(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updrow, const_cast < alglib_impl::ae_vector * >(v.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinvupdatecolumn(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, updcolumn, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rmatrixinvupdateuv(const_cast < alglib_impl::ae_matrix * >(inva.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(u.c_ptr()), const_cast < alglib_impl::ae_vector * >(v.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === SCHUR Package ===
+namespace alglib_impl {
 // Subroutine performing the Schur decomposition of a general matrix by using
 // the QR algorithm with multiple shifts.
 //
@@ -38779,8 +38435,32 @@ bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s, ae_state *_state) {
    ae_frame_leave(_state);
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::rmatrixschur(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, const_cast < alglib_impl::ae_matrix * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+} // end of namespace alglib
 
 // === SPDGEVD Package ===
+namespace alglib_impl {
 // Algorithm for solving the following generalized symmetric positive-definite
 // eigenproblem:
 //     A*x = lambda*B*x (1) or
@@ -39146,8 +38826,52 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
    ae_frame_leave(_state);
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixgevd(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isuppera, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), isupperb, zneeded, problemtype, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), const_cast < alglib_impl::ae_matrix * >(z.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::smatrixgevdreduce(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isuppera, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), isupperb, problemtype, const_cast < alglib_impl::ae_matrix * >(r.c_ptr()), &isupperr, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+} // end of namespace alglib
 
 // === MATDET Package ===
+namespace alglib_impl {
 // Determinant calculation of the matrix given by its LU decomposition.
 //
 // Input parameters:
@@ -39389,3 +39113,249 @@ double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    return result;
 }
 } // end of namespace alglib_impl
+
+namespace alglib {
+double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.rows() != a.cols()) || (a.rows() != pivots.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
+   n = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#endif
+
+double rmatrixdet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+double rmatrixdet(const real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.rows() != a.cols()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
+   n = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::rmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#endif
+
+complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_complex result = alglib_impl::cmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < complex *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.rows() != a.cols()) || (a.rows() != pivots.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
+   n = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_complex result = alglib_impl::cmatrixludet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(pivots.c_ptr()), n, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < complex *>(&result));
+}
+#endif
+
+complex cmatrixdet(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_complex result = alglib_impl::cmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < complex *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+complex cmatrixdet(const complex_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.rows() != a.cols()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
+   n = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_complex result = alglib_impl::cmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < complex *>(&result));
+}
+#endif
+
+double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixcholeskydet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+double spdmatrixcholeskydet(const real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((a.rows() != a.cols()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
+   n = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixcholeskydet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#endif
+
+double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#if !defined(AE_NO_EXCEPTIONS)
+double spdmatrixdet(const real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   bool isupper;
+   if ((a.rows() != a.cols()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");
+   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
+   n = a.rows();
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::spdmatrixdet(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), n, isupper, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+#endif
+} // end of namespace alglib

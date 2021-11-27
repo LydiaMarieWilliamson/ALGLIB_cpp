@@ -26,1538 +26,10 @@
 #   pragma warning(disable:4996)
 #endif
 
-namespace alglib {
 // === GAMMAFUNC Package ===
-
-// === NORMALDISTR Package ===
-
-// === IBETAF Package ===
-
-// === STUDENTTDISTR Package ===
-
-// === FDISTR Package ===
-
-// === IGAMMAF Package ===
-
-// === CHISQUAREDISTR Package ===
-
-// === BINOMIALDISTR Package ===
-
-// === EXPINTEGRALS Package ===
-
-// === JACOBIANELLIPTIC Package ===
-
-// === TRIGINTEGRALS Package ===
-
-// === CHEBYSHEV Package ===
-
-// === POISSONDISTR Package ===
-
-// === BETAF Package ===
-
-// === FRESNEL Package ===
-
-// === PSIF Package ===
-
-// === AIRYF Package ===
-
-// === DAWSON Package ===
-
-// === HERMITE Package ===
-
-// === LEGENDRE Package ===
-
-// === BESSEL Package ===
-
-// === LAGUERRE Package ===
-
-// === ELLIPTIC Package ===
-
-// === GAMMAFUNC Package ===
-double gammafunction(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::gammafunction(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double lngamma(const double x, double &sgngam, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::lngamma(x, &sgngam, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === NORMALDISTR Package ===
-double errorfunction(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::errorfunction(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double errorfunctionc(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::errorfunctionc(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double normaldistribution(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::normaldistribution(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double normalpdf(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::normalpdf(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double normalcdf(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::normalcdf(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double inverf(const double e, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::inverf(e, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invnormaldistribution(const double y0, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invnormaldistribution(y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invnormalcdf(const double y0, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invnormalcdf(y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::bivariatenormalpdf(x, y, rho, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::bivariatenormalcdf(x, y, rho, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === IBETAF Package ===
-double incompletebeta(const double a, const double b, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::incompletebeta(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invincompletebeta(const double a, const double b, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invincompletebeta(a, b, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === STUDENTTDISTR Package ===
-double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::studenttdistribution(k, t, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invstudenttdistribution(k, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === FDISTR Package ===
-double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::fdistribution(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::fcdistribution(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invfdistribution(a, b, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === IGAMMAF Package ===
-double incompletegamma(const double a, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::incompletegamma(a, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double incompletegammac(const double a, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::incompletegammac(a, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invincompletegammac(const double a, const double y0, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invincompletegammac(a, y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === CHISQUAREDISTR Package ===
-double chisquaredistribution(const double v, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::chisquaredistribution(v, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double chisquarecdistribution(const double v, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::chisquarecdistribution(v, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invchisquaredistribution(const double v, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invchisquaredistribution(v, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === BINOMIALDISTR Package ===
-double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::binomialdistribution(k, n, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::binomialcdistribution(k, n, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invbinomialdistribution(k, n, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === EXPINTEGRALS Package ===
-double exponentialintegralei(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::exponentialintegralei(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::exponentialintegralen(x, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === JACOBIANELLIPTIC Package ===
-void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === TRIGINTEGRALS Package ===
-void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::sinecosineintegrals(x, &si, &ci, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === CHEBYSHEV Package ===
-double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::chebyshevcalculate(r, n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::chebyshevsum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), r, n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::chebyshevcoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fromchebyshev(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === POISSONDISTR Package ===
-double poissondistribution(const ae_int_t k, const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::poissondistribution(k, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::poissoncdistribution(k, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::invpoissondistribution(k, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === BETAF Package ===
-double beta(const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::beta(a, b, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === FRESNEL Package ===
-void fresnelintegral(const double x, double &c, double &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fresnelintegral(x, &c, &s, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === PSIF Package ===
-double psi(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::psi(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === AIRYF Package ===
-void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::airy(x, &ai, &aip, &bi, &bip, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === DAWSON Package ===
-double dawsonintegral(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::dawsonintegral(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === HERMITE Package ===
-double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::hermitecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::hermitesum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::hermitecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === LEGENDRE Package ===
-double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::legendrecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::legendresum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::legendrecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === BESSEL Package ===
-double besselj0(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselj0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besselj1(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselj1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besseljn(const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besseljn(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double bessely0(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::bessely0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double bessely1(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::bessely1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besselyn(const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselyn(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besseli0(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besseli0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besseli1(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besseli1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besselk0(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselk0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besselk1(const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselk1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double besselkn(const ae_int_t nn, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::besselkn(nn, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-// === LAGUERRE Package ===
-double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::laguerrecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::laguerresum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::laguerrecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === ELLIPTIC Package ===
-double ellipticintegralk(const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::ellipticintegralk(m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double ellipticintegralkhighprecision(const double m1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::ellipticintegralkhighprecision(m1, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::incompleteellipticintegralk(phi, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double ellipticintegrale(const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::ellipticintegrale(m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-
-double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::incompleteellipticintegrale(phi, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
-}
-} // end of namespace alglib
-
 namespace alglib_impl {
-// === GAMMAFUNC Package ===
 static double gammafunc_gammastirf(double x, ae_state *_state);
 
-// === NORMALDISTR Package ===
-static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx, ae_state *_state);
-static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx, ae_state *_state);
-
-// === IBETAF Package ===
-static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv, ae_state *_state);
-static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv, ae_state *_state);
-static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam, ae_state *_state);
-
-// === STUDENTTDISTR Package ===
-
-// === FDISTR Package ===
-
-// === IGAMMAF Package ===
-
-// === CHISQUAREDISTR Package ===
-
-// === BINOMIALDISTR Package ===
-
-// === EXPINTEGRALS Package ===
-
-// === JACOBIANELLIPTIC Package ===
-
-// === TRIGINTEGRALS Package ===
-static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
-
-// === CHEBYSHEV Package ===
-
-// === POISSONDISTR Package ===
-
-// === BETAF Package ===
-
-// === FRESNEL Package ===
-
-// === PSIF Package ===
-
-// === AIRYF Package ===
-
-// === DAWSON Package ===
-
-// === HERMITE Package ===
-
-// === LEGENDRE Package ===
-
-// === BESSEL Package ===
-static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state);
-static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
-static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state);
-static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
-static void bessel_besselasympt0(double x, double *pzero, double *qzero, ae_state *_state);
-static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_state *_state);
-
-// === LAGUERRE Package ===
-
-// === ELLIPTIC Package ===
-
-// === GAMMAFUNC Package ===
 // Gamma function
 //
 // Input parameters:
@@ -1820,8 +292,55 @@ static double gammafunc_gammastirf(double x, ae_state *_state) {
    result = 2.50662827463100050242 * y * w;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double gammafunction(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::gammafunction(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double lngamma(const double x, double &sgngam, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::lngamma(x, &sgngam, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === NORMALDISTR Package ===
+namespace alglib_impl {
+static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx, ae_state *_state);
+static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx, ae_state *_state);
+
 // Error function
 //
 // The integral is
@@ -2358,8 +877,216 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
    result = gw * exphsk22x2 * (exphsk1sqrt1x2 / sqrt1x2 - exphsk2 * (1 + (4 - x * y * s) * r * r / 8));
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double errorfunction(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::errorfunction(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double errorfunctionc(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::errorfunctionc(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double normaldistribution(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::normaldistribution(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double normalpdf(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::normalpdf(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double normalcdf(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::normalcdf(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double inverf(const double e, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::inverf(e, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invnormaldistribution(const double y0, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invnormaldistribution(y0, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invnormalcdf(const double y0, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invnormalcdf(y0, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::bivariatenormalpdf(x, y, rho, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::bivariatenormalcdf(x, y, rho, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === IBETAF Package ===
+namespace alglib_impl {
+static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv, ae_state *_state);
+static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv, ae_state *_state);
+static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam, ae_state *_state);
+
 // Incomplete beta integral
 //
 // Returns incomplete beta integral of the arguments, evaluated
@@ -3103,8 +1830,52 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    result = s;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double incompletebeta(const double a, const double b, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::incompletebeta(a, b, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invincompletebeta(const double a, const double b, const double y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invincompletebeta(a, b, y, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === STUDENTTDISTR Package ===
+namespace alglib_impl {
 // Student's t distribution
 //
 // Computes the integral from minus infinity to t of the Student
@@ -3260,8 +2031,52 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
    result = rflg * t;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::studenttdistribution(k, t, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invstudenttdistribution(k, p, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === FDISTR Package ===
+namespace alglib_impl {
 // F distribution
 //
 // Returns the area from zero to x under the F density
@@ -3403,8 +2218,72 @@ double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state) {
    }
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::fdistribution(a, b, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::fcdistribution(a, b, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invfdistribution(a, b, y, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === IGAMMAF Package ===
+namespace alglib_impl {
 // Incomplete gamma integral
 //
 // The function is defined by
@@ -3739,8 +2618,72 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
    result = x;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double incompletegamma(const double a, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::incompletegamma(a, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double incompletegammac(const double a, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::incompletegammac(a, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invincompletegammac(const double a, const double y0, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invincompletegammac(a, y0, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === CHISQUAREDISTR Package ===
+namespace alglib_impl {
 // Chi-square distribution
 //
 // Returns the area under the left hand tail (from 0 to x)
@@ -3845,8 +2788,72 @@ double invchisquaredistribution(double v, double y, ae_state *_state) {
    result = 2 * invincompletegammac(0.5 * v, y, _state);
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double chisquaredistribution(const double v, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::chisquaredistribution(v, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double chisquarecdistribution(const double v, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::chisquarecdistribution(v, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invchisquaredistribution(const double v, const double y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invchisquaredistribution(v, y, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === BINOMIALDISTR Package ===
+namespace alglib_impl {
 // Binomial distribution
 //
 // Returns the sum of the terms 0 through k of the Binomial
@@ -4018,8 +3025,72 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_stat
    result = p;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::binomialdistribution(k, n, p, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::binomialcdistribution(k, n, p, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invbinomialdistribution(k, n, y, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === EXPINTEGRALS Package ===
+namespace alglib_impl {
 // Exponential integral Ei(x)
 //
 //               x
@@ -4360,8 +3431,52 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
    }
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double exponentialintegralei(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::exponentialintegralei(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::exponentialintegralen(x, n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === JACOBIANELLIPTIC Package ===
+namespace alglib_impl {
 // Jacobian Elliptic Functions
 //
 // Evaluates the Jacobian elliptic functions sn(u|m), cn(u|m),
@@ -4483,8 +3598,34 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    *ph = phi;
    ae_frame_leave(_state);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === TRIGINTEGRALS Package ===
+namespace alglib_impl {
+static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
+
 // Sine and cosine integrals
 //
 // Evaluates the integrals
@@ -4890,8 +4031,52 @@ static void trigintegrals_chebiterationshichi(double x, double c, double *b0, do
    *b1 = *b0;
    *b0 = x * (*b1) - (*b2) + c;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::sinecosineintegrals(x, &si, &ci, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === CHEBYSHEV Package ===
+namespace alglib_impl {
 // Calculation of the value of the Chebyshev polynomials of the
 // first and second kinds.
 //
@@ -5059,8 +4244,92 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
    }
    while (i <= n);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::chebyshevcalculate(r, n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::chebyshevsum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), r, n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::chebyshevcoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::fromchebyshev(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === POISSONDISTR Package ===
+namespace alglib_impl {
 // Poisson distribution
 //
 // Returns the sum of the first k+1 terms of the Poisson
@@ -5151,8 +4420,72 @@ double invpoissondistribution(ae_int_t k, double y, ae_state *_state) {
    result = invincompletegammac((double)(k + 1), y, _state);
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double poissondistribution(const ae_int_t k, const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::poissondistribution(k, m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::poissoncdistribution(k, m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::invpoissondistribution(k, y, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === BETAF Package ===
+namespace alglib_impl {
 // Beta function
 //
 //
@@ -5207,8 +4540,32 @@ double beta(double a, double b, ae_state *_state) {
    result = y;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double beta(const double a, const double b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::beta(a, b, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === FRESNEL Package ===
+namespace alglib_impl {
 // Fresnel integral
 //
 // Evaluates the Fresnel integrals
@@ -5371,8 +4728,32 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
    *c = *c * ae_sign(xxa, _state);
    *s = *s * ae_sign(xxa, _state);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void fresnelintegral(const double x, double &c, double &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::fresnelintegral(x, &c, &s, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === PSIF Package ===
+namespace alglib_impl {
 // Psi (digamma) function
 //
 //              d      -
@@ -5484,8 +4865,32 @@ double psi(double x, ae_state *_state) {
    result = y;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double psi(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::psi(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === AIRYF Package ===
+namespace alglib_impl {
 // Airy function
 //
 // Solution of the differential equation
@@ -5806,8 +5211,32 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
       *bip = sqrt3 * (uf + ug);
    }
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::airy(x, &ai, &aip, &bi, &bip, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === DAWSON Package ===
+namespace alglib_impl {
 // Dawson's Integral
 //
 // Approximates the integral
@@ -5923,8 +5352,32 @@ double dawsonintegral(double x, ae_state *_state) {
    result = sg * 0.5 * y;
    return result;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double dawsonintegral(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::dawsonintegral(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === HERMITE Package ===
+namespace alglib_impl {
 // Calculation of the value of the Hermite polynomial.
 //
 // Parameters:
@@ -6015,8 +5468,72 @@ void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
       c->ptr.p_double[n - 2 * (i + 1)] = -c->ptr.p_double[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1);
    }
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::hermitecalculate(n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::hermitesum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::hermitecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === LEGENDRE Package ===
+namespace alglib_impl {
 // Calculation of the value of the Legendre polynomial Pn.
 //
 // Parameters:
@@ -6105,8 +5622,79 @@ void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
       c->ptr.p_double[n - 2 * (i + 1)] = -c->ptr.p_double[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2 / (i + 1) / (2 * (n - i) - 1);
    }
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::legendrecalculate(n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::legendresum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::legendrecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === BESSEL Package ===
+namespace alglib_impl {
+static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state);
+static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
+static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state);
+static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state);
+static void bessel_besselasympt0(double x, double *pzero, double *qzero, ae_state *_state);
+static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_state *_state);
+
 // Bessel function of order zero
 //
 // Returns Bessel function of order zero of the argument.
@@ -7157,8 +6745,232 @@ static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_stat
    *pzero = p2 / q2;
    *qzero = 8 * p3 / q3 / x;
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double besselj0(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselj0(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besselj1(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselj1(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besseljn(const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besseljn(n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double bessely0(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::bessely0(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double bessely1(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::bessely1(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besselyn(const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselyn(n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besseli0(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besseli0(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besseli1(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besseli1(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besselk0(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselk0(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besselk1(const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselk1(x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double besselkn(const ae_int_t nn, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::besselkn(nn, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib
 
 // === LAGUERRE Package ===
+namespace alglib_impl {
 // Calculation of the value of the Laguerre polynomial.
 //
 // Parameters:
@@ -7237,8 +7049,72 @@ void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
       c->ptr.p_double[i + 1] = -c->ptr.p_double[i] * (n - i) / (i + 1) / (i + 1);
    }
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::laguerrecalculate(n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::laguerresum(const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, x, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::laguerrecoefficients(n, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === ELLIPTIC Package ===
+namespace alglib_impl {
 // Complete elliptic integral of the first kind
 //
 // Approximates the integral
@@ -7641,3 +7517,105 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    return result;
 }
 } // end of namespace alglib_impl
+
+namespace alglib {
+double ellipticintegralk(const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::ellipticintegralk(m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double ellipticintegralkhighprecision(const double m1, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::ellipticintegralkhighprecision(m1, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::incompleteellipticintegralk(phi, m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double ellipticintegrale(const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::ellipticintegrale(m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+
+double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double result = alglib_impl::incompleteellipticintegrale(phi, m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < double *>(&result));
+}
+} // end of namespace alglib

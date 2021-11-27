@@ -16,8 +16,8 @@
 
 #include "Ap.h"
 
-namespace alglib_impl {
 // === APSERV Package ===
+namespace alglib_impl {
 typedef struct {
    ae_vector ba0;
    ae_vector ia0;
@@ -56,112 +56,6 @@ typedef struct {
    ae_vector val;
 } scomplexarray;
 
-// === ABLASF Package ===
-
-// === HBLAS Package ===
-
-// === CREFLECTIONS Package ===
-
-// === SBLAS Package ===
-
-// === ABLASMKL Package ===
-
-// === SCODES Package ===
-
-// === TSORT Package ===
-
-// === BLAS Package ===
-
-// === ROTATIONS Package ===
-
-// === BASICSTATOPS Package ===
-
-// === TRLINSOLVE Package ===
-
-// === SAFESOLVE Package ===
-
-// === XBLAS Package ===
-
-// === LINMIN Package ===
-typedef struct {
-   bool brackt;
-   bool stage1;
-   ae_int_t infoc;
-   double dg;
-   double dgm;
-   double dginit;
-   double dgtest;
-   double dgx;
-   double dgxm;
-   double dgy;
-   double dgym;
-   double finit;
-   double ftest1;
-   double fm;
-   double fx;
-   double fxm;
-   double fy;
-   double fym;
-   double stx;
-   double sty;
-   double stmin;
-   double stmax;
-   double width;
-   double width1;
-   double xtrapf;
-} linminstate;
-typedef struct {
-   bool needf;
-   ae_vector x;
-   double f;
-   ae_int_t n;
-   ae_vector xbase;
-   ae_vector s;
-   double stplen;
-   double fcur;
-   double stpmax;
-   ae_int_t fmax;
-   ae_int_t nfev;
-   ae_int_t info;
-   rcommstate rstate;
-} armijostate;
-
-// === NEARUNITYUNIT Package ===
-
-// === NTHEORY Package ===
-
-// === FTBASE Package ===
-typedef struct {
-   ae_matrix entries;
-   ae_vector buffer;
-   ae_vector precr;
-   ae_vector preci;
-   ae_shared_pool bluesteinpool;
-} fasttransformplan;
-
-// === HPCCORES Package ===
-typedef struct {
-   ae_int_t chunksize;
-   ae_int_t ntotal;
-   ae_int_t nin;
-   ae_int_t nout;
-   ae_int_t wcount;
-   ae_vector batch4buf;
-   ae_vector hpcbuf;
-   ae_matrix xy;
-   ae_matrix xy2;
-   ae_vector xyrow;
-   ae_vector x;
-   ae_vector y;
-   ae_vector desiredy;
-   double e;
-   ae_vector g;
-   ae_vector tmp0;
-} mlpbuffers;
-} // end of namespace alglib_impl
-
-namespace alglib_impl {
-// === APSERV Package ===
 void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s, ae_state *_state);
 bool alwaysfalse(ae_state *_state);
 void touchint(ae_int_t *a, ae_state *_state);
@@ -308,8 +202,10 @@ void _scomplexarray_init(void *_p, ae_state *_state, bool make_automatic);
 void _scomplexarray_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _scomplexarray_clear(void *_p);
 void _scomplexarray_destroy(void *_p);
+} // end of namespace alglib_impl
 
 // === ABLASF Package ===
+namespace alglib_impl {
 #ifdef ALGLIB_NO_FAST_KERNELS
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 #endif
@@ -481,21 +377,29 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === HBLAS Package ===
+namespace alglib_impl {
 void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y, ae_state *_state);
 void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === CREFLECTIONS Package ===
+namespace alglib_impl {
 void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau, ae_state *_state);
 void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
 void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === SBLAS Package ===
+namespace alglib_impl {
 void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y, ae_state *_state);
 void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === ABLASMKL Package ===
+namespace alglib_impl {
 bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
 bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
 bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
@@ -527,8 +431,10 @@ bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneed
 bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state);
 bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, bool *evdresult, ae_state *_state);
 bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector *vals, ZVector *cidx, ZVector *ridx, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === SCODES Package ===
+namespace alglib_impl {
 ae_int_t getrdfserializationcode(ae_state *_state);
 ae_int_t getkdtreeserializationcode(ae_state *_state);
 ae_int_t getmlpserializationcode(ae_state *_state);
@@ -539,8 +445,10 @@ ae_int_t getidwserializationcode(ae_state *_state);
 ae_int_t getsparsematrixserializationcode(ae_state *_state);
 ae_int_t getknnserializationcode(ae_state *_state);
 ae_int_t getlptestserializationcode(ae_state *_state);
+} // end of namespace alglib_impl
 
 // === TSORT Package ===
+namespace alglib_impl {
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state);
 void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state);
 void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n, ae_state *_state);
@@ -554,8 +462,10 @@ void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t 
 void tagheappopi(RVector *a, ZVector *b, ae_int_t *n, ae_state *_state);
 ae_int_t lowerbound(RVector *a, ae_int_t n, double t, ae_state *_state);
 ae_int_t upperbound(RVector *a, ae_int_t n, double t, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === BLAS Package ===
+namespace alglib_impl {
 double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2, ae_state *_state);
 ae_int_t vectoridxabsmax(RVector *x, ae_int_t i1, ae_int_t i2, ae_state *_state);
 ae_int_t columnidxabsmax(RMatrix *x, ae_int_t i1, ae_int_t i2, ae_int_t j, ae_state *_state);
@@ -567,29 +477,84 @@ void copyandtranspose(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_i
 void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector *x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector *y, ae_int_t iy1, ae_int_t iy2, double beta, ae_state *_state);
 double pythag2(double x, double y, ae_state *_state);
 void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === ROTATIONS Package ===
+namespace alglib_impl {
 void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work, ae_state *_state);
 void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work, ae_state *_state);
 void generaterotation(double f, double g, double *cs, double *sn, double *r, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === BASICSTATOPS Package ===
+namespace alglib_impl {
 void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf, ae_state *_state);
 void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === TRLINSOLVE Package ===
+namespace alglib_impl {
 void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state);
 void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === SAFESOLVE Package ===
+namespace alglib_impl {
 bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth, ae_state *_state);
 bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === XBLAS Package ===
+namespace alglib_impl {
 void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr, ae_state *_state);
 void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === LINMIN Package ===
+namespace alglib_impl {
+typedef struct {
+   bool brackt;
+   bool stage1;
+   ae_int_t infoc;
+   double dg;
+   double dgm;
+   double dginit;
+   double dgtest;
+   double dgx;
+   double dgxm;
+   double dgy;
+   double dgym;
+   double finit;
+   double ftest1;
+   double fm;
+   double fx;
+   double fxm;
+   double fy;
+   double fym;
+   double stx;
+   double sty;
+   double stmin;
+   double stmax;
+   double width;
+   double width1;
+   double xtrapf;
+} linminstate;
+typedef struct {
+   bool needf;
+   ae_vector x;
+   double f;
+   ae_int_t n;
+   ae_vector xbase;
+   ae_vector s;
+   double stplen;
+   double fcur;
+   double stpmax;
+   ae_int_t fmax;
+   ae_int_t nfev;
+   ae_int_t info;
+   rcommstate rstate;
+} armijostate;
+
 void linminnormalized(RVector *d, double *stp, ae_int_t n, ae_state *_state);
 void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage, ae_state *_state);
 void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, double stpmax, ae_int_t fmax, armijostate *state, ae_state *_state);
@@ -603,16 +568,30 @@ void _armijostate_init(void *_p, ae_state *_state, bool make_automatic);
 void _armijostate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _armijostate_clear(void *_p);
 void _armijostate_destroy(void *_p);
+} // end of namespace alglib_impl
 
 // === NEARUNITYUNIT Package ===
+namespace alglib_impl {
 double nulog1p(double x, ae_state *_state);
 double nuexpm1(double x, ae_state *_state);
 double nucosm1(double x, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === NTHEORY Package ===
+namespace alglib_impl {
 void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot, ae_state *_state);
+} // end of namespace alglib_impl
 
 // === FTBASE Package ===
+namespace alglib_impl {
+typedef struct {
+   ae_matrix entries;
+   ae_vector buffer;
+   ae_vector precr;
+   ae_vector preci;
+   ae_shared_pool bluesteinpool;
+} fasttransformplan;
+
 void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state);
 void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt, ae_state *_state);
 void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
@@ -624,8 +603,29 @@ void _fasttransformplan_init(void *_p, ae_state *_state, bool make_automatic);
 void _fasttransformplan_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _fasttransformplan_clear(void *_p);
 void _fasttransformplan_destroy(void *_p);
+} // end of namespace alglib_impl
 
 // === HPCCORES Package ===
+namespace alglib_impl {
+typedef struct {
+   ae_int_t chunksize;
+   ae_int_t ntotal;
+   ae_int_t nin;
+   ae_int_t nout;
+   ae_int_t wcount;
+   ae_vector batch4buf;
+   ae_vector hpcbuf;
+   ae_matrix xy;
+   ae_matrix xy2;
+   ae_vector xyrow;
+   ae_vector x;
+   ae_vector y;
+   ae_vector desiredy;
+   double e;
+   ae_vector g;
+   ae_vector tmp0;
+} mlpbuffers;
+
 void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf, ae_state *_state);
 void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad, ae_state *_state);
 bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc, ae_state *_state);

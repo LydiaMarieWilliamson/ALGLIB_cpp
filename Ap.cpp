@@ -32,6 +32,15 @@
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 
 #include "Ap.h"
+#if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#   include "KernelsSse2.h"
+#endif
+#if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#   include "KernelsAvx2.h"
+#endif
+#if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#   include "KernelsFma.h"
+#endif
 #include <limits>
 #include <locale.h>
 #include <ctype.h>
@@ -5190,11 +5199,4053 @@ void _rcommstate_clear(rcommstate *p) {
 void _rcommstate_destroy(rcommstate *p) {
    _rcommstate_clear(p);
 }
+
+// Optimized shared C/C++ linear algebra code.
+#define alglib_simd_alignment 16
+
+#define alglib_r_block        32
+#define alglib_half_r_block   16
+#define alglib_twice_r_block  64
+
+#define alglib_c_block        16
+#define alglib_half_c_block    8
+#define alglib_twice_c_block  32
+
+// This subroutine calculates fast 32x32 real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using either generic C code or native optimizations (if available)
+//
+// IMPORTANT:
+// * A must be stored in row-major order,
+//   stride is alglib_r_block,
+//   aligned on alglib_simd_alignment boundary
+// * X must be aligned on alglib_simd_alignment boundary
+// * Y may be non-aligned
+void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+   ae_int_t i, k;
+   const double *pa0, *pa1, *pb;
+
+   pa0 = a;
+   pa1 = a + alglib_r_block;
+   pb = x;
+   for (i = 0; i < 16; i++) {
+      double v0 = 0, v1 = 0;
+      for (k = 0; k < 4; k++) {
+         v0 += pa0[0] * pb[0];
+         v1 += pa1[0] * pb[0];
+         v0 += pa0[1] * pb[1];
+         v1 += pa1[1] * pb[1];
+         v0 += pa0[2] * pb[2];
+         v1 += pa1[2] * pb[2];
+         v0 += pa0[3] * pb[3];
+         v1 += pa1[3] * pb[3];
+         v0 += pa0[4] * pb[4];
+         v1 += pa1[4] * pb[4];
+         v0 += pa0[5] * pb[5];
+         v1 += pa1[5] * pb[5];
+         v0 += pa0[6] * pb[6];
+         v1 += pa1[6] * pb[6];
+         v0 += pa0[7] * pb[7];
+         v1 += pa1[7] * pb[7];
+         pa0 += 8;
+         pa1 += 8;
+         pb += 8;
+      }
+      y[0] = beta * y[0] + alpha * v0;
+      y[stride] = beta * y[stride] + alpha * v1;
+
+   // now we've processed rows I and I+1,
+   // pa0 and pa1 are pointing to rows I+1 and I+2.
+   // move to I+2 and I+3.
+      pa0 += alglib_r_block;
+      pa1 += alglib_r_block;
+      pb = x;
+      y += 2 * stride;
+   }
+}
+
+// This function calculates MxN real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
+// product is calculated (only beta is updated); however, this update  is not
+// efficient  and  this  function  should  NOT  be used for multiplication of
+// vector and scalar.
+//
+// IMPORTANT:
+// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * A must be stored in row-major order with stride equal to alglib_r_block
+void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+// Handle special cases:
+// - alpha is zero or n is zero
+// - m is zero
+   if (m == 0)
+      return;
+   if (alpha == 0.0 || n == 0) {
+      ae_int_t i;
+      if (beta == 0.0) {
+         for (i = 0; i < m; i++) {
+            *y = 0.0;
+            y += stride;
+         }
+      } else {
+         for (i = 0; i < m; i++) {
+            *y *= beta;
+            y += stride;
+         }
+      }
+      return;
+   }
+// Handle general case: nonzero alpha, n and m
+//
+   if (m == 32 && n == 32) {
+   // 32x32, may be we have something better than general implementation
+      _ialglib_mv_32(a, x, y, stride, alpha, beta);
+   } else {
+      ae_int_t i, k, m2, n8, n2, ntrail2;
+      const double *pa0, *pa1, *pb;
+
+   // First M/2 rows of A are processed in pairs.
+   // optimized code is used.
+      m2 = m / 2;
+      n8 = n / 8;
+      ntrail2 = (n - 8 * n8) / 2;
+      for (i = 0; i < m2; i++) {
+         double v0 = 0, v1 = 0;
+
+      // 'a' points to the part of the matrix which
+      // is not processed yet
+         pb = x;
+         pa0 = a;
+         pa1 = a + alglib_r_block;
+         a += alglib_twice_r_block;
+
+      // 8 elements per iteration
+         for (k = 0; k < n8; k++) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+            v0 += pa0[1] * pb[1];
+            v1 += pa1[1] * pb[1];
+            v0 += pa0[2] * pb[2];
+            v1 += pa1[2] * pb[2];
+            v0 += pa0[3] * pb[3];
+            v1 += pa1[3] * pb[3];
+            v0 += pa0[4] * pb[4];
+            v1 += pa1[4] * pb[4];
+            v0 += pa0[5] * pb[5];
+            v1 += pa1[5] * pb[5];
+            v0 += pa0[6] * pb[6];
+            v1 += pa1[6] * pb[6];
+            v0 += pa0[7] * pb[7];
+            v1 += pa1[7] * pb[7];
+            pa0 += 8;
+            pa1 += 8;
+            pb += 8;
+         }
+
+      // 2 elements per iteration
+         for (k = 0; k < ntrail2; k++) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+            v0 += pa0[1] * pb[1];
+            v1 += pa1[1] * pb[1];
+            pa0 += 2;
+            pa1 += 2;
+            pb += 2;
+         }
+
+      // last element, if needed
+         if (n % 2 != 0) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+         }
+      // final update
+         if (beta != 0) {
+            y[0] = beta * y[0] + alpha * v0;
+            y[stride] = beta * y[stride] + alpha * v1;
+         } else {
+            y[0] = alpha * v0;
+            y[stride] = alpha * v1;
+         }
+
+      // move to the next pair of elements
+         y += 2 * stride;
+      }
+
+   // Last (odd) row is processed with less optimized code.
+      if (m % 2 != 0) {
+         double v0 = 0;
+
+      // 'a' points to the part of the matrix which
+      // is not processed yet
+         pb = x;
+         pa0 = a;
+
+      // 2 elements per iteration
+         n2 = n / 2;
+         for (k = 0; k < n2; k++) {
+            v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
+            pa0 += 2;
+            pb += 2;
+         }
+
+      // last element, if needed
+         if (n % 2 != 0)
+            v0 += pa0[0] * pb[0];
+
+      // final update
+         if (beta != 0)
+            y[0] = beta * y[0] + alpha * v0;
+         else
+            y[0] = alpha * v0;
+      }
+   }
+}
+
+// This function calculates MxN real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
+// product is calculated (only beta is updated); however, this update  is not
+// efficient  and  this  function  should  NOT  be used for multiplication of
+// vector and scalar.
+//
+// IMPORTANT:
+// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * A must be stored in row-major order with stride equal to alglib_r_block
+// * y may be non-aligned
+// * both A and x must have same offset with respect to 16-byte boundary:
+//   either both are aligned, or both are aligned with offset 8. Function
+//   will crash your system if you try to call it with misaligned or
+//   incorrectly aligned data.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+   ae_int_t i, k, n2;
+   ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
+   const double *pa0, *pa1, *pa2, *pb;
+   __m128d v0, v1, v2, va0, va1, va2, vx, vtmp;
+
+// Handle special cases:
+// - alpha is zero or n is zero
+// - m is zero
+   if (m == 0)
+      return;
+   if (alpha == 0.0 || n == 0) {
+      if (beta == 0.0) {
+         for (i = 0; i < m; i++) {
+            *y = 0.0;
+            y += stride;
+         }
+      } else {
+         for (i = 0; i < m; i++) {
+            *y *= beta;
+            y += stride;
+         }
+      }
+      return;
+   }
+// Handle general case: nonzero alpha, n and m
+//
+// We divide problem as follows...
+//
+// Rows M are divided into:
+// - mb3 blocks, each 3xN
+// - mtail blocks, each 1xN
+//
+// Within a row, elements are divided  into:
+// - nhead 1x1 blocks (used to align the rest, either 0 or 1)
+// - nb8 1x8 blocks, aligned to 16-byte boundary
+// - nb2 1x2 blocks, aligned to 16-byte boundary
+// - ntail 1x1 blocks, aligned too (altough we don't rely on it)
+//
+   n2 = n / 2;
+   mb3 = m / 3;
+   mtail = m % 3;
+   nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
+   nb8 = (n - nhead) / 8;
+   nb2 = (n - nhead - 8 * nb8) / 2;
+   ntail = n - nhead - 8 * nb8 - 2 * nb2;
+   for (i = 0; i < mb3; i++) {
+      double row0, row1, row2;
+      row0 = 0;
+      row1 = 0;
+      row2 = 0;
+      pb = x;
+      pa0 = a;
+      pa1 = a + alglib_r_block;
+      pa2 = a + alglib_twice_r_block;
+      a += 3 * alglib_r_block;
+      if (nhead == 1) {
+         vx = _mm_load_sd(pb);
+         v0 = _mm_load_sd(pa0);
+         v1 = _mm_load_sd(pa1);
+         v2 = _mm_load_sd(pa2);
+
+         v0 = _mm_mul_sd(v0, vx);
+         v1 = _mm_mul_sd(v1, vx);
+         v2 = _mm_mul_sd(v2, vx);
+
+         pa0++;
+         pa1++;
+         pa2++;
+         pb++;
+      } else {
+         v0 = _mm_setzero_pd();
+         v1 = _mm_setzero_pd();
+         v2 = _mm_setzero_pd();
+      }
+      for (k = 0; k < nb8; k++) {
+      // this code is a shuffle of simultaneous dot product.
+      // see below for commented unshuffled original version.
+         vx = _mm_load_pd(pb);
+         va0 = _mm_load_pd(pa0);
+         va1 = _mm_load_pd(pa1);
+         va0 = _mm_mul_pd(va0, vx);
+         va2 = _mm_load_pd(pa2);
+         v0 = _mm_add_pd(va0, v0);
+         va1 = _mm_mul_pd(va1, vx);
+         va0 = _mm_load_pd(pa0 + 2);
+         v1 = _mm_add_pd(va1, v1);
+         va2 = _mm_mul_pd(va2, vx);
+         va1 = _mm_load_pd(pa1 + 2);
+         v2 = _mm_add_pd(va2, v2);
+         vx = _mm_load_pd(pb + 2);
+         va0 = _mm_mul_pd(va0, vx);
+         va2 = _mm_load_pd(pa2 + 2);
+         v0 = _mm_add_pd(va0, v0);
+         va1 = _mm_mul_pd(va1, vx);
+         va0 = _mm_load_pd(pa0 + 4);
+         v1 = _mm_add_pd(va1, v1);
+         va2 = _mm_mul_pd(va2, vx);
+         va1 = _mm_load_pd(pa1 + 4);
+         v2 = _mm_add_pd(va2, v2);
+         vx = _mm_load_pd(pb + 4);
+         va0 = _mm_mul_pd(va0, vx);
+         va2 = _mm_load_pd(pa2 + 4);
+         v0 = _mm_add_pd(va0, v0);
+         va1 = _mm_mul_pd(va1, vx);
+         va0 = _mm_load_pd(pa0 + 6);
+         v1 = _mm_add_pd(va1, v1);
+         va2 = _mm_mul_pd(va2, vx);
+         va1 = _mm_load_pd(pa1 + 6);
+         v2 = _mm_add_pd(va2, v2);
+         vx = _mm_load_pd(pb + 6);
+         va0 = _mm_mul_pd(va0, vx);
+         v0 = _mm_add_pd(va0, v0);
+         va2 = _mm_load_pd(pa2 + 6);
+         va1 = _mm_mul_pd(va1, vx);
+         v1 = _mm_add_pd(va1, v1);
+         va2 = _mm_mul_pd(va2, vx);
+         v2 = _mm_add_pd(va2, v2);
+
+         pa0 += 8;
+         pa1 += 8;
+         pa2 += 8;
+         pb += 8;
+
+#   if 0
+      // this is unshuffled version of code above
+
+         vx = _mm_load_pd(pb);
+         va0 = _mm_load_pd(pa0);
+         va1 = _mm_load_pd(pa1);
+         va2 = _mm_load_pd(pa2);
+
+         va0 = _mm_mul_pd(va0, vx);
+         va1 = _mm_mul_pd(va1, vx);
+         va2 = _mm_mul_pd(va2, vx);
+
+         v0 = _mm_add_pd(va0, v0);
+         v1 = _mm_add_pd(va1, v1);
+         v2 = _mm_add_pd(va2, v2);
+
+         vx = _mm_load_pd(pb + 2);
+         va0 = _mm_load_pd(pa0 + 2);
+         va1 = _mm_load_pd(pa1 + 2);
+         va2 = _mm_load_pd(pa2 + 2);
+
+         va0 = _mm_mul_pd(va0, vx);
+         va1 = _mm_mul_pd(va1, vx);
+         va2 = _mm_mul_pd(va2, vx);
+
+         v0 = _mm_add_pd(va0, v0);
+         v1 = _mm_add_pd(va1, v1);
+         v2 = _mm_add_pd(va2, v2);
+
+         vx = _mm_load_pd(pb + 4);
+         va0 = _mm_load_pd(pa0 + 4);
+         va1 = _mm_load_pd(pa1 + 4);
+         va2 = _mm_load_pd(pa2 + 4);
+
+         va0 = _mm_mul_pd(va0, vx);
+         va1 = _mm_mul_pd(va1, vx);
+         va2 = _mm_mul_pd(va2, vx);
+
+         v0 = _mm_add_pd(va0, v0);
+         v1 = _mm_add_pd(va1, v1);
+         v2 = _mm_add_pd(va2, v2);
+
+         vx = _mm_load_pd(pb + 6);
+         va0 = _mm_load_pd(pa0 + 6);
+         va1 = _mm_load_pd(pa1 + 6);
+         va2 = _mm_load_pd(pa2 + 6);
+
+         va0 = _mm_mul_pd(va0, vx);
+         va1 = _mm_mul_pd(va1, vx);
+         va2 = _mm_mul_pd(va2, vx);
+
+         v0 = _mm_add_pd(va0, v0);
+         v1 = _mm_add_pd(va1, v1);
+         v2 = _mm_add_pd(va2, v2);
+#   endif
+      }
+      for (k = 0; k < nb2; k++) {
+         vx = _mm_load_pd(pb);
+         va0 = _mm_load_pd(pa0);
+         va1 = _mm_load_pd(pa1);
+         va2 = _mm_load_pd(pa2);
+
+         va0 = _mm_mul_pd(va0, vx);
+         v0 = _mm_add_pd(va0, v0);
+         va1 = _mm_mul_pd(va1, vx);
+         v1 = _mm_add_pd(va1, v1);
+         va2 = _mm_mul_pd(va2, vx);
+         v2 = _mm_add_pd(va2, v2);
+
+         pa0 += 2;
+         pa1 += 2;
+         pa2 += 2;
+         pb += 2;
+      }
+      for (k = 0; k < ntail; k++) {
+         vx = _mm_load1_pd(pb);
+         va0 = _mm_load1_pd(pa0);
+         va1 = _mm_load1_pd(pa1);
+         va2 = _mm_load1_pd(pa2);
+
+         va0 = _mm_mul_sd(va0, vx);
+         v0 = _mm_add_sd(v0, va0);
+         va1 = _mm_mul_sd(va1, vx);
+         v1 = _mm_add_sd(v1, va1);
+         va2 = _mm_mul_sd(va2, vx);
+         v2 = _mm_add_sd(v2, va2);
+      }
+      vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
+      _mm_storel_pd(&row0, vtmp);
+      _mm_storeh_pd(&row1, vtmp);
+      v2 = _mm_add_sd(_mm_shuffle_pd(v2, v2, 1), v2);
+      _mm_storel_pd(&row2, v2);
+      if (beta != 0) {
+         y[0] = beta * y[0] + alpha * row0;
+         y[stride] = beta * y[stride] + alpha * row1;
+         y[2 * stride] = beta * y[2 * stride] + alpha * row2;
+      } else {
+         y[0] = alpha * row0;
+         y[stride] = alpha * row1;
+         y[2 * stride] = alpha * row2;
+      }
+      y += 3 * stride;
+   }
+   for (i = 0; i < mtail; i++) {
+      double row0;
+      row0 = 0;
+      pb = x;
+      pa0 = a;
+      a += alglib_r_block;
+      for (k = 0; k < n2; k++) {
+         row0 += pb[0] * pa0[0] + pb[1] * pa0[1];
+         pa0 += 2;
+         pb += 2;
+      }
+      if (n % 2)
+         row0 += pb[0] * pa0[0];
+      if (beta != 0)
+         y[0] = beta * y[0] + alpha * row0;
+      else
+         y[0] = alpha * row0;
+      y += stride;
+   }
+}
+#endif
+
+// This subroutine calculates fast MxN complex matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code, where A, x, y, alpha and beta are complex.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
+// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
+// important when A or x contain infinities/NANs).
+//
+// IMPORTANT:
+// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * A must be stored in row-major order, as sequence of double precision
+//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
+//   in doubles).
+// * Y may be referenced by cy (pointer to ae_complex) or
+//   dy (pointer to array of double precision pair) depending on what type of
+//   output you wish. Pass pointer to Y as one of these parameters,
+//   AND SET OTHER PARAMETER TO NULL.
+// * both A and x must be aligned; y may be non-aligned.
+void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+   ae_int_t i, j;
+   const double *pa, *parow, *pb;
+
+   parow = a;
+   for (i = 0; i < m; i++) {
+      double v0 = 0, v1 = 0;
+      pa = parow;
+      pb = x;
+      for (j = 0; j < n; j++) {
+         v0 += pa[0] * pb[0];
+         v1 += pa[0] * pb[1];
+         v0 -= pa[1] * pb[1];
+         v1 += pa[1] * pb[0];
+
+         pa += 2;
+         pb += 2;
+      }
+      if (cy != NULL) {
+         double tx = (beta.x * cy->x - beta.y * cy->y) + (alpha.x * v0 - alpha.y * v1);
+         double ty = (beta.x * cy->y + beta.y * cy->x) + (alpha.x * v1 + alpha.y * v0);
+         cy->x = tx;
+         cy->y = ty;
+         cy += stride;
+      } else {
+         double tx = (beta.x * dy[0] - beta.y * dy[1]) + (alpha.x * v0 - alpha.y * v1);
+         double ty = (beta.x * dy[1] + beta.y * dy[0]) + (alpha.x * v1 + alpha.y * v0);
+         dy[0] = tx;
+         dy[1] = ty;
+         dy += 2 * stride;
+      }
+      parow += 2 * alglib_c_block;
+   }
+}
+
+// This subroutine calculates fast MxN complex matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code, where A, x, y, alpha and beta are complex.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
+// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
+// important when A or x contain infinities/NANs).
+//
+// IMPORTANT:
+// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * A must be stored in row-major order, as sequence of double precision
+//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
+//   in doubles).
+// * Y may be referenced by cy (pointer to ae_complex) or
+//   dy (pointer to array of double precision pair) depending on what type of
+//   output you wish. Pass pointer to Y as one of these parameters,
+//   AND SET OTHER PARAMETER TO NULL.
+// * both A and x must be aligned; y may be non-aligned.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+   ae_int_t i, j, m2;
+   const double *pa0, *pa1, *parow, *pb;
+   __m128d vbeta, vbetax, vbetay;
+   __m128d valpha, valphax, valphay;
+
+   m2 = m / 2;
+   parow = a;
+   if (cy != NULL) {
+      dy = (double *)cy;
+      cy = NULL;
+   }
+   vbeta = _mm_loadh_pd(_mm_load_sd(&beta.x), &beta.y);
+   vbetax = _mm_unpacklo_pd(vbeta, vbeta);
+   vbetay = _mm_unpackhi_pd(vbeta, vbeta);
+   valpha = _mm_loadh_pd(_mm_load_sd(&alpha.x), &alpha.y);
+   valphax = _mm_unpacklo_pd(valpha, valpha);
+   valphay = _mm_unpackhi_pd(valpha, valpha);
+   for (i = 0; i < m2; i++) {
+      __m128d vx, vy, vt0, vt1, vt2, vt3, vt4, vt5, vrx, vry, vtx, vty;
+      pa0 = parow;
+      pa1 = parow + 2 * alglib_c_block;
+      pb = x;
+      vx = _mm_setzero_pd();
+      vy = _mm_setzero_pd();
+      for (j = 0; j < n; j++) {
+         vt0 = _mm_load1_pd(pb);
+         vt1 = _mm_load1_pd(pb + 1);
+         vt2 = _mm_load_pd(pa0);
+         vt3 = _mm_load_pd(pa1);
+         vt5 = _mm_unpacklo_pd(vt2, vt3);
+         vt4 = _mm_unpackhi_pd(vt2, vt3);
+         vt2 = vt5;
+         vt3 = vt4;
+
+         vt2 = _mm_mul_pd(vt2, vt0);
+         vx = _mm_add_pd(vx, vt2);
+         vt3 = _mm_mul_pd(vt3, vt1);
+         vx = _mm_sub_pd(vx, vt3);
+         vt4 = _mm_mul_pd(vt4, vt0);
+         vy = _mm_add_pd(vy, vt4);
+         vt5 = _mm_mul_pd(vt5, vt1);
+         vy = _mm_add_pd(vy, vt5);
+
+         pa0 += 2;
+         pa1 += 2;
+         pb += 2;
+      }
+      if (beta.x == 0.0 && beta.y == 0.0) {
+         vrx = _mm_setzero_pd();
+         vry = _mm_setzero_pd();
+      } else {
+         vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
+         vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
+         vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
+         vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
+      }
+      vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
+      vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
+      vrx = _mm_add_pd(vrx, vtx);
+      vry = _mm_add_pd(vry, vty);
+      _mm_storel_pd(dy + 0, vrx);
+      _mm_storeh_pd(dy + 2 * stride + 0, vrx);
+      _mm_storel_pd(dy + 1, vry);
+      _mm_storeh_pd(dy + 2 * stride + 1, vry);
+      dy += 4 * stride;
+      parow += 4 * alglib_c_block;
+   }
+   if (m % 2) {
+      double v0 = 0, v1 = 0;
+      double tx, ty;
+      pa0 = parow;
+      pb = x;
+      for (j = 0; j < n; j++) {
+         v0 += pa0[0] * pb[0];
+         v1 += pa0[0] * pb[1];
+         v0 -= pa0[1] * pb[1];
+         v1 += pa0[1] * pb[0];
+
+         pa0 += 2;
+         pb += 2;
+      }
+      if (beta.x == 0.0 && beta.y == 0.0) {
+         tx = 0.0;
+         ty = 0.0;
+      } else {
+         tx = beta.x * dy[0] - beta.y * dy[1];
+         ty = beta.x * dy[1] + beta.y * dy[0];
+      }
+      tx += alpha.x * v0 - alpha.y * v1;
+      ty += alpha.x * v1 + alpha.y * v0;
+      dy[0] = tx;
+      dy[1] = ty;
+      dy += 2 * stride;
+      parow += 2 * alglib_c_block;
+   }
+}
+#endif
+
+// This subroutine sets vector to zero
+void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
+   ae_int_t i;
+   if (stride == 1) {
+      for (i = 0; i < n; i++, p++)
+         *p = 0.0;
+   } else {
+      for (i = 0; i < n; i++, p += stride)
+         *p = 0.0;
+   }
+}
+
+// This subroutine sets vector to zero
+void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
+   ae_int_t i;
+   if (stride == 1) {
+      for (i = 0; i < n; i++, p++) {
+         p->x = 0.0;
+         p->y = 0.0;
+      }
+   } else {
+      for (i = 0; i < n; i++, p += stride) {
+         p->x = 0.0;
+         p->y = 0.0;
+      }
+   }
+}
+
+// This subroutine copies unaligned real vector
+void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
+   ae_int_t i, n2;
+   if (stridea == 1 && strideb == 1) {
+      n2 = n / 2;
+      for (i = n2; i != 0; i--, a += 2, b += 2) {
+         b[0] = a[0];
+         b[1] = a[1];
+      }
+      if (n % 2 != 0)
+         b[0] = a[0];
+   } else {
+      for (i = 0; i < n; i++, a += stridea, b += strideb)
+         *b = *a;
+   }
+}
+
+// This subroutine copies unaligned complex vector
+// (passed as ae_complex*)
+//
+// 1. strideb is stride measured in complex numbers, not doubles
+// 2. conj may be "N" (no conj.) or "C" (conj.)
+void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+   ae_int_t i;
+
+// more general case
+   if (conj[0] == 'N' || conj[0] == 'n') {
+      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+         b[0] = a->x;
+         b[1] = a->y;
+      }
+   } else {
+      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+         b[0] = a->x;
+         b[1] = -a->y;
+      }
+   }
+}
+
+// This subroutine copies unaligned complex vector (passed as double*)
+//
+// 1. strideb is stride measured in complex numbers, not doubles
+// 2. conj may be "N" (no conj.) or "C" (conj.)
+void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+   ae_int_t i;
+
+// more general case
+   if (conj[0] == 'N' || conj[0] == 'n') {
+      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+         b[0] = a[0];
+         b[1] = a[1];
+      }
+   } else {
+      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+         b[0] = a[0];
+         b[1] = -a[1];
+      }
+   }
+}
+
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_r_block
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
+   ae_int_t i, j, n2;
+   const double *psrc;
+   double *pdst;
+   if (op == 0) {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+            pdst[0] = psrc[0];
+            pdst[1] = psrc[1];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   } else {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += 1, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
+            pdst[0] = psrc[0];
+            pdst[alglib_r_block] = psrc[1];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   }
+}
+
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_r_block
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
+   ae_int_t i, j, mb2;
+   const double *psrc0, *psrc1;
+   double *pdst;
+   if (op == 0) {
+      ae_int_t nb8, ntail;
+      nb8 = n / 8;
+      ntail = n - 8 * nb8;
+      for (i = 0, psrc0 = a; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
+         pdst = b;
+         for (j = 0; j < nb8; j++) {
+            __m128d v0, v1;
+            v0 = _mm_loadu_pd(psrc0);
+            _mm_store_pd(pdst, v0);
+            v1 = _mm_loadu_pd(psrc0 + 2);
+            _mm_store_pd(pdst + 2, v1);
+            v1 = _mm_loadu_pd(psrc0 + 4);
+            _mm_store_pd(pdst + 4, v1);
+            v1 = _mm_loadu_pd(psrc0 + 6);
+            _mm_store_pd(pdst + 6, v1);
+            pdst += 8;
+            psrc0 += 8;
+         }
+         for (j = 0; j < ntail; j++)
+            pdst[j] = psrc0[j];
+      }
+   } else {
+      const double *arow0, *arow1;
+      double *bcol0, *bcol1, *pdst0, *pdst1;
+      ae_int_t nb4, ntail, n2;
+
+      n2 = n / 2;
+      mb2 = m / 2;
+      nb4 = n / 4;
+      ntail = n - 4 * nb4;
+
+      arow0 = a;
+      arow1 = a + stride;
+      bcol0 = b;
+      bcol1 = b + 1;
+      for (i = 0; i < mb2; i++) {
+         psrc0 = arow0;
+         psrc1 = arow1;
+         pdst0 = bcol0;
+         pdst1 = bcol1;
+         for (j = 0; j < nb4; j++) {
+            __m128d v0, v1, v2, v3;
+            v0 = _mm_loadu_pd(psrc0);
+            v1 = _mm_loadu_pd(psrc1);
+            v2 = _mm_loadu_pd(psrc0 + 2);
+            v3 = _mm_loadu_pd(psrc1 + 2);
+            _mm_store_pd(pdst0, _mm_unpacklo_pd(v0, v1));
+            _mm_store_pd(pdst0 + alglib_r_block, _mm_unpackhi_pd(v0, v1));
+            _mm_store_pd(pdst0 + 2 * alglib_r_block, _mm_unpacklo_pd(v2, v3));
+            _mm_store_pd(pdst0 + 3 * alglib_r_block, _mm_unpackhi_pd(v2, v3));
+
+            pdst0 += 4 * alglib_r_block;
+            pdst1 += 4 * alglib_r_block;
+            psrc0 += 4;
+            psrc1 += 4;
+         }
+         for (j = 0; j < ntail; j++) {
+            pdst0[0] = psrc0[0];
+            pdst1[0] = psrc1[0];
+            pdst0 += alglib_r_block;
+            pdst1 += alglib_r_block;
+            psrc0 += 1;
+            psrc1 += 1;
+         }
+         arow0 += 2 * stride;
+         arow1 += 2 * stride;
+         bcol0 += 2;
+         bcol1 += 2;
+      }
+      if (m % 2) {
+         psrc0 = arow0;
+         pdst0 = bcol0;
+         for (j = 0; j < n2; j++) {
+            pdst0[0] = psrc0[0];
+            pdst0[alglib_r_block] = psrc0[1];
+            pdst0 += alglib_twice_r_block;
+            psrc0 += 2;
+         }
+         if (n % 2 != 0)
+            pdst0[0] = psrc0[0];
+      }
+   }
+}
+#endif
+
+// This subroutine copies matrix from  aligned contigous storage to non-
+// aligned non-contigous storage
+//
+// A:
+// * MxN
+// * aligned
+// * contigous
+// * stride is alglib_r_block
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * non-aligned, non-contigous
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
+   ae_int_t i, j, n2;
+   const double *psrc;
+   double *pdst;
+   if (op == 0) {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a += alglib_r_block, b += stride, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+            pdst[0] = psrc[0];
+            pdst[1] = psrc[1];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   } else {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a++, b += stride, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
+            pdst[0] = psrc[0];
+            pdst[1] = psrc[alglib_r_block];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   }
+}
+
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+// * pointer to ae_complex is passed
+//
+// B:
+// * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_c_block
+// * pointer to double is passed
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+// * 2 - conjugate transposition
+// * 3 - conjugate, but no  transposition
+void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
+   ae_int_t i, j;
+   const ae_complex *psrc;
+   double *pdst;
+   if (op == 0) {
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
+            pdst[0] = psrc->x;
+            pdst[1] = psrc->y;
+         }
+   }
+   if (op == 1) {
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+            pdst[0] = psrc->x;
+            pdst[1] = psrc->y;
+         }
+   }
+   if (op == 2) {
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+            pdst[0] = psrc->x;
+            pdst[1] = -psrc->y;
+         }
+   }
+   if (op == 3) {
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
+            pdst[0] = psrc->x;
+            pdst[1] = -psrc->y;
+         }
+   }
+}
+
+// This subroutine copies matrix from aligned contigous storage to
+// non-aligned non-contigous storage
+//
+// A:
+// * 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
+// * aligned
+// * stride is alglib_c_block
+// * pointer to double is passed
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * pointer to ae_complex is passed
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+// * 2 - conjugate transposition
+// * 3 - conjugate, but no  transposition
+void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
+   ae_int_t i, j;
+   const double *psrc;
+   ae_complex *pdst;
+   if (op == 0) {
+      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
+            pdst->x = psrc[0];
+            pdst->y = psrc[1];
+         }
+   }
+   if (op == 1) {
+      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+            pdst->x = psrc[0];
+            pdst->y = psrc[1];
+         }
+   }
+   if (op == 2) {
+      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+            pdst->x = psrc[0];
+            pdst->y = -psrc[1];
+         }
+   }
+   if (op == 3) {
+      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
+         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
+            pdst->x = psrc[0];
+            pdst->y = -psrc[1];
+         }
+   }
+}
+
+// Real GEMM kernel
+bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
+   int i;
+   double *crow;
+   double _abuf[alglib_r_block + alglib_simd_alignment];
+   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
+   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+
+   if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || alpha == 0.0)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      rmv = &_ialglib_rmv_sse2;
+      mcopyblock = &_ialglib_mcopyblock_sse2;
+   }
+#endif
+
+// copy b
+   if (optypeb == 0)
+      mcopyblock(k, n, _b, 1, _b_stride, b);
+   else
+      mcopyblock(n, k, _b, 0, _b_stride, b);
+
+// multiply B by A (from the right, by rows)
+// and store result in C
+   crow = _c;
+   if (optypea == 0) {
+      const double *arow = _a;
+      for (i = 0; i < m; i++) {
+         _ialglib_vcopy(k, arow, 1, abuf, 1);
+         if (beta == 0)
+            _ialglib_vzero(n, crow, 1);
+         rmv(n, k, b, abuf, crow, 1, alpha, beta);
+         crow += _c_stride;
+         arow += _a_stride;
+      }
+   } else {
+      const double *acol = _a;
+      for (i = 0; i < m; i++) {
+         _ialglib_vcopy(k, acol, _a_stride, abuf, 1);
+         if (beta == 0)
+            _ialglib_vzero(n, crow, 1);
+         rmv(n, k, b, abuf, crow, 1, alpha, beta);
+         crow += _c_stride;
+         acol++;
+      }
+   }
+   return true;
+}
+
+// Complex GEMM kernel
+bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
+   const ae_complex *arow;
+   ae_complex *crow;
+   ae_int_t i;
+   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
+   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
+   ae_int_t brows;
+   ae_int_t bcols;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+
+   if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      cmv = &_ialglib_cmv_sse2;
+   }
+#endif
+
+// copy b
+   brows = optypeb == 0 ? k : n;
+   bcols = optypeb == 0 ? n : k;
+   if (optypeb == 0)
+      _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
+   if (optypeb == 1)
+      _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
+   if (optypeb == 2)
+      _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
+
+// multiply B by A (from the right, by rows)
+// and store result in C
+   arow = _a;
+   crow = _c;
+   for (i = 0; i < m; i++) {
+      if (optypea == 0) {
+         _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
+         arow += _a_stride;
+      } else if (optypea == 1) {
+         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
+         arow++;
+      } else {
+         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
+         arow++;
+      }
+      if (beta.x == 0 && beta.y == 0)
+         _ialglib_vzero_complex(n, crow, 1);
+      cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
+      crow += _c_stride;
+   }
+   return true;
+}
+
+// complex TRSM kernel
+bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+// local buffers
+   double *pdiag;
+   ae_int_t i;
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   bool uppera;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+
+   if (m > alglib_c_block || n > alglib_c_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      cmv = &_ialglib_cmv_sse2;
+   }
+#endif
+
+// Prepare
+   _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
+   _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
+   if (isunit)
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         pdiag[0] = 1.0;
+         pdiag[1] = 0.0;
+      }
+   if (optype == 0)
+      uppera = isupper;
+   else
+      uppera = !isupper;
+
+// Solve Y*A^-1=X where A is upper or lower triangular
+   if (uppera) {
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c;
+         ae_complex beta;
+         ae_complex alpha;
+         tmp_c.x = pdiag[0];
+         tmp_c.y = pdiag[1];
+         beta = ae_c_d_div(1.0, tmp_c);
+         alpha.x = -beta.x;
+         alpha.y = -beta.y;
+         _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
+         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
+   } else {
+      for (i = n - 1, pdiag = abuf + 2 * ((n - 1) * alglib_c_block + (n - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c;
+         ae_complex beta;
+         ae_complex alpha;
+         tmp_c.x = pdiag[0];
+         tmp_c.y = pdiag[1];
+         beta = ae_c_d_div(1.0, tmp_c);
+         alpha.x = -beta.x;
+         alpha.y = -beta.y;
+         _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
+         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
+   }
+   return true;
+}
+
+// real TRSM kernel
+bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+// local buffers
+   double *pdiag;
+   ae_int_t i;
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   bool uppera;
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+
+   if (m > alglib_r_block || n > alglib_r_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      rmv = &_ialglib_rmv_sse2;
+      mcopyblock = &_ialglib_mcopyblock_sse2;
+   }
+#endif
+
+// Prepare
+   mcopyblock(n, n, _a, optype, _a_stride, abuf);
+   mcopyblock(m, n, _x, 0, _x_stride, xbuf);
+   if (isunit)
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
+         *pdiag = 1.0;
+   if (optype == 0)
+      uppera = isupper;
+   else
+      uppera = !isupper;
+
+// Solve Y*A^-1=X where A is upper or lower triangular
+   if (uppera) {
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
+         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+   } else {
+      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
+         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+   }
+   return true;
+}
+
+// complex TRSM kernel
+bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+// local buffers
+   double *pdiag, *arow;
+   ae_int_t i;
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   bool uppera;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+
+   if (m > alglib_c_block || n > alglib_c_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      cmv = &_ialglib_cmv_sse2;
+   }
+#endif
+
+// Prepare
+// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+   _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
+   _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
+   if (isunit)
+      for (i = 0, pdiag = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         pdiag[0] = 1.0;
+         pdiag[1] = 0.0;
+      }
+   if (optype == 0)
+      uppera = isupper;
+   else
+      uppera = !isupper;
+
+// Solve A^-1*Y^T=X^T where A is upper or lower triangular
+   if (uppera) {
+      for (i = m - 1, pdiag = abuf + 2 * ((m - 1) * alglib_c_block + (m - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c;
+         ae_complex beta;
+         ae_complex alpha;
+         tmp_c.x = pdiag[0];
+         tmp_c.y = pdiag[1];
+         beta = ae_c_d_div(1.0, tmp_c);
+         alpha.x = -beta.x;
+         alpha.y = -beta.y;
+         _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
+         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+   } else {
+      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
+         ae_complex tmp_c;
+         ae_complex beta;
+         ae_complex alpha;
+         tmp_c.x = pdiag[0];
+         tmp_c.y = pdiag[1];
+         beta = ae_c_d_div(1.0, tmp_c);
+         alpha.x = -beta.x;
+         alpha.y = -beta.y;
+         _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
+         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+   }
+   return true;
+}
+
+// real TRSM kernel
+bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+// local buffers
+   double *pdiag, *arow;
+   ae_int_t i;
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   bool uppera;
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+
+   if (m > alglib_r_block || n > alglib_r_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (ae_cpuid() & CPU_SSE2) {
+      rmv = &_ialglib_rmv_sse2;
+      mcopyblock = &_ialglib_mcopyblock_sse2;
+   }
+#endif
+
+// Prepare
+// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+   mcopyblock(m, m, _a, optype, _a_stride, abuf);
+   mcopyblock(m, n, _x, 1, _x_stride, xbuf);
+   if (isunit)
+      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
+         *pdiag = 1.0;
+   if (optype == 0)
+      uppera = isupper;
+   else
+      uppera = !isupper;
+
+// Solve A^-1*Y^T=X^T where A is upper or lower triangular
+   if (uppera) {
+      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
+         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
+   } else {
+      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
+         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
+   }
+   return true;
+}
+
+// complex SYRK kernel
+bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
+// local buffers
+   double *arow, *crow;
+   ae_complex c_alpha, c_beta;
+   ae_int_t i;
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+
+   if (n > alglib_c_block || k > alglib_c_block)
+      return false;
+   if (n == 0)
+      return true;
+
+// copy A and C, task is transformed to "A*A^H"-form.
+// if beta==0, then C is filled by zeros (and not referenced)
+//
+// alpha==0 or k==0 are correctly processed (A is not referenced)
+   c_alpha.x = alpha;
+   c_alpha.y = 0;
+   c_beta.x = beta;
+   c_beta.y = 0;
+   if (alpha == 0)
+      k = 0;
+   if (k > 0) {
+      if (optypea == 0)
+         _ialglib_mcopyblock_complex(n, k, _a, 3, _a_stride, abuf);
+      else
+         _ialglib_mcopyblock_complex(k, n, _a, 1, _a_stride, abuf);
+   }
+   _ialglib_mcopyblock_complex(n, n, _c, 0, _c_stride, cbuf);
+   if (beta == 0) {
+      for (i = 0, crow = cbuf; i < n; i++, crow += 2 * alglib_c_block)
+         if (isupper)
+            _ialglib_vzero(2 * (n - i), crow + 2 * i, 1);
+         else
+            _ialglib_vzero(2 * (i + 1), crow, 1);
+   }
+// update C
+   if (isupper) {
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+         _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
+         _ialglib_cmv(n - i, k, arow, tmpbuf, NULL, crow + 2 * i, 1, c_alpha, c_beta);
+      }
+   } else {
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+         _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
+         _ialglib_cmv(i + 1, k, abuf, tmpbuf, NULL, crow, 1, c_alpha, c_beta);
+      }
+   }
+
+// copy back
+   _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
+
+   return true;
+}
+
+// real SYRK kernel
+bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
+// local buffers
+   double *arow, *crow;
+   ae_int_t i;
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
+
+   if (n > alglib_r_block || k > alglib_r_block)
+      return false;
+   if (n == 0)
+      return true;
+
+// copy A and C, task is transformed to "A*A^T"-form.
+// if beta==0, then C is filled by zeros (and not referenced)
+//
+// alpha==0 or k==0 are correctly processed (A is not referenced)
+   if (alpha == 0)
+      k = 0;
+   if (k > 0) {
+      if (optypea == 0)
+         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
+      else
+         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
+   }
+   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
+   if (beta == 0) {
+      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
+         if (isupper)
+            _ialglib_vzero(n - i, crow + i, 1);
+         else
+            _ialglib_vzero(i + 1, crow, 1);
+   }
+// update C
+   if (isupper) {
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
+         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
+      }
+   } else {
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
+         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
+      }
+   }
+
+// copy back
+   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
+
+   return true;
+}
+
+// complex rank-1 kernel
+bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
+// Locals
+   ae_complex *arow, *pu, *pv, *vtmp, *dst;
+   ae_int_t n2 = n / 2;
+   ae_int_t i, j;
+
+// Quick exit
+   if (m <= 0 || n <= 0)
+      return false;
+
+// update pairs of rows
+   arow = _a;
+   pu = _u;
+   vtmp = _v;
+   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
+   // update by two
+      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
+         double ux = pu[0].x;
+         double uy = pu[0].y;
+         double v0x = pv[0].x;
+         double v0y = pv[0].y;
+         double v1x = pv[1].x;
+         double v1y = pv[1].y;
+         dst[0].x += ux * v0x - uy * v0y;
+         dst[0].y += ux * v0y + uy * v0x;
+         dst[1].x += ux * v1x - uy * v1y;
+         dst[1].y += ux * v1y + uy * v1x;
+      }
+
+   // final update
+      if (n % 2 != 0) {
+         double ux = pu[0].x;
+         double uy = pu[0].y;
+         double vx = pv[0].x;
+         double vy = pv[0].y;
+         dst[0].x += ux * vx - uy * vy;
+         dst[0].y += ux * vy + uy * vx;
+      }
+   }
+   return true;
+}
+
+// real rank-1 kernel
+// deprecated version
+bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
+// Locals
+   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
+   ae_int_t m2 = m / 2;
+   ae_int_t n2 = n / 2;
+   ae_int_t stride = _a_stride;
+   ae_int_t stride2 = 2 * _a_stride;
+   ae_int_t i, j;
+
+// Quick exit
+   if (m <= 0 || n <= 0)
+      return false;
+
+// update pairs of rows
+   arow0 = _a;
+   arow1 = arow0 + stride;
+   pu = _u;
+   vtmp = _v;
+   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+   // update by two
+      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+         dst0[0] += pu[0] * pv[0];
+         dst0[1] += pu[0] * pv[1];
+         dst1[0] += pu[1] * pv[0];
+         dst1[1] += pu[1] * pv[1];
+      }
+
+   // final update
+      if (n % 2 != 0) {
+         dst0[0] += pu[0] * pv[0];
+         dst1[0] += pu[1] * pv[0];
+      }
+   }
+
+// update last row
+   if (m % 2 != 0) {
+   // update by two
+      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
+         dst0[0] += pu[0] * pv[0];
+         dst0[1] += pu[0] * pv[1];
+      }
+
+   // final update
+      if (n % 2 != 0)
+         dst0[0] += pu[0] * pv[0];
+   }
+   return true;
+}
+
+// real rank-1 kernel
+// deprecated version
+bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
+// Locals
+   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
+   ae_int_t m2 = m / 2;
+   ae_int_t n2 = n / 2;
+   ae_int_t stride = _a_stride;
+   ae_int_t stride2 = 2 * _a_stride;
+   ae_int_t i, j;
+
+// Quick exit
+   if (m <= 0 || n <= 0 || alpha == 0.0)
+      return false;
+
+// update pairs of rows
+   arow0 = _a;
+   arow1 = arow0 + stride;
+   pu = _u;
+   vtmp = _v;
+   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+      double au0 = alpha * pu[0];
+      double au1 = alpha * pu[1];
+
+   // update by two
+      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+         dst0[0] += au0 * pv[0];
+         dst0[1] += au0 * pv[1];
+         dst1[0] += au1 * pv[0];
+         dst1[1] += au1 * pv[1];
+      }
+
+   // final update
+      if (n % 2 != 0) {
+         dst0[0] += au0 * pv[0];
+         dst1[0] += au1 * pv[0];
+      }
+   }
+
+// update last row
+   if (m % 2 != 0) {
+      double au0 = alpha * pu[0];
+
+   // update by two
+      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
+         dst0[0] += au0 * pv[0];
+         dst0[1] += au0 * pv[1];
+      }
+
+   // final update
+      if (n % 2 != 0)
+         dst0[0] += au0 * pv[0];
+   }
+   return true;
+}
+
+// Interface functions for efficient kernels
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_rmatrixgemm(m, n, k, alpha, _a->ptr.pp_double[ia] + ja, _a->stride, optypea, _b->ptr.pp_double[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_double[ic] + jc, _c->stride);
+}
+
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if ((alpha.x == 0.0 && alpha.y == 0) || k == 0 || n == 0 || m == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_cmatrixgemm(m, n, k, alpha, _a->ptr.pp_complex[ia] + ja, _a->stride, optypea, _b->ptr.pp_complex[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_complex[ic] + jc, _c->stride);
+}
+
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (m == 0 || n == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_cmatrixrighttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
+}
+
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (m == 0 || n == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_rmatrixrighttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
+}
+
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (m == 0 || n == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_cmatrixlefttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
+}
+
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (m == 0 || n == 0)
+      return false;
+
+// handle with optimized ALGLIB kernel
+   return _ialglib_rmatrixlefttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
+}
+
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (alpha == 0.0 || k == 0 || n == 0)
+      return false;
+
+// ALGLIB kernel
+   return _ialglib_cmatrixherk(n, k, alpha, &a->ptr.pp_complex[ia][ja], a->stride, optypea, beta, &c->ptr.pp_complex[ic][jc], c->stride, isupper);
+}
+
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (alpha == 0.0 || k == 0 || n == 0)
+      return false;
+
+// ALGLIB kernel
+   return _ialglib_rmatrixsyrk(n, k, alpha, &a->ptr.pp_double[ia][ja], a->stride, optypea, beta, &c->ptr.pp_double[ic][jc], c->stride, isupper);
+}
+
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_cmatrixrank1(m, n, &a->ptr.pp_complex[ia][ja], a->stride, &u->ptr.p_complex[uoffs], &v->ptr.p_complex[voffs]);
+}
+
+bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_rmatrixrank1(m, n, &a->ptr.pp_double[ia][ja], a->stride, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
+}
+
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_rmatrixger(m, n, &a->ptr.pp_double[ia][ja], a->stride, alpha, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
+}
+
+// This function reads rectangular matrix A given by two column pointers
+// col0 and col1 and stride src_stride and moves it into contiguous row-
+// by-row storage given by dst.
+//
+// It can handle following special cases:
+// * col1==NULL    in this case second column of A is filled by zeros
+void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
+   ae_int_t n2, j, stride2;
+
+// handle special case
+   if (col1 == NULL) {
+      for (j = 0; j < n; j++) {
+         dst[0] = *col0;
+         dst[1] = 0.0;
+         col0 += src_stride;
+         dst += 2;
+      }
+      return;
+   }
+// handle general case
+   n2 = n / 2;
+   stride2 = src_stride * 2;
+   for (j = 0; j < n2; j++) {
+      dst[0] = *col0;
+      dst[1] = *col1;
+      dst[2] = col0[src_stride];
+      dst[3] = col1[src_stride];
+      col0 += stride2;
+      col1 += stride2;
+      dst += 4;
+   }
+   if (n % 2) {
+      dst[0] = *col0;
+      dst[1] = *col1;
+   }
+}
+
+// This function reads rectangular matrix A given by two column pointers col0
+// and  col1  and  stride src_stride and moves it into  contiguous row-by-row
+// storage given by dst.
+//
+// dst must be aligned, col0 and col1 may be non-aligned.
+//
+// It can handle following special cases:
+// * col1==NULL        in this case second column of A is filled by zeros
+// * src_stride==1     efficient SSE-based code is used
+// * col1-col0==1      efficient SSE-based code is used
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
+   ae_int_t n2, j, stride2;
+
+// handle special case: col1==NULL
+   if (col1 == NULL) {
+      for (j = 0; j < n; j++) {
+         dst[0] = *col0;
+         dst[1] = 0.0;
+         col0 += src_stride;
+         dst += 2;
+      }
+      return;
+   }
+// handle unit stride
+   if (src_stride == 1) {
+      __m128d v0, v1;
+      n2 = n / 2;
+      for (j = 0; j < n2; j++) {
+         v0 = _mm_loadu_pd(col0);
+         col0 += 2;
+         v1 = _mm_loadu_pd(col1);
+         col1 += 2;
+         _mm_store_pd(dst, _mm_unpacklo_pd(v0, v1));
+         _mm_store_pd(dst + 2, _mm_unpackhi_pd(v0, v1));
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+      }
+      return;
+   }
+// handle col1-col0==1
+   if (col1 - col0 == 1) {
+      __m128d v0, v1;
+      n2 = n / 2;
+      stride2 = 2 * src_stride;
+      for (j = 0; j < n2; j++) {
+         v0 = _mm_loadu_pd(col0);
+         v1 = _mm_loadu_pd(col0 + src_stride);
+         _mm_store_pd(dst, v0);
+         _mm_store_pd(dst + 2, v1);
+         col0 += stride2;
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = col0[0];
+         dst[1] = col0[1];
+      }
+      return;
+   }
+// handle general case
+   n2 = n / 2;
+   stride2 = src_stride * 2;
+   for (j = 0; j < n2; j++) {
+      dst[0] = *col0;
+      dst[1] = *col1;
+      dst[2] = col0[src_stride];
+      dst[3] = col1[src_stride];
+      col0 += stride2;
+      col1 += stride2;
+      dst += 4;
+   }
+   if (n % 2) {
+      dst[0] = *col0;
+      dst[1] = *col1;
+   }
+}
+#endif
+
+// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
+// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A and B must be aligned; R may be non-aligned.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero -
+// just ignored).
+//
+// However, when alpha is zero, we still calculate A'*B, which is
+// multiplied by zero afterwards.
+//
+// Function accepts additional parameter store_mode:
+// * if 0, full R is stored
+// * if 1, only first row of R is stored
+// * if 2, only first column of R is stored
+// * if 3, only top left element of R is stored
+void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+   double v00, v01, v10, v11;
+   ae_int_t t;
+   v00 = 0.0;
+   v01 = 0.0;
+   v10 = 0.0;
+   v11 = 0.0;
+   for (t = 0; t < k; t++) {
+      v00 += a[0] * b[0];
+      v01 += a[0] * b[1];
+      v10 += a[1] * b[0];
+      v11 += a[1] * b[1];
+      a += 2;
+      b += 2;
+   }
+   if (store_mode == 0) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[1] = alpha * v01;
+         r[stride + 0] = alpha * v10;
+         r[stride + 1] = alpha * v11;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[1] = beta * r[1] + alpha * v01;
+         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
+      }
+      return;
+   }
+   if (store_mode == 1) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[1] = alpha * v01;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[1] = beta * r[1] + alpha * v01;
+      }
+      return;
+   }
+   if (store_mode == 2) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[stride + 0] = alpha * v10;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+      }
+      return;
+   }
+   if (store_mode == 3) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+      }
+      return;
+   }
+}
+
+// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
+// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A and B must be aligned; R may be non-aligned.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero -
+// just ignored).
+//
+// However, when alpha is zero, we still calculate A'*B, which is
+// multiplied by zero afterwards.
+//
+// Function accepts additional parameter store_mode:
+// * if 0, full R is stored
+// * if 1, only first row of R is stored
+// * if 2, only first column of R is stored
+// * if 3, only top left element of R is stored
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will still be defined and callable, but it
+// will do nothing.  If (2)  is  failed , call to this function will probably
+// crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+// We calculate product of two Kx2 matrices (result is 2x2).
+// VA and VB store result as follows:
+//
+//        [ VD[0]  VE[0] ]
+// A'*B = [              ]
+//        [ VE[1]  VD[1] ]
+//
+   __m128d va, vb, vd, ve, vt, r0, r1, valpha, vbeta;
+   ae_int_t t, k2;
+
+// calculate product
+   k2 = k / 2;
+   vd = _mm_setzero_pd();
+   ve = _mm_setzero_pd();
+   for (t = 0; t < k2; t++) {
+      vb = _mm_load_pd(b);
+      va = _mm_load_pd(a);
+      vt = vb;
+      vb = _mm_mul_pd(va, vb);
+      vt = _mm_shuffle_pd(vt, vt, 1);
+      vd = _mm_add_pd(vb, vd);
+      vt = _mm_mul_pd(va, vt);
+      vb = _mm_load_pd(b + 2);
+      ve = _mm_add_pd(vt, ve);
+      va = _mm_load_pd(a + 2);
+      vt = vb;
+      vb = _mm_mul_pd(va, vb);
+      vt = _mm_shuffle_pd(vt, vt, 1);
+      vd = _mm_add_pd(vb, vd);
+      vt = _mm_mul_pd(va, vt);
+      ve = _mm_add_pd(vt, ve);
+      a += 4;
+      b += 4;
+   }
+   if (k % 2) {
+      va = _mm_load_pd(a);
+      vb = _mm_load_pd(b);
+      vt = _mm_shuffle_pd(vb, vb, 1);
+      vd = _mm_add_pd(_mm_mul_pd(va, vb), vd);
+      ve = _mm_add_pd(_mm_mul_pd(va, vt), ve);
+   }
+// r0 is first row of alpha*A'*B, r1 is second row
+   valpha = _mm_load1_pd(&alpha);
+   r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
+   r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
+
+// store
+   if (store_mode == 0) {
+      if (beta == 0) {
+         _mm_storeu_pd(r, r0);
+         _mm_storeu_pd(r + stride, r1);
+      } else {
+         vbeta = _mm_load1_pd(&beta);
+         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
+         _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
+      }
+      return;
+   }
+   if (store_mode == 1) {
+      if (beta == 0)
+         _mm_storeu_pd(r, r0);
+      else
+         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&beta)), r0));
+      return;
+   }
+   if (store_mode == 2) {
+      double buf[4];
+      _mm_storeu_pd(buf, r0);
+      _mm_storeu_pd(buf + 2, r1);
+      if (beta == 0) {
+         r[0] = buf[0];
+         r[stride + 0] = buf[2];
+      } else {
+         r[0] = beta * r[0] + buf[0];
+         r[stride + 0] = beta * r[stride + 0] + buf[2];
+      }
+      return;
+   }
+   if (store_mode == 3) {
+      double buf[2];
+      _mm_storeu_pd(buf, r0);
+      if (beta == 0)
+         r[0] = buf[0];
+      else
+         r[0] = beta * r[0] + buf[0];
+      return;
+   }
+}
+#endif
+
+// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
+// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A, B0 and B1 must be aligned; R may be non-aligned.
+//
+// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
+// locations.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
+// ignored).
+//
+// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// multiplied by zero afterwards.
+//
+// Unlike mm22 functions, this function does NOT support partial  output of R
+// - we always store full 2x4 matrix.
+void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
+   _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
+   _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
+}
+
+// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
+// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A, B0 and B1 must be aligned; R may be non-aligned.
+//
+// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
+// locations.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
+// ignored).
+//
+// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// multiplied by zero afterwards.
+//
+// Unlike mm22 functions, this function does NOT support partial  output of R
+// - we always store full 2x4 matrix.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will still be defined and callable, but it
+// will do nothing.  If (2)  is  failed , call to this function will probably
+// crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
+#if defined(AE_HAS_SSE2_INTRINSICS)
+void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
+// We calculate product of two Kx2 matrices (result is 2x2).
+// V0, V1, V2, V3 store result as follows:
+//
+//     [ V0[0]  V1[1] V2[0]  V3[1] ]
+// R = [                           ]
+//     [ V1[0]  V0[1] V3[0]  V2[1] ]
+//
+// VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
+// VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
+// (both vars store same data - either B0 or B1). Results from multiplication
+// by VA0/VA1 are stored in VB0/VB1 too.
+//
+   __m128d v0, v1, v2, v3, va0, va1, vb0, vb1;
+   __m128d r00, r01, r10, r11, valpha, vbeta;
+   ae_int_t t;
+
+   v0 = _mm_setzero_pd();
+   v1 = _mm_setzero_pd();
+   v2 = _mm_setzero_pd();
+   v3 = _mm_setzero_pd();
+   for (t = 0; t < k; t++) {
+      va0 = _mm_load_pd(a);
+      vb0 = _mm_load_pd(b0);
+      va1 = _mm_load_pd(a);
+
+      vb0 = _mm_mul_pd(va0, vb0);
+      vb1 = _mm_load_pd(b0);
+      v0 = _mm_add_pd(v0, vb0);
+      vb1 = _mm_mul_pd(va1, vb1);
+      vb0 = _mm_load_pd(b1);
+      v1 = _mm_add_pd(v1, vb1);
+
+      vb0 = _mm_mul_pd(va0, vb0);
+      vb1 = _mm_load_pd(b1);
+      v2 = _mm_add_pd(v2, vb0);
+      vb1 = _mm_mul_pd(va1, vb1);
+      v3 = _mm_add_pd(v3, vb1);
+
+      a += 2;
+      b0 += 2;
+      b1 += 2;
+   }
+
+// shuffle V1 and V3 (conversion to more convenient storage format):
+//
+//     [ V0[0]  V1[0] V2[0]  V3[0] ]
+// R = [                           ]
+//     [ V1[1]  V0[1] V3[1]  V2[1] ]
+//
+// unpack results to
+//
+// [ r00 r01 ]
+// [ r10 r11 ]
+//
+   valpha = _mm_load1_pd(&alpha);
+   v1 = _mm_shuffle_pd(v1, v1, 1);
+   v3 = _mm_shuffle_pd(v3, v3, 1);
+   r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
+   r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
+   r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
+   r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
+
+// store
+   if (beta == 0) {
+      _mm_storeu_pd(r, r00);
+      _mm_storeu_pd(r + 2, r01);
+      _mm_storeu_pd(r + stride, r10);
+      _mm_storeu_pd(r + stride + 2, r11);
+   } else {
+      vbeta = _mm_load1_pd(&beta);
+      _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r00));
+      _mm_storeu_pd(r + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + 2), vbeta), r01));
+      _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r10));
+      _mm_storeu_pd(r + stride + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride + 2), vbeta), r11));
+   }
+}
+#endif
+
+#if !defined(ALGLIB_NO_FAST_KERNELS)
+
+// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     Y       -   array[N], vector to process
+//
+// RESULT:
+//     (X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
+   ae_int_t i;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+   // use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, y->ptr.p_double, _state))
+// Original generic C implementation
+   result = (double)(0);
+   for (i = 0; i <= n - 1; i++) {
+      result = result + x->ptr.p_double[i] * y->ptr.p_double[i];
+   }
+   return result;
+}
+
+// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
+   ae_int_t j;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
+   result = (double)(0);
+   for (j = 0; j <= n - 1; j++) {
+      result = result + x->ptr.p_double[j] * a->ptr.pp_double[i][j];
+   }
+   return result;
+}
+
+// Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state) {
+   ae_int_t j;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->ptr.pp_double[ia], b->ptr.pp_double[ib], _state))
+   result = (double)(0);
+   for (j = 0; j <= n - 1; j++) {
+      result = result + a->ptr.pp_double[ia][j] * b->ptr.pp_double[ib][j];
+   }
+   return result;
+}
+
+// Computes dot product (X,X) for elements [0,N) of X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     (X,X)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->ptr.p_double, _state))
+   result = (double)(0);
+   for (i = 0; i <= n - 1; i++) {
+      v = x->ptr.p_double[i];
+      result = result + v * v;
+   }
+   return result;
+}
+
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, y->ptr.p_double, _state))
+   for (j = 0; j <= n - 1; j++) {
+      y->ptr.p_double[j] = x->ptr.p_double[j];
+   }
+}
+
+// Copies vector X[] to row I of A[,]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   preallocated 2D array large enough to store result
+//     I       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
+   for (j = 0; j <= n - 1; j++) {
+      a->ptr.pp_double[i][j] = x->ptr.p_double[j];
+   }
+}
+
+// Copies row I of A[,] to vector X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     X       -   preallocated destination
+//
+// OUTPUT PARAMETERS:
+//     X       -   array[N], destination
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], x->ptr.p_double, _state))
+   for (j = 0; j <= n - 1; j++) {
+      x->ptr.p_double[j] = a->ptr.pp_double[i][j];
+   }
+}
+
+// Copies row I of A[,] to row K of B[,].
+//
+// A[i,...] and B[k,...] may overlap.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     B       -   preallocated destination
+//     K       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     B       -   row K overwritten
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], b->ptr.pp_double[k], _state))
+   for (j = 0; j <= n - 1; j++) {
+      b->ptr.pp_double[k][j] = a->ptr.pp_double[i][j];
+   }
+}
+
+// Performs copying with multiplication of V*X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   array[N], Y = V*X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      y->ptr.p_double[i] = v * x->ptr.p_double[i];
+   }
+}
+
+// Performs copying with multiplication of V*X[] to Y[I,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[?,N]
+//     RIdx    -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     Y       -   Y[RIdx,...] = V*X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.pp_double[ridx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      y->ptr.pp_double[ridx][i] = v * x->ptr.p_double[i];
+   }
+}
+
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   X copied to Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv, (n, x->ptr.p_int, y->ptr.p_int, _state))
+   for (j = 0; j <= n - 1; j++) {
+      y->ptr.p_int[j] = x->ptr.p_int[j];
+   }
+}
+
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1 * 8)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv, (n, x->ptr.p_bool, y->ptr.p_bool, _state))
+   for (j = 0; j <= n - 1; j++) {
+      y->ptr.p_bool[j] = x->ptr.p_bool[j];
+   }
+}
+
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, x->ptr.p_double, _state))
+   for (j = 0; j <= n - 1; j++) {
+      x->ptr.p_double[j] = v;
+   }
+}
+
+// Sets row I of A[,] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     I       -   row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, a->ptr.pp_double[i], _state))
+   for (j = 0; j <= n - 1; j++) {
+      a->ptr.pp_double[i][j] = v;
+   }
+}
+
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx, (n, v, x->ptr.p_double + offsx, _state))
+   for (j = 0; j <= n - 1; j++) {
+      x->ptr.p_double[offsx + j] = v;
+   }
+}
+
+// Sets matrix A[] to V
+//
+// INPUT PARAMETERS:
+//     M, N    -   rows/cols count
+//     V       -   value to set
+//     A       -   array[M,N]
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading M rows, N cols are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state *_state) {
+   _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, pDest, _state));
+
+   ae_int_t j;
+   for (j = 0; j <= n - 1; j++) {
+      pDest[j] = v;
+   }
+}
+
+void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) {
+      for (i = 0; i < m; i++) {
+         rsetm_simd(n, v, a->ptr.pp_double[i], _state);
+      }
+      return;
+   }
+
+   for (i = 0; i <= m - 1; i++) {
+      for (j = 0; j <= n - 1; j++) {
+         a->ptr.pp_double[i][j] = v;
+      }
+   }
+}
+
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv, (n, v, x->ptr.p_int, _state))
+   for (j = 0; j <= n - 1; j++) {
+      x->ptr.p_int[j] = v;
+   }
+}
+
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1 * 8)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv, (n, v, x->ptr.p_bool, _state))
+   for (j = 0; j <= n - 1; j++) {
+      x->ptr.p_bool[j] = v;
+   }
+}
+
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = x->ptr.p_double[i] * v;
+   }
+}
+
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   row length
+//     X       -   array[?,N], row to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.pp_double[rowidx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * v;
+   }
+}
+
+// Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     X       -   vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements OffsX:OffsX+N-1 multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->ptr.p_double + offsx, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] * v;
+   }
+}
+
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[N], vector to process
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.p_double[i];
+   }
+}
+
+// Performs inplace addition of vector Y[] to row X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] + alpha * y->ptr.p_double[i];
+   }
+}
+
+// Performs inplace addition of Y[RIdx,...] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdx-th row is added
+//     RIdx    -   row index
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridx], x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.pp_double[ridx][i];
+   }
+}
+
+// Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
+//     RIdxSrc -   source row index
+//     X       -   array[?,N], matrix whose RIdxDst-th row is target
+//     RIdxDst -   destination row index
+//
+// RESULT:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridxsrc], x->ptr.pp_double[ridxdst], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[ridxdst][i] = x->ptr.pp_double[ridxdst][i] + alpha * y->ptr.pp_double[ridxsrc][i];
+   }
+}
+
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   source vector
+//     OffsY   -   source offset
+//     X       -   destination vector
+//     OffsX   -   destination offset
+//
+// RESULT:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->ptr.p_double + offsy, x->ptr.p_double + offsx, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] + alpha * y->ptr.p_double[offsy + i];
+   }
+}
+
+// Performs componentwise multiplication of vector X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise(X*Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.p_double[i];
+   }
+}
+
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * y->ptr.p_double[i];
+   }
+}
+
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.pp_double[rowidx], x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.pp_double[rowidx][i];
+   }
+}
+
+// Performs componentwise max of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = ae_maxreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
+   }
+}
+
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[rowidx][i] = ae_maxreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
+   }
+}
+
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     rowidx  -   target row RowIdx
+//
+// RESULT:
+//     Y := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      y->ptr.p_double[i] = ae_maxreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
+   }
+}
+
+// Performs componentwise min of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   source vector
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.p_double[i] = ae_minreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
+   }
+}
+
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+   for (i = 0; i <= n - 1; i++) {
+      x->ptr.pp_double[rowidx][i] = ae_minreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
+   }
+}
+
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
+   ae_int_t i;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
+   for (i = 0; i <= n - 1; i++) {
+      y->ptr.p_double[i] = ae_minreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
+   }
+}
+
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(X[i])
+//     zero for N=0
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.p_double, _state));
+
+   if (n == 0)
+      return 0.0;
+   result = x->ptr.p_double[0];
+   for (i = 1; i <= n - 1; i++) {
+      v = x->ptr.p_double[i];
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(X[RowIdx,i])
+//     zero for N=0
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.pp_double[rowidx], _state))
+         if (n == 0)
+   return 0.0;
+   result = x->ptr.pp_double[rowidx][0];
+   for (i = 1; i <= n - 1; i++) {
+      v = x->ptr.pp_double[rowidx][i];
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(|X[i]|)
+//     zero for N=0
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.p_double, _state))
+      result = (double)(0);
+   for (i = 0; i <= n - 1; i++) {
+      v = ae_fabs(x->ptr.p_double[i], _state);
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(|X[RowIdx,i]|)
+//     zero for N=0
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.pp_double[rowidx], _state))
+      result = (double)(0);
+   for (i = 0; i <= n - 1; i++) {
+      v = ae_fabs(x->ptr.pp_double[rowidx][i], _state);
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx, (n, x->ptr.p_double + offsx, y->ptr.p_double + offsy, _state))
+   for (j = 0; j <= n - 1; j++) {
+      y->ptr.p_double[offsy + j] = x->ptr.p_double[offsx + j];
+   }
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state) {
+   ae_int_t j;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1)
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx, (n, x->ptr.p_int + offsx, y->ptr.p_int + offsy, _state))
+   for (j = 0; j <= n - 1; j++) {
+      y->ptr.p_int[offsy + j] = x->ptr.p_int[offsx + j];
+   }
+}
+
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N elements
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M elements
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
+void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+
+// Properly premultiply Y by Beta.
+//
+// Quick exit for M=0, N=0 or Alpha=0.
+// After this block we have M>0, N>0, Alpha<>0.
+   if (m <= 0) {
+      return;
+   }
+   if (ae_fp_neq(beta, (double)(0))) {
+      rmulv(m, beta, y, _state);
+   } else {
+      rsetv(m, 0.0, y, _state);
+   }
+   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
+      return;
+   }
+// Straight or transposed?
+   if (opa == 0) {
+   // Try SIMD code
+      if (n >= _ABLASF_KERNEL_SIZE2)
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
+   // Generic C version: y += A*x
+      for (i = 0; i <= m - 1; i++) {
+         v = (double)(0);
+         for (j = 0; j <= n - 1; j++) {
+            v = v + a->ptr.pp_double[i][j] * x->ptr.p_double[j];
+         }
+         y->ptr.p_double[i] = alpha * v + y->ptr.p_double[i];
+      }
+      return;
+   }
+   if (opa == 1) {
+   // Try SIMD code
+      if (m >= _ABLASF_KERNEL_SIZE2)
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
+   // Generic C version: y += A^T*x
+      for (i = 0; i <= n - 1; i++) {
+         v = alpha * x->ptr.p_double[i];
+         for (j = 0; j <= m - 1; j++) {
+            y->ptr.p_double[j] = y->ptr.p_double[j] + v * a->ptr.pp_double[i][j];
+         }
+      }
+      return;
+   }
+}
+
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// Here x, y, A are subvectors/submatrices of larger vectors/matrices.
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     IA  -   submatrix offset (row index)
+//     JA  -   submatrix offset (column index)
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N+IX elements
+//     IX  -   subvector offset
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M+IY elements
+//     IY  -   subvector offset
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
+void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+
+// Properly premultiply Y by Beta.
+//
+// Quick exit for M=0, N=0 or Alpha=0.
+// After this block we have M>0, N>0, Alpha<>0.
+   if (m <= 0) {
+      return;
+   }
+   if (ae_fp_neq(beta, (double)(0))) {
+      rmulvx(m, beta, y, iy, _state);
+   } else {
+      rsetvx(m, 0.0, y, iy, _state);
+   }
+   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
+      return;
+   }
+// Straight or transposed?
+   if (opa == 0) {
+   // Try SIMD code
+      if (n >= _ABLASF_KERNEL_SIZE2)
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
+   // Generic C code: y += A*x
+      for (i = 0; i <= m - 1; i++) {
+         v = (double)(0);
+         for (j = 0; j <= n - 1; j++) {
+            v = v + a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+         }
+         y->ptr.p_double[iy + i] = alpha * v + y->ptr.p_double[iy + i];
+      }
+      return;
+   }
+   if (opa == 1) {
+   // Try SIMD code
+      if (m >= _ABLASF_KERNEL_SIZE2)
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
+   // Generic C code: y += A^T*x
+      for (i = 0; i <= n - 1; i++) {
+         v = alpha * x->ptr.p_double[ix + i];
+         for (j = 0; j <= m - 1; j++) {
+            y->ptr.p_double[iy + j] = y->ptr.p_double[iy + j] + v * a->ptr.pp_double[ia + i][ja + j];
+         }
+      }
+      return;
+   }
+}
+
+// Rank-1 correction: A := A + alpha*u*v'
+//
+// NOTE: this  function  expects  A  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, u, v.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows
+//     N   -   number of columns
+//     A   -   target MxN matrix
+//     Alpha-  coefficient
+//     U   -   vector #1
+//     V   -   vector #2
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
+void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   double s;
+
+   if ((m <= 0 || n <= 0) || ae_fp_eq(alpha, (double)(0))) {
+      return;
+   }
+   for (i = 0; i <= m - 1; i++) {
+      s = alpha * u->ptr.p_double[i];
+      for (j = 0; j <= n - 1; j++) {
+         a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] + s * v->ptr.p_double[j];
+      }
+   }
+}
+
+// This subroutine solves linear system op(A)*x=b where:
+// * A is NxN upper/lower triangular/unitriangular matrix
+// * X and B are Nx1 vectors
+// * "op" may be identity transformation or transposition
+//
+// Solution replaces X.
+//
+// IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
+//            * no integrity checks for operand sizes, out-of-bounds accesses
+//              and so on is performed
+//
+// INPUT PARAMETERS
+//     N   -   matrix size, N>=0
+//     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     IsUpper -   whether matrix is upper triangular
+//     IsUnit  -   whether matrix is unitriangular
+//     OpType  -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     X       -   right part, actual vector is stored in X[IX:IX+N-1]
+//     IX      -   offset
+//
+// OUTPUT PARAMETERS
+//     X       -   solution replaces elements X[IX:IX+N-1]
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+
+   if (n <= 0) {
+      return;
+   }
+   if (optype == 0 && isupper) {
+      for (i = n - 1; i >= 0; i--) {
+         v = x->ptr.p_double[ix + i];
+         for (j = i + 1; j <= n - 1; j++) {
+            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+         }
+         if (!isunit) {
+            v = v / a->ptr.pp_double[ia + i][ja + i];
+         }
+         x->ptr.p_double[ix + i] = v;
+      }
+      return;
+   }
+   if (optype == 0 && !isupper) {
+      for (i = 0; i <= n - 1; i++) {
+         v = x->ptr.p_double[ix + i];
+         for (j = 0; j <= i - 1; j++) {
+            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+         }
+         if (!isunit) {
+            v = v / a->ptr.pp_double[ia + i][ja + i];
+         }
+         x->ptr.p_double[ix + i] = v;
+      }
+      return;
+   }
+   if (optype == 1 && isupper) {
+      for (i = 0; i <= n - 1; i++) {
+         v = x->ptr.p_double[ix + i];
+         if (!isunit) {
+            v = v / a->ptr.pp_double[ia + i][ja + i];
+         }
+         x->ptr.p_double[ix + i] = v;
+         if (v == 0) {
+            continue;
+         }
+         for (j = i + 1; j <= n - 1; j++) {
+            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
+         }
+      }
+      return;
+   }
+   if (optype == 1 && !isupper) {
+      for (i = n - 1; i >= 0; i--) {
+         v = x->ptr.p_double[ix + i];
+         if (!isunit) {
+            v = v / a->ptr.pp_double[ia + i][ja + i];
+         }
+         x->ptr.p_double[ix + i] = v;
+         if (v == 0) {
+            continue;
+         }
+         for (j = 0; j <= i - 1; j++) {
+            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
+         }
+      }
+      return;
+   }
+   ae_assert(false, "rTRSVX: unexpected operation type", _state);
+}
+
+// Fast rGEMM kernel with AVX2/FMA support
+// ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
+#   if !defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+   return false;
+#   else
+   const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
+   const ae_int_t micro_size = _ABLASF_MICRO_SIZE;
+   ae_int_t out0, out1;
+   double *c;
+   ae_int_t stride_c;
+   ae_int_t cpu_id = ae_cpuid();
+   ae_int_t(*ablasf_packblk) (const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
+   void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = ablasf_dotblkh_avx2;
+   void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = ablasf_daxpby_avx2;
+
+// Determine CPU and kernel support
+   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(cpu_id & CPU_AVX2))
+      return false;
+#      if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+   if (cpu_id & CPU_FMA)
+      ablasf_dotblk = ablasf_dotblkh_fma;
+#      endif
+
+// Prepare C
+   c = _c->ptr.pp_double[ic] + jc;
+   stride_c = _c->stride;
+
+// Do we have alpha*A*B ?
+   if (alpha != 0 && k > 0) {
+   // Prepare structures
+      ae_int_t base0, base1, offs0;
+      double *a = _a->ptr.pp_double[ia] + ja;
+      double *b = _b->ptr.pp_double[ib] + jb;
+      ae_int_t stride_a = _a->stride;
+      ae_int_t stride_b = _b->stride;
+      double _blka[_ABLASF_BLOCK_SIZE * _ABLASF_MICRO_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double _blkb_long[_ABLASF_BLOCK_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double _blkc[_ABLASF_MICRO_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double *blka = (double *)ae_align(_blka, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+      double *storageb_long = (double *)ae_align(_blkb_long, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+      double *blkc = (double *)ae_align(_blkc, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+
+   // Pack transform(B) into precomputed block form
+      for (base1 = 0; base1 < n; base1 += micro_size) {
+         const ae_int_t lim1 = n - base1 < micro_size ? n - base1 : micro_size;
+         double *curb = storageb_long + base1 * block_size;
+         ablasf_packblk(b + (optypeb == 0 ? base1 : base1 * stride_b), stride_b, optypeb == 0 ? 1 : 0, k, lim1, curb, block_size, micro_size);
+      }
+
+   // Output
+      for (base0 = 0; base0 < m; base0 += micro_size) {
+      // Load block row of transform(A)
+         const ae_int_t lim0 = m - base0 < micro_size ? m - base0 : micro_size;
+         const ae_int_t round_k = ablasf_packblk(a + (optypea == 0 ? base0 * stride_a : base0), stride_a, optypea, k, lim0, blka, block_size, micro_size);
+
+      // Compute block(A)'*entire(B)
+         for (base1 = 0; base1 < n; base1 += micro_size)
+            ablasf_dotblk(blka, storageb_long + base1 * block_size, round_k, block_size, micro_size, blkc + base1, block_size);
+
+      // Output block row of block(A)'*entire(B)
+         for (offs0 = 0; offs0 < lim0; offs0++)
+            ablasf_daxpby(n, alpha, blkc + offs0 * block_size, beta, c + (base0 + offs0) * stride_c);
+      }
+   } else {
+   // No A*B, just beta*C (degenerate case, not optimized)
+      if (beta == 0) {
+         for (out0 = 0; out0 < m; out0++)
+            for (out1 = 0; out1 < n; out1++)
+               c[out0 * stride_c + out1] = 0.0;
+      } else if (beta != 1) {
+         for (out0 = 0; out0 < m; out0++)
+            for (out1 = 0; out1 < n; out1++)
+               c[out0 * stride_c + out1] *= beta;
+      }
+   }
+   return true;
+#   endif
+}
+
+// Returns recommended width of the SIMD-friendly buffer
+ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state) {
+#   if AE_CPU==AE_INTEL
+   return 4;
+#   else
+   return 1;
+#   endif
+}
+
+// Solving linear system: propagating computed supernode.
+//
+// Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
+// RHS storage format.
+//
+// INPUT PARAMETERS:
+//
+// OUTPUT PARAMETERS:
+// ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
+void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t baseoffs;
+   double v;
+
+// Try SIMD kernels
+#   if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+   if (sstride == 4 || (blocksize == 2 && sstride == 2))
+      if (ae_cpuid() & CPU_FMA) {
+         spchol_propagatefwd_fma(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth, _state);
+         return;
+      }
+#   endif
+
+// Propagate rank-1 node (can not be accelerated with SIMD)
+   if (blocksize == 1 && sstride == 1) {
+   // blocksize is 1, stride is 1
+      double vx = x->ptr.p_double[cols0];
+      double *p_mat_row = rowstorage->ptr.p_double + offss + 1 * 1;
+      double *p_simd_buf = simdbuf->ptr.p_double;
+      ae_int_t *p_rowidx = superrowidx->ptr.p_int + rbase;
+      if (simdwidth == 4) {
+         for (k = 0; k < offdiagsize; k++)
+            p_simd_buf[p_rowidx[k] * 4] -= p_mat_row[k] * vx;
+      } else {
+         for (k = 0; k < offdiagsize; k++)
+            p_simd_buf[p_rowidx[k] * simdwidth] -= p_mat_row[k] * vx;
+      }
+      return;
+   }
+// Generic C code for generic propagate
+   for (k = 0; k <= offdiagsize - 1; k++) {
+      i = superrowidx->ptr.p_int[rbase + k];
+      baseoffs = offss + (k + blocksize) * sstride;
+      v = simdbuf->ptr.p_double[i * simdwidth];
+      for (j = 0; j <= blocksize - 1; j++) {
+         v = v - rowstorage->ptr.p_double[baseoffs + j] * x->ptr.p_double[cols0 + j];
+      }
+      simdbuf->ptr.p_double[i * simdwidth] = v;
+   }
+}
+
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs AxBxCx4 update, i.e.:
+// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
+//   it has 3 or 4 columns)
+// * U is a uHeight*B matrix
+// * Uc' is a B*C matrix, with C<=A
+// * scatter() scatters rows and columns of U*Uc'
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update (quick exit for unsupported
+//   combinations of input sizes)
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4, (rowstorage->ptr.p_double, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
+// Generic code
+   ae_int_t k;
+   ae_int_t targetrow;
+   ae_int_t targetcol;
+   ae_int_t offsk;
+   double d0;
+   double d1;
+   double d2;
+   double d3;
+   double u00;
+   double u01;
+   double u02;
+   double u03;
+   double u10;
+   double u11;
+   double u12;
+   double u13;
+   double u20;
+   double u21;
+   double u22;
+   double u23;
+   double u30;
+   double u31;
+   double u32;
+   double u33;
+   double uk0;
+   double uk1;
+   double uk2;
+   double uk3;
+   ae_int_t srccol0;
+   ae_int_t srccol1;
+   ae_int_t srccol2;
+   ae_int_t srccol3;
+   bool result;
+
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+   result = false;
+   if (twidth < 3 || twidth > 4) {
+      return result;
+   }
+   if (uwidth < 1 || uwidth > 4) {
+      return result;
+   }
+   if (urank > 4) {
+      return result;
+   }
+// Determine source columns for target columns, -1 if target column
+// is not updated.
+   srccol0 = -1;
+   srccol1 = -1;
+   srccol2 = -1;
+   srccol3 = -1;
+   for (k = 0; k <= uwidth - 1; k++) {
+      targetcol = raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]];
+      if (targetcol == 0) {
+         srccol0 = k;
+      }
+      if (targetcol == 1) {
+         srccol1 = k;
+      }
+      if (targetcol == 2) {
+         srccol2 = k;
+      }
+      if (targetcol == 3) {
+         srccol3 = k;
+      }
+   }
+
+// Load update matrix into aligned/rearranged 4x4 storage
+   d0 = (double)(0);
+   d1 = (double)(0);
+   d2 = (double)(0);
+   d3 = (double)(0);
+   u00 = (double)(0);
+   u01 = (double)(0);
+   u02 = (double)(0);
+   u03 = (double)(0);
+   u10 = (double)(0);
+   u11 = (double)(0);
+   u12 = (double)(0);
+   u13 = (double)(0);
+   u20 = (double)(0);
+   u21 = (double)(0);
+   u22 = (double)(0);
+   u23 = (double)(0);
+   u30 = (double)(0);
+   u31 = (double)(0);
+   u32 = (double)(0);
+   u33 = (double)(0);
+   if (urank >= 1) {
+      d0 = diagd->ptr.p_double[offsd + 0];
+   }
+   if (urank >= 2) {
+      d1 = diagd->ptr.p_double[offsd + 1];
+   }
+   if (urank >= 3) {
+      d2 = diagd->ptr.p_double[offsd + 2];
+   }
+   if (urank >= 4) {
+      d3 = diagd->ptr.p_double[offsd + 3];
+   }
+   if (srccol0 >= 0) {
+      if (urank >= 1) {
+         u00 = d0 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 0];
+      }
+      if (urank >= 2) {
+         u01 = d1 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u02 = d2 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u03 = d3 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 3];
+      }
+   }
+   if (srccol1 >= 0) {
+      if (urank >= 1) {
+         u10 = d0 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 0];
+      }
+      if (urank >= 2) {
+         u11 = d1 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u12 = d2 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u13 = d3 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 3];
+      }
+   }
+   if (srccol2 >= 0) {
+      if (urank >= 1) {
+         u20 = d0 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 0];
+      }
+      if (urank >= 2) {
+         u21 = d1 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u22 = d2 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u23 = d3 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 3];
+      }
+   }
+   if (srccol3 >= 0) {
+      if (urank >= 1) {
+         u30 = d0 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 0];
+      }
+      if (urank >= 2) {
+         u31 = d1 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u32 = d2 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u33 = d3 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 3];
+      }
+   }
+// Run update
+   if (urank == 1) {
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0;
+      }
+   }
+   if (urank == 2) {
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         uk1 = rowstorage->ptr.p_double[offsk + 1];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1;
+      }
+   }
+   if (urank == 3) {
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         uk1 = rowstorage->ptr.p_double[offsk + 1];
+         uk2 = rowstorage->ptr.p_double[offsk + 2];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2;
+      }
+   }
+   if (urank == 4) {
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         uk1 = rowstorage->ptr.p_double[offsk + 1];
+         uk2 = rowstorage->ptr.p_double[offsk + 2];
+         uk3 = rowstorage->ptr.p_double[offsk + 3];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs 4x4x4x4 update, i.e.:
+// * S is a tHeight*4 matrix
+// * U is a uHeight*4 matrix
+// * Uc' is a 4*4 matrix
+// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
+//   densely packed).
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
+   ae_int_t k;
+   ae_int_t targetrow;
+   ae_int_t offsk;
+   double d0;
+   double d1;
+   double d2;
+   double d3;
+   double u00;
+   double u01;
+   double u02;
+   double u03;
+   double u10;
+   double u11;
+   double u12;
+   double u13;
+   double u20;
+   double u21;
+   double u22;
+   double u23;
+   double u30;
+   double u31;
+   double u32;
+   double u33;
+   double uk0;
+   double uk1;
+   double uk2;
+   double uk3;
+   bool result;
+
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernel4444, (rowstorage->ptr.p_double, offss, sheight, offsu, uheight, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
+// Generic C fallback code
+   d0 = diagd->ptr.p_double[offsd + 0];
+   d1 = diagd->ptr.p_double[offsd + 1];
+   d2 = diagd->ptr.p_double[offsd + 2];
+   d3 = diagd->ptr.p_double[offsd + 3];
+   u00 = d0 * rowstorage->ptr.p_double[offsu + 0 * 4 + 0];
+   u01 = d1 * rowstorage->ptr.p_double[offsu + 0 * 4 + 1];
+   u02 = d2 * rowstorage->ptr.p_double[offsu + 0 * 4 + 2];
+   u03 = d3 * rowstorage->ptr.p_double[offsu + 0 * 4 + 3];
+   u10 = d0 * rowstorage->ptr.p_double[offsu + 1 * 4 + 0];
+   u11 = d1 * rowstorage->ptr.p_double[offsu + 1 * 4 + 1];
+   u12 = d2 * rowstorage->ptr.p_double[offsu + 1 * 4 + 2];
+   u13 = d3 * rowstorage->ptr.p_double[offsu + 1 * 4 + 3];
+   u20 = d0 * rowstorage->ptr.p_double[offsu + 2 * 4 + 0];
+   u21 = d1 * rowstorage->ptr.p_double[offsu + 2 * 4 + 1];
+   u22 = d2 * rowstorage->ptr.p_double[offsu + 2 * 4 + 2];
+   u23 = d3 * rowstorage->ptr.p_double[offsu + 2 * 4 + 3];
+   u30 = d0 * rowstorage->ptr.p_double[offsu + 3 * 4 + 0];
+   u31 = d1 * rowstorage->ptr.p_double[offsu + 3 * 4 + 1];
+   u32 = d2 * rowstorage->ptr.p_double[offsu + 3 * 4 + 2];
+   u33 = d3 * rowstorage->ptr.p_double[offsu + 3 * 4 + 3];
+   if (sheight == uheight) {
+   // No row scatter, the most efficient code
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + k * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         uk1 = rowstorage->ptr.p_double[offsk + 1];
+         uk2 = rowstorage->ptr.p_double[offsk + 2];
+         uk3 = rowstorage->ptr.p_double[offsk + 3];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+      }
+   } else {
+   // Row scatter is performed, less efficient code using double mapping to determine target row index
+      for (k = 0; k <= uheight - 1; k++) {
+         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->ptr.p_double[offsk + 0];
+         uk1 = rowstorage->ptr.p_double[offsk + 1];
+         uk2 = rowstorage->ptr.p_double[offsk + 2];
+         uk3 = rowstorage->ptr.p_double[offsk + 3];
+         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// ALGLIB_NO_FAST_KERNELS
+#endif
 } // end of namespace alglib_impl
 
 namespace alglib {
 // Declarations for C++-related functionality.
-
 // Internal forwards
 double get_aenv_nan();
 double get_aenv_posinf();
@@ -7863,4056 +11914,3 @@ void trace_disable() {
    alglib_impl::ae_trace_disable();
 }
 } // end of namespace alglib
-
-// Optimized shared C/C++ linear algebra code.
-#if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
-#   include "KernelsSse2.h"
-#endif
-#if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
-#   include "KernelsAvx2.h"
-#endif
-#if defined(_ALGLIB_HAS_FMA_INTRINSICS)
-#   include "KernelsFma.h"
-#endif
-namespace alglib_impl {
-#define alglib_simd_alignment 16
-
-#define alglib_r_block        32
-#define alglib_half_r_block   16
-#define alglib_twice_r_block  64
-
-#define alglib_c_block        16
-#define alglib_half_c_block    8
-#define alglib_twice_c_block  32
-
-// This subroutine calculates fast 32x32 real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using either generic C code or native optimizations (if available)
-//
-// IMPORTANT:
-// * A must be stored in row-major order,
-//   stride is alglib_r_block,
-//   aligned on alglib_simd_alignment boundary
-// * X must be aligned on alglib_simd_alignment boundary
-// * Y may be non-aligned
-void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k;
-   const double *pa0, *pa1, *pb;
-
-   pa0 = a;
-   pa1 = a + alglib_r_block;
-   pb = x;
-   for (i = 0; i < 16; i++) {
-      double v0 = 0, v1 = 0;
-      for (k = 0; k < 4; k++) {
-         v0 += pa0[0] * pb[0];
-         v1 += pa1[0] * pb[0];
-         v0 += pa0[1] * pb[1];
-         v1 += pa1[1] * pb[1];
-         v0 += pa0[2] * pb[2];
-         v1 += pa1[2] * pb[2];
-         v0 += pa0[3] * pb[3];
-         v1 += pa1[3] * pb[3];
-         v0 += pa0[4] * pb[4];
-         v1 += pa1[4] * pb[4];
-         v0 += pa0[5] * pb[5];
-         v1 += pa1[5] * pb[5];
-         v0 += pa0[6] * pb[6];
-         v1 += pa1[6] * pb[6];
-         v0 += pa0[7] * pb[7];
-         v1 += pa1[7] * pb[7];
-         pa0 += 8;
-         pa1 += 8;
-         pb += 8;
-      }
-      y[0] = beta * y[0] + alpha * v0;
-      y[stride] = beta * y[stride] + alpha * v1;
-
-   // now we've processed rows I and I+1,
-   // pa0 and pa1 are pointing to rows I+1 and I+2.
-   // move to I+2 and I+3.
-      pa0 += alglib_r_block;
-      pa1 += alglib_r_block;
-      pb = x;
-      y += 2 * stride;
-   }
-}
-
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
-   if (m == 0)
-      return;
-   if (alpha == 0.0 || n == 0) {
-      ae_int_t i;
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
-            *y = 0.0;
-            y += stride;
-         }
-      } else {
-         for (i = 0; i < m; i++) {
-            *y *= beta;
-            y += stride;
-         }
-      }
-      return;
-   }
-// Handle general case: nonzero alpha, n and m
-//
-   if (m == 32 && n == 32) {
-   // 32x32, may be we have something better than general implementation
-      _ialglib_mv_32(a, x, y, stride, alpha, beta);
-   } else {
-      ae_int_t i, k, m2, n8, n2, ntrail2;
-      const double *pa0, *pa1, *pb;
-
-   // First M/2 rows of A are processed in pairs.
-   // optimized code is used.
-      m2 = m / 2;
-      n8 = n / 8;
-      ntrail2 = (n - 8 * n8) / 2;
-      for (i = 0; i < m2; i++) {
-         double v0 = 0, v1 = 0;
-
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-         pa1 = a + alglib_r_block;
-         a += alglib_twice_r_block;
-
-      // 8 elements per iteration
-         for (k = 0; k < n8; k++) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-            v0 += pa0[1] * pb[1];
-            v1 += pa1[1] * pb[1];
-            v0 += pa0[2] * pb[2];
-            v1 += pa1[2] * pb[2];
-            v0 += pa0[3] * pb[3];
-            v1 += pa1[3] * pb[3];
-            v0 += pa0[4] * pb[4];
-            v1 += pa1[4] * pb[4];
-            v0 += pa0[5] * pb[5];
-            v1 += pa1[5] * pb[5];
-            v0 += pa0[6] * pb[6];
-            v1 += pa1[6] * pb[6];
-            v0 += pa0[7] * pb[7];
-            v1 += pa1[7] * pb[7];
-            pa0 += 8;
-            pa1 += 8;
-            pb += 8;
-         }
-
-      // 2 elements per iteration
-         for (k = 0; k < ntrail2; k++) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-            v0 += pa0[1] * pb[1];
-            v1 += pa1[1] * pb[1];
-            pa0 += 2;
-            pa1 += 2;
-            pb += 2;
-         }
-
-      // last element, if needed
-         if (n % 2 != 0) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-         }
-      // final update
-         if (beta != 0) {
-            y[0] = beta * y[0] + alpha * v0;
-            y[stride] = beta * y[stride] + alpha * v1;
-         } else {
-            y[0] = alpha * v0;
-            y[stride] = alpha * v1;
-         }
-
-      // move to the next pair of elements
-         y += 2 * stride;
-      }
-
-   // Last (odd) row is processed with less optimized code.
-      if (m % 2 != 0) {
-         double v0 = 0;
-
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-
-      // 2 elements per iteration
-         n2 = n / 2;
-         for (k = 0; k < n2; k++) {
-            v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
-            pa0 += 2;
-            pb += 2;
-         }
-
-      // last element, if needed
-         if (n % 2 != 0)
-            v0 += pa0[0] * pb[0];
-
-      // final update
-         if (beta != 0)
-            y[0] = beta * y[0] + alpha * v0;
-         else
-            y[0] = alpha * v0;
-      }
-   }
-}
-
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-// * y may be non-aligned
-// * both A and x must have same offset with respect to 16-byte boundary:
-//   either both are aligned, or both are aligned with offset 8. Function
-//   will crash your system if you try to call it with misaligned or
-//   incorrectly aligned data.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k, n2;
-   ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
-   const double *pa0, *pa1, *pa2, *pb;
-   __m128d v0, v1, v2, va0, va1, va2, vx, vtmp;
-
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
-   if (m == 0)
-      return;
-   if (alpha == 0.0 || n == 0) {
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
-            *y = 0.0;
-            y += stride;
-         }
-      } else {
-         for (i = 0; i < m; i++) {
-            *y *= beta;
-            y += stride;
-         }
-      }
-      return;
-   }
-// Handle general case: nonzero alpha, n and m
-//
-// We divide problem as follows...
-//
-// Rows M are divided into:
-// - mb3 blocks, each 3xN
-// - mtail blocks, each 1xN
-//
-// Within a row, elements are divided  into:
-// - nhead 1x1 blocks (used to align the rest, either 0 or 1)
-// - nb8 1x8 blocks, aligned to 16-byte boundary
-// - nb2 1x2 blocks, aligned to 16-byte boundary
-// - ntail 1x1 blocks, aligned too (altough we don't rely on it)
-//
-   n2 = n / 2;
-   mb3 = m / 3;
-   mtail = m % 3;
-   nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
-   nb8 = (n - nhead) / 8;
-   nb2 = (n - nhead - 8 * nb8) / 2;
-   ntail = n - nhead - 8 * nb8 - 2 * nb2;
-   for (i = 0; i < mb3; i++) {
-      double row0, row1, row2;
-      row0 = 0;
-      row1 = 0;
-      row2 = 0;
-      pb = x;
-      pa0 = a;
-      pa1 = a + alglib_r_block;
-      pa2 = a + alglib_twice_r_block;
-      a += 3 * alglib_r_block;
-      if (nhead == 1) {
-         vx = _mm_load_sd(pb);
-         v0 = _mm_load_sd(pa0);
-         v1 = _mm_load_sd(pa1);
-         v2 = _mm_load_sd(pa2);
-
-         v0 = _mm_mul_sd(v0, vx);
-         v1 = _mm_mul_sd(v1, vx);
-         v2 = _mm_mul_sd(v2, vx);
-
-         pa0++;
-         pa1++;
-         pa2++;
-         pb++;
-      } else {
-         v0 = _mm_setzero_pd();
-         v1 = _mm_setzero_pd();
-         v2 = _mm_setzero_pd();
-      }
-      for (k = 0; k < nb8; k++) {
-      // this code is a shuffle of simultaneous dot product.
-      // see below for commented unshuffled original version.
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va0 = _mm_mul_pd(va0, vx);
-         va2 = _mm_load_pd(pa2);
-         v0 = _mm_add_pd(va0, v0);
-         va1 = _mm_mul_pd(va1, vx);
-         va0 = _mm_load_pd(pa0 + 2);
-         v1 = _mm_add_pd(va1, v1);
-         va2 = _mm_mul_pd(va2, vx);
-         va1 = _mm_load_pd(pa1 + 2);
-         v2 = _mm_add_pd(va2, v2);
-         vx = _mm_load_pd(pb + 2);
-         va0 = _mm_mul_pd(va0, vx);
-         va2 = _mm_load_pd(pa2 + 2);
-         v0 = _mm_add_pd(va0, v0);
-         va1 = _mm_mul_pd(va1, vx);
-         va0 = _mm_load_pd(pa0 + 4);
-         v1 = _mm_add_pd(va1, v1);
-         va2 = _mm_mul_pd(va2, vx);
-         va1 = _mm_load_pd(pa1 + 4);
-         v2 = _mm_add_pd(va2, v2);
-         vx = _mm_load_pd(pb + 4);
-         va0 = _mm_mul_pd(va0, vx);
-         va2 = _mm_load_pd(pa2 + 4);
-         v0 = _mm_add_pd(va0, v0);
-         va1 = _mm_mul_pd(va1, vx);
-         va0 = _mm_load_pd(pa0 + 6);
-         v1 = _mm_add_pd(va1, v1);
-         va2 = _mm_mul_pd(va2, vx);
-         va1 = _mm_load_pd(pa1 + 6);
-         v2 = _mm_add_pd(va2, v2);
-         vx = _mm_load_pd(pb + 6);
-         va0 = _mm_mul_pd(va0, vx);
-         v0 = _mm_add_pd(va0, v0);
-         va2 = _mm_load_pd(pa2 + 6);
-         va1 = _mm_mul_pd(va1, vx);
-         v1 = _mm_add_pd(va1, v1);
-         va2 = _mm_mul_pd(va2, vx);
-         v2 = _mm_add_pd(va2, v2);
-
-         pa0 += 8;
-         pa1 += 8;
-         pa2 += 8;
-         pb += 8;
-
-#   if 0
-      // this is unshuffled version of code above
-
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
-
-         va0 = _mm_mul_pd(va0, vx);
-         va1 = _mm_mul_pd(va1, vx);
-         va2 = _mm_mul_pd(va2, vx);
-
-         v0 = _mm_add_pd(va0, v0);
-         v1 = _mm_add_pd(va1, v1);
-         v2 = _mm_add_pd(va2, v2);
-
-         vx = _mm_load_pd(pb + 2);
-         va0 = _mm_load_pd(pa0 + 2);
-         va1 = _mm_load_pd(pa1 + 2);
-         va2 = _mm_load_pd(pa2 + 2);
-
-         va0 = _mm_mul_pd(va0, vx);
-         va1 = _mm_mul_pd(va1, vx);
-         va2 = _mm_mul_pd(va2, vx);
-
-         v0 = _mm_add_pd(va0, v0);
-         v1 = _mm_add_pd(va1, v1);
-         v2 = _mm_add_pd(va2, v2);
-
-         vx = _mm_load_pd(pb + 4);
-         va0 = _mm_load_pd(pa0 + 4);
-         va1 = _mm_load_pd(pa1 + 4);
-         va2 = _mm_load_pd(pa2 + 4);
-
-         va0 = _mm_mul_pd(va0, vx);
-         va1 = _mm_mul_pd(va1, vx);
-         va2 = _mm_mul_pd(va2, vx);
-
-         v0 = _mm_add_pd(va0, v0);
-         v1 = _mm_add_pd(va1, v1);
-         v2 = _mm_add_pd(va2, v2);
-
-         vx = _mm_load_pd(pb + 6);
-         va0 = _mm_load_pd(pa0 + 6);
-         va1 = _mm_load_pd(pa1 + 6);
-         va2 = _mm_load_pd(pa2 + 6);
-
-         va0 = _mm_mul_pd(va0, vx);
-         va1 = _mm_mul_pd(va1, vx);
-         va2 = _mm_mul_pd(va2, vx);
-
-         v0 = _mm_add_pd(va0, v0);
-         v1 = _mm_add_pd(va1, v1);
-         v2 = _mm_add_pd(va2, v2);
-#   endif
-      }
-      for (k = 0; k < nb2; k++) {
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
-
-         va0 = _mm_mul_pd(va0, vx);
-         v0 = _mm_add_pd(va0, v0);
-         va1 = _mm_mul_pd(va1, vx);
-         v1 = _mm_add_pd(va1, v1);
-         va2 = _mm_mul_pd(va2, vx);
-         v2 = _mm_add_pd(va2, v2);
-
-         pa0 += 2;
-         pa1 += 2;
-         pa2 += 2;
-         pb += 2;
-      }
-      for (k = 0; k < ntail; k++) {
-         vx = _mm_load1_pd(pb);
-         va0 = _mm_load1_pd(pa0);
-         va1 = _mm_load1_pd(pa1);
-         va2 = _mm_load1_pd(pa2);
-
-         va0 = _mm_mul_sd(va0, vx);
-         v0 = _mm_add_sd(v0, va0);
-         va1 = _mm_mul_sd(va1, vx);
-         v1 = _mm_add_sd(v1, va1);
-         va2 = _mm_mul_sd(va2, vx);
-         v2 = _mm_add_sd(v2, va2);
-      }
-      vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
-      _mm_storel_pd(&row0, vtmp);
-      _mm_storeh_pd(&row1, vtmp);
-      v2 = _mm_add_sd(_mm_shuffle_pd(v2, v2, 1), v2);
-      _mm_storel_pd(&row2, v2);
-      if (beta != 0) {
-         y[0] = beta * y[0] + alpha * row0;
-         y[stride] = beta * y[stride] + alpha * row1;
-         y[2 * stride] = beta * y[2 * stride] + alpha * row2;
-      } else {
-         y[0] = alpha * row0;
-         y[stride] = alpha * row1;
-         y[2 * stride] = alpha * row2;
-      }
-      y += 3 * stride;
-   }
-   for (i = 0; i < mtail; i++) {
-      double row0;
-      row0 = 0;
-      pb = x;
-      pa0 = a;
-      a += alglib_r_block;
-      for (k = 0; k < n2; k++) {
-         row0 += pb[0] * pa0[0] + pb[1] * pa0[1];
-         pa0 += 2;
-         pb += 2;
-      }
-      if (n % 2)
-         row0 += pb[0] * pa0[0];
-      if (beta != 0)
-         y[0] = beta * y[0] + alpha * row0;
-      else
-         y[0] = alpha * row0;
-      y += stride;
-   }
-}
-#endif
-
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
-   ae_int_t i, j;
-   const double *pa, *parow, *pb;
-
-   parow = a;
-   for (i = 0; i < m; i++) {
-      double v0 = 0, v1 = 0;
-      pa = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
-         v0 += pa[0] * pb[0];
-         v1 += pa[0] * pb[1];
-         v0 -= pa[1] * pb[1];
-         v1 += pa[1] * pb[0];
-
-         pa += 2;
-         pb += 2;
-      }
-      if (cy != NULL) {
-         double tx = (beta.x * cy->x - beta.y * cy->y) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * cy->y + beta.y * cy->x) + (alpha.x * v1 + alpha.y * v0);
-         cy->x = tx;
-         cy->y = ty;
-         cy += stride;
-      } else {
-         double tx = (beta.x * dy[0] - beta.y * dy[1]) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * dy[1] + beta.y * dy[0]) + (alpha.x * v1 + alpha.y * v0);
-         dy[0] = tx;
-         dy[1] = ty;
-         dy += 2 * stride;
-      }
-      parow += 2 * alglib_c_block;
-   }
-}
-
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
-   ae_int_t i, j, m2;
-   const double *pa0, *pa1, *parow, *pb;
-   __m128d vbeta, vbetax, vbetay;
-   __m128d valpha, valphax, valphay;
-
-   m2 = m / 2;
-   parow = a;
-   if (cy != NULL) {
-      dy = (double *)cy;
-      cy = NULL;
-   }
-   vbeta = _mm_loadh_pd(_mm_load_sd(&beta.x), &beta.y);
-   vbetax = _mm_unpacklo_pd(vbeta, vbeta);
-   vbetay = _mm_unpackhi_pd(vbeta, vbeta);
-   valpha = _mm_loadh_pd(_mm_load_sd(&alpha.x), &alpha.y);
-   valphax = _mm_unpacklo_pd(valpha, valpha);
-   valphay = _mm_unpackhi_pd(valpha, valpha);
-   for (i = 0; i < m2; i++) {
-      __m128d vx, vy, vt0, vt1, vt2, vt3, vt4, vt5, vrx, vry, vtx, vty;
-      pa0 = parow;
-      pa1 = parow + 2 * alglib_c_block;
-      pb = x;
-      vx = _mm_setzero_pd();
-      vy = _mm_setzero_pd();
-      for (j = 0; j < n; j++) {
-         vt0 = _mm_load1_pd(pb);
-         vt1 = _mm_load1_pd(pb + 1);
-         vt2 = _mm_load_pd(pa0);
-         vt3 = _mm_load_pd(pa1);
-         vt5 = _mm_unpacklo_pd(vt2, vt3);
-         vt4 = _mm_unpackhi_pd(vt2, vt3);
-         vt2 = vt5;
-         vt3 = vt4;
-
-         vt2 = _mm_mul_pd(vt2, vt0);
-         vx = _mm_add_pd(vx, vt2);
-         vt3 = _mm_mul_pd(vt3, vt1);
-         vx = _mm_sub_pd(vx, vt3);
-         vt4 = _mm_mul_pd(vt4, vt0);
-         vy = _mm_add_pd(vy, vt4);
-         vt5 = _mm_mul_pd(vt5, vt1);
-         vy = _mm_add_pd(vy, vt5);
-
-         pa0 += 2;
-         pa1 += 2;
-         pb += 2;
-      }
-      if (beta.x == 0.0 && beta.y == 0.0) {
-         vrx = _mm_setzero_pd();
-         vry = _mm_setzero_pd();
-      } else {
-         vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
-         vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
-         vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
-         vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
-      }
-      vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
-      vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
-      vrx = _mm_add_pd(vrx, vtx);
-      vry = _mm_add_pd(vry, vty);
-      _mm_storel_pd(dy + 0, vrx);
-      _mm_storeh_pd(dy + 2 * stride + 0, vrx);
-      _mm_storel_pd(dy + 1, vry);
-      _mm_storeh_pd(dy + 2 * stride + 1, vry);
-      dy += 4 * stride;
-      parow += 4 * alglib_c_block;
-   }
-   if (m % 2) {
-      double v0 = 0, v1 = 0;
-      double tx, ty;
-      pa0 = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
-         v0 += pa0[0] * pb[0];
-         v1 += pa0[0] * pb[1];
-         v0 -= pa0[1] * pb[1];
-         v1 += pa0[1] * pb[0];
-
-         pa0 += 2;
-         pb += 2;
-      }
-      if (beta.x == 0.0 && beta.y == 0.0) {
-         tx = 0.0;
-         ty = 0.0;
-      } else {
-         tx = beta.x * dy[0] - beta.y * dy[1];
-         ty = beta.x * dy[1] + beta.y * dy[0];
-      }
-      tx += alpha.x * v0 - alpha.y * v1;
-      ty += alpha.x * v1 + alpha.y * v0;
-      dy[0] = tx;
-      dy[1] = ty;
-      dy += 2 * stride;
-      parow += 2 * alglib_c_block;
-   }
-}
-#endif
-
-// This subroutine sets vector to zero
-void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++)
-         *p = 0.0;
-   } else {
-      for (i = 0; i < n; i++, p += stride)
-         *p = 0.0;
-   }
-}
-
-// This subroutine sets vector to zero
-void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   } else {
-      for (i = 0; i < n; i++, p += stride) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   }
-}
-
-// This subroutine copies unaligned real vector
-void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
-   ae_int_t i, n2;
-   if (stridea == 1 && strideb == 1) {
-      n2 = n / 2;
-      for (i = n2; i != 0; i--, a += 2, b += 2) {
-         b[0] = a[0];
-         b[1] = a[1];
-      }
-      if (n % 2 != 0)
-         b[0] = a[0];
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += strideb)
-         *b = *a;
-   }
-}
-
-// This subroutine copies unaligned complex vector
-// (passed as ae_complex*)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
-         b[0] = a->x;
-         b[1] = a->y;
-      }
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
-         b[0] = a->x;
-         b[1] = -a->y;
-      }
-   }
-}
-
-// This subroutine copies unaligned complex vector (passed as double*)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
-         b[0] = a[0];
-         b[1] = a[1];
-      }
-   } else {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
-         b[0] = a[0];
-         b[1] = -a[1];
-      }
-   }
-}
-
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
-            pdst[0] = psrc[0];
-            pdst[1] = psrc[1];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 1, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
-            pdst[0] = psrc[0];
-            pdst[alglib_r_block] = psrc[1];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   }
-}
-
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, mb2;
-   const double *psrc0, *psrc1;
-   double *pdst;
-   if (op == 0) {
-      ae_int_t nb8, ntail;
-      nb8 = n / 8;
-      ntail = n - 8 * nb8;
-      for (i = 0, psrc0 = a; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
-         pdst = b;
-         for (j = 0; j < nb8; j++) {
-            __m128d v0, v1;
-            v0 = _mm_loadu_pd(psrc0);
-            _mm_store_pd(pdst, v0);
-            v1 = _mm_loadu_pd(psrc0 + 2);
-            _mm_store_pd(pdst + 2, v1);
-            v1 = _mm_loadu_pd(psrc0 + 4);
-            _mm_store_pd(pdst + 4, v1);
-            v1 = _mm_loadu_pd(psrc0 + 6);
-            _mm_store_pd(pdst + 6, v1);
-            pdst += 8;
-            psrc0 += 8;
-         }
-         for (j = 0; j < ntail; j++)
-            pdst[j] = psrc0[j];
-      }
-   } else {
-      const double *arow0, *arow1;
-      double *bcol0, *bcol1, *pdst0, *pdst1;
-      ae_int_t nb4, ntail, n2;
-
-      n2 = n / 2;
-      mb2 = m / 2;
-      nb4 = n / 4;
-      ntail = n - 4 * nb4;
-
-      arow0 = a;
-      arow1 = a + stride;
-      bcol0 = b;
-      bcol1 = b + 1;
-      for (i = 0; i < mb2; i++) {
-         psrc0 = arow0;
-         psrc1 = arow1;
-         pdst0 = bcol0;
-         pdst1 = bcol1;
-         for (j = 0; j < nb4; j++) {
-            __m128d v0, v1, v2, v3;
-            v0 = _mm_loadu_pd(psrc0);
-            v1 = _mm_loadu_pd(psrc1);
-            v2 = _mm_loadu_pd(psrc0 + 2);
-            v3 = _mm_loadu_pd(psrc1 + 2);
-            _mm_store_pd(pdst0, _mm_unpacklo_pd(v0, v1));
-            _mm_store_pd(pdst0 + alglib_r_block, _mm_unpackhi_pd(v0, v1));
-            _mm_store_pd(pdst0 + 2 * alglib_r_block, _mm_unpacklo_pd(v2, v3));
-            _mm_store_pd(pdst0 + 3 * alglib_r_block, _mm_unpackhi_pd(v2, v3));
-
-            pdst0 += 4 * alglib_r_block;
-            pdst1 += 4 * alglib_r_block;
-            psrc0 += 4;
-            psrc1 += 4;
-         }
-         for (j = 0; j < ntail; j++) {
-            pdst0[0] = psrc0[0];
-            pdst1[0] = psrc1[0];
-            pdst0 += alglib_r_block;
-            pdst1 += alglib_r_block;
-            psrc0 += 1;
-            psrc1 += 1;
-         }
-         arow0 += 2 * stride;
-         arow1 += 2 * stride;
-         bcol0 += 2;
-         bcol1 += 2;
-      }
-      if (m % 2) {
-         psrc0 = arow0;
-         pdst0 = bcol0;
-         for (j = 0; j < n2; j++) {
-            pdst0[0] = psrc0[0];
-            pdst0[alglib_r_block] = psrc0[1];
-            pdst0 += alglib_twice_r_block;
-            psrc0 += 2;
-         }
-         if (n % 2 != 0)
-            pdst0[0] = psrc0[0];
-      }
-   }
-}
-#endif
-
-// This subroutine copies matrix from  aligned contigous storage to non-
-// aligned non-contigous storage
-//
-// A:
-// * MxN
-// * aligned
-// * contigous
-// * stride is alglib_r_block
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * non-aligned, non-contigous
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += alglib_r_block, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
-            pdst[0] = psrc[0];
-            pdst[1] = psrc[1];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a++, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
-            pdst[0] = psrc[0];
-            pdst[1] = psrc[alglib_r_block];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   }
-}
-
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-// * pointer to ae_complex is passed
-//
-// B:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
-void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j;
-   const ae_complex *psrc;
-   double *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
-         }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
-         }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
-         }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
-         }
-   }
-}
-
-// This subroutine copies matrix from aligned contigous storage to
-// non-aligned non-contigous storage
-//
-// A:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * pointer to ae_complex is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
-void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
-   ae_int_t i, j;
-   const double *psrc;
-   ae_complex *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
-         }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
-         }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
-         }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
-         }
-   }
-}
-
-// Real GEMM kernel
-bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
-   int i;
-   double *crow;
-   double _abuf[alglib_r_block + alglib_simd_alignment];
-   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
-
-   if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || alpha == 0.0)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      rmv = &_ialglib_rmv_sse2;
-      mcopyblock = &_ialglib_mcopyblock_sse2;
-   }
-#endif
-
-// copy b
-   if (optypeb == 0)
-      mcopyblock(k, n, _b, 1, _b_stride, b);
-   else
-      mcopyblock(n, k, _b, 0, _b_stride, b);
-
-// multiply B by A (from the right, by rows)
-// and store result in C
-   crow = _c;
-   if (optypea == 0) {
-      const double *arow = _a;
-      for (i = 0; i < m; i++) {
-         _ialglib_vcopy(k, arow, 1, abuf, 1);
-         if (beta == 0)
-            _ialglib_vzero(n, crow, 1);
-         rmv(n, k, b, abuf, crow, 1, alpha, beta);
-         crow += _c_stride;
-         arow += _a_stride;
-      }
-   } else {
-      const double *acol = _a;
-      for (i = 0; i < m; i++) {
-         _ialglib_vcopy(k, acol, _a_stride, abuf, 1);
-         if (beta == 0)
-            _ialglib_vzero(n, crow, 1);
-         rmv(n, k, b, abuf, crow, 1, alpha, beta);
-         crow += _c_stride;
-         acol++;
-      }
-   }
-   return true;
-}
-
-// Complex GEMM kernel
-bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
-   const ae_complex *arow;
-   ae_complex *crow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
-   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
-   ae_int_t brows;
-   ae_int_t bcols;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
-
-   if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      cmv = &_ialglib_cmv_sse2;
-   }
-#endif
-
-// copy b
-   brows = optypeb == 0 ? k : n;
-   bcols = optypeb == 0 ? n : k;
-   if (optypeb == 0)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
-   if (optypeb == 1)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
-   if (optypeb == 2)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
-
-// multiply B by A (from the right, by rows)
-// and store result in C
-   arow = _a;
-   crow = _c;
-   for (i = 0; i < m; i++) {
-      if (optypea == 0) {
-         _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
-         arow += _a_stride;
-      } else if (optypea == 1) {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
-         arow++;
-      } else {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
-         arow++;
-      }
-      if (beta.x == 0 && beta.y == 0)
-         _ialglib_vzero_complex(n, crow, 1);
-      cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
-      crow += _c_stride;
-   }
-   return true;
-}
-
-// complex TRSM kernel
-bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
-
-   if (m > alglib_c_block || n > alglib_c_block)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      cmv = &_ialglib_cmv_sse2;
-   }
-#endif
-
-// Prepare
-   _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
-   _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         pdiag[0] = 1.0;
-         pdiag[1] = 0.0;
-      }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
-         _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
-   } else {
-      for (i = n - 1, pdiag = abuf + 2 * ((n - 1) * alglib_c_block + (n - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
-         _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
-   }
-   return true;
-}
-
-// real TRSM kernel
-bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
-
-   if (m > alglib_r_block || n > alglib_r_block)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      rmv = &_ialglib_rmv_sse2;
-      mcopyblock = &_ialglib_mcopyblock_sse2;
-   }
-#endif
-
-// Prepare
-   mcopyblock(n, n, _a, optype, _a_stride, abuf);
-   mcopyblock(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
-         *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
-         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
-   } else {
-      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
-         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
-   }
-   return true;
-}
-
-// complex TRSM kernel
-bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
-
-   if (m > alglib_c_block || n > alglib_c_block)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      cmv = &_ialglib_cmv_sse2;
-   }
-#endif
-
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
-   _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
-   _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         pdiag[0] = 1.0;
-         pdiag[1] = 0.0;
-      }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + 2 * ((m - 1) * alglib_c_block + (m - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
-         _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
-         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
-   } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
-         _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
-         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
-   }
-   return true;
-}
-
-// real TRSM kernel
-bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
-
-   if (m > alglib_r_block || n > alglib_r_block)
-      return false;
-
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      rmv = &_ialglib_rmv_sse2;
-      mcopyblock = &_ialglib_mcopyblock_sse2;
-   }
-#endif
-
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
-   mcopyblock(m, m, _a, optype, _a_stride, abuf);
-   mcopyblock(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
-         *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
-         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
-   } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
-         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
-   }
-   return true;
-}
-
-// complex SYRK kernel
-bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_complex c_alpha, c_beta;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-
-   if (n > alglib_c_block || k > alglib_c_block)
-      return false;
-   if (n == 0)
-      return true;
-
-// copy A and C, task is transformed to "A*A^H"-form.
-// if beta==0, then C is filled by zeros (and not referenced)
-//
-// alpha==0 or k==0 are correctly processed (A is not referenced)
-   c_alpha.x = alpha;
-   c_alpha.y = 0;
-   c_beta.x = beta;
-   c_beta.y = 0;
-   if (alpha == 0)
-      k = 0;
-   if (k > 0) {
-      if (optypea == 0)
-         _ialglib_mcopyblock_complex(n, k, _a, 3, _a_stride, abuf);
-      else
-         _ialglib_mcopyblock_complex(k, n, _a, 1, _a_stride, abuf);
-   }
-   _ialglib_mcopyblock_complex(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += 2 * alglib_c_block)
-         if (isupper)
-            _ialglib_vzero(2 * (n - i), crow + 2 * i, 1);
-         else
-            _ialglib_vzero(2 * (i + 1), crow, 1);
-   }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
-         _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
-         _ialglib_cmv(n - i, k, arow, tmpbuf, NULL, crow + 2 * i, 1, c_alpha, c_beta);
-      }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
-         _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
-         _ialglib_cmv(i + 1, k, abuf, tmpbuf, NULL, crow, 1, c_alpha, c_beta);
-      }
-   }
-
-// copy back
-   _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
-
-   return true;
-}
-
-// real SYRK kernel
-bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
-
-   if (n > alglib_r_block || k > alglib_r_block)
-      return false;
-   if (n == 0)
-      return true;
-
-// copy A and C, task is transformed to "A*A^T"-form.
-// if beta==0, then C is filled by zeros (and not referenced)
-//
-// alpha==0 or k==0 are correctly processed (A is not referenced)
-   if (alpha == 0)
-      k = 0;
-   if (k > 0) {
-      if (optypea == 0)
-         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
-      else
-         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
-   }
-   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
-         if (isupper)
-            _ialglib_vzero(n - i, crow + i, 1);
-         else
-            _ialglib_vzero(i + 1, crow, 1);
-   }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
-      }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
-      }
-   }
-
-// copy back
-   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
-
-   return true;
-}
-
-// complex rank-1 kernel
-bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
-// Locals
-   ae_complex *arow, *pu, *pv, *vtmp, *dst;
-   ae_int_t n2 = n / 2;
-   ae_int_t i, j;
-
-// Quick exit
-   if (m <= 0 || n <= 0)
-      return false;
-
-// update pairs of rows
-   arow = _a;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
-   // update by two
-      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
-         double ux = pu[0].x;
-         double uy = pu[0].y;
-         double v0x = pv[0].x;
-         double v0y = pv[0].y;
-         double v1x = pv[1].x;
-         double v1y = pv[1].y;
-         dst[0].x += ux * v0x - uy * v0y;
-         dst[0].y += ux * v0y + uy * v0x;
-         dst[1].x += ux * v1x - uy * v1y;
-         dst[1].y += ux * v1y + uy * v1x;
-      }
-
-   // final update
-      if (n % 2 != 0) {
-         double ux = pu[0].x;
-         double uy = pu[0].y;
-         double vx = pv[0].x;
-         double vy = pv[0].y;
-         dst[0].x += ux * vx - uy * vy;
-         dst[0].y += ux * vy + uy * vx;
-      }
-   }
-   return true;
-}
-
-// real rank-1 kernel
-// deprecated version
-bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
-   ae_int_t m2 = m / 2;
-   ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
-   ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-
-// Quick exit
-   if (m <= 0 || n <= 0)
-      return false;
-
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
-         dst0[0] += pu[0] * pv[0];
-         dst0[1] += pu[0] * pv[1];
-         dst1[0] += pu[1] * pv[0];
-         dst1[1] += pu[1] * pv[1];
-      }
-
-   // final update
-      if (n % 2 != 0) {
-         dst0[0] += pu[0] * pv[0];
-         dst1[0] += pu[1] * pv[0];
-      }
-   }
-
-// update last row
-   if (m % 2 != 0) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
-         dst0[0] += pu[0] * pv[0];
-         dst0[1] += pu[0] * pv[1];
-      }
-
-   // final update
-      if (n % 2 != 0)
-         dst0[0] += pu[0] * pv[0];
-   }
-   return true;
-}
-
-// real rank-1 kernel
-// deprecated version
-bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
-   ae_int_t m2 = m / 2;
-   ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
-   ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-
-// Quick exit
-   if (m <= 0 || n <= 0 || alpha == 0.0)
-      return false;
-
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
-      double au0 = alpha * pu[0];
-      double au1 = alpha * pu[1];
-
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
-         dst0[0] += au0 * pv[0];
-         dst0[1] += au0 * pv[1];
-         dst1[0] += au1 * pv[0];
-         dst1[1] += au1 * pv[1];
-      }
-
-   // final update
-      if (n % 2 != 0) {
-         dst0[0] += au0 * pv[0];
-         dst1[0] += au1 * pv[0];
-      }
-   }
-
-// update last row
-   if (m % 2 != 0) {
-      double au0 = alpha * pu[0];
-
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
-         dst0[0] += au0 * pv[0];
-         dst0[1] += au0 * pv[1];
-      }
-
-   // final update
-      if (n % 2 != 0)
-         dst0[0] += au0 * pv[0];
-   }
-   return true;
-}
-
-// Interface functions for efficient kernels
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixgemm(m, n, k, alpha, _a->ptr.pp_double[ia] + ja, _a->stride, optypea, _b->ptr.pp_double[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_double[ic] + jc, _c->stride);
-}
-
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if ((alpha.x == 0.0 && alpha.y == 0) || k == 0 || n == 0 || m == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixgemm(m, n, k, alpha, _a->ptr.pp_complex[ia] + ja, _a->stride, optypea, _b->ptr.pp_complex[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_complex[ic] + jc, _c->stride);
-}
-
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixrighttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
-}
-
-bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixrighttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
-}
-
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixlefttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
-}
-
-bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixlefttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
-}
-
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
-      return false;
-
-// ALGLIB kernel
-   return _ialglib_cmatrixherk(n, k, alpha, &a->ptr.pp_complex[ia][ja], a->stride, optypea, beta, &c->ptr.pp_complex[ic][jc], c->stride, isupper);
-}
-
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
-      return false;
-
-// ALGLIB kernel
-   return _ialglib_rmatrixsyrk(n, k, alpha, &a->ptr.pp_double[ia][ja], a->stride, optypea, beta, &c->ptr.pp_double[ic][jc], c->stride, isupper);
-}
-
-bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_cmatrixrank1(m, n, &a->ptr.pp_complex[ia][ja], a->stride, &u->ptr.p_complex[uoffs], &v->ptr.p_complex[voffs]);
-}
-
-bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_rmatrixrank1(m, n, &a->ptr.pp_double[ia][ja], a->stride, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
-}
-
-bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_rmatrixger(m, n, &a->ptr.pp_double[ia][ja], a->stride, alpha, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
-}
-
-// This function reads rectangular matrix A given by two column pointers
-// col0 and col1 and stride src_stride and moves it into contiguous row-
-// by-row storage given by dst.
-//
-// It can handle following special cases:
-// * col1==NULL    in this case second column of A is filled by zeros
-void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-
-// handle special case
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
-         dst[0] = *col0;
-         dst[1] = 0.0;
-         col0 += src_stride;
-         dst += 2;
-      }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-   }
-}
-
-// This function reads rectangular matrix A given by two column pointers col0
-// and  col1  and  stride src_stride and moves it into  contiguous row-by-row
-// storage given by dst.
-//
-// dst must be aligned, col0 and col1 may be non-aligned.
-//
-// It can handle following special cases:
-// * col1==NULL        in this case second column of A is filled by zeros
-// * src_stride==1     efficient SSE-based code is used
-// * col1-col0==1      efficient SSE-based code is used
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-
-// handle special case: col1==NULL
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
-         dst[0] = *col0;
-         dst[1] = 0.0;
-         col0 += src_stride;
-         dst += 2;
-      }
-      return;
-   }
-// handle unit stride
-   if (src_stride == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
-         col0 += 2;
-         v1 = _mm_loadu_pd(col1);
-         col1 += 2;
-         _mm_store_pd(dst, _mm_unpacklo_pd(v0, v1));
-         _mm_store_pd(dst + 2, _mm_unpackhi_pd(v0, v1));
-         dst += 4;
-      }
-      if (n % 2) {
-         dst[0] = *col0;
-         dst[1] = *col1;
-      }
-      return;
-   }
-// handle col1-col0==1
-   if (col1 - col0 == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      stride2 = 2 * src_stride;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
-         v1 = _mm_loadu_pd(col0 + src_stride);
-         _mm_store_pd(dst, v0);
-         _mm_store_pd(dst + 2, v1);
-         col0 += stride2;
-         dst += 4;
-      }
-      if (n % 2) {
-         dst[0] = col0[0];
-         dst[1] = col0[1];
-      }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-   }
-}
-#endif
-
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-   double v00, v01, v10, v11;
-   ae_int_t t;
-   v00 = 0.0;
-   v01 = 0.0;
-   v10 = 0.0;
-   v11 = 0.0;
-   for (t = 0; t < k; t++) {
-      v00 += a[0] * b[0];
-      v01 += a[0] * b[1];
-      v10 += a[1] * b[0];
-      v11 += a[1] * b[1];
-      a += 2;
-      b += 2;
-   }
-   if (store_mode == 0) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-         r[stride + 0] = alpha * v10;
-         r[stride + 1] = alpha * v11;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
-      }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-      }
-      return;
-   }
-   if (store_mode == 2) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[stride + 0] = alpha * v10;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-      }
-      return;
-   }
-   if (store_mode == 3) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-      }
-      return;
-   }
-}
-
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// VA and VB store result as follows:
-//
-//        [ VD[0]  VE[0] ]
-// A'*B = [              ]
-//        [ VE[1]  VD[1] ]
-//
-   __m128d va, vb, vd, ve, vt, r0, r1, valpha, vbeta;
-   ae_int_t t, k2;
-
-// calculate product
-   k2 = k / 2;
-   vd = _mm_setzero_pd();
-   ve = _mm_setzero_pd();
-   for (t = 0; t < k2; t++) {
-      vb = _mm_load_pd(b);
-      va = _mm_load_pd(a);
-      vt = vb;
-      vb = _mm_mul_pd(va, vb);
-      vt = _mm_shuffle_pd(vt, vt, 1);
-      vd = _mm_add_pd(vb, vd);
-      vt = _mm_mul_pd(va, vt);
-      vb = _mm_load_pd(b + 2);
-      ve = _mm_add_pd(vt, ve);
-      va = _mm_load_pd(a + 2);
-      vt = vb;
-      vb = _mm_mul_pd(va, vb);
-      vt = _mm_shuffle_pd(vt, vt, 1);
-      vd = _mm_add_pd(vb, vd);
-      vt = _mm_mul_pd(va, vt);
-      ve = _mm_add_pd(vt, ve);
-      a += 4;
-      b += 4;
-   }
-   if (k % 2) {
-      va = _mm_load_pd(a);
-      vb = _mm_load_pd(b);
-      vt = _mm_shuffle_pd(vb, vb, 1);
-      vd = _mm_add_pd(_mm_mul_pd(va, vb), vd);
-      ve = _mm_add_pd(_mm_mul_pd(va, vt), ve);
-   }
-// r0 is first row of alpha*A'*B, r1 is second row
-   valpha = _mm_load1_pd(&alpha);
-   r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
-   r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
-
-// store
-   if (store_mode == 0) {
-      if (beta == 0) {
-         _mm_storeu_pd(r, r0);
-         _mm_storeu_pd(r + stride, r1);
-      } else {
-         vbeta = _mm_load1_pd(&beta);
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
-         _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
-      }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0)
-         _mm_storeu_pd(r, r0);
-      else
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&beta)), r0));
-      return;
-   }
-   if (store_mode == 2) {
-      double buf[4];
-      _mm_storeu_pd(buf, r0);
-      _mm_storeu_pd(buf + 2, r1);
-      if (beta == 0) {
-         r[0] = buf[0];
-         r[stride + 0] = buf[2];
-      } else {
-         r[0] = beta * r[0] + buf[0];
-         r[stride + 0] = beta * r[stride + 0] + buf[2];
-      }
-      return;
-   }
-   if (store_mode == 3) {
-      double buf[2];
-      _mm_storeu_pd(buf, r0);
-      if (beta == 0)
-         r[0] = buf[0];
-      else
-         r[0] = beta * r[0] + buf[0];
-      return;
-   }
-}
-#endif
-
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-   _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
-   _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
-}
-
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
-void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// V0, V1, V2, V3 store result as follows:
-//
-//     [ V0[0]  V1[1] V2[0]  V3[1] ]
-// R = [                           ]
-//     [ V1[0]  V0[1] V3[0]  V2[1] ]
-//
-// VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
-// VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
-// (both vars store same data - either B0 or B1). Results from multiplication
-// by VA0/VA1 are stored in VB0/VB1 too.
-//
-   __m128d v0, v1, v2, v3, va0, va1, vb0, vb1;
-   __m128d r00, r01, r10, r11, valpha, vbeta;
-   ae_int_t t;
-
-   v0 = _mm_setzero_pd();
-   v1 = _mm_setzero_pd();
-   v2 = _mm_setzero_pd();
-   v3 = _mm_setzero_pd();
-   for (t = 0; t < k; t++) {
-      va0 = _mm_load_pd(a);
-      vb0 = _mm_load_pd(b0);
-      va1 = _mm_load_pd(a);
-
-      vb0 = _mm_mul_pd(va0, vb0);
-      vb1 = _mm_load_pd(b0);
-      v0 = _mm_add_pd(v0, vb0);
-      vb1 = _mm_mul_pd(va1, vb1);
-      vb0 = _mm_load_pd(b1);
-      v1 = _mm_add_pd(v1, vb1);
-
-      vb0 = _mm_mul_pd(va0, vb0);
-      vb1 = _mm_load_pd(b1);
-      v2 = _mm_add_pd(v2, vb0);
-      vb1 = _mm_mul_pd(va1, vb1);
-      v3 = _mm_add_pd(v3, vb1);
-
-      a += 2;
-      b0 += 2;
-      b1 += 2;
-   }
-
-// shuffle V1 and V3 (conversion to more convenient storage format):
-//
-//     [ V0[0]  V1[0] V2[0]  V3[0] ]
-// R = [                           ]
-//     [ V1[1]  V0[1] V3[1]  V2[1] ]
-//
-// unpack results to
-//
-// [ r00 r01 ]
-// [ r10 r11 ]
-//
-   valpha = _mm_load1_pd(&alpha);
-   v1 = _mm_shuffle_pd(v1, v1, 1);
-   v3 = _mm_shuffle_pd(v3, v3, 1);
-   r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
-   r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
-   r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
-   r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
-
-// store
-   if (beta == 0) {
-      _mm_storeu_pd(r, r00);
-      _mm_storeu_pd(r + 2, r01);
-      _mm_storeu_pd(r + stride, r10);
-      _mm_storeu_pd(r + stride + 2, r11);
-   } else {
-      vbeta = _mm_load1_pd(&beta);
-      _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r00));
-      _mm_storeu_pd(r + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + 2), vbeta), r01));
-      _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r10));
-      _mm_storeu_pd(r + stride + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride + 2), vbeta), r11));
-   }
-}
-#endif
-
-#if !defined(ALGLIB_NO_FAST_KERNELS)
-
-// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     Y       -   array[N], vector to process
-//
-// RESULT:
-//     (X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
-   ae_int_t i;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, y->ptr.p_double, _state)) // use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result
-      // Original generic C implementation
-         result = (double)(0);
-   for (i = 0; i <= n - 1; i++) {
-      result = result + x->ptr.p_double[i] * y->ptr.p_double[i];
-   }
-   return result;
-}
-
-// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     A       -   array[?,N], matrix to process
-//     I       -   row index
-//
-// RESULT:
-//     (X,Ai)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
-   ae_int_t j;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
-         result = (double)(0);
-   for (j = 0; j <= n - 1; j++) {
-      result = result + x->ptr.p_double[j] * a->ptr.pp_double[i][j];
-   }
-   return result;
-}
-
-// Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     A       -   array[?,N], matrix to process
-//     I       -   row index
-//
-// RESULT:
-//     (X,Ai)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state) {
-   ae_int_t j;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->ptr.pp_double[ia], b->ptr.pp_double[ib], _state))
-         result = (double)(0);
-   for (j = 0; j <= n - 1; j++) {
-      result = result + a->ptr.pp_double[ia][j] * b->ptr.pp_double[ib][j];
-   }
-   return result;
-}
-
-// Computes dot product (X,X) for elements [0,N) of X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//
-// RESULT:
-//     (X,X)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->ptr.p_double, _state))
-         result = (double)(0);
-   for (i = 0; i <= n - 1; i++) {
-      v = x->ptr.p_double[i];
-      result = result + v * v;
-   }
-   return result;
-}
-
-// Copies vector X[] to Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   preallocated array[N]
-//
-// OUTPUT PARAMETERS:
-//     Y       -   leading N elements are replaced by X
-//
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, y->ptr.p_double, _state))
-         for (j = 0; j <= n - 1; j++) {
-         y->ptr.p_double[j] = x->ptr.p_double[j];
-      }
-}
-
-// Copies vector X[] to row I of A[,]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], source
-//     A       -   preallocated 2D array large enough to store result
-//     I       -   destination row index
-//
-// OUTPUT PARAMETERS:
-//     A       -   leading N elements of I-th row are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
-         for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = x->ptr.p_double[j];
-      }
-}
-
-// Copies row I of A[,] to vector X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     A       -   2D array, source
-//     I       -   source row index
-//     X       -   preallocated destination
-//
-// OUTPUT PARAMETERS:
-//     X       -   array[N], destination
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], x->ptr.p_double, _state))
-         for (j = 0; j <= n - 1; j++) {
-         x->ptr.p_double[j] = a->ptr.pp_double[i][j];
-      }
-}
-
-// Copies row I of A[,] to row K of B[,].
-//
-// A[i,...] and B[k,...] may overlap.
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     A       -   2D array, source
-//     I       -   source row index
-//     B       -   preallocated destination
-//     K       -   destination row index
-//
-// OUTPUT PARAMETERS:
-//     B       -   row K overwritten
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], b->ptr.pp_double[k], _state))
-         for (j = 0; j <= n - 1; j++) {
-         b->ptr.pp_double[k][j] = a->ptr.pp_double[i][j];
-      }
-}
-
-// Performs copying with multiplication of V*X[] to Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   multiplier
-//     X       -   array[N], source
-//     Y       -   preallocated array[N]
-//
-// OUTPUT PARAMETERS:
-//     Y       -   array[N], Y = V*X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         y->ptr.p_double[i] = v * x->ptr.p_double[i];
-      }
-}
-
-// Performs copying with multiplication of V*X[] to Y[I,*]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   multiplier
-//     X       -   array[N], source
-//     Y       -   preallocated array[?,N]
-//     RIdx    -   destination row index
-//
-// OUTPUT PARAMETERS:
-//     Y       -   Y[RIdx,...] = V*X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.pp_double[ridx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         y->ptr.pp_double[ridx][i] = v * x->ptr.p_double[i];
-      }
-}
-
-// Copies vector X[] to Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   source array
-//     Y       -   preallocated array[N]
-//
-// OUTPUT PARAMETERS:
-//     Y       -   X copied to Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv, (n, x->ptr.p_int, y->ptr.p_int, _state))
-         for (j = 0; j <= n - 1; j++) {
-         y->ptr.p_int[j] = x->ptr.p_int[j];
-      }
-}
-
-// Copies vector X[] to Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   preallocated array[N]
-//
-// OUTPUT PARAMETERS:
-//     Y       -   leading N elements are replaced by X
-//
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1 * 8)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv, (n, x->ptr.p_bool, y->ptr.p_bool, _state))
-         for (j = 0; j <= n - 1; j++) {
-         y->ptr.p_bool[j] = x->ptr.p_bool[j];
-      }
-}
-
-// Sets vector X[] to V
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// OUTPUT PARAMETERS:
-//     X       -   leading N elements are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, x->ptr.p_double, _state))
-         for (j = 0; j <= n - 1; j++) {
-         x->ptr.p_double[j] = v;
-      }
-}
-
-// Sets row I of A[,] to V
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   value to set
-//     A       -   array[N,N] or larger
-//     I       -   row index
-//
-// OUTPUT PARAMETERS:
-//     A       -   leading N elements of I-th row are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, a->ptr.pp_double[i], _state))
-         for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = v;
-      }
-}
-
-// Sets X[OffsX:OffsX+N-1] to V
-//
-// INPUT PARAMETERS:
-//     N       -   subvector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// OUTPUT PARAMETERS:
-//     X       -   X[OffsX:OffsX+N-1] is replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx, (n, v, x->ptr.p_double + offsx, _state))
-         for (j = 0; j <= n - 1; j++) {
-         x->ptr.p_double[offsx + j] = v;
-      }
-}
-
-// Sets matrix A[] to V
-//
-// INPUT PARAMETERS:
-//     M, N    -   rows/cols count
-//     V       -   value to set
-//     A       -   array[M,N]
-//
-// OUTPUT PARAMETERS:
-//     A       -   leading M rows, N cols are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state *_state) {
-   _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, pDest, _state));
-
-   ae_int_t j;
-   for (j = 0; j <= n - 1; j++) {
-      pDest[j] = v;
-   }
-}
-
-void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1) {
-      for (i = 0; i < m; i++) {
-         rsetm_simd(n, v, a->ptr.pp_double[i], _state);
-      }
-      return;
-   }
-
-   for (i = 0; i <= m - 1; i++) {
-      for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = v;
-      }
-   }
-}
-
-// Sets vector X[] to V
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// OUTPUT PARAMETERS:
-//     X       -   leading N elements are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv, (n, v, x->ptr.p_int, _state))
-         for (j = 0; j <= n - 1; j++) {
-         x->ptr.p_int[j] = v;
-      }
-}
-
-// Sets vector X[] to V
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// OUTPUT PARAMETERS:
-//     X       -   leading N elements are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1 * 8)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv, (n, v, x->ptr.p_bool, _state))
-         for (j = 0; j <= n - 1; j++) {
-         x->ptr.p_bool[j] = v;
-      }
-}
-
-// Performs inplace multiplication of X[] by V
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     V       -   multiplier
-//
-// OUTPUT PARAMETERS:
-//     X       -   elements 0...N-1 multiplied by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] * v;
-      }
-}
-
-// Performs inplace multiplication of X[] by V
-//
-// INPUT PARAMETERS:
-//     N       -   row length
-//     X       -   array[?,N], row to process
-//     V       -   multiplier
-//
-// OUTPUT PARAMETERS:
-//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.pp_double[rowidx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * v;
-      }
-}
-
-// Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
-//
-// INPUT PARAMETERS:
-//     N       -   subvector length
-//     X       -   vector to process
-//     V       -   multiplier
-//
-// OUTPUT PARAMETERS:
-//     X       -   elements OffsX:OffsX+N-1 multiplied by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->ptr.p_double + offsx, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] * v;
-      }
-}
-
-// Performs inplace addition of Y[] to X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   array[N], vector to process
-//     X       -   array[N], vector to process
-//
-// RESULT:
-//     X := X + alpha*Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.p_double[i];
-      }
-}
-
-// Performs inplace addition of vector Y[] to row X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   vector to add
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := X + alpha*Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] + alpha * y->ptr.p_double[i];
-      }
-}
-
-// Performs inplace addition of Y[RIdx,...] to X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   array[?,N], matrix whose RIdx-th row is added
-//     RIdx    -   row index
-//     X       -   array[N], vector to process
-//
-// RESULT:
-//     X := X + alpha*Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridx], x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.pp_double[ridx][i];
-      }
-}
-
-// Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
-//     RIdxSrc -   source row index
-//     X       -   array[?,N], matrix whose RIdxDst-th row is target
-//     RIdxDst -   destination row index
-//
-// RESULT:
-//     X := X + alpha*Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridxsrc], x->ptr.pp_double[ridxdst], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[ridxdst][i] = x->ptr.pp_double[ridxdst][i] + alpha * y->ptr.pp_double[ridxsrc][i];
-      }
-}
-
-// Performs inplace addition of Y[] to X[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   source vector
-//     OffsY   -   source offset
-//     X       -   destination vector
-//     OffsX   -   destination offset
-//
-// RESULT:
-//     X := X + alpha*Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->ptr.p_double + offsy, x->ptr.p_double + offsx, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] + alpha * y->ptr.p_double[offsy + i];
-      }
-}
-
-// Performs componentwise multiplication of vector X[] by vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target vector
-//
-// RESULT:
-//     X := componentwise(X*Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.p_double[i];
-      }
-}
-
-// Performs componentwise multiplication of row X[] by vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := componentwise(X*Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * y->ptr.p_double[i];
-      }
-}
-
-// Performs componentwise multiplication of row X[] by vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := componentwise(X*Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.pp_double[rowidx], x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.pp_double[rowidx][i];
-      }
-}
-
-// Performs componentwise max of vector X[] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target vector
-//
-// RESULT:
-//     X := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = ae_maxreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
-      }
-}
-
-// Performs componentwise max of row X[] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[rowidx][i] = ae_maxreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
-      }
-}
-
-// Performs componentwise max of row X[I] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   matrix, I-th row is source
-//     rowidx  -   target row RowIdx
-//
-// RESULT:
-//     Y := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         y->ptr.p_double[i] = ae_maxreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
-      }
-}
-
-// Performs componentwise min of vector X[] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   source vector
-//     X       -   target vector
-//
-// RESULT:
-//     X := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = ae_minreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
-      }
-}
-
-// Performs componentwise max of row X[] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
-         for (i = 0; i <= n - 1; i++) {
-         x->ptr.pp_double[rowidx][i] = ae_minreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
-      }
-}
-
-// Performs componentwise max of row X[I] and vector Y[]
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   matrix, I-th row is source
-//     X       -   target row RowIdx
-//
-// RESULT:
-//     X := componentwise_max(X,Y)
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state) {
-   ae_int_t i;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
-         for (i = 0; i <= n - 1; i++) {
-         y->ptr.p_double[i] = ae_minreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
-      }
-}
-
-// Returns maximum X
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//
-// OUTPUT PARAMETERS:
-//     max(X[i])
-//     zero for N=0
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.p_double, _state));
-
-   if (n == 0)
-      return 0.0;
-   result = x->ptr.p_double[0];
-   for (i = 1; i <= n - 1; i++) {
-      v = x->ptr.p_double[i];
-      if (v > result) {
-         result = v;
-      }
-   }
-   return result;
-}
-
-// Returns maximum X
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   matrix to process, RowIdx-th row is processed
-//
-// OUTPUT PARAMETERS:
-//     max(X[RowIdx,i])
-//     zero for N=0
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.pp_double[rowidx], _state))
-         if (n == 0)
-         return 0.0;
-   result = x->ptr.pp_double[rowidx][0];
-   for (i = 1; i <= n - 1; i++) {
-      v = x->ptr.pp_double[rowidx][i];
-      if (v > result) {
-         result = v;
-      }
-   }
-   return result;
-}
-
-// Returns maximum |X|
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//
-// OUTPUT PARAMETERS:
-//     max(|X[i]|)
-//     zero for N=0
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.p_double, _state))
-         result = (double)(0);
-   for (i = 0; i <= n - 1; i++) {
-      v = ae_fabs(x->ptr.p_double[i], _state);
-      if (v > result) {
-         result = v;
-      }
-   }
-   return result;
-}
-
-// Returns maximum |X|
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   matrix to process, RowIdx-th row is processed
-//
-// OUTPUT PARAMETERS:
-//     max(|X[RowIdx,i]|)
-//     zero for N=0
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.pp_double[rowidx], _state))
-         result = (double)(0);
-   for (i = 0; i <= n - 1; i++) {
-      v = ae_fabs(x->ptr.pp_double[rowidx][i], _state);
-      if (v > result) {
-         result = v;
-      }
-   }
-   return result;
-}
-
-// Copies vector X[] to Y[], extended version
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   preallocated array[N]
-//     OffsY   -   destination offset
-//
-// OUTPUT PARAMETERS:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx, (n, x->ptr.p_double + offsx, y->ptr.p_double + offsy, _state))
-         for (j = 0; j <= n - 1; j++) {
-         y->ptr.p_double[offsy + j] = x->ptr.p_double[offsx + j];
-      }
-}
-
-// Copies vector X[] to Y[], extended version
-//
-// INPUT PARAMETERS:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   preallocated array[N]
-//     OffsY   -   destination offset
-//
-// OUTPUT PARAMETERS:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state) {
-   ae_int_t j;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx, (n, x->ptr.p_int + offsx, y->ptr.p_int + offsy, _state))
-         for (j = 0; j <= n - 1; j++) {
-         y->ptr.p_int[offsy + j] = x->ptr.p_int[offsx + j];
-      }
-}
-
-// Matrix-vector product: y := alpha*op(A)*x + beta*y
-//
-// NOTE: this  function  expects  Y  to  be  large enough to store result. No
-//       automatic preallocation happens for  smaller  arrays.  No  integrity
-//       checks is performed for sizes of A, x, y.
-//
-// INPUT PARAMETERS:
-//     M   -   number of rows of op(A)
-//     N   -   number of columns of op(A)
-//     Alpha-  coefficient
-//     A   -   source matrix
-//     OpA -   operation type:
-//             * OpA=0     =>  op(A) = A
-//             * OpA=1     =>  op(A) = A^T
-//     X   -   input vector, has at least N elements
-//     Beta-   coefficient
-//     Y   -   preallocated output array, has at least M elements
-//
-// OUTPUT PARAMETERS:
-//     Y   -   vector which stores result
-//
-// HANDLING OF SPECIAL CASES:
-//     * if M=0, then subroutine does nothing. It does not even touch arrays.
-//     * if N=0 or Alpha=0.0, then:
-//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-//         at all. Initial values of Y are ignored (we do not  multiply  Y by
-//         zero, we just rewrite it by zeros)
-//       * if Beta<>0, then Y is replaced by Beta*Y
-//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-//        initial state of Y is ignored (rewritten by  A*x,  without  initial
-//        multiplication by zeros).
-// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
-void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-
-// Properly premultiply Y by Beta.
-//
-// Quick exit for M=0, N=0 or Alpha=0.
-// After this block we have M>0, N>0, Alpha<>0.
-   if (m <= 0) {
-      return;
-   }
-   if (ae_fp_neq(beta, (double)(0))) {
-      rmulv(m, beta, y, _state);
-   } else {
-      rsetv(m, 0.0, y, _state);
-   }
-   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
-      return;
-   }
-// Straight or transposed?
-   if (opa == 0) {
-   // Try SIMD code
-      if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
-         // Generic C version: y += A*x
-            for (i = 0; i <= m - 1; i++) {
-            v = (double)(0);
-            for (j = 0; j <= n - 1; j++) {
-               v = v + a->ptr.pp_double[i][j] * x->ptr.p_double[j];
-            }
-            y->ptr.p_double[i] = alpha * v + y->ptr.p_double[i];
-         }
-      return;
-   }
-   if (opa == 1) {
-   // Try SIMD code
-      if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
-         // Generic C version: y += A^T*x
-            for (i = 0; i <= n - 1; i++) {
-            v = alpha * x->ptr.p_double[i];
-            for (j = 0; j <= m - 1; j++) {
-               y->ptr.p_double[j] = y->ptr.p_double[j] + v * a->ptr.pp_double[i][j];
-            }
-         }
-      return;
-   }
-}
-
-// Matrix-vector product: y := alpha*op(A)*x + beta*y
-//
-// Here x, y, A are subvectors/submatrices of larger vectors/matrices.
-//
-// NOTE: this  function  expects  Y  to  be  large enough to store result. No
-//       automatic preallocation happens for  smaller  arrays.  No  integrity
-//       checks is performed for sizes of A, x, y.
-//
-// INPUT PARAMETERS:
-//     M   -   number of rows of op(A)
-//     N   -   number of columns of op(A)
-//     Alpha-  coefficient
-//     A   -   source matrix
-//     IA  -   submatrix offset (row index)
-//     JA  -   submatrix offset (column index)
-//     OpA -   operation type:
-//             * OpA=0     =>  op(A) = A
-//             * OpA=1     =>  op(A) = A^T
-//     X   -   input vector, has at least N+IX elements
-//     IX  -   subvector offset
-//     Beta-   coefficient
-//     Y   -   preallocated output array, has at least M+IY elements
-//     IY  -   subvector offset
-//
-// OUTPUT PARAMETERS:
-//     Y   -   vector which stores result
-//
-// HANDLING OF SPECIAL CASES:
-//     * if M=0, then subroutine does nothing. It does not even touch arrays.
-//     * if N=0 or Alpha=0.0, then:
-//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-//         at all. Initial values of Y are ignored (we do not  multiply  Y by
-//         zero, we just rewrite it by zeros)
-//       * if Beta<>0, then Y is replaced by Beta*Y
-//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-//        initial state of Y is ignored (rewritten by  A*x,  without  initial
-//        multiplication by zeros).
-// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
-void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-
-// Properly premultiply Y by Beta.
-//
-// Quick exit for M=0, N=0 or Alpha=0.
-// After this block we have M>0, N>0, Alpha<>0.
-   if (m <= 0) {
-      return;
-   }
-   if (ae_fp_neq(beta, (double)(0))) {
-      rmulvx(m, beta, y, iy, _state);
-   } else {
-      rsetvx(m, 0.0, y, iy, _state);
-   }
-   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
-      return;
-   }
-// Straight or transposed?
-   if (opa == 0) {
-   // Try SIMD code
-      if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
-         // Generic C code: y += A*x
-            for (i = 0; i <= m - 1; i++) {
-            v = (double)(0);
-            for (j = 0; j <= n - 1; j++) {
-               v = v + a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
-            }
-            y->ptr.p_double[iy + i] = alpha * v + y->ptr.p_double[iy + i];
-         }
-      return;
-   }
-   if (opa == 1) {
-   // Try SIMD code
-      if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
-         // Generic C code: y += A^T*x
-            for (i = 0; i <= n - 1; i++) {
-            v = alpha * x->ptr.p_double[ix + i];
-            for (j = 0; j <= m - 1; j++) {
-               y->ptr.p_double[iy + j] = y->ptr.p_double[iy + j] + v * a->ptr.pp_double[ia + i][ja + j];
-            }
-         }
-      return;
-   }
-}
-
-// Rank-1 correction: A := A + alpha*u*v'
-//
-// NOTE: this  function  expects  A  to  be  large enough to store result. No
-//       automatic preallocation happens for  smaller  arrays.  No  integrity
-//       checks is performed for sizes of A, u, v.
-//
-// INPUT PARAMETERS:
-//     M   -   number of rows
-//     N   -   number of columns
-//     A   -   target MxN matrix
-//     Alpha-  coefficient
-//     U   -   vector #1
-//     V   -   vector #2
-// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
-void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   double s;
-
-   if ((m <= 0 || n <= 0) || ae_fp_eq(alpha, (double)(0))) {
-      return;
-   }
-   for (i = 0; i <= m - 1; i++) {
-      s = alpha * u->ptr.p_double[i];
-      for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] + s * v->ptr.p_double[j];
-      }
-   }
-}
-
-// This subroutine solves linear system op(A)*x=b where:
-// * A is NxN upper/lower triangular/unitriangular matrix
-// * X and B are Nx1 vectors
-// * "op" may be identity transformation or transposition
-//
-// Solution replaces X.
-//
-// IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
-//            * no integrity checks for operand sizes, out-of-bounds accesses
-//              and so on is performed
-//
-// INPUT PARAMETERS
-//     N   -   matrix size, N>=0
-//     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     IsUpper -   whether matrix is upper triangular
-//     IsUnit  -   whether matrix is unitriangular
-//     OpType  -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//     X       -   right part, actual vector is stored in X[IX:IX+N-1]
-//     IX      -   offset
-//
-// OUTPUT PARAMETERS
-//     X       -   solution replaces elements X[IX:IX+N-1]
-// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-
-   if (n <= 0) {
-      return;
-   }
-   if (optype == 0 && isupper) {
-      for (i = n - 1; i >= 0; i--) {
-         v = x->ptr.p_double[ix + i];
-         for (j = i + 1; j <= n - 1; j++) {
-            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
-         }
-         if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
-         }
-         x->ptr.p_double[ix + i] = v;
-      }
-      return;
-   }
-   if (optype == 0 && !isupper) {
-      for (i = 0; i <= n - 1; i++) {
-         v = x->ptr.p_double[ix + i];
-         for (j = 0; j <= i - 1; j++) {
-            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
-         }
-         if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
-         }
-         x->ptr.p_double[ix + i] = v;
-      }
-      return;
-   }
-   if (optype == 1 && isupper) {
-      for (i = 0; i <= n - 1; i++) {
-         v = x->ptr.p_double[ix + i];
-         if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
-         }
-         x->ptr.p_double[ix + i] = v;
-         if (v == 0) {
-            continue;
-         }
-         for (j = i + 1; j <= n - 1; j++) {
-            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
-         }
-      }
-      return;
-   }
-   if (optype == 1 && !isupper) {
-      for (i = n - 1; i >= 0; i--) {
-         v = x->ptr.p_double[ix + i];
-         if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
-         }
-         x->ptr.p_double[ix + i] = v;
-         if (v == 0) {
-            continue;
-         }
-         for (j = 0; j <= i - 1; j++) {
-            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
-         }
-      }
-      return;
-   }
-   ae_assert(false, "rTRSVX: unexpected operation type", _state);
-}
-
-// Fast rGEMM kernel with AVX2/FMA support
-// ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
-bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
-#   if !defined(_ALGLIB_HAS_AVX2_INTRINSICS)
-   return false;
-#   else
-   const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
-   const ae_int_t micro_size = _ABLASF_MICRO_SIZE;
-   ae_int_t out0, out1;
-   double *c;
-   ae_int_t stride_c;
-   ae_int_t cpu_id = ae_cpuid();
-   ae_int_t(*ablasf_packblk) (const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
-   void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = ablasf_dotblkh_avx2;
-   void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = ablasf_daxpby_avx2;
-
-// Determine CPU and kernel support
-   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(cpu_id & CPU_AVX2))
-      return false;
-#      if defined(_ALGLIB_HAS_FMA_INTRINSICS)
-   if (cpu_id & CPU_FMA)
-      ablasf_dotblk = ablasf_dotblkh_fma;
-#      endif
-
-// Prepare C
-   c = _c->ptr.pp_double[ic] + jc;
-   stride_c = _c->stride;
-
-// Do we have alpha*A*B ?
-   if (alpha != 0 && k > 0) {
-   // Prepare structures
-      ae_int_t base0, base1, offs0;
-      double *a = _a->ptr.pp_double[ia] + ja;
-      double *b = _b->ptr.pp_double[ib] + jb;
-      ae_int_t stride_a = _a->stride;
-      ae_int_t stride_b = _b->stride;
-      double _blka[_ABLASF_BLOCK_SIZE * _ABLASF_MICRO_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double _blkb_long[_ABLASF_BLOCK_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double _blkc[_ABLASF_MICRO_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double *blka = (double *)ae_align(_blka, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-      double *storageb_long = (double *)ae_align(_blkb_long, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-      double *blkc = (double *)ae_align(_blkc, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-
-   // Pack transform(B) into precomputed block form
-      for (base1 = 0; base1 < n; base1 += micro_size) {
-         const ae_int_t lim1 = n - base1 < micro_size ? n - base1 : micro_size;
-         double *curb = storageb_long + base1 * block_size;
-         ablasf_packblk(b + (optypeb == 0 ? base1 : base1 * stride_b), stride_b, optypeb == 0 ? 1 : 0, k, lim1, curb, block_size, micro_size);
-      }
-
-   // Output
-      for (base0 = 0; base0 < m; base0 += micro_size) {
-      // Load block row of transform(A)
-         const ae_int_t lim0 = m - base0 < micro_size ? m - base0 : micro_size;
-         const ae_int_t round_k = ablasf_packblk(a + (optypea == 0 ? base0 * stride_a : base0), stride_a, optypea, k, lim0, blka, block_size, micro_size);
-
-      // Compute block(A)'*entire(B)
-         for (base1 = 0; base1 < n; base1 += micro_size)
-            ablasf_dotblk(blka, storageb_long + base1 * block_size, round_k, block_size, micro_size, blkc + base1, block_size);
-
-      // Output block row of block(A)'*entire(B)
-         for (offs0 = 0; offs0 < lim0; offs0++)
-            ablasf_daxpby(n, alpha, blkc + offs0 * block_size, beta, c + (base0 + offs0) * stride_c);
-      }
-   } else {
-   // No A*B, just beta*C (degenerate case, not optimized)
-      if (beta == 0) {
-         for (out0 = 0; out0 < m; out0++)
-            for (out1 = 0; out1 < n; out1++)
-               c[out0 * stride_c + out1] = 0.0;
-      } else if (beta != 1) {
-         for (out0 = 0; out0 < m; out0++)
-            for (out1 = 0; out1 < n; out1++)
-               c[out0 * stride_c + out1] *= beta;
-      }
-   }
-   return true;
-#   endif
-}
-
-// Returns recommended width of the SIMD-friendly buffer
-ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state) {
-#   if AE_CPU==AE_INTEL
-   return 4;
-#   else
-   return 1;
-#   endif
-}
-
-// Solving linear system: propagating computed supernode.
-//
-// Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
-// RHS storage format.
-//
-// INPUT PARAMETERS:
-//
-// OUTPUT PARAMETERS:
-// ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
-void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t baseoffs;
-   double v;
-
-// Try SIMD kernels
-#   if defined(_ALGLIB_HAS_FMA_INTRINSICS)
-   if (sstride == 4 || (blocksize == 2 && sstride == 2))
-      if (ae_cpuid() & CPU_FMA) {
-         spchol_propagatefwd_fma(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth, _state);
-         return;
-      }
-#   endif
-
-// Propagate rank-1 node (can not be accelerated with SIMD)
-   if (blocksize == 1 && sstride == 1) {
-   // blocksize is 1, stride is 1
-      double vx = x->ptr.p_double[cols0];
-      double *p_mat_row = rowstorage->ptr.p_double + offss + 1 * 1;
-      double *p_simd_buf = simdbuf->ptr.p_double;
-      ae_int_t *p_rowidx = superrowidx->ptr.p_int + rbase;
-      if (simdwidth == 4) {
-         for (k = 0; k < offdiagsize; k++)
-            p_simd_buf[p_rowidx[k] * 4] -= p_mat_row[k] * vx;
-      } else {
-         for (k = 0; k < offdiagsize; k++)
-            p_simd_buf[p_rowidx[k] * simdwidth] -= p_mat_row[k] * vx;
-      }
-      return;
-   }
-// Generic C code for generic propagate
-   for (k = 0; k <= offdiagsize - 1; k++) {
-      i = superrowidx->ptr.p_int[rbase + k];
-      baseoffs = offss + (k + blocksize) * sstride;
-      v = simdbuf->ptr.p_double[i * simdwidth];
-      for (j = 0; j <= blocksize - 1; j++) {
-         v = v - rowstorage->ptr.p_double[baseoffs + j] * x->ptr.p_double[cols0 + j];
-      }
-      simdbuf->ptr.p_double[i * simdwidth] = v;
-   }
-}
-
-// Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs AxBxCx4 update, i.e.:
-// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
-//   it has 3 or 4 columns)
-// * U is a uHeight*B matrix
-// * Uc' is a B*C matrix, with C<=A
-// * scatter() scatters rows and columns of U*Uc'
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
-// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4, (rowstorage->ptr.p_double, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
-   // Generic code
-   ae_int_t k;
-   ae_int_t targetrow;
-   ae_int_t targetcol;
-   ae_int_t offsk;
-   double d0;
-   double d1;
-   double d2;
-   double d3;
-   double u00;
-   double u01;
-   double u02;
-   double u03;
-   double u10;
-   double u11;
-   double u12;
-   double u13;
-   double u20;
-   double u21;
-   double u22;
-   double u23;
-   double u30;
-   double u31;
-   double u32;
-   double u33;
-   double uk0;
-   double uk1;
-   double uk2;
-   double uk3;
-   ae_int_t srccol0;
-   ae_int_t srccol1;
-   ae_int_t srccol2;
-   ae_int_t srccol3;
-   bool result;
-
-// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
-   result = false;
-   if (twidth < 3 || twidth > 4) {
-      return result;
-   }
-   if (uwidth < 1 || uwidth > 4) {
-      return result;
-   }
-   if (urank > 4) {
-      return result;
-   }
-// Determine source columns for target columns, -1 if target column
-// is not updated.
-   srccol0 = -1;
-   srccol1 = -1;
-   srccol2 = -1;
-   srccol3 = -1;
-   for (k = 0; k <= uwidth - 1; k++) {
-      targetcol = raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]];
-      if (targetcol == 0) {
-         srccol0 = k;
-      }
-      if (targetcol == 1) {
-         srccol1 = k;
-      }
-      if (targetcol == 2) {
-         srccol2 = k;
-      }
-      if (targetcol == 3) {
-         srccol3 = k;
-      }
-   }
-
-// Load update matrix into aligned/rearranged 4x4 storage
-   d0 = (double)(0);
-   d1 = (double)(0);
-   d2 = (double)(0);
-   d3 = (double)(0);
-   u00 = (double)(0);
-   u01 = (double)(0);
-   u02 = (double)(0);
-   u03 = (double)(0);
-   u10 = (double)(0);
-   u11 = (double)(0);
-   u12 = (double)(0);
-   u13 = (double)(0);
-   u20 = (double)(0);
-   u21 = (double)(0);
-   u22 = (double)(0);
-   u23 = (double)(0);
-   u30 = (double)(0);
-   u31 = (double)(0);
-   u32 = (double)(0);
-   u33 = (double)(0);
-   if (urank >= 1) {
-      d0 = diagd->ptr.p_double[offsd + 0];
-   }
-   if (urank >= 2) {
-      d1 = diagd->ptr.p_double[offsd + 1];
-   }
-   if (urank >= 3) {
-      d2 = diagd->ptr.p_double[offsd + 2];
-   }
-   if (urank >= 4) {
-      d3 = diagd->ptr.p_double[offsd + 3];
-   }
-   if (srccol0 >= 0) {
-      if (urank >= 1) {
-         u00 = d0 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 0];
-      }
-      if (urank >= 2) {
-         u01 = d1 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 1];
-      }
-      if (urank >= 3) {
-         u02 = d2 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 2];
-      }
-      if (urank >= 4) {
-         u03 = d3 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 3];
-      }
-   }
-   if (srccol1 >= 0) {
-      if (urank >= 1) {
-         u10 = d0 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 0];
-      }
-      if (urank >= 2) {
-         u11 = d1 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 1];
-      }
-      if (urank >= 3) {
-         u12 = d2 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 2];
-      }
-      if (urank >= 4) {
-         u13 = d3 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 3];
-      }
-   }
-   if (srccol2 >= 0) {
-      if (urank >= 1) {
-         u20 = d0 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 0];
-      }
-      if (urank >= 2) {
-         u21 = d1 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 1];
-      }
-      if (urank >= 3) {
-         u22 = d2 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 2];
-      }
-      if (urank >= 4) {
-         u23 = d3 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 3];
-      }
-   }
-   if (srccol3 >= 0) {
-      if (urank >= 1) {
-         u30 = d0 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 0];
-      }
-      if (urank >= 2) {
-         u31 = d1 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 1];
-      }
-      if (urank >= 3) {
-         u32 = d2 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 2];
-      }
-      if (urank >= 4) {
-         u33 = d3 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 3];
-      }
-   }
-// Run update
-   if (urank == 1) {
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
-         offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0;
-      }
-   }
-   if (urank == 2) {
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
-         offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1;
-      }
-   }
-   if (urank == 3) {
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
-         offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2;
-      }
-   }
-   if (urank == 4) {
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
-         offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
-      }
-   }
-   result = true;
-   return result;
-}
-
-// Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs 4x4x4x4 update, i.e.:
-// * S is a tHeight*4 matrix
-// * U is a uHeight*4 matrix
-// * Uc' is a 4*4 matrix
-// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
-//   densely packed).
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update.
-// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
-   ae_int_t k;
-   ae_int_t targetrow;
-   ae_int_t offsk;
-   double d0;
-   double d1;
-   double d2;
-   double d3;
-   double u00;
-   double u01;
-   double u02;
-   double u03;
-   double u10;
-   double u11;
-   double u12;
-   double u13;
-   double u20;
-   double u21;
-   double u22;
-   double u23;
-   double u30;
-   double u31;
-   double u32;
-   double u33;
-   double uk0;
-   double uk1;
-   double uk2;
-   double uk3;
-   bool result;
-
-// Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernel4444, (rowstorage->ptr.p_double, offss, sheight, offsu, uheight, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
-   // Generic C fallback code
-      d0 = diagd->ptr.p_double[offsd + 0];
-   d1 = diagd->ptr.p_double[offsd + 1];
-   d2 = diagd->ptr.p_double[offsd + 2];
-   d3 = diagd->ptr.p_double[offsd + 3];
-   u00 = d0 * rowstorage->ptr.p_double[offsu + 0 * 4 + 0];
-   u01 = d1 * rowstorage->ptr.p_double[offsu + 0 * 4 + 1];
-   u02 = d2 * rowstorage->ptr.p_double[offsu + 0 * 4 + 2];
-   u03 = d3 * rowstorage->ptr.p_double[offsu + 0 * 4 + 3];
-   u10 = d0 * rowstorage->ptr.p_double[offsu + 1 * 4 + 0];
-   u11 = d1 * rowstorage->ptr.p_double[offsu + 1 * 4 + 1];
-   u12 = d2 * rowstorage->ptr.p_double[offsu + 1 * 4 + 2];
-   u13 = d3 * rowstorage->ptr.p_double[offsu + 1 * 4 + 3];
-   u20 = d0 * rowstorage->ptr.p_double[offsu + 2 * 4 + 0];
-   u21 = d1 * rowstorage->ptr.p_double[offsu + 2 * 4 + 1];
-   u22 = d2 * rowstorage->ptr.p_double[offsu + 2 * 4 + 2];
-   u23 = d3 * rowstorage->ptr.p_double[offsu + 2 * 4 + 3];
-   u30 = d0 * rowstorage->ptr.p_double[offsu + 3 * 4 + 0];
-   u31 = d1 * rowstorage->ptr.p_double[offsu + 3 * 4 + 1];
-   u32 = d2 * rowstorage->ptr.p_double[offsu + 3 * 4 + 2];
-   u33 = d3 * rowstorage->ptr.p_double[offsu + 3 * 4 + 3];
-   if (sheight == uheight) {
-   // No row scatter, the most efficient code
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + k * 4;
-         offsk = offsu + k * 4;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
-      }
-   } else {
-   // Row scatter is performed, less efficient code using double mapping to determine target row index
-      for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
-         offsk = offsu + k * 4;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
-      }
-   }
-   result = true;
-   return result;
-}
-
-// ALGLIB_NO_FAST_KERNELS
-#endif
-} // end of namespace alglib_impl

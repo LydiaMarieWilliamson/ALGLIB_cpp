@@ -26,6858 +26,8 @@
 #   pragma warning(disable:4996)
 #endif
 
-namespace alglib {
 // === OPTGUARDAPI Package ===
-
-// === OPTSERV Package ===
-
-// === MINLBFGS Package ===
-
-// === CQMODELS Package ===
-
-// === LPQPSERV Package ===
-
-// === SNNLS Package ===
-
-// === SACTIVESETS Package ===
-
-// === QQPSOLVER Package ===
-
-// === QPDENSEAULSOLVER Package ===
-
-// === MINBLEIC Package ===
-
-// === QPBLEICSOLVER Package ===
-
-// === VIPMSOLVER Package ===
-
-// === MINQP Package ===
-
-// === MINLM Package ===
-
-// === MINCG Package ===
-
-// === NLCSQP Package ===
-
-// === LPQPPRESOLVE Package ===
-
-// === REVISEDDUALSIMPLEX Package ===
-
-// === MINLP Package ===
-
-// === NLCSLP Package ===
-
-// === MINNLC Package ===
-
-// === MINNS Package ===
-
-// === MINCOMP Package ===
-
-// === MINBC Package ===
-
-// === OPTS Package ===
-
-// === OPTGUARDAPI Package ===
-// This structure is used to store  OptGuard  report,  i.e.  report  on   the
-// properties of the nonlinear function being optimized with ALGLIB.
-//
-// After you tell your optimizer to activate OptGuard  this technology starts
-// to silently monitor function values and gradients/Jacobians  being  passed
-// all around during your optimization session. Depending on specific set  of
-// checks enabled OptGuard may perform additional function evaluations  (say,
-// about 3*N evaluations if you want to check analytic gradient for errors).
-//
-// Upon discovering that something strange happens  (function  values  and/or
-// gradient components change too sharply and/or unexpectedly) OptGuard  sets
-// one of the "suspicion  flags" (without interrupting optimization session).
-// After optimization is done, you can examine OptGuard report.
-//
-// Following report fields can be set:
-// * nonc0suspected
-// * nonc1suspected
-// * badgradsuspected
-//
-//
-// === WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER =================
-//
-// Following  types  of  errors  in your target function (constraints) can be
-// caught:
-// a) discontinuous functions ("non-C0" part of the report)
-// b) functions with discontinuous derivative ("non-C1" part of the report)
-// c) errors in the analytic gradient provided by user
-//
-// These types of errors result in optimizer  stopping  well  before reaching
-// solution (most often - right after encountering discontinuity).
-//
-// Type A errors are usually  coding  errors  during  implementation  of  the
-// target function. Most "normal" problems involve continuous functions,  and
-// anyway you can't reliably optimize discontinuous function.
-//
-// Type B errors are either coding errors or (in case code itself is correct)
-// evidence of the fact  that  your  problem  is  an  "incorrect"  one.  Most
-// optimizers (except for ones provided by MINNS subpackage) do  not  support
-// nonsmooth problems.
-//
-// Type C errors are coding errors which often prevent optimizer from  making
-// even one step  or result in optimizing stopping  too  early,  as  soon  as
-// actual descent direction becomes too different from one suggested by user-
-// supplied gradient.
-//
-//
-// === WHAT IS REPORTED =====================================================
-//
-// Following set of report fields deals with discontinuous  target functions,
-// ones not belonging to C0 continuity class:
-//
-// * nonc0suspected - is a flag which is set upon discovering some indication
-//   of the discontinuity. If this flag is false, the rest of "non-C0" fields
-//   should be ignored
-// * nonc0fidx - is an index of the function (0 for  target  function,  1  or
-//   higher for nonlinear constraints) which is suspected of being "non-C0"
-// * nonc0lipshitzc - a Lipchitz constant for a function which was  suspected
-//   of being non-continuous.
-// * nonc0test0positive -  set  to  indicate  specific  test  which  detected
-//   continuity violation (test #0)
-//
-// Following set of report fields deals with discontinuous gradient/Jacobian,
-// i.e. with functions violating C1 continuity:
-//
-// * nonc1suspected - is a flag which is set upon discovering some indication
-//   of the discontinuity. If this flag is false, the rest of "non-C1" fields
-//   should be ignored
-// * nonc1fidx - is an index of the function (0 for  target  function,  1  or
-//   higher for nonlinear constraints) which is suspected of being "non-C1"
-// * nonc1lipshitzc - a Lipchitz constant for a function gradient  which  was
-//   suspected of being non-smooth.
-// * nonc1test0positive -  set  to  indicate  specific  test  which  detected
-//   continuity violation (test #0)
-// * nonc1test1positive -  set  to  indicate  specific  test  which  detected
-//   continuity violation (test #1)
-//
-// Following set of report fields deals with errors in the gradient:
-// * badgradsuspected - is a flad which is set upon discovering an  error  in
-//   the analytic gradient supplied by user
-// * badgradfidx - index  of   the  function  with bad gradient (0 for target
-//   function, 1 or higher for nonlinear constraints)
-// * badgradvidx - index of the variable
-// * badgradxbase - location where Jacobian is tested
-// * following  matrices  store  user-supplied  Jacobian  and  its  numerical
-//   differentiation version (which is assumed to be  free  from  the  coding
-//   errors), both of them computed near the initial point:
-//   * badgraduser, an array[K,N], analytic Jacobian supplied by user
-//   * badgradnum,  an array[K,N], numeric  Jacobian computed by ALGLIB
-//   Here K is a total number of  nonlinear  functions  (target  +  nonlinear
-//   constraints), N is a variable number.
-//   The  element  of  badgraduser[] with index [badgradfidx,badgradvidx]  is
-//   assumed to be wrong.
-//
-// More detailed error log can  be  obtained  from  optimizer  by  explicitly
-// requesting reports for tests C0.0, C1.0, C1.1.
-// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardreport, AndD DecVal(nonc0suspected) AndD DecVal(nonc0test0positive) AndD DecVal(nonc0fidx) AndD DecVal(nonc0lipschitzc) AndD DecVal(nonc1suspected) AndD DecVal(nonc1test0positive) AndD DecVal(nonc1test1positive) AndD DecVal(nonc1fidx) AndD DecVal(nonc1lipschitzc) AndD DecVal(badgradsuspected) AndD DecVal(badgradfidx) AndD DecVal(badgradvidx) AndD DecVar(badgradxbase) AndD DecVar(badgraduser) AndD DecVar(badgradnum))
-
-// This  structure  is  used  for  detailed   reporting  about  suspected  C0
-// continuity violation.
-//
-// === WHAT IS TESTED =======================================================
-//
-// C0 test  studies  function  values (not gradient!)  obtained  during  line
-// searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
-// usually indicate that discontinuity was detected.
-//
-//
-// === WHAT IS REPORTED =====================================================
-//
-// Actually, report retrieval function returns TWO report structures:
-//
-// * one for most suspicious point found so far (one with highest  change  in
-//   the function value), so called "strongest" report
-// * another one for most detailed line search (more function  evaluations  =
-//   easier to understand what's going on) which triggered  test #0 criteria,
-//   so called "longest" report
-//
-// In both cases following fields are returned:
-//
-// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
-//   did not notice anything (in the latter cases fields below are empty).
-// * fidx - is an index of the function (0 for  target  function, 1 or higher
-//   for nonlinear constraints) which is suspected of being "non-C1"
-// * x0[], d[] - arrays of length N which store initial point  and  direction
-//   for line search (d[] can be normalized, but does not have to)
-// * stp[], f[] - arrays of length CNT which store step lengths and  function
-//   values at these points; f[i] is evaluated in x0+stp[i]*d.
-// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
-//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
-//   stpidxa+2.
-//
-// You can plot function values stored in stp[]  and  f[]  arrays  and  study
-// behavior of your function by your own eyes, just  to  be  sure  that  test
-// correctly reported C1 violation.
-// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
-
-// This  structure  is  used  for  detailed   reporting  about  suspected  C1
-// continuity violation as flagged by C1 test #0 (OptGuard  has several tests
-// for C1 continuity, this report is used by #0).
-//
-// === WHAT IS TESTED =======================================================
-//
-// C1 test #0 studies function values (not gradient!)  obtained  during  line
-// searches and monitors behavior of directional  derivative  estimate.  This
-// test is less powerful than test #1, but it does  not  depend  on  gradient
-// values  and  thus  it  is  more  robust  against  artifacts  introduced by
-// numerical differentiation.
-//
-//
-// === WHAT IS REPORTED =====================================================
-//
-// Actually, report retrieval function returns TWO report structures:
-//
-// * one for most suspicious point found so far (one with highest  change  in
-//   the directional derivative), so called "strongest" report
-// * another one for most detailed line search (more function  evaluations  =
-//   easier to understand what's going on) which triggered  test #0 criteria,
-//   so called "longest" report
-//
-// In both cases following fields are returned:
-//
-// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
-//   did not notice anything (in the latter cases fields below are empty).
-// * fidx - is an index of the function (0 for  target  function, 1 or higher
-//   for nonlinear constraints) which is suspected of being "non-C1"
-// * x0[], d[] - arrays of length N which store initial point  and  direction
-//   for line search (d[] can be normalized, but does not have to)
-// * stp[], f[] - arrays of length CNT which store step lengths and  function
-//   values at these points; f[i] is evaluated in x0+stp[i]*d.
-// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
-//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
-//   stpidxa+2.
-//
-// You can plot function values stored in stp[]  and  f[]  arrays  and  study
-// behavior of your function by your own eyes, just  to  be  sure  that  test
-// correctly reported C1 violation.
-// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
-
-// This  structure  is  used  for  detailed   reporting  about  suspected  C1
-// continuity violation as flagged by C1 test #1 (OptGuard  has several tests
-// for C1 continuity, this report is used by #1).
-//
-// === WHAT IS TESTED =======================================================
-//
-// C1 test #1 studies individual  components  of  the  gradient  as  recorded
-// during line searches. Upon discovering discontinuity in the gradient  this
-// test records specific component which was suspected (or  one  with  highest
-// indication of discontinuity if multiple components are suspected).
-//
-// When precise analytic gradient is provided this test is more powerful than
-// test #0  which  works  with  function  values  and  ignores  user-provided
-// gradient.  However,  test  #0  becomes  more   powerful   when   numerical
-// differentiation is employed (in such cases test #1 detects  higher  levels
-// of numerical noise and becomes too conservative).
-//
-// This test also tells specific components of the gradient which violate  C1
-// continuity, which makes it more informative than #0, which just tells that
-// continuity is violated.
-//
-//
-// === WHAT IS REPORTED =====================================================
-//
-// Actually, report retrieval function returns TWO report structures:
-//
-// * one for most suspicious point found so far (one with highest  change  in
-//   the directional derivative), so called "strongest" report
-// * another one for most detailed line search (more function  evaluations  =
-//   easier to understand what's going on) which triggered  test #1 criteria,
-//   so called "longest" report
-//
-// In both cases following fields are returned:
-//
-// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
-//   did not notice anything (in the latter cases fields below are empty).
-// * fidx - is an index of the function (0 for  target  function, 1 or higher
-//   for nonlinear constraints) which is suspected of being "non-C1"
-// * vidx - is an index of the variable in [0,N) with nonsmooth derivative
-// * x0[], d[] - arrays of length N which store initial point  and  direction
-//   for line search (d[] can be normalized, but does not have to)
-// * stp[], g[] - arrays of length CNT which store step lengths and  gradient
-//   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
-//   vidx-th component of the gradient.
-// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
-//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
-//   stpidxa+2.
-//
-// You can plot function values stored in stp[]  and  g[]  arrays  and  study
-// behavior of your function by your own eyes, just  to  be  sure  that  test
-// correctly reported C1 violation.
-// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
-DefClass(optguardnonc1test1report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVal(vidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(g) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
-
-// === OPTSERV Package ===
-
-// === MINLBFGS Package ===
-//
-DefClass(minlbfgsstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-
-// This structure stores optimization report:
-// * IterationsCount           total number of inner iterations
-// * NFEV                      number of gradient evaluations
-// * TerminationType           termination type (see below)
-//
-// TERMINATION CODES
-//
-// TerminationType field contains completion code, which can be:
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signalled.
-//    1    relative function improvement is no more than EpsF.
-//    2    relative step is no more than EpsX.
-//    4    gradient norm is no more than EpsG
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    terminated    by  user  who  called  minlbfgsrequesttermination().
-//         X contains point which was   "current accepted"  when  termination
-//         request was submitted.
-//
-// Other fields of this structure are not documented and should not be used!
-DefClass(minlbfgsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
-
-void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgscreate(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgscreate(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgscreatef(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgscreatef(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetcond(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetxrep(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetstpmax(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetscale(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetprecdefault(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetpreccholesky(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(p.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetprecdiag(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetprecscale(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetprecscale(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minlbfgsiteration(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied gradient,  and one which uses function value
-//    only  and  numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    (either MinLBFGSCreate() for analytical gradient  or  MinLBFGSCreateF()
-//    for numerical differentiation) you should choose appropriate variant of
-//    MinLBFGSOptimize() - one  which  accepts  function  AND gradient or one
-//    which accepts function ONLY.
-//
-//    Be careful to choose variant of MinLBFGSOptimize() which corresponds to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed to MinLBFGSOptimize()  and specific
-//    function used to create optimizer.
-//
-//
-//                      |         USER PASSED TO MinLBFGSOptimize()
-//    CREATED WITH      |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    MinLBFGSCreateF() |     work                FAIL
-//    MinLBFGSCreate()  |     FAIL                work
-//
-//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-//    function  and  MinLBFGSOptimize()  version.   Attemps   to   use   such
-//    combination (for example, to create optimizer with MinLBFGSCreateF() and
-//    to pass gradient information to MinCGOptimize()) will lead to exception
-//    being thrown. Either  you  did  not pass gradient when it WAS needed or
-//    you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardgradient(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardsmoothness(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), level, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t level;
-
-   level = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardsmoothness(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), level, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardresults(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardnonc1test0results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardnonc1test1results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsresults(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsresultsbuf(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsrestartfrom(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsrequesttermination(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === CQMODELS Package ===
-
-// === LPQPSERV Package ===
-
-// === SNNLS Package ===
-
-// === SACTIVESETS Package ===
-
-// === QQPSOLVER Package ===
-
-// === QPDENSEAULSOLVER Package ===
-
-// === MINBLEIC Package ===
-// This object stores nonlinear optimizer state.
-// You should use functions provided by MinBLEIC subpackage to work with this
-// object
-DefClass(minbleicstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-
-// This structure stores optimization report:
-// * IterationsCount           number of iterations
-// * NFEV                      number of gradient evaluations
-// * TerminationType           termination type (see below)
-//
-// TERMINATION CODES
-//
-// TerminationType field contains completion code, which can be:
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signalled.
-//   -3    inconsistent constraints. Feasible point is
-//         either nonexistent or too hard to find. Try to
-//         restart optimizer with better initial approximation
-//    1    relative function improvement is no more than EpsF.
-//    2    relative step is no more than EpsX.
-//    4    gradient norm is no more than EpsG
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    terminated by user who called minbleicrequesttermination(). X contains
-//         point which was "current accepted" when  termination  request  was
-//         submitted.
-//
-// ADDITIONAL FIELDS
-//
-// There are additional fields which can be used for debugging:
-// * DebugEqErr                error in the equality constraints (2-norm)
-// * DebugFS                   f, calculated at projection of initial point
-//                             to the feasible set
-// * DebugFF                   f, calculated at the final point
-// * DebugDX                   |X_start-X_final|
-DefClass(minbleicreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype) AndD DecVal(debugeqerr) AndD DecVal(debugfs) AndD DecVal(debugff) AndD DecVal(debugdx) AndD DecVal(debugfeasqpits) AndD DecVal(debugfeasgpaits) AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount))
-
-void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleiccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleiccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleiccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleiccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetbc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetlc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minbleicsetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetlc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetcond(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetscale(const minbleicstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetscale(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetprecdefault(const minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetprecdefault(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetprecdiag(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetprecscale(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetxrep(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetstpmax(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minbleiciteration(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied gradient,  and one which uses function value
-//    only  and  numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    (either  MinBLEICCreate() for analytical gradient or  MinBLEICCreateF()
-//    for numerical differentiation) you should choose appropriate variant of
-//    MinBLEICOptimize() - one  which  accepts  function  AND gradient or one
-//    which accepts function ONLY.
-//
-//    Be careful to choose variant of MinBLEICOptimize() which corresponds to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed to MinBLEICOptimize()  and specific
-//    function used to create optimizer.
-//
-//
-//                      |         USER PASSED TO MinBLEICOptimize()
-//    CREATED WITH      |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    MinBLEICCreateF() |     work                FAIL
-//    MinBLEICCreate()  |     FAIL                work
-//
-//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-//    function  and  MinBLEICOptimize()  version.   Attemps   to   use   such
-//    combination (for  example,  to  create optimizer with MinBLEICCreateF()
-//    and  to  pass  gradient information to MinBLEICOptimize()) will lead to
-//    exception being thrown. Either  you  did  not pass gradient when it WAS
-//    needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbleicoptimize()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbleicoptimize()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minbleicoptguardgradient(const minbleicstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardgradient(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardsmoothness(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), level, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t level;
-
-   level = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardsmoothness(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), level, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardresults(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardnonc1test0results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardnonc1test1results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicresults(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicresultsbuf(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicrestartfrom(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicrequesttermination(const minbleicstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicrequesttermination(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === QPBLEICSOLVER Package ===
-
-// === VIPMSOLVER Package ===
-
-// === MINQP Package ===
-// This object stores nonlinear optimizer state.
-// You should use functions provided by MinQP subpackage to work with this
-// object
-DefClass(minqpstate, EndD)
-
-// This structure stores optimization report:
-// * InnerIterationsCount      number of inner iterations
-// * OuterIterationsCount      number of outer iterations
-// * NCholesky                 number of Cholesky decomposition
-// * NMV                       number of matrix-vector products
-//                             (only products calculated as part of iterative
-//                             process are counted)
-// * TerminationType           completion code (see below)
-// * LagBC                     Lagrange multipliers for box constraints,
-//                             array[N], not filled by QP-BLEIC solver
-// * LagLC                     Lagrange multipliers for linear constraints,
-//                             array[MSparse+MDense], ignored by QP-BLEIC solver
-//
-// === COMPLETION CODES =====================================================
-//
-// Completion codes:
-// * -9    failure of the automatic scale evaluation:  one  of  the  diagonal
-//         elements of the quadratic term is non-positive.  Specify  variable
-//         scales manually!
-// * -5    inappropriate solver was used:
-//         * QuickQP solver for problem with general linear constraints (dense/sparse)
-// * -4    BLEIC-QP or QuickQP solver found unconstrained direction
-//         of negative curvature (function is unbounded from
-//         below  even  under  constraints),  no  meaningful
-//         minimum can be found.
-// * -3    inconsistent constraints (or, maybe, feasible point is
-//         too hard to find). If you are sure that constraints are feasible,
-//         try to restart optimizer with better initial approximation.
-// * -2    IPM solver has difficulty finding primal/dual feasible point.
-//         It is likely that the problem is either infeasible or unbounded,
-//         but it is difficult to determine exact reason for termination.
-//         X contains best point found so far.
-// *  1..4 successful completion
-// *  5    MaxIts steps was taken
-// *  7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//
-// === LAGRANGE MULTIPLIERS =================================================
-//
-// Some  optimizers  report  values of  Lagrange  multipliers  on  successful
-// completion (positive completion code):
-// * DENSE-IPM-QP and SPARSE-IPM-QP return very precise Lagrange  multipliers
-//   as determined during solution process.
-// * DENSE-AUL-QP returns approximate Lagrange multipliers  (which  are  very
-//   close to "true"  Lagrange  multipliers  except  for  overconstrained  or
-//   degenerate problems)
-//
-// Two arrays of multipliers are returned:
-// * LagBC is array[N] which is loaded with multipliers from box constraints;
-//   LagBC[i]>0 means that I-th constraint is at the  upper bound, LagBC[I]<0
-//   means that I-th constraint is at the lower bound, LagBC[I]=0 means  that
-//   I-th box constraint is inactive.
-// * LagLC is array[MSparse+MDense] which is  loaded  with  multipliers  from
-//   general  linear  constraints  (former  MSparse  elements  corresponds to
-//   sparse part of the constraint matrix, latter MDense are  for  the  dense
-//   constraints, as was specified by user).
-//   LagLC[i]>0 means that I-th constraint at  the  upper  bound,  LagLC[i]<0
-//   means that I-th constraint is at the lower bound, LagLC[i]=0 means  that
-//   I-th linear constraint is inactive.
-//
-// On failure (or when optimizer does not support Lagrange multipliers) these
-// arrays are zero-filled.
-//
-// It is expected that at solution the dual feasibility condition holds:
-//
-//     C+H*(Xs-X0) + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
-//
-// where
-// * C is a linear term
-// * H is a quadratic term
-// * Xs is a solution, and X0 is an origin term (zero by default)
-// * Ei is a vector with 1.0 at position I and 0 in other positions
-// * Ai is an I-th row of linear constraint matrix
-//
-// NOTE: methods  from  IPM  family  may  also  return  meaningful   Lagrange
-//       multipliers  on  completion   with   code   -2   (infeasibility   or
-//       unboundedness  detected).
-DefClass(minqpreport, AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount) AndD DecVal(nmv) AndD DecVal(ncholesky) AndD DecVal(terminationtype) AndD DecVar(lagbc) AndD DecVar(laglc))
-
-void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpcreate(n, const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlinearterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(b.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetquadraticterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   bool isupper;
-   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
-      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
-   isupper = false;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetquadraticterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetquadratictermsparse(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetstartingpoint(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetorigin(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(xorigin.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetscale(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetscaleautodiag(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetalgobleic(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetalgodenseaul(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsx, rho, itscnt, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetalgodenseipm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), eps, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetalgosparseipm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), eps, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetalgoquickqp(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsg, epsf, epsx, maxouterits, usenewton, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetbc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetbcall(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), bndl, bndu, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetbci(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), i, bndl, bndu, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minqpsetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlcsparse(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlcmixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlcmixedlegacy(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((a.rows() != al.length()) || (a.rows() != au.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minqpsetlc2dense': looks like one of arguments has wrong size");
-   k = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2mixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsea.c_ptr()), ksparse, const_cast < alglib_impl::ae_matrix * >(densea.c_ptr()), kdense, const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpaddlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(a.c_ptr()), al, au, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpaddlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(idxa.c_ptr()), const_cast < alglib_impl::ae_vector * >(vala.c_ptr()), nnz, al, au, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpaddlc2sparsefromdense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(da.c_ptr()), al, au, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpoptimize(const minqpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpoptimize(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpresults(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minqpreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpresultsbuf(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minqpreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MINLM Package ===
-// Levenberg-Marquardt optimizer.
-//
-// This structure should be created using one of the MinLMCreate???()
-// functions. You should not access its fields directly; use ALGLIB functions
-// to work with it.
-DefClass(minlmstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(needfgh) AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(g) AndD DecVar(h) AndD DecVar(j) AndD DecVar(x))
-
-// Optimization report, filled by MinLMResults() function
-//
-// FIELDS:
-// * TerminationType, completetion code:
-//     * -8    optimizer detected NAN/INF values either in the function itself,
-//             or in its Jacobian
-//     * -5    inappropriate solver was used:
-//             * solver created with minlmcreatefgh() used  on  problem  with
-//               general linear constraints (set with minlmsetlc() call).
-//     * -3    constraints are inconsistent
-//     *  2    relative step is no more than EpsX.
-//     *  5    MaxIts steps was taken
-//     *  7    stopping conditions are too stringent,
-//             further improvement is impossible
-//     *  8    terminated   by  user  who  called  MinLMRequestTermination().
-//             X contains point which was "current accepted" when termination
-//             request was submitted.
-// * IterationsCount, contains iterations count
-// * NFunc, number of function calculations
-// * NJac, number of Jacobi matrix calculations
-// * NGrad, number of gradient calculations
-// * NHess, number of Hessian calculations
-// * NCholesky, number of Cholesky decomposition calculations
-DefClass(minlmreport, AndD DecVal(iterationscount) AndD DecVal(terminationtype) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(ngrad) AndD DecVal(nhess) AndD DecVal(ncholesky))
-
-void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatevj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatevj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatev(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatev(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefgh(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefgh(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetcond(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetxrep(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetstpmax(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmsetscale(const minlmstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetscale(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetbc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetlc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlmsetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetlc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmsetacctype(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), acctype, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minlmiteration(const minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minlmiteration(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     hess    -   callback which calculates function (or merit function)
-//                 value func, gradient grad and Hessian hess at given point x
-//     fvec    -   callback which calculates function vector fi[]
-//                 at given point x
-//     jac     -   callback which calculates function vector fi[]
-//                 and Jacobian jac at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-// NOTES:
-//
-// 1. Depending on function used to create state  structure,  this  algorithm
-//    may accept Jacobian and/or Hessian and/or gradient.  According  to  the
-//    said above, there ase several versions of this function,  which  accept
-//    different sets of callbacks.
-//
-//    This flexibility opens way to subtle errors - you may create state with
-//    MinLMCreateFGH() (optimization using Hessian), but call function  which
-//    does not accept Hessian. So when algorithm will request Hessian,  there
-//    will be no callback to call. In this case exception will be thrown.
-//
-//    Be careful to avoid such errors because there is no way to find them at
-//    compile time - you can see them at runtime only.
-// ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
-         fvec(state.x, state.fi, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
-         fvec(state.x, state.fi, ptr);
-         continue;
-      }
-      if (state.needfij) {
-         jac(state.x, state.fi, state.j, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'minlmoptimize()' (hess is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.needfgh) {
-         hess(state.x, state.f, state.g, state.h, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.needfij) {
-         jac(state.x, state.fi, state.j, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
-   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.needfij) {
-         jac(state.x, state.fi, state.j, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minlmoptguardgradient(const minlmstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmoptguardgradient(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmoptguardresults(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmresults(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmresultsbuf(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmrestartfrom(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmrequesttermination(const minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmrequesttermination(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatevgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatevgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlmcreatefj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-// === MINCG Package ===
-// This object stores state of the nonlinear CG optimizer.
-//
-// You should use ALGLIB functions to work with this object.
-DefClass(mincgstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-
-// This structure stores optimization report:
-// * IterationsCount           total number of inner iterations
-// * NFEV                      number of gradient evaluations
-// * TerminationType           termination type (see below)
-//
-// TERMINATION CODES
-//
-// TerminationType field contains completion code, which can be:
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signalled.
-//    1    relative function improvement is no more than EpsF.
-//    2    relative step is no more than EpsX.
-//    4    gradient norm is no more than EpsG
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    terminated by user who called mincgrequesttermination(). X contains
-//         point which was "current accepted" when  termination  request  was
-//         submitted.
-//
-// Other fields of this structure are not documented and should not be used!
-DefClass(mincgreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
-
-void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgcreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgcreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgcreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgcreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetcond(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetscale(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetxrep(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetcgtype(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), cgtype, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetstpmax(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsuggeststep(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), stp, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetprecdefault(const mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetprecdefault(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetprecdiag(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgsetprecscale(const mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgsetprecscale(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool mincgiteration(const mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::mincgiteration(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied  gradient, and one which uses function value
-//    only  and  numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    (either MinCGCreate()  for analytical gradient  or  MinCGCreateF()  for
-//    numerical differentiation) you should  choose  appropriate  variant  of
-//    MinCGOptimize() - one which accepts function AND gradient or one  which
-//    accepts function ONLY.
-//
-//    Be careful to choose variant of MinCGOptimize()  which  corresponds  to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed  to  MinCGOptimize()  and  specific
-//    function used to create optimizer.
-//
-//
-//                   |         USER PASSED TO MinCGOptimize()
-//    CREATED WITH   |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    MinCGCreateF() |     work                FAIL
-//    MinCGCreate()  |     FAIL                work
-//
-//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-//    function and MinCGOptimize() version. Attemps to use  such  combination
-//    (for  example,  to create optimizer with  MinCGCreateF()  and  to  pass
-//    gradient information to MinCGOptimize()) will lead to  exception  being
-//    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
-//    passed gradient when it was NOT needed.
-// ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'mincgoptimize()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'mincgoptimize()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void mincgoptguardgradient(const mincgstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardgradient(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardsmoothness(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), level, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t level;
-
-   level = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardsmoothness(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), level, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardresults(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardnonc1test0results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardnonc1test1results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgresults(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgresultsbuf(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgrestartfrom(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void mincgrequesttermination(const mincgstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgrequesttermination(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === NLCSQP Package ===
-
-// === LPQPPRESOLVE Package ===
-
-// === REVISEDDUALSIMPLEX Package ===
-
-// === MINLP Package ===
-// This object stores linear solver state.
-// You should use functions provided by MinLP subpackage to work with this
-// object
-DefClass(minlpstate, EndD)
-
-// This structure stores optimization report:
-// * f                         target function value
-// * lagbc                     Lagrange coefficients for box constraints
-// * laglc                     Lagrange coefficients for linear constraints
-// * y                         dual variables
-// * stats                     array[N+M], statuses of box (N) and linear (M)
-//                             constraints. This array is filled only by  DSS
-//                             algorithm because IPM always stops at INTERIOR
-//                             point:
-//                             * stats[i]>0  =>  constraint at upper bound
-//                                               (also used for free non-basic
-//                                               variables set to zero)
-//                             * stats[i]<0  =>  constraint at lower bound
-//                             * stats[i]=0  =>  constraint is inactive, basic
-//                                               variable
-// * primalerror               primal feasibility error
-// * dualerror                 dual feasibility error
-// * slackerror                complementary slackness error
-// * iterationscount           iteration count
-// * terminationtype           completion code (see below)
-//
-// COMPLETION CODES
-//
-// Completion codes:
-// * -4    LP problem is primal unbounded (dual infeasible)
-// * -3    LP problem is primal infeasible (dual unbounded)
-// *  1..4 successful completion
-// *  5    MaxIts steps was taken
-// *  7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//
-// LAGRANGE COEFFICIENTS
-//
-// Positive Lagrange coefficient means that constraint is at its upper bound.
-// Negative coefficient means that constraint is at its lower  bound.  It  is
-// expected that at solution the dual feasibility condition holds:
-//
-//     C + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
-//
-// where
-// * C is a cost vector (linear term)
-// * Ei is a vector with 1.0 at position I and 0 in other positions
-// * Ai is an I-th row of linear constraint matrix
-DefClass(minlpreport, AndD DecVal(f) AndD DecVar(lagbc) AndD DecVar(laglc) AndD DecVar(y) AndD DecVar(stats) AndD DecVal(primalerror) AndD DecVal(dualerror) AndD DecVal(slackerror) AndD DecVal(iterationscount) AndD DecVal(terminationtype))
-
-void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpcreate(n, const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetalgodss(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetalgoipm(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlpsetalgoipm(const minlpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   double eps;
-
-   eps = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetalgoipm(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlpsetcost(const minlpstate &state, const real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetcost(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetscale(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetbc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetbcall(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), bndl, bndu, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetbci(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), i, bndl, bndu, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((a.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlpsetlc': looks like one of arguments has wrong size");
-   k = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((a.rows() != al.length()) || (a.rows() != au.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlpsetlc2dense': looks like one of arguments has wrong size");
-   k = a.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpaddlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(a.c_ptr()), al, au, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpaddlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(idxa.c_ptr()), const_cast < alglib_impl::ae_vector * >(vala.c_ptr()), nnz, al, au, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpoptimize(const minlpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpoptimize(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpresults(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlpreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpresultsbuf(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlpreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === NLCSLP Package ===
-
-// === MINNLC Package ===
-// This object stores nonlinear optimizer state.
-// You should use functions provided by MinNLC subpackage to work  with  this
-// object
-DefClass(minnlcstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
-
-// These fields store optimization report:
-// * iterationscount           total number of inner iterations
-// * nfev                      number of gradient evaluations
-// * terminationtype           termination type (see below)
-//
-// Scaled constraint violations are reported:
-// * bcerr                     maximum violation of the box constraints
-// * bcidx                     index of the most violated box  constraint (or
-//                             -1, if all box constraints  are  satisfied  or
-//                             there is no box constraint)
-// * lcerr                     maximum violation of the  linear  constraints,
-//                             computed as maximum  scaled  distance  between
-//                             final point and constraint boundary.
-// * lcidx                     index of the most violated  linear  constraint
-//                             (or -1, if all constraints  are  satisfied  or
-//                             there is no general linear constraints)
-// * nlcerr                    maximum violation of the nonlinear constraints
-// * nlcidx                    index of the most violated nonlinear constraint
-//                             (or -1, if all constraints  are  satisfied  or
-//                             there is no nonlinear constraints)
-//
-// Violations of box constraints are scaled on per-component basis  according
-// to  the  scale  vector s[] as specified by minnlcsetscale(). Violations of
-// the general linear  constraints  are  also  computed  using  user-supplied
-// variable scaling. Violations of nonlinear constraints are computed "as is"
-//
-// TERMINATION CODES
-//
-// TerminationType field contains completion code, which can be either:
-//
-// === FAILURE CODE ===
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signaled.
-//   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
-//         constraints does NOT trigger emergency  completion;  you  have  to
-//         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
-//         constraints.
-//
-// === SUCCESS CODE ===
-//    2    relative step is no more than EpsX.
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    user requested algorithm termination via minnlcrequesttermination(),
-//         last accepted point is returned
-//
-// Other fields of this structure are not documented and should not be used!
-DefClass(minnlcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(bcerr) AndD DecVal(bcidx) AndD DecVal(lcerr) AndD DecVal(lcidx) AndD DecVal(nlcerr) AndD DecVal(nlcidx) AndD DecVal(dbgphase0its))
-
-void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetbc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minnlcsetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetnlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), nlec, nlic, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetcond(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetscale(const minnlcstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetscale(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetprecinexact(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetprecinexact(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetprecexactlowrank(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), updatefreq, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetprecexactrobust(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), updatefreq, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetprecnone(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetprecnone(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetstpmax(const minnlcstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetstpmax(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetalgoaul(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), rho, itscnt, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetalgoslp(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetalgosqp(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcsetxrep(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minnlciteration(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     fvec    -   callback which calculates function vector fi[]
-//                 at given point x
-//     jac     -   callback which calculates function vector fi[]
-//                 and Jacobian jac at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied Jacobian, and one which uses  only  function
-//    vector and numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    you should choose appropriate variant of MinNLCOptimize() -  one  which
-//    accepts function AND Jacobian or one which accepts ONLY function.
-//
-//    Be careful to choose variant of MinNLCOptimize()  which  corresponds to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed to MinNLCOptimize()   and  specific
-//    function used to create optimizer.
-//
-//
-//                      |         USER PASSED TO MinNLCOptimize()
-//    CREATED WITH      |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    MinNLCCreateF()   |     works               FAILS
-//    MinNLCCreate()    |     FAILS               works
-//
-//    Here "FAILS" denotes inappropriate combinations  of  optimizer creation
-//    function  and  MinNLCOptimize()  version.   Attemps   to    use    such
-//    combination will lead to exception. Either  you  did  not pass gradient
-//    when it WAS needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnlcoptimize()' (fvec is NULL)", &_alglib_env_state);
-   while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
-         fvec(state.x, state.fi, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnlcoptimize()' (jac is NULL)", &_alglib_env_state);
-   while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfij) {
-         jac(state.x, state.fi, state.j, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minnlcoptguardgradient(const minnlcstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardgradient(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardsmoothness(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), level, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t level;
-
-   level = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardsmoothness(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), level, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardresults(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardnonc1test0results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardnonc1test1results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcresults(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcresultsbuf(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcrequesttermination(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcrestartfrom(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MINNS Package ===
-// This object stores nonlinear optimizer state.
-// You should use functions provided by MinNS subpackage to work  with  this
-// object
-DefClass(minnsstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
-
-// This structure stores optimization report:
-// * IterationsCount           total number of inner iterations
-// * NFEV                      number of gradient evaluations
-// * TerminationType           termination type (see below)
-// * CErr                      maximum violation of all types of constraints
-// * LCErr                     maximum violation of linear constraints
-// * NLCErr                    maximum violation of nonlinear constraints
-//
-// TERMINATION CODES
-//
-// TerminationType field contains completion code, which can be:
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signalled.
-//   -3    box constraints are inconsistent
-//   -1    inconsistent parameters were passed:
-//         * penalty parameter for minnssetalgoags() is zero,
-//           but we have nonlinear constraints set by minnssetnlc()
-//    2    sampling radius decreased below epsx
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    User requested termination via MinNSRequestTermination()
-//
-// Other fields of this structure are not documented and should not be used!
-DefClass(minnsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(cerr) AndD DecVal(lcerr) AndD DecVal(nlcerr) AndD DecVal(terminationtype) AndD DecVal(varidx) AndD DecVal(funcidx))
-
-void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnscreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnscreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnscreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnscreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetbc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minnssetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetnlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), nlec, nlic, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetcond(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetscale(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetalgoags(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), radius, penalty, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnssetxrep(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnsrequesttermination(const minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnsrequesttermination(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minnsiteration(const minnsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minnsiteration(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     fvec    -   callback which calculates function vector fi[]
-//                 at given point x
-//     jac     -   callback which calculates function vector fi[]
-//                 and Jacobian jac at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied Jacobian, and one which uses  only  function
-//    vector and numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    you should choose appropriate variant of  minnsoptimize() -  one  which
-//    accepts function AND Jacobian or one which accepts ONLY function.
-//
-//    Be careful to choose variant of minnsoptimize()  which  corresponds  to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed to minnsoptimize()    and  specific
-//    function used to create optimizer.
-//
-//
-//                      |         USER PASSED TO minnsoptimize()
-//    CREATED WITH      |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    minnscreatef()    |     works               FAILS
-//    minnscreate()     |     FAILS               works
-//
-//    Here "FAILS" denotes inappropriate combinations  of  optimizer creation
-//    function  and  minnsoptimize()  version.   Attemps   to    use     such
-//    combination will lead to exception. Either  you  did  not pass gradient
-//    when it WAS needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnsoptimize()' (fvec is NULL)", &_alglib_env_state);
-   while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
-         fvec(state.x, state.fi, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnsoptimize()' (jac is NULL)", &_alglib_env_state);
-   while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfij) {
-         jac(state.x, state.fi, state.j, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnsresults(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnsresultsbuf(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnsrestartfrom(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MINCOMP Package ===
-//
-DefClass(minasastate, AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-
-//
-DefClass(minasareport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(activeconstraints))
-
-void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetdefaultpreconditioner(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgssetcholeskypreconditioner(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(p.c_ptr()), isupper, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetbarrierwidth(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), mu, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicsetbarrierdecay(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), mudecay, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != bndl.length()) || (x.length() != bndu.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'minasacreate': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasasetcond(const_cast < alglib_impl::minasastate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasasetxrep(const minasastate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasasetxrep(const_cast < alglib_impl::minasastate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasasetalgorithm(const_cast < alglib_impl::minasastate * >(state.c_ptr()), algotype, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasasetstpmax(const minasastate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasasetstpmax(const_cast < alglib_impl::minasastate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minasaiteration(const minasastate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minasaiteration(const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minasaoptimize()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::minasaiteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minasaoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasaresults(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minasareport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasaresultsbuf(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minasareport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasarestartfrom(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === MINBC Package ===
-// This object stores nonlinear optimizer state.
-// You should use functions provided by MinBC subpackage to work with this
-// object
-DefClass(minbcstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
-
-// This structure stores optimization report:
-// * iterationscount           number of iterations
-// * nfev                      number of gradient evaluations
-// * terminationtype           termination type (see below)
-//
-// TERMINATION CODES
-//
-// terminationtype field contains completion code, which can be:
-//   -8    internal integrity control detected  infinite  or  NAN  values  in
-//         function/gradient. Abnormal termination signalled.
-//   -3    inconsistent constraints.
-//    1    relative function improvement is no more than EpsF.
-//    2    relative step is no more than EpsX.
-//    4    gradient norm is no more than EpsG
-//    5    MaxIts steps was taken
-//    7    stopping conditions are too stringent,
-//         further improvement is impossible,
-//         X contains best point found so far.
-//    8    terminated by user who called minbcrequesttermination(). X contains
-//         point which was "current accepted" when  termination  request  was
-//         submitted.
-DefClass(minbcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype))
-
-void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetbc(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetcond(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetscale(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetprecdefault(const minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetprecdefault(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetprecdiag(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetprecscale(const minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetprecscale(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetxrep(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcsetstpmax(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-bool minbciteration(const minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::minbciteration(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
-}
-
-// This family of functions is used to launcn iterations of nonlinear optimizer
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     grad    -   callback which calculates function (or merit function)
-//                 value func and gradient grad at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-//
-// NOTES:
-//
-// 1. This function has two different implementations: one which  uses  exact
-//    (analytical) user-supplied gradient,  and one which uses function value
-//    only  and  numerically  differentiates  function  in  order  to  obtain
-//    gradient.
-//
-//    Depending  on  the  specific  function  used to create optimizer object
-//    (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
-//    for numerical differentiation) you should choose appropriate variant of
-//    MinBCOptimize() - one  which  accepts  function  AND gradient or one
-//    which accepts function ONLY.
-//
-//    Be careful to choose variant of MinBCOptimize() which corresponds to
-//    your optimization scheme! Table below lists different  combinations  of
-//    callback (function/gradient) passed to MinBCOptimize()  and specific
-//    function used to create optimizer.
-//
-//
-//                      |         USER PASSED TO MinBCOptimize()
-//    CREATED WITH      |  function only   |  function and gradient
-//    ------------------------------------------------------------
-//    MinBCCreateF()    |     works               FAILS
-//    MinBCCreate()     |     FAILS               works
-//
-//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-//    function  and  MinBCOptimize()  version.   Attemps   to   use   such
-//    combination (for  example,  to  create optimizer with MinBCCreateF()
-//    and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
-//    exception being thrown. Either  you  did  not pass gradient when it WAS
-//    needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbcoptimize()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.x, state.f, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbcoptimize()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
-         grad(state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.x, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
-   }
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void minbcoptguardgradient(const minbcstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardgradient(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), teststep, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardsmoothness(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), level, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#if !defined(AE_NO_EXCEPTIONS)
-void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t level;
-
-   level = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardsmoothness(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), level, &_alglib_env_state);
-
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-#endif
-
-void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardresults(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardnonc1test0results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardnonc1test1results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcresults(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcresultsbuf(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcreport * >(rep.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcrestartfrom(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void minbcrequesttermination(const minbcstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcrequesttermination(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-// === OPTS Package ===
-// This is a test problem class  intended  for  internal  performance  tests.
-// Never use it directly in your projects.
-DefClass(lptestproblem, EndD)
-
-void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-   alglib_impl::ae_int_t ssize;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_alloc_start(&serializer);
-   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
-   s_out.clear();
-   s_out.reserve((size_t)(ssize + 1));
-   alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
-   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_alloc_start(&serializer);
-   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
-   alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
-   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-
-void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
-   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
-   alglib_impl::ae_serializer serializer;
-
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
-   alglib_impl::ae_serializer_init(&serializer);
-   alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
-   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
-   alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
-   alglib_impl::ae_state_clear(&state);
-}
-
-void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemcreate(n, hasknowntarget, targetf, const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemsetscale(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemsetcost(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemsetbc(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemsetlc2(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-
-void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::xdbgminlpcreatefromtestproblem(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
-}
-} // end of namespace alglib
-
 namespace alglib_impl {
-// === OPTGUARDAPI Package ===
-
-// === OPTSERV Package ===
-static double optserv_ognoiselevelf = 1.0E2 * ae_machineepsilon;
-static double optserv_ognoiselevelg = 1.0E4 * ae_machineepsilon;
-static double optserv_ogminrating0 = 50.0;
-static double optserv_ogminrating1 = 50.0;
-static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *tmp0, ae_state *_state);
-static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, double *err, RVector *grad, RVector *tmp0, ae_state *_state);
-static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state);
-static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
-static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
-
-// === MINLBFGS Package ===
-static double minlbfgs_gtol = 0.4;
-static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
-
-// === CQMODELS Package ===
-static ae_int_t cqmodels_newtonrefinementits = 3;
-static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state);
-static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tmp, ae_state *_state);
-
-// === LPQPSERV Package ===
-
-// === SNNLS Package ===
-static void snnls_funcgradu(snnlssolver *s, RVector *x, RVector *r, RVector *g, double *f, ae_state *_state);
-static void snnls_func(snnlssolver *s, RVector *x, double *f, ae_state *_state);
-static void snnls_trdprepare(snnlssolver *s, RVector *x, RVector *diag, double lambdav, RVector *trdd, RMatrix *trda, RVector *tmp0, RVector *tmp1, RVector *tmp2, RMatrix *tmplq, ae_state *_state);
-static void snnls_trdsolve(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t nd, RVector *d, ae_state *_state);
-static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t nd, ae_int_t idx, RVector *tmp, ae_state *_state);
-
-// === SACTIVESETS Package ===
-static ae_int_t sactivesets_maxbasisage = 5;
-static double sactivesets_maxbasisdecay = 0.01;
-static double sactivesets_minnormseparation = 0.25;
-static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, bool normalize, RVector *d, ae_state *_state);
-static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RVector *h, ae_state *_state);
-
-// === QQPSOLVER Package ===
-static ae_int_t qqpsolver_quickqprestartcg = 50;
-static double qqpsolver_regz = 1.0E-9;
-static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, RVector *d, double stp, RVector *tmp0, RVector *tmp1, ae_state *_state);
-static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g, ae_state *_state);
-static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d, RVector *g, double *d1, ae_int_t *d1est, double *d2, ae_int_t *d2est, RVector *tmp0, ae_state *_state);
-static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state);
-static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state);
-static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state);
-static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state);
-
-// === QPDENSEAULSOLVER Package ===
-static double qpdenseaulsolver_evictionlevel = -0.01;
-static double qpdenseaulsolver_expansionratio = 0.20;
-static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *nulc, double rho, RMatrix *exa, RVector *exb, RVector *exbndl, RVector *exbndu, RMatrix *tmp2, ae_state *_state);
-static void qpdenseaulsolver_generateexinitialpoint(RVector *sclsftxc, ae_int_t nmain, ae_int_t nslack, RVector *exxc, ae_state *_state);
-static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *exxc, RVector *nulcest, qpdenseaulbuffers *buffers, ae_state *_state);
-static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state);
-static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, bool usecleic, RMatrix *tmp2, ae_state *_state);
-static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, bool *allowwseviction, ae_state *_state);
-
-// === MINBLEIC Package ===
-static double minbleic_gtol = 0.4;
-static double minbleic_maxnonmonotoniclen = 1.0E-7;
-static double minbleic_initialdecay = 0.5;
-static double minbleic_mindecay = 0.1;
-static double minbleic_decaycorrection = 0.8;
-static double minbleic_penaltyfactor = 100;
-static void minbleic_clearrequestfields(minbleicstate *state, ae_state *_state);
-static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state);
-static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, ae_state *_state);
-
-// === QPBLEICSOLVER Package ===
-
-// === VIPMSOLVER Package ===
-static ae_int_t vipmsolver_maxipmits = 200;
-static double vipmsolver_initslackval = 100.0;
-static double vipmsolver_steplengthdecay = 0.95;
-static double vipmsolver_stagnationdelta = 0.99999;
-static double vipmsolver_primalinfeasible1 = 1.0E-3;
-static double vipmsolver_dualinfeasible1 = 1.0E-3;
-static double vipmsolver_bigy = 1.0E8;
-static double vipmsolver_ygrowth = 1.0E6;
-static ae_int_t vipmsolver_itersfortoostringentcond = 25;
-static ae_int_t vipmsolver_minitersbeforedroppingbounds = 3;
-static ae_int_t vipmsolver_minitersbeforeinfeasible = 3;
-static ae_int_t vipmsolver_minitersbeforestagnation = 5;
-static ae_int_t vipmsolver_minitersbeforeeworststagnation = 50;
-static ae_int_t vipmsolver_primalstagnationlen = 5;
-static ae_int_t vipmsolver_dualstagnationlen = 7;
-static double vipmsolver_bigconstrxtol = 1.0E-5;
-static double vipmsolver_bigconstrmag = 1.0E3;
-static double vipmsolver_minitersbeforesafeguards = 5;
-static double vipmsolver_badsteplength = 1.0E-3;
-static void vipmsolver_varsinitbyzero(vipmvars *vstate, ae_int_t n, ae_int_t m, ae_state *_state);
-static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc, ae_state *_state);
-static void vipmsolver_varsaddstep(vipmvars *vstate, vipmvars *vdir, double stpp, double stpd, ae_state *_state);
-static double vipmsolver_varscomputecomplementaritygap(vipmvars *vstate, ae_state *_state);
-static double vipmsolver_varscomputemu(vipmvars *vstate, ae_state *_state);
-static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_int_t nmain, ae_int_t ftype, ae_state *_state);
-static double vipmsolver_vipmtarget(vipmstate *state, RVector *x, ae_state *_state);
-static void vipmsolver_multiplygeax(vipmstate *state, double alpha, RVector *x, ae_int_t offsx, double beta, RVector *y, ae_int_t offsax, ae_state *_state);
-static void vipmsolver_multiplygeatx(vipmstate *state, double alpha, RVector *x, ae_int_t offsx, double beta, RVector *y, ae_int_t offsy, ae_state *_state);
-static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx, ae_state *_state);
-static void vipmsolver_vipmmultiply(vipmstate *state, RVector *x, RVector *y, RVector *hx, RVector *ax, RVector *aty, ae_state *_state);
-static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_state);
-static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state);
-static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy, ae_state *_state);
-static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state);
-static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, vipmvars *sol, ae_state *_state);
-static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, bool isdampepslarge, ae_state *_state);
-static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vipmvars *vs, double stepdecay, double *alphap, double *alphad, ae_state *_state);
-static void vipmsolver_vipmperformstep(vipmstate *state, double alphap, double alphad, ae_state *_state);
-static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *errd2, double *errpinf, double *errdinf, double *egap, ae_state *_state);
-static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmvars *vd, double alphap, double alphad, ae_state *_state);
-static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, double sigma, double alphap, double alphad, ae_state *_state);
-static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *direstimate, vipmrighthandside *rhs, double reg, ae_state *_state);
-static void vipmsolver_rhssubtract(vipmstate *state, vipmrighthandside *rhs, vipmvars *v0, vipmvars *vdcandidate, double reg, ae_state *_state);
-static double vipmsolver_rhsprimal2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
-static double vipmsolver_rhsdual2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
-static double vipmsolver_rhsprimalinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
-static double vipmsolver_rhsdualinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
-static double vipmsolver_rhscompl2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
-static double vipmsolver_minnz(RVector *x, ae_int_t n, ae_state *_state);
-static double vipmsolver_minprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
-
-// === MINQP Package ===
-
-// === MINLM Package ===
-static double minlm_lambdaup = 2.0;
-static double minlm_lambdadown = 0.33;
-static double minlm_suspiciousnu = 16;
-static ae_int_t minlm_smallmodelage = 3;
-static ae_int_t minlm_additers = 5;
-static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *state, ae_state *_state);
-static void minlm_clearrequestfields(minlmstate *state, ae_state *_state);
-static bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state);
-static void minlm_decreaselambda(double *lambdav, double *nu, ae_state *_state);
-static ae_int_t minlm_checkdecrease(RMatrix *quadraticmodel, RVector *gbase, double fbase, ae_int_t n, RVector *deltax, double fnew, double *lambdav, double *nu, ae_state *_state);
-static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state);
-static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadraticmodel, RVector *gbase, double fbase, RVector *xbase, RVector *fibase, ae_int_t modelage, ae_state *_state);
-static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, bool *deltaxready, RVector *deltaf, bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state);
-
-// === MINCG Package ===
-static ae_int_t mincg_rscountdownlen = 10;
-static double mincg_gtol = 0.3;
-static void mincg_clearrequestfields(mincgstate *state, ae_state *_state);
-static void mincg_preconditionedmultiply(mincgstate *state, RVector *x, RVector *work0, RVector *work1, ae_state *_state);
-static double mincg_preconditionedmultiply2(mincgstate *state, RVector *x, RVector *y, RVector *work0, RVector *work1, ae_state *_state);
-static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *state, ae_state *_state);
-
-// === NLCSQP Package ===
-static double nlcsqp_sqpdeltadecrease = 0.20;
-static double nlcsqp_sqpdeltaincrease = 0.80;
-static double nlcsqp_maxtrustraddecay = 0.1;
-static double nlcsqp_maxtrustradgrowth = 1.333;
-static double nlcsqp_maxbigc = 1.0E5;
-static double nlcsqp_meritfunctionbase = 0.0;
-static double nlcsqp_meritfunctiongain = 2.0;
-static double nlcsqp_augmentationfactor = 10.0;
-static double nlcsqp_inittrustrad = 0.1;
-static double nlcsqp_stagnationepsf = 1.0E-12;
-static ae_int_t nlcsqp_fstagnationlimit = 20;
-static ae_int_t nlcsqp_trustradstagnationlimit = 10;
-static double nlcsqp_sqpbigscale = 5.0;
-static double nlcsqp_sqpsmallscale = 0.2;
-static ae_int_t nlcsqp_penaltymemlen = 5;
-static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolver, ae_state *_state);
-static void nlcsqp_qpsubsolversetalgoipm(minsqpsubsolver *subsolver, ae_state *_state);
-static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
-static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h, ae_int_t nq, RVector *b, ae_int_t n, RVector *bndl, RVector *bndu, sparsematrix *a, ae_int_t m, RVector *al, RVector *au, double trustrad, ae_int_t *terminationtype, RVector *d, RVector *lagmult, ae_state *_state);
-static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state);
-static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RMatrix *abslagmemory, ae_int_t memlen, ae_state *_state);
-static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state);
-static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, bool *increasebigc, ae_int_t *status, ae_state *_state);
-static void nlcsqp_sqpsendx(minsqpstate *state, RVector *xs, ae_state *_state);
-static bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
-static void nlcsqp_sqpcopystate(minsqpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
-static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minsqptmplagrangian *tmp, double *f, RVector *g, ae_state *_state);
-static double nlcsqp_meritfunction(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, ae_state *_state);
-static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, ae_state *_state);
-static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, double *meritf, double *rawlag, ae_state *_state);
-
-// === LPQPPRESOLVE Package ===
-
-// === REVISEDDUALSIMPLEX Package ===
-static ae_int_t reviseddualsimplex_maxforcedrestarts = 1;
-static ae_int_t reviseddualsimplex_safetrfage = 5;
-static ae_int_t reviseddualsimplex_defaultmaxtrfage = 100;
-static double reviseddualsimplex_minbeta = 1.0E-4;
-static double reviseddualsimplex_maxudecay = 0.001;
-static double reviseddualsimplex_shiftlen = 1.0E-12;
-static double reviseddualsimplex_alphatrigger = 1.0E8 * ae_machineepsilon;
-static double reviseddualsimplex_alphatrigger2 = 0.001;
-static ae_int_t reviseddualsimplex_ssinvalid = 0;
-static ae_int_t reviseddualsimplex_ssvalidxn = 1;
-static ae_int_t reviseddualsimplex_ssvalid = 2;
-static ae_int_t reviseddualsimplex_ccfixed = 0;
-static ae_int_t reviseddualsimplex_cclower = 1;
-static ae_int_t reviseddualsimplex_ccupper = 2;
-static ae_int_t reviseddualsimplex_ccrange = 3;
-static ae_int_t reviseddualsimplex_ccfree = 4;
-static ae_int_t reviseddualsimplex_ccinfeasible = 5;
-static void reviseddualsimplex_subprobleminit(ae_int_t n, dualsimplexsubproblem *s, ae_state *_state);
-static void reviseddualsimplex_subprobleminitphase1(dualsimplexsubproblem *s0, dualsimplexbasis *basis, dualsimplexsubproblem *s1, ae_state *_state);
-static void reviseddualsimplex_subprobleminitphase3(dualsimplexsubproblem *s0, dualsimplexsubproblem *s1, ae_state *_state);
-static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
-static void reviseddualsimplex_subproblemhandlexnupdate(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
-static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t q, double alpharpiv, double *thetad, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t r, dssvector *rhor, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, dssvector *alphar, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, ae_int_t q, RVector *alphaq, RVector *alphaqim, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t p, ae_int_t *q, double *alpharpiv, double *thetad, ZVector *possibleflips, ae_int_t *possibleflipscnt, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t p, ae_int_t q, ae_int_t r, double delta, double alphapiv, double thetap, double thetad, RVector *alphaq, RVector *alphaqim, dssvector *alphar, RVector *tau, ZVector *possiblealpharflips, ae_int_t possiblealpharflipscnt, dualsimplexsettings *settings, ae_state *_state);
-static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state);
-static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t i, ae_int_t k, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
-static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
-static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_solveboxonly(dualsimplexstate *state, ae_state *_state);
-static void reviseddualsimplex_setzeroxystats(dualsimplexstate *state, ae_state *_state);
-static void reviseddualsimplex_basisinit(ae_int_t ns, ae_int_t m, dualsimplexbasis *s, ae_state *_state);
-static void reviseddualsimplex_basisclearstats(dualsimplexbasis *s, ae_state *_state);
-static bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
-static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s, ae_state *_state);
-static void reviseddualsimplex_basisexportto(dualsimplexbasis *s0, dualsimplexbasis *s1, ae_state *_state);
-static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_basisfreshtrf(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
-static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix *at, ae_int_t p, ae_int_t q, RVector *alphaq, RVector *alphaqim, ae_int_t r, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tmpx, ae_state *_state);
-static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, bool needintermediate, RVector *tx, ae_state *_state);
-static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tx, ae_state *_state);
-static void reviseddualsimplex_computeanxn(dualsimplexstate *state, dualsimplexsubproblem *subproblem, RVector *x, RVector *y, ae_state *_state);
-static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector *y, RVector *r, ae_state *_state);
-static bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
-static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
-static bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
-static void reviseddualsimplex_downgradestate(dualsimplexsubproblem *subproblem, ae_int_t s, ae_state *_state);
-static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
-static bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd, ae_state *_state);
-static void reviseddualsimplex_inversecyclicpermutation(ZVector *bwd, ae_int_t m, ae_int_t d, ZVector *tmpi, ae_state *_state);
-static void reviseddualsimplex_offloadbasiccomponents(dualsimplexsubproblem *s, dualsimplexbasis *basis, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_recombinebasicnonbasicx(dualsimplexsubproblem *s, dualsimplexbasis *basis, ae_state *_state);
-static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexbasis *basis, apbuffers *buffers, RVector *x, RVector *lagbc, RVector *laglc, ZVector *stats, ae_state *_state);
-static void reviseddualsimplex_dvalloc(dssvector *x, ae_int_t n, ae_state *_state);
-static void reviseddualsimplex_dvinit(dssvector *x, ae_int_t n, ae_state *_state);
-static void reviseddualsimplex_dvdensetosparse(dssvector *x, ae_state *_state);
-static void reviseddualsimplex_dvsparsetodense(dssvector *x, ae_state *_state);
-static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n, ae_state *_state);
-static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t *cnt, ae_state *_state);
-
-// === MINLP Package ===
-static ae_int_t minlp_alllogicalsbasis = 0;
-static void minlp_clearreportfields(minlpstate *state, ae_state *_state);
-
-// === NLCSLP Package ===
-static double nlcslp_slpstpclosetozero = 0.001;
-static double nlcslp_slpdeltadecrease = 0.20;
-static double nlcslp_slpdeltaincrease = 0.80;
-static double nlcslp_slpstpclosetoone = 0.95;
-static double nlcslp_maxtrustraddecay = 0.1;
-static double nlcslp_maxtrustradgrowth = 1.333;
-static double nlcslp_slpgtol = 0.4;
-static double nlcslp_bigc = 500.0;
-static double nlcslp_bfgstol = 1.0E-5;
-static double nlcslp_meritfunctionbase = 0.0;
-static double nlcslp_meritfunctiongain = 2.0;
-static double nlcslp_inequalitydampingfactor = 10.0;
-static double nlcslp_augmentationfactor = 10.0;
-static double nlcslp_inittrustrad = 0.1;
-static double nlcslp_stagnationepsf = 1.0E-12;
-static ae_int_t nlcslp_lpfailureslimit = 20;
-static ae_int_t nlcslp_fstagnationlimit = 20;
-static ae_int_t nlcslp_nondescentlimit = 99999;
-static ae_int_t nlcslp_nonmonotonicphase2limit = 5;
-static double nlcslp_slpbigscale = 5.0;
-static double nlcslp_slpsmallscale = 0.2;
-static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolver, ae_int_t hessiantype, ae_state *_state);
-static void nlcslp_lpsubproblemrestart(minslpstate *sstate, minslpsubsolver *subsolver, ae_state *_state);
-static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
-static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state);
-static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, minslpsubsolver *subsolver, RVector *d, ae_state *_state);
-static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection, ae_state *_state);
-static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state);
-static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RVector *meritlagmult, ae_state *_state);
-static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state);
-static void nlcslp_slpsendx(minslpstate *state, RVector *xs, ae_state *_state);
-static bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
-static void nlcslp_slpcopystate(minslpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
-static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minslptmplagrangian *tmp, double *f, RVector *g, double *lcerr, ae_int_t *lcidx, double *nlcerr, ae_int_t *nlcidx, ae_state *_state);
-static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, ae_state *_state);
-static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp, ae_state *_state);
-static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, double *meritf, double *rawlag, ae_state *_state);
-
-// === MINNLC Package ===
-static double minnlc_aulmaxgrowth = 10.0;
-static double minnlc_maxlagmult = 1.0E7;
-static ae_int_t minnlc_lbfgsfactor = 10;
-static double minnlc_hessesttol = 1.0E-6;
-static double minnlc_initgamma = 1.0E-6;
-static double minnlc_regprec = 1.0E-6;
-static void minnlc_clearrequestfields(minnlcstate *state, ae_state *_state);
-static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state);
-static void minnlc_clearpreconditioner(minlbfgsstate *auloptimizer, ae_state *_state);
-static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, ae_int_t *preccounter, minlbfgsstate *auloptimizer, RVector *x, double rho, double gammak, RVector *bndl, BVector *hasbndl, RVector *bndu, BVector *hasbndu, RVector *nubc, RMatrix *cleic, RVector *nulc, RVector *fi, RMatrix *jac, RVector *nunlc, RVector *bufd, RVector *bufc, RMatrix *bufw, RMatrix *bufz, RVector *tmp0, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t ng, ae_int_t nh, ae_state *_state);
-static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVector *bndu, BVector *hasbndu, RVector *nubc, ae_int_t n, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
-static void minnlc_penaltylc(RVector *x, RMatrix *cleic, RVector *nulc, ae_int_t n, ae_int_t nec, ae_int_t nic, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
-static void minnlc_penaltynlc(RVector *fi, RMatrix *j, RVector *nunlc, ae_int_t n, ae_int_t ng, ae_int_t nh, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
-static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state);
-static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl, RVector *scaledbndu, RVector *xu, ae_state *_state);
-
-// === MINNS Package ===
-static void minns_clearrequestfields(minnsstate *state, ae_state *_state);
-static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
-static bool minns_agsiteration(minnsstate *state, ae_state *_state);
-static void minns_unscalepointbc(minnsstate *state, RVector *x, ae_state *_state);
-static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, ae_int_t *dbgncholesky, minnsqp *state, ae_state *_state);
-static void minns_qpcalculategradfunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, RVector *g, double *f, RVector *tmp, ae_state *_state);
-static void minns_qpcalculatefunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, double *f, RVector *tmp, ae_state *_state);
-static void minns_qpsolveu(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state);
-static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state);
-
-// === MINCOMP Package ===
-static ae_int_t mincomp_n1 = 2;
-static ae_int_t mincomp_n2 = 2;
-static double mincomp_stpmin = 1.0E-300;
-static double mincomp_gtol = 0.3;
-static double mincomp_gpaftol = 0.0001;
-static double mincomp_gpadecay = 0.5;
-static double mincomp_asarho = 0.5;
-static double mincomp_asaboundedantigradnorm(minasastate *state, ae_state *_state);
-static double mincomp_asaginorm(minasastate *state, ae_state *_state);
-static double mincomp_asad1norm(minasastate *state, ae_state *_state);
-static bool mincomp_asauisempty(minasastate *state, ae_state *_state);
-static void mincomp_clearrequestfields(minasastate *state, ae_state *_state);
-
-// === MINBC Package ===
-static double minbc_gtol = 0.4;
-static double minbc_maxnonmonotoniclen = 1.0E-5;
-static double minbc_initialdecay = 0.5;
-static double minbc_mindecay = 0.1;
-static double minbc_decaycorrection = 0.8;
-static void minbc_clearrequestfields(minbcstate *state, ae_state *_state);
-static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state);
-static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_state *_state);
-
-// === OPTS Package ===
-
-// === OPTGUARDAPI Package ===
 // This subroutine initializes "internal" OptGuard report,  i.e. one intended
 // for internal use by optimizers.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
@@ -7221,8 +371,260 @@ void _optguardnonc1test1report_destroy(void *_p) {
    ae_vector_destroy(&p->stp);
    ae_vector_destroy(&p->g);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This structure is used to store  OptGuard  report,  i.e.  report  on   the
+// properties of the nonlinear function being optimized with ALGLIB.
+//
+// After you tell your optimizer to activate OptGuard  this technology starts
+// to silently monitor function values and gradients/Jacobians  being  passed
+// all around during your optimization session. Depending on specific set  of
+// checks enabled OptGuard may perform additional function evaluations  (say,
+// about 3*N evaluations if you want to check analytic gradient for errors).
+//
+// Upon discovering that something strange happens  (function  values  and/or
+// gradient components change too sharply and/or unexpectedly) OptGuard  sets
+// one of the "suspicion  flags" (without interrupting optimization session).
+// After optimization is done, you can examine OptGuard report.
+//
+// Following report fields can be set:
+// * nonc0suspected
+// * nonc1suspected
+// * badgradsuspected
+//
+//
+// === WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER =================
+//
+// Following  types  of  errors  in your target function (constraints) can be
+// caught:
+// a) discontinuous functions ("non-C0" part of the report)
+// b) functions with discontinuous derivative ("non-C1" part of the report)
+// c) errors in the analytic gradient provided by user
+//
+// These types of errors result in optimizer  stopping  well  before reaching
+// solution (most often - right after encountering discontinuity).
+//
+// Type A errors are usually  coding  errors  during  implementation  of  the
+// target function. Most "normal" problems involve continuous functions,  and
+// anyway you can't reliably optimize discontinuous function.
+//
+// Type B errors are either coding errors or (in case code itself is correct)
+// evidence of the fact  that  your  problem  is  an  "incorrect"  one.  Most
+// optimizers (except for ones provided by MINNS subpackage) do  not  support
+// nonsmooth problems.
+//
+// Type C errors are coding errors which often prevent optimizer from  making
+// even one step  or result in optimizing stopping  too  early,  as  soon  as
+// actual descent direction becomes too different from one suggested by user-
+// supplied gradient.
+//
+//
+// === WHAT IS REPORTED =====================================================
+//
+// Following set of report fields deals with discontinuous  target functions,
+// ones not belonging to C0 continuity class:
+//
+// * nonc0suspected - is a flag which is set upon discovering some indication
+//   of the discontinuity. If this flag is false, the rest of "non-C0" fields
+//   should be ignored
+// * nonc0fidx - is an index of the function (0 for  target  function,  1  or
+//   higher for nonlinear constraints) which is suspected of being "non-C0"
+// * nonc0lipshitzc - a Lipchitz constant for a function which was  suspected
+//   of being non-continuous.
+// * nonc0test0positive -  set  to  indicate  specific  test  which  detected
+//   continuity violation (test #0)
+//
+// Following set of report fields deals with discontinuous gradient/Jacobian,
+// i.e. with functions violating C1 continuity:
+//
+// * nonc1suspected - is a flag which is set upon discovering some indication
+//   of the discontinuity. If this flag is false, the rest of "non-C1" fields
+//   should be ignored
+// * nonc1fidx - is an index of the function (0 for  target  function,  1  or
+//   higher for nonlinear constraints) which is suspected of being "non-C1"
+// * nonc1lipshitzc - a Lipchitz constant for a function gradient  which  was
+//   suspected of being non-smooth.
+// * nonc1test0positive -  set  to  indicate  specific  test  which  detected
+//   continuity violation (test #0)
+// * nonc1test1positive -  set  to  indicate  specific  test  which  detected
+//   continuity violation (test #1)
+//
+// Following set of report fields deals with errors in the gradient:
+// * badgradsuspected - is a flad which is set upon discovering an  error  in
+//   the analytic gradient supplied by user
+// * badgradfidx - index  of   the  function  with bad gradient (0 for target
+//   function, 1 or higher for nonlinear constraints)
+// * badgradvidx - index of the variable
+// * badgradxbase - location where Jacobian is tested
+// * following  matrices  store  user-supplied  Jacobian  and  its  numerical
+//   differentiation version (which is assumed to be  free  from  the  coding
+//   errors), both of them computed near the initial point:
+//   * badgraduser, an array[K,N], analytic Jacobian supplied by user
+//   * badgradnum,  an array[K,N], numeric  Jacobian computed by ALGLIB
+//   Here K is a total number of  nonlinear  functions  (target  +  nonlinear
+//   constraints), N is a variable number.
+//   The  element  of  badgraduser[] with index [badgradfidx,badgradvidx]  is
+//   assumed to be wrong.
+//
+// More detailed error log can  be  obtained  from  optimizer  by  explicitly
+// requesting reports for tests C0.0, C1.0, C1.1.
+// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
+DefClass(optguardreport, AndD DecVal(nonc0suspected) AndD DecVal(nonc0test0positive) AndD DecVal(nonc0fidx) AndD DecVal(nonc0lipschitzc) AndD DecVal(nonc1suspected) AndD DecVal(nonc1test0positive) AndD DecVal(nonc1test1positive) AndD DecVal(nonc1fidx) AndD DecVal(nonc1lipschitzc) AndD DecVal(badgradsuspected) AndD DecVal(badgradfidx) AndD DecVal(badgradvidx) AndD DecVar(badgradxbase) AndD DecVar(badgraduser) AndD DecVar(badgradnum))
+
+// This  structure  is  used  for  detailed   reporting  about  suspected  C0
+// continuity violation.
+//
+// === WHAT IS TESTED =======================================================
+//
+// C0 test  studies  function  values (not gradient!)  obtained  during  line
+// searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
+// usually indicate that discontinuity was detected.
+//
+//
+// === WHAT IS REPORTED =====================================================
+//
+// Actually, report retrieval function returns TWO report structures:
+//
+// * one for most suspicious point found so far (one with highest  change  in
+//   the function value), so called "strongest" report
+// * another one for most detailed line search (more function  evaluations  =
+//   easier to understand what's going on) which triggered  test #0 criteria,
+//   so called "longest" report
+//
+// In both cases following fields are returned:
+//
+// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
+//   did not notice anything (in the latter cases fields below are empty).
+// * fidx - is an index of the function (0 for  target  function, 1 or higher
+//   for nonlinear constraints) which is suspected of being "non-C1"
+// * x0[], d[] - arrays of length N which store initial point  and  direction
+//   for line search (d[] can be normalized, but does not have to)
+// * stp[], f[] - arrays of length CNT which store step lengths and  function
+//   values at these points; f[i] is evaluated in x0+stp[i]*d.
+// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
+//   stpidxa+2.
+//
+// You can plot function values stored in stp[]  and  f[]  arrays  and  study
+// behavior of your function by your own eyes, just  to  be  sure  that  test
+// correctly reported C1 violation.
+// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
+DefClass(optguardnonc0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+
+// This  structure  is  used  for  detailed   reporting  about  suspected  C1
+// continuity violation as flagged by C1 test #0 (OptGuard  has several tests
+// for C1 continuity, this report is used by #0).
+//
+// === WHAT IS TESTED =======================================================
+//
+// C1 test #0 studies function values (not gradient!)  obtained  during  line
+// searches and monitors behavior of directional  derivative  estimate.  This
+// test is less powerful than test #1, but it does  not  depend  on  gradient
+// values  and  thus  it  is  more  robust  against  artifacts  introduced by
+// numerical differentiation.
+//
+//
+// === WHAT IS REPORTED =====================================================
+//
+// Actually, report retrieval function returns TWO report structures:
+//
+// * one for most suspicious point found so far (one with highest  change  in
+//   the directional derivative), so called "strongest" report
+// * another one for most detailed line search (more function  evaluations  =
+//   easier to understand what's going on) which triggered  test #0 criteria,
+//   so called "longest" report
+//
+// In both cases following fields are returned:
+//
+// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
+//   did not notice anything (in the latter cases fields below are empty).
+// * fidx - is an index of the function (0 for  target  function, 1 or higher
+//   for nonlinear constraints) which is suspected of being "non-C1"
+// * x0[], d[] - arrays of length N which store initial point  and  direction
+//   for line search (d[] can be normalized, but does not have to)
+// * stp[], f[] - arrays of length CNT which store step lengths and  function
+//   values at these points; f[i] is evaluated in x0+stp[i]*d.
+// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
+//   stpidxa+2.
+//
+// You can plot function values stored in stp[]  and  f[]  arrays  and  study
+// behavior of your function by your own eyes, just  to  be  sure  that  test
+// correctly reported C1 violation.
+// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
+DefClass(optguardnonc1test0report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(f) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+
+// This  structure  is  used  for  detailed   reporting  about  suspected  C1
+// continuity violation as flagged by C1 test #1 (OptGuard  has several tests
+// for C1 continuity, this report is used by #1).
+//
+// === WHAT IS TESTED =======================================================
+//
+// C1 test #1 studies individual  components  of  the  gradient  as  recorded
+// during line searches. Upon discovering discontinuity in the gradient  this
+// test records specific component which was suspected (or  one  with  highest
+// indication of discontinuity if multiple components are suspected).
+//
+// When precise analytic gradient is provided this test is more powerful than
+// test #0  which  works  with  function  values  and  ignores  user-provided
+// gradient.  However,  test  #0  becomes  more   powerful   when   numerical
+// differentiation is employed (in such cases test #1 detects  higher  levels
+// of numerical noise and becomes too conservative).
+//
+// This test also tells specific components of the gradient which violate  C1
+// continuity, which makes it more informative than #0, which just tells that
+// continuity is violated.
+//
+//
+// === WHAT IS REPORTED =====================================================
+//
+// Actually, report retrieval function returns TWO report structures:
+//
+// * one for most suspicious point found so far (one with highest  change  in
+//   the directional derivative), so called "strongest" report
+// * another one for most detailed line search (more function  evaluations  =
+//   easier to understand what's going on) which triggered  test #1 criteria,
+//   so called "longest" report
+//
+// In both cases following fields are returned:
+//
+// * positive - is TRUE  when test flagged suspicious point;  FALSE  if  test
+//   did not notice anything (in the latter cases fields below are empty).
+// * fidx - is an index of the function (0 for  target  function, 1 or higher
+//   for nonlinear constraints) which is suspected of being "non-C1"
+// * vidx - is an index of the variable in [0,N) with nonsmooth derivative
+// * x0[], d[] - arrays of length N which store initial point  and  direction
+//   for line search (d[] can be normalized, but does not have to)
+// * stp[], g[] - arrays of length CNT which store step lengths and  gradient
+//   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
+//   vidx-th component of the gradient.
+// * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   with  most  likely  position  of  the  violation  between  stpidxa+1 and
+//   stpidxa+2.
+//
+// You can plot function values stored in stp[]  and  g[]  arrays  and  study
+// behavior of your function by your own eyes, just  to  be  sure  that  test
+// correctly reported C1 violation.
+// ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
+DefClass(optguardnonc1test1report, AndD DecVal(positive) AndD DecVal(fidx) AndD DecVal(vidx) AndD DecVar(x0) AndD DecVar(d) AndD DecVal(n) AndD DecVar(stp) AndD DecVar(g) AndD DecVal(cnt) AndD DecVal(stpidxa) AndD DecVal(stpidxb))
+} // end of namespace alglib
 
 // === OPTSERV Package ===
+namespace alglib_impl {
+static double optserv_ognoiselevelf = 1.0E2 * ae_machineepsilon;
+static double optserv_ognoiselevelg = 1.0E4 * ae_machineepsilon;
+static double optserv_ogminrating0 = 50.0;
+static double optserv_ogminrating1 = 50.0;
+static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *tmp0, ae_state *_state);
+static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, double *err, RVector *grad, RVector *tmp0, ae_state *_state);
+static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state);
+static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
+static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
+
 // This subroutine checks violation of the box constraints. On output it sets
 // bcerr to the maximum scaled violation, bcidx to the index of the violating
 // constraint.
@@ -10660,8 +4062,13 @@ void _smoothnessmonitor_destroy(void *_p) {
    ae_vector_destroy(&p->f0);
    ae_matrix_destroy(&p->j0);
 }
+} // end of namespace alglib_impl
 
 // === MINLBFGS Package ===
+namespace alglib_impl {
+static double minlbfgs_gtol = 0.4;
+static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
+
 //         LIMITED MEMORY BFGS METHOD FOR LARGE SCALE OPTIMIZATION
 //
 // DESCRIPTION:
@@ -12269,8 +5676,608 @@ void _minlbfgsreport_destroy(void *_p) {
    minlbfgsreport *p = (minlbfgsreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+//
+DefClass(minlbfgsstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+
+// This structure stores optimization report:
+// * IterationsCount           total number of inner iterations
+// * NFEV                      number of gradient evaluations
+// * TerminationType           termination type (see below)
+//
+// TERMINATION CODES
+//
+// TerminationType field contains completion code, which can be:
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signalled.
+//    1    relative function improvement is no more than EpsF.
+//    2    relative step is no more than EpsX.
+//    4    gradient norm is no more than EpsG
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    terminated    by  user  who  called  minlbfgsrequesttermination().
+//         X contains point which was   "current accepted"  when  termination
+//         request was submitted.
+//
+// Other fields of this structure are not documented and should not be used!
+DefClass(minlbfgsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
+
+void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgscreate(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgscreate(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgscreatef(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgscreatef(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetcond(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetxrep(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetstpmax(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetscale(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetprecdefault(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetpreccholesky(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(p.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetprecdiag(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetprecscale(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetprecscale(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minlbfgsiteration(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied gradient,  and one which uses function value
+//    only  and  numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    (either MinLBFGSCreate() for analytical gradient  or  MinLBFGSCreateF()
+//    for numerical differentiation) you should choose appropriate variant of
+//    MinLBFGSOptimize() - one  which  accepts  function  AND gradient or one
+//    which accepts function ONLY.
+//
+//    Be careful to choose variant of MinLBFGSOptimize() which corresponds to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed to MinLBFGSOptimize()  and specific
+//    function used to create optimizer.
+//
+//
+//                      |         USER PASSED TO MinLBFGSOptimize()
+//    CREATED WITH      |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    MinLBFGSCreateF() |     work                FAIL
+//    MinLBFGSCreate()  |     FAIL                work
+//
+//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+//    function  and  MinLBFGSOptimize()  version.   Attemps   to   use   such
+//    combination (for example, to create optimizer with MinLBFGSCreateF() and
+//    to pass gradient information to MinCGOptimize()) will lead to exception
+//    being thrown. Either  you  did  not pass gradient when it WAS needed or
+//    you passed gradient when it was NOT needed.
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (func is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (grad is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardgradient(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardsmoothness(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), level, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t level;
+
+   level = 1;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardsmoothness(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), level, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardresults(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardnonc1test0results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsoptguardnonc1test1results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsresults(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsresultsbuf(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlbfgsreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsrestartfrom(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgsrequesttermination(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === CQMODELS Package ===
+namespace alglib_impl {
+static ae_int_t cqmodels_newtonrefinementits = 3;
+static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state);
+static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tmp, ae_state *_state);
+
 // This subroutine is used to initialize CQM. By default, empty NxN model  is
 // generated, with Alpha=Lambda=Theta=0.0 and zero b.
 //
@@ -13625,8 +7632,10 @@ void _convexquadraticmodel_destroy(void *_p) {
    ae_vector_destroy(&p->tmpg);
    ae_matrix_destroy(&p->tmp2);
 }
+} // end of namespace alglib_impl
 
 // === LPQPSERV Package ===
+namespace alglib_impl {
 // This function generates scaled (by S) and shifted (by XC) reformulation of
 // the box constraints.
 //
@@ -14203,8 +8212,16 @@ void unscaleunshiftpointbc(RVector *s, RVector *xorigin, RVector *rawbndl, RVect
       }
    }
 }
+} // end of namespace alglib_impl
 
 // === SNNLS Package ===
+namespace alglib_impl {
+static void snnls_funcgradu(snnlssolver *s, RVector *x, RVector *r, RVector *g, double *f, ae_state *_state);
+static void snnls_func(snnlssolver *s, RVector *x, double *f, ae_state *_state);
+static void snnls_trdprepare(snnlssolver *s, RVector *x, RVector *diag, double lambdav, RVector *trdd, RMatrix *trda, RVector *tmp0, RVector *tmp1, RVector *tmp2, RMatrix *tmplq, ae_state *_state);
+static void snnls_trdsolve(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t nd, RVector *d, ae_state *_state);
+static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t nd, ae_int_t idx, RVector *tmp, ae_state *_state);
+
 // This subroutine is used to initialize SNNLS solver.
 //
 // By default, empty NNLS problem is produced, but we allocated enough  space
@@ -15026,8 +9043,16 @@ void _snnlssolver_destroy(void *_p) {
    ae_vector_destroy(&p->tmp2);
    ae_vector_destroy(&p->rdtmprowmap);
 }
+} // end of namespace alglib_impl
 
 // === SACTIVESETS Package ===
+namespace alglib_impl {
+static ae_int_t sactivesets_maxbasisage = 5;
+static double sactivesets_maxbasisdecay = 0.01;
+static double sactivesets_minnormseparation = 0.25;
+static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, bool normalize, RVector *d, ae_state *_state);
+static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RVector *h, ae_state *_state);
+
 // This   subroutine   is   used  to initialize active set. By default, empty
 // N-variable model with no constraints is  generated.  Previously  allocated
 // buffer variables are reused as much as possible.
@@ -17159,8 +11184,20 @@ void _sactiveset_destroy(void *_p) {
    ae_vector_destroy(&p->tmpcs);
    ae_vector_destroy(&p->tmpci);
 }
+} // end of namespace alglib_impl
 
 // === QQPSOLVER Package ===
+namespace alglib_impl {
+static ae_int_t qqpsolver_quickqprestartcg = 50;
+static double qqpsolver_regz = 1.0E-9;
+static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, RVector *d, double stp, RVector *tmp0, RVector *tmp1, ae_state *_state);
+static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g, ae_state *_state);
+static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d, RVector *g, double *d1, ae_int_t *d1est, double *d2, ae_int_t *d2est, RVector *tmp0, ae_state *_state);
+static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state);
+static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state);
+static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state);
+static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state);
+
 // This function initializes QQPSettings structure with default settings.
 //
 // Newly created structure MUST be initialized by default settings  -  or  by
@@ -18863,8 +12900,19 @@ void _qqpbuffers_destroy(void *_p) {
    ae_vector_destroy(&p->stpbuf);
    _sparsebuffers_destroy(&p->sbuf);
 }
+} // end of namespace alglib_impl
 
 // === QPDENSEAULSOLVER Package ===
+namespace alglib_impl {
+static double qpdenseaulsolver_evictionlevel = -0.01;
+static double qpdenseaulsolver_expansionratio = 0.20;
+static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *nulc, double rho, RMatrix *exa, RVector *exb, RVector *exbndl, RVector *exbndu, RMatrix *tmp2, ae_state *_state);
+static void qpdenseaulsolver_generateexinitialpoint(RVector *sclsftxc, ae_int_t nmain, ae_int_t nslack, RVector *exxc, ae_state *_state);
+static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *exxc, RVector *nulcest, qpdenseaulbuffers *buffers, ae_state *_state);
+static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state);
+static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, bool usecleic, RMatrix *tmp2, ae_state *_state);
+static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, bool *allowwseviction, ae_state *_state);
+
 // This function initializes QPDENSEAULSettings structure with default settings.
 //
 // Newly created structure MUST be initialized by default settings  -  or  by
@@ -20171,8 +14219,20 @@ void _qpdenseaulbuffers_destroy(void *_p) {
    ae_vector_destroy(&p->nicerr);
    ae_vector_destroy(&p->nicnact);
 }
+} // end of namespace alglib_impl
 
 // === MINBLEIC Package ===
+namespace alglib_impl {
+static double minbleic_gtol = 0.4;
+static double minbleic_maxnonmonotoniclen = 1.0E-7;
+static double minbleic_initialdecay = 0.5;
+static double minbleic_mindecay = 0.1;
+static double minbleic_decaycorrection = 0.8;
+static double minbleic_penaltyfactor = 100;
+static void minbleic_clearrequestfields(minbleicstate *state, ae_state *_state);
+static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state);
+static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, ae_state *_state);
+
 //                      BOUND CONSTRAINED OPTIMIZATION
 //        WITH ADDITIONAL LINEAR EQUALITY AND INEQUALITY CONSTRAINTS
 //
@@ -22366,8 +16426,656 @@ void _minbleicreport_destroy(void *_p) {
    minbleicreport *p = (minbleicreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores nonlinear optimizer state.
+// You should use functions provided by MinBLEIC subpackage to work with this
+// object
+DefClass(minbleicstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+
+// This structure stores optimization report:
+// * IterationsCount           number of iterations
+// * NFEV                      number of gradient evaluations
+// * TerminationType           termination type (see below)
+//
+// TERMINATION CODES
+//
+// TerminationType field contains completion code, which can be:
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signalled.
+//   -3    inconsistent constraints. Feasible point is
+//         either nonexistent or too hard to find. Try to
+//         restart optimizer with better initial approximation
+//    1    relative function improvement is no more than EpsF.
+//    2    relative step is no more than EpsX.
+//    4    gradient norm is no more than EpsG
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    terminated by user who called minbleicrequesttermination(). X contains
+//         point which was "current accepted" when  termination  request  was
+//         submitted.
+//
+// ADDITIONAL FIELDS
+//
+// There are additional fields which can be used for debugging:
+// * DebugEqErr                error in the equality constraints (2-norm)
+// * DebugFS                   f, calculated at projection of initial point
+//                             to the feasible set
+// * DebugFF                   f, calculated at the final point
+// * DebugDX                   |X_start-X_final|
+DefClass(minbleicreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype) AndD DecVal(debugeqerr) AndD DecVal(debugfs) AndD DecVal(debugff) AndD DecVal(debugdx) AndD DecVal(debugfeasqpits) AndD DecVal(debugfeasgpaits) AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount))
+
+void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleiccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleiccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleiccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleiccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetbc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetlc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((c.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minbleicsetlc': looks like one of arguments has wrong size");
+   k = c.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetlc(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetcond(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetscale(const minbleicstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetscale(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetprecdefault(const minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetprecdefault(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetprecdiag(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetprecscale(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetxrep(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetstpmax(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minbleiciteration(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied gradient,  and one which uses function value
+//    only  and  numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    (either  MinBLEICCreate() for analytical gradient or  MinBLEICCreateF()
+//    for numerical differentiation) you should choose appropriate variant of
+//    MinBLEICOptimize() - one  which  accepts  function  AND gradient or one
+//    which accepts function ONLY.
+//
+//    Be careful to choose variant of MinBLEICOptimize() which corresponds to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed to MinBLEICOptimize()  and specific
+//    function used to create optimizer.
+//
+//
+//                      |         USER PASSED TO MinBLEICOptimize()
+//    CREATED WITH      |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    MinBLEICCreateF() |     work                FAIL
+//    MinBLEICCreate()  |     FAIL                work
+//
+//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+//    function  and  MinBLEICOptimize()  version.   Attemps   to   use   such
+//    combination (for  example,  to  create optimizer with MinBLEICCreateF()
+//    and  to  pass  gradient information to MinBLEICOptimize()) will lead to
+//    exception being thrown. Either  you  did  not pass gradient when it WAS
+//    needed or you passed gradient when it was NOT needed.
+// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
+void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbleicoptimize()' (func is NULL)", &_alglib_env_state);
+   while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbleicoptimize()' (grad is NULL)", &_alglib_env_state);
+   while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minbleicoptguardgradient(const minbleicstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardgradient(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardsmoothness(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), level, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t level;
+
+   level = 1;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardsmoothness(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), level, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardresults(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardnonc1test0results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicoptguardnonc1test1results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicresults(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicresultsbuf(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbleicreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicrestartfrom(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicrequesttermination(const minbleicstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicrequesttermination(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === QPBLEICSOLVER Package ===
+namespace alglib_impl {
 // This function initializes QPBLEICSettings structure with default settings.
 //
 // Newly created structure MUST be initialized by default settings  -  or  by
@@ -22757,8 +17465,62 @@ void _qpbleicbuffers_destroy(void *_p) {
    ae_vector_destroy(&p->tmp1);
    ae_vector_destroy(&p->tmpi);
 }
+} // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
+namespace alglib_impl {
+static ae_int_t vipmsolver_maxipmits = 200;
+static double vipmsolver_initslackval = 100.0;
+static double vipmsolver_steplengthdecay = 0.95;
+static double vipmsolver_stagnationdelta = 0.99999;
+static double vipmsolver_primalinfeasible1 = 1.0E-3;
+static double vipmsolver_dualinfeasible1 = 1.0E-3;
+static double vipmsolver_bigy = 1.0E8;
+static double vipmsolver_ygrowth = 1.0E6;
+static ae_int_t vipmsolver_itersfortoostringentcond = 25;
+static ae_int_t vipmsolver_minitersbeforedroppingbounds = 3;
+static ae_int_t vipmsolver_minitersbeforeinfeasible = 3;
+static ae_int_t vipmsolver_minitersbeforestagnation = 5;
+static ae_int_t vipmsolver_minitersbeforeeworststagnation = 50;
+static ae_int_t vipmsolver_primalstagnationlen = 5;
+static ae_int_t vipmsolver_dualstagnationlen = 7;
+static double vipmsolver_bigconstrxtol = 1.0E-5;
+static double vipmsolver_bigconstrmag = 1.0E3;
+static double vipmsolver_minitersbeforesafeguards = 5;
+static double vipmsolver_badsteplength = 1.0E-3;
+static void vipmsolver_varsinitbyzero(vipmvars *vstate, ae_int_t n, ae_int_t m, ae_state *_state);
+static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc, ae_state *_state);
+static void vipmsolver_varsaddstep(vipmvars *vstate, vipmvars *vdir, double stpp, double stpd, ae_state *_state);
+static double vipmsolver_varscomputecomplementaritygap(vipmvars *vstate, ae_state *_state);
+static double vipmsolver_varscomputemu(vipmvars *vstate, ae_state *_state);
+static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_int_t nmain, ae_int_t ftype, ae_state *_state);
+static double vipmsolver_vipmtarget(vipmstate *state, RVector *x, ae_state *_state);
+static void vipmsolver_multiplygeax(vipmstate *state, double alpha, RVector *x, ae_int_t offsx, double beta, RVector *y, ae_int_t offsax, ae_state *_state);
+static void vipmsolver_multiplygeatx(vipmstate *state, double alpha, RVector *x, ae_int_t offsx, double beta, RVector *y, ae_int_t offsy, ae_state *_state);
+static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx, ae_state *_state);
+static void vipmsolver_vipmmultiply(vipmstate *state, RVector *x, RVector *y, RVector *hx, RVector *ax, RVector *aty, ae_state *_state);
+static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_state);
+static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state);
+static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy, ae_state *_state);
+static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state);
+static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, vipmvars *sol, ae_state *_state);
+static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, bool isdampepslarge, ae_state *_state);
+static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vipmvars *vs, double stepdecay, double *alphap, double *alphad, ae_state *_state);
+static void vipmsolver_vipmperformstep(vipmstate *state, double alphap, double alphad, ae_state *_state);
+static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *errd2, double *errpinf, double *errdinf, double *egap, ae_state *_state);
+static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmvars *vd, double alphap, double alphad, ae_state *_state);
+static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, double sigma, double alphap, double alphad, ae_state *_state);
+static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *direstimate, vipmrighthandside *rhs, double reg, ae_state *_state);
+static void vipmsolver_rhssubtract(vipmstate *state, vipmrighthandside *rhs, vipmvars *v0, vipmvars *vdcandidate, double reg, ae_state *_state);
+static double vipmsolver_rhsprimal2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
+static double vipmsolver_rhsdual2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
+static double vipmsolver_rhsprimalinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
+static double vipmsolver_rhsdualinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
+static double vipmsolver_rhscompl2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state);
+static double vipmsolver_minnz(RVector *x, ae_int_t n, ae_state *_state);
+static double vipmsolver_minprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
+
 // Initializes QP-IPM state and prepares it to receive quadratic/linear terms
 // and constraints.
 //
@@ -26559,8 +21321,10 @@ void _vipmstate_destroy(void *_p) {
    ae_vector_destroy(&p->tmpi);
    _sparsematrix_destroy(&p->tmpsparse0);
 }
+} // end of namespace alglib_impl
 
 // === MINQP Package ===
+namespace alglib_impl {
 //                     CONSTRAINED QUADRATIC PROGRAMMING
 //
 // The subroutine creates QP optimizer. After initial creation,  it  contains
@@ -29017,8 +23781,751 @@ void _minqpreport_destroy(void *_p) {
    ae_vector_destroy(&p->lagbc);
    ae_vector_destroy(&p->laglc);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores nonlinear optimizer state.
+// You should use functions provided by MinQP subpackage to work with this
+// object
+DefClass(minqpstate, EndD)
+
+// This structure stores optimization report:
+// * InnerIterationsCount      number of inner iterations
+// * OuterIterationsCount      number of outer iterations
+// * NCholesky                 number of Cholesky decomposition
+// * NMV                       number of matrix-vector products
+//                             (only products calculated as part of iterative
+//                             process are counted)
+// * TerminationType           completion code (see below)
+// * LagBC                     Lagrange multipliers for box constraints,
+//                             array[N], not filled by QP-BLEIC solver
+// * LagLC                     Lagrange multipliers for linear constraints,
+//                             array[MSparse+MDense], ignored by QP-BLEIC solver
+//
+// === COMPLETION CODES =====================================================
+//
+// Completion codes:
+// * -9    failure of the automatic scale evaluation:  one  of  the  diagonal
+//         elements of the quadratic term is non-positive.  Specify  variable
+//         scales manually!
+// * -5    inappropriate solver was used:
+//         * QuickQP solver for problem with general linear constraints (dense/sparse)
+// * -4    BLEIC-QP or QuickQP solver found unconstrained direction
+//         of negative curvature (function is unbounded from
+//         below  even  under  constraints),  no  meaningful
+//         minimum can be found.
+// * -3    inconsistent constraints (or, maybe, feasible point is
+//         too hard to find). If you are sure that constraints are feasible,
+//         try to restart optimizer with better initial approximation.
+// * -2    IPM solver has difficulty finding primal/dual feasible point.
+//         It is likely that the problem is either infeasible or unbounded,
+//         but it is difficult to determine exact reason for termination.
+//         X contains best point found so far.
+// *  1..4 successful completion
+// *  5    MaxIts steps was taken
+// *  7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//
+// === LAGRANGE MULTIPLIERS =================================================
+//
+// Some  optimizers  report  values of  Lagrange  multipliers  on  successful
+// completion (positive completion code):
+// * DENSE-IPM-QP and SPARSE-IPM-QP return very precise Lagrange  multipliers
+//   as determined during solution process.
+// * DENSE-AUL-QP returns approximate Lagrange multipliers  (which  are  very
+//   close to "true"  Lagrange  multipliers  except  for  overconstrained  or
+//   degenerate problems)
+//
+// Two arrays of multipliers are returned:
+// * LagBC is array[N] which is loaded with multipliers from box constraints;
+//   LagBC[i]>0 means that I-th constraint is at the  upper bound, LagBC[I]<0
+//   means that I-th constraint is at the lower bound, LagBC[I]=0 means  that
+//   I-th box constraint is inactive.
+// * LagLC is array[MSparse+MDense] which is  loaded  with  multipliers  from
+//   general  linear  constraints  (former  MSparse  elements  corresponds to
+//   sparse part of the constraint matrix, latter MDense are  for  the  dense
+//   constraints, as was specified by user).
+//   LagLC[i]>0 means that I-th constraint at  the  upper  bound,  LagLC[i]<0
+//   means that I-th constraint is at the lower bound, LagLC[i]=0 means  that
+//   I-th linear constraint is inactive.
+//
+// On failure (or when optimizer does not support Lagrange multipliers) these
+// arrays are zero-filled.
+//
+// It is expected that at solution the dual feasibility condition holds:
+//
+//     C+H*(Xs-X0) + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+//
+// where
+// * C is a linear term
+// * H is a quadratic term
+// * Xs is a solution, and X0 is an origin term (zero by default)
+// * Ei is a vector with 1.0 at position I and 0 in other positions
+// * Ai is an I-th row of linear constraint matrix
+//
+// NOTE: methods  from  IPM  family  may  also  return  meaningful   Lagrange
+//       multipliers  on  completion   with   code   -2   (infeasibility   or
+//       unboundedness  detected).
+DefClass(minqpreport, AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount) AndD DecVal(nmv) AndD DecVal(ncholesky) AndD DecVal(terminationtype) AndD DecVar(lagbc) AndD DecVar(laglc))
+
+void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpcreate(n, const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlinearterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetquadraticterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   bool isupper;
+   if (!alglib_impl::ae_is_symmetric(const_cast < alglib_impl::ae_matrix * >(a.c_ptr())))
+      _ALGLIB_CPP_EXCEPTION("'a' parameter is not symmetric matrix");
+   isupper = false;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetquadraticterm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), isupper, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetquadratictermsparse(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetstartingpoint(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetorigin(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(xorigin.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetscale(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetscaleautodiag(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetalgobleic(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetalgodenseaul(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsx, rho, itscnt, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetalgodenseipm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), eps, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetalgosparseipm(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), eps, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetalgoquickqp(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), epsg, epsf, epsx, maxouterits, usenewton, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetbc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetbcall(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), bndl, bndu, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetbci(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), i, bndl, bndu, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((c.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minqpsetlc': looks like one of arguments has wrong size");
+   k = c.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlcsparse(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlcmixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlcmixedlegacy(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((a.rows() != al.length()) || (a.rows() != au.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minqpsetlc2dense': looks like one of arguments has wrong size");
+   k = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpsetlc2mixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsea.c_ptr()), ksparse, const_cast < alglib_impl::ae_matrix * >(densea.c_ptr()), kdense, const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpaddlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(a.c_ptr()), al, au, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpaddlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(idxa.c_ptr()), const_cast < alglib_impl::ae_vector * >(vala.c_ptr()), nnz, al, au, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpaddlc2sparsefromdense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(da.c_ptr()), al, au, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpoptimize(const minqpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpoptimize(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpresults(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minqpreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minqpresultsbuf(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minqpreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MINLM Package ===
+namespace alglib_impl {
+static double minlm_lambdaup = 2.0;
+static double minlm_lambdadown = 0.33;
+static double minlm_suspiciousnu = 16;
+static ae_int_t minlm_smallmodelage = 3;
+static ae_int_t minlm_additers = 5;
+static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *state, ae_state *_state);
+static void minlm_clearrequestfields(minlmstate *state, ae_state *_state);
+static bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state);
+static void minlm_decreaselambda(double *lambdav, double *nu, ae_state *_state);
+static ae_int_t minlm_checkdecrease(RMatrix *quadraticmodel, RVector *gbase, double fbase, ae_int_t n, RVector *deltax, double fnew, double *lambdav, double *nu, ae_state *_state);
+static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state);
+static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadraticmodel, RVector *gbase, double fbase, RVector *xbase, RVector *fibase, ae_int_t modelage, ae_state *_state);
+static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, bool *deltaxready, RVector *deltaf, bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state);
+
 //                 IMPROVED LEVENBERG-MARQUARDT METHOD FOR
 //                  NON-LINEAR LEAST SQUARES OPTIMIZATION
 //
@@ -31939,8 +27446,805 @@ void _minlmreport_destroy(void *_p) {
    minlmreport *p = (minlmreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// Levenberg-Marquardt optimizer.
+//
+// This structure should be created using one of the MinLMCreate???()
+// functions. You should not access its fields directly; use ALGLIB functions
+// to work with it.
+DefClass(minlmstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(needfgh) AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(g) AndD DecVar(h) AndD DecVar(j) AndD DecVar(x))
+
+// Optimization report, filled by MinLMResults() function
+//
+// FIELDS:
+// * TerminationType, completetion code:
+//     * -8    optimizer detected NAN/INF values either in the function itself,
+//             or in its Jacobian
+//     * -5    inappropriate solver was used:
+//             * solver created with minlmcreatefgh() used  on  problem  with
+//               general linear constraints (set with minlmsetlc() call).
+//     * -3    constraints are inconsistent
+//     *  2    relative step is no more than EpsX.
+//     *  5    MaxIts steps was taken
+//     *  7    stopping conditions are too stringent,
+//             further improvement is impossible
+//     *  8    terminated   by  user  who  called  MinLMRequestTermination().
+//             X contains point which was "current accepted" when termination
+//             request was submitted.
+// * IterationsCount, contains iterations count
+// * NFunc, number of function calculations
+// * NJac, number of Jacobi matrix calculations
+// * NGrad, number of gradient calculations
+// * NHess, number of Hessian calculations
+// * NCholesky, number of Cholesky decomposition calculations
+DefClass(minlmreport, AndD DecVal(iterationscount) AndD DecVal(terminationtype) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(ngrad) AndD DecVal(nhess) AndD DecVal(ncholesky))
+
+void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatevj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatevj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatev(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatev(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefgh(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefgh(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetcond(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetxrep(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetstpmax(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmsetscale(const minlmstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetscale(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetbc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetlc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((c.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlmsetlc': looks like one of arguments has wrong size");
+   k = c.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetlc(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmsetacctype(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), acctype, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minlmiteration(const minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minlmiteration(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     hess    -   callback which calculates function (or merit function)
+//                 value func, gradient grad and Hessian hess at given point x
+//     fvec    -   callback which calculates function vector fi[]
+//                 at given point x
+//     jac     -   callback which calculates function vector fi[]
+//                 and Jacobian jac at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// NOTES:
+//
+// 1. Depending on function used to create state  structure,  this  algorithm
+//    may accept Jacobian and/or Hessian and/or gradient.  According  to  the
+//    said above, there ase several versions of this function,  which  accept
+//    different sets of callbacks.
+//
+//    This flexibility opens way to subtle errors - you may create state with
+//    MinLMCreateFGH() (optimization using Hessian), but call function  which
+//    does not accept Hessian. So when algorithm will request Hessian,  there
+//    will be no callback to call. In this case exception will be thrown.
+//
+//    Be careful to avoid such errors because there is no way to find them at
+//    compile time - you can see them at runtime only.
+// ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
+         fvec(state.x, state.fi, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
+         fvec(state.x, state.fi, ptr);
+         continue;
+      }
+      if (state.needfij) {
+         jac(state.x, state.fi, state.j, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'minlmoptimize()' (hess is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.needfgh) {
+         hess(state.x, state.f, state.g, state.h, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.needfij) {
+         jac(state.x, state.fi, state.j, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
+   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
+   while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.needfij) {
+         jac(state.x, state.fi, state.j, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minlmoptguardgradient(const minlmstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmoptguardgradient(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmoptguardresults(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmresults(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmresultsbuf(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmrestartfrom(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmrequesttermination(const minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmrequesttermination(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatevgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatevgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefgj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlmcreatefj(n, m, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+} // end of namespace alglib
 
 // === MINCG Package ===
+namespace alglib_impl {
+static ae_int_t mincg_rscountdownlen = 10;
+static double mincg_gtol = 0.3;
+static void mincg_clearrequestfields(mincgstate *state, ae_state *_state);
+static void mincg_preconditionedmultiply(mincgstate *state, RVector *x, RVector *work0, RVector *work1, ae_state *_state);
+static double mincg_preconditionedmultiply2(mincgstate *state, RVector *x, RVector *y, RVector *work0, RVector *work1, ae_state *_state);
+static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *state, ae_state *_state);
+
 //         NONLINEAR CONJUGATE GRADIENT METHOD
 //
 // DESCRIPTION:
@@ -33742,8 +30046,657 @@ void _mincgreport_destroy(void *_p) {
    mincgreport *p = (mincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores state of the nonlinear CG optimizer.
+//
+// You should use ALGLIB functions to work with this object.
+DefClass(mincgstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+
+// This structure stores optimization report:
+// * IterationsCount           total number of inner iterations
+// * NFEV                      number of gradient evaluations
+// * TerminationType           termination type (see below)
+//
+// TERMINATION CODES
+//
+// TerminationType field contains completion code, which can be:
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signalled.
+//    1    relative function improvement is no more than EpsF.
+//    2    relative step is no more than EpsX.
+//    4    gradient norm is no more than EpsG
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    terminated by user who called mincgrequesttermination(). X contains
+//         point which was "current accepted" when  termination  request  was
+//         submitted.
+//
+// Other fields of this structure are not documented and should not be used!
+DefClass(mincgreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
+
+void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgcreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgcreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgcreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgcreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetcond(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetscale(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetxrep(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetcgtype(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), cgtype, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetstpmax(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsuggeststep(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), stp, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetprecdefault(const mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetprecdefault(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetprecdiag(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgsetprecscale(const mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgsetprecscale(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool mincgiteration(const mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::mincgiteration(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied  gradient, and one which uses function value
+//    only  and  numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    (either MinCGCreate()  for analytical gradient  or  MinCGCreateF()  for
+//    numerical differentiation) you should  choose  appropriate  variant  of
+//    MinCGOptimize() - one which accepts function AND gradient or one  which
+//    accepts function ONLY.
+//
+//    Be careful to choose variant of MinCGOptimize()  which  corresponds  to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed  to  MinCGOptimize()  and  specific
+//    function used to create optimizer.
+//
+//
+//                   |         USER PASSED TO MinCGOptimize()
+//    CREATED WITH   |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    MinCGCreateF() |     work                FAIL
+//    MinCGCreate()  |     FAIL                work
+//
+//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+//    function and MinCGOptimize() version. Attemps to use  such  combination
+//    (for  example,  to create optimizer with  MinCGCreateF()  and  to  pass
+//    gradient information to MinCGOptimize()) will lead to  exception  being
+//    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
+//    passed gradient when it was NOT needed.
+// ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
+void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'mincgoptimize()' (func is NULL)", &_alglib_env_state);
+   while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'mincgoptimize()' (grad is NULL)", &_alglib_env_state);
+   while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void mincgoptguardgradient(const mincgstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardgradient(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardsmoothness(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), level, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t level;
+
+   level = 1;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardsmoothness(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), level, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardresults(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardnonc1test0results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgoptguardnonc1test1results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgresults(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgresultsbuf(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::mincgreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgrestartfrom(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void mincgrequesttermination(const mincgstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::mincgrequesttermination(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === NLCSQP Package ===
+namespace alglib_impl {
+static double nlcsqp_sqpdeltadecrease = 0.20;
+static double nlcsqp_sqpdeltaincrease = 0.80;
+static double nlcsqp_maxtrustraddecay = 0.1;
+static double nlcsqp_maxtrustradgrowth = 1.333;
+static double nlcsqp_maxbigc = 1.0E5;
+static double nlcsqp_meritfunctionbase = 0.0;
+static double nlcsqp_meritfunctiongain = 2.0;
+static double nlcsqp_augmentationfactor = 10.0;
+static double nlcsqp_inittrustrad = 0.1;
+static double nlcsqp_stagnationepsf = 1.0E-12;
+static ae_int_t nlcsqp_fstagnationlimit = 20;
+static ae_int_t nlcsqp_trustradstagnationlimit = 10;
+static double nlcsqp_sqpbigscale = 5.0;
+static double nlcsqp_sqpsmallscale = 0.2;
+static ae_int_t nlcsqp_penaltymemlen = 5;
+static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolver, ae_state *_state);
+static void nlcsqp_qpsubsolversetalgoipm(minsqpsubsolver *subsolver, ae_state *_state);
+static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
+static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h, ae_int_t nq, RVector *b, ae_int_t n, RVector *bndl, RVector *bndu, sparsematrix *a, ae_int_t m, RVector *al, RVector *au, double trustrad, ae_int_t *terminationtype, RVector *d, RVector *lagmult, ae_state *_state);
+static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state);
+static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RMatrix *abslagmemory, ae_int_t memlen, ae_state *_state);
+static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state);
+static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, bool *increasebigc, ae_int_t *status, ae_state *_state);
+static void nlcsqp_sqpsendx(minsqpstate *state, RVector *xs, ae_state *_state);
+static bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
+static void nlcsqp_sqpcopystate(minsqpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
+static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minsqptmplagrangian *tmp, double *f, RVector *g, ae_state *_state);
+static double nlcsqp_meritfunction(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, ae_state *_state);
+static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, ae_state *_state);
+static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, double *meritf, double *rawlag, ae_state *_state);
+
 void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minsqpstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -36207,8 +33160,10 @@ void _minsqpstate_destroy(void *_p) {
    _minsqptmpmerit_destroy(&p->tmpmerit);
    _rcommstate_destroy(&p->rstate);
 }
+} // end of namespace alglib_impl
 
 // === LPQPPRESOLVE Package ===
+namespace alglib_impl {
 // No presolve, just user-supplied scaling + constraint and cost vector
 // normalization.
 //
@@ -36445,8 +33400,81 @@ void _presolveinfo_destroy(void *_p) {
    ae_vector_destroy(&p->al);
    ae_vector_destroy(&p->au);
 }
+} // end of namespace alglib_impl
 
 // === REVISEDDUALSIMPLEX Package ===
+namespace alglib_impl {
+static ae_int_t reviseddualsimplex_maxforcedrestarts = 1;
+static ae_int_t reviseddualsimplex_safetrfage = 5;
+static ae_int_t reviseddualsimplex_defaultmaxtrfage = 100;
+static double reviseddualsimplex_minbeta = 1.0E-4;
+static double reviseddualsimplex_maxudecay = 0.001;
+static double reviseddualsimplex_shiftlen = 1.0E-12;
+static double reviseddualsimplex_alphatrigger = 1.0E8 * ae_machineepsilon;
+static double reviseddualsimplex_alphatrigger2 = 0.001;
+static ae_int_t reviseddualsimplex_ssinvalid = 0;
+static ae_int_t reviseddualsimplex_ssvalidxn = 1;
+static ae_int_t reviseddualsimplex_ssvalid = 2;
+static ae_int_t reviseddualsimplex_ccfixed = 0;
+static ae_int_t reviseddualsimplex_cclower = 1;
+static ae_int_t reviseddualsimplex_ccupper = 2;
+static ae_int_t reviseddualsimplex_ccrange = 3;
+static ae_int_t reviseddualsimplex_ccfree = 4;
+static ae_int_t reviseddualsimplex_ccinfeasible = 5;
+static void reviseddualsimplex_subprobleminit(ae_int_t n, dualsimplexsubproblem *s, ae_state *_state);
+static void reviseddualsimplex_subprobleminitphase1(dualsimplexsubproblem *s0, dualsimplexbasis *basis, dualsimplexsubproblem *s1, ae_state *_state);
+static void reviseddualsimplex_subprobleminitphase3(dualsimplexsubproblem *s0, dualsimplexsubproblem *s1, ae_state *_state);
+static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
+static void reviseddualsimplex_subproblemhandlexnupdate(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
+static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t q, double alpharpiv, double *thetad, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t r, dssvector *rhor, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, dssvector *alphar, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, ae_int_t q, RVector *alphaq, RVector *alphaqim, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t p, ae_int_t *q, double *alpharpiv, double *thetad, ZVector *possibleflips, ae_int_t *possibleflipscnt, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t p, ae_int_t q, ae_int_t r, double delta, double alphapiv, double thetap, double thetad, RVector *alphaq, RVector *alphaqim, dssvector *alphar, RVector *tau, ZVector *possiblealpharflips, ae_int_t possiblealpharflipscnt, dualsimplexsettings *settings, ae_state *_state);
+static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state);
+static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t i, ae_int_t k, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
+static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
+static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_solveboxonly(dualsimplexstate *state, ae_state *_state);
+static void reviseddualsimplex_setzeroxystats(dualsimplexstate *state, ae_state *_state);
+static void reviseddualsimplex_basisinit(ae_int_t ns, ae_int_t m, dualsimplexbasis *s, ae_state *_state);
+static void reviseddualsimplex_basisclearstats(dualsimplexbasis *s, ae_state *_state);
+static bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s, ae_state *_state);
+static void reviseddualsimplex_basisexportto(dualsimplexbasis *s0, dualsimplexbasis *s1, ae_state *_state);
+static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_basisfreshtrf(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix *at, ae_int_t p, ae_int_t q, RVector *alphaq, RVector *alphaqim, ae_int_t r, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tmpx, ae_state *_state);
+static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, bool needintermediate, RVector *tx, ae_state *_state);
+static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tx, ae_state *_state);
+static void reviseddualsimplex_computeanxn(dualsimplexstate *state, dualsimplexsubproblem *subproblem, RVector *x, RVector *y, ae_state *_state);
+static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector *y, RVector *r, ae_state *_state);
+static bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static void reviseddualsimplex_downgradestate(dualsimplexsubproblem *subproblem, ae_int_t s, ae_state *_state);
+static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
+static bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd, ae_state *_state);
+static void reviseddualsimplex_inversecyclicpermutation(ZVector *bwd, ae_int_t m, ae_int_t d, ZVector *tmpi, ae_state *_state);
+static void reviseddualsimplex_offloadbasiccomponents(dualsimplexsubproblem *s, dualsimplexbasis *basis, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_recombinebasicnonbasicx(dualsimplexsubproblem *s, dualsimplexbasis *basis, ae_state *_state);
+static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexbasis *basis, apbuffers *buffers, RVector *x, RVector *lagbc, RVector *laglc, ZVector *stats, ae_state *_state);
+static void reviseddualsimplex_dvalloc(dssvector *x, ae_int_t n, ae_state *_state);
+static void reviseddualsimplex_dvinit(dssvector *x, ae_int_t n, ae_state *_state);
+static void reviseddualsimplex_dvdensetosparse(dssvector *x, ae_state *_state);
+static void reviseddualsimplex_dvsparsetodense(dssvector *x, ae_state *_state);
+static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n, ae_state *_state);
+static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t *cnt, ae_state *_state);
+
 void dsssettingsinit(dualsimplexsettings *settings, ae_state *_state) {
 
    settings->xtolabs = 1.0E-6;
@@ -41031,8 +38059,13 @@ void _dualsimplexstate_destroy(void *_p) {
    ae_vector_destroy(&p->eligiblealphar);
    ae_vector_destroy(&p->harrisset);
 }
+} // end of namespace alglib_impl
 
 // === MINLP Package ===
+namespace alglib_impl {
+static ae_int_t minlp_alllogicalsbasis = 0;
+static void minlp_clearreportfields(minlpstate *state, ae_state *_state);
+
 //                             LINEAR PROGRAMMING
 //
 // The subroutine creates LP  solver.  After  initial  creation  it  contains
@@ -42217,8 +39250,480 @@ void _minlpreport_destroy(void *_p) {
    ae_vector_destroy(&p->y);
    ae_vector_destroy(&p->stats);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores linear solver state.
+// You should use functions provided by MinLP subpackage to work with this
+// object
+DefClass(minlpstate, EndD)
+
+// This structure stores optimization report:
+// * f                         target function value
+// * lagbc                     Lagrange coefficients for box constraints
+// * laglc                     Lagrange coefficients for linear constraints
+// * y                         dual variables
+// * stats                     array[N+M], statuses of box (N) and linear (M)
+//                             constraints. This array is filled only by  DSS
+//                             algorithm because IPM always stops at INTERIOR
+//                             point:
+//                             * stats[i]>0  =>  constraint at upper bound
+//                                               (also used for free non-basic
+//                                               variables set to zero)
+//                             * stats[i]<0  =>  constraint at lower bound
+//                             * stats[i]=0  =>  constraint is inactive, basic
+//                                               variable
+// * primalerror               primal feasibility error
+// * dualerror                 dual feasibility error
+// * slackerror                complementary slackness error
+// * iterationscount           iteration count
+// * terminationtype           completion code (see below)
+//
+// COMPLETION CODES
+//
+// Completion codes:
+// * -4    LP problem is primal unbounded (dual infeasible)
+// * -3    LP problem is primal infeasible (dual unbounded)
+// *  1..4 successful completion
+// *  5    MaxIts steps was taken
+// *  7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//
+// LAGRANGE COEFFICIENTS
+//
+// Positive Lagrange coefficient means that constraint is at its upper bound.
+// Negative coefficient means that constraint is at its lower  bound.  It  is
+// expected that at solution the dual feasibility condition holds:
+//
+//     C + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+//
+// where
+// * C is a cost vector (linear term)
+// * Ei is a vector with 1.0 at position I and 0 in other positions
+// * Ai is an I-th row of linear constraint matrix
+DefClass(minlpreport, AndD DecVal(f) AndD DecVar(lagbc) AndD DecVar(laglc) AndD DecVar(y) AndD DecVar(stats) AndD DecVal(primalerror) AndD DecVal(dualerror) AndD DecVal(slackerror) AndD DecVal(iterationscount) AndD DecVal(terminationtype))
+
+void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpcreate(n, const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetalgodss(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetalgoipm(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlpsetalgoipm(const minlpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   double eps;
+
+   eps = 0;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetalgoipm(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), eps, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlpsetcost(const minlpstate &state, const real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetcost(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetscale(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetbc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetbcall(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), bndl, bndu, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetbci(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), i, bndl, bndu, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetlc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((a.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlpsetlc': looks like one of arguments has wrong size");
+   k = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetlc(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((a.rows() != al.length()) || (a.rows() != au.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minlpsetlc2dense': looks like one of arguments has wrong size");
+   k = a.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpsetlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpaddlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(a.c_ptr()), al, au, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpaddlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(idxa.c_ptr()), const_cast < alglib_impl::ae_vector * >(vala.c_ptr()), nnz, al, au, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpoptimize(const minlpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpoptimize(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpresults(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlpreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlpresultsbuf(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minlpreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === NLCSLP Package ===
+namespace alglib_impl {
+static double nlcslp_slpstpclosetozero = 0.001;
+static double nlcslp_slpdeltadecrease = 0.20;
+static double nlcslp_slpdeltaincrease = 0.80;
+static double nlcslp_slpstpclosetoone = 0.95;
+static double nlcslp_maxtrustraddecay = 0.1;
+static double nlcslp_maxtrustradgrowth = 1.333;
+static double nlcslp_slpgtol = 0.4;
+static double nlcslp_bigc = 500.0;
+static double nlcslp_bfgstol = 1.0E-5;
+static double nlcslp_meritfunctionbase = 0.0;
+static double nlcslp_meritfunctiongain = 2.0;
+static double nlcslp_inequalitydampingfactor = 10.0;
+static double nlcslp_augmentationfactor = 10.0;
+static double nlcslp_inittrustrad = 0.1;
+static double nlcslp_stagnationepsf = 1.0E-12;
+static ae_int_t nlcslp_lpfailureslimit = 20;
+static ae_int_t nlcslp_fstagnationlimit = 20;
+static ae_int_t nlcslp_nondescentlimit = 99999;
+static ae_int_t nlcslp_nonmonotonicphase2limit = 5;
+static double nlcslp_slpbigscale = 5.0;
+static double nlcslp_slpsmallscale = 0.2;
+static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolver, ae_int_t hessiantype, ae_state *_state);
+static void nlcslp_lpsubproblemrestart(minslpstate *sstate, minslpsubsolver *subsolver, ae_state *_state);
+static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
+static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state);
+static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, minslpsubsolver *subsolver, RVector *d, ae_state *_state);
+static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection, ae_state *_state);
+static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state);
+static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RVector *meritlagmult, ae_state *_state);
+static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state);
+static void nlcslp_slpsendx(minslpstate *state, RVector *xs, ae_state *_state);
+static bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
+static void nlcslp_slpcopystate(minslpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
+static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minslptmplagrangian *tmp, double *f, RVector *g, double *lcerr, ae_int_t *lcidx, double *nlcerr, ae_int_t *nlcidx, ae_state *_state);
+static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, ae_state *_state);
+static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp, ae_state *_state);
+static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, double *meritf, double *rawlag, ae_state *_state);
+
 void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minslpstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -45230,8 +42735,26 @@ void _minslpstate_destroy(void *_p) {
    _minslptmpmerit_destroy(&p->tmpmerit);
    _rcommstate_destroy(&p->rstate);
 }
+} // end of namespace alglib_impl
 
 // === MINNLC Package ===
+namespace alglib_impl {
+static double minnlc_aulmaxgrowth = 10.0;
+static double minnlc_maxlagmult = 1.0E7;
+static ae_int_t minnlc_lbfgsfactor = 10;
+static double minnlc_hessesttol = 1.0E-6;
+static double minnlc_initgamma = 1.0E-6;
+static double minnlc_regprec = 1.0E-6;
+static void minnlc_clearrequestfields(minnlcstate *state, ae_state *_state);
+static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state);
+static void minnlc_clearpreconditioner(minlbfgsstate *auloptimizer, ae_state *_state);
+static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, ae_int_t *preccounter, minlbfgsstate *auloptimizer, RVector *x, double rho, double gammak, RVector *bndl, BVector *hasbndl, RVector *bndu, BVector *hasbndu, RVector *nubc, RMatrix *cleic, RVector *nulc, RVector *fi, RMatrix *jac, RVector *nunlc, RVector *bufd, RVector *bufc, RMatrix *bufw, RMatrix *bufz, RVector *tmp0, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t ng, ae_int_t nh, ae_state *_state);
+static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVector *bndu, BVector *hasbndu, RVector *nubc, ae_int_t n, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
+static void minnlc_penaltylc(RVector *x, RMatrix *cleic, RVector *nulc, ae_int_t n, ae_int_t nec, ae_int_t nic, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
+static void minnlc_penaltynlc(RVector *fi, RMatrix *j, RVector *nunlc, ae_int_t n, ae_int_t ng, ae_int_t nh, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
+static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state);
+static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl, RVector *scaledbndu, RVector *xu, ae_state *_state);
+
 //                   NONLINEARLY  CONSTRAINED  OPTIMIZATION
 //             WITH PRECONDITIONED AUGMENTED LAGRANGIAN ALGORITHM
 //
@@ -48608,8 +46131,779 @@ void _minnlcreport_destroy(void *_p) {
    minnlcreport *p = (minnlcreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores nonlinear optimizer state.
+// You should use functions provided by MinNLC subpackage to work  with  this
+// object
+DefClass(minnlcstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
+
+// These fields store optimization report:
+// * iterationscount           total number of inner iterations
+// * nfev                      number of gradient evaluations
+// * terminationtype           termination type (see below)
+//
+// Scaled constraint violations are reported:
+// * bcerr                     maximum violation of the box constraints
+// * bcidx                     index of the most violated box  constraint (or
+//                             -1, if all box constraints  are  satisfied  or
+//                             there is no box constraint)
+// * lcerr                     maximum violation of the  linear  constraints,
+//                             computed as maximum  scaled  distance  between
+//                             final point and constraint boundary.
+// * lcidx                     index of the most violated  linear  constraint
+//                             (or -1, if all constraints  are  satisfied  or
+//                             there is no general linear constraints)
+// * nlcerr                    maximum violation of the nonlinear constraints
+// * nlcidx                    index of the most violated nonlinear constraint
+//                             (or -1, if all constraints  are  satisfied  or
+//                             there is no nonlinear constraints)
+//
+// Violations of box constraints are scaled on per-component basis  according
+// to  the  scale  vector s[] as specified by minnlcsetscale(). Violations of
+// the general linear  constraints  are  also  computed  using  user-supplied
+// variable scaling. Violations of nonlinear constraints are computed "as is"
+//
+// TERMINATION CODES
+//
+// TerminationType field contains completion code, which can be either:
+//
+// === FAILURE CODE ===
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signaled.
+//   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
+//         constraints does NOT trigger emergency  completion;  you  have  to
+//         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
+//         constraints.
+//
+// === SUCCESS CODE ===
+//    2    relative step is no more than EpsX.
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    user requested algorithm termination via minnlcrequesttermination(),
+//         last accepted point is returned
+//
+// Other fields of this structure are not documented and should not be used!
+DefClass(minnlcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(bcerr) AndD DecVal(bcidx) AndD DecVal(lcerr) AndD DecVal(lcidx) AndD DecVal(nlcerr) AndD DecVal(nlcidx) AndD DecVal(dbgphase0its))
+
+void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetbc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((c.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minnlcsetlc': looks like one of arguments has wrong size");
+   k = c.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetnlc(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), nlec, nlic, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetcond(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetscale(const minnlcstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetscale(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetprecinexact(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetprecinexact(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetprecexactlowrank(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), updatefreq, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetprecexactrobust(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), updatefreq, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetprecnone(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetprecnone(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetstpmax(const minnlcstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetstpmax(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetalgoaul(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), rho, itscnt, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetalgoslp(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetalgosqp(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcsetxrep(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minnlciteration(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     fvec    -   callback which calculates function vector fi[]
+//                 at given point x
+//     jac     -   callback which calculates function vector fi[]
+//                 and Jacobian jac at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied Jacobian, and one which uses  only  function
+//    vector and numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    you should choose appropriate variant of MinNLCOptimize() -  one  which
+//    accepts function AND Jacobian or one which accepts ONLY function.
+//
+//    Be careful to choose variant of MinNLCOptimize()  which  corresponds to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed to MinNLCOptimize()   and  specific
+//    function used to create optimizer.
+//
+//
+//                      |         USER PASSED TO MinNLCOptimize()
+//    CREATED WITH      |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    MinNLCCreateF()   |     works               FAILS
+//    MinNLCCreate()    |     FAILS               works
+//
+//    Here "FAILS" denotes inappropriate combinations  of  optimizer creation
+//    function  and  MinNLCOptimize()  version.   Attemps   to    use    such
+//    combination will lead to exception. Either  you  did  not pass gradient
+//    when it WAS needed or you passed gradient when it was NOT needed.
+// ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
+void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnlcoptimize()' (fvec is NULL)", &_alglib_env_state);
+   while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
+         fvec(state.x, state.fi, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnlcoptimize()' (jac is NULL)", &_alglib_env_state);
+   while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfij) {
+         jac(state.x, state.fi, state.j, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minnlcoptguardgradient(const minnlcstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardgradient(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardsmoothness(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), level, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t level;
+
+   level = 1;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardsmoothness(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), level, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardresults(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardnonc1test0results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcoptguardnonc1test1results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcresults(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcresultsbuf(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnlcreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcrequesttermination(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnlcrestartfrom(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MINNS Package ===
+namespace alglib_impl {
+static void minns_clearrequestfields(minnsstate *state, ae_state *_state);
+static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
+static bool minns_agsiteration(minnsstate *state, ae_state *_state);
+static void minns_unscalepointbc(minnsstate *state, RVector *x, ae_state *_state);
+static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, ae_int_t *dbgncholesky, minnsqp *state, ae_state *_state);
+static void minns_qpcalculategradfunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, RVector *g, double *f, RVector *tmp, ae_state *_state);
+static void minns_qpcalculatefunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, double *f, RVector *tmp, ae_state *_state);
+static void minns_qpsolveu(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state);
+static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state);
+
 //                   NONSMOOTH NONCONVEX OPTIMIZATION
 //             SUBJECT TO BOX/LINEAR/NONLINEAR-NONSMOOTH CONSTRAINTS
 //
@@ -51203,8 +49497,500 @@ void _minnsreport_destroy(void *_p) {
    minnsreport *p = (minnsreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores nonlinear optimizer state.
+// You should use functions provided by MinNS subpackage to work  with  this
+// object
+DefClass(minnsstate, AndD DecVal(needfi) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
+
+// This structure stores optimization report:
+// * IterationsCount           total number of inner iterations
+// * NFEV                      number of gradient evaluations
+// * TerminationType           termination type (see below)
+// * CErr                      maximum violation of all types of constraints
+// * LCErr                     maximum violation of linear constraints
+// * NLCErr                    maximum violation of nonlinear constraints
+//
+// TERMINATION CODES
+//
+// TerminationType field contains completion code, which can be:
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signalled.
+//   -3    box constraints are inconsistent
+//   -1    inconsistent parameters were passed:
+//         * penalty parameter for minnssetalgoags() is zero,
+//           but we have nonlinear constraints set by minnssetnlc()
+//    2    sampling radius decreased below epsx
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    User requested termination via MinNSRequestTermination()
+//
+// Other fields of this structure are not documented and should not be used!
+DefClass(minnsreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(cerr) AndD DecVal(lcerr) AndD DecVal(nlcerr) AndD DecVal(terminationtype) AndD DecVal(varidx) AndD DecVal(funcidx))
+
+void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnscreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnscreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnscreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnscreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetbc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t k;
+   if ((c.rows() != ct.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minnssetlc': looks like one of arguments has wrong size");
+   k = c.rows();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetnlc(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), nlec, nlic, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetcond(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetscale(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetalgoags(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), radius, penalty, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnssetxrep(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnsrequesttermination(const minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnsrequesttermination(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minnsiteration(const minnsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minnsiteration(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     fvec    -   callback which calculates function vector fi[]
+//                 at given point x
+//     jac     -   callback which calculates function vector fi[]
+//                 and Jacobian jac at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied Jacobian, and one which uses  only  function
+//    vector and numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    you should choose appropriate variant of  minnsoptimize() -  one  which
+//    accepts function AND Jacobian or one which accepts ONLY function.
+//
+//    Be careful to choose variant of minnsoptimize()  which  corresponds  to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed to minnsoptimize()    and  specific
+//    function used to create optimizer.
+//
+//
+//                      |         USER PASSED TO minnsoptimize()
+//    CREATED WITH      |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    minnscreatef()    |     works               FAILS
+//    minnscreate()     |     FAILS               works
+//
+//    Here "FAILS" denotes inappropriate combinations  of  optimizer creation
+//    function  and  minnsoptimize()  version.   Attemps   to    use     such
+//    combination will lead to exception. Either  you  did  not pass gradient
+//    when it WAS needed or you passed gradient when it was NOT needed.
+// ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
+void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnsoptimize()' (fvec is NULL)", &_alglib_env_state);
+   while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfi) {
+         fvec(state.x, state.fi, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnsoptimize()' (jac is NULL)", &_alglib_env_state);
+   while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfij) {
+         jac(state.x, state.fi, state.j, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnsresults(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnsresultsbuf(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minnsreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minnsrestartfrom(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MINCOMP Package ===
+namespace alglib_impl {
+static ae_int_t mincomp_n1 = 2;
+static ae_int_t mincomp_n2 = 2;
+static double mincomp_stpmin = 1.0E-300;
+static double mincomp_gtol = 0.3;
+static double mincomp_gpaftol = 0.0001;
+static double mincomp_gpadecay = 0.5;
+static double mincomp_asarho = 0.5;
+static double mincomp_asaboundedantigradnorm(minasastate *state, ae_state *_state);
+static double mincomp_asaginorm(minasastate *state, ae_state *_state);
+static double mincomp_asad1norm(minasastate *state, ae_state *_state);
+static bool mincomp_asauisempty(minasastate *state, ae_state *_state);
+static void mincomp_clearrequestfields(minasastate *state, ae_state *_state);
+
 // Obsolete function, use MinLBFGSSetPrecDefault() instead.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 // API: void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams);
@@ -52292,8 +51078,350 @@ void _minasareport_destroy(void *_p) {
    minasareport *p = (minasareport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+//
+DefClass(minasastate, AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+
+//
+DefClass(minasareport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype) AndD DecVal(activeconstraints))
+
+void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetdefaultpreconditioner(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minlbfgssetcholeskypreconditioner(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(p.c_ptr()), isupper, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetbarrierwidth(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), mu, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbleicsetbarrierdecay(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), mudecay, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+   if ((x.length() != bndl.length()) || (x.length() != bndu.length()))
+      _ALGLIB_CPP_EXCEPTION("Error while calling 'minasacreate': looks like one of arguments has wrong size");
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasasetcond(const_cast < alglib_impl::minasastate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasasetxrep(const minasastate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasasetxrep(const_cast < alglib_impl::minasastate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasasetalgorithm(const_cast < alglib_impl::minasastate * >(state.c_ptr()), algotype, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasasetstpmax(const minasastate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasasetstpmax(const_cast < alglib_impl::minasastate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minasaiteration(const minasastate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minasaiteration(const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minasaoptimize()' (grad is NULL)", &_alglib_env_state);
+   while (alglib_impl::minasaiteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minasaoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasaresults(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minasareport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasaresultsbuf(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minasareport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minasarestartfrom(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === MINBC Package ===
+namespace alglib_impl {
+static double minbc_gtol = 0.4;
+static double minbc_maxnonmonotoniclen = 1.0E-5;
+static double minbc_initialdecay = 0.5;
+static double minbc_mindecay = 0.1;
+static double minbc_decaycorrection = 0.8;
+static void minbc_clearrequestfields(minbcstate *state, ae_state *_state);
+static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state);
+static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_state *_state);
+
 //                      BOX CONSTRAINED OPTIMIZATION
 //           WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
 //
@@ -54446,8 +53574,605 @@ void _minbcreport_destroy(void *_p) {
    minbcreport *p = (minbcreport *) _p;
    ae_touch_ptr((void *)p);
 }
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores nonlinear optimizer state.
+// You should use functions provided by MinBC subpackage to work with this
+// object
+DefClass(minbcstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(g) AndD DecVar(x))
+
+// This structure stores optimization report:
+// * iterationscount           number of iterations
+// * nfev                      number of gradient evaluations
+// * terminationtype           termination type (see below)
+//
+// TERMINATION CODES
+//
+// terminationtype field contains completion code, which can be:
+//   -8    internal integrity control detected  infinite  or  NAN  values  in
+//         function/gradient. Abnormal termination signalled.
+//   -3    inconsistent constraints.
+//    1    relative function improvement is no more than EpsF.
+//    2    relative step is no more than EpsX.
+//    4    gradient norm is no more than EpsG
+//    5    MaxIts steps was taken
+//    7    stopping conditions are too stringent,
+//         further improvement is impossible,
+//         X contains best point found so far.
+//    8    terminated by user who called minbcrequesttermination(). X contains
+//         point which was "current accepted" when  termination  request  was
+//         submitted.
+DefClass(minbcreport, AndD DecVal(iterationscount) AndD DecVal(nfev) AndD DecVal(varidx) AndD DecVal(terminationtype))
+
+void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbccreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t n;
+
+   n = x.length();
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbccreatef(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), diffstep, const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetbc(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetcond(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), epsg, epsf, epsx, maxits, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetscale(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetprecdefault(const minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetprecdefault(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetprecdiag(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetprecscale(const minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetprecscale(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetxrep(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcsetstpmax(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+bool minbciteration(const minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return 0;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   bool result = alglib_impl::minbciteration(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return *(reinterpret_cast < bool *>(&result));
+}
+
+// This family of functions is used to launcn iterations of nonlinear optimizer
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     grad    -   callback which calculates function (or merit function)
+//                 value func and gradient grad at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// NOTES:
+//
+// 1. This function has two different implementations: one which  uses  exact
+//    (analytical) user-supplied gradient,  and one which uses function value
+//    only  and  numerically  differentiates  function  in  order  to  obtain
+//    gradient.
+//
+//    Depending  on  the  specific  function  used to create optimizer object
+//    (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
+//    for numerical differentiation) you should choose appropriate variant of
+//    MinBCOptimize() - one  which  accepts  function  AND gradient or one
+//    which accepts function ONLY.
+//
+//    Be careful to choose variant of MinBCOptimize() which corresponds to
+//    your optimization scheme! Table below lists different  combinations  of
+//    callback (function/gradient) passed to MinBCOptimize()  and specific
+//    function used to create optimizer.
+//
+//
+//                      |         USER PASSED TO MinBCOptimize()
+//    CREATED WITH      |  function only   |  function and gradient
+//    ------------------------------------------------------------
+//    MinBCCreateF()    |     works               FAILS
+//    MinBCCreate()     |     FAILS               works
+//
+//    Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+//    function  and  MinBCOptimize()  version.   Attemps   to   use   such
+//    combination (for  example,  to  create optimizer with MinBCCreateF()
+//    and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
+//    exception being thrown. Either  you  did  not pass gradient when it WAS
+//    needed or you passed gradient when it was NOT needed.
+// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
+void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbcoptimize()' (func is NULL)", &_alglib_env_state);
+   while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
+         func(state.x, state.f, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbcoptimize()' (grad is NULL)", &_alglib_env_state);
+   while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state)) {
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needfg) {
+         grad(state.x, state.f, state.g, ptr);
+         continue;
+      }
+      if (state.xupdated) {
+         if (rep != NULL)
+            rep(state.x, state.f, ptr);
+         continue;
+      }
+      goto lbl_no_callback;
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+   }
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void minbcoptguardgradient(const minbcstate &state, const double teststep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardgradient(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardsmoothness(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), level, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#if !defined(AE_NO_EXCEPTIONS)
+void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   ae_int_t level;
+
+   level = 1;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump))
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardsmoothness(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), level, &_alglib_env_state);
+
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+#endif
+
+void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardresults(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardnonc1test0results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcoptguardnonc1test1results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcresults(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcresultsbuf(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::minbcreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcrestartfrom(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void minbcrequesttermination(const minbcstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::minbcrequesttermination(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib
 
 // === OPTS Package ===
+namespace alglib_impl {
 // Initialize test LP problem.
 //
 // This function is intended for internal use by ALGLIB.
@@ -54690,3 +54415,229 @@ void _lptestproblem_destroy(void *_p) {
    ae_vector_destroy(&p->au);
 }
 } // end of namespace alglib_impl
+
+namespace alglib {
+// This is a test problem class  intended  for  internal  performance  tests.
+// Never use it directly in your projects.
+DefClass(lptestproblem, EndD)
+
+void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+   alglib_impl::ae_int_t ssize;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
+   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   s_out.clear();
+   s_out.reserve((size_t)(ssize + 1));
+   alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
+   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
+   alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
+   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+
+void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
+   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state state;
+   alglib_impl::ae_serializer serializer;
+
+   alglib_impl::ae_state_init(&state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_serializer_init(&serializer);
+   alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
+   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
+   alglib_impl::ae_serializer_stop(&serializer, &state);
+   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_state_clear(&state);
+}
+
+void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::lptestproblemcreate(n, hasknowntarget, targetf, const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::lptestproblemsetscale(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::lptestproblemsetcost(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::lptestproblemsetbc(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::lptestproblemsetlc2(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), m, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+
+void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams) {
+   jmp_buf _break_jump;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   if (setjmp(_break_jump)) {
+#if !defined(AE_NO_EXCEPTIONS)
+      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
+#else
+      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
+      return;
+#endif
+   }
+   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::xdbgminlpcreatefromtestproblem(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::minlpstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return;
+}
+} // end of namespace alglib

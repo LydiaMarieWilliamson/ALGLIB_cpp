@@ -16,8 +16,8 @@
 
 #include "AlgLibInternal.h"
 
-namespace alglib_impl {
 // === ODESOLVER Package ===
+namespace alglib_impl {
 typedef struct {
    ae_int_t n;
    ae_int_t m;
@@ -49,23 +49,7 @@ typedef struct {
    ae_int_t nfev;
    ae_int_t terminationtype;
 } odesolverreport;
-} // end of namespace alglib_impl
 
-namespace alglib {
-// === ODESOLVER Package ===
-DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
-DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
-
-// === ODESOLVER Package ===
-void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
-void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
-bool odesolveriteration(const odesolverstate &state, const xparams _xparams = xdefault);
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
-void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = xdefault);
-} // end of namespace alglib
-
-namespace alglib_impl {
-// === ODESOLVER Package ===
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
 bool odesolveriteration(odesolverstate *state, ae_state *_state);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state);
@@ -78,5 +62,16 @@ void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool m
 void _odesolverreport_clear(void *_p);
 void _odesolverreport_destroy(void *_p);
 } // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
+DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
+
+void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
+void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
+bool odesolveriteration(const odesolverstate &state, const xparams _xparams = xdefault);
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
+void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = xdefault);
+} // end of namespace alglib
 
 #endif // OnceOnly
