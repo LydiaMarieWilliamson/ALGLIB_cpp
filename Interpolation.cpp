@@ -7637,7 +7637,7 @@ void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t 
 
 // === LSFIT Package ===
 // Depends on: (Optimization) MINLM
-// Depends on: SPLINE1D, POLINT
+// Depends on: POLINT, SPLINE1D
 namespace alglib_impl {
 // This function analyzes section of curve for processing by RDP algorithm:
 // given set of points X,Y with indexes [I0,I1] it returns point with
@@ -13625,7 +13625,7 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep) {
 } // end of namespace alglib
 
 // === FITSPHERE Package ===
-// Depends on: (Optimization) MINNLC, MINLM
+// Depends on: (Optimization) MINLM, MINNLC
 namespace alglib_impl {
 // Fitting minimum circumscribed, maximum inscribed or minimum  zone  circles
 // (or NX-dimensional spheres)  to  data  (a  set of points in NX-dimensional
@@ -17342,7 +17342,6 @@ void rbfv1report_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
-// Depends on: (AlgLibInternal) SCODES
 // Depends on: SPLINE1D
 namespace alglib_impl {
 static const double spline2d_cholreg = 1.0E-12;
@@ -25793,7 +25792,7 @@ void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_
 } // end of namespace alglib
 
 // === INTCOMP Package ===
-// Depends on: FITSPHERE, SPLINE1D
+// Depends on: SPLINE1D, FITSPHERE
 namespace alglib_impl {
 // This function is left for backward compatibility.
 // Use fitspherex() instead.
@@ -25871,7 +25870,7 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
 } // end of namespace alglib
 
 // === RBF Package ===
-// Depends on: RBFV2, RBFV1
+// Depends on: RBFV1, RBFV2
 namespace alglib_impl {
 static const double rbf_eps = 1.0E-6;
 static const double rbf_rbffarradius = 6.0;

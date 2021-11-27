@@ -330,7 +330,7 @@ void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t 
 
 // === LSFIT Package ===
 // Depends on: (Optimization) MINLM
-// Depends on: SPLINE1D, POLINT
+// Depends on: POLINT, SPLINE1D
 namespace alglib_impl {
 struct polynomialfitreport {
    double taskrcond;
@@ -539,7 +539,7 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep);
 } // end of namespace alglib
 
 // === FITSPHERE Package ===
-// Depends on: (Optimization) MINNLC, MINLM
+// Depends on: (Optimization) MINLM, MINNLC
 namespace alglib_impl {
 struct fitsphereinternalreport {
    ae_int_t nfev;
@@ -713,7 +713,6 @@ void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
-// Depends on: (AlgLibInternal) SCODES
 // Depends on: SPLINE1D
 namespace alglib_impl {
 struct spline2dinterpolant {
@@ -1019,7 +1018,7 @@ void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_
 } // end of namespace alglib
 
 // === INTCOMP Package ===
-// Depends on: FITSPHERE, SPLINE1D
+// Depends on: SPLINE1D, FITSPHERE
 namespace alglib_impl {
 void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
@@ -1035,7 +1034,7 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
 } // end of namespace alglib
 
 // === RBF Package ===
-// Depends on: RBFV2, RBFV1
+// Depends on: RBFV1, RBFV2
 namespace alglib_impl {
 struct rbfcalcbuffer {
    ae_int_t modelversion;

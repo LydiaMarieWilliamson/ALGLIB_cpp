@@ -15,7 +15,7 @@
 #include "Solvers.h"
 
 // === POLYNOMIALSOLVER Package ===
-// Depends on: (LinAlg) TRFAC, EVD
+// Depends on: (LinAlg) EVD, TRFAC
 namespace alglib_impl {
 // Polynomial root finding.
 //
@@ -154,7 +154,7 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 
 // === DIRECTDENSESOLVERS Package ===
 // Depends on: (AlgLibInternal) XBLAS
-// Depends on: (LinAlg) RCOND, SVD
+// Depends on: (LinAlg) SVD, RCOND
 namespace alglib_impl {
 // Dense solver for A*x=b with N*N real matrix A and N*1 real vectorx  x  and
 // b. This is "slow-but-feature rich" version of the  linear  solver.  Faster
@@ -3827,8 +3827,12 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 }
 } // end of namespace alglib
 
+// === ITERATIVESPARSE Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: DIRECTSPARSESOLVERS
+
 // === LINCG Package ===
-// Depends on: (LinAlg) SPARSE, MATGEN
+// Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
 static const double lincg_defaultprecision = 1.0E-6;
 

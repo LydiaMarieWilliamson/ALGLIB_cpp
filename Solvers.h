@@ -17,7 +17,7 @@
 #include "LinAlg.h"
 
 // === POLYNOMIALSOLVER Package ===
-// Depends on: (LinAlg) TRFAC, EVD
+// Depends on: (LinAlg) EVD, TRFAC
 namespace alglib_impl {
 struct polynomialsolverreport {
    double maxerr;
@@ -37,7 +37,7 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 
 // === DIRECTDENSESOLVERS Package ===
 // Depends on: (AlgLibInternal) XBLAS
-// Depends on: (LinAlg) RCOND, SVD
+// Depends on: (LinAlg) SVD, RCOND
 namespace alglib_impl {
 struct densesolverreport {
    double r1;
@@ -166,8 +166,12 @@ void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x
 void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 } // end of namespace alglib
 
+// === ITERATIVESPARSE Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: DIRECTSPARSESOLVERS
+
 // === LINCG Package ===
-// Depends on: (LinAlg) SPARSE, MATGEN
+// Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
 struct lincgstate {
    ae_vector rx;

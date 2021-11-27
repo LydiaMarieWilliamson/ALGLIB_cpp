@@ -18,7 +18,7 @@
 #include "Optimization.h"
 
 // === PCA Package ===
-// Depends on: (LinAlg) SVD, EVD
+// Depends on: (LinAlg) EVD, SVD
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, RVector *s2, RMatrix *v);
@@ -66,7 +66,7 @@ void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array
 } // end of namespace alglib
 
 // === MLPBASE Package ===
-// Depends on: (AlgLibInternal) SCODES, HPCCORES
+// Depends on: (AlgLibInternal) HPCCORES
 // Depends on: (LinAlg) SPARSE
 // Depends on: BDSS
 namespace alglib_impl {
@@ -776,7 +776,7 @@ void filterlrma(real_1d_array &x, const ae_int_t k);
 } // end of namespace alglib
 
 // === SSA Package ===
-// Depends on: (LinAlg) SVD, EVD
+// Depends on: (LinAlg) EVD, SVD
 namespace alglib_impl {
 struct ssamodel {
    ae_int_t nsequences;
@@ -881,7 +881,7 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
 } // end of namespace alglib
 
 // === LDA Package ===
-// Depends on: (LinAlg) MATINV, EVD
+// Depends on: (LinAlg) EVD, MATINV
 namespace alglib_impl {
 void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w);
 void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w);

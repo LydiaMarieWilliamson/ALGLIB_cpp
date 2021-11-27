@@ -550,7 +550,7 @@ DefClass(optguardnonc1test1report, DecVal(positive) DecVal(fidx) DecVal(vidx) De
 } // end of namespace alglib
 
 // === OPTSERV Package ===
-// Depends on: (LinAlg) MATINV, SVD
+// Depends on: (LinAlg) SVD, MATINV
 // Depends on: OPTGUARDAPI
 namespace alglib_impl {
 static const double optserv_ognoiselevelf = 1.0E2 * machineepsilon;
@@ -4406,7 +4406,8 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep) {
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -4459,7 +4460,8 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -11158,7 +11160,7 @@ void qqpbuffers_free(void *_p, bool make_automatic) {
 
 // === QPDENSEAULSOLVER Package ===
 // Depends on: (Solvers) DIRECTDENSESOLVERS, LINLSQR
-// Depends on: QQPSOLVER, MINLBFGS, LPQPSERV
+// Depends on: MINLBFGS, LPQPSERV, QQPSOLVER
 namespace alglib_impl {
 // This function initializes QPDENSEAULSettings structure with default settings.
 //
@@ -13838,7 +13840,8 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep) {
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -13891,7 +13894,8 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -14871,8 +14875,8 @@ void qpbleicbuffers_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
-// Depends on: (LinAlg) DIRECTDENSESOLVERS
-// Depends on: CQMODELS, MINLBFGS, LPQPSERV
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MINLBFGS, CQMODELS, LPQPSERV
 namespace alglib_impl {
 static const double vipmsolver_initslackval = 100.0;
 
@@ -18168,7 +18172,7 @@ void vipmstate_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === MINQP Package ===
-// Depends on: VIPMSOLVER, QPDENSEAULSOLVER, QPBLEICSOLVER
+// Depends on: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER
 namespace alglib_impl {
 // CONSTRAINED QUADRATIC PROGRAMMING
 // The subroutine creates QP optimizer. After initial creation,  it  contains
@@ -24343,7 +24347,8 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep) {
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -24396,7 +24401,8 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -34287,7 +34293,7 @@ void minslpstate_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === MINNLC Package ===
-// Depends on: NLCSQP, MINBLEIC, NLCSLP
+// Depends on: MINBLEIC, NLCSQP, NLCSLP
 namespace alglib_impl {
 // Internal initialization subroutine.
 // Sets default NLC solver with default criteria.
@@ -36521,7 +36527,8 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep) {
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -36576,7 +36583,8 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -42055,7 +42063,8 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep) {
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -42108,7 +42117,8 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // Inputs:
 //     State   -   algorithm state
@@ -42650,3 +42660,6 @@ void minbcrequesttermination(const minbcstate &state) {
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
+
+// === OPTS Package ===
+// Depends on: MINLP

@@ -85,7 +85,7 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 } // end of namespace alglib
 
 // === ORTFAC Package ===
-// Depends on: (AlgLibInternal) CREFLECTIONS, HBLAS, SBLAS
+// Depends on: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: ABLAS
 namespace alglib_impl {
@@ -184,7 +184,7 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
 } // end of namespace alglib
 
 // === SPARSE Package ===
-// Depends on: (AlgLibInternal) ABLASMKL, TSORT
+// Depends on: (AlgLibInternal) ABLASMKL, SCODES, TSORT
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 struct sparsematrix {
@@ -345,7 +345,7 @@ ae_int_t sparsegetlowercount(const sparsematrix &s);
 } // end of namespace alglib
 
 // === HSSCHUR Package ===
-// Depends on: (AlgLibInternal) ROTATIONS, BLAS
+// Depends on: (AlgLibInternal) BLAS, ROTATIONS
 // Depends on: ABLAS
 namespace alglib_impl {
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info);
@@ -355,7 +355,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
 
 // === EVD Package ===
 // Depends on: (AlgLibInternal) BASICSTATOPS
-// Depends on: SPARSE, MATGEN, ORTFAC, HSSCHUR
+// Depends on: ORTFAC, MATGEN, SPARSE, HSSCHUR
 namespace alglib_impl {
 struct eigsubspacestate {
    ae_int_t n;
@@ -538,7 +538,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
-// Depends on: SPARSE, ABLAS
+// Depends on: ABLAS, SPARSE
 namespace alglib_impl {
 struct amdnset {
    ae_int_t n;
@@ -689,7 +689,7 @@ bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVec
 
 // === TRFAC Package ===
 // Depends on: (AlgLibInternal) ROTATIONS
-// Depends on: SPTRF, SPCHOL, MATGEN
+// Depends on: MATGEN, SPTRF, SPCHOL
 namespace alglib_impl {
 struct sparsedecompositionanalysis {
    ae_int_t n;
@@ -877,7 +877,7 @@ void fblssolvels(RMatrix *a, RVector *b, ae_int_t m, ae_int_t n, RVector *tmp0, 
 } // end of namespace alglib_impl
 
 // === NORMESTIMATOR Package ===
-// Depends on: SPARSE, MATGEN
+// Depends on: MATGEN, SPARSE
 namespace alglib_impl {
 struct normestimatorstate {
    ae_int_t n;
@@ -993,7 +993,7 @@ bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s);
 } // end of namespace alglib
 
 // === SPDGEVD Package ===
-// Depends on: MATINV, EVD
+// Depends on: EVD, MATINV
 namespace alglib_impl {
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr);

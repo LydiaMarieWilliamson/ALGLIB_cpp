@@ -2591,7 +2591,7 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 } // end of namespace alglib
 
 // === ORTFAC Package ===
-// Depends on: (AlgLibInternal) CREFLECTIONS, HBLAS, SBLAS
+// Depends on: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: ABLAS
 namespace alglib_impl {
@@ -5949,7 +5949,7 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n) {
 } // end of namespace alglib
 
 // === SPARSE Package ===
-// Depends on: (AlgLibInternal) ABLASMKL, TSORT
+// Depends on: (AlgLibInternal) ABLASMKL, SCODES, TSORT
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 static const double sparse_desiredloadfactor = 0.66;
@@ -11155,7 +11155,7 @@ ae_int_t sparsegetlowercount(const sparsematrix &s) {
 } // end of namespace alglib
 
 // === HSSCHUR Package ===
-// Depends on: (AlgLibInternal) ROTATIONS, BLAS
+// Depends on: (AlgLibInternal) BLAS, ROTATIONS
 // Depends on: ABLAS
 namespace alglib_impl {
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
@@ -12127,7 +12127,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
 
 // === EVD Package ===
 // Depends on: (AlgLibInternal) BASICSTATOPS
-// Depends on: SPARSE, MATGEN, ORTFAC, HSSCHUR
+// Depends on: ORTFAC, MATGEN, SPARSE, HSSCHUR
 namespace alglib_impl {
 static const ae_int_t evd_stepswithintol = 2;
 
@@ -18886,7 +18886,7 @@ void sluv2buffer_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
-// Depends on: SPARSE, ABLAS
+// Depends on: ABLAS, SPARSE
 namespace alglib_impl {
 static const ae_int_t amdordering_knsheadersize = 2;
 static const ae_int_t amdordering_llmentrysize = 6;
@@ -22696,7 +22696,7 @@ void spcholanalysis_free(void *_p, bool make_automatic) {
 
 // === TRFAC Package ===
 // Depends on: (AlgLibInternal) ROTATIONS
-// Depends on: SPTRF, SPCHOL, MATGEN
+// Depends on: MATGEN, SPTRF, SPCHOL
 namespace alglib_impl {
 // LU decomposition of a general real matrix with row pivoting
 //
@@ -28398,7 +28398,7 @@ void fblsgmresstate_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === NORMESTIMATOR Package ===
-// Depends on: SPARSE, MATGEN
+// Depends on: MATGEN, SPARSE
 namespace alglib_impl {
 // This procedure initializes matrix norm estimator.
 //
@@ -30464,7 +30464,7 @@ bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s) {
 } // end of namespace alglib
 
 // === SPDGEVD Package ===
-// Depends on: MATINV, EVD
+// Depends on: EVD, MATINV
 namespace alglib_impl {
 // Algorithm for solving the following generalized symmetric positive-definite
 // eigenproblem:

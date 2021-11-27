@@ -104,7 +104,7 @@ DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vid
 } // end of namespace alglib
 
 // === OPTSERV Package ===
-// Depends on: (LinAlg) MATINV, SVD
+// Depends on: (LinAlg) SVD, MATINV
 // Depends on: OPTGUARDAPI
 namespace alglib_impl {
 struct precbuflbfgs {
@@ -656,7 +656,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 
 // === QPDENSEAULSOLVER Package ===
 // Depends on: (Solvers) DIRECTDENSESOLVERS, LINLSQR
-// Depends on: QQPSOLVER, MINLBFGS, LPQPSERV
+// Depends on: MINLBFGS, LPQPSERV, QQPSOLVER
 namespace alglib_impl {
 struct qpdenseaulsettings {
    double epsx;
@@ -929,8 +929,8 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
 } // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
-// Depends on: (LinAlg) DIRECTDENSESOLVERS
-// Depends on: CQMODELS, MINLBFGS, LPQPSERV
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MINLBFGS, CQMODELS, LPQPSERV
 namespace alglib_impl {
 struct vipmvars {
    ae_int_t n;
@@ -1076,7 +1076,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 } // end of namespace alglib_impl
 
 // === MINQP Package ===
-// Depends on: VIPMSOLVER, QPDENSEAULSOLVER, QPBLEICSOLVER
+// Depends on: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER
 namespace alglib_impl {
 struct minqpstate {
    ae_int_t n;
@@ -2166,7 +2166,7 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
 } // end of namespace alglib_impl
 
 // === MINNLC Package ===
-// Depends on: NLCSQP, MINBLEIC, NLCSLP
+// Depends on: MINBLEIC, NLCSQP, NLCSLP
 namespace alglib_impl {
 struct minnlcstate {
    double stabilizingpoint;
@@ -2749,5 +2749,8 @@ void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep
 void minbcrestartfrom(const minbcstate &state, const real_1d_array &x);
 void minbcrequesttermination(const minbcstate &state);
 } // end of namespace alglib
+
+// === OPTS Package ===
+// Depends on: MINLP
 
 #endif // OnceOnly

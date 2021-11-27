@@ -1598,25 +1598,25 @@ The subpackages included with AlgLibInternal, primarily meant for internal use, 
 They are, however, included in the dependencies listed under the other subpackages.
 Therefore, a short summary is provided here for each of the subpackages.
 <table align=center border=1><tbody>
-<tr align=left valign=top><td><a name=unit_scodes>scodes</a></td><td>Serialization codes.</td></tr>
 <tr align=left valign=top><td><a name=unit_apserv>apserv</a></td><td>Auxiliary routines, mostly stubs/legacies from the Commercial Edition of ALGLIB.</td></tr>
-<tr align=left valign=top><td><a name=unit_tsort>tsort</a></td><td>Basic tag sort routines.<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
-<tr align=left valign=top><td><a name=unit_ablasmkl>ablasmkl</a></td><td>ABLAS Hooks for MKL (or other external library) ABLAS routines (used only in <a href=#unit_sparse>sparse</a> and <a href=#unit_ablas>ablas</a>).</td></tr>
-<tr align=left valign=top><td><a name=unit_ablasf>ablasf</a></td><td>ABLAS Hooks for fast ABLAS routines (used only in <a href=#unit_ablas>ablas</a>).</td></tr>
-<tr align=left valign=top><td><a name=unit_creflections>creflections</a></td><td>Complex reflection transformation (used only in <a href=#unit_matgen>matgen</a> and <a href=#unit_ortfac>ortfac</a>).</td></tr>
-<tr align=left valign=top><td><a name=unit_rotations>rotations</a></td><td>Matrix rotation routines.</td></tr>
-<tr align=left valign=top><td><a name=unit_trlinsolve>trlinsolve</a></td><td>"Safe" triangular matrix solver.</td></tr>
-<tr align=left valign=top><td><a name=unit_safesolve>safesolve</a></td><td>"Safe" matrix solver (used only in <a href=#unit_rcond>rcond</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_ablasf>ablasf</a></td><td>ABLAS Hooks for fast ABLAS routines (used only in <a href=#unit_hqrnd>hqrnd</a> and <a href=#unit_ablas>ablas</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_hblas>hblas</a></td><td>Basic BLAS routines for Hermitian matrices (used only in <a href=#unit_ortfac>ortfac</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_creflections>creflections</a></td><td>Complex reflection transformation (used only in <a href=#unit_matgen>matgen</a> and <a href=#unit_ortfac>ortfac</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_sblas>sblas</a></td><td>Basic BLAS routines for Symmetric matrices (used only in <a href=#unit_ortfac>ortfac</a>).<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
+<tr align=left valign=top><td><a name=unit_ablasmkl>ablasmkl</a></td><td>ABLAS Hooks for MKL (or other external library) ABLAS routines (used only in <a href=#unit_sparse>sparse</a> and <a href=#unit_ablas>ablas</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_scodes>scodes</a></td><td>Serialization codes.</td></tr>
+<tr align=left valign=top><td><a name=unit_tsort>tsort</a></td><td>Basic tag sort routines.<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
 <tr align=left valign=top><td><a name=unit_blas>blas</a></td><td>Basic BLAS routines for general matrices.</td></tr>
-<tr align=left valign=top><td><a name=unit_linmin>linmin</a></td><td>Line search minimizers (mcsrch and Armijo search).</td></tr>
-<tr align=left valign=top><td><a name=unit_xblas>xblas</a></td><td>Basic BLAS routines for extra precision (used only in <a href=#unit_directdensesolvers>directdensesolvers</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_rotations>rotations</a></td><td>Matrix rotation routines.</td></tr>
 <tr align=left valign=top><td><a name=unit_basicstatops>basicstatops</a></td><td>Ranking procedures for statistics (used only in <a href=#unit_evd>evd</a> and <a href=#unit_basestat>basestat</a>).<br/>Depends on: <a href=#unit_tsort>tsort</a>.</td></tr>
-<tr align=left valign=top><td><a name=unit_hpccores>hpccores</a></td><td>Basic routines for HPC computations (used only in <a href=#unit_mlpbase>mlpbase</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_trlinsolve>trlinsolve</a></td><td>"Safe" triangular matrix solver (used only in <a href=#unit_rcond>rcond</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_safesolve>safesolve</a></td><td>"Safe" matrix solver (used only in <a href=#unit_rcond>rcond</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_xblas>xblas</a></td><td>Basic BLAS routines for extra precision (used only in <a href=#unit_directdensesolvers>directdensesolvers</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_linmin>linmin</a></td><td>Line search minimizers (mcsrch and Armijo search).</td></tr>
+<tr align=left valign=top><td><a name=unit_nearunityunit>nearunityunit</a></td><td>Basic "near unity" support routines log, exp and cos for the binomial distribution (used only in <a href=#unit_binomialdistr>binomialdistr</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_ntheory>ntheory</a></td><td>Basic number theoretic support routines for FFT (used only in <a href=#unit_ftbase>ftbase</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_ftbase>ftbase</a></td><td>An FFT engine, similar to (but not as extensive as) FFTW (used only in <a href=#unit_fft>fft</a>).<br/>Depends on: <a href=#unit_apserv>apserv</a>, <a href=#unit_ntheory>ntheory</a>.</td></tr>
-<tr align=left valign=top><td><a name=unit_nearunityunit>nearunityunit</a></td><td>Basic "near unity" support routines log, exp and cos for the binomial distribution (used only in <a href=#unit_binomialdistr>binomialdistr</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_hpccores>hpccores</a></td><td>Basic routines for HPC computations (used only in <a href=#unit_mlpbase>mlpbase</a>).</td></tr>
 </tbody></table>
 </p>
 <p>
@@ -31233,7 +31233,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -31286,7 +31287,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -32271,7 +32273,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -32324,7 +32327,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -33414,7 +33418,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -33467,7 +33472,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -34688,7 +34694,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -34741,7 +34748,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -37613,7 +37621,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
@@ -37668,7 +37677,8 @@ In both cases following fields are returned:
   with  most  likely  position  of  the  violation  between  stpidxa+1 and
   stpidxa+2.
 
-= SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
+==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+====                   you will see where C1 continuity is violated. ====
 
 Inputs:
     State   -   algorithm state
