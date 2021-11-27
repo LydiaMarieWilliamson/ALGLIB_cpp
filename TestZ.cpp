@@ -1,18 +1,6 @@
 #include "stdafx.h"
 #include <sstream>
 #include <math.h>
-
-#include "AlgLibMisc.h"
-#include "AlgLibInternal.h"
-#include "LinAlg.h"
-#include "Statistics.h"
-#include "DataAnalysis.h"
-#include "SpecialFunctions.h"
-#include "Solvers.h"
-#include "Optimization.h"
-#include "DiffEquations.h"
-#include "FastTransforms.h"
-#include "Integration.h"
 #include "Interpolation.h"
 
 #if !defined(AE_NO_EXCEPTIONS)

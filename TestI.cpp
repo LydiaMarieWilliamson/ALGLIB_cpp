@@ -1,17 +1,9 @@
 #include "stdafx.h"
 #include <math.h>
-#include "AlgLibInternal.h"
-#include "AlgLibMisc.h"
-#include "LinAlg.h"
-#include "Solvers.h"
-#include "Optimization.h"
-#include "DiffEquations.h"
-#include "SpecialFunctions.h"
-#include "Integration.h"
-#include "Statistics.h"
-#include "Interpolation.h"
-#include "FastTransforms.h"
 #include "DataAnalysis.h"
+#include "DiffEquations.h"
+#include "FastTransforms.h"
+#include "Interpolation.h"
 
 using namespace alglib;
 
