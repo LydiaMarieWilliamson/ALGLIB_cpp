@@ -27,6 +27,7 @@
 #endif
 
 // === ABLAS Package ===
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 static ae_int_t ablas_blas2minvendorkernelsize = 8;
 static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
@@ -3253,6 +3254,9 @@ void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const c
 } // end of namespace alglib
 
 // === ORTFAC Package ===
+// Depends on: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 static void ortfac_cmatrixqrbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
 static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector *work, CVector *t, CVector *tau, ae_state *_state);
@@ -6423,6 +6427,9 @@ void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool is
 } // end of namespace alglib
 
 // === MATGEN Package ===
+// Depends on: (AlgLibInternal) CREFLECTIONS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 // Generation of a random uniformly distributed (Haar) orthogonal matrix
 //
@@ -7564,6 +7571,8 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xp
 } // end of namespace alglib
 
 // === SPARSE Package ===
+// Depends on: (AlgLibInternal) ABLASMKL, SCODES, TSORT
+// Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 static double sparse_desiredloadfactor = 0.66;
 static double sparse_maxloadfactor = 0.75;
@@ -14193,6 +14202,8 @@ ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams) {
 } // end of namespace alglib
 
 // === HSSCHUR Package ===
+// Depends on: (AlgLibInternal) BLAS, ROTATIONS
+// Depends on: ABLAS
 namespace alglib_impl {
 static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_t ilo, ae_int_t ihi, RMatrix *h, RVector *wr, RVector *wi, ae_int_t iloz, ae_int_t ihiz, RMatrix *z, RVector *work, RVector *workv3, RVector *workc1, RVector *works1, ae_int_t *info, ae_state *_state);
 static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, double *rt1r, double *rt1i, double *rt2r, double *rt2i, double *cs, double *sn, ae_state *_state);
@@ -15291,6 +15302,8 @@ static ae_int_t hsschur_extschursigntoone(double b, ae_state *_state) {
 } // end of namespace alglib_impl
 
 // === EVD Package ===
+// Depends on: (AlgLibInternal) BASICSTATOPS
+// Depends on: ORTFAC, MATGEN, SPARSE, HSSCHUR
 namespace alglib_impl {
 static ae_int_t evd_stepswithintol = 2;
 static void evd_clearrfields(eigsubspacestate *state, ae_state *_state);
@@ -21391,6 +21404,7 @@ bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded
 } // end of namespace alglib
 
 // === DLU Package ===
+// Depends on: ABLAS
 namespace alglib_impl {
 static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
 static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
@@ -21764,6 +21778,7 @@ static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
 } // end of namespace alglib_impl
 
 // === SPTRF Package ===
+// Depends on: SPARSE, DLU
 namespace alglib_impl {
 static double sptrf_densebnd = 0.10;
 static ae_int_t sptrf_slswidth = 8;
@@ -23162,6 +23177,7 @@ void _sluv2buffer_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
+// Depends on: ABLAS, SPARSE
 namespace alglib_impl {
 static ae_int_t amdordering_knsheadersize = 2;
 static ae_int_t amdordering_llmentrysize = 6;
@@ -25288,6 +25304,7 @@ void _amdbuffer_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === SPCHOL Package ===
+// Depends on: AMDORDERING
 namespace alglib_impl {
 static ae_int_t spchol_maxsupernode = 4;
 static double spchol_maxmergeinefficiency = 0.25;
@@ -25454,7 +25471,7 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
       ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
 
    // Analyze row statistics
-      ae_trace("=== ANALYZING ROW STATISTICS =======================================================================\n");
+      ae_trace("==== ANALYZING ROW STATISTICS ====\n");
       ae_trace("row size is:\n");
       isetv(n, 1, &analysis->tmp0, _state);
       for (i = 0; i <= n - 1; i++) {
@@ -26404,7 +26421,7 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
 
 // Trace
    if (analysis->dotracesupernodalstructure) {
-      ae_trace("=== GENERATING SUPERNODAL STRUCTURE ================================================================\n");
+      ae_trace("==== GENERATING SUPERNODAL STRUCTURE ====\n");
    }
 // Convert etree from per-column parent array to per-column children list
    spchol_fromparenttochildren(parent, n, tchildrenr, tchildreni, ttmp0, _state);
@@ -26658,7 +26675,7 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
 
 // Analyze statistics for trace output
    if (analysis->dotrace) {
-      ae_trace("=== ANALYZING SUPERNODAL DEPENDENCIES ==============================================================\n");
+      ae_trace("==== ANALYZING SUPERNODAL DEPENDENCIES ====\n");
       dbgrank1nodes = 0;
       dbgrank2nodes = 0;
       dbgrank3nodes = 0;
@@ -28725,6 +28742,8 @@ void _spcholanalysis_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === TRFAC Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: MATGEN, SPTRF, SPCHOL
 namespace alglib_impl {
 static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
 static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp, ae_state *_state);
@@ -30921,6 +30940,9 @@ void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const spa
 } // end of namespace alglib
 
 // === BDSVD Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *uu, ae_int_t ustart, ae_int_t nru, RMatrix *c, ae_int_t cstart, ae_int_t ncc, RMatrix *vt, ae_int_t vstart, ae_int_t ncvt, ae_state *_state);
 static double bdsvd_extsignbdsqr(double a, double b, ae_state *_state);
@@ -31967,6 +31989,8 @@ bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, co
 } // end of namespace alglib
 
 // === SVD Package ===
+// Depends on: (AlgLibInternal) BLAS
+// Depends on: ORTFAC, BDSVD
 namespace alglib_impl {
 // Singular value decomposition of a rectangular matrix.
 //
@@ -32255,6 +32279,8 @@ bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, cons
 } // end of namespace alglib
 
 // === RCOND Package ===
+// Depends on: (AlgLibInternal) TRLINSOLVE, SAFESOLVE
+// Depends on: TRFAC
 namespace alglib_impl {
 static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
 static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state);
@@ -34777,6 +34803,8 @@ double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool
 } // end of namespace alglib
 
 // === FBLS Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: ORTFAC
 namespace alglib_impl {
 // Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
 //
@@ -35700,6 +35728,7 @@ void _fblsgmresstate_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === NORMESTIMATOR Package ===
+// Depends on: MATGEN, SPARSE
 namespace alglib_impl {
 // This procedure initializes matrix norm estimator.
 //
@@ -36131,6 +36160,7 @@ void normestimatorresults(const normestimatorstate &state, double &nrm, const xp
 } // end of namespace alglib
 
 // === MATINV Package ===
+// Depends on: RCOND
 namespace alglib_impl {
 static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
 bool _trypexec_matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool isunit, RVector *tmp, sinteger *info, ae_state *_state);
@@ -38368,6 +38398,7 @@ void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_arr
 } // end of namespace alglib
 
 // === SCHUR Package ===
+// Depends on: ORTFAC, HSSCHUR
 namespace alglib_impl {
 // Subroutine performing the Schur decomposition of a general matrix by using
 // the QR algorithm with multiple shifts.
@@ -38460,6 +38491,7 @@ bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xp
 } // end of namespace alglib
 
 // === SPDGEVD Package ===
+// Depends on: EVD, MATINV
 namespace alglib_impl {
 // Algorithm for solving the following generalized symmetric positive-definite
 // eigenproblem:
@@ -38871,6 +38903,7 @@ bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, 
 } // end of namespace alglib
 
 // === MATDET Package ===
+// Depends on: TRFAC
 namespace alglib_impl {
 // Determinant calculation of the matrix given by its LU decomposition.
 //

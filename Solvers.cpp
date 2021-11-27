@@ -27,6 +27,7 @@
 #endif
 
 // === POLYNOMIALSOLVER Package ===
+// Depends on: (LinAlg) EVD, TRFAC
 namespace alglib_impl {
 // Polynomial root finding.
 //
@@ -207,6 +208,8 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 } // end of namespace alglib
 
 // === DIRECTDENSESOLVERS Package ===
+// Depends on: (AlgLibInternal) XBLAS
+// Depends on: (LinAlg) SVD, RCOND
 namespace alglib_impl {
 static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
 static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
@@ -4319,6 +4322,7 @@ void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t
 } // end of namespace alglib
 
 // === DIRECTSPARSESOLVERS Package ===
+// Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
 // Sparse linear solver for A*x=b with N*N  sparse  real  symmetric  positive
 // definite matrix A, N*1 vectors x and b.
@@ -4826,6 +4830,8 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 } // end of namespace alglib
 
 // === ITERATIVESPARSE Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: DIRECTSPARSESOLVERS
 namespace alglib_impl {
 static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_state *_state);
 static void iterativesparse_clearrequestfields(sparsesolverstate *state, ae_state *_state);
@@ -6254,6 +6260,7 @@ void sparsesolverrequesttermination(const sparsesolverstate &state, const xparam
 } // end of namespace alglib
 
 // === LINCG Package ===
+// Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
 static double lincg_defaultprecision = 1.0E-6;
 static void lincg_clearrfields(lincgstate *state, ae_state *_state);
@@ -7298,6 +7305,7 @@ void lincgsetxrep(const lincgstate &state, const bool needxrep, const xparams _x
 } // end of namespace alglib
 
 // === LINLSQR Package ===
+// Depends on: (LinAlg) SVD, NORMESTIMATOR
 namespace alglib_impl {
 static double linlsqr_atol = 1.0E-6;
 static double linlsqr_btol = 1.0E-6;
@@ -8449,6 +8457,8 @@ void linlsqrrequesttermination(const linlsqrstate &state, const xparams _xparams
 } // end of namespace alglib
 
 // === NLEQ Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
 namespace alglib_impl {
 static void nleq_clearrequestfields(nleqstate *state, ae_state *_state);
 static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae_state *_state);

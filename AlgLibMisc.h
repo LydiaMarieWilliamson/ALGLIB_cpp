@@ -17,6 +17,7 @@
 #include "AlgLibInternal.h"
 
 // === HQRND Package ===
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 typedef struct {
    ae_int_t s1;
@@ -147,6 +148,7 @@ double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const re
 } // end of namespace alglib
 
 // === NEARESTNEIGHBOR Package ===
+// Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
 typedef struct {
    ae_vector x;

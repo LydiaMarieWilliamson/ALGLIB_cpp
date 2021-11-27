@@ -27,6 +27,7 @@
 #endif
 
 // === OPTGUARDAPI Package ===
+// Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 // This subroutine initializes "internal" OptGuard report,  i.e. one intended
 // for internal use by optimizers.
@@ -394,7 +395,7 @@ namespace alglib {
 // * badgradsuspected
 //
 //
-// === WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER =================
+// ==== WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER ====
 //
 // Following  types  of  errors  in your target function (constraints) can be
 // caught:
@@ -420,7 +421,7 @@ namespace alglib {
 // supplied gradient.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Following set of report fields deals with discontinuous  target functions,
 // ones not belonging to C0 continuity class:
@@ -475,14 +476,14 @@ DefClass(optguardreport, DecVal(nonc0suspected) DecVal(nonc0test0positive) DecVa
 // This  structure  is  used  for  detailed   reporting  about  suspected  C0
 // continuity violation.
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C0 test  studies  function  values (not gradient!)  obtained  during  line
 // searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
 // usually indicate that discontinuity was detected.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -517,7 +518,7 @@ DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d)
 // continuity violation as flagged by C1 test #0 (OptGuard  has several tests
 // for C1 continuity, this report is used by #0).
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C1 test #0 studies function values (not gradient!)  obtained  during  line
 // searches and monitors behavior of directional  derivative  estimate.  This
@@ -526,7 +527,7 @@ DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d)
 // numerical differentiation.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -561,7 +562,7 @@ DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecV
 // continuity violation as flagged by C1 test #1 (OptGuard  has several tests
 // for C1 continuity, this report is used by #1).
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C1 test #1 studies individual  components  of  the  gradient  as  recorded
 // during line searches. Upon discovering discontinuity in the gradient  this
@@ -579,7 +580,7 @@ DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecV
 // continuity is violated.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -614,6 +615,8 @@ DefClass(optguardnonc1test1report, DecVal(positive) DecVal(fidx) DecVal(vidx) De
 } // end of namespace alglib
 
 // === OPTSERV Package ===
+// Depends on: (LinAlg) SVD, MATINV
+// Depends on: OPTGUARDAPI
 namespace alglib_impl {
 static double optserv_ognoiselevelf = 1.0E2 * ae_machineepsilon;
 static double optserv_ognoiselevelg = 1.0E4 * ae_machineepsilon;
@@ -4065,6 +4068,9 @@ void _smoothnessmonitor_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MINLBFGS Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
+// Depends on: OPTSERV
 namespace alglib_impl {
 static double minlbfgs_gtol = 0.4;
 static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
@@ -5119,7 +5125,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with minlbfgssetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -5180,7 +5186,7 @@ void minlbfgsoptguardgradient(minlbfgsstate *state, double teststep, ae_state *_
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -5209,7 +5215,7 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -5235,7 +5241,7 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -5249,8 +5255,6 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 // * minlbfgsoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -5311,10 +5315,8 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -5369,10 +5371,8 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -6273,6 +6273,7 @@ void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xpara
 } // end of namespace alglib
 
 // === CQMODELS Package ===
+// Depends on: (LinAlg) TRFAC, FBLS
 namespace alglib_impl {
 static ae_int_t cqmodels_newtonrefinementits = 3;
 static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state);
@@ -7635,6 +7636,7 @@ void _convexquadraticmodel_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === LPQPSERV Package ===
+// Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
 // This function generates scaled (by S) and shifted (by XC) reformulation of
 // the box constraints.
@@ -8215,6 +8217,7 @@ void unscaleunshiftpointbc(RVector *s, RVector *xorigin, RVector *rawbndl, RVect
 } // end of namespace alglib_impl
 
 // === SNNLS Package ===
+// Depends on: (LinAlg) TRFAC, FBLS
 namespace alglib_impl {
 static void snnls_funcgradu(snnlssolver *s, RVector *x, RVector *r, RVector *g, double *f, ae_state *_state);
 static void snnls_func(snnlssolver *s, RVector *x, double *f, ae_state *_state);
@@ -9046,6 +9049,7 @@ void _snnlssolver_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === SACTIVESETS Package ===
+// Depends on: OPTSERV, SNNLS
 namespace alglib_impl {
 static ae_int_t sactivesets_maxbasisage = 5;
 static double sactivesets_maxbasisdecay = 0.01;
@@ -11187,6 +11191,7 @@ void _sactiveset_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === QQPSOLVER Package ===
+// Depends on: CQMODELS, SACTIVESETS
 namespace alglib_impl {
 static ae_int_t qqpsolver_quickqprestartcg = 50;
 static double qqpsolver_regz = 1.0E-9;
@@ -12903,6 +12908,8 @@ void _qqpbuffers_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === QPDENSEAULSOLVER Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS, LINLSQR
+// Depends on: MINLBFGS, LPQPSERV, QQPSOLVER
 namespace alglib_impl {
 static double qpdenseaulsolver_evictionlevel = -0.01;
 static double qpdenseaulsolver_expansionratio = 0.20;
@@ -14222,6 +14229,8 @@ void _qpdenseaulbuffers_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MINBLEIC Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: CQMODELS, SACTIVESETS
 namespace alglib_impl {
 static double minbleic_gtol = 0.4;
 static double minbleic_maxnonmonotoniclen = 1.0E-7;
@@ -15688,7 +15697,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with minbleicsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -15749,7 +15758,7 @@ void minbleicoptguardgradient(minbleicstate *state, double teststep, ae_state *_
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -15778,7 +15787,7 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -15804,7 +15813,7 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -15818,8 +15827,6 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 // * minbleicoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -15880,10 +15887,8 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -15938,10 +15943,8 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -17075,6 +17078,7 @@ void minbleicrequesttermination(const minbleicstate &state, const xparams _xpara
 } // end of namespace alglib
 
 // === QPBLEICSOLVER Package ===
+// Depends on: MINBLEIC
 namespace alglib_impl {
 // This function initializes QPBLEICSettings structure with default settings.
 //
@@ -17468,6 +17472,8 @@ void _qpbleicbuffers_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MINLBFGS, CQMODELS, LPQPSERV
 namespace alglib_impl {
 static ae_int_t vipmsolver_maxipmits = 200;
 static double vipmsolver_initslackval = 100.0;
@@ -18295,7 +18301,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 
    // Trace beginning
       if (state->dotrace) {
-         ae_trace("=== PREDICTOR-CORRECTOR STEP %2d ====================================================================\n", (int)(iteridx));
+         ae_trace("==== PREDICTOR-CORRECTOR STEP %2d ====\n", (int)(iteridx));
       }
    // Check regularization status, terminate if overregularized
       if (ae_fp_greater_eq(dampeps, maxdampeps)) {
@@ -19381,7 +19387,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
 
    // A problem formulation with possible slacks.
    //
-   // === A FORMULATION WITHOUT FROZEN VARIABLES ===
+   // ==== A FORMULATION WITHOUT FROZEN VARIABLES ====
    //
    // We have to solve following system:
    //
@@ -19419,7 +19425,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    // (b) EWave
    // (c) HWave
    //
-   // === SPECIAL HANDLING OF FROZEN VARIABLES ===
+   // ==== SPECIAL HANDLING OF FROZEN VARIABLES ====
    //
    // Frozen variables result in zero steps, i.e. zero components of Xh and Xz.
    // It could be implemented by explicit modification of KKT system (zeroing out
@@ -21324,6 +21330,7 @@ void _vipmstate_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MINQP Package ===
+// Depends on: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER
 namespace alglib_impl {
 //                     CONSTRAINED QUADRATIC PROGRAMMING
 //
@@ -21915,7 +21922,7 @@ void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t i
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -22010,7 +22017,7 @@ void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -23802,7 +23809,7 @@ DefClass(minqpstate, )
 // * LagLC                     Lagrange multipliers for linear constraints,
 //                             array[MSparse+MDense], ignored by QP-BLEIC solver
 //
-// === COMPLETION CODES =====================================================
+// ==== COMPLETION CODES ====
 //
 // Completion codes:
 // * -9    failure of the automatic scale evaluation:  one  of  the  diagonal
@@ -23827,7 +23834,7 @@ DefClass(minqpstate, )
 //         further improvement is impossible,
 //         X contains best point found so far.
 //
-// === LAGRANGE MULTIPLIERS =================================================
+// ==== LAGRANGE MULTIPLIERS ====
 //
 // Some  optimizers  report  values of  Lagrange  multipliers  on  successful
 // completion (positive completion code):
@@ -24511,6 +24518,7 @@ void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep
 } // end of namespace alglib
 
 // === MINLM Package ===
+// Depends on: MINQP
 namespace alglib_impl {
 static double minlm_lambdaup = 2.0;
 static double minlm_lambdadown = 0.33;
@@ -26357,7 +26365,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with minlmsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -28237,6 +28245,8 @@ void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, 
 } // end of namespace alglib
 
 // === MINCG Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV
 namespace alglib_impl {
 static ae_int_t mincg_rscountdownlen = 10;
 static double mincg_gtol = 0.3;
@@ -29238,7 +29248,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with mincgsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -29299,7 +29309,7 @@ void mincgoptguardgradient(mincgstate *state, double teststep, ae_state *_state)
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -29328,7 +29338,7 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -29354,7 +29364,7 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -29368,8 +29378,6 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 // * mincgoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -29430,10 +29438,8 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_sta
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -29488,10 +29494,8 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -30665,6 +30669,7 @@ void mincgrequesttermination(const mincgstate &state, const xparams _xparams) {
 } // end of namespace alglib
 
 // === NLCSQP Package ===
+// Depends on: VIPMSOLVER
 namespace alglib_impl {
 static double nlcsqp_sqpdeltadecrease = 0.20;
 static double nlcsqp_sqpdeltaincrease = 0.80;
@@ -31033,7 +31038,7 @@ lbl_3:
 
 // Trace output (if needed)
    if (dotrace) {
-      ae_trace("\n=== OUTER ITERATION %5d STARTED ==================================================================\n", (int)(state->repiterationscount));
+      ae_trace("\n==== OUTER ITERATION %5d STARTED ====\n", (int)(state->repiterationscount));
       if (dodetailedtrace) {
          ae_trace("> printing raw data (prior to applying variable and function scales)\n");
          ae_trace("X (raw)       = ");
@@ -33163,6 +33168,7 @@ void _minsqpstate_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === LPQPPRESOLVE Package ===
+// Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
 // No presolve, just user-supplied scaling + constraint and cost vector
 // normalization.
@@ -33403,6 +33409,8 @@ void _presolveinfo_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === REVISEDDUALSIMPLEX Package ===
+// Depends on: (LinAlg) TRFAC
+// Depends on: LPQPPRESOLVE
 namespace alglib_impl {
 static ae_int_t reviseddualsimplex_maxforcedrestarts = 1;
 static ae_int_t reviseddualsimplex_safetrfage = 5;
@@ -35291,7 +35299,7 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
          if (isphase1) {
             i = state->repiterationscount1;
          }
-         ae_trace("=== ITERATION %5d STARTED ========================================================================\n", (int)(i));
+         ae_trace("==== ITERATION %5d STARTED ====\n", (int)(i));
          if (state->dodetailedtrace) {
          }
       }
@@ -35435,7 +35443,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
    // Iteration report
       if (state->dotrace) {
          i = state->repiterationscount3;
-         ae_trace("=== ITERATION %5d STARTED ========================================================================\n", (int)(i));
+         ae_trace("==== ITERATION %5d STARTED ====\n", (int)(i));
          if (state->dodetailedtrace) {
          }
       }
@@ -38062,6 +38070,7 @@ void _dualsimplexstate_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MINLP Package ===
+// Depends on: VIPMSOLVER, REVISEDDUALSIMPLEX
 namespace alglib_impl {
 static ae_int_t minlp_alllogicalsbasis = 0;
 static void minlp_clearreportfields(minlpstate *state, ae_state *_state);
@@ -38144,7 +38153,7 @@ void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
 //                 * default value is zero
 //                 Algorithm stops when relative error is less than Eps.
 //
-// ===== TRACING DSS SOLVER =================================================
+// ==== TRACING DSS SOLVER ====
 //
 // DSS solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -38202,7 +38211,7 @@ void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
 //                 Algorithm  stops  when  primal  error  AND  dual error AND
 //                 duality gap are less than Eps.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -39685,6 +39694,8 @@ void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep
 } // end of namespace alglib
 
 // === NLCSLP Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV, REVISEDDUALSIMPLEX
 namespace alglib_impl {
 static double nlcslp_slpstpclosetozero = 0.001;
 static double nlcslp_slpdeltadecrease = 0.20;
@@ -40093,7 +40104,7 @@ lbl_5:
 
 // Trace output (if needed)
    if (dotrace) {
-      ae_trace("\n=== OUTER ITERATION %5d STARTED ==================================================================\n", (int)(state->repouteriterationscount));
+      ae_trace("\n==== OUTER ITERATION %5d STARTED ====\n", (int)(state->repouteriterationscount));
       if (dodetailedtrace) {
          ae_trace("> printing raw data (prior to applying variable and function scales)\n");
          ae_trace("X (raw)       = ");
@@ -42738,6 +42749,7 @@ void _minslpstate_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MINNLC Package ===
+// Depends on: MINBLEIC, NLCSQP, NLCSLP
 namespace alglib_impl {
 static double minnlc_aulmaxgrowth = 10.0;
 static double minnlc_maxlagmult = 1.0E7;
@@ -43619,7 +43631,7 @@ void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state 
 // INPUT PARAMETERS:
 //     State   -   structure which stores algorithm state
 //
-// ===== TRACING SLP SOLVER =================================================
+// ==== TRACING SLP SOLVER ====
 //
 // SLP solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -43703,7 +43715,7 @@ void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
 // INPUT PARAMETERS:
 //     State   -   structure which stores algorithm state
 //
-// ===== INTERACTION WITH OPTGUARD ==========================================
+// ==== INTERACTION WITH OPTGUARD ====
 //
 // OptGuard integrity  checker  allows us to catch problems  like  errors  in
 // gradients   and  discontinuity/nonsmoothness  of  the  target/constraints.
@@ -43721,7 +43733,7 @@ void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
 //   additional  function  evaluations (~40  per  line  step) that will  help
 //   OptGuard integrity checker to study properties of your problem
 //
-// ===== TRACING SQP SOLVER =================================================
+// ==== TRACING SQP SOLVER ====
 //
 // SQP solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -44452,7 +44464,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with minnlcsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -44517,7 +44529,7 @@ void minnlcoptguardgradient(minnlcstate *state, double teststep, ae_state *_stat
 //                       per step, which is not enough for OptGuard  to  make
 //                       any conclusions.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -44546,7 +44558,7 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -44573,7 +44585,7 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 // Here function index 0 means  target function, index 1  or  higher  denotes
 // nonlinear constraints.
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -44587,8 +44599,6 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 // * minnlcoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -44651,10 +44661,8 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_s
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -44711,10 +44719,8 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -44756,7 +44762,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 //                 You   should   check   rep.terminationtype  in  order   to
 //                 distinguish successful termination from unsuccessful one:
 //
-//                 === FAILURE CODES ===
+//                 ==== FAILURE CODES ====
 //                 * -8    internal  integrity control  detected  infinite or
 //                         NAN   values    in   function/gradient.   Abnormal
 //                         termination signalled.
@@ -44766,7 +44772,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 //                               to examine rep.bcerr/rep.lcerr/rep.nlcerr to
 //                               detect possibly inconsistent constraints.
 //
-//                 === SUCCESS CODES ===
+//                 ==== SUCCESS CODES ====
 //                 *  2   scaled step is no more than EpsX.
 //                 *  5   MaxIts steps were taken.
 //                 *  8   user   requested    algorithm    termination    via
@@ -46169,7 +46175,7 @@ DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) 
 //
 // TerminationType field contains completion code, which can be either:
 //
-// === FAILURE CODE ===
+// ==== FAILURE CODE ====
 //   -8    internal integrity control detected  infinite  or  NAN  values  in
 //         function/gradient. Abnormal termination signaled.
 //   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
@@ -46177,7 +46183,7 @@ DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) 
 //         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
 //         constraints.
 //
-// === SUCCESS CODE ===
+// ==== SUCCESS CODE ====
 //    2    relative step is no more than EpsX.
 //    5    MaxIts steps was taken
 //    7    stopping conditions are too stringent,
@@ -46893,6 +46899,7 @@ void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const x
 } // end of namespace alglib
 
 // === MINNS Package ===
+// Depends on: MINBLEIC
 namespace alglib_impl {
 static void minns_clearrequestfields(minnsstate *state, ae_state *_state);
 static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
@@ -47392,7 +47399,7 @@ void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
 //
-// ===== TRACING AGS SOLVER =================================================
+// ==== TRACING AGS SOLVER ====
 //
 // AGS solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -48145,7 +48152,7 @@ lbl_4:
       goto lbl_5;
    }
    if (dotrace) {
-      ae_trace("\n=== ITERATION %5d STARTED ========================================================================\n", (int)(state->repinneriterationscount));
+      ae_trace("\n==== ITERATION %5d STARTED ====\n", (int)(state->repinneriterationscount));
    }
 // First phase of iteration - central point:
 //
@@ -49977,6 +49984,7 @@ void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xpa
 } // end of namespace alglib
 
 // === MINCOMP Package ===
+// Depends on: MINLBFGS, MINBLEIC
 namespace alglib_impl {
 static ae_int_t mincomp_n1 = 2;
 static ae_int_t mincomp_n2 = 2;
@@ -51412,6 +51420,8 @@ void minasarestartfrom(const minasastate &state, const real_1d_array &x, const r
 } // end of namespace alglib
 
 // === MINBC Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV
 namespace alglib_impl {
 static double minbc_gtol = 0.4;
 static double minbc_maxnonmonotoniclen = 1.0E-5;
@@ -52896,7 +52906,7 @@ lbl_rcomm:
 //                     You may use different step for different parameters by
 //                     means of setting scale with minbcsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -52957,7 +52967,7 @@ void minbcoptguardgradient(minbcstate *state, double teststep, ae_state *_state)
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -52986,7 +52996,7 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -53012,7 +53022,7 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -53026,8 +53036,6 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 // * minbcoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -53088,10 +53096,8 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_sta
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -53146,10 +53152,8 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -54172,6 +54176,7 @@ void minbcrequesttermination(const minbcstate &state, const xparams _xparams) {
 } // end of namespace alglib
 
 // === OPTS Package ===
+// Depends on: MINLP
 namespace alglib_impl {
 // Initialize test LP problem.
 //

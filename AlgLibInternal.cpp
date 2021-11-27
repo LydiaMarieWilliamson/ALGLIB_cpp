@@ -5700,6 +5700,7 @@ void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, 
 } // end of namespace alglib_impl
 
 // === SBLAS Package ===
+// Depends on: APSERV
 namespace alglib_impl {
 void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y, ae_state *_state) {
    ae_int_t i;
@@ -6352,6 +6353,7 @@ ae_int_t getlptestserializationcode(ae_state *_state) {
 } // end of namespace alglib_impl
 
 // === TSORT Package ===
+// Depends on: APSERV
 namespace alglib_impl {
 static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
 static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
@@ -8068,6 +8070,7 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r, ae_
 } // end of namespace alglib_impl
 
 // === BASICSTATOPS Package ===
+// Depends on: TSORT
 namespace alglib_impl {
 // Internal tied ranking subroutine.
 //
@@ -10721,6 +10724,7 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_st
 } // end of namespace alglib_impl
 
 // === FTBASE Package ===
+// Depends on: APSERV, NTHEORY
 namespace alglib_impl {
 static ae_int_t ftbase_coltype = 0;
 static ae_int_t ftbase_coloperandscnt = 1;

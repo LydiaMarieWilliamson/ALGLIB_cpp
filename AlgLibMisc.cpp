@@ -27,6 +27,7 @@
 #endif
 
 // === HQRND Package ===
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 static ae_int_t hqrnd_hqrndmax = 2147483561;
 static ae_int_t hqrnd_hqrndm1 = 2147483563;
@@ -2153,6 +2154,7 @@ double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const re
 } // end of namespace alglib
 
 // === NEARESTNEIGHBOR Package ===
+// Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
 static ae_int_t nearestneighbor_splitnodesize = 6;
 static ae_int_t nearestneighbor_kdtreefirstversion = 0;

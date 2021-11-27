@@ -17,6 +17,7 @@
 #include "AlgLibMisc.h"
 
 // === ABLAS Package ===
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 void ablassplitlength(RMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
 void ablascomplexsplitlength(CMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
@@ -92,6 +93,9 @@ void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const c
 } // end of namespace alglib
 
 // === ORTFAC Package ===
+// Depends on: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state);
@@ -151,6 +155,9 @@ void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool is
 } // end of namespace alglib
 
 // === MATGEN Package ===
+// Depends on: (AlgLibInternal) CREFLECTIONS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 void rmatrixrndorthogonal(ae_int_t n, RMatrix *a, ae_state *_state);
 void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state);
@@ -186,6 +193,8 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xp
 } // end of namespace alglib
 
 // === SPARSE Package ===
+// Depends on: (AlgLibInternal) ABLASMKL, SCODES, TSORT
+// Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 typedef struct {
    ae_vector vals;
@@ -353,6 +362,8 @@ ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams = xde
 } // end of namespace alglib
 
 // === HSSCHUR Package ===
+// Depends on: (AlgLibInternal) BLAS, ROTATIONS
+// Depends on: ABLAS
 namespace alglib_impl {
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info, ae_state *_state);
 bool upperhessenbergschurdecomposition(RMatrix *h, ae_int_t n, RMatrix *s, ae_state *_state);
@@ -360,6 +371,8 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
 } // end of namespace alglib_impl
 
 // === EVD Package ===
+// Depends on: (AlgLibInternal) BASICSTATOPS
+// Depends on: ORTFAC, MATGEN, SPARSE, HSSCHUR
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -462,6 +475,7 @@ bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded
 } // end of namespace alglib
 
 // === DLU Package ===
+// Depends on: ABLAS
 namespace alglib_impl {
 void cmatrixluprec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp, ae_state *_state);
 void rmatrixluprec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp, ae_state *_state);
@@ -470,6 +484,7 @@ void rmatrixplurec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
 } // end of namespace alglib_impl
 
 // === SPTRF Package ===
+// Depends on: SPARSE, DLU
 namespace alglib_impl {
 typedef struct {
    ae_int_t nfixed;
@@ -542,6 +557,7 @@ void _sluv2buffer_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === AMDORDERING Package ===
+// Depends on: ABLAS, SPARSE
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -638,6 +654,7 @@ void _amdbuffer_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === SPCHOL Package ===
+// Depends on: AMDORDERING
 namespace alglib_impl {
 typedef struct {
    ae_int_t tasktype;
@@ -714,6 +731,8 @@ void _spcholanalysis_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === TRFAC Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: MATGEN, SPTRF, SPCHOL
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -774,6 +793,9 @@ void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const spa
 } // end of namespace alglib
 
 // === BDSVD Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: ABLAS
 namespace alglib_impl {
 bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, ae_state *_state);
 bool bidiagonalsvddecomposition(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, ae_state *_state);
@@ -784,6 +806,8 @@ bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, co
 } // end of namespace alglib
 
 // === SVD Package ===
+// Depends on: (AlgLibInternal) BLAS
+// Depends on: ORTFAC, BDSVD
 namespace alglib_impl {
 bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t vtneeded, ae_int_t additionalmemory, RVector *w, RMatrix *u, RMatrix *vt, ae_state *_state);
 } // end of namespace alglib_impl
@@ -793,6 +817,8 @@ bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, cons
 } // end of namespace alglib
 
 // === RCOND Package ===
+// Depends on: (AlgLibInternal) TRLINSOLVE, SAFESOLVE
+// Depends on: TRFAC
 namespace alglib_impl {
 double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state);
 double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state);
@@ -833,6 +859,8 @@ double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool
 } // end of namespace alglib
 
 // === FBLS Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
+// Depends on: ORTFAC
 namespace alglib_impl {
 typedef struct {
    double e1;
@@ -894,6 +922,7 @@ void _fblsgmresstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === NORMESTIMATOR Package ===
+// Depends on: MATGEN, SPARSE
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -937,6 +966,7 @@ void normestimatorresults(const normestimatorstate &state, double &nrm, const xp
 } // end of namespace alglib
 
 // === MATINV Package ===
+// Depends on: RCOND
 namespace alglib_impl {
 typedef struct {
    double r1;
@@ -1002,6 +1032,7 @@ void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_arr
 } // end of namespace alglib
 
 // === SCHUR Package ===
+// Depends on: ORTFAC, HSSCHUR
 namespace alglib_impl {
 bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s, ae_state *_state);
 } // end of namespace alglib_impl
@@ -1011,6 +1042,7 @@ bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xp
 } // end of namespace alglib
 
 // === SPDGEVD Package ===
+// Depends on: EVD, MATINV
 namespace alglib_impl {
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z, ae_state *_state);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr, ae_state *_state);
@@ -1022,6 +1054,7 @@ bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, 
 } // end of namespace alglib
 
 // === MATDET Package ===
+// Depends on: TRFAC
 namespace alglib_impl {
 double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state);
 double rmatrixdet(RMatrix *a, ae_int_t n, ae_state *_state);

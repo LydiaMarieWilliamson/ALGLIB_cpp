@@ -27,6 +27,8 @@
 #endif
 
 // === BASESTAT Package ===
+// Depends on: (AlgLibInternal) BASICSTATOPS
+// Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
 static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state);
 bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state);
@@ -2498,6 +2500,8 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 } // end of namespace alglib
 
 // === CORRELATIONTESTS Package ===
+// Depends on: (SpecialFunctions) STUDENTTDISTR
+// Depends on: BASESTAT
 namespace alglib_impl {
 static double correlationtests_spearmantail5(double s, ae_state *_state);
 static double correlationtests_spearmantail6(double s, ae_state *_state);
@@ -5068,6 +5072,7 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const x
 } // end of namespace alglib
 
 // === VARIANCETESTS Package ===
+// Depends on: (SpecialFunctions) FDISTR, CHISQUAREDISTR
 namespace alglib_impl {
 // Two-sample F-test
 //
@@ -5279,6 +5284,7 @@ void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const doubl
 } // end of namespace alglib
 
 // === WSR Package ===
+// Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state);
 static double wsr_w5(double s, ae_state *_state);
@@ -10079,6 +10085,7 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
 } // end of namespace alglib
 
 // === MANNWHITNEYU Package ===
+// Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state);
 static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n, ae_state *_state);
@@ -13950,6 +13957,7 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 } // end of namespace alglib
 
 // === STEST Package ===
+// Depends on: (SpecialFunctions) BINOMIALDISTR
 namespace alglib_impl {
 // Sign test
 //
@@ -14054,6 +14062,7 @@ void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double me
 } // end of namespace alglib
 
 // === STUDENTTTESTS Package ===
+// Depends on: (SpecialFunctions) STUDENTTDISTR
 namespace alglib_impl {
 // One-sample t-test
 //

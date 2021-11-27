@@ -27,6 +27,9 @@
 #endif
 
 // === PCA Package ===
+// === PCA Package ===
+// Depends on: (LinAlg) EVD, SVD
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 // Principal components analysis
 //
@@ -453,6 +456,7 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
 } // end of namespace alglib_impl
 
 // === BDSS Package ===
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 static double bdss_xlny(double x, double y, ae_state *_state);
 static double bdss_getcv(ZVector *cnt, ae_int_t nc, ae_state *_state);
@@ -1586,6 +1590,9 @@ void _cvreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MLPBASE Package ===
+// Depends on: (AlgLibInternal) HPCCORES
+// Depends on: (LinAlg) SPARSE
+// Depends on: BDSS
 namespace alglib_impl {
 static ae_int_t mlpbase_mlpvnum = 7;
 static ae_int_t mlpbase_mlpfirstversion = 0;
@@ -7709,6 +7716,7 @@ void _multilayerperceptron_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MLPE Package ===
+// Depends on: MLPBASE
 namespace alglib_impl {
 static ae_int_t mlpe_mlpefirstversion = 1;
 
@@ -8480,6 +8488,9 @@ void _mlpensemble_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === CLUSTERING Package ===
+// Depends on: (AlgLibInternal) BLAS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 static ae_int_t clustering_kmeansblocksize = 32;
 static ae_int_t clustering_kmeansparalleldim = 8;
@@ -10877,6 +10888,9 @@ void _kmeansreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === DFOREST Package ===
+// Depends on: (AlgLibInternal) SCODES
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: BDSS
 namespace alglib_impl {
 static ae_int_t dforest_innernodewidth = 3;
 static ae_int_t dforest_leafnodewidth = 2;
@@ -11479,7 +11493,7 @@ double dfbuilderpeekprogress(decisionforestbuilder *s, ae_state *_state) {
 //                     compact 16-bit representation with dfbinarycompression()
 //     Rep         -   report, see below for information on its fields.
 //
-// === report information produced by forest construction function ==========
+// ==== report information produced by forest construction function ====
 //
 // Decision forest training report includes following information:
 // * training set errors
@@ -15221,6 +15235,9 @@ void _dfinternalbuffers_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === LINREG Package ===
+// Depends on: (SpecialFunctions) IGAMMAF
+// Depends on: (LinAlg) SVD
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 static ae_int_t linreg_lrvnum = 5;
 static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar, ae_state *_state);
@@ -16227,6 +16244,7 @@ void _lrreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === FILTERS Package ===
+// Depends on: LINREG
 namespace alglib_impl {
 // Filters: simple moving averages (unsymmetric).
 //
@@ -16477,6 +16495,7 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
 } // end of namespace alglib_impl
 
 // === SSA Package ===
+// Depends on: (LinAlg) EVD, SVD
 namespace alglib_impl {
 static bool ssa_hassomethingtoanalyze(ssamodel *s, ae_state *_state);
 static bool ssa_issequencebigenough(ssamodel *s, ae_int_t i, ae_state *_state);
@@ -18948,6 +18967,7 @@ void _ssamodel_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === LDA Package ===
+// Depends on: (LinAlg) EVD, MATINV
 namespace alglib_impl {
 // Multiclass Fisher LDA
 //
@@ -19304,6 +19324,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
 } // end of namespace alglib_impl
 
 // === MCPD Package ===
+// Depends on: (Optimization) MINBLEIC
 namespace alglib_impl {
 static double mcpd_xtol = 1.0E-8;
 static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s, ae_state *_state);
@@ -20445,6 +20466,8 @@ void _mcpdreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === LOGIT Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MLPBASE
 namespace alglib_impl {
 static double logit_xtol = 100 * ae_machineepsilon;
 static double logit_ftol = 0.0001;
@@ -21671,6 +21694,8 @@ void _mnlreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === KNN Package ===
+// Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
+// Depends on: BDSS
 namespace alglib_impl {
 static ae_int_t knn_knnfirstversion = 0;
 static void knn_clearreport(knnreport *rep, ae_state *_state);
@@ -22753,6 +22778,9 @@ void _knnreport_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === MLPTRAIN Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: (Optimization) MINLBFGS
+// Depends on: MLPE
 namespace alglib_impl {
 static double mlptrain_mindecay = 0.001;
 static ae_int_t mlptrain_defaultlbfgsfactor = 6;
@@ -25917,6 +25945,7 @@ void _mlpparallelizationcv_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === DATACOMP Package ===
+// Depends on: CLUSTERING
 namespace alglib_impl {
 // k-means++ clusterization.
 // Backward compatibility function, we recommend to use CLUSTERING subpackage
@@ -28440,7 +28469,7 @@ DefClass(decisionforest, )
 
 // Decision forest training report.
 //
-// === training/oob errors ==================================================
+// ==== training/oob errors ====
 //
 // Following fields store training set errors:
 // * relclserror           -   fraction of misclassified cases, [0,1]
@@ -28457,7 +28486,7 @@ DefClass(decisionforest, )
 // For regression problems:
 // * RELCLS and AVGCE errors are zero
 //
-// === variable importance ==================================================
+// ==== variable importance ====
 //
 // Following fields are used to store variable importance information:
 //

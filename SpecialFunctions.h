@@ -28,6 +28,7 @@ double lngamma(const double x, double &sgngam, const xparams _xparams = xdefault
 } // end of namespace alglib
 
 // === NORMALDISTR Package ===
+// Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 double errorfunction(double x, ae_state *_state);
 double errorfunctionc(double x, ae_state *_state);
@@ -55,6 +56,7 @@ double bivariatenormalcdf(const double x, const double y, const double rho, cons
 } // end of namespace alglib
 
 // === IBETAF Package ===
+// Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
 double incompletebeta(double a, double b, double x, ae_state *_state);
 double invincompletebeta(double a, double b, double y, ae_state *_state);
@@ -66,6 +68,7 @@ double invincompletebeta(const double a, const double b, const double y, const x
 } // end of namespace alglib
 
 // === STUDENTTDISTR Package ===
+// Depends on: IBETAF
 namespace alglib_impl {
 double studenttdistribution(ae_int_t k, double t, ae_state *_state);
 double invstudenttdistribution(ae_int_t k, double p, ae_state *_state);
@@ -77,6 +80,7 @@ double invstudenttdistribution(const ae_int_t k, const double p, const xparams _
 } // end of namespace alglib
 
 // === FDISTR Package ===
+// Depends on: IBETAF
 namespace alglib_impl {
 double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state);
 double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state);
@@ -90,6 +94,7 @@ double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, cons
 } // end of namespace alglib
 
 // === IGAMMAF Package ===
+// Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
 double incompletegamma(double a, double x, ae_state *_state);
 double incompletegammac(double a, double x, ae_state *_state);
@@ -103,6 +108,7 @@ double invincompletegammac(const double a, const double y0, const xparams _xpara
 } // end of namespace alglib
 
 // === CHISQUAREDISTR Package ===
+// Depends on: IGAMMAF
 namespace alglib_impl {
 double chisquaredistribution(double v, double x, ae_state *_state);
 double chisquarecdistribution(double v, double x, ae_state *_state);
@@ -116,6 +122,8 @@ double invchisquaredistribution(const double v, const double y, const xparams _x
 } // end of namespace alglib
 
 // === BINOMIALDISTR Package ===
+// Depends on: (AlgLibInternal) NEARUNITYUNIT
+// Depends on: IBETAF
 namespace alglib_impl {
 double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state);
 double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state);
@@ -175,6 +183,7 @@ void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, c
 } // end of namespace alglib
 
 // === POISSONDISTR Package ===
+// Depends on: IGAMMAF
 namespace alglib_impl {
 double poissondistribution(ae_int_t k, double m, ae_state *_state);
 double poissoncdistribution(ae_int_t k, double m, ae_state *_state);
@@ -188,6 +197,7 @@ double invpoissondistribution(const ae_int_t k, const double y, const xparams _x
 } // end of namespace alglib
 
 // === BETAF Package ===
+// Depends on: GAMMAFUNC
 namespace alglib_impl {
 double beta(double a, double b, ae_state *_state);
 } // end of namespace alglib_impl

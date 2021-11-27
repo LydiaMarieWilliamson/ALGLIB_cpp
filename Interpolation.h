@@ -18,6 +18,7 @@
 #include "Optimization.h"
 
 // === RATINT Package ===
+// Depends on: (AlgLibInternal) TSORT
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -56,6 +57,8 @@ void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array 
 } // end of namespace alglib
 
 // === IDW Package ===
+// Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
+// Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
 typedef struct {
    ae_vector x;
@@ -184,6 +187,7 @@ void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xpar
 } // end of namespace alglib
 
 // === INTFITSERV Package ===
+// Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
 void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, double *xa, double *xb, double *sa, double *sb, RVector *xoriginal, RVector *yoriginal, ae_state *_state);
 void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v, ae_state *_state);
@@ -191,6 +195,7 @@ void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_
 } // end of namespace alglib_impl
 
 // === POLINT Package ===
+// Depends on: RATINT
 namespace alglib_impl {
 void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *t, ae_state *_state);
 void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentricinterpolant *p, ae_state *_state);
@@ -230,6 +235,9 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
 } // end of namespace alglib
 
 // === SPLINE1D Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: (Solvers) LINLSQR
+// Depends on: INTFITSERV
 namespace alglib_impl {
 typedef struct {
    bool periodic;
@@ -319,6 +327,8 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, splin
 } // end of namespace alglib
 
 // === LSFIT Package ===
+// Depends on: (Optimization) MINLM
+// Depends on: POLINT, SPLINE1D
 namespace alglib_impl {
 typedef struct {
    double taskrcond;
@@ -528,6 +538,7 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const
 } // end of namespace alglib
 
 // === FITSPHERE Package ===
+// Depends on: (Optimization) MINLM, MINNLC
 namespace alglib_impl {
 typedef struct {
    ae_int_t nfev;
@@ -555,6 +566,8 @@ void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
 } // end of namespace alglib
 
 // === PARAMETRIC Package ===
+// Depends on: (Integration) AUTOGK
+// Depends on: SPLINE1D
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -623,6 +636,8 @@ void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t
 } // end of namespace alglib
 
 // === RBFV1 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: LSFIT
 namespace alglib_impl {
 typedef struct {
    ae_vector calcbufxcx;
@@ -701,6 +716,7 @@ void _rbfv1report_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
+// Depends on: SPLINE1D
 namespace alglib_impl {
 typedef struct {
    ae_int_t stype;
@@ -880,6 +896,8 @@ void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2df
 } // end of namespace alglib
 
 // === RBFV2 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: LSFIT
 namespace alglib_impl {
 typedef struct {
    ae_vector x;
@@ -963,6 +981,7 @@ void _rbfv2report_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === SPLINE3D Package ===
+// Depends on: SPLINE1D
 namespace alglib_impl {
 typedef struct {
    ae_int_t k;
@@ -1006,6 +1025,7 @@ void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_
 } // end of namespace alglib
 
 // === INTCOMP Package ===
+// Depends on: SPLINE1D, FITSPHERE
 namespace alglib_impl {
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state);
 void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state);
@@ -1027,6 +1047,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
 } // end of namespace alglib
 
 // === RBF Package ===
+// Depends on: RBFV1, RBFV2
 namespace alglib_impl {
 typedef struct {
    ae_int_t modelversion;

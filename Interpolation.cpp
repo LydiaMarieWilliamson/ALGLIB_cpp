@@ -27,6 +27,7 @@
 #endif
 
 // === RATINT Package ===
+// Depends on: (AlgLibInternal) TSORT
 namespace alglib_impl {
 static void ratint_barycentricnormalize(barycentricinterpolant *b, ae_state *_state);
 
@@ -855,6 +856,8 @@ void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array 
 } // end of namespace alglib
 
 // === IDW Package ===
+// Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
+// Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
 static double idw_w0 = 1.0;
 static double idw_meps = 1.0E-50;
@@ -2752,6 +2755,7 @@ void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xpar
 } // end of namespace alglib
 
 // === INTFITSERV Package ===
+// Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
 // Internal subroutine: automatic scaling for LLS tasks.
 // NEVER CALL IT DIRECTLY!
@@ -3196,6 +3200,7 @@ void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_
 } // end of namespace alglib_impl
 
 // === POLINT Package ===
+// Depends on: RATINT
 namespace alglib_impl {
 // Conversion from barycentric representation to Chebyshev basis.
 // This function has O(N^2) complexity.
@@ -4778,6 +4783,9 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
 } // end of namespace alglib
 
 // === SPLINE1D Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: (Solvers) LINLSQR
+// Depends on: INTFITSERV
 namespace alglib_impl {
 static double spline1d_lambdareg = 1.0e-9;
 static double spline1d_cholreg = 1.0e-12;
@@ -9235,6 +9243,8 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, splin
 } // end of namespace alglib
 
 // === LSFIT Package ===
+// Depends on: (Optimization) MINLM
+// Depends on: POLINT, SPLINE1D
 namespace alglib_impl {
 static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1, ae_int_t *worstidx, double *worsterror, ae_state *_state);
 static void lsfit_rdprecursive(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1, double eps, RVector *xout, RVector *yout, ae_int_t *nout, ae_state *_state);
@@ -16806,6 +16816,7 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const
 } // end of namespace alglib
 
 // === FITSPHERE Package ===
+// Depends on: (Optimization) MINLM, MINNLC
 namespace alglib_impl {
 // Fits least squares (LS) circle (or NX-dimensional sphere) to data  (a  set
 // of points in NX-dimensional space).
@@ -17748,6 +17759,8 @@ void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
 } // end of namespace alglib
 
 // === PARAMETRIC Package ===
+// Depends on: (Integration) AUTOGK
+// Depends on: SPLINE1D
 namespace alglib_impl {
 static void parametric_pspline2par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector *p, ae_state *_state);
 static void parametric_pspline3par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector *p, ae_state *_state);
@@ -19266,6 +19279,8 @@ void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t
 } // end of namespace alglib
 
 // === RBFV1 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: LSFIT
 namespace alglib_impl {
 static ae_int_t rbfv1_mxnx = 3;
 static double rbfv1_rbffarradius = 6;
@@ -21269,6 +21284,7 @@ void _rbfv1report_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
+// Depends on: SPLINE1D
 namespace alglib_impl {
 static double spline2d_cholreg = 1.0E-12;
 static double spline2d_lambdaregblocklls = 1.0E-6;
@@ -27186,6 +27202,8 @@ void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2df
 } // end of namespace alglib
 
 // === RBFV2 Package ===
+// Depends on: (AlgLibMisc) NEARESTNEIGHBOR
+// Depends on: LSFIT
 namespace alglib_impl {
 static double rbfv2_defaultlambdareg = 1.0E-6;
 static double rbfv2_defaultsupportr = 0.10;
@@ -30203,6 +30221,7 @@ void _rbfv2report_destroy(void *_p) {
 } // end of namespace alglib_impl
 
 // === SPLINE3D Package ===
+// Depends on: SPLINE1D
 namespace alglib_impl {
 static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, double z, double *f, double *fx, double *fy, double *fxy, ae_state *_state);
 
@@ -31272,6 +31291,7 @@ void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_
 } // end of namespace alglib
 
 // === INTCOMP Package ===
+// Depends on: SPLINE1D, FITSPHERE
 namespace alglib_impl {
 // This function is left for backward compatibility.
 // Use fitspheremc() instead.
@@ -31829,6 +31849,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
 } // end of namespace alglib
 
 // === RBF Package ===
+// Depends on: RBFV1, RBFV2
 namespace alglib_impl {
 static double rbf_eps = 1.0E-6;
 static double rbf_rbffarradius = 6;
@@ -32132,8 +32153,6 @@ void rbfsetpointsandscales(rbfmodel *r, RMatrix *xy, ae_int_t n, RVector *s, ae_
 //            for large-scale interpolation problems. So, we recommend you to
 //            consider Hierarchical RBF as default option.
 //
-// ==========================================================================
-//
 // This  function  sets  RBF interpolation algorithm. ALGLIB supports several
 // RBF algorithms with different properties.
 //
@@ -32200,8 +32219,6 @@ void rbfsetalgoqnn(rbfmodel *s, double q, double z, ae_state *_state) {
 //            requires less memory than QNN and RBF-ML. It is especially good
 //            for large-scale interpolation problems. So, we recommend you to
 //            consider Hierarchical RBF as default option.
-//
-// ==========================================================================
 //
 // This  function  sets  RBF interpolation algorithm. ALGLIB supports several
 // RBF algorithms with different properties.

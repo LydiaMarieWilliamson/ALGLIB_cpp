@@ -18,6 +18,8 @@
 #include "SpecialFunctions.h"
 
 // === GQ Package ===
+// Depends on: (SpecialFunctions) GAMMAFUNC
+// Depends on: (LinAlg) EVD
 namespace alglib_impl {
 void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
 void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
@@ -39,6 +41,7 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 } // end of namespace alglib
 
 // === GKQ Package ===
+// Depends on: GQ
 namespace alglib_impl {
 void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
 void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
@@ -56,6 +59,7 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 } // end of namespace alglib
 
 // === AUTOGK Package ===
+// Depends on: GKQ
 namespace alglib_impl {
 typedef struct {
    ae_int_t terminationtype;

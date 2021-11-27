@@ -18,6 +18,8 @@
 #include "Optimization.h"
 
 // === PCA Package ===
+// Depends on: (LinAlg) EVD, SVD
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, RVector *s2, RMatrix *v, ae_state *_state);
 void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t nneeded, double eps, ae_int_t maxits, RVector *s2, RMatrix *v, ae_state *_state);
@@ -31,6 +33,7 @@ void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, c
 } // end of namespace alglib
 
 // === BDSS Package ===
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 typedef struct {
    double relclserror;
@@ -64,6 +67,9 @@ void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array
 } // end of namespace alglib
 
 // === MLPBASE Package ===
+// Depends on: (AlgLibInternal) HPCCORES
+// Depends on: (LinAlg) SPARSE
+// Depends on: BDSS
 namespace alglib_impl {
 typedef struct {
    double relclserror;
@@ -274,6 +280,7 @@ double mlperrorsparsesubset(const multilayerperceptron &network, const sparsemat
 } // end of namespace alglib
 
 // === MLPE Package ===
+// Depends on: MLPBASE
 namespace alglib_impl {
 typedef struct {
    ae_int_t ensemblesize;
@@ -352,6 +359,9 @@ double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, con
 } // end of namespace alglib
 
 // === CLUSTERING Package ===
+// Depends on: (AlgLibInternal) BLAS
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 typedef struct {
    ae_matrix ct;
@@ -458,6 +468,9 @@ void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &
 } // end of namespace alglib
 
 // === DFOREST Package ===
+// Depends on: (AlgLibInternal) SCODES
+// Depends on: (AlgLibMisc) HQRND
+// Depends on: BDSS
 namespace alglib_impl {
 typedef struct {
    ae_int_t dstype;
@@ -696,6 +709,9 @@ void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoin
 } // end of namespace alglib
 
 // === LINREG Package ===
+// Depends on: (SpecialFunctions) IGAMMAF
+// Depends on: (LinAlg) SVD
+// Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
 typedef struct {
    ae_vector w;
@@ -752,6 +768,7 @@ double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_in
 } // end of namespace alglib
 
 // === FILTERS Package ===
+// Depends on: LINREG
 namespace alglib_impl {
 void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state);
 void filterema(RVector *x, ae_int_t n, double alpha, ae_state *_state);
@@ -768,6 +785,7 @@ void filterlrma(real_1d_array &x, const ae_int_t k, const xparams _xparams = xde
 } // end of namespace alglib
 
 // === SSA Package ===
+// Depends on: (LinAlg) EVD, SVD
 namespace alglib_impl {
 typedef struct {
    ae_int_t nsequences;
@@ -873,6 +891,7 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
 } // end of namespace alglib
 
 // === LDA Package ===
+// Depends on: (LinAlg) EVD, MATINV
 namespace alglib_impl {
 void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w, ae_state *_state);
 void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w, ae_state *_state);
@@ -884,6 +903,7 @@ void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
 } // end of namespace alglib
 
 // === MCPD Package ===
+// Depends on: (Optimization) MINBLEIC
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -970,6 +990,8 @@ void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep, const xp
 } // end of namespace alglib
 
 // === LOGIT Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MLPBASE
 namespace alglib_impl {
 typedef struct {
    ae_vector w;
@@ -1050,6 +1072,8 @@ ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int
 } // end of namespace alglib
 
 // === KNN Package ===
+// Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
+// Depends on: BDSS
 namespace alglib_impl {
 typedef struct {
    kdtreerequestbuffer treebuf;
@@ -1157,6 +1181,9 @@ void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t
 } // end of namespace alglib
 
 // === MLPTRAIN Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: (Optimization) MINLBFGS
+// Depends on: MLPE
 namespace alglib_impl {
 typedef struct {
    double relclserror;
@@ -1304,6 +1331,7 @@ void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const 
 } // end of namespace alglib
 
 // === DATACOMP Package ===
+// Depends on: CLUSTERING
 namespace alglib_impl {
 void kmeansgenerate(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t restarts, ae_int_t *info, RMatrix *c, ZVector *xyc, ae_state *_state);
 } // end of namespace alglib_impl

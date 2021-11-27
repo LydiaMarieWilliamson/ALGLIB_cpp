@@ -27,6 +27,7 @@
 #endif
 
 // === FFT Package ===
+// Depends on: (AlgLibInternal) FTBASE
 namespace alglib_impl {
 // 1-dimensional complex FFT.
 //
@@ -580,6 +581,7 @@ void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xpara
 } // end of namespace alglib
 
 // === FHT Package ===
+// Depends on: FFT
 namespace alglib_impl {
 // 1-dimensional Fast Hartley Transform.
 //
@@ -694,6 +696,7 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams) {
 } // end of namespace alglib
 
 // === CONV Package ===
+// Depends on: FFT
 namespace alglib_impl {
 // 1-dimensional complex convolution.
 //
@@ -2140,6 +2143,7 @@ void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_
 } // end of namespace alglib
 
 // === CORR Package ===
+// Depends on: CONV
 namespace alglib_impl {
 // 1-dimensional complex cross-correlation.
 //

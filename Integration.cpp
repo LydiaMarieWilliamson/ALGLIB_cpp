@@ -27,6 +27,8 @@
 #endif
 
 // === GQ Package ===
+// Depends on: (SpecialFunctions) GAMMAFUNC
+// Depends on: (LinAlg) EVD
 namespace alglib_impl {
 // Computation of nodes and weights for a Gauss quadrature formula
 //
@@ -820,6 +822,7 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 } // end of namespace alglib
 
 // === GKQ Package ===
+// Depends on: GQ
 namespace alglib_impl {
 // Computation of nodes and weights of a Gauss-Kronrod quadrature formula
 //
@@ -1730,6 +1733,7 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 } // end of namespace alglib
 
 // === AUTOGK Package ===
+// Depends on: GKQ
 namespace alglib_impl {
 static ae_int_t autogk_maxsubintervals = 10000;
 static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state, ae_state *_state);

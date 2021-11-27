@@ -17,6 +17,7 @@
 #include "AlgLibInternal.h"
 
 // === FFT Package ===
+// Depends on: (AlgLibInternal) FTBASE
 namespace alglib_impl {
 void fftc1d(CVector *a, ae_int_t n, ae_state *_state);
 void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state);
@@ -38,6 +39,7 @@ void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xpara
 } // end of namespace alglib
 
 // === FHT Package ===
+// Depends on: FFT
 namespace alglib_impl {
 void fhtr1d(RVector *a, ae_int_t n, ae_state *_state);
 void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state);
@@ -49,6 +51,7 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = xdef
 } // end of namespace alglib
 
 // === CONV Package ===
+// Depends on: FFT
 namespace alglib_impl {
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state);
 void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state);
@@ -74,6 +77,7 @@ void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_
 } // end of namespace alglib
 
 // === CORR Package ===
+// Depends on: CONV
 namespace alglib_impl {
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r, ae_state *_state);
 void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, CVector *c, ae_state *_state);

@@ -17,6 +17,7 @@
 #include "AlgLibInternal.h"
 
 // === ODESOLVER Package ===
+// Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;

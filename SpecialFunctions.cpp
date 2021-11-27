@@ -337,6 +337,7 @@ double lngamma(const double x, double &sgngam, const xparams _xparams) {
 } // end of namespace alglib
 
 // === NORMALDISTR Package ===
+// Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx, ae_state *_state);
 static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx, ae_state *_state);
@@ -1082,6 +1083,7 @@ double bivariatenormalcdf(const double x, const double y, const double rho, cons
 } // end of namespace alglib
 
 // === IBETAF Package ===
+// Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
 static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv, ae_state *_state);
 static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv, ae_state *_state);
@@ -1875,6 +1877,7 @@ double invincompletebeta(const double a, const double b, const double y, const x
 } // end of namespace alglib
 
 // === STUDENTTDISTR Package ===
+// Depends on: IBETAF
 namespace alglib_impl {
 // Student's t distribution
 //
@@ -2076,6 +2079,7 @@ double invstudenttdistribution(const ae_int_t k, const double p, const xparams _
 } // end of namespace alglib
 
 // === FDISTR Package ===
+// Depends on: IBETAF
 namespace alglib_impl {
 // F distribution
 //
@@ -2283,6 +2287,7 @@ double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, cons
 } // end of namespace alglib
 
 // === IGAMMAF Package ===
+// Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
 // Incomplete gamma integral
 //
@@ -2683,6 +2688,7 @@ double invincompletegammac(const double a, const double y0, const xparams _xpara
 } // end of namespace alglib
 
 // === CHISQUAREDISTR Package ===
+// Depends on: IGAMMAF
 namespace alglib_impl {
 // Chi-square distribution
 //
@@ -2853,6 +2859,8 @@ double invchisquaredistribution(const double v, const double y, const xparams _x
 } // end of namespace alglib
 
 // === BINOMIALDISTR Package ===
+// Depends on: (AlgLibInternal) NEARUNITYUNIT
+// Depends on: IBETAF
 namespace alglib_impl {
 // Binomial distribution
 //
@@ -4329,6 +4337,7 @@ void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, c
 } // end of namespace alglib
 
 // === POISSONDISTR Package ===
+// Depends on: IGAMMAF
 namespace alglib_impl {
 // Poisson distribution
 //
@@ -4485,6 +4494,7 @@ double invpoissondistribution(const ae_int_t k, const double y, const xparams _x
 } // end of namespace alglib
 
 // === BETAF Package ===
+// Depends on: GAMMAFUNC
 namespace alglib_impl {
 // Beta function
 //

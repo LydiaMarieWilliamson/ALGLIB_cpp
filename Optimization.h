@@ -17,6 +17,7 @@
 #include "Solvers.h"
 
 // === OPTGUARDAPI Package ===
+// Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 typedef struct {
    bool nonc0suspected;
@@ -104,6 +105,8 @@ DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vid
 } // end of namespace alglib
 
 // === OPTSERV Package ===
+// Depends on: (LinAlg) SVD, MATINV
+// Depends on: OPTGUARDAPI
 namespace alglib_impl {
 typedef struct {
    ae_vector norms;
@@ -239,6 +242,9 @@ void _smoothnessmonitor_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === MINLBFGS Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
+// Depends on: OPTSERV
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -372,6 +378,7 @@ void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xpara
 } // end of namespace alglib
 
 // === CQMODELS Package ===
+// Depends on: (LinAlg) TRFAC, FBLS
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -439,6 +446,7 @@ void _convexquadraticmodel_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === LPQPSERV Package ===
+// Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
 void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *bndu, ae_int_t n, ae_state *_state);
 void scaleshiftdensebrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, RMatrix *densea, RVector *ab, RVector *ar, ae_int_t m, ae_state *_state);
@@ -453,6 +461,7 @@ void unscaleunshiftpointbc(RVector *s, RVector *xorigin, RVector *rawbndl, RVect
 } // end of namespace alglib_impl
 
 // === SNNLS Package ===
+// Depends on: (LinAlg) TRFAC, FBLS
 namespace alglib_impl {
 typedef struct {
    ae_int_t ns;
@@ -497,6 +506,7 @@ void _snnlssolver_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === SACTIVESETS Package ===
+// Depends on: OPTSERV, SNNLS
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -581,6 +591,7 @@ void _sactiveset_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === QQPSOLVER Package ===
+// Depends on: CQMODELS, SACTIVESETS
 namespace alglib_impl {
 typedef struct {
    double epsg;
@@ -653,6 +664,8 @@ void _qqpbuffers_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === QPDENSEAULSOLVER Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS, LINLSQR
+// Depends on: MINLBFGS, LPQPSERV, QQPSOLVER
 namespace alglib_impl {
 typedef struct {
    double epsx;
@@ -719,6 +732,8 @@ void _qpdenseaulbuffers_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === MINBLEIC Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: CQMODELS, SACTIVESETS
 namespace alglib_impl {
 typedef struct {
    ae_int_t nmain;
@@ -894,6 +909,7 @@ void minbleicrequesttermination(const minbleicstate &state, const xparams _xpara
 } // end of namespace alglib
 
 // === QPBLEICSOLVER Package ===
+// Depends on: MINBLEIC
 namespace alglib_impl {
 typedef struct {
    double epsg;
@@ -925,6 +941,8 @@ void _qpbleicbuffers_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MINLBFGS, CQMODELS, LPQPSERV
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -1073,6 +1091,7 @@ void _vipmstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === MINQP Package ===
+// Depends on: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -1227,6 +1246,7 @@ void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep
 } // end of namespace alglib
 
 // === MINLM Package ===
+// Depends on: MINQP
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -1422,6 +1442,8 @@ void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, 
 } // end of namespace alglib
 
 // === MINCG Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -1567,6 +1589,7 @@ void mincgrequesttermination(const mincgstate &state, const xparams _xparams = x
 } // end of namespace alglib
 
 // === NLCSQP Package ===
+// Depends on: VIPMSOLVER
 namespace alglib_impl {
 typedef struct {
    ae_int_t algokind;
@@ -1713,6 +1736,7 @@ void _minsqpstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === LPQPPRESOLVE Package ===
+// Depends on: (LinAlg) SPARSE
 namespace alglib_impl {
 typedef struct {
    ae_int_t newn;
@@ -1741,6 +1765,8 @@ void _presolveinfo_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === REVISEDDUALSIMPLEX Package ===
+// Depends on: (LinAlg) TRFAC
+// Depends on: LPQPPRESOLVE
 namespace alglib_impl {
 typedef struct {
    double pivottol;
@@ -1911,6 +1937,7 @@ void _dualsimplexstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 // === MINLP Package ===
+// Depends on: VIPMSOLVER, REVISEDDUALSIMPLEX
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -2014,6 +2041,8 @@ void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep
 } // end of namespace alglib
 
 // === NLCSLP Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV, REVISEDDUALSIMPLEX
 namespace alglib_impl {
 typedef struct {
    presolveinfo presolver;
@@ -2179,6 +2208,7 @@ namespace alglib {
 } // end of namespace alglib
 
 // === MINNLC Package ===
+// Depends on: MINBLEIC, NLCSQP, NLCSLP
 namespace alglib_impl {
 typedef struct {
    double stabilizingpoint;
@@ -2355,6 +2385,7 @@ void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const x
 } // end of namespace alglib
 
 // === MINNS Package ===
+// Depends on: MINBLEIC
 namespace alglib_impl {
 typedef struct {
    double fc;
@@ -2528,6 +2559,7 @@ void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xpa
 } // end of namespace alglib
 
 // === MINCOMP Package ===
+// Depends on: MINLBFGS, MINBLEIC
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -2627,6 +2659,8 @@ void minasarestartfrom(const minasastate &state, const real_1d_array &x, const r
 } // end of namespace alglib
 
 // === MINBC Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: OPTSERV
 namespace alglib_impl {
 typedef struct {
    ae_int_t nmain;
@@ -2768,6 +2802,7 @@ void minbcrequesttermination(const minbcstate &state, const xparams _xparams = x
 } // end of namespace alglib
 
 // === OPTS Package ===
+// Depends on: MINLP
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;

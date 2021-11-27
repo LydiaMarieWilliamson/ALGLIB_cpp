@@ -6503,7 +6503,7 @@ using namespace alglib;
 <div style='color: navy; margin-top: 0; margin-bottom: 0;'>
 // Decision forest training report.
 //
-// === training/oob errors ==================================================
+// ==== training/oob errors ====
 //
 // Following fields store training set errors:
 // * relclserror           -   fraction of misclassified cases, [0,1]
@@ -6520,7 +6520,7 @@ using namespace alglib;
 // For regression problems:
 // * RELCLS and AVGCE errors are zero
 //
-// === variable importance ==================================================
+// ==== variable importance ====
 //
 // Following fields are used to store variable importance information:
 //
@@ -6733,7 +6733,7 @@ using namespace alglib;
 //                     compact 16-bit representation with dfbinarycompression()
 //     Rep         -   report, see below for information on its fields.
 //
-// === report information produced by forest construction function ==========
+// ==== report information produced by forest construction function ====
 //
 // Decision forest training report includes following information:
 // * training set errors
@@ -22450,7 +22450,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with minbcsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -22500,10 +22500,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -22557,10 +22555,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -22581,7 +22577,7 @@ using namespace alglib;
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -22607,7 +22603,7 @@ using namespace alglib;
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -22621,8 +22617,6 @@ using namespace alglib;
 // * minbcoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -22696,7 +22690,7 @@ using namespace alglib;
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -23546,7 +23540,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with minbleicsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -23596,10 +23590,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -23653,10 +23645,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -23677,7 +23667,7 @@ using namespace alglib;
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -23703,7 +23693,7 @@ using namespace alglib;
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -23717,8 +23707,6 @@ using namespace alglib;
 // * minbleicoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -23792,7 +23780,7 @@ using namespace alglib;
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -24765,7 +24753,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with mincgsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -24816,10 +24804,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -24873,10 +24859,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -24897,7 +24881,7 @@ using namespace alglib;
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -24923,7 +24907,7 @@ using namespace alglib;
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -24937,8 +24921,6 @@ using namespace alglib;
 // * mincgoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -25013,7 +24995,7 @@ using namespace alglib;
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -26127,7 +26109,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with minlbfgssetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -26178,10 +26160,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -26235,10 +26215,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -26259,7 +26237,7 @@ using namespace alglib;
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -26285,7 +26263,7 @@ using namespace alglib;
 // * rep.nonc0suspected
 // * rep.nonc1suspected
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -26299,8 +26277,6 @@ using namespace alglib;
 // * minlbfgsoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -26375,7 +26351,7 @@ using namespace alglib;
 //                       try to perform additional evaluations  in  order  to
 //                       get more information about suspicious locations.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -27363,7 +27339,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with minlmsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -28509,7 +28485,7 @@ using namespace alglib;
 //                 * default value is zero
 //                 Algorithm stops when relative error is less than Eps.
 //
-// ===== TRACING DSS SOLVER =================================================
+// ==== TRACING DSS SOLVER ====
 //
 // DSS solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -28564,7 +28540,7 @@ using namespace alglib;
 //                 Algorithm  stops  when  primal  error  AND  dual error AND
 //                 duality gap are less than Eps.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -29041,7 +29017,7 @@ using namespace alglib;
 //
 // TerminationType field contains completion code, which can be either:
 //
-// === FAILURE CODE ===
+// ==== FAILURE CODE ====
 //   -8    internal integrity control detected  infinite  or  NAN  values  in
 //         function/gradient. Abnormal termination signaled.
 //   -3    box  constraints  are  infeasible.  Note: infeasibility of non-box
@@ -29049,7 +29025,7 @@ using namespace alglib;
 //         examine  bcerr/lcerr/nlcerr   to  detect   possibly   inconsistent
 //         constraints.
 //
-// === SUCCESS CODE ===
+// ==== SUCCESS CODE ====
 //    2    relative step is no more than EpsX.
 //    5    MaxIts steps was taken
 //    7    stopping conditions are too stringent,
@@ -29304,7 +29280,7 @@ using namespace alglib;
 //                     You may use different step for different parameters by
 //                     means of setting scale with minnlcsetscale().
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // In order to verify gradient algorithm performs following steps:
 //   * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
@@ -29357,10 +29333,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -29416,10 +29390,8 @@ using namespace alglib;
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
-// ==========================================================================
-// = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will
-// =                   see where C1 continuity is violated.
-// ==========================================================================
+// ==== SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -   ====
+// ====                   you will see where C1 continuity is violated. ====
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -29440,7 +29412,7 @@ using namespace alglib;
 // Results of OptGuard integrity check, should be called  after  optimization
 // session is over.
 //
-// === PRIMARY REPORT =======================================================
+// ==== PRIMARY REPORT ====
 //
 // OptGuard performs several checks which are intended to catch common errors
 // in the implementation of nonlinear function/gradient:
@@ -29467,7 +29439,7 @@ using namespace alglib;
 // Here function index 0 means  target function, index 1  or  higher  denotes
 // nonlinear constraints.
 //
-// === ADDITIONAL REPORTS/LOGS ==============================================
+// ==== ADDITIONAL REPORTS/LOGS ====
 //
 // Several different tests are performed to catch C0/C1 errors, you can  find
 // out specific test signaled error by looking to:
@@ -29481,8 +29453,6 @@ using namespace alglib;
 // * minnlcoptguardnonc1test1results()
 // which return detailed error reports, specific points where discontinuities
 // were found, and so on.
-//
-// ==========================================================================
 //
 // INPUT PARAMETERS:
 //     state   -   algorithm state
@@ -29561,7 +29531,7 @@ using namespace alglib;
 //                       per step, which is not enough for OptGuard  to  make
 //                       any conclusions.
 //
-// === EXPLANATION ==========================================================
+// ==== EXPLANATION ====
 //
 // One major source of headache during optimization  is  the  possibility  of
 // the coding errors in the target function/constraints (or their gradients).
@@ -29713,7 +29683,7 @@ using namespace alglib;
 //                 You   should   check   rep.terminationtype  in  order   to
 //                 distinguish successful termination from unsuccessful one:
 //
-//                 === FAILURE CODES ===
+//                 ==== FAILURE CODES ====
 //                 * -8    internal  integrity control  detected  infinite or
 //                         NAN   values    in   function/gradient.   Abnormal
 //                         termination signalled.
@@ -29723,7 +29693,7 @@ using namespace alglib;
 //                               to examine rep.bcerr/rep.lcerr/rep.nlcerr to
 //                               detect possibly inconsistent constraints.
 //
-//                 === SUCCESS CODES ===
+//                 ==== SUCCESS CODES ====
 //                 *  2   scaled step is no more than EpsX.
 //                 *  5   MaxIts steps were taken.
 //                 *  8   user   requested    algorithm    termination    via
@@ -30004,7 +29974,7 @@ using namespace alglib;
 // INPUT PARAMETERS:
 //     State   -   structure which stores algorithm state
 //
-// ===== TRACING SLP SOLVER =================================================
+// ==== TRACING SLP SOLVER ====
 //
 // SLP solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -30092,7 +30062,7 @@ using namespace alglib;
 // INPUT PARAMETERS:
 //     State   -   structure which stores algorithm state
 //
-// ===== INTERACTION WITH OPTGUARD ==========================================
+// ==== INTERACTION WITH OPTGUARD ====
 //
 // OptGuard integrity  checker  allows us to catch problems  like  errors  in
 // gradients   and  discontinuity/nonsmoothness  of  the  target/constraints.
@@ -30110,7 +30080,7 @@ using namespace alglib;
 //   additional  function  evaluations (~40  per  line  step) that will  help
 //   OptGuard integrity checker to study properties of your problem
 //
-// ===== TRACING SQP SOLVER =================================================
+// ==== TRACING SQP SOLVER ====
 //
 // SQP solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -31561,7 +31531,7 @@ using namespace alglib;
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
 //
-// ===== TRACING AGS SOLVER =================================================
+// ==== TRACING AGS SOLVER ====
 //
 // AGS solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -32366,7 +32336,7 @@ using namespace alglib;
 // * LagLC                     Lagrange multipliers for linear constraints,
 //                             array[MSparse+MDense], ignored by QP-BLEIC solver
 //
-// === COMPLETION CODES =====================================================
+// ==== COMPLETION CODES ====
 //
 // Completion codes:
 // * -9    failure of the automatic scale evaluation:  one  of  the  diagonal
@@ -32391,7 +32361,7 @@ using namespace alglib;
 //         further improvement is impossible,
 //         X contains best point found so far.
 //
-// === LAGRANGE MULTIPLIERS =================================================
+// ==== LAGRANGE MULTIPLIERS ====
 //
 // Some  optimizers  report  values of  Lagrange  multipliers  on  successful
 // completion (positive completion code):
@@ -32920,7 +32890,7 @@ using namespace alglib;
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -33120,7 +33090,7 @@ using namespace alglib;
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 //
-// ===== TRACING IPM SOLVER =================================================
+// ==== TRACING IPM SOLVER ====
 //
 // IPM solver supports advanced tracing capabilities. You can trace algorithm
 // output by specifying following trace symbols (case-insensitive)  by  means
@@ -39772,14 +39742,14 @@ using namespace alglib;
 // This  structure  is  used  for  detailed   reporting  about  suspected  C0
 // continuity violation.
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C0 test  studies  function  values (not gradient!)  obtained  during  line
 // searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
 // usually indicate that discontinuity was detected.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -39832,7 +39802,7 @@ using namespace alglib;
 // continuity violation as flagged by C1 test #0 (OptGuard  has several tests
 // for C1 continuity, this report is used by #0).
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C1 test #0 studies function values (not gradient!)  obtained  during  line
 // searches and monitors behavior of directional  derivative  estimate.  This
@@ -39841,7 +39811,7 @@ using namespace alglib;
 // numerical differentiation.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -39894,7 +39864,7 @@ using namespace alglib;
 // continuity violation as flagged by C1 test #1 (OptGuard  has several tests
 // for C1 continuity, this report is used by #1).
 //
-// === WHAT IS TESTED =======================================================
+// ==== WHAT IS TESTED ====
 //
 // C1 test #1 studies individual  components  of  the  gradient  as  recorded
 // during line searches. Upon discovering discontinuity in the gradient  this
@@ -39912,7 +39882,7 @@ using namespace alglib;
 // continuity is violated.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
 //
@@ -39984,7 +39954,7 @@ using namespace alglib;
 // * badgradsuspected
 //
 //
-// === WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER =================
+// ==== WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER ====
 //
 // Following  types  of  errors  in your target function (constraints) can be
 // caught:
@@ -40010,7 +39980,7 @@ using namespace alglib;
 // supplied gradient.
 //
 //
-// === WHAT IS REPORTED =====================================================
+// ==== WHAT IS REPORTED ====
 //
 // Following set of report fields deals with discontinuous  target functions,
 // ones not belonging to C0 continuity class:
@@ -43688,8 +43658,6 @@ ae_int_t rbfgetmodelversion(rbfmodel s, <b>const</b> xparams _xparams = xdefault
 //            for large-scale interpolation problems. So, we recommend you to
 //            consider Hierarchical RBF as default option.
 //
-// ==========================================================================
-//
 // This  function  sets  RBF interpolation algorithm. ALGLIB supports several
 // RBF algorithms with different properties.
 //
@@ -43791,8 +43759,6 @@ ae_int_t rbfgetmodelversion(rbfmodel s, <b>const</b> xparams _xparams = xdefault
 //            requires less memory than QNN and RBF-ML. It is especially good
 //            for large-scale interpolation problems. So, we recommend you to
 //            consider Hierarchical RBF as default option.
-//
-// ==========================================================================
 //
 // This  function  sets  RBF interpolation algorithm. ALGLIB supports several
 // RBF algorithms with different properties.

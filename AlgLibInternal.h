@@ -393,6 +393,7 @@ void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, 
 } // end of namespace alglib_impl
 
 // === SBLAS Package ===
+// Depends on: APSERV
 namespace alglib_impl {
 void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y, ae_state *_state);
 void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha, ae_state *_state);
@@ -448,6 +449,7 @@ ae_int_t getlptestserializationcode(ae_state *_state);
 } // end of namespace alglib_impl
 
 // === TSORT Package ===
+// Depends on: APSERV
 namespace alglib_impl {
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state);
 void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state);
@@ -487,6 +489,7 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r, ae_
 } // end of namespace alglib_impl
 
 // === BASICSTATOPS Package ===
+// Depends on: TSORT
 namespace alglib_impl {
 void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf, ae_state *_state);
 void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf, ae_state *_state);
@@ -583,6 +586,7 @@ void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot
 } // end of namespace alglib_impl
 
 // === FTBASE Package ===
+// Depends on: APSERV, NTHEORY
 namespace alglib_impl {
 typedef struct {
    ae_matrix entries;

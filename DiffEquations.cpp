@@ -27,6 +27,7 @@
 #endif
 
 // === ODESOLVER Package ===
+// Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 static double odesolver_odesolvermaxgrow = 3.0;
 static double odesolver_odesolvermaxshrink = 10.0;

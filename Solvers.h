@@ -17,6 +17,7 @@
 #include "LinAlg.h"
 
 // === POLYNOMIALSOLVER Package ===
+// Depends on: (LinAlg) EVD, TRFAC
 namespace alglib_impl {
 typedef struct {
    double maxerr;
@@ -36,6 +37,8 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 } // end of namespace alglib
 
 // === DIRECTDENSESOLVERS Package ===
+// Depends on: (AlgLibInternal) XBLAS
+// Depends on: (LinAlg) SVD, RCOND
 namespace alglib_impl {
 typedef struct {
    double r1;
@@ -139,6 +142,7 @@ void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t
 } // end of namespace alglib
 
 // === DIRECTSPARSESOLVERS Package ===
+// Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
 typedef struct {
    ae_int_t terminationtype;
@@ -170,6 +174,8 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 } // end of namespace alglib
 
 // === ITERATIVESPARSE Package ===
+// Depends on: (LinAlg) FBLS
+// Depends on: DIRECTSPARSESOLVERS
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
@@ -245,6 +251,7 @@ void sparsesolverrequesttermination(const sparsesolverstate &state, const xparam
 } // end of namespace alglib
 
 // === LINCG Package ===
+// Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
 typedef struct {
    ae_vector rx;
@@ -331,6 +338,7 @@ void lincgsetxrep(const lincgstate &state, const bool needxrep, const xparams _x
 } // end of namespace alglib
 
 // === LINLSQR Package ===
+// Depends on: (LinAlg) SVD, NORMESTIMATOR
 namespace alglib_impl {
 typedef struct {
    normestimatorstate nes;
@@ -435,6 +443,8 @@ void linlsqrrequesttermination(const linlsqrstate &state, const xparams _xparams
 } // end of namespace alglib
 
 // === NLEQ Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
 namespace alglib_impl {
 typedef struct {
    ae_int_t n;
