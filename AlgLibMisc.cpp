@@ -449,7 +449,7 @@ namespace alglib {
 //     V           -   precomputed value
 //     MagicV      -   'magic' value used to determine whether State structure
 //                     was correctly initialized.
-DefClass(hqrndstate, EndD)
+DefClass(hqrndstate, )
 
 void hqrndrandomize(hqrndstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -1469,7 +1469,7 @@ namespace alglib {
 // This is a debug class intended for testing ALGLIB interface generator.
 // Never use it in any real life project.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
+DefClass(xdebugrecord1, DecVal(i) DecComplex(c) DecVar(a))
 
 void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -4350,10 +4350,10 @@ namespace alglib {
 // multithreaded mode (multiple threads working with same KD-tree object).
 //
 // This object should be created with KDTreeCreateRequestBuffer().
-DefClass(kdtreerequestbuffer, EndD)
+DefClass(kdtreerequestbuffer, )
 
 // KD-tree object.
-DefClass(kdtree, EndD)
+DefClass(kdtree, )
 
 void kdtreeserialize(kdtree &obj, std::string &s_out) {
    jmp_buf _break_jump;

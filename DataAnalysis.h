@@ -203,7 +203,7 @@ void _multilayerperceptron_destroy(void *_p);
 
 namespace alglib {
 DecClass(modelerrors, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
-DecClass(multilayerperceptron, EndD);
+DecClass(multilayerperceptron, );
 
 void mlpserialize(multilayerperceptron &obj, std::string &s_out);
 void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
@@ -320,7 +320,7 @@ void _mlpensemble_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(mlpensemble, EndD);
+DecClass(mlpensemble, );
 
 void mlpeserialize(mlpensemble &obj, std::string &s_out);
 void mlpeunserialize(const std::string &s_in, mlpensemble &obj);
@@ -436,7 +436,7 @@ void _kmeansreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(clusterizerstate, EndD);
+DecClass(clusterizerstate, );
 DecClass(ahcreport, ae_int_t &terminationtype; ae_int_t &npoints; integer_1d_array p; integer_2d_array z; integer_2d_array pz; integer_2d_array pm; real_1d_array mergedist;);
 DecClass(kmeansreport, ae_int_t &npoints; ae_int_t &nfeatures; ae_int_t &terminationtype; ae_int_t &iterationscount; double &energy; ae_int_t &k; real_2d_array c; integer_1d_array cidx;);
 
@@ -654,9 +654,9 @@ void _dfinternalbuffers_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(decisionforestbuilder, EndD);
-DecClass(decisionforestbuffer, EndD);
-DecClass(decisionforest, EndD);
+DecClass(decisionforestbuilder, );
+DecClass(decisionforestbuffer, );
+DecClass(decisionforest, );
 DecClass(dfreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; double &oobrelclserror; double &oobavgce; double &oobrmserror; double &oobavgerror; double &oobavgrelerror; integer_1d_array topvars; real_1d_array varimportances;);
 
 void dfserialize(decisionforest &obj, std::string &s_out);
@@ -736,7 +736,7 @@ void _lrreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(linearmodel, EndD);
+DecClass(linearmodel, );
 DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
 
 void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams = xdefault);
@@ -841,7 +841,7 @@ void _ssamodel_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(ssamodel, EndD);
+DecClass(ssamodel, );
 
 void ssacreate(ssamodel &s, const xparams _xparams = xdefault);
 void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth, const xparams _xparams = xdefault);
@@ -947,7 +947,7 @@ void _mcpdreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(mcpdstate, EndD);
+DecClass(mcpdstate, );
 DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
 void mcpdcreate(const ae_int_t n, mcpdstate &s, const xparams _xparams = xdefault);
@@ -1033,7 +1033,7 @@ void _mnlreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(logitmodel, EndD);
+DecClass(logitmodel, );
 DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
 
 void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep, const xparams _xparams = xdefault);
@@ -1127,9 +1127,9 @@ void _knnreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(knnbuffer, EndD);
-DecClass(knnbuilder, EndD);
-DecClass(knnmodel, EndD);
+DecClass(knnbuffer, );
+DecClass(knnbuilder, );
+DecClass(knnmodel, );
 DecClass(knnreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 
 void knnserialize(knnmodel &obj, std::string &s_out);
@@ -1279,7 +1279,7 @@ void _mlpparallelizationcv_destroy(void *_p);
 namespace alglib {
 DecClass(mlpreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
 DecClass(mlpcvreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
-DecClass(mlptrainer, EndD);
+DecClass(mlptrainer, );
 
 void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, const xparams _xparams = xdefault);
 void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, const xparams _xparams = xdefault);

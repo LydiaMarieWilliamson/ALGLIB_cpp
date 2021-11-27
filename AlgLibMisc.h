@@ -43,7 +43,7 @@ void _hqrndstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(hqrndstate, EndD);
+DecClass(hqrndstate, );
 
 void hqrndrandomize(hqrndstate &state, const xparams _xparams = xdefault);
 void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = xdefault);
@@ -222,10 +222,10 @@ void _kdtree_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(kdtreerequestbuffer, EndD);
+DecClass(kdtreerequestbuffer, );
 
 // KD-tree object.
-DecClass(kdtree, EndD);
+DecClass(kdtree, );
 
 void kdtreeserialize(kdtree &obj, std::string &s_out);
 void kdtreeunserialize(const std::string &s_in, kdtree &obj);

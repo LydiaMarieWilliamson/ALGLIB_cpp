@@ -2671,7 +2671,7 @@ namespace alglib {
 // * Rep.NFEV countains number of function calculations
 // * Rep.NIntervals contains number of intervals [a,b]
 //   was partitioned into.
-DefClass(autogkreport, AndD DecVal(terminationtype) AndD DecVal(nfev) AndD DecVal(nintervals))
+DefClass(autogkreport, DecVal(terminationtype) DecVal(nfev) DecVal(nintervals))
 
 // This structure stores state of the integration algorithm.
 //
@@ -2680,7 +2680,7 @@ DefClass(autogkreport, AndD DecVal(terminationtype) AndD DecVal(nfev) AndD DecVa
 // * autogksmooth()/AutoGKSmoothW()/... to create objects
 // * autogkintegrate() to begin integration
 // * autogkresults() to get results
-DefClass(autogkstate, AndD DecVal(needf) AndD DecVal(x) AndD DecVal(xminusa) AndD DecVal(bminusx) AndD DecVal(f))
+DefClass(autogkstate, DecVal(needf) DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
 
 void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams) {
    jmp_buf _break_jump;

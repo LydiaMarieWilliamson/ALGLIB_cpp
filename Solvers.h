@@ -222,7 +222,7 @@ void _sparsesolverstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsesolverstate, EndD);
+DecClass(sparsesolverstate, );
 
 void sparsesolvesymmetricgmres(const sparsematrix &a, const bool isupper, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
 void sparsesolvegmres(const sparsematrix &a, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
@@ -315,7 +315,7 @@ void _lincgreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(lincgstate, EndD);
+DecClass(lincgstate, );
 DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype; double &r2;);
 
 void lincgcreate(const ae_int_t n, lincgstate &state, const xparams _xparams = xdefault);
@@ -418,7 +418,7 @@ void _linlsqrreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(linlsqrstate, EndD);
+DecClass(linlsqrstate, );
 DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
 void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams = xdefault);

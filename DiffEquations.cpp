@@ -608,10 +608,10 @@ void _odesolverreport_destroy(void *_p) {
 
 namespace alglib {
 //
-DefClass(odesolverstate, AndD DecVal(needdy) AndD DecVar(y) AndD DecVar(dy) AndD DecVal(x))
+DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
 
 //
-DefClass(odesolverreport, AndD DecVal(nfev) AndD DecVal(terminationtype))
+DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
    jmp_buf _break_jump;

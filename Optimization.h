@@ -1189,7 +1189,7 @@ void _minqpreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(minqpstate, EndD);
+DecClass(minqpstate, );
 DecClass(minqpreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nmv; ae_int_t &ncholesky; ae_int_t &terminationtype; real_1d_array lagbc; real_1d_array laglc;);
 
 void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams = xdefault);
@@ -1989,7 +1989,7 @@ void _minlpreport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(minlpstate, EndD);
+DecClass(minlpstate, );
 DecClass(minlpreport, double &f; real_1d_array lagbc; real_1d_array laglc; real_1d_array y; integer_1d_array stats; double &primalerror; double &dualerror; double &slackerror; ae_int_t &iterationscount; ae_int_t &terminationtype;);
 
 void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams = xdefault);
@@ -2799,7 +2799,7 @@ void _lptestproblem_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(lptestproblem, EndD);
+DecClass(lptestproblem, );
 
 void lptestproblemserialize(lptestproblem &obj, std::string &s_out);
 void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj);

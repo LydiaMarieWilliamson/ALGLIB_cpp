@@ -26064,10 +26064,10 @@ namespace alglib {
 //
 // NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 //         errors in prediction of posterior probabilities
-DefClass(modelerrors, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror))
+DefClass(modelerrors, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
 //
-DefClass(multilayerperceptron, EndD)
+DefClass(multilayerperceptron, )
 
 void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -27413,7 +27413,7 @@ double mlperrorsparsesubset(const multilayerperceptron &network, const sparsemat
 // === MLPE Package ===
 namespace alglib {
 // Neural networks ensemble
-DefClass(mlpensemble, EndD)
+DefClass(mlpensemble, )
 
 void mlpeserialize(mlpensemble &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -27983,7 +27983,7 @@ namespace alglib {
 // You should not try to access its fields directly.
 // Use ALGLIB functions in order to work with this object.
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
-DefClass(clusterizerstate, EndD)
+DefClass(clusterizerstate, )
 
 // This structure  is used to store results of the agglomerative hierarchical
 // clustering (AHC).
@@ -28083,7 +28083,7 @@ DefClass(clusterizerstate, EndD)
 //       PM. I-th row of Z describes same merge of clusters as I-th row of PM,
 //       with "left" cluster from Z corresponding to the "left" one from PM.
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
-DefClass(ahcreport, AndD DecVal(terminationtype) AndD DecVal(npoints) AndD DecVar(p) AndD DecVar(z) AndD DecVar(pz) AndD DecVar(pm) AndD DecVar(mergedist))
+DefClass(ahcreport, DecVal(terminationtype) DecVal(npoints) DecVar(p) DecVar(z) DecVar(pz) DecVar(pm) DecVar(mergedist))
 
 // This  structure   is  used  to  store  results of the  k-means  clustering
 // algorithm.
@@ -28117,7 +28117,7 @@ DefClass(ahcreport, AndD DecVal(terminationtype) AndD DecVal(npoints) AndD DecVa
 //     Energy          merit function, "energy", sum  of  squared  deviations
 //                     from cluster centers
 // ALGLIB: Copyright 27.11.2012 by Sergey Bochkanov
-DefClass(kmeansreport, AndD DecVal(npoints) AndD DecVal(nfeatures) AndD DecVal(terminationtype) AndD DecVal(iterationscount) AndD DecVal(energy) AndD DecVal(k) AndD DecVar(c) AndD DecVar(cidx))
+DefClass(kmeansreport, DecVal(npoints) DecVal(nfeatures) DecVal(terminationtype) DecVal(iterationscount) DecVal(energy) DecVal(k) DecVar(c) DecVar(cidx))
 
 void clusterizercreate(clusterizerstate &s, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -28426,17 +28426,17 @@ namespace alglib {
 // A random forest (decision forest) builder object.
 //
 // Used to store dataset and specify decision forest training algorithm settings.
-DefClass(decisionforestbuilder, EndD)
+DefClass(decisionforestbuilder, )
 
 // Buffer object which is used to perform  various  requests  (usually  model
 // inference) in the multithreaded mode (multiple threads working  with  same
 // DF object).
 //
 // This object should be created with DFCreateBuffer().
-DefClass(decisionforestbuffer, EndD)
+DefClass(decisionforestbuffer, )
 
 // Decision forest (random forest) model.
-DefClass(decisionforest, EndD)
+DefClass(decisionforest, )
 
 // Decision forest training report.
 //
@@ -28510,7 +28510,7 @@ DefClass(decisionforest, EndD)
 // More information on variable importance ratings can be found  in  comments
 // on the dfbuildersetimportancegini() and dfbuildersetimportancepermutation()
 // functions.
-DefClass(dfreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(oobrelclserror) AndD DecVal(oobavgce) AndD DecVal(oobrmserror) AndD DecVal(oobavgerror) AndD DecVal(oobavgrelerror) AndD DecVar(topvars) AndD DecVar(varimportances))
+DefClass(dfreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(oobrelclserror) DecVal(oobavgce) DecVal(oobrmserror) DecVal(oobavgerror) DecVal(oobavgrelerror) DecVar(topvars) DecVar(varimportances))
 
 void dfserialize(decisionforest &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -29216,7 +29216,7 @@ void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoin
 // === LINREG Package ===
 namespace alglib {
 //
-DefClass(linearmodel, EndD)
+DefClass(linearmodel, )
 
 // LRReport structure contains additional information about linear model:
 // * C             -   covariation matrix,  array[0..NVars,0..NVars].
@@ -29233,7 +29233,7 @@ DefClass(linearmodel, EndD)
 //
 // All other fields of the structure are intended for internal use and should
 // not be used outside ALGLIB.
-DefClass(lrreport, AndD DecVar(c) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(cvrmserror) AndD DecVal(cvavgerror) AndD DecVal(cvavgrelerror) AndD DecVal(ncvdefects) AndD DecVar(cvdefects))
+DefClass(lrreport, DecVar(c) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(cvrmserror) DecVal(cvavgerror) DecVal(cvavgrelerror) DecVal(ncvdefects) DecVar(cvdefects))
 
 void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -29561,7 +29561,7 @@ namespace alglib {
 // This object stores state of the SSA model.
 //
 // You should use ALGLIB functions to work with this object.
-DefClass(ssamodel, EndD)
+DefClass(ssamodel, )
 
 void ssacreate(ssamodel &s, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -30153,7 +30153,7 @@ namespace alglib {
 //
 // You should use ALGLIB functions in order to work with this object.
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
-DefClass(mcpdstate, EndD)
+DefClass(mcpdstate, )
 
 // This structure is a MCPD training report:
 //     InnerIterationsCount    -   number of inner iterations of the
@@ -30166,7 +30166,7 @@ DefClass(mcpdstate, EndD)
 //                                 values denote success, negative ones -
 //                                 failure)
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
-DefClass(mcpdreport, AndD DecVal(inneriterationscount) AndD DecVal(outeriterationscount) AndD DecVal(nfev) AndD DecVal(terminationtype))
+DefClass(mcpdreport, DecVal(inneriterationscount) DecVal(outeriterationscount) DecVal(nfev) DecVal(terminationtype))
 
 void mcpdcreate(const ae_int_t n, mcpdstate &s, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -30511,12 +30511,12 @@ void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep, const xp
 // === LOGIT Package ===
 namespace alglib {
 //
-DefClass(logitmodel, EndD)
+DefClass(logitmodel, )
 
 // MNLReport structure contains information about training process:
 // * NGrad     -   number of gradient calculations
 // * NHess     -   number of Hessian calculations
-DefClass(mnlreport, AndD DecVal(ngrad) AndD DecVal(nhess))
+DefClass(mnlreport, DecVal(ngrad) DecVal(nhess))
 
 void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -30746,14 +30746,14 @@ namespace alglib {
 // KNN object).
 //
 // This object should be created with KNNCreateBuffer().
-DefClass(knnbuffer, EndD)
+DefClass(knnbuffer, )
 
 // A KNN builder object; this object encapsulates  dataset  and  all  related
 // settings, it is used to create an actual instance of KNN model.
-DefClass(knnbuilder, EndD)
+DefClass(knnbuilder, )
 
 // KNN model, can be used for classification or regression
-DefClass(knnmodel, EndD)
+DefClass(knnmodel, )
 
 // KNN training report.
 //
@@ -30769,7 +30769,7 @@ DefClass(knnmodel, EndD)
 //
 // For regression problems:
 // * RELCLS and AVGCE errors are zero
-DefClass(knnreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror))
+DefClass(knnreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
 void knnserialize(knnmodel &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -31248,16 +31248,16 @@ namespace alglib {
 //
 // NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 //         errors in prediction of posterior probabilities
-DefClass(mlpreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(ngrad) AndD DecVal(nhess) AndD DecVal(ncholesky))
+DefClass(mlpreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(ngrad) DecVal(nhess) DecVal(ncholesky))
 
 // Cross-validation estimates of generalization error
-DefClass(mlpcvreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror))
+DefClass(mlpcvreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
 // Trainer object for neural network.
 //
 // You should not try to access fields of this object directly -  use  ALGLIB
 // functions to work with this object.
-DefClass(mlptrainer, EndD)
+DefClass(mlptrainer, )
 
 void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;

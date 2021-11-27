@@ -691,7 +691,7 @@ void _barycentricinterpolant_destroy(void *_p) {
 
 namespace alglib {
 // Barycentric interpolant.
-DefClass(barycentricinterpolant, EndD)
+DefClass(barycentricinterpolant, )
 
 double barycentriccalc(const barycentricinterpolant &b, const double t, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -2276,20 +2276,20 @@ namespace alglib {
 // multithreaded mode (multiple threads working with same IDW object).
 //
 // This object should be created with idwcreatecalcbuffer().
-DefClass(idwcalcbuffer, EndD)
+DefClass(idwcalcbuffer, )
 
 // IDW (Inverse Distance Weighting) model object.
-DefClass(idwmodel, EndD)
+DefClass(idwmodel, )
 
 // Builder object used to generate IDW (Inverse Distance Weighting) model.
-DefClass(idwbuilder, EndD)
+DefClass(idwbuilder, )
 
 // IDW fitting report:
 //     rmserror        RMS error
 //     avgerror        average error
 //     maxerror        maximum error
 //     r2              coefficient of determination,  R-squared, 1-RSS/TSS
-DefClass(idwreport, AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(maxerror) AndD DecVal(r2))
+DefClass(idwreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void idwserialize(idwmodel &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -8562,7 +8562,7 @@ void _spline1dfitreport_destroy(void *_p) {
 
 namespace alglib {
 // 1-dimensional spline interpolant
-DefClass(spline1dinterpolant, EndD)
+DefClass(spline1dinterpolant, )
 
 // Spline fitting report:
 //     RMSError        RMS error
@@ -8573,7 +8573,7 @@ DefClass(spline1dinterpolant, EndD)
 // Fields  below are  filled  by   obsolete    functions   (Spline1DFitCubic,
 // Spline1DFitHermite). Modern fitting functions do NOT fill these fields:
 //     TaskRCond       reciprocal of task's condition number
-DefClass(spline1dfitreport, AndD DecVal(taskrcond) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(maxerror))
+DefClass(spline1dfitreport, DecVal(taskrcond) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(maxerror))
 
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -15486,7 +15486,7 @@ namespace alglib {
 //     AvgError        average error
 //     AvgRelError     average relative error (for non-zero Y[I])
 //     MaxError        maximum error
-DefClass(polynomialfitreport, AndD DecVal(taskrcond) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(maxerror))
+DefClass(polynomialfitreport, DecVal(taskrcond) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(maxerror))
 
 // Barycentric fitting report:
 //     RMSError        RMS error
@@ -15494,7 +15494,7 @@ DefClass(polynomialfitreport, AndD DecVal(taskrcond) AndD DecVal(rmserror) AndD 
 //     AvgRelError     average relative error (for non-zero Y[I])
 //     MaxError        maximum error
 //     TaskRCond       reciprocal of task's condition number
-DefClass(barycentricfitreport, AndD DecVal(taskrcond) AndD DecVal(dbest) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(maxerror))
+DefClass(barycentricfitreport, DecVal(taskrcond) DecVal(dbest) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(maxerror))
 
 // Least squares fitting report. This structure contains informational fields
 // which are set by fitting functions provided by this unit.
@@ -15526,13 +15526,13 @@ DefClass(barycentricfitreport, AndD DecVal(taskrcond) AndD DecVal(dbest) AndD De
 //                     some solvers.
 //     R2              coefficient of determination (non-weighted, non-adjusted),
 //                     filled by some solvers.
-DefClass(lsfitreport, AndD DecVal(taskrcond) AndD DecVal(iterationscount) AndD DecVal(varidx) AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(avgrelerror) AndD DecVal(maxerror) AndD DecVal(wrmserror) AndD DecVar(covpar) AndD DecVar(errpar) AndD DecVar(errcurve) AndD DecVar(noise) AndD DecVal(r2))
+DefClass(lsfitreport, DecVal(taskrcond) DecVal(iterationscount) DecVal(varidx) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(maxerror) DecVal(wrmserror) DecVar(covpar) DecVar(errpar) DecVar(errcurve) DecVar(noise) DecVal(r2))
 
 // Nonlinear fitter.
 //
 // You should use ALGLIB functions to work with fitter.
 // Never try to access its fields directly!
-DefClass(lsfitstate, AndD DecVal(needf) AndD DecVal(needfg) AndD DecVal(needfgh) AndD DecVal(xupdated) AndD DecVar(c) AndD DecVal(f) AndD DecVar(g) AndD DecVar(h) AndD DecVar(x))
+DefClass(lsfitstate, DecVal(needf) DecVal(needfg) DecVal(needfgh) DecVal(xupdated) DecVar(c) DecVal(f) DecVar(g) DecVar(h) DecVar(x))
 
 void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -18916,13 +18916,13 @@ namespace alglib {
 //
 // You should not try to access its members directly - use PSpline2XXXXXXXX()
 // functions instead.
-DefClass(pspline2interpolant, EndD)
+DefClass(pspline2interpolant, )
 
 // Parametric spline inteprolant: 3-dimensional curve.
 //
 // You should not try to access its members directly - use PSpline3XXXXXXXX()
 // functions instead.
-DefClass(pspline3interpolant, EndD)
+DefClass(pspline3interpolant, )
 
 void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -26472,17 +26472,17 @@ void _spline2dfastddmbuf_destroy(void *_p) {
 
 namespace alglib {
 // 2-dimensional spline inteprolant
-DefClass(spline2dinterpolant, EndD)
+DefClass(spline2dinterpolant, )
 
 // Nonlinear least squares solver used to fit 2D splines to data
-DefClass(spline2dbuilder, EndD)
+DefClass(spline2dbuilder, )
 
 // Spline 2D fitting report:
 //     rmserror        RMS error
 //     avgerror        average error
 //     maxerror        maximum error
 //     r2              coefficient of determination,  R-squared, 1-RSS/TSS
-DefClass(spline2dfitreport, AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(maxerror) AndD DecVal(r2))
+DefClass(spline2dfitreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    jmp_buf _break_jump;
@@ -31108,7 +31108,7 @@ void _spline3dinterpolant_destroy(void *_p) {
 
 namespace alglib {
 // 3-dimensional spline inteprolant
-DefClass(spline3dinterpolant, EndD)
+DefClass(spline3dinterpolant, )
 
 double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z, const xparams _xparams) {
    jmp_buf _break_jump;
@@ -34045,13 +34045,13 @@ namespace alglib {
 // multithreaded mode (multiple threads working with same KD-tree object).
 //
 // This object should be created with KDTreeCreateBuffer().
-DefClass(rbfcalcbuffer, EndD)
+DefClass(rbfcalcbuffer, )
 
 // RBF model.
 //
 // Never try to directly work with fields of this object - always use  ALGLIB
 // functions to use this object.
-DefClass(rbfmodel, EndD)
+DefClass(rbfmodel, )
 
 // RBF solution report:
 // * TerminationType   -   termination type, positive values - success,
@@ -34060,7 +34060,7 @@ DefClass(rbfmodel, EndD)
 // Fields which are set by modern RBF solvers (hierarchical):
 // * RMSError          -   root-mean-square error; NAN for old solvers (ML, QNN)
 // * MaxError          -   maximum error; NAN for old solvers (ML, QNN)
-DefClass(rbfreport, AndD DecVal(rmserror) AndD DecVal(maxerror) AndD DecVal(arows) AndD DecVal(acols) AndD DecVal(annz) AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(terminationtype))
+DefClass(rbfreport, DecVal(rmserror) DecVal(maxerror) DecVal(arows) DecVal(acols) DecVal(annz) DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
    jmp_buf _break_jump;

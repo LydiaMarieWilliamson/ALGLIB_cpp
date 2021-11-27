@@ -282,8 +282,8 @@ void _sparsebuffers_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsematrix, EndD);
-DecClass(sparsebuffers, EndD);
+DecClass(sparsematrix, );
+DecClass(sparsebuffers, );
 
 void sparseserialize(sparsematrix &obj, std::string &s_out);
 void sparseunserialize(const std::string &s_in, sparsematrix &obj);
@@ -434,7 +434,7 @@ void _eigsubspacereport_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(eigsubspacestate, EndD);
+DecClass(eigsubspacestate, );
 DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 
 void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams = xdefault);
@@ -754,7 +754,7 @@ void _sparsedecompositionanalysis_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsedecompositionanalysis, EndD);
+DecClass(sparsedecompositionanalysis, );
 
 void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = xdefault);
 void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = xdefault);
@@ -928,7 +928,7 @@ void _normestimatorstate_destroy(void *_p);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(normestimatorstate, EndD);
+DecClass(normestimatorstate, );
 
 void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams = xdefault);
 void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval, const xparams _xparams = xdefault);
