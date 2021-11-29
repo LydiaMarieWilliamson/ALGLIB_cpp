@@ -129,7 +129,7 @@ bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &
    return true;
 }
 
-template < class T > void spoil_vector_by_adding_element(T &x) {
+template<class T> void spoil_vector_by_adding_element(T &x) {
    ae_int_t i;
    T y = x;
    x.setlength(y.length() + 1);
@@ -138,7 +138,7 @@ template < class T > void spoil_vector_by_adding_element(T &x) {
    x(y.length()) = 0;
 }
 
-template < class T > void spoil_vector_by_deleting_element(T &x) {
+template<class T> void spoil_vector_by_deleting_element(T &x) {
    ae_int_t i;
    T y = x;
    x.setlength(y.length() - 1);
@@ -146,7 +146,7 @@ template < class T > void spoil_vector_by_deleting_element(T &x) {
       x(i) = y(i);
 }
 
-template < class T > void spoil_matrix_by_adding_row(T &x) {
+template<class T> void spoil_matrix_by_adding_row(T &x) {
    ae_int_t i, j;
    T y = x;
    x.setlength(y.rows() + 1, y.cols());
@@ -157,7 +157,7 @@ template < class T > void spoil_matrix_by_adding_row(T &x) {
       x(y.rows(), j) = 0;
 }
 
-template < class T > void spoil_matrix_by_deleting_row(T &x) {
+template<class T> void spoil_matrix_by_deleting_row(T &x) {
    ae_int_t i, j;
    T y = x;
    x.setlength(y.rows() - 1, y.cols());
@@ -166,7 +166,7 @@ template < class T > void spoil_matrix_by_deleting_row(T &x) {
          x(i, j) = y(i, j);
 }
 
-template < class T > void spoil_matrix_by_adding_col(T &x) {
+template<class T> void spoil_matrix_by_adding_col(T &x) {
    ae_int_t i, j;
    T y = x;
    x.setlength(y.rows(), y.cols() + 1);
@@ -177,7 +177,7 @@ template < class T > void spoil_matrix_by_adding_col(T &x) {
       x(i, y.cols()) = 0;
 }
 
-template < class T > void spoil_matrix_by_deleting_col(T &x) {
+template<class T> void spoil_matrix_by_deleting_col(T &x) {
    ae_int_t i, j;
    T y = x;
    x.setlength(y.rows(), y.cols() - 1);
@@ -186,32 +186,32 @@ template < class T > void spoil_matrix_by_deleting_col(T &x) {
          x(i, j) = y(i, j);
 }
 
-template < class T > void spoil_vector_by_nan(T &x) {
+template<class T> void spoil_vector_by_nan(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = fp_nan;
 }
 
-template < class T > void spoil_vector_by_posinf(T &x) {
+template<class T> void spoil_vector_by_posinf(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = fp_posinf;
 }
 
-template < class T > void spoil_vector_by_neginf(T &x) {
+template<class T> void spoil_vector_by_neginf(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = fp_neginf;
 }
 
-template < class T > void spoil_matrix_by_nan(T &x) {
+template<class T> void spoil_matrix_by_nan(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = fp_nan;
 }
 
-template < class T > void spoil_matrix_by_posinf(T &x) {
+template<class T> void spoil_matrix_by_posinf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = fp_posinf;
 }
 
-template < class T > void spoil_matrix_by_neginf(T &x) {
+template<class T> void spoil_matrix_by_neginf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = fp_neginf;
 }
@@ -12566,8 +12566,7 @@ int main() {
       _TotalResult = _TotalResult && _TestResult;
 
       printf("151/151\n");
-   }
-   catch( ...) {
+   } catch(...) {
       printf("Unhandled exception was raised!\n");
       return 1;
    }

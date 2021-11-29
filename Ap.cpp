@@ -45,7 +45,6 @@
 #      if AE_COMPILER == AE_MSVC
 #         include <intrin.h>
 #      endif
-
 #   endif
 #endif
 
@@ -1690,7 +1689,7 @@ void ae_smart_ptr_destroy(void *_dst) {
 //
 // You can specify NULL new_ptr, in which case is_owner/destroy are ignored.
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*destroy)(void *)) {
-   if(dst->is_owner && dst->ptr != NULL) {
+   if (dst->is_owner && dst->ptr != NULL) {
       dst->destroy(dst->ptr);
       if (dst->is_dynamic)
          ae_free(dst->ptr);
@@ -9439,7 +9438,7 @@ std::string complex::tostring(int _dps) const {
 }
 #endif
 
-bool operator==(const complex &lhs, const complex &rhs) {
+bool operator == (const complex &lhs, const complex &rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -10454,8 +10453,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
          }
       }
       alglib_impl::ae_free(p);
-   }
-   catch( ...) {
+   } catch(...) {
       alglib_impl::ae_free(p);
       throw;
    }
@@ -10853,8 +10851,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
             }
          }
       alglib_impl::ae_free(p);
-   }
-   catch( ...) {
+   } catch(...) {
       alglib_impl::ae_free(p);
       throw;
    }

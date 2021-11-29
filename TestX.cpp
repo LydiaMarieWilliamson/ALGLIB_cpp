@@ -125,27 +125,19 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
    try {
       grad = "[0,1]";
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       grad = z;
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       grad.setlength(10);
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       grad.setlength(1);
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
 
 //
 // This block actually calculates function/gradient
@@ -186,34 +178,24 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
    try {
       jac = "[[0]]";
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       jac = "[[0,0],[1,1]]";
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       z = "[[0,1]]";
       jac = z;
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       jac.setlength(10, 6);
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
    try {
       jac.setlength(2, 1);
       issue505_passed = false;
-   }
-   catch( ...) {
-   }
+   } catch(...) { }
 
 //
 // This block actually calculates function/gradient
@@ -408,44 +390,35 @@ int main() {
             acopy = "[false,true,true]";
             proxy = acopy;
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy = "[true,true,true]";
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(100);
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(proxy.length());
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
       try {
@@ -550,44 +523,35 @@ int main() {
             acopy = s6;
             proxy = acopy;
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy = s6;
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(100);
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(proxy.length());
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
       try {
@@ -696,40 +660,32 @@ int main() {
                acopy = s6;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy = s6;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy.setlength(100);
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy.setlength(proxy.length());
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
          }
@@ -771,45 +727,36 @@ int main() {
                acopy = s6;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy = s6;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy.setlength(100);
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
             try {
                proxy.setlength(proxy.length());
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
       try {
@@ -917,44 +864,35 @@ int main() {
             acopy = s6;
             proxy = acopy;
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy = s6;
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(100);
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
 
          try {
             proxy.setlength(proxy.length());
             passed = false;
-         }
-         catch(ap_error e) {
-         }
-         catch( ...) {
+         } catch(ap_error e) {
+         } catch(...) {
             passed = false;
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1119,10 +1057,8 @@ int main() {
                acopy = s60;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1131,10 +1067,8 @@ int main() {
                acopy = s61;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1142,10 +1076,8 @@ int main() {
             try {
                proxy = s60;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1153,10 +1085,8 @@ int main() {
             try {
                proxy = s61;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1164,10 +1094,8 @@ int main() {
             try {
                proxy.setlength(100, 99);
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1175,10 +1103,8 @@ int main() {
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
          }
@@ -1228,10 +1154,8 @@ int main() {
                acopy = s60;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1240,10 +1164,8 @@ int main() {
                acopy = s61;
                proxy = acopy;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1251,10 +1173,8 @@ int main() {
             try {
                proxy = s60;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1262,10 +1182,8 @@ int main() {
             try {
                proxy = s61;
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1273,10 +1191,8 @@ int main() {
             try {
                proxy.setlength(100, 99);
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
 
@@ -1284,15 +1200,12 @@ int main() {
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
                passed = false;
-            }
-            catch(ap_error e) {
-            }
-            catch( ...) {
+            } catch(ap_error e) {
+            } catch(...) {
                passed = false;
             }
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1320,10 +1233,8 @@ int main() {
             real_2d_array arr;
             read_csv("nonexistent123foralgtestinglib", '\t', CSV_DEFAULT, arr);
             passed = false;
-         }
-         catch(ap_error) {
-         }
-         catch( ...) {
+         } catch(ap_error) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1334,10 +1245,8 @@ int main() {
             read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = false;
-         }
-         catch(ap_error) {
-         }
-         catch( ...) {
+         } catch(ap_error) {
+         } catch(...) {
             passed = false;
          }
          try {
@@ -1346,10 +1255,8 @@ int main() {
             read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = false;
-         }
-         catch(ap_error) {
-         }
-         catch( ...) {
+         } catch(ap_error) {
+         } catch(...) {
             passed = false;
          }
          try {
@@ -1358,10 +1265,8 @@ int main() {
             read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = false;
-         }
-         catch(ap_error) {
-         }
-         catch( ...) {
+         } catch(ap_error) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1372,8 +1277,7 @@ int main() {
             read_csv(csv_name, '\t', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = passed && arr.rows() == 0 && arr.cols() == 0;
-         }
-         catch( ...) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1384,8 +1288,7 @@ int main() {
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.rows() == 0 && arr.cols() == 0;
-         }
-         catch( ...) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1396,8 +1299,7 @@ int main() {
             read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.00,6.00]]";
-         }
-         catch( ...) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1408,8 +1310,7 @@ int main() {
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.25,6.10]]";
-         }
-         catch( ...) {
+         } catch(...) {
             passed = false;
          }
 
@@ -1420,12 +1321,10 @@ int main() {
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
             passed = passed && arr.tostring(2) == "[[1.10,2.90,-3.50],[11.00,0.20,-30.00],[1.00,-2.00,3.00],[0.10,-0.20,0.30]]";
-         }
-         catch( ...) {
+         } catch(...) {
             passed = false;
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1482,8 +1381,7 @@ int main() {
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1523,8 +1421,7 @@ int main() {
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1549,8 +1446,7 @@ int main() {
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1575,8 +1471,7 @@ int main() {
             for (int j = 0; j < nx + ny; j++)
                passed = passed && (rxy0[0][j] == rxy1[0][j]);
          }
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1667,8 +1562,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfunserialize(std::string(pc_str), model);
          for (int i = 0; i < ref_val.length(); i++)
             passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1680,8 +1574,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfunserialize(std::string(pc_str) + ".", model);
          for (int i = 0; i < ref_val.length(); i++)
             passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1694,8 +1587,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(stream, model);
          passed = false;
-      }
-      catch( ...) {
+      } catch(...) {
       } // do nothing, it is expected to fail
 
       try {
@@ -1708,8 +1600,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
             passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1726,8 +1617,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          passed = passed && (stream.get() == 'a');
          passed = passed && (stream.get() == 'z');
          passed = passed && (stream.get() == '>');
-      }
-      catch( ...) {
+      } catch(...) {
          passed = false;
       }
 
@@ -1921,8 +1811,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          // We survived all tests, next iteration will bring no changed, terminate loop!
          //
             break;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             were_exceptions = true;
          }
       }
@@ -2024,8 +1913,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                _ae_set_global_threading(default_global_threading); // restore
                setnworkers(default_nworkers);
             }
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             passed = false;
          }
          printf(fmt_speedup, "* default speedup", time_glob_ser / time_glob_ser);
@@ -2079,8 +1967,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgoptimize(state, func505_grad, NULL, &x0);
          mincgresults(state, x, rep);
          issue505_passed = issue505_passed && (fabs(4 * pow(x[0] - x0, 3)) < 1.0E-3);
-      }
-      catch( ...) {
+      } catch(...) {
          issue505_passed = false;
       }
       try {
@@ -2098,8 +1985,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmoptimize(state, func505_vec, func505_jac, NULL, &x0);
          minlmresults(state, x, rep);
          issue505_passed = issue505_passed && (fabs(x[0] - x0) < 1.0E-3);
-      }
-      catch( ...) {
+      } catch(...) {
          issue505_passed = false;
       }
       printf(fmt_str, "* issue 505", issue505_passed ? "OK" : "FAILED");
@@ -2159,8 +2045,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                issue478_passed = issue478_passed && (n1 / (n0 + n1) > 0.45);
                issue478_passed = issue478_passed && (n1 / (n0 + n1) < 0.55);
             }
-         }
-         catch( ...) {
+         } catch(...) {
             issue478_passed = false;
          }
          printf(fmt_str, "* issue 478", issue478_passed ? "OK" : "FAILED");
@@ -2239,8 +2124,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_recycle(&pool, &ptr1, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
-      }
-      catch( ...) {
+      } catch(...) {
          issue528_passed = false;
       }
       printf(fmt_str, "* issue 528", issue528_passed ? "OK" : "FAILED");
@@ -2279,8 +2163,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          multilayerperceptron net2(net0);
          mlpprocess(net2, x, y2);
          issue591_passed = issue591_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
-      }
-      catch( ...) {
+      } catch(...) {
          issue591_passed = false;
       }
       printf(fmt_str, "* issue 591", issue591_passed ? "OK" : "FAILED");
@@ -2316,8 +2199,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mlpprocess(net2, x, y2);
          issue594_passed = issue594_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
          issue594_passed = issue594_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
-      }
-      catch( ...) {
+      } catch(...) {
          issue594_passed = false;
       }
       printf(fmt_str, "* issue 594", issue594_passed ? "OK" : "FAILED");
@@ -2353,8 +2235,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue764_passed = issue764_passed && (alloc_cnt == alglib_impl::_alloc_counter);
-      }
-      catch( ...) {
+      } catch(...) {
          issue764_passed = false;
       }
       printf(fmt_str, "* issue 764", issue764_passed ? "OK" : "FAILED");
@@ -2379,8 +2260,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          issue813_passed = false;
          try {
             minlmoptimize(state, &issue813_callback);
-         }
-         catch( ...) {
+         } catch(...) {
             issue813_passed = true;
          }
          printf(fmt_str, "* issue 813", issue813_passed ? "OK" : "FAILED");
@@ -2403,26 +2283,20 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       // throw int*
          try {
             mincgoptimize(state, &issue824_callback_i);
-         }
-         catch(int *) {
-         }
-         catch(double *) {
+         } catch(int *) {
+         } catch(double *) {
             issue824_passed = false;
-         }
-         catch( ...) {
+         } catch(...) {
             issue824_passed = false;
          }
 
       // throw double*
          try {
             mincgoptimize(state, &issue824_callback_d);
-         }
-         catch(int *) {
+         } catch(int *) {
             issue824_passed = false;
-         }
-         catch(double *) {
-         }
-         catch( ...) {
+         } catch(double *) {
+         } catch(...) {
             issue824_passed = false;
          }
 
