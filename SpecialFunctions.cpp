@@ -6340,7 +6340,7 @@ double besselk0(double x, ae_state *_state) {
    double b2;
    double result;
 
-   ae_assert(ae_fp_greater(x, (double)(0)), "Domain error in BesselK0: x<=0", _state);
+   ae_assert(ae_fp_greater(x, (double)(0)), "Domain error in BesselK0: x <= 0", _state);
    if (ae_fp_less_eq(x, (double)(2))) {
       y = x * x - 2.0;
       bessel_besselmfirstcheb(1.37446543561352307156E-16, &b0, &b1, &b2, _state);

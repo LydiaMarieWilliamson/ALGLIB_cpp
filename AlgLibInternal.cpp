@@ -1085,7 +1085,7 @@ void randomunit(ae_int_t n, RVector *x, ae_state *_state) {
    double v;
    double vv;
 
-   ae_assert(n > 0, "RandomUnit: N<=0", _state);
+   ae_assert(n > 0, "RandomUnit: N <= 0", _state);
    if (x->cnt < n) {
       ae_vector_set_length(x, n, _state);
    }
@@ -1741,7 +1741,7 @@ void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t 
    *task1 = 0;
 
    ae_assert(tasksize >= 2, "TiledSplit: TaskSize<2", _state);
-   ae_assert(tasksize > tilesize, "TiledSplit: TaskSize<=TileSize", _state);
+   ae_assert(tasksize > tilesize, "TiledSplit: TaskSize <= TileSize", _state);
    cc = chunkscount(tasksize, tilesize, _state);
    ae_assert(cc >= 2, "TiledSplit: integrity check failed", _state);
    *task0 = idivup(cc, 2, _state) * tilesize;
@@ -10544,8 +10544,8 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_st
    double rb;
    ae_int_t result;
 
-   ae_assert(a >= 0 && a < n, "ModMul: A<0 or A>=N", _state);
-   ae_assert(b >= 0 && b < n, "ModMul: B<0 or B>=N", _state);
+   ae_assert(a >= 0 && a < n, "ModMul: A<0 or A >= N", _state);
+   ae_assert(b >= 0 && b < n, "ModMul: B<0 or B >= N", _state);
 
 // Base cases
    ra = (double)(a);
@@ -10610,7 +10610,7 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_st
    ae_int_t t;
    ae_int_t result;
 
-   ae_assert(a >= 0 && a < n, "ModExp: A<0 or A>=N", _state);
+   ae_assert(a >= 0 && a < n, "ModExp: A<0 or A >= N", _state);
    ae_assert(b >= 0, "ModExp: B<0", _state);
 
 // Base cases
@@ -10713,8 +10713,8 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state 
    _srealarray_init(&bluesteinbuf, _state, true);
 
 // Initial check for parameters
-   ae_assert(n > 0, "FTComplexFFTPlan: N<=0", _state);
-   ae_assert(k > 0, "FTComplexFFTPlan: K<=0", _state);
+   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
+   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
 
 // Determine required sizes of precomputed real and integer
 // buffers. This stage of code is highly dependent on internals
@@ -10997,8 +10997,8 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
    memset(&localbuf, 0, sizeof(localbuf));
    _srealarray_init(&localbuf, _state, true);
 
-   ae_assert(n > 0, "FTComplexFFTPlan: N<=0", _state);
-   ae_assert(k > 0, "FTComplexFFTPlan: K<=0", _state);
+   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
+   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
    ae_assert(!topmostplan || childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan", _state);
 
 // Try to generate "topmost" plan
@@ -11391,7 +11391,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
       }
    // Process Bluestein's FFT operation
       if (operation == ftbase_opbluesteinsfft) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize!=2 for Bluesteins FFT", _state);
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize != 2 for Bluesteins FFT", _state);
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufa, _state);
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb, _state);
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc, _state);
@@ -12624,7 +12624,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
    *n1 = 0;
    *n2 = 0;
 
-   ae_assert(n > 0, "FTFactorize: N<=0", _state);
+   ae_assert(n > 0, "FTFactorize: N <= 0", _state);
    *n1 = 0;
    *n2 = 0;
 
@@ -12688,7 +12688,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
 static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state) {
    ae_int_t result;
 
-   ae_assert(n > 0, "FTOptimisticEstimate: N<=0", _state);
+   ae_assert(n > 0, "FTOptimisticEstimate: N <= 0", _state);
    result = ae_ifloor(1.0E-5 * 5 * n * ae_log((double)(n), _state) / ae_log((double)(2), _state), _state);
    return result;
 }

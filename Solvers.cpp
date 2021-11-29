@@ -87,7 +87,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_vector_init(&wr, 0, DT_REAL, _state, true);
    ae_vector_init(&wi, 0, DT_REAL, _state, true);
 
-   ae_assert(n > 0, "PolynomialSolve: N<=0", _state);
+   ae_assert(n > 0, "PolynomialSolve: N <= 0", _state);
    ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1", _state);
    ae_assert(isfinitevector(a, n + 1, _state), "PolynomialSolve: A contains infitite numbers", _state);
    ae_assert(ae_fp_neq(a->ptr.p_double[n], (double)(0)), "PolynomialSolve: A[N]=0", _state);
@@ -4347,9 +4347,9 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
    _sparsematrix_init(&a2, _state, true);
 
    n = sparsegetnrows(a, _state);
-   ae_assert(n > 0, "SparseSPDSolveSKS: N<=0", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDSolveSKS: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDSolveSKS: cols(A)!=N", _state);
+   ae_assert(n > 0, "SparseSPDSolveSKS: N <= 0", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDSolveSKS: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDSolveSKS: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSPDSolveSKS: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSPDSolveSKS: B contains infinities or NANs", _state);
    initsparsesolverreport(rep, _state);
@@ -4417,9 +4417,9 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    ae_vector_init(&p, 0, DT_INT, _state, true);
 
    n = sparsegetnrows(a, _state);
-   ae_assert(n > 0, "SparseSPDSolve: N<=0", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDSolve: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDSolve: cols(A)!=N", _state);
+   ae_assert(n > 0, "SparseSPDSolve: N <= 0", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDSolve: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDSolve: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSPDSolve: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSPDSolve: B contains infinities or NANs", _state);
    initsparsesolverreport(rep, _state);
@@ -4484,9 +4484,9 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
    _sparsesolverreport_clear(rep);
 
    n = sparsegetnrows(a, _state);
-   ae_assert(n > 0, "SparseSPDCholeskySolve: N<=0", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDCholeskySolve: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDCholeskySolve: cols(A)!=N", _state);
+   ae_assert(n > 0, "SparseSPDCholeskySolve: N <= 0", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSPDCholeskySolve: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSPDCholeskySolve: cols(A) != N", _state);
    ae_assert(sparseissks(a, _state) || sparseiscrs(a, _state), "SparseSPDCholeskySolve: A is not an SKS/CRS matrix", _state);
    ae_assert(b->cnt >= n, "SparseSPDCholeskySolve: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSPDCholeskySolve: B contains infinities or NANs", _state);
@@ -4555,9 +4555,9 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    ae_vector_init(&pivq, 0, DT_INT, _state, true);
 
    n = sparsegetnrows(a, _state);
-   ae_assert(n > 0, "SparseSolve: N<=0", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolve: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSolve: cols(A)!=N", _state);
+   ae_assert(n > 0, "SparseSolve: N <= 0", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolve: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSolve: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolve: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolve: B contains infinities or NANs", _state);
    initsparsesolverreport(rep, _state);
@@ -4625,9 +4625,9 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
    _sparsesolverreport_clear(rep);
 
    n = sparsegetnrows(a, _state);
-   ae_assert(n > 0, "SparseLUSolve: N<=0", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseLUSolve: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseLUSolve: cols(A)!=N", _state);
+   ae_assert(n > 0, "SparseLUSolve: N <= 0", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseLUSolve: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseLUSolve: cols(A) != N", _state);
    ae_assert(sparseiscrs(a, _state), "SparseLUSolve: A is not an SKS matrix", _state);
    ae_assert(b->cnt >= n, "SparseLUSolve: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseLUSolve: B contains infinities or NANs", _state);
@@ -4897,8 +4897,8 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 
 // Test inputs
    ae_assert(n >= 1, "SparseSolveSymmetricGMRES: tried to automatically detect N from sizeof(A), got nonpositive size", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolveSymmetricGMRES: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSolveSymmetricGMRES: cols(A)!=N", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolveSymmetricGMRES: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSolveSymmetricGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveSymmetricGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveSymmetricGMRES: B contains NAN/INF", _state);
    ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, (double)(0)), "SparseSolveSymmetricGMRES: EpsF<0 or infinite", _state);
@@ -4986,8 +4986,8 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
 
 // Test inputs
    ae_assert(n >= 1, "SparseSolveGMRES: tried to automatically detect N from sizeof(A), got nonpositive size", _state);
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolveGMRES: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSolveGMRES: cols(A)!=N", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolveGMRES: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSolveGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveGMRES: B contains NAN/INF", _state);
    ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, (double)(0)), "SparseSolveGMRES: EpsF<0 or infinite", _state);
@@ -5074,7 +5074,7 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) 
 
    _sparsesolverstate_clear(state);
 
-   ae_assert(n >= 1, "SparseSolverCreate: N<=0", _state);
+   ae_assert(n >= 1, "SparseSolverCreate: N <= 0", _state);
    state->n = n;
    state->running = false;
    state->userterminationneeded = false;
@@ -5205,8 +5205,8 @@ void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool 
    n = state->n;
 
 // Test inputs
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolverSolveSymmetric: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSolverSolveSymmetric: cols(A)!=N", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolverSolveSymmetric: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSolverSolveSymmetric: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolverSolveSymmetric: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolverSolveSymmetric: B contains NAN/INF", _state);
 
@@ -5259,8 +5259,8 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b, ae
    n = state->n;
 
 // Test inputs
-   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolverSolve: rows(A)!=N", _state);
-   ae_assert(sparsegetncols(a, _state) == n, "SparseSolverSolve: cols(A)!=N", _state);
+   ae_assert(sparsegetnrows(a, _state) == n, "SparseSolverSolve: rows(A) != N", _state);
+   ae_assert(sparsegetncols(a, _state) == n, "SparseSolverSolve: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolverSolve: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolverSolve: B contains NAN/INF", _state);
 
@@ -6282,7 +6282,7 @@ void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
 
    _lincgstate_clear(state);
 
-   ae_assert(n > 0, "LinCGCreate: N<=0", _state);
+   ae_assert(n > 0, "LinCGCreate: N <= 0", _state);
    state->n = n;
    state->prectype = 0;
    state->itsbeforerestart = n;
@@ -7328,8 +7328,8 @@ void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state
 
    _linlsqrstate_clear(state);
 
-   ae_assert(m > 0, "LinLSQRCreate: M<=0", _state);
-   ae_assert(n > 0, "LinLSQRCreate: N<=0", _state);
+   ae_assert(m > 0, "LinLSQRCreate: M <= 0", _state);
+   ae_assert(n > 0, "LinLSQRCreate: N <= 0", _state);
    linlsqrcreatebuf(m, n, state, _state);
 }
 
@@ -7348,8 +7348,8 @@ void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state
 void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state) {
    ae_int_t i;
 
-   ae_assert(m > 0, "LinLSQRCreateBuf: M<=0", _state);
-   ae_assert(n > 0, "LinLSQRCreateBuf: N<=0", _state);
+   ae_assert(m > 0, "LinLSQRCreateBuf: M <= 0", _state);
+   ae_assert(n > 0, "LinLSQRCreateBuf: N <= 0", _state);
    state->m = m;
    state->n = n;
    state->prectype = 0;

@@ -7660,8 +7660,8 @@ void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state 
 void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
 
-   ae_assert(m > 0, "SparseCreateBuf: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateBuf: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateBuf: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateBuf: N <= 0", _state);
    ae_assert(k >= 0, "SparseCreateBuf: K<0", _state);
 
 // Hash-table size is max(existing_size,requested_size)
@@ -7723,8 +7723,8 @@ void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, ae_s
 
    _sparsematrix_clear(s);
 
-   ae_assert(m > 0, "SparseCreateCRS: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateCRS: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateCRS: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateCRS: N <= 0", _state);
    ae_assert(ner->cnt >= m, "SparseCreateCRS: Length(NER)<M", _state);
    for (i = 0; i <= m - 1; i++) {
       ae_assert(ner->ptr.p_int[i] >= 0, "SparseCreateCRS: NER[] contains negative elements", _state);
@@ -7766,8 +7766,8 @@ void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, a
    ae_int_t i;
    ae_int_t noe;
 
-   ae_assert(m > 0, "SparseCreateCRSBuf: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateCRSBuf: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateCRSBuf: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateCRSBuf: N <= 0", _state);
    ae_assert(ner->cnt >= m, "SparseCreateCRSBuf: Length(NER)<M", _state);
    noe = 0;
    s->matrixtype = 1;
@@ -7819,8 +7819,8 @@ void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematri
 
    _sparsematrix_clear(s);
 
-   ae_assert(m > 0, "SparseCreateSKS: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateSKS: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateSKS: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateSKS: N <= 0", _state);
    ae_assert(m == n, "SparseCreateSKS: M<>N", _state);
    ae_assert(d->cnt >= m, "SparseCreateSKS: Length(D)<M", _state);
    ae_assert(u->cnt >= n, "SparseCreateSKS: Length(U)<N", _state);
@@ -7867,8 +7867,8 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
    ae_int_t mxd;
    ae_int_t mxu;
 
-   ae_assert(m > 0, "SparseCreateSKSBuf: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateSKSBuf: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateSKSBuf: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateSKSBuf: N <= 0", _state);
    ae_assert(m == n, "SparseCreateSKSBuf: M<>N", _state);
    ae_assert(d->cnt >= m, "SparseCreateSKSBuf: Length(D)<M", _state);
    ae_assert(u->cnt >= n, "SparseCreateSKSBuf: Length(U)<N", _state);
@@ -7941,10 +7941,10 @@ void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s, a
 
    _sparsematrix_clear(s);
 
-   ae_assert(m > 0, "SparseCreateSKSBand: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateSKSBand: N<=0", _state);
+   ae_assert(m > 0, "SparseCreateSKSBand: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateSKSBand: N <= 0", _state);
    ae_assert(bw >= 0, "SparseCreateSKSBand: BW<0", _state);
-   ae_assert(m == n, "SparseCreateSKSBand: M!=N", _state);
+   ae_assert(m == n, "SparseCreateSKSBand: M != N", _state);
    sparsecreatesksbandbuf(m, n, bw, s, _state);
 }
 
@@ -7976,9 +7976,9 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
    ae_int_t mxu;
    ae_int_t dui;
 
-   ae_assert(m > 0, "SparseCreateSKSBandBuf: M<=0", _state);
-   ae_assert(n > 0, "SparseCreateSKSBandBuf: N<=0", _state);
-   ae_assert(m == n, "SparseCreateSKSBandBuf: M!=N", _state);
+   ae_assert(m > 0, "SparseCreateSKSBandBuf: M <= 0", _state);
+   ae_assert(n > 0, "SparseCreateSKSBandBuf: N <= 0", _state);
+   ae_assert(m == n, "SparseCreateSKSBandBuf: M != N", _state);
    ae_assert(bw >= 0, "SparseCreateSKSBandBuf: BW<0", _state);
    minmn = ae_minint(m, n, _state);
    s->matrixtype = 2;
@@ -8124,9 +8124,9 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
 
    ae_assert(s->matrixtype == 0, "SparseAdd: matrix must be in the Hash-Table mode to do this operation", _state);
    ae_assert(i >= 0, "SparseAdd: I<0", _state);
-   ae_assert(i < s->m, "SparseAdd: I>=M", _state);
+   ae_assert(i < s->m, "SparseAdd: I >= M", _state);
    ae_assert(j >= 0, "SparseAdd: J<0", _state);
-   ae_assert(j < s->n, "SparseAdd: J>=N", _state);
+   ae_assert(j < s->n, "SparseAdd: J >= N", _state);
    ae_assert(ae_isfinite(v, _state), "SparseAdd: V is not finite number", _state);
    if (ae_fp_eq(v, (double)(0))) {
       return;
@@ -8211,9 +8211,9 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
 
    ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseSet: unsupported matrix storage format", _state);
    ae_assert(i >= 0, "SparseSet: I<0", _state);
-   ae_assert(i < s->m, "SparseSet: I>=M", _state);
+   ae_assert(i < s->m, "SparseSet: I >= M", _state);
    ae_assert(j >= 0, "SparseSet: J<0", _state);
-   ae_assert(j < s->n, "SparseSet: J>=N", _state);
+   ae_assert(j < s->n, "SparseSet: J >= N", _state);
    ae_assert(ae_isfinite(v, _state), "SparseSet: V is not finite number", _state);
 
 // Hash-table matrix
@@ -8303,9 +8303,9 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
    double result;
 
    ae_assert(i >= 0, "SparseGet: I<0", _state);
-   ae_assert(i < s->m, "SparseGet: I>=M", _state);
+   ae_assert(i < s->m, "SparseGet: I >= M", _state);
    ae_assert(j >= 0, "SparseGet: J<0", _state);
-   ae_assert(j < s->n, "SparseGet: J>=N", _state);
+   ae_assert(j < s->n, "SparseGet: J >= N", _state);
    result = 0.0;
    if (s->matrixtype == 0) {
 
@@ -8404,9 +8404,9 @@ bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
    bool result;
 
    ae_assert(i >= 0, "SparseExists: I<0", _state);
-   ae_assert(i < s->m, "SparseExists: I>=M", _state);
+   ae_assert(i < s->m, "SparseExists: I >= M", _state);
    ae_assert(j >= 0, "SparseExists: J<0", _state);
-   ae_assert(j < s->n, "SparseExists: J>=N", _state);
+   ae_assert(j < s->n, "SparseExists: J >= N", _state);
    result = false;
    if (s->matrixtype == 0) {
 
@@ -8494,8 +8494,8 @@ double sparsegetdiagonal(sparsematrix *s, ae_int_t i, ae_state *_state) {
    double result;
 
    ae_assert(i >= 0, "SparseGetDiagonal: I<0", _state);
-   ae_assert(i < s->m, "SparseGetDiagonal: I>=M", _state);
-   ae_assert(i < s->n, "SparseGetDiagonal: I>=N", _state);
+   ae_assert(i < s->m, "SparseGetDiagonal: I >= M", _state);
+   ae_assert(i < s->n, "SparseGetDiagonal: I >= N", _state);
    result = (double)(0);
    if (s->matrixtype == 0) {
       result = sparseget(s, i, i, _state);
@@ -9322,7 +9322,7 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_st
 
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMM: incorrect matrix type (convert your matrix to CRS/SKS)", _state);
    ae_assert(a->rows >= s->n, "SparseMM: Rows(A)<N", _state);
-   ae_assert(k > 0, "SparseMM: K<=0", _state);
+   ae_assert(k > 0, "SparseMM: K <= 0", _state);
    m = s->m;
    n = s->n;
    k1 = k - 1;
@@ -9458,7 +9458,7 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_s
 
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMTM: incorrect matrix type (convert your matrix to CRS/SKS)", _state);
    ae_assert(a->rows >= s->m, "SparseMTM: Rows(A)<M", _state);
-   ae_assert(k > 0, "SparseMTM: K<=0", _state);
+   ae_assert(k > 0, "SparseMTM: K <= 0", _state);
    m = s->m;
    n = s->n;
    k1 = k - 1;
@@ -9601,7 +9601,7 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMM2: incorrect matrix type (convert your matrix to CRS/SKS)", _state);
    ae_assert(s->m == s->n, "SparseMM2: matrix is non-square", _state);
    ae_assert(a->rows >= s->n, "SparseMM2: Rows(A)<N", _state);
-   ae_assert(k > 0, "SparseMM2: K<=0", _state);
+   ae_assert(k > 0, "SparseMM2: K <= 0", _state);
    n = s->n;
    k1 = k - 1;
    rmatrixsetlengthatleast(b0, n, k, _state);
@@ -10801,8 +10801,8 @@ bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae
    ae_int_t k1;
    bool result;
 
-   ae_assert(0 <= i && i < s->m, "SparseRewriteExisting: invalid argument I(either I<0 or I>=S.M)", _state);
-   ae_assert(0 <= j && j < s->n, "SparseRewriteExisting: invalid argument J(either J<0 or J>=S.N)", _state);
+   ae_assert(0 <= i && i < s->m, "SparseRewriteExisting: invalid argument I(either I<0 or I >= S.M)", _state);
+   ae_assert(0 <= j && j < s->n, "SparseRewriteExisting: invalid argument J(either J<0 or J >= S.N)", _state);
    ae_assert(ae_isfinite(v, _state), "SparseRewriteExisting: invalid argument V(either V is infinite or V is NaN)", _state);
    result = false;
 
@@ -10906,7 +10906,7 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow, ae_state *_state) 
    ae_int_t upperprofile;
 
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseGetRow: S must be CRS/SKS-based matrix", _state);
-   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I>=M", _state);
+   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I >= M", _state);
 
 // Prepare output buffer
    rvectorsetlengthatleast(irow, s->n, _state);
@@ -10992,7 +10992,7 @@ void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVecto
    *nzcnt = 0;
 
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseGetRow: S must be CRS/SKS-based matrix", _state);
-   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I>=M", _state);
+   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I >= M", _state);
 
 // Initialize NZCnt
    *nzcnt = 0;
@@ -15359,8 +15359,8 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state
 
    _eigsubspacestate_clear(state);
 
-   ae_assert(n > 0, "EigSubspaceCreate: N<=0", _state);
-   ae_assert(k > 0, "EigSubspaceCreate: K<=0", _state);
+   ae_assert(n > 0, "EigSubspaceCreate: N <= 0", _state);
+   ae_assert(k > 0, "EigSubspaceCreate: K <= 0", _state);
    ae_assert(k <= n, "EigSubspaceCreate: K>N", _state);
    eigsubspacecreatebuf(n, k, state, _state);
 }
@@ -15371,8 +15371,8 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state
 // API: void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state, const xparams _xparams = xdefault);
 void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state *_state) {
 
-   ae_assert(n > 0, "EigSubspaceCreate: N<=0", _state);
-   ae_assert(k > 0, "EigSubspaceCreate: K<=0", _state);
+   ae_assert(n > 0, "EigSubspaceCreate: N <= 0", _state);
+   ae_assert(k > 0, "EigSubspaceCreate: K <= 0", _state);
    ae_assert(k <= n, "EigSubspaceCreate: K>N", _state);
 
 // Initialize algorithm parameters
@@ -16639,7 +16639,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
    ae_vector_init(&ex, 0, DT_REAL, _state, true);
    ae_matrix_init(&z1, 0, 0, DT_REAL, _state, true);
 
-   ae_assert(n >= 1, "SMatrixTDEVD: N<=0", _state);
+   ae_assert(n >= 1, "SMatrixTDEVD: N <= 0", _state);
    ae_assert(zneeded >= 0 && zneeded <= 3, "SMatrixTDEVD: incorrect ZNeeded", _state);
    result = false;
 
@@ -27061,8 +27061,8 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
    ae_int_t cursize;
    double v;
 
-   ae_assert(a->m == head + tail, "PartialCholeskyPattern: rows(A)!=Head+Tail", _state);
-   ae_assert(a->n == head + tail, "PartialCholeskyPattern: cols(A)!=Head+Tail", _state);
+   ae_assert(a->m == head + tail, "PartialCholeskyPattern: rows(A) != Head+Tail", _state);
+   ae_assert(a->n == head + tail, "PartialCholeskyPattern: cols(A) != Head+Tail", _state);
    ae_assert(tmpparent->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpParent)<Head+Tail+1", _state);
    ae_assert(tmpchildrenr->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenR)<Head+Tail+1", _state);
    ae_assert(tmpchildreni->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenI)<Head+Tail+1", _state);
@@ -28928,7 +28928,7 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
    memset(&bufr, 0, sizeof(bufr));
    ae_vector_init(&bufr, 0, DT_REAL, _state, true);
 
-   ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1: N<=0", _state);
+   ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1: Rows(A)<N", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1: Cols(A)<N", _state);
    ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1: Length(U)<N", _state);
@@ -28998,7 +28998,7 @@ void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *f
    memset(&bufr, 0, sizeof(bufr));
    ae_vector_init(&bufr, 0, DT_REAL, _state, true);
 
-   ae_assert(n > 0, "SPDMatrixCholeskyUpdateFix: N<=0", _state);
+   ae_assert(n > 0, "SPDMatrixCholeskyUpdateFix: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFix: Rows(A)<N", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFix: Cols(A)<N", _state);
    ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFix: Length(Fix)<N", _state);
@@ -29040,7 +29040,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
    double v;
    double vv;
 
-   ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1Buf: N<=0", _state);
+   ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1Buf: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Rows(A)<N", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Cols(A)<N", _state);
    ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Length(U)<N", _state);
@@ -29147,7 +29147,7 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
    double v;
    double vv;
 
-   ae_assert(n > 0, "SPDMatrixCholeskyUpdateFixBuf: N<=0", _state);
+   ae_assert(n > 0, "SPDMatrixCholeskyUpdateFixBuf: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFixBuf: Rows(A)<N", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFixBuf: Cols(A)<N", _state);
    ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFixBuf: Length(Fix)<N", _state);
@@ -35525,7 +35525,7 @@ void fblssolvels(RMatrix *a, RVector *b, ae_int_t m, ae_int_t n, RVector *tmp0, 
    ae_int_t k;
    double v;
 
-   ae_assert(n > 0, "FBLSSolveLS: N<=0", _state);
+   ae_assert(n > 0, "FBLSSolveLS: N <= 0", _state);
    ae_assert(m >= n, "FBLSSolveLS: M<N", _state);
    ae_assert(a->rows >= m, "FBLSSolveLS: Rows(A)<M", _state);
    ae_assert(a->cols >= n, "FBLSSolveLS: Cols(A)<N", _state);
@@ -35750,10 +35750,10 @@ void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits,
 
    _normestimatorstate_clear(state);
 
-   ae_assert(m > 0, "NormEstimatorCreate: M<=0", _state);
-   ae_assert(n > 0, "NormEstimatorCreate: N<=0", _state);
-   ae_assert(nstart > 0, "NormEstimatorCreate: NStart<=0", _state);
-   ae_assert(nits > 0, "NormEstimatorCreate: NIts<=0", _state);
+   ae_assert(m > 0, "NormEstimatorCreate: M <= 0", _state);
+   ae_assert(n > 0, "NormEstimatorCreate: N <= 0", _state);
+   ae_assert(nstart > 0, "NormEstimatorCreate: NStart <= 0", _state);
+   ae_assert(nits > 0, "NormEstimatorCreate: NIts <= 0", _state);
    state->m = m;
    state->n = n;
    state->nstart = nstart;
@@ -36208,7 +36208,7 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_vector_init(&work, 0, DT_REAL, _state, true);
    _sinteger_init(&sinfo, _state, true);
 
-   ae_assert(n > 0, "RMatrixLUInverse: N<=0!", _state);
+   ae_assert(n > 0, "RMatrixLUInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixLUInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "RMatrixLUInverse: rows(A)<N!", _state);
    ae_assert(pivots->cnt >= n, "RMatrixLUInverse: len(Pivots)<N!", _state);
@@ -36285,7 +36285,7 @@ void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, a
    _matinvreport_clear(rep);
    ae_vector_init(&pivots, 0, DT_INT, _state, true);
 
-   ae_assert(n > 0, "RMatrixInverse: N<=0!", _state);
+   ae_assert(n > 0, "RMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "RMatrixInverse: rows(A)<N!", _state);
    ae_assert(apservisfinitematrix(a, n, n, _state), "RMatrixInverse: A contains infinite or NaN values!", _state);
@@ -36331,7 +36331,7 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
    _sinteger_init(&sinfo, _state, true);
 
-   ae_assert(n > 0, "CMatrixLUInverse: N<=0!", _state);
+   ae_assert(n > 0, "CMatrixLUInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CMatrixLUInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "CMatrixLUInverse: rows(A)<N!", _state);
    ae_assert(pivots->cnt >= n, "CMatrixLUInverse: len(Pivots)<N!", _state);
@@ -36404,7 +36404,7 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, a
    _matinvreport_clear(rep);
    ae_vector_init(&pivots, 0, DT_INT, _state, true);
 
-   ae_assert(n > 0, "CRMatrixInverse: N<=0!", _state);
+   ae_assert(n > 0, "CRMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CRMatrixInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "CRMatrixInverse: rows(A)<N!", _state);
    ae_assert(apservisfinitecmatrix(a, n, n, _state), "CMatrixInverse: A contains infinite or NaN values!", _state);
@@ -36457,7 +36457,7 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    ae_vector_init(&tmp, 0, DT_REAL, _state, true);
    _matinvreport_init(&rep2, _state, true);
 
-   ae_assert(n > 0, "SPDMatrixCholeskyInverse: N<=0!", _state);
+   ae_assert(n > 0, "SPDMatrixCholeskyInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyInverse: rows(A)<N!", _state);
    *info = 1;
@@ -36532,7 +36532,7 @@ void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
    *info = 0;
    _matinvreport_clear(rep);
 
-   ae_assert(n > 0, "SPDMatrixInverse: N<=0!", _state);
+   ae_assert(n > 0, "SPDMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "SPDMatrixInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "SPDMatrixInverse: rows(A)<N!", _state);
    ae_assert(isfinitertrmatrix(a, n, isupper, _state), "SPDMatrixInverse: A contains infinite or NaN values!", _state);
@@ -36588,7 +36588,7 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    _matinvreport_init(&rep2, _state, true);
    ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
 
-   ae_assert(n > 0, "HPDMatrixCholeskyInverse: N<=0!", _state);
+   ae_assert(n > 0, "HPDMatrixCholeskyInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "HPDMatrixCholeskyInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A)<N!", _state);
    f = true;
@@ -36663,7 +36663,7 @@ void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
    *info = 0;
    _matinvreport_clear(rep);
 
-   ae_assert(n > 0, "HPDMatrixInverse: N<=0!", _state);
+   ae_assert(n > 0, "HPDMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "HPDMatrixInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "HPDMatrixInverse: rows(A)<N!", _state);
    ae_assert(apservisfinitectrmatrix(a, n, isupper, _state), "HPDMatrixInverse: A contains infinite or NaN values!", _state);
@@ -36726,7 +36726,7 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_vector_init(&tmp, 0, DT_REAL, _state, true);
    _sinteger_init(&sinfo, _state, true);
 
-   ae_assert(n > 0, "RMatrixTRInverse: N<=0!", _state);
+   ae_assert(n > 0, "RMatrixTRInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixTRInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "RMatrixTRInverse: rows(A)<N!", _state);
    ae_assert(isfinitertrmatrix(a, n, isupper, _state), "RMatrixTRInverse: A contains infinite or NaN values!", _state);
@@ -36805,7 +36805,7 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
    _sinteger_init(&sinfo, _state, true);
 
-   ae_assert(n > 0, "CMatrixTRInverse: N<=0!", _state);
+   ae_assert(n > 0, "CMatrixTRInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CMatrixTRInverse: cols(A)<N!", _state);
    ae_assert(a->rows >= n, "CMatrixTRInverse: rows(A)<N!", _state);
    ae_assert(apservisfinitectrmatrix(a, n, isupper, _state), "CMatrixTRInverse: A contains infinite or NaN values!", _state);
@@ -38680,7 +38680,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
    ae_vector_init(&w3, 0, DT_REAL, _state, true);
    _matinvreport_init(&rep, _state, true);
 
-   ae_assert(n > 0, "SMatrixGEVDReduce: N<=0!", _state);
+   ae_assert(n > 0, "SMatrixGEVDReduce: N <= 0!", _state);
    ae_assert((problemtype == 1 || problemtype == 2) || problemtype == 3, "SMatrixGEVDReduce: incorrect ProblemType!", _state);
    result = true;
 

@@ -9438,7 +9438,7 @@ std::string complex::tostring(int _dps) const {
 }
 #endif
 
-bool operator == (const complex &lhs, const complex &rhs) {
+bool operator==(const complex &lhs, const complex &rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -10361,7 +10361,7 @@ void ae_vector_wrapper::setlength(ae_int_t iLen) {
 #endif
    }
    alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
-   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, ptr==NULL (array was not correctly initialized)", &_state);
+   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, ptr == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, ptr is frozen proxy array", &_state);
    alglib_impl::ae_vector_set_length(ptr, iLen, &_state);
    alglib_impl::ae_state_clear(&_state);
@@ -10872,7 +10872,7 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
 #endif
    }
    alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
-   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, p_mat==NULL (array was not correctly initialized)", &_state);
+   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, attempt to resize proxy array", &_state);
    alglib_impl::ae_matrix_set_length(ptr, rows, cols, &_state);
    alglib_impl::ae_state_clear(&_state);

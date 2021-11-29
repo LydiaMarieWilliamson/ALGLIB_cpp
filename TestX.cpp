@@ -233,11 +233,11 @@ struct async_rbf_record {
    rbfreport *p_report;
    bool thread_finished;
 };
-DWORD WINAPI async_build_rbf_model(LPVOID T) {
+void *async_build_rbf_model(void *T) {
    async_rbf_record *p = (async_rbf_record *) T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
-   return 0;
+   return NULL;
 }
 #elif AE_OS == AE_WINDOWS
 struct async_rbf_record {
@@ -245,11 +245,11 @@ struct async_rbf_record {
    rbfreport *p_report;
    bool thread_finished;
 };
-void *async_build_rbf_model(void *T) {
+DWORD WINAPI async_build_rbf_model(LPVOID T) {
    async_rbf_record *p = (async_rbf_record *) T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
-   return NULL;
+   return 0;
 }
 #endif
 

@@ -2077,7 +2077,7 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
 
 // Check inputs
    for (i = 0; i <= n - 1; i++) {
-      ae_assert(ae_fp_greater(d->ptr.p_double[i], (double)(0)), "InexactLBFGSPreconditioner: D[]<=0", _state);
+      ae_assert(ae_fp_greater(d->ptr.p_double[i], (double)(0)), "InexactLBFGSPreconditioner: D[] <= 0", _state);
    }
    for (i = 0; i <= k - 1; i++) {
       ae_assert(ae_fp_greater_eq(c->ptr.p_double[i], (double)(0)), "InexactLBFGSPreconditioner: C[]<0", _state);
@@ -2171,10 +2171,10 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
    bool b;
 
 // Check inputs
-   ae_assert(n > 0, "PrepareLowRankPreconditioner: N<=0", _state);
-   ae_assert(k >= 0, "PrepareLowRankPreconditioner: N<=0", _state);
+   ae_assert(n > 0, "PrepareLowRankPreconditioner: N <= 0", _state);
+   ae_assert(k >= 0, "PrepareLowRankPreconditioner: N <= 0", _state);
    for (i = 0; i <= n - 1; i++) {
-      ae_assert(ae_fp_greater(d->ptr.p_double[i], (double)(0)), "PrepareLowRankPreconditioner: D[]<=0", _state);
+      ae_assert(ae_fp_greater(d->ptr.p_double[i], (double)(0)), "PrepareLowRankPreconditioner: D[] <= 0", _state);
    }
    for (i = 0; i <= k - 1; i++) {
       ae_assert(ae_fp_greater_eq(c->ptr.p_double[i], (double)(0)), "PrepareLowRankPreconditioner: C[]<0", _state);
@@ -2720,7 +2720,7 @@ void smoothnessmonitorfinalizelinesearch(smoothnessmonitor *monitor, ae_state *_
 // ALGLIB: Copyright 10.10.2019 by Sergey Bochkanov
 void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale, ae_state *_state) {
 
-   ae_assert(ae_isfinite(stpmax, _state) && ae_fp_greater(stpmax, (double)(0)), "SmoothnessMonitorStartProbing: StpMax<=0", _state);
+   ae_assert(ae_isfinite(stpmax, _state) && ae_fp_greater(stpmax, (double)(0)), "SmoothnessMonitorStartProbing: StpMax <= 0", _state);
    ae_assert(nvalues >= 1, "SmoothnessMonitorStartProbing: NValues<1", _state);
    ae_assert(ae_isfinite(stepscale, _state) && ae_fp_greater_eq(stepscale, (double)(0)), "SmoothnessMonitorStartProbing: StepScale<0", _state);
    monitor->probingnvalues = nvalues;
@@ -8275,7 +8275,7 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
 
    ae_assert(nd >= 0, "SNNLSSetProblem: ND<0", _state);
    ae_assert(ns >= 0, "SNNLSSetProblem: NS<0", _state);
-   ae_assert(nr > 0, "SNNLSSetProblem: NR<=0", _state);
+   ae_assert(nr > 0, "SNNLSSetProblem: NR <= 0", _state);
    ae_assert(ns <= nr, "SNNLSSetProblem: NS>NR", _state);
    ae_assert(a->rows >= nr || nd == 0, "SNNLSSetProblem: rows(A)<NR", _state);
    ae_assert(a->cols >= nd, "SNNLSSetProblem: cols(A)<ND", _state);
@@ -8314,7 +8314,7 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
 void snnlsdropnnc(snnlssolver *s, ae_int_t idx, ae_state *_state) {
 
    ae_assert(idx >= 0, "SNNLSDropNNC: Idx<0", _state);
-   ae_assert(idx < s->ns + s->nd, "SNNLSDropNNC: Idx>=NS+ND", _state);
+   ae_assert(idx < s->ns + s->nd, "SNNLSDropNNC: Idx >= NS+ND", _state);
    s->nnc.ptr.p_bool[idx] = false;
 }
 
@@ -17734,7 +17734,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
       state->targetscale = normalizedenseqpinplace(&state->denseh, false, nmain, &state->c, n, _state);
    }
    if (state->factorizationtype == 1) {
-      ae_assert(nmain == n, "VIPMSetQuadraticLinear: critical integrity check failed, NMain!=N", _state);
+      ae_assert(nmain == n, "VIPMSetQuadraticLinear: critical integrity check failed, NMain != N", _state);
 
    // Quadratic term is stored in sparse format: either sparsify dense
    // term of copy sparse one
@@ -19870,7 +19870,7 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
 
    // Lower bound: G*inv(Z) and Z*inv(G)
       if (state->hasgz.ptr.p_bool[i]) {
-         ae_assert(v0->g.ptr.p_double[i] > 0.0 && v0->z.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - G[i]<=0 or Z[i]<=0", _state);
+         ae_assert(v0->g.ptr.p_double[i] > 0.0 && v0->z.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - G[i] <= 0 or Z[i] <= 0", _state);
          state->diagdz.ptr.p_double[i] = v0->z.ptr.p_double[i] / v0->g.ptr.p_double[i];
          state->diagdzi.ptr.p_double[i] = 1 / state->diagdz.ptr.p_double[i];
          state->diagdziri.ptr.p_double[i] = 1 / (state->diagdzi.ptr.p_double[i] + regeps);
@@ -19880,7 +19880,7 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
 
    // Upper bound: T*inv(S) and S*inv(T)
       if (state->hasts.ptr.p_bool[i]) {
-         ae_assert(v0->t.ptr.p_double[i] > 0.0 && v0->s.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - T[i]<=0 or S[i]<=0", _state);
+         ae_assert(v0->t.ptr.p_double[i] > 0.0 && v0->s.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - T[i] <= 0 or S[i] <= 0", _state);
          state->diagds.ptr.p_double[i] = v0->s.ptr.p_double[i] / v0->t.ptr.p_double[i];
          state->diagdsi.ptr.p_double[i] = 1 / state->diagds.ptr.p_double[i];
          state->diagdsiri.ptr.p_double[i] = 1 / (state->diagdsi.ptr.p_double[i] + regeps);
@@ -19901,7 +19901,7 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
 
    // Lower bound
       if (state->haswv.ptr.p_bool[i]) {
-         ae_assert(v0->v.ptr.p_double[i] > 0.0 && v0->w.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - V[i]<=0 or W[i]<=0", _state);
+         ae_assert(v0->v.ptr.p_double[i] > 0.0 && v0->w.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - V[i] <= 0 or W[i] <= 0", _state);
          state->diagdw.ptr.p_double[i] = v0->w.ptr.p_double[i] / v0->v.ptr.p_double[i];
          state->diagdwi.ptr.p_double[i] = 1 / state->diagdw.ptr.p_double[i];
          state->diagdwir.ptr.p_double[i] = state->diagdwi.ptr.p_double[i] + regeps;
@@ -19911,7 +19911,7 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
 
    // Upper bound
       if (state->haspq.ptr.p_bool[i]) {
-         ae_assert(v0->p.ptr.p_double[i] > 0.0 && v0->q.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - P[i]<=0 or Q[i]<=0", _state);
+         ae_assert(v0->p.ptr.p_double[i] > 0.0 && v0->q.ptr.p_double[i] > 0.0, "VIPMPrecomputeNewtonFactorization: integrity failure - P[i] <= 0 or Q[i] <= 0", _state);
          state->diagdq.ptr.p_double[i] = v0->q.ptr.p_double[i] / v0->p.ptr.p_double[i];
          state->diagdqi.ptr.p_double[i] = 1 / state->diagdq.ptr.p_double[i];
          state->diagdqiri.ptr.p_double[i] = 1 / (state->diagdqi.ptr.p_double[i] + regeps);
@@ -20275,14 +20275,14 @@ static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmva
    for (i = 0; i <= n - 1; i++) {
       if (state->hasgz.ptr.p_bool[i]) {
          ae_assert(!state->isfrozen.ptr.p_bool[i], "[VIPM]RunIntegrityChecks: integrity failure - X[I] is frozen", _state);
-         ae_assert(v0->g.ptr.p_double[i] > 0.0 && v0->z.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - G[i]<=0 or Z[i]<=0", _state);
+         ae_assert(v0->g.ptr.p_double[i] > 0.0 && v0->z.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - G[i] <= 0 or Z[i] <= 0", _state);
       } else {
          ae_assert(v0->g.ptr.p_double[i] == 0.0 && v0->z.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - G[i]<>0 or Z[i]<>0 for absent lower bound", _state);
          ae_assert(vd->g.ptr.p_double[i] == 0.0 && vd->z.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - G[i]<>0 or Z[i]<>0 for absent lower bound", _state);
       }
       if (state->hasts.ptr.p_bool[i]) {
          ae_assert(!state->isfrozen.ptr.p_bool[i], "[VIPM]RunIntegrityChecks: integrity failure - X[I] is frozen", _state);
-         ae_assert(v0->t.ptr.p_double[i] > 0.0 && v0->s.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - T[i]<=0 or S[i]<=0", _state);
+         ae_assert(v0->t.ptr.p_double[i] > 0.0 && v0->s.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - T[i] <= 0 or S[i] <= 0", _state);
       } else {
          ae_assert(v0->t.ptr.p_double[i] == 0.0 && v0->s.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - T[i]<>0 or S[i]<>0 for absent upper bound", _state);
          ae_assert(vd->t.ptr.p_double[i] == 0.0 && vd->s.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - T[i]<>0 or S[i]<>0 for absent upper bound", _state);
@@ -20291,13 +20291,13 @@ static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmva
    for (i = 0; i <= m - 1; i++) {
       ae_assert(state->haswv.ptr.p_bool[i] || !state->haspq.ptr.p_bool[i], "[VIPM]RunIntegrityChecks: inconsistent HasWV/HasPQ", _state);
       if (state->haswv.ptr.p_bool[i]) {
-         ae_assert(v0->v.ptr.p_double[i] > 0.0 && v0->w.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - V[i]<=0 or W[i]<=0", _state);
+         ae_assert(v0->v.ptr.p_double[i] > 0.0 && v0->w.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - V[i] <= 0 or W[i] <= 0", _state);
       } else {
          ae_assert(v0->v.ptr.p_double[i] == 0.0 && v0->w.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - V[i]<>0 or W[i]<>0 for linear equality constraint", _state);
          ae_assert(vd->v.ptr.p_double[i] == 0.0 && vd->w.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - V[i]<>0 or W[i]<>0 for linear equality constraint", _state);
       }
       if (state->haspq.ptr.p_bool[i]) {
-         ae_assert(v0->p.ptr.p_double[i] > 0.0 && v0->q.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - P[i]<=0 or Q[i]<=0", _state);
+         ae_assert(v0->p.ptr.p_double[i] > 0.0 && v0->q.ptr.p_double[i] > 0.0, "[VIPM]RunIntegrityChecks: integrity failure - P[i] <= 0 or Q[i] <= 0", _state);
       } else {
          ae_assert(v0->p.ptr.p_double[i] == 0.0 && v0->q.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - P[i]<>0 or Q[i]<>0 for absent range of linear constraint", _state);
          ae_assert(vd->p.ptr.p_double[i] == 0.0 && vd->q.ptr.p_double[i] == 0.0, "[VIPM]RunIntegrityChecks: integrity failure - P[i]<>0 or Q[i]<>0 for absent range of linear constraint", _state);
@@ -20393,7 +20393,7 @@ static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, 
       ae_trace("S (U dual mult) = ");
       tracevectorautoprec(&state->current.s, 0, n, _state);
       ae_trace("\n");
-      ae_trace("> primal slacks and dual multipliers for linear constraints, B/R stand for B<=Ax<=B+R\n");
+      ae_trace("> primal slacks and dual multipliers for linear constraints, B/R stand for B <= Ax <= B+R\n");
       ae_trace("Y (lag mult)    = ");
       tracevectorautoprec(&state->current.y, 0, m, _state);
       ae_trace("\n");
@@ -20525,7 +20525,7 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
 // GammaQ   = mu*inv(P)*e - q - inv(P)*DELTAP*deltaQ
    for (i = 0; i <= n - 1; i++) {
       if (state->hasgz.ptr.p_bool[i]) {
-         ae_assert(v0->g.ptr.p_double[i] > 0.0, "RhsCompute: G[i]<=0", _state);
+         ae_assert(v0->g.ptr.p_double[i] > 0.0, "RhsCompute: G[i] <= 0", _state);
          rhs->gammaz.ptr.p_double[i] = muestimate / v0->g.ptr.p_double[i] - v0->z.ptr.p_double[i] - direstimate->g.ptr.p_double[i] * direstimate->z.ptr.p_double[i] / v0->g.ptr.p_double[i];
       } else {
          ae_assert(v0->g.ptr.p_double[i] == 0.0, "RhsCompute: G[i]<>0 for absent constraint", _state);
@@ -20537,7 +20537,7 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
       if (state->haswv.ptr.p_bool[i]) {
 
       // Inequality/range constraint
-         ae_assert(v0->v.ptr.p_double[i] > 0.0, "RhsCompute: V[i]<=0", _state);
+         ae_assert(v0->v.ptr.p_double[i] > 0.0, "RhsCompute: V[i] <= 0", _state);
          rhs->gammaw.ptr.p_double[i] = muestimate / v0->v.ptr.p_double[i] - v0->w.ptr.p_double[i] - direstimate->v.ptr.p_double[i] * direstimate->w.ptr.p_double[i] / v0->v.ptr.p_double[i];
       } else {
 
@@ -20551,7 +20551,7 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
       if (state->hasts.ptr.p_bool[i]) {
 
       // Upper bound is present
-         ae_assert(v0->t.ptr.p_double[i] > 0.0, "RhsCompute: T[i]<=0", _state);
+         ae_assert(v0->t.ptr.p_double[i] > 0.0, "RhsCompute: T[i] <= 0", _state);
          rhs->gammas.ptr.p_double[i] = muestimate / v0->t.ptr.p_double[i] - v0->s.ptr.p_double[i] - direstimate->t.ptr.p_double[i] * direstimate->s.ptr.p_double[i] / v0->t.ptr.p_double[i];
       } else {
 
@@ -20563,7 +20563,7 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
    }
    for (i = 0; i <= m - 1; i++) {
       if (state->haspq.ptr.p_bool[i]) {
-         ae_assert(v0->p.ptr.p_double[i] > 0.0, "RhsCompute: P[i]<=0", _state);
+         ae_assert(v0->p.ptr.p_double[i] > 0.0, "RhsCompute: P[i] <= 0", _state);
          rhs->gammaq.ptr.p_double[i] = muestimate / v0->p.ptr.p_double[i] - v0->q.ptr.p_double[i] - direstimate->p.ptr.p_double[i] * direstimate->q.ptr.p_double[i] / v0->p.ptr.p_double[i];
       } else {
          ae_assert(v0->p.ptr.p_double[i] == 0.0, "RhsCompute: P[i]<>0 for absent range", _state);
@@ -24672,7 +24672,7 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
    _minlmstate_clear(state);
 
    ae_assert(ae_isfinite(diffstep, _state), "MinLMCreateV: DiffStep is not finite!", _state);
-   ae_assert(ae_fp_greater(diffstep, (double)(0)), "MinLMCreateV: DiffStep<=0!", _state);
+   ae_assert(ae_fp_greater(diffstep, (double)(0)), "MinLMCreateV: DiffStep <= 0!", _state);
    ae_assert(n >= 1, "MinLMCreateV: N<1!", _state);
    ae_assert(m >= 1, "MinLMCreateV: M<1!", _state);
    ae_assert(x->cnt >= n, "MinLMCreateV: Length(X)<N!", _state);
@@ -33218,7 +33218,7 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
    info->newm = k;
    info->oldm = k;
    for (i = 0; i <= n - 1; i++) {
-      ae_assert(s->ptr.p_double[i] > 0, "PresolveNoneScaleUser: S<=0", _state);
+      ae_assert(s->ptr.p_double[i] > 0, "PresolveNoneScaleUser: S <= 0", _state);
       ae_assert(ae_isfinite(bndl->ptr.p_double[i], _state) || ae_isneginf(bndl->ptr.p_double[i], _state), "PresolveNoneScaleUser: BndL contains NAN or +INF", _state);
       ae_assert(ae_isfinite(bndu->ptr.p_double[i], _state) || ae_isposinf(bndu->ptr.p_double[i], _state), "PresolveNoneScaleUser: BndU contains NAN or -INF", _state);
       info->colscales.ptr.p_double[i] = s->ptr.p_double[i];
@@ -33494,7 +33494,7 @@ void dsssettingsinit(dualsimplexsettings *settings, ae_state *_state) {
 void dssinit(ae_int_t n, dualsimplexstate *s, ae_state *_state) {
    ae_int_t i;
 
-   ae_assert(n > 0, "DSSInit: N<=0", _state);
+   ae_assert(n > 0, "DSSInit: N <= 0", _state);
    s->ns = n;
    s->m = 0;
    rvectorgrowto(&s->rawbndl, n, _state);
@@ -34010,7 +34010,7 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings, ae_stat
 static void reviseddualsimplex_subprobleminit(ae_int_t n, dualsimplexsubproblem *s, ae_state *_state) {
    ae_int_t i;
 
-   ae_assert(n > 0, "SubproblemInit: N<=0", _state);
+   ae_assert(n > 0, "SubproblemInit: N <= 0", _state);
    s->ns = n;
    s->m = 0;
    s->state = reviseddualsimplex_ssinvalid;
@@ -34440,7 +34440,7 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
 
 // Integrity checks
    ae_assert(s->state == reviseddualsimplex_ssvalid, "PricingStep: invalid X", _state);
-   ae_assert(m > 0, "PricingStep: M<=0", _state);
+   ae_assert(m > 0, "PricingStep: M <= 0", _state);
 
 // Timers
    t0 = 0;
@@ -34597,7 +34597,7 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
    m = s->m;
 
 // Integrity checks
-   ae_assert(m > 0, "BTranStep: M<=0", _state);
+   ae_assert(m > 0, "BTranStep: M <= 0", _state);
 
 // Timers
    t0 = 0;
@@ -34651,7 +34651,7 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
    nx = s->ns + s->m;
 
 // Integrity checks
-   ae_assert(m > 0, "BTranStep: M<=0", _state);
+   ae_assert(m > 0, "BTranStep: M <= 0", _state);
 
 // Timers
    t0 = 0;
@@ -34750,7 +34750,7 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
    m = s->m;
 
 // Integrity checks
-   ae_assert(m > 0, "BTranStep: M<=0", _state);
+   ae_assert(m > 0, "BTranStep: M <= 0", _state);
 
 // Timers
    t0 = 0;
@@ -35269,7 +35269,7 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
 
 // Integrity checks
    ae_assert(s->state == reviseddualsimplex_ssvalid, "SolveSubproblemDual: X is not valid", _state);
-   ae_assert(m > 0, "SolveSubproblemDual: M<=0", _state);
+   ae_assert(m > 0, "SolveSubproblemDual: M <= 0", _state);
    for (i = 0; i <= nx - 1; i++) {
       ae_assert(s->bndt.ptr.p_int[i] != reviseddualsimplex_ccinfeasible, "SolveSubproblemDual: infeasible box constraints", _state);
    }
@@ -35418,7 +35418,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
 
 // Integrity checks
    ae_assert(s->state == reviseddualsimplex_ssvalid, "SolveSubproblemPrimal: X is not valid", _state);
-   ae_assert(m > 0, "SolveSubproblemPrimal: M<=0", _state);
+   ae_assert(m > 0, "SolveSubproblemPrimal: M <= 0", _state);
    for (i = 0; i <= nx - 1; i++) {
       ae_assert(s->bndt.ptr.p_int[i] != reviseddualsimplex_ccinfeasible, "SolveSubproblemPrimal: infeasible box constraints", _state);
    }
@@ -35655,7 +35655,7 @@ static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplex
 
 // Integrity checks
    ae_assert(state->primary.state == reviseddualsimplex_ssvalid, "InvokePhase1: invalid primary X", _state);
-   ae_assert(m > 0, "InvokePhase1: M<=0", _state);
+   ae_assert(m > 0, "InvokePhase1: M <= 0", _state);
 
 // Is it dual feasible from the very beginning (or maybe after initial DFC)?
    if (state->dotrace) {
@@ -43567,7 +43567,7 @@ void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state 
 
    ae_assert(itscnt >= 0, "MinNLCSetAlgoAUL: negative ItsCnt", _state);
    ae_assert(ae_isfinite(rho, _state), "MinNLCSetAlgoAUL: Rho is not finite", _state);
-   ae_assert(ae_fp_greater(rho, (double)(0)), "MinNLCSetAlgoAUL: Rho<=0", _state);
+   ae_assert(ae_fp_greater(rho, (double)(0)), "MinNLCSetAlgoAUL: Rho <= 0", _state);
    if (itscnt == 0) {
       itscnt = 10;
    }
@@ -47422,7 +47422,7 @@ void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
 void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state *_state) {
 
    ae_assert(ae_isfinite(radius, _state), "MinNSSetAlgoAGS: Radius is not finite", _state);
-   ae_assert(ae_fp_greater(radius, (double)(0)), "MinNSSetAlgoAGS: Radius<=0", _state);
+   ae_assert(ae_fp_greater(radius, (double)(0)), "MinNSSetAlgoAGS: Radius <= 0", _state);
    ae_assert(ae_isfinite(penalty, _state), "MinNSSetAlgoAGS: Penalty is not finite", _state);
    ae_assert(ae_fp_greater_eq(penalty, 0.0), "MinNSSetAlgoAGS: Penalty<0", _state);
    state->agsrhononlinear = penalty;

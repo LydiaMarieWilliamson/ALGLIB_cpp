@@ -360,8 +360,8 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
    ae_assert(maxits >= 0, "PCATruncatedSubspaceSparse: maxits<0", _state);
    ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, (double)(0)), "PCATruncatedSubspaceSparse: eps<0 or is not finite", _state);
    if (npoints > 0) {
-      ae_assert(sparsegetnrows(x, _state) == npoints, "PCATruncatedSubspaceSparse: rows(x)!=npoints", _state);
-      ae_assert(sparsegetncols(x, _state) == nvars, "PCATruncatedSubspaceSparse: cols(x)!=nvars", _state);
+      ae_assert(sparsegetnrows(x, _state) == npoints, "PCATruncatedSubspaceSparse: rows(x) != npoints", _state);
+      ae_assert(sparsegetncols(x, _state) == nvars, "PCATruncatedSubspaceSparse: cols(x) != nvars", _state);
    }
 // Special case: NPoints=0
    if (npoints == 0) {
@@ -8676,7 +8676,7 @@ void clusterizersetahcalgo(clusterizerstate *s, ae_int_t algo, ae_state *_state)
 // API: void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits, const xparams _xparams = xdefault);
 void clusterizersetkmeanslimits(clusterizerstate *s, ae_int_t restarts, ae_int_t maxits, ae_state *_state) {
 
-   ae_assert(restarts >= 1, "ClusterizerSetKMeansLimits: Restarts<=0", _state);
+   ae_assert(restarts >= 1, "ClusterizerSetKMeansLimits: Restarts <= 0", _state);
    ae_assert(maxits >= 0, "ClusterizerSetKMeansLimits: MaxIts<0", _state);
    s->kmeansrestarts = restarts;
    s->kmeansmaxits = maxits;
@@ -9204,9 +9204,9 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
 
    npoints = rep->npoints;
    ae_assert(npoints >= 0, "ClusterizerGetKClusters: internal error in Rep integrity", _state);
-   ae_assert(k >= 0, "ClusterizerGetKClusters: K<=0", _state);
+   ae_assert(k >= 0, "ClusterizerGetKClusters: K <= 0", _state);
    ae_assert(k <= npoints, "ClusterizerGetKClusters: K>NPoints", _state);
-   ae_assert(k > 0 || npoints == 0, "ClusterizerGetKClusters: K<=0", _state);
+   ae_assert(k > 0 || npoints == 0, "ClusterizerGetKClusters: K <= 0", _state);
    ae_assert(npoints == rep->npoints, "ClusterizerGetKClusters: NPoints<>Rep.NPoints", _state);
 
 // Quick exit
@@ -16377,7 +16377,7 @@ void filterema(RVector *x, ae_int_t n, double alpha, ae_state *_state) {
    ae_assert(n >= 0, "FilterEMA: N<0", _state);
    ae_assert(x->cnt >= n, "FilterEMA: Length(X)<N", _state);
    ae_assert(isfinitevector(x, n, _state), "FilterEMA: X contains INF or NAN", _state);
-   ae_assert(ae_fp_greater(alpha, (double)(0)), "FilterEMA: Alpha<=0", _state);
+   ae_assert(ae_fp_greater(alpha, (double)(0)), "FilterEMA: Alpha <= 0", _state);
    ae_assert(ae_fp_less_eq(alpha, (double)(1)), "FilterEMA: Alpha>1", _state);
 
 // Quick exit, if necessary
@@ -18756,7 +18756,7 @@ static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt, ae_state
 // ALGLIB: Copyright 20.12.2017 by Sergey Bochkanov
 static void ssa_updatexxtprepare(ssamodel *s, ae_int_t updatesize, ae_int_t windowwidth, ae_int_t memorylimit, ae_state *_state) {
 
-   ae_assert(windowwidth > 0, "UpdateXXTPrepare: WinW<=0", _state);
+   ae_assert(windowwidth > 0, "UpdateXXTPrepare: WinW <= 0", _state);
    s->uxbatchlimit = ae_maxint(updatesize, 1, _state);
    if (memorylimit > 0) {
       s->uxbatchlimit = ae_minint(s->uxbatchlimit, ae_maxint(memorylimit / windowwidth, 4 * windowwidth, _state), _state);
@@ -19426,7 +19426,7 @@ void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s, ae_state *_s
 
    ae_assert(n >= 2, "MCPDCreateEntry: N<2", _state);
    ae_assert(entrystate >= 0, "MCPDCreateEntry: EntryState<0", _state);
-   ae_assert(entrystate < n, "MCPDCreateEntry: EntryState>=N", _state);
+   ae_assert(entrystate < n, "MCPDCreateEntry: EntryState >= N", _state);
    mcpd_mcpdinit(n, entrystate, -1, s, _state);
 }
 
@@ -19479,7 +19479,7 @@ void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s, ae_state *_sta
 
    ae_assert(n >= 2, "MCPDCreateExit: N<2", _state);
    ae_assert(exitstate >= 0, "MCPDCreateExit: ExitState<0", _state);
-   ae_assert(exitstate < n, "MCPDCreateExit: ExitState>=N", _state);
+   ae_assert(exitstate < n, "MCPDCreateExit: ExitState >= N", _state);
    mcpd_mcpdinit(n, -1, exitstate, s, _state);
 }
 
@@ -19543,9 +19543,9 @@ void mcpdcreateentryexit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mc
 
    ae_assert(n >= 2, "MCPDCreateEntryExit: N<2", _state);
    ae_assert(entrystate >= 0, "MCPDCreateEntryExit: EntryState<0", _state);
-   ae_assert(entrystate < n, "MCPDCreateEntryExit: EntryState>=N", _state);
+   ae_assert(entrystate < n, "MCPDCreateEntryExit: EntryState >= N", _state);
    ae_assert(exitstate >= 0, "MCPDCreateEntryExit: ExitState<0", _state);
-   ae_assert(exitstate < n, "MCPDCreateEntryExit: ExitState>=N", _state);
+   ae_assert(exitstate < n, "MCPDCreateEntryExit: ExitState >= N", _state);
    ae_assert(entrystate != exitstate, "MCPDCreateEntryExit: EntryState=ExitState", _state);
    mcpd_mcpdinit(n, entrystate, exitstate, s, _state);
 }
@@ -19753,9 +19753,9 @@ void mcpdsetec(mcpdstate *s, RMatrix *ec, ae_state *_state) {
 void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c, ae_state *_state) {
 
    ae_assert(i >= 0, "MCPDAddEC: I<0", _state);
-   ae_assert(i < s->n, "MCPDAddEC: I>=N", _state);
+   ae_assert(i < s->n, "MCPDAddEC: I >= N", _state);
    ae_assert(j >= 0, "MCPDAddEC: J<0", _state);
-   ae_assert(j < s->n, "MCPDAddEC: J>=N", _state);
+   ae_assert(j < s->n, "MCPDAddEC: J >= N", _state);
    ae_assert(ae_isnan(c, _state) || ae_isfinite(c, _state), "MCPDAddEC: C is not finite number or NAN", _state);
    s->ec.ptr.pp_double[i][j] = c;
 }
@@ -19873,9 +19873,9 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu, ae_state *_state) {
 void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu, ae_state *_state) {
 
    ae_assert(i >= 0, "MCPDAddBC: I<0", _state);
-   ae_assert(i < s->n, "MCPDAddBC: I>=N", _state);
+   ae_assert(i < s->n, "MCPDAddBC: I >= N", _state);
    ae_assert(j >= 0, "MCPDAddBC: J<0", _state);
-   ae_assert(j < s->n, "MCPDAddBC: J>=N", _state);
+   ae_assert(j < s->n, "MCPDAddBC: J >= N", _state);
    ae_assert(ae_isfinite(bndl, _state) || ae_isneginf(bndl, _state), "MCPDAddBC: BndL is NAN or +INF", _state);
    ae_assert(ae_isfinite(bndu, _state) || ae_isposinf(bndu, _state), "MCPDAddBC: BndU is NAN or -INF", _state);
    s->bndl.ptr.pp_double[i][j] = bndl;
@@ -23757,7 +23757,7 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints, ae_state *_stat
    ae_int_t i;
    ae_int_t j;
 
-   ae_assert(s->nin >= 1, "MLPSetDataset: possible parameter S is not initialized or spoiled(S.NIn<=0).", _state);
+   ae_assert(s->nin >= 1, "MLPSetDataset: possible parameter S is not initialized or spoiled(S.NIn <= 0).", _state);
    ae_assert(npoints >= 0, "MLPSetDataset: NPoint<0", _state);
    ae_assert(npoints <= xy->rows, "MLPSetDataset: invalid size of matrix XY(NPoint more then rows of matrix XY)", _state);
    s->datatype = 0;
@@ -23776,7 +23776,7 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints, ae_state *_stat
       ae_assert(ndim <= xy->cols, "MLPSetDataset: invalid size of matrix XY(too few columns in matrix XY).", _state);
       ae_assert(apservisfinitematrix(xy, npoints, ndim, _state), "MLPSetDataset: parameter XY contains Infinite or NaN.", _state);
       for (i = 0; i <= npoints - 1; i++) {
-         ae_assert(ae_round(xy->ptr.pp_double[i][s->nin], _state) >= 0 && ae_round(xy->ptr.pp_double[i][s->nin], _state) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn]>=NClasses).", _state);
+         ae_assert(ae_round(xy->ptr.pp_double[i][s->nin], _state) >= 0 && ae_round(xy->ptr.pp_double[i][s->nin], _state) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).", _state);
       }
    }
    rmatrixsetlengthatleast(&s->densexy, npoints, ndim, _state);
@@ -23827,7 +23827,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints, ae_s
    ae_int_t j;
 
 // Check correctness of the data
-   ae_assert(s->nin > 0, "MLPSetSparseDataset: possible parameter S is not initialized or spoiled(S.NIn<=0).", _state);
+   ae_assert(s->nin > 0, "MLPSetSparseDataset: possible parameter S is not initialized or spoiled(S.NIn <= 0).", _state);
    ae_assert(npoints >= 0, "MLPSetSparseDataset: NPoint<0", _state);
    ae_assert(npoints <= sparsegetnrows(xy, _state), "MLPSetSparseDataset: invalid size of sparse matrix XY(NPoint more then rows of matrix XY)", _state);
    if (npoints > 0) {
@@ -23849,7 +23849,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints, ae_s
                if (j != s->nin) {
                   ae_assert(ae_isfinite(v, _state), "MLPSetSparseDataset: sparse matrix XY contains Infinite or NaN.", _state);
                } else {
-                  ae_assert((ae_isfinite(v, _state) && ae_round(v, _state) >= 0) && ae_round(v, _state) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn]>=NClasses).", _state);
+                  ae_assert((ae_isfinite(v, _state) && ae_round(v, _state) >= 0) && ae_round(v, _state) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).", _state);
                }
             }
          }

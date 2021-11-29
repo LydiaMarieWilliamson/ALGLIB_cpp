@@ -93,7 +93,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
    ae_int_t b;
    ae_int_t result;
 
-   ae_assert(n > 0, "HQRNDUniformI: N<=0!", _state);
+   ae_assert(n > 0, "HQRNDUniformI: N <= 0!", _state);
    maxcnt = hqrnd_hqrndmax + 1;
 
 // Two branches: one for N <= MaxCnt, another for N>MaxCnt.
@@ -311,7 +311,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
    double result;
 
-   ae_assert(ae_fp_greater(lambdav, (double)(0)), "HQRNDExponential: LambdaV<=0!", _state);
+   ae_assert(ae_fp_greater(lambdav, (double)(0)), "HQRNDExponential: LambdaV <= 0!", _state);
    result = -ae_log(hqrnduniformr(state, _state), _state) / lambdav;
    return result;
 }
@@ -332,7 +332,7 @@ double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state) {
    double result;
 
-   ae_assert(n > 0, "HQRNDDiscrete: N<=0", _state);
+   ae_assert(n > 0, "HQRNDDiscrete: N <= 0", _state);
    ae_assert(n <= x->cnt, "HQRNDDiscrete: Length(X)<N", _state);
    result = x->ptr.p_double[hqrnduniformi(state, n, _state)];
    return result;
@@ -360,7 +360,7 @@ double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_sta
    ae_int_t i;
    double result;
 
-   ae_assert(n > 0, "HQRNDContinuous: N<=0", _state);
+   ae_assert(n > 0, "HQRNDContinuous: N <= 0", _state);
    ae_assert(n <= x->cnt, "HQRNDContinuous: Length(X)<N", _state);
    if (n == 1) {
       result = x->ptr.p_double[0];

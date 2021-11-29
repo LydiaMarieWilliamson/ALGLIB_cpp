@@ -359,8 +359,8 @@ In particular, it will work under any POSIX-compatible OS and under Windows.
 
 <p>
 If you want to use multithreaded capabilities of the <i>commercial</i> version of ALGLIB,
-you should compile it in OS-specific mode by #defining either <code>AE_OS=AE_WINDOWS</code>
-or <code>AE_OS=AE_POSIX</code> at compile time, depending on OS being used.
+you should compile it in OS-specific mode by #defining either <code>AE_OS = AE_POSIX</code>
+or <code>AE_OS = AE_WINDOWS</code> at compile time, depending on OS being used.
 Former corresponds to any modern OS (32/64-bit Windows XP and later) from Windows family,
 while latter means almost any POSIX-compatible OS.
 It applies only to commercial version of ALGLIB.
@@ -515,7 +515,7 @@ This feature is absent in the Free Edition.
 
 <p>
 Presently ALGLIB supports only x86/x64 SIMD, including SSE2, AVX2 and FMA instruction sets.
-This support can be activated by compiling ALGLIB with <code>AE_CPU=AE_INTEL</code> macro symbol being #defined at the global level.
+This support can be activated by compiling ALGLIB with <code>AE_CPU = AE_INTEL</code> macro symbol being #defined at the global level.
 Sections below discuss how to compile ALGLIB in order to get the fastest executable possible or, alternatively, to get the most portable one.
 </p>
 
@@ -533,7 +533,7 @@ In order to do so, two steps are necessary:
 </p>
 
 <ul>
-<li>#define <code>AE_CPU=AE_INTEL</code> preprocessor symbol at the global level</li>
+<li>#define <code>AE_CPU = AE_INTEL</code> preprocessor symbol at the global level</li>
 <li>compile all ALGLIB sources with SSE2/AVX2/FMA compiler switches</li>
 </ul>
 
@@ -571,7 +571,7 @@ If one needs a SIMD-capable application with portability guarantees, one has to:
 </p>
 
 <ul>
-<li>#define <code>AE_CPU=AE_INTEL</code> preprocessor symbol at the global level</li>
+<li>#define <code>AE_CPU = AE_INTEL</code> preprocessor symbol at the global level</li>
 <li>compile <code>KernelsFma.cpp</code> with SSE2/AVX2/FMA support enabled at the compiler level</li>
 <li>compile <code>KernelsAvx2.cpp</code> with SSE2/AVX2 support enabled</li>
 <li>compile <code>KernelsSse2.cpp</code> with SSE2 support enabled</li>
@@ -594,7 +594,7 @@ Most often it happens when one has to compile ALGLIB using some <i>really</i> ou
 </p>
 
 <p>
-It is possible to selectively disable a SIMD instruction set of your choice by combining <code>AE_CPU=AE_INTEL</code> #definition with one of the following #defines:
+It is possible to selectively disable a SIMD instruction set of your choice by combining <code>AE_CPU = AE_INTEL</code> #definition with one of the following #defines:
 </p>
 
 <ul>
@@ -607,8 +607,8 @@ It is possible to selectively disable a SIMD instruction set of your choice by c
 
 <p>
 If you want to use multithreaded capabilities of the <i>Commercial</i> Edition,
-you should compile it in the OS-specific mode by #defining either <code>AE_OS=AE_WINDOWS</code>,
-<code>AE_OS=AE_POSIX</code> or <code>AE_OS=AE_LINUX</code> (POSIX with Linux-specific extensions) at compile time,
+you should compile it in the OS-specific mode by #defining either <code>AE_OS = AE_POSIX</code>,
+<code>AE_OS = AE_WINDOWS</code> or <code>AE_OS = AE_LINUX</code> (POSIX with Linux-specific extensions) at compile time,
 depending on the OS being used.
 The former corresponds to any modern OS (32/64-bit Windows XP and later) from Windows family,
 while the latter means almost any POSIX-compatible OS (or any OS from the Linux family).
@@ -741,7 +741,7 @@ Performance is 0.9 GFLOPS
 </pre>
 
 <p>
-Still not impressed. Let's turn on optimizations for x86 architecture: define <code>AE_CPU=AE_INTEL</code>, add <code>/arch:AVX2</code>.
+Still not impressed. Let's turn on optimizations for x86 architecture: define <code>AE_CPU = AE_INTEL</code>, add <code>/arch:AVX2</code>.
 This option provides some speed-up in both free and commercial editions of ALGLIB.
 </p>
 
@@ -756,7 +756,7 @@ Performance is 4.5 GFLOPS
 
 <p>
 It is good, but we have 4 cores - and only one of them was used.
-Defining <code>AE_OS=AE_WINDOWS</code> allows ALGLIB to use Windows threads to parallelize execution of some functions.
+Defining <code>AE_OS = AE_WINDOWS</code> allows ALGLIB to use Windows threads to parallelize execution of some functions.
 Starting from this moment, our example applies only to Commercial Edition.
 </p>
 
@@ -907,7 +907,7 @@ Performance is 2.8 GFLOPS
 </pre>
 
 <p>
-Better, but not impressed. Let's turn on optimizations for x86 architecture: define <code>AE_CPU=AE_INTEL</code>, add <code>-mavx2 -mfma</code>.
+Better, but not impressed. Let's turn on optimizations for x86 architecture: define <code>AE_CPU = AE_INTEL</code>, add <code>-mavx2 -mfma</code>.
 This option provides some speed-up in both free and commercial editions of ALGLIB.
 </p>
 
@@ -922,7 +922,7 @@ Performance is 5.0 GFLOPS
 
 <p>
 It is good, but we have 4 cores (in fact, 2 cores - it is 2-way hyperthreaded system) and only one of them was used.
-Defining <code>AE_OS=AE_POSIX</code> allows ALGLIB to use POSIX threads to parallelize execution of some functions.
+Defining <code>AE_OS = AE_POSIX</code> allows ALGLIB to use POSIX threads to parallelize execution of some functions.
 You should also specify <code>-pthread</code> flag to link with <i>pthreads</i> standard library.
 Starting from this moment, our example applies only to Commercial Edition.
 </p>
@@ -1579,7 +1579,7 @@ From the other side, if you do not activate this feature, your code will be port
 
 <p>
 In order to turn on x86-specific optimizations,
-you should define <code>AE_CPU=AE_INTEL</code> preprocessor definition at global level.
+you should define <code>AE_CPU = AE_INTEL</code> preprocessor definition at global level.
 It will tell ALGLIB to use SIMD intrinsics supported by GCC, MSVC and Intel compilers.
 Additionally you should tell compiler to generate SIMD-capable code.
 It can be done in the project settings of your IDE or in the command line:
@@ -1634,8 +1634,8 @@ Let explain it in more details...
 <p>
 <b>1</b>.
 You should compile ALGLIB in OS-specific mode by #defining either
-<code>AE_OS=AE_WINDOWS</code> or <code>AE_OS=AE_POSIX</code>
-(or <code>AE_OS=AE_LINUX</code>, which means "POSIX with Linux extensions") at compile time,
+<code>AE_OS = AE_POSIX</code> or <code>AE_OS = AE_WINDOWS</code>
+(or <code>AE_OS = AE_LINUX</code>, which means "POSIX with Linux extensions") at compile time,
 depending on OS being used.
 Former corresponds to any modern OS (32/64-bit Windows XP and later) from Windows family,
 while latter two mean almost any POSIX-compatible OS or any OS from the Linux family.
@@ -1788,10 +1788,10 @@ In order to activate MKL extensions you should:
 #define globally <code>AE_MKL</code> to activate ALGLIB-MKL connection.
 </li>
 <li>
-additionally, #define globally <code>AE_OS=AE_WINDOWS</code> or <code>AE_OS=AE_POSIX</code> to activate multithreading capabilities
+additionally, #define globally <code>AE_OS = AE_POSIX</code> or <code>AE_OS = AE_WINDOWS</code> to activate multithreading capabilities
 </li>
 <li>
-additionally, #define globally <code>AE_CPU=AE_INTEL</code> to use SIMD instructions provided by x86/x64 CPU's in the rest of ALGLIB
+additionally, #define globally <code>AE_CPU = AE_INTEL</code> to use SIMD instructions provided by x86/x64 CPU's in the rest of ALGLIB
 </li>
 <li>
 Depending on your OS, perform one of the following:<br>
@@ -1814,7 +1814,7 @@ Several examples of ALGLIB+MKL usage are given in the <a href='#gs_compile_examp
 If you bought separate license for Intel MKL, and want  to  use  your  own
 installation  of  MKL  -  and  not our lightweight distribution - then you
 should compile ALGLIB as it was told in the previous section, with all necessary preprocessor definitions
-(AE_OS=AE_WINDOWS or AE_OS=AE_POSIX, AE_CPU=AE_INTEL and AE_MKL defined).
+(AE_OS = AE_POSIX or AE_OS = AE_WINDOWS, AE_CPU = AE_INTEL and AE_MKL defined).
 But instead of linking with MKL Extensions binary,
 you should add to your project <code>alglib2mkl.c</code> file from <code>addons-mkl</code> directory
 and compile it (as C file) along with the rest of ALGLIB.
@@ -1876,7 +1876,7 @@ Exception-free method of reporting critical errors can be activated by #defining
 
 <ul>
 <li><code>AE_NO_EXCEPTIONS</code> - to switch from exception-based to exception-free code</li>
-<li><code>AE_THREADING=AE_SERIAL_UNSAFE</code> - to confirm that you are aware of limitations associated
+<li><code>AE_THREADING = AE_SERIAL_UNSAFE</code> - to confirm that you are aware of limitations associated
 with exception-free mode (it does not support multithreading)</li>
 </ul>
 
@@ -36012,8 +36012,8 @@ using namespace alglib;
 <font color=navy>// In order to use multithreading, you have to:</font>
 <font color=navy>// 1) Install SMP edition of ALGLIB.</font>
 <font color=navy>// 2) This step is specific <b>for</b> C++ users: you should activate OS-specific</font>
-<font color=navy>//    capabilities of ALGLIB by defining AE_OS=AE_POSIX (<b>for</b> *nix systems)</font>
-<font color=navy>//    or AE_OS=AE_WINDOWS (<b>for</b> Windows systems).</font>
+<font color=navy>//    capabilities of ALGLIB by defining AE_OS = AE_POSIX (<b>for</b> *nix systems)</font>
+<font color=navy>//    or AE_OS = AE_WINDOWS (<b>for</b> Windows systems).</font>
 <font color=navy>//    C# users <b>do</b> not have to perform this step because C# programs are</font>
 <font color=navy>//    portable across different systems without OS-specific tuning.</font>
 <font color=navy>// 3) Tell ALGLIB that you want it to use multithreading by means of</font>
