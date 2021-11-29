@@ -208,95 +208,39 @@ void _scomplexarray_destroy(void *_p);
 namespace alglib_impl {
 #ifdef ALGLIB_NO_FAST_KERNELS
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rdotv2(ae_int_t n, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void raddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rmaxv(ae_int_t n, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void rsetallocv(ae_int_t n, double v, RVector *x, ae_state *_state);
 void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
 void rallocv(ae_int_t n, RVector *x, ae_state *_state);
@@ -307,17 +251,13 @@ void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
 void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void rcopyallocv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state);
 void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state);
@@ -325,42 +265,28 @@ void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
 void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void igrowv(ae_int_t newn, ZVector *x, ae_state *_state);
 void rgrowv(ae_int_t newn, RVector *x, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t cidx, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 void rcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j, ae_state *_state);
 void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state);
-#endif
-#ifdef ALGLIB_NO_FAST_KERNELS
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double ralpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
 bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
 bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);

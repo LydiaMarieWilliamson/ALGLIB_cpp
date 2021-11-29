@@ -11,20 +11,8 @@
 //	See the GNU General Public License for more details.
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
-#ifdef _MSC_VER
-#   define _CRT_SECURE_NO_WARNINGS
-#endif
-#include "stdafx.h"
+#define InAlgLib
 #include "Optimization.h"
-
-// disable some irrelevant warnings
-#if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)
-#   pragma warning(disable:4100)
-#   pragma warning(disable:4127)
-#   pragma warning(disable:4611)
-#   pragma warning(disable:4702)
-#   pragma warning(disable:4996)
-#endif
 
 // === OPTGUARDAPI Package ===
 // Depends on: (AlgLibInternal) APSERV
@@ -5711,7 +5699,7 @@ void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5725,7 +5713,7 @@ void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -5750,7 +5738,7 @@ void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5764,7 +5752,7 @@ void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x,
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -5789,7 +5777,7 @@ void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5809,7 +5797,7 @@ void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5829,7 +5817,7 @@ void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5849,7 +5837,7 @@ void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5869,7 +5857,7 @@ void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams) 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5889,7 +5877,7 @@ void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5909,7 +5897,7 @@ void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5929,7 +5917,7 @@ void minlbfgssetprecscale(const minlbfgsstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -5949,7 +5937,7 @@ bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6014,7 +6002,7 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6045,7 +6033,7 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6077,7 +6065,7 @@ void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6097,7 +6085,7 @@ void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6111,7 +6099,7 @@ void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -6136,7 +6124,7 @@ void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6156,7 +6144,7 @@ void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6176,7 +6164,7 @@ void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6196,7 +6184,7 @@ void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsrepor
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6216,7 +6204,7 @@ void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsre
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6236,7 +6224,7 @@ void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -6256,7 +6244,7 @@ void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16476,7 +16464,7 @@ void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &sta
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16490,7 +16478,7 @@ void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &sta
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16515,7 +16503,7 @@ void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diff
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16529,7 +16517,7 @@ void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diff
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16554,7 +16542,7 @@ void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16574,7 +16562,7 @@ void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const int
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16588,7 +16576,7 @@ void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const int
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16614,7 +16602,7 @@ void minbleicsetcond(const minbleicstate &state, const double epsg, const double
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16634,7 +16622,7 @@ void minbleicsetscale(const minbleicstate &state, const real_1d_array &s, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16654,7 +16642,7 @@ void minbleicsetprecdefault(const minbleicstate &state, const xparams _xparams) 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16674,7 +16662,7 @@ void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16694,7 +16682,7 @@ void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16714,7 +16702,7 @@ void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16734,7 +16722,7 @@ void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16754,7 +16742,7 @@ bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16819,7 +16807,7 @@ void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16850,7 +16838,7 @@ void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16882,7 +16870,7 @@ void minbleicoptguardgradient(const minbleicstate &state, const double teststep,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16902,7 +16890,7 @@ void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16916,7 +16904,7 @@ void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16941,7 +16929,7 @@ void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16961,7 +16949,7 @@ void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16981,7 +16969,7 @@ void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17001,7 +16989,7 @@ void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicrepor
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17021,7 +17009,7 @@ void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicre
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17041,7 +17029,7 @@ void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17061,7 +17049,7 @@ void minbleicrequesttermination(const minbleicstate &state, const xparams _xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -23881,7 +23869,7 @@ void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -23901,7 +23889,7 @@ void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -23921,7 +23909,7 @@ void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -23935,7 +23923,7 @@ void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -23961,7 +23949,7 @@ void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -23981,7 +23969,7 @@ void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24001,7 +23989,7 @@ void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24021,7 +24009,7 @@ void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24041,7 +24029,7 @@ void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24061,7 +24049,7 @@ void minqpsetalgobleic(const minqpstate &state, const double epsg, const double 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24081,7 +24069,7 @@ void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const doub
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24101,7 +24089,7 @@ void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24121,7 +24109,7 @@ void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24141,7 +24129,7 @@ void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24161,7 +24149,7 @@ void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24181,7 +24169,7 @@ void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24201,7 +24189,7 @@ void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24221,7 +24209,7 @@ void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24235,7 +24223,7 @@ void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -24261,7 +24249,7 @@ void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const inte
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24281,7 +24269,7 @@ void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24301,7 +24289,7 @@ void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24321,7 +24309,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24335,7 +24323,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -24361,7 +24349,7 @@ void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_a
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24381,7 +24369,7 @@ void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24401,7 +24389,7 @@ void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24421,7 +24409,7 @@ void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const re
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24441,7 +24429,7 @@ void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24461,7 +24449,7 @@ void minqpoptimize(const minqpstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24481,7 +24469,7 @@ void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -24501,7 +24489,7 @@ void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27494,7 +27482,7 @@ void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, m
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27508,7 +27496,7 @@ void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, m
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -27533,7 +27521,7 @@ void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27547,7 +27535,7 @@ void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -27572,7 +27560,7 @@ void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27586,7 +27574,7 @@ void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state,
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -27611,7 +27599,7 @@ void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t max
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27631,7 +27619,7 @@ void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27651,7 +27639,7 @@ void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27671,7 +27659,7 @@ void minlmsetscale(const minlmstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27691,7 +27679,7 @@ void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27711,7 +27699,7 @@ void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27725,7 +27713,7 @@ void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -27751,7 +27739,7 @@ void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27771,7 +27759,7 @@ bool minlmiteration(const minlmstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27825,7 +27813,7 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27856,7 +27844,7 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27892,7 +27880,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27933,7 +27921,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27969,7 +27957,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28011,7 +27999,7 @@ void minlmoptguardgradient(const minlmstate &state, const double teststep, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28031,7 +28019,7 @@ void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28051,7 +28039,7 @@ void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28071,7 +28059,7 @@ void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28091,7 +28079,7 @@ void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28111,7 +28099,7 @@ void minlmrequesttermination(const minlmstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28131,7 +28119,7 @@ void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28145,7 +28133,7 @@ void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -28170,7 +28158,7 @@ void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28184,7 +28172,7 @@ void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -28209,7 +28197,7 @@ void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, m
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -28223,7 +28211,7 @@ void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, m
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -30087,7 +30075,7 @@ void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30101,7 +30089,7 @@ void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -30126,7 +30114,7 @@ void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30140,7 +30128,7 @@ void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -30165,7 +30153,7 @@ void mincgsetcond(const mincgstate &state, const double epsg, const double epsf,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30185,7 +30173,7 @@ void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30205,7 +30193,7 @@ void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30225,7 +30213,7 @@ void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30245,7 +30233,7 @@ void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30265,7 +30253,7 @@ void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30285,7 +30273,7 @@ void mincgsetprecdefault(const mincgstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30305,7 +30293,7 @@ void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30325,7 +30313,7 @@ void mincgsetprecscale(const mincgstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30345,7 +30333,7 @@ bool mincgiteration(const mincgstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30410,7 +30398,7 @@ void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30441,7 +30429,7 @@ void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30473,7 +30461,7 @@ void mincgoptguardgradient(const mincgstate &state, const double teststep, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30493,7 +30481,7 @@ void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30507,7 +30495,7 @@ void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -30532,7 +30520,7 @@ void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30552,7 +30540,7 @@ void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30572,7 +30560,7 @@ void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30592,7 +30580,7 @@ void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30612,7 +30600,7 @@ void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30632,7 +30620,7 @@ void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -30652,7 +30640,7 @@ void mincgrequesttermination(const mincgstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39318,7 +39306,7 @@ void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39338,7 +39326,7 @@ void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39358,7 +39346,7 @@ void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39372,7 +39360,7 @@ void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _x
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlpsetalgoipm(const minlpstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -39397,7 +39385,7 @@ void minlpsetcost(const minlpstate &state, const real_1d_array &c, const xparams
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39417,7 +39405,7 @@ void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39437,7 +39425,7 @@ void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39457,7 +39445,7 @@ void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39477,7 +39465,7 @@ void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39497,7 +39485,7 @@ void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39511,7 +39499,7 @@ void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -39537,7 +39525,7 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39551,7 +39539,7 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -39577,7 +39565,7 @@ void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_a
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39597,7 +39585,7 @@ void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39617,7 +39605,7 @@ void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const re
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39637,7 +39625,7 @@ void minlpoptimize(const minlpstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39657,7 +39645,7 @@ void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -39677,7 +39665,7 @@ void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46200,7 +46188,7 @@ void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46214,7 +46202,7 @@ void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -46239,7 +46227,7 @@ void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffst
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46253,7 +46241,7 @@ void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffst
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -46278,7 +46266,7 @@ void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46298,7 +46286,7 @@ void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46312,7 +46300,7 @@ void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -46338,7 +46326,7 @@ void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46358,7 +46346,7 @@ void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t m
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46378,7 +46366,7 @@ void minnlcsetscale(const minnlcstate &state, const real_1d_array &s, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46398,7 +46386,7 @@ void minnlcsetprecinexact(const minnlcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46418,7 +46406,7 @@ void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefr
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46438,7 +46426,7 @@ void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefre
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46458,7 +46446,7 @@ void minnlcsetprecnone(const minnlcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46478,7 +46466,7 @@ void minnlcsetstpmax(const minnlcstate &state, const double stpmax, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46498,7 +46486,7 @@ void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46518,7 +46506,7 @@ void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46538,7 +46526,7 @@ void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46558,7 +46546,7 @@ void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46578,7 +46566,7 @@ bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46640,7 +46628,7 @@ void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, rea
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46671,7 +46659,7 @@ void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46703,7 +46691,7 @@ void minnlcoptguardgradient(const minnlcstate &state, const double teststep, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46723,7 +46711,7 @@ void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46737,7 +46725,7 @@ void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -46762,7 +46750,7 @@ void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46782,7 +46770,7 @@ void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46802,7 +46790,7 @@ void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46822,7 +46810,7 @@ void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46842,7 +46830,7 @@ void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46862,7 +46850,7 @@ void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams) 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -46882,7 +46870,7 @@ void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49544,7 +49532,7 @@ void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49558,7 +49546,7 @@ void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -49583,7 +49571,7 @@ void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49597,7 +49585,7 @@ void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -49622,7 +49610,7 @@ void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49642,7 +49630,7 @@ void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49656,7 +49644,7 @@ void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -49682,7 +49670,7 @@ void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49702,7 +49690,7 @@ void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t max
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49722,7 +49710,7 @@ void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49742,7 +49730,7 @@ void minnssetalgoags(const minnsstate &state, const double radius, const double 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49762,7 +49750,7 @@ void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49782,7 +49770,7 @@ void minnsrequesttermination(const minnsstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49802,7 +49790,7 @@ bool minnsiteration(const minnsstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49864,7 +49852,7 @@ void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49895,7 +49883,7 @@ void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49927,7 +49915,7 @@ void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49947,7 +49935,7 @@ void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -49967,7 +49955,7 @@ void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51100,7 +51088,7 @@ void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51120,7 +51108,7 @@ void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51140,7 +51128,7 @@ void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51160,7 +51148,7 @@ void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51180,7 +51168,7 @@ void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51194,7 +51182,7 @@ void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -51220,7 +51208,7 @@ void minasasetcond(const minasastate &state, const double epsg, const double eps
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51240,7 +51228,7 @@ void minasasetxrep(const minasastate &state, const bool needxrep, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51260,7 +51248,7 @@ void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51280,7 +51268,7 @@ void minasasetstpmax(const minasastate &state, const double stpmax, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51300,7 +51288,7 @@ bool minasaiteration(const minasastate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51331,7 +51319,7 @@ void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51363,7 +51351,7 @@ void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51383,7 +51371,7 @@ void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -51403,7 +51391,7 @@ void minasarestartfrom(const minasastate &state, const real_1d_array &x, const r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53614,7 +53602,7 @@ void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53628,7 +53616,7 @@ void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, co
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -53653,7 +53641,7 @@ void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53667,7 +53655,7 @@ void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffste
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -53692,7 +53680,7 @@ void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53712,7 +53700,7 @@ void minbcsetcond(const minbcstate &state, const double epsg, const double epsf,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53732,7 +53720,7 @@ void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53752,7 +53740,7 @@ void minbcsetprecdefault(const minbcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53772,7 +53760,7 @@ void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53792,7 +53780,7 @@ void minbcsetprecscale(const minbcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53812,7 +53800,7 @@ void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53832,7 +53820,7 @@ void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53852,7 +53840,7 @@ bool minbciteration(const minbcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53917,7 +53905,7 @@ void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53948,7 +53936,7 @@ void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -53980,7 +53968,7 @@ void minbcoptguardgradient(const minbcstate &state, const double teststep, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54000,7 +53988,7 @@ void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54014,7 +54002,7 @@ void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -54039,7 +54027,7 @@ void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54059,7 +54047,7 @@ void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54079,7 +54067,7 @@ void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54099,7 +54087,7 @@ void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54119,7 +54107,7 @@ void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54139,7 +54127,7 @@ void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54159,7 +54147,7 @@ void minbcrequesttermination(const minbcstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54434,7 +54422,7 @@ void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -54462,7 +54450,7 @@ void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -54488,7 +54476,7 @@ void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -54510,7 +54498,7 @@ void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -54531,7 +54519,7 @@ void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const doub
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54551,7 +54539,7 @@ void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54571,7 +54559,7 @@ void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54591,7 +54579,7 @@ void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54611,7 +54599,7 @@ void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const re
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -54631,7 +54619,7 @@ void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);

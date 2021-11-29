@@ -1,12 +1,10 @@
-#include "stdafx.h"
 #include <sstream>
-#include <math.h>
 #include "DataAnalysis.h"
 #include "Interpolation.h"
-#if AE_OS==AE_WINDOWS
-#   include <windows.h>
-#elif AE_OS==AE_POSIX
+#if AE_OS == AE_POSIX
 #   include <pthread.h>
+#elif AE_OS == AE_WINDOWS
+#   include <windows.h>
 #endif
 
 using namespace alglib;
@@ -247,7 +245,7 @@ void file_put_contents(const char *filename, const char *contents) {
    fclose(f);
 }
 
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_POSIX
 struct async_rbf_record {
    rbfmodel *p_model;
    rbfreport *p_report;
@@ -259,7 +257,7 @@ DWORD WINAPI async_build_rbf_model(LPVOID T) {
    p->thread_finished = true;
    return 0;
 }
-#elif AE_OS==AE_POSIX
+#elif AE_OS == AE_WINDOWS
 struct async_rbf_record {
    rbfmodel *p_model;
    rbfreport *p_report;
@@ -1743,7 +1741,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    }
    {
       bool passed = true;
-#if (AE_OS==AE_WINDOWS) || AE_OS==AE_POSIX
+#if AE_OS == AE_POSIX || AE_OS == AE_WINDOWS
       hqrndstate rs;
       rbfmodel rbf;
       rbfreport rep;
@@ -1764,16 +1762,16 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
-#   if AE_OS==AE_WINDOWS
-      if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
+#   if AE_OS == AE_POSIX
+      pthread_t thread;
+      if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
          printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
          return 1;
       }
-#   elif AE_OS==AE_POSIX
-      pthread_t thread;
-      if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
+#   elif AE_OS == AE_WINDOWS
+      if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
          printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
          printf(">>> unable to create background thread\n");
          fflush(stdout);

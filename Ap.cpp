@@ -11,16 +11,13 @@
 //	See the GNU General Public License for more details.
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
-#ifdef _MSC_VER
-#   define _CRT_SECURE_NO_WARNINGS
-#endif
-#include "stdafx.h"
+#define InAlgLib
 
 // if AE_OS == AE_LINUX (will be redefined to AE_POSIX in Ap.h),
 // set _GNU_SOURCE flag BEFORE any #includes to get affinity
 // management functions
 //
-#if (AE_OS==AE_LINUX) && !defined(_GNU_SOURCE)
+#if AE_OS == AE_LINUX && !defined _GNU_SOURCE
 #   define _GNU_SOURCE
 #endif
 
@@ -31,36 +28,25 @@
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 
 #include "Ap.h"
-#if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#if defined _ALGLIB_HAS_SSE2_INTRINSICS
 #   include "KernelsSse2.h"
 #endif
-#if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#if defined _ALGLIB_HAS_AVX2_INTRINSICS
 #   include "KernelsAvx2.h"
 #endif
-#if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#if defined _ALGLIB_HAS_FMA_INTRINSICS
 #   include "KernelsFma.h"
 #endif
 #include <limits>
 #include <locale.h>
 #include <ctype.h>
-
-#if defined(AE_CPU)
-#   if (AE_CPU==AE_INTEL)
-
-#      if AE_COMPILER==AE_MSVC
+#if defined AE_CPU
+#   if (AE_CPU == AE_INTEL)
+#      if AE_COMPILER == AE_MSVC
 #         include <intrin.h>
 #      endif
 
 #   endif
-#endif
-
-// disable some irrelevant warnings
-#if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)
-#   pragma warning(disable:4100)
-#   pragma warning(disable:4127)
-#   pragma warning(disable:4611)
-#   pragma warning(disable:4702)
-#   pragma warning(disable:4996)
 #endif
 
 namespace alglib_impl {
@@ -69,18 +55,18 @@ namespace alglib_impl {
 #ifdef AE_USE_CPP
 } // end of namespace alglib_impl
 #endif
-#if AE_OS==AE_WINDOWS || defined(AE_DEBUG4WINDOWS)
-#   ifndef _WIN32_WINNT
-#      define _WIN32_WINNT 0x0501
-#   endif
-#   include <windows.h>
-#   include <process.h>
-#elif AE_OS==AE_POSIX || defined(AE_DEBUG4POSIX)
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <time.h>
 #   include <unistd.h>
 #   include <pthread.h>
 #   include <sched.h>
 #   include <sys/time.h>
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+#   ifndef _WIN32_WINNT
+#      define _WIN32_WINNT 0x0501
+#   endif
+#   include <windows.h>
+#   include <process.h>
 #endif
 // Debugging helpers for Windows
 #ifdef AE_DEBUG4WINDOWS
@@ -143,11 +129,11 @@ namespace alglib_impl {
 //
 // This is internal structure which implements lock functionality.
 typedef struct {
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_POSIX
+   pthread_mutex_t mutex;
+#elif AE_OS == AE_WINDOWS
    volatile ae_int_t *volatile p_lock;
    char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
-#elif AE_OS==AE_POSIX
-   pthread_mutex_t mutex;
 #else
    bool is_locked;
 #endif
@@ -178,10 +164,10 @@ unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _
 //                            =  0 for manually defined number of cores (AE_NWORKERS is defined)
 // PROTECTION:  not needed; runtime modification is possible, but we do not need exact
 //              synchronization.
-#if defined(AE_NWORKERS) && (AE_NWORKERS<=0)
+#if defined AE_NWORKERS && AE_NWORKERS <= 0
 #   error AE_NWORKERS must be positive number or not defined at all.
 #endif
-#if defined(AE_NWORKERS)
+#if defined AE_NWORKERS
 ae_int_t _alglib_cores_to_use = 0;
 #else
 ae_int_t _alglib_cores_to_use = 0;
@@ -233,8 +219,8 @@ static bool alglib_fclose_trace = false;
 static char alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
 
 // Fields for memory allocation over static array
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
-#   if AE_THREADING!=AE_SERIAL_UNSAFE
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
+#   if AE_THREADING != AE_SERIAL_UNSAFE
 #      error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
 #   endif
 static ae_int_t sm_page_size = 0;
@@ -271,7 +257,7 @@ void ae_never_call_it() {
 }
 
 // Standard function wrappers for better GLIBC portability
-#if defined(X_FOR_LINUX)
+#if defined X_FOR_LINUX
 __asm__(".symver exp,exp@GLIBC_2.2.5");
 __asm__(".symver log,log@GLIBC_2.2.5");
 __asm__(".symver pow,pow@GLIBC_2.2.5");
@@ -325,7 +311,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id) {
       return _alloc_counter_total;
 
    if (id == _ALGLIB_VENDOR_MEMSTAT) {
-#if defined(AE_MKL)
+#if defined AE_MKL
       return ae_mkl_memstat();
 #else
       return 0;
@@ -333,7 +319,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id) {
    }
 // workstealing counters
    if (id == _ALGLIB_WSDBG_NCORES)
-#if defined(AE_SMP)
+#if defined AE_SMP
       return ae_cores_count();
 #else
       return 0;
@@ -344,7 +330,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id) {
       return dbgws_pushroot_failed;
 
    if (id == _ALGLIB_GET_CORES_COUNT)
-#if defined(AE_SMP)
+#if defined AE_SMP
       return ae_cores_count();
 #else
       return 0;
@@ -439,17 +425,17 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
    ae_int_t ncores;
 
 // determine cores count
-#if defined(AE_NWORKERS)
+#if defined AE_NWORKERS
    ncores = AE_NWORKERS;
-#elif AE_OS==AE_WINDOWS
-   SYSTEM_INFO sysInfo;
-   GetSystemInfo(&sysInfo);
-   ncores = (ae_int_t) (sysInfo.dwNumberOfProcessors);
-#elif AE_OS==AE_POSIX
+#elif AE_OS == AE_POSIX
    {
       long r = sysconf(_SC_NPROCESSORS_ONLN);
       ncores = r <= 0 ? 1 : r;
    }
+#elif AE_OS == AE_WINDOWS
+   SYSTEM_INFO sysInfo;
+   GetSystemInfo(&sysInfo);
+   ncores = (ae_int_t) (sysInfo.dwNumberOfProcessors);
 #else
    ncores = 1;
 #endif
@@ -475,7 +461,7 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 //       so use it only when necessary.
 void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_WINDOWS
    for (;;) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
@@ -492,9 +478,9 @@ void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) + v), v0) == v0)
          break;
    }
-#elif defined(__clang__) && (AE_CPU==AE_INTEL)
+#elif defined __clang__ && (AE_CPU == AE_INTEL)
    __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER==AE_GNUC) && (AE_CPU==AE_INTEL) && (__GNUC__*100+__GNUC__>=470)
+#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
    __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
 #else
 #endif
@@ -514,7 +500,7 @@ void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
 //       so use it only when necessary.
 void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_WINDOWS
    for (;;) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
@@ -531,9 +517,9 @@ void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) - v), v0) == v0)
          break;
    }
-#elif defined(__clang__) && (AE_CPU==AE_INTEL)
+#elif defined __clang__ && (AE_CPU == AE_INTEL)
    __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER==AE_GNUC) && (AE_CPU==AE_INTEL) && (__GNUC__*100+__GNUC__>=470)
+#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
    __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
 #else
 #endif
@@ -578,7 +564,7 @@ void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
       abort();
 }
 
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
 void set_memory_pool(void *ptr, size_t size) {
 // Integrity checks
    AE_CRITICAL_ASSERT(sm_page_size == 0);
@@ -706,7 +692,7 @@ void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free) {
 #endif
 
 void *aligned_malloc(size_t size, size_t alignment) {
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return ae_static_malloc(size, alignment);
 #else
    char *result = NULL;
@@ -758,7 +744,7 @@ void *aligned_malloc(size_t size, size_t alignment) {
 }
 
 void *aligned_extract_ptr(void *block) {
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
 #else
    if (block == NULL)
@@ -768,7 +754,7 @@ void *aligned_extract_ptr(void *block) {
 }
 
 void aligned_free(void *block) {
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    ae_static_free(block);
 #else
    void *p;
@@ -1960,11 +1946,11 @@ ae_int_t ae_cpuid() {
 // if not initialized, determine system properties
    if (!_ae_cpuid_initialized) {
    // SSE2
-#if defined(AE_CPU) && (AE_CPU==AE_INTEL)
-#   if AE_COMPILER==AE_MSVC
+#if defined AE_CPU && AE_CPU == AE_INTEL
+#   if AE_COMPILER == AE_MSVC
       {
       // SSE2 support
-#      if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#      if defined _ALGLIB_HAS_SSE2_INTRINSICS
          int CPUInfo[4];
          __cpuid(CPUInfo, 1);
          if ((CPUInfo[3] & 0x04000000) != 0)
@@ -1972,12 +1958,12 @@ ae_int_t ae_cpuid() {
 #      endif
 
       // check OS support for XSAVE XGETBV
-#      if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#      if defined _ALGLIB_HAS_AVX2_INTRINSICS
          __cpuid(CPUInfo, 1);
          if ((CPUInfo[2] & (0x1 << 27)) != 0)
             if ((_xgetbv(0) & 0x6) == 0x6) {
             // AVX2 support
-#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS) && (_MSC_VER>=1600)
+#         if defined _ALGLIB_HAS_AVX2_INTRINSICS && (_MSC_VER >= 1600)
                if (_ae_cpuid_has_sse2) {
                   __cpuidex(CPUInfo, 7, 0);
                   if ((CPUInfo[1] & (0x1 << 5)) != 0)
@@ -1986,7 +1972,7 @@ ae_int_t ae_cpuid() {
 #         endif
 
             // FMA support
-#         if defined(_ALGLIB_HAS_FMA_INTRINSICS) && (_MSC_VER>=1600)
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS && (_MSC_VER >= 1600)
                if (_ae_cpuid_has_avx2) {
                   __cpuid(CPUInfo, 1);
                   if ((CPUInfo[2] & (0x1 << 12)) != 0)
@@ -1996,25 +1982,25 @@ ae_int_t ae_cpuid() {
             }
 #      endif
       }
-#   elif AE_COMPILER==AE_GNUC
+#   elif AE_COMPILER == AE_GNUC
       {
          ae_int_t a, b, c, d;
 
       // SSE2 support
-#      if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#      if defined _ALGLIB_HAS_SSE2_INTRINSICS
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((d & 0x04000000) != 0)
             _ae_cpuid_has_sse2 = true;
 #      endif
 
       // check OS support for XSAVE XGETBV
-#      if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#      if defined _ALGLIB_HAS_AVX2_INTRINSICS
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((c & (0x1 << 27)) != 0) {
             __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
             if ((a & 0x6) == 0x6) {
             // AVX2 support
-#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#         if defined _ALGLIB_HAS_AVX2_INTRINSICS
                if (_ae_cpuid_has_sse2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
                   if ((b & (0x1 << 5)) != 0)
@@ -2023,7 +2009,7 @@ ae_int_t ae_cpuid() {
 #         endif
 
             // FMA support
-#         if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS
                if (_ae_cpuid_has_avx2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
                   if ((c & (0x1 << 12)) != 0)
@@ -2034,7 +2020,7 @@ ae_int_t ae_cpuid() {
          }
 #      endif
       }
-#   elif AE_COMPILER==AE_SUNC
+#   elif AE_COMPILER == AE_SUNC
       {
          ae_int_t a, b, c, d;
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
@@ -2045,18 +2031,18 @@ ae_int_t ae_cpuid() {
 #   endif
 #endif
    // Perform one more CPUID call to generate memory fence
-#if AE_CPU==AE_INTEL
-#   if AE_COMPILER==AE_MSVC
+#if AE_CPU == AE_INTEL
+#   if AE_COMPILER == AE_MSVC
       {
          int CPUInfo[4];
          __cpuid(CPUInfo, 1);
       }
-#   elif AE_COMPILER==AE_GNUC
+#   elif AE_COMPILER == AE_GNUC
       {
          ae_int_t a, b, c, d;
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
       }
-#   elif AE_COMPILER==AE_SUNC
+#   elif AE_COMPILER == AE_SUNC
       {
          ae_int_t a, b, c, d;
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
@@ -2163,9 +2149,7 @@ void ae_trace(const char *printf_fmt, ...) {
 }
 
 int ae_tickcount() {
-#if AE_OS==AE_WINDOWS || defined(AE_DEBUG4WINDOWS)
-   return (int)GetTickCount();
-#elif AE_OS==AE_POSIX || defined(AE_DEBUG4POSIX)
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
    struct timeval now;
    ae_int64_t r, v;
    gettimeofday(&now, NULL);
@@ -2180,6 +2164,8 @@ int ae_tickcount() {
       return 0;
    return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
 #   endif
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+   return (int)GetTickCount();
 #else
    return 0;
 #endif
@@ -3448,11 +3434,11 @@ void ae_spin_wait(ae_int_t cnt) {
 // NOTE: this function should NOT be called when AE_OS is AE_UNKNOWN  -  the
 //       whole program will be abnormally terminated.
 void ae_yield() {
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_POSIX
+   sched_yield();
+#elif AE_OS == AE_WINDOWS
    if (!SwitchToThread())
       Sleep(0);
-#elif AE_OS==AE_POSIX
-   sched_yield();
 #else
    abort();
 #endif
@@ -3465,11 +3451,11 @@ void ae_yield() {
 // during its allocation. However, you have to call  _ae_free_lock_raw()  in
 // order to deallocate this lock properly.
 void _ae_init_lock_raw(_lock *p) {
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_POSIX
+   pthread_mutex_init(&p->mutex, NULL);
+#elif AE_OS == AE_WINDOWS
    p->p_lock = (ae_int_t *) ae_align((void *)(&p->buf), AE_LOCK_ALIGNMENT);
    p->p_lock[0] = 0;
-#elif AE_OS==AE_POSIX
-   pthread_mutex_init(&p->mutex, NULL);
 #else
    p->is_locked = false;
 #endif
@@ -3479,7 +3465,18 @@ void _ae_init_lock_raw(_lock *p) {
 //
 // It is low-level workhorse utilized by ae_acquire_lock().
 void _ae_acquire_lock_raw(_lock *p) {
-#if AE_OS==AE_WINDOWS
+#if AE_OS == AE_POSIX
+   ae_int_t cnt = 0;
+   for (;;) {
+      if (pthread_mutex_trylock(&p->mutex) == 0)
+         return;
+      ae_spin_wait(AE_LOCK_CYCLES);
+      cnt++;
+      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
+         ae_yield();
+   }
+   ;
+#elif AE_OS == AE_WINDOWS
    ae_int_t cnt = 0;
 #   ifdef AE_SMP_DEBUGCOUNTERS
    InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_acquisitions);
@@ -3499,17 +3496,6 @@ void _ae_acquire_lock_raw(_lock *p) {
          ae_yield();
       }
    }
-#elif AE_OS==AE_POSIX
-   ae_int_t cnt = 0;
-   for (;;) {
-      if (pthread_mutex_trylock(&p->mutex) == 0)
-         return;
-      ae_spin_wait(AE_LOCK_CYCLES);
-      cnt++;
-      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
-         ae_yield();
-   }
-   ;
 #else
    AE_CRITICAL_ASSERT(!p->is_locked);
    p->is_locked = true;
@@ -3520,10 +3506,10 @@ void _ae_acquire_lock_raw(_lock *p) {
 //
 // It is low-level lock function which is used by ae_release_lock.
 void _ae_release_lock_raw(_lock *p) {
-#if AE_OS==AE_WINDOWS
-   InterlockedExchange((LONG volatile *)p->p_lock, 0);
-#elif AE_OS==AE_POSIX
+#if AE_OS == AE_POSIX
    pthread_mutex_unlock(&p->mutex);
+#elif AE_OS == AE_WINDOWS
+   InterlockedExchange((LONG volatile *)p->p_lock, 0);
 #else
    p->is_locked = false;
 #endif
@@ -3531,7 +3517,7 @@ void _ae_release_lock_raw(_lock *p) {
 
 // This function frees _lock structure.
 void _ae_free_lock_raw(_lock *p) {
-#if AE_OS==AE_POSIX
+#if AE_OS == AE_POSIX
    pthread_mutex_destroy(&p->mutex);
 #endif
 }
@@ -5438,7 +5424,7 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
    ae_int_t i, k, n2;
    ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
@@ -5776,7 +5762,7 @@ void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_c
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
    ae_int_t i, j, m2;
    const double *pa0, *pa1, *parow, *pb;
@@ -6036,7 +6022,7 @@ void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, a
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
    ae_int_t i, j, mb2;
    const double *psrc0, *psrc1;
@@ -7053,7 +7039,7 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
    ae_int_t n2, j, stride2;
 
@@ -7229,7 +7215,7 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
 // We calculate product of two Kx2 matrices (result is 2x2).
 // VA and VB store result as follows:
@@ -7372,7 +7358,7 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 // If  you  want  to  know  whether  it  is safe to call it, you should check
 // results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
 // and will do its work.
-#if defined(AE_HAS_SSE2_INTRINSICS)
+#if defined AE_HAS_SSE2_INTRINSICS
 void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
 // We calculate product of two Kx2 matrices (result is 2x2).
 // V0, V1, V2, V3 store result as follows:
@@ -7452,7 +7438,7 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
 }
 #endif
 
-#if !defined(ALGLIB_NO_FAST_KERNELS)
+#if !defined ALGLIB_NO_FAST_KERNELS
 
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
@@ -8756,7 +8742,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
 // Fast rGEMM kernel with AVX2/FMA support
 // ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
 bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
-#   if !defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#   if !defined _ALGLIB_HAS_AVX2_INTRINSICS
    return false;
 #   else
    const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
@@ -8772,7 +8758,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 // Determine CPU and kernel support
    if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(cpu_id & CPU_AVX2))
       return false;
-#      if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#      if defined _ALGLIB_HAS_FMA_INTRINSICS
    if (cpu_id & CPU_FMA)
       ablasf_dotblk = ablasf_dotblkh_fma;
 #      endif
@@ -8835,7 +8821,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 
 // Returns recommended width of the SIMD-friendly buffer
 ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state) {
-#   if AE_CPU==AE_INTEL
+#   if AE_CPU == AE_INTEL
    return 4;
 #   else
    return 1;
@@ -8859,7 +8845,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
    double v;
 
 // Try SIMD kernels
-#   if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#   if defined _ALGLIB_HAS_FMA_INTRINSICS
    if (sstride == 4 || (blocksize == 2 && sstride == 2))
       if (ae_cpuid() & CPU_FMA) {
          spchol_propagatefwd_fma(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth, _state);
@@ -9273,7 +9259,7 @@ const ae_int_t endianness = alglib_impl::ae_get_endianness();
 const double fp_nan = get_aenv_nan();
 const double fp_posinf = get_aenv_posinf();
 const double fp_neginf = get_aenv_neginf();
-#if defined(AE_NO_EXCEPTIONS)
+#if defined AE_NO_EXCEPTIONS
 static const char *_alglib_last_error = NULL;
 #endif
 static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
@@ -9284,7 +9270,7 @@ const xparams &serial = *((const xparams *)(&_i64_xserial));
 const xparams &parallel = *((const xparams *)(&_i64_xparallel));
 
 // Exception handling
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 ap_error::ap_error() {
 }
 
@@ -9414,7 +9400,7 @@ const alglib_impl::ae_complex *complex::c_ptr() const {
    return (const alglib_impl::ae_complex *)this;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 std::string complex::tostring(int _dps) const {
    char mask[32];
    char buf_x[32];
@@ -10297,7 +10283,7 @@ ae_int_t vlen(ae_int_t n1, ae_int_t n2) {
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype) {
    if (e_ptr == NULL || e_ptr->datatype != datatype) {
       const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(msg);
 #else
       ptr = NULL;
@@ -10316,7 +10302,7 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
 
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -10339,7 +10325,7 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
 
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -10368,7 +10354,7 @@ void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state _state;
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
@@ -10404,7 +10390,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
       return *this;
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
@@ -10432,7 +10418,7 @@ alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() {
    return ptr;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
    std::vector < const char *>svec;
    size_t i;
@@ -10527,7 +10513,7 @@ const bool *boolean_1d_array::getcontent() const {
    return ptr->ptr.p_bool;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 boolean_1d_array::boolean_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_BOOL) {
 }
 
@@ -10589,7 +10575,7 @@ const ae_int_t *integer_1d_array::getcontent() const {
    return ptr->ptr.p_int;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 integer_1d_array::integer_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_INT) {
 }
 
@@ -10651,7 +10637,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
 
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -10680,7 +10666,7 @@ const double *real_1d_array::getcontent() const {
    return ptr->ptr.p_double;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 real_1d_array::real_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_REAL) {
 }
 
@@ -10744,7 +10730,7 @@ const complex *complex_1d_array::getcontent() const {
    return (const complex *)ptr->ptr.p_complex;
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 complex_1d_array::complex_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) {
 }
 
@@ -10758,7 +10744,7 @@ std::string complex_1d_array::tostring(int dps) const {
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype) {
    if (e_ptr->datatype != datatype) {
       const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(msg);
 #else
       ptr = NULL;
@@ -10777,7 +10763,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
 
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -10801,7 +10787,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
 
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -10827,7 +10813,7 @@ ae_matrix_wrapper::~ae_matrix_wrapper() {
       ae_matrix_clear(ptr);
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
    std::vector< std::vector<const char *> > smat;
    size_t i, j;
@@ -10881,7 +10867,7 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state _state;
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
@@ -10934,7 +10920,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
       return *this;
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
@@ -11009,7 +10995,7 @@ void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pC
          ptr->ptr.pp_bool[i][j] = pContent[i * icols + j];
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 boolean_2d_array::boolean_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_BOOL) {
 }
 
@@ -11073,7 +11059,7 @@ void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t
          ptr->ptr.pp_int[i][j] = pContent[i * icols + j];
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 integer_2d_array::integer_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_INT) {
 }
 
@@ -11143,7 +11129,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    alglib_impl::x_matrix x;
    alglib_impl::ae_state_init(&_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_state.error_msg);
 #else
       ptr = NULL;
@@ -11166,7 +11152,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    ae_state_clear(&_state);
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 real_2d_array::real_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_REAL) {
 }
 
@@ -11232,7 +11218,7 @@ void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex 
       }
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 complex_2d_array::complex_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) {
 }
 
@@ -11314,7 +11300,7 @@ ae_int_t my_stricmp(const char *s1, const char *s2) {
    }
 }
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 //
 // This function filters out all spaces from the string.
 // It returns string allocated with ae_malloc().
@@ -11783,7 +11769,7 @@ bool fp_isfinite(double x) {
 }
 
 // CSV functions
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out) {
    int flag;
 

@@ -1,9 +1,7 @@
-#include "stdafx.h"
 #include <sstream>
-#include <math.h>
 #include "Interpolation.h"
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 #   error "This test should be compiled with AE_NO_EXCEPTIONS defined"
 #endif
 

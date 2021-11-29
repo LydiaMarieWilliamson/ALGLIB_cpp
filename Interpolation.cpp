@@ -11,20 +11,8 @@
 //	See the GNU General Public License for more details.
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
-#ifdef _MSC_VER
-#   define _CRT_SECURE_NO_WARNINGS
-#endif
-#include "stdafx.h"
+#define InAlgLib
 #include "Interpolation.h"
-
-// disable some irrelevant warnings
-#if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)
-#   pragma warning(disable:4100)
-#   pragma warning(disable:4127)
-#   pragma warning(disable:4611)
-#   pragma warning(disable:4702)
-#   pragma warning(disable:4996)
-#endif
 
 // === RATINT Package ===
 // Depends on: (AlgLibInternal) TSORT
@@ -699,7 +687,7 @@ double barycentriccalc(const barycentricinterpolant &b, const double t, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -719,7 +707,7 @@ void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -739,7 +727,7 @@ void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -759,7 +747,7 @@ void barycentriclintransx(const barycentricinterpolant &b, const double ca, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -779,7 +767,7 @@ void barycentriclintransy(const barycentricinterpolant &b, const double ca, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -799,7 +787,7 @@ void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_arr
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -819,7 +807,7 @@ void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -839,7 +827,7 @@ void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2302,7 +2290,7 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -2330,7 +2318,7 @@ void idwserialize(idwmodel &obj, std::ostream &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -2356,7 +2344,7 @@ void idwunserialize(const std::string &s_in, idwmodel &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -2378,7 +2366,7 @@ void idwunserialize(const std::istream &s_in, idwmodel &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -2399,7 +2387,7 @@ void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2419,7 +2407,7 @@ void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2439,7 +2427,7 @@ void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2459,7 +2447,7 @@ void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2473,7 +2461,7 @@ void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -2498,7 +2486,7 @@ void idwbuildersetalgomstab(const idwbuilder &state, const double srad, const xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2518,7 +2506,7 @@ void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2538,7 +2526,7 @@ void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2558,7 +2546,7 @@ void idwbuildersetuserterm(const idwbuilder &state, const double v, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2578,7 +2566,7 @@ void idwbuildersetconstterm(const idwbuilder &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2598,7 +2586,7 @@ void idwbuildersetzeroterm(const idwbuilder &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2618,7 +2606,7 @@ double idwcalc1(const idwmodel &s, const double x0, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2638,7 +2626,7 @@ double idwcalc2(const idwmodel &s, const double x0, const double x1, const xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2658,7 +2646,7 @@ double idwcalc3(const idwmodel &s, const double x0, const double x1, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2678,7 +2666,7 @@ void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2698,7 +2686,7 @@ void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2718,7 +2706,7 @@ void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_arr
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -2738,7 +2726,7 @@ void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4369,7 +4357,7 @@ void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const d
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4389,7 +4377,7 @@ void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4403,7 +4391,7 @@ void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4428,7 +4416,7 @@ void polynomialbar2pow(const barycentricinterpolant &p, const double c, const do
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4442,7 +4430,7 @@ void polynomialbar2pow(const barycentricinterpolant &p, const double c, const do
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4469,7 +4457,7 @@ void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4483,7 +4471,7 @@ void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c,
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4512,7 +4500,7 @@ void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4526,7 +4514,7 @@ void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_in
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4552,7 +4540,7 @@ void polynomialbuildeqdist(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4566,7 +4554,7 @@ void polynomialbuildeqdist(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4591,7 +4579,7 @@ void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4605,7 +4593,7 @@ void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4630,7 +4618,7 @@ void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4644,7 +4632,7 @@ void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4669,7 +4657,7 @@ double polynomialcalceqdist(const double a, const double b, const real_1d_array 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4683,7 +4671,7 @@ double polynomialcalceqdist(const double a, const double b, const real_1d_array 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4708,7 +4696,7 @@ double polynomialcalccheb1(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4722,7 +4710,7 @@ double polynomialcalccheb1(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -4747,7 +4735,7 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -4761,7 +4749,7 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8588,7 +8576,7 @@ void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const a
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8602,7 +8590,7 @@ void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const a
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8628,7 +8616,7 @@ void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8642,7 +8630,7 @@ void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8676,7 +8664,7 @@ void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8690,7 +8678,7 @@ void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8724,7 +8712,7 @@ void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8738,7 +8726,7 @@ void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8772,7 +8760,7 @@ void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8786,7 +8774,7 @@ void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8822,7 +8810,7 @@ void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8836,7 +8824,7 @@ void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8872,7 +8860,7 @@ void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8886,7 +8874,7 @@ void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8922,7 +8910,7 @@ void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8936,7 +8924,7 @@ void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, con
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -8966,7 +8954,7 @@ void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -8980,7 +8968,7 @@ void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -9006,7 +8994,7 @@ void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9020,7 +9008,7 @@ void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -9046,7 +9034,7 @@ double spline1dcalc(const spline1dinterpolant &c, const double x, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9066,7 +9054,7 @@ void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9086,7 +9074,7 @@ void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tb
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9106,7 +9094,7 @@ void spline1dlintransx(const spline1dinterpolant &c, const double a, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9126,7 +9114,7 @@ void spline1dlintransy(const spline1dinterpolant &c, const double a, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9146,7 +9134,7 @@ double spline1dintegrate(const spline1dinterpolant &c, const double x, const xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9166,7 +9154,7 @@ void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9180,7 +9168,7 @@ void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -9206,7 +9194,7 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -9220,7 +9208,7 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15549,7 +15537,7 @@ void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15569,7 +15557,7 @@ void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15589,7 +15577,7 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15603,7 +15591,7 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15629,7 +15617,7 @@ void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15643,7 +15631,7 @@ void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15673,7 +15661,7 @@ double logisticcalc4(const double x, const double a, const double b, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15693,7 +15681,7 @@ double logisticcalc5(const double x, const double a, const double b, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15713,7 +15701,7 @@ void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15733,7 +15721,7 @@ void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15753,7 +15741,7 @@ void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15773,7 +15761,7 @@ void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15793,7 +15781,7 @@ void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15813,7 +15801,7 @@ void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15833,7 +15821,7 @@ void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15853,7 +15841,7 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15867,7 +15855,7 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15897,7 +15885,7 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15911,7 +15899,7 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15941,7 +15929,7 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15955,7 +15943,7 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -15981,7 +15969,7 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -15995,7 +15983,7 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16021,7 +16009,7 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16035,7 +16023,7 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16063,7 +16051,7 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16077,7 +16065,7 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16109,7 +16097,7 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16123,7 +16111,7 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16151,7 +16139,7 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16165,7 +16153,7 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16197,7 +16185,7 @@ void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16211,7 +16199,7 @@ void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16241,7 +16229,7 @@ void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16255,7 +16243,7 @@ void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16285,7 +16273,7 @@ void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16299,7 +16287,7 @@ void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16329,7 +16317,7 @@ void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16343,7 +16331,7 @@ void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16373,7 +16361,7 @@ void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16387,7 +16375,7 @@ void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16417,7 +16405,7 @@ void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16431,7 +16419,7 @@ void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, lsfitstate &state, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16461,7 +16449,7 @@ void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t max
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16481,7 +16469,7 @@ void lsfitsetstpmax(const lsfitstate &state, const double stpmax, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16501,7 +16489,7 @@ void lsfitsetxrep(const lsfitstate &state, const bool needxrep, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16521,7 +16509,7 @@ void lsfitsetscale(const lsfitstate &state, const real_1d_array &s, const xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16541,7 +16529,7 @@ void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16561,7 +16549,7 @@ void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16575,7 +16563,7 @@ void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -16601,7 +16589,7 @@ bool lsfititeration(const lsfitstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16670,7 +16658,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16701,7 +16689,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16737,7 +16725,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16779,7 +16767,7 @@ void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsf
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -16799,7 +16787,7 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17662,7 +17650,7 @@ void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17682,7 +17670,7 @@ void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17702,7 +17690,7 @@ void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17722,7 +17710,7 @@ void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -17742,7 +17730,7 @@ void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -18942,7 +18930,7 @@ void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -18962,7 +18950,7 @@ void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -18982,7 +18970,7 @@ void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_i
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19002,7 +18990,7 @@ void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_i
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19022,7 +19010,7 @@ void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19042,7 +19030,7 @@ void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19062,7 +19050,7 @@ void pspline2calc(const pspline2interpolant &p, const double t, double &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19082,7 +19070,7 @@ void pspline3calc(const pspline3interpolant &p, const double t, double &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19102,7 +19090,7 @@ void pspline2tangent(const pspline2interpolant &p, const double t, double &x, do
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19122,7 +19110,7 @@ void pspline3tangent(const pspline3interpolant &p, const double t, double &x, do
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19142,7 +19130,7 @@ void pspline2diff(const pspline2interpolant &p, const double t, double &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19162,7 +19150,7 @@ void pspline3diff(const pspline3interpolant &p, const double t, double &x, doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19182,7 +19170,7 @@ void pspline2diff2(const pspline2interpolant &p, const double t, double &x, doub
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19202,7 +19190,7 @@ void pspline3diff2(const pspline3interpolant &p, const double t, double &x, doub
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19222,7 +19210,7 @@ double pspline2arclength(const pspline2interpolant &p, const double a, const dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19242,7 +19230,7 @@ double pspline3arclength(const pspline3interpolant &p, const double a, const dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -19262,7 +19250,7 @@ void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26508,7 +26496,7 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -26536,7 +26524,7 @@ void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -26562,7 +26550,7 @@ void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -26584,7 +26572,7 @@ void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -26605,7 +26593,7 @@ double spline2dcalc(const spline2dinterpolant &c, const double x, const double y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26625,7 +26613,7 @@ void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26645,7 +26633,7 @@ void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26665,7 +26653,7 @@ double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26685,7 +26673,7 @@ void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26705,7 +26693,7 @@ void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26725,7 +26713,7 @@ void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const dou
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26745,7 +26733,7 @@ void spline2dlintransf(const spline2dinterpolant &c, const double a, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26765,7 +26753,7 @@ void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc, const x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26785,7 +26773,7 @@ void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, c
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26805,7 +26793,7 @@ void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26825,7 +26813,7 @@ void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26845,7 +26833,7 @@ void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26865,7 +26853,7 @@ void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26885,7 +26873,7 @@ void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26905,7 +26893,7 @@ void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26925,7 +26913,7 @@ void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26945,7 +26933,7 @@ void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26965,7 +26953,7 @@ void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v, co
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -26985,7 +26973,7 @@ void spline2dbuildersetlinterm(const spline2dbuilder &state, const xparams _xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27005,7 +26993,7 @@ void spline2dbuildersetconstterm(const spline2dbuilder &state, const xparams _xp
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27025,7 +27013,7 @@ void spline2dbuildersetzeroterm(const spline2dbuilder &state, const xparams _xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27045,7 +27033,7 @@ void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27065,7 +27053,7 @@ void spline2dbuildersetareaauto(const spline2dbuilder &state, const xparams _xpa
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27085,7 +27073,7 @@ void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27105,7 +27093,7 @@ void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27125,7 +27113,7 @@ void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27145,7 +27133,7 @@ void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double l
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27165,7 +27153,7 @@ void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double l
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -27185,7 +27173,7 @@ void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2df
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31134,7 +31122,7 @@ double spline3dcalc(const spline3dinterpolant &c, const double x, const double y
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31154,7 +31142,7 @@ void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const do
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31174,7 +31162,7 @@ void spline3dlintransf(const spline3dinterpolant &c, const double a, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31194,7 +31182,7 @@ void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31214,7 +31202,7 @@ void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const rea
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31234,7 +31222,7 @@ void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31254,7 +31242,7 @@ void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31274,7 +31262,7 @@ void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31692,7 +31680,7 @@ void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31712,7 +31700,7 @@ void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31732,7 +31720,7 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31752,7 +31740,7 @@ void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31772,7 +31760,7 @@ void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31786,7 +31774,7 @@ void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -31812,7 +31800,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -31826,7 +31814,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -34087,7 +34075,7 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -34115,7 +34103,7 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -34141,7 +34129,7 @@ void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -34163,7 +34151,7 @@ void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
 
    alglib_impl::ae_state_init(&state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(state.error_msg);
@@ -34184,7 +34172,7 @@ void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34204,7 +34192,7 @@ void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _x
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34224,7 +34212,7 @@ void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34238,7 +34226,7 @@ void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -34263,7 +34251,7 @@ void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34277,7 +34265,7 @@ void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const real_1d_array &s, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -34302,7 +34290,7 @@ void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z, const xpar
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34316,7 +34304,7 @@ void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z, const xpar
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void rbfsetalgoqnn(const rbfmodel &s, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -34343,7 +34331,7 @@ void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34357,7 +34345,7 @@ void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
@@ -34382,7 +34370,7 @@ void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34402,7 +34390,7 @@ void rbfsetlinterm(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34422,7 +34410,7 @@ void rbfsetconstterm(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34442,7 +34430,7 @@ void rbfsetzeroterm(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34462,7 +34450,7 @@ void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34482,7 +34470,7 @@ void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits, const xparams _xparam
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34502,7 +34490,7 @@ void rbfsetv2supportr(const rbfmodel &s, const double r, const xparams _xparams)
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34522,7 +34510,7 @@ void rbfbuildmodel(const rbfmodel &s, rbfreport &rep, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34542,7 +34530,7 @@ double rbfcalc1(const rbfmodel &s, const double x0, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34562,7 +34550,7 @@ double rbfcalc2(const rbfmodel &s, const double x0, const double x1, const xpara
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34582,7 +34570,7 @@ double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const doubl
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34602,7 +34590,7 @@ void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const 
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34622,7 +34610,7 @@ void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, con
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34642,7 +34630,7 @@ void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_arr
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34662,7 +34650,7 @@ void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0,
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34682,7 +34670,7 @@ void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34702,7 +34690,7 @@ void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34722,7 +34710,7 @@ void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34742,7 +34730,7 @@ void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_in
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34762,7 +34750,7 @@ void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34782,7 +34770,7 @@ ae_int_t rbfgetmodelversion(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34802,7 +34790,7 @@ double rbfpeekprogress(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
@@ -34822,7 +34810,7 @@ void rbfrequesttermination(const rbfmodel &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
    if (setjmp(_break_jump)) {
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
       _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
 #else
       _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);

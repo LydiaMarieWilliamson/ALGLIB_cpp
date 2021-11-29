@@ -14,6 +14,11 @@
 #ifndef OnceOnlyAp_h
 #define OnceOnlyAp_h
 
+#if defined InAlgLib && defined _MSC_VER
+#   define _CRT_SECURE_NO_WARNINGS
+#endif
+
+#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -80,6 +85,16 @@
 #   define AE_COMPILER AE_SUNC
 #elif defined _MSC_VER
 #   define AE_COMPILER AE_MSVC
+// Disable some irrelevant warnings.
+//(@) Originally preceded the headers other than Ap.h in TestC.cpp and followed them in the program module *.cpp files.
+//(@) None of this has actually been tested on Windows yet.
+#   if defined && !defined AE_ALL_WARNINGS
+#      pragma warning(disable:4100)
+#      pragma warning(disable:4127)
+#      pragma warning(disable:4611)
+#      pragma warning(disable:4702)
+#      pragma warning(disable:4996)
+#   endif
 #else
 #   define AE_COMPILER AE_OTHERC
 #endif
@@ -938,10 +953,7 @@ extern FILE *alglib_trace_file;
 // * ae_debugrng(), returns random number generated with high-quality random numbers generator
 // * ae_set_seed(), sets seed of the debug RNG (NON-THREAD-SAFE!!!)
 // * ae_get_seed(), returns two seed values of the debug RNG (NON-THREAD-SAFE!!!)
-#ifdef AE_DEBUG4WINDOWS
-#   define flushconsole(s) fflush(stdout)
-#endif
-#ifdef AE_DEBUG4POSIX
+#if defined AE_DEBUG4POSIX || defined AE_DEBUG4WINDOWS
 #   define flushconsole(s) fflush(stdout)
 #endif
 
@@ -952,22 +964,22 @@ extern FILE *alglib_trace_file;
 #   define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
    // SIMD kernel dispatchers
 #   if defined _ALGLIB_HAS_SSE2_INTRINSICS
-#      define _ALGLIB_KKK_VOID_SSE2(fname,params)   if( cached_cpuid&CPU_SSE2 ) { fname##_sse2 params; return; }
-#      define _ALGLIB_KKK_RETURN_SSE2(fname,params) if( cached_cpuid&CPU_SSE2 ) { return fname##_sse2 params; }
+#      define _ALGLIB_KKK_VOID_SSE2(fname,params)   if (cached_cpuid&CPU_SSE2) { fname##_sse2 params; return; }
+#      define _ALGLIB_KKK_RETURN_SSE2(fname,params) if (cached_cpuid&CPU_SSE2) { return fname##_sse2 params; }
 #   else
 #      define _ALGLIB_KKK_VOID_SSE2(fname,params)
 #      define _ALGLIB_KKK_RETURN_SSE2(fname,params)
 #   endif
 #   if defined _ALGLIB_HAS_AVX2_INTRINSICS
-#      define _ALGLIB_KKK_VOID_AVX2(fname,params)   if( cached_cpuid&CPU_AVX2 ) { fname##_avx2 params; return; }
-#      define _ALGLIB_KKK_RETURN_AVX2(fname,params) if( cached_cpuid&CPU_AVX2 ) { return fname##_avx2 params; }
+#      define _ALGLIB_KKK_VOID_AVX2(fname,params)   if (cached_cpuid&CPU_AVX2) { fname##_avx2 params; return; }
+#      define _ALGLIB_KKK_RETURN_AVX2(fname,params) if (cached_cpuid&CPU_AVX2) { return fname##_avx2 params; }
 #   else
 #      define _ALGLIB_KKK_VOID_AVX2(fname,params)
 #      define _ALGLIB_KKK_RETURN_AVX2(fname,params)
 #   endif
 #   if defined _ALGLIB_HAS_FMA_INTRINSICS
-#      define _ALGLIB_KKK_VOID_FMA(fname,params)    if( cached_cpuid&CPU_FMA )  { fname##_fma params; return; }
-#      define _ALGLIB_KKK_RETURN_FMA(fname,params)  if( cached_cpuid&CPU_FMA )  { return fname##_fma params; }
+#      define _ALGLIB_KKK_VOID_FMA(fname,params)    if (cached_cpuid&CPU_FMA)  { fname##_fma params; return; }
+#      define _ALGLIB_KKK_RETURN_FMA(fname,params)  if (cached_cpuid&CPU_FMA)  { return fname##_fma params; }
 #   else
 #      define _ALGLIB_KKK_VOID_FMA(fname,params)
 #      define _ALGLIB_KKK_RETURN_FMA(fname,params)

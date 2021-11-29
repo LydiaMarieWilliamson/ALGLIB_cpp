@@ -6,7 +6,7 @@
 #define AE_USE_CPP
 
 namespace alglib_impl {
-#if !defined(ALGLIB_NO_FAST_KERNELS) && defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_AVX2_INTRINSICS
 
 double rdotv_avx2(const ae_int_t n, const Real *__restrict x, const Real *__restrict y, const ae_state *__restrict _state);
 double rdotv2_avx2(const ae_int_t n, const Real *__restrict x, const ae_state *__restrict _state);

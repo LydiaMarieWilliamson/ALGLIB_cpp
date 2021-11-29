@@ -1,7 +1,4 @@
-#ifdef _MSC_VER
-#   define _CRT_SECURE_NO_WARNINGS
-#endif
-#include "stdafx.h"
+#define InAlgLib
 
 //
 // Must be defined before we include kernel header
@@ -11,17 +8,8 @@
 
 #include "KernelsSse2.h"
 
-// disable some irrelevant warnings
-#if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)
-#   pragma warning(disable:4100)
-#   pragma warning(disable:4127)
-#   pragma warning(disable:4611)
-#   pragma warning(disable:4702)
-#   pragma warning(disable:4996)
-#endif
-
 namespace alglib_impl {
-#if !defined(ALGLIB_NO_FAST_KERNELS) && defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_SSE2_INTRINSICS
 
 double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state) {
    ae_int_t i;

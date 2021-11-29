@@ -11,20 +11,8 @@
 //	See the GNU General Public License for more details.
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
-#ifdef _MSC_VER
-#   define _CRT_SECURE_NO_WARNINGS
-#endif
-#include "stdafx.h"
+#define InAlgLib
 #include "AlgLibInternal.h"
-
-// disable some irrelevant warnings
-#if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)
-#   pragma warning(disable:4100)
-#   pragma warning(disable:4127)
-#   pragma warning(disable:4611)
-#   pragma warning(disable:4702)
-#   pragma warning(disable:4996)
-#endif
 
 // === APSERV Package ===
 namespace alglib_impl {
@@ -2432,9 +2420,7 @@ void _scomplexarray_destroy(void *_p) {
 namespace alglib_impl {
 #ifdef ALGLIB_NO_FAST_KERNELS
 static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
 // Inputs:
@@ -2455,9 +2441,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
 //
 // Inputs:
@@ -2479,9 +2463,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
 //
 // Inputs:
@@ -2503,9 +2485,7 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Computes dot product (X,X) for elements [0,N) of X[]
 //
 // Inputs:
@@ -2527,9 +2507,7 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[] to X[]
 //
 // Inputs:
@@ -2548,9 +2526,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
       x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.p_double[i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[] to X[]
 //
 // Inputs:
@@ -2571,7 +2547,7 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
       x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] + alpha * y->ptr.p_double[offsy + i];
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Performs inplace addition of vector Y[] to column X[]
 //
@@ -2611,9 +2587,7 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
       x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] + alpha * y->ptr.p_double[i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of vector X[] by vector Y[]
 //
 // Inputs:
@@ -2631,9 +2605,7 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
       x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.p_double[i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
 // Inputs:
@@ -2651,9 +2623,7 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
       x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * y->ptr.p_double[i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise multiplication of row X[] by vector Y[]
 //
 // Inputs:
@@ -2671,9 +2641,7 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
       x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.pp_double[rowidx][i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of vector X[] and vector Y[]
 //
 // Inputs:
@@ -2691,9 +2659,7 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
       x->ptr.p_double[i] = ae_maxreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[] and vector Y[]
 //
 // Inputs:
@@ -2711,9 +2677,7 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
       x->ptr.pp_double[rowidx][i] = ae_maxreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[I] and vector Y[]
 //
 // Inputs:
@@ -2731,9 +2695,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
       y->ptr.p_double[i] = ae_maxreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of vector X[] and vector Y[]
 //
 // Inputs:
@@ -2751,9 +2713,7 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
       x->ptr.p_double[i] = ae_minreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[] and vector Y[]
 //
 // Inputs:
@@ -2771,9 +2731,7 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
       x->ptr.pp_double[rowidx][i] = ae_minreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs componentwise max of row X[I] and vector Y[]
 //
 // Inputs:
@@ -2791,9 +2749,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
       y->ptr.p_double[i] = ae_minreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[RIdx,...] to X[]
 //
 // Inputs:
@@ -2813,9 +2769,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
       x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.pp_double[ridx][i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
 //
 // Inputs:
@@ -2836,9 +2790,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
       x->ptr.pp_double[ridxdst][i] = x->ptr.pp_double[ridxdst][i] + alpha * y->ptr.pp_double[ridxsrc][i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[] by V
 //
 // Inputs:
@@ -2856,9 +2808,7 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
       x->ptr.p_double[i] = x->ptr.p_double[i] * v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[] by V
 //
 // Inputs:
@@ -2876,9 +2826,7 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
       x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
 //
 // Inputs:
@@ -2896,9 +2844,7 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
       x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] * v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum X
 //
 // Inputs:
@@ -2927,9 +2873,7 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum |X|
 //
 // Inputs:
@@ -2954,9 +2898,7 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum X
 //
 // Inputs:
@@ -2985,9 +2927,7 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Returns maximum |X|
 //
 // Inputs:
@@ -3012,9 +2952,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    }
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
 // Inputs:
@@ -3032,9 +2970,7 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
       x->ptr.p_double[j] = v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Sets X[OffsX:OffsX+N-1] to V
 //
 // Inputs:
@@ -3052,9 +2988,7 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
       x->ptr.p_double[offsx + j] = v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
 // Inputs:
@@ -3072,9 +3006,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
       x->ptr.p_int[j] = v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Sets vector X[] to V
 //
 // Inputs:
@@ -3092,9 +3024,7 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
       x->ptr.p_bool[j] = v;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Sets matrix A[] to V
 //
 // Inputs:
@@ -3115,7 +3045,7 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
       }
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Sets vector X[] to V, reallocating X[] if too small
 //
@@ -3282,7 +3212,7 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
       a->ptr.pp_double[i][j] = v;
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Sets col J of A[,] to V
 //
@@ -3324,9 +3254,7 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
       y->ptr.p_double[j] = x->ptr.p_double[j];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[]
 //
 // Inputs:
@@ -3347,9 +3275,7 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
       y->ptr.p_bool[j] = x->ptr.p_bool[j];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[], extended version
 //
 // Inputs:
@@ -3371,7 +3297,7 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
       y->ptr.p_double[offsy + j] = x->ptr.p_double[offsx + j];
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
 //
@@ -3494,9 +3420,7 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
       y->ptr.p_int[j] = x->ptr.p_int[j];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Copies vector X[] to Y[], extended version
 //
 // Inputs:
@@ -3518,7 +3442,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
       y->ptr.p_int[offsy + j] = x->ptr.p_int[offsx + j];
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Grows X, i.e. changes its size in such a way that:
 // a) contents is preserved
@@ -3593,9 +3517,7 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
       y->ptr.p_double[i] = v * x->ptr.p_double[i];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Performs copying with multiplication of V*X[] to Y[I,*]
 //
 // Inputs:
@@ -3615,7 +3537,7 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
       y->ptr.pp_double[ridx][i] = v * x->ptr.p_double[i];
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Performs copying with multiplication of V*X[] to Y[*,J]
 //
@@ -3656,9 +3578,7 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
       a->ptr.pp_double[i][j] = x->ptr.p_double[j];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Copies row I of A[,] to vector X[]
 //
 // Inputs:
@@ -3677,9 +3597,7 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
       x->ptr.p_double[j] = a->ptr.pp_double[i][j];
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Copies row I of A[,] to row K of B[,].
 //
 // A[i,...] and B[k,...] may overlap.
@@ -3701,7 +3619,7 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
       b->ptr.pp_double[k][j] = a->ptr.pp_double[i][j];
    }
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Copies vector X[] to column J of A[,]
 //
@@ -3818,9 +3736,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
       return;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Matrix-vector product: y := alpha*op(A)*x + beta*y
 //
 // Here x, y, A are subvectors/submatrices of larger vectors/matrices.
@@ -3904,9 +3820,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
       return;
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Rank-1 correction: A := A + alpha*u*v'
 //
 // NOTE: this  function  expects  A  to  be  large enough to store result. No
@@ -3936,9 +3850,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
       }
    }
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // This subroutine solves linear system op(A)*x=b where:
 // * A is NxN upper/lower triangular/unitriangular matrix
 // * X and B are Nx1 vectors
@@ -4034,7 +3946,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
    }
    ae_assert(false, "rTRSVX: unexpected operation type", _state);
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
@@ -5383,7 +5295,7 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
    result = false;
    return result;
 }
-#endif
+#endif // defined ALGLIB_NO_FAST_KERNELS
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===

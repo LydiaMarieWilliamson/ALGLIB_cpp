@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include <math.h>
 #include "DataAnalysis.h"
 #include "DiffEquations.h"
 #include "FastTransforms.h"
@@ -507,15 +505,15 @@ int main() {
    bool _TestResult;
    int _spoil_scenario;
    printf("CPUID:%s%s%s\n", alglib_impl::ae_cpuid() & alglib_impl::CPU_SSE2 ? " sse2" : "", alglib_impl::ae_cpuid() & alglib_impl::CPU_AVX2 ? " avx2" : "", alglib_impl::ae_cpuid() & alglib_impl::CPU_FMA ? " fma" : "");
-#if AE_OS==AE_WINDOWS
-   printf("OS: Windows\n");
-#elif AE_OS==AE_POSIX
+#if AE_OS == AE_POSIX
    printf("OS: POSIX\n");
+#elif AE_OS == AE_WINDOWS
+   printf("OS: Windows\n");
 #else
    printf("OS: unknown\n");
 #endif
    printf("C++ tests. Please wait...\n");
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    const ae_int_t _static_pool_size = 1000000;
    ae_int_t _static_pool_used = 0, _static_pool_free = 0;
    void *_static_pool = malloc(_static_pool_size);
