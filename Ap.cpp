@@ -16,8 +16,7 @@
 #endif
 #include "stdafx.h"
 
-//
-// if AE_OS==AE_LINUX (will be redefined to AE_POSIX in Ap.h),
+// if AE_OS == AE_LINUX (will be redefined to AE_POSIX in Ap.h),
 // set _GNU_SOURCE flag BEFORE any #includes to get affinity
 // management functions
 //
@@ -169,7 +168,7 @@ static const char *sef_xdesc = "";
 unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
 
 // DESCRIPTION: recommended number of active workers:
-//              * positive value >=1 is used to specify exact number of active workers
+//              * positive value >= 1 is used to specify exact number of active workers
 //              * 0 means that ALL available cores are used
 //              * negative value means that all cores EXCEPT for cores_to_use will be used
 //                (say, -1 means that all cores except for one will be used). At least one
@@ -245,7 +244,7 @@ static unsigned char *sm_mem = NULL;
 #endif
 
 // These declarations are used to ensure that
-// sizeof(bool)=1, sizeof(ae_int32_t)==4, sizeof(ae_int64_t)==8, sizeof(ae_int_t)==sizeof(void*).
+// sizeof(bool)=1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void*).
 // they will lead to syntax error otherwise (array size will be negative).
 //
 // you can remove them, if you want - they are not used anywhere.
@@ -543,8 +542,8 @@ void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
 // This function cleans up automatically managed memory before caller terminates
 // ALGLIB executing by ae_break() or by simply stopping calling callback.
 //
-// For state!=NULL it calls thread_exception_handler() and the ae_state_clear().
-// For state==NULL it does nothing.
+// For state != NULL it calls thread_exception_handler() and the ae_state_clear().
+// For state == NULL it does nothing.
 void ae_clean_up_before_breaking(ae_state *state) {
    if (state != NULL) {
       if (state->thread_exception_handler != NULL)
@@ -555,11 +554,11 @@ void ae_clean_up_before_breaking(ae_state *state) {
 
 // This function abnormally aborts program, using one of several ways:
 //
-// * for state!=NULL and state->break_jump being initialized with  call  to
+// * for state != NULL and state->break_jump being initialized with  call  to
 //   ae_state_set_break_jump() - it performs longjmp() to return site.
 // * otherwise, abort() is called
 //
-// In   all  cases,  for  state!=NULL  function  sets  state->last_error  and
+// In   all  cases,  for  state != NULL  function  sets  state->last_error  and
 // state->error_msg fields. It also clears state with ae_state_clear().
 //
 // If state is not NULL and state->thread_exception_handler  is  set,  it  is
@@ -1010,7 +1009,7 @@ void ae_db_attach(ae_dyn_block *block, ae_state *state) {
 // This function initializes dynamic block:
 //
 // block               destination block, MUST be zero-filled on entry
-// size                size (in bytes), >=0.
+// size                size (in bytes), >= 0.
 // state               ALGLIB environment state, non-NULL
 // make_automatic      if true, vector is added to the dynamic block list
 //
@@ -3703,8 +3702,8 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make
    ae_shared_pool *dst, *src;
    ae_shared_pool_entry *ptr;
 
-// state!=NULL, allocation errors result in exception
-// AE_CRITICAL_ASSERT(state!=NULL);
+// state != NULL, allocation errors result in exception
+// AE_CRITICAL_ASSERT(state != NULL);
 
    dst = (ae_shared_pool *) _dst;
    src = (ae_shared_pool *) _src;
@@ -3804,7 +3803,7 @@ bool ae_shared_pool_is_initialized(void *_dst) {
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*destroy)(void *ptr), ae_state *state) {
-// state!=NULL, allocation errors result in exception
+// state != NULL, allocation errors result in exception
    AE_CRITICAL_ASSERT(state != NULL);
 
 // destroy internal objects
@@ -3838,7 +3837,7 @@ void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t si
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state) {
    void *new_obj;
 
-// state!=NULL, allocation errors are handled by throwing exception from ae_malloc()
+// state != NULL, allocation errors are handled by throwing exception from ae_malloc()
    AE_CRITICAL_ASSERT(state != NULL);
 
 // assert that pool was seeded
@@ -3896,7 +3895,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state) {
    ae_shared_pool_entry *new_entry;
 
-// state!=NULL, allocation errors are handled by throwing exception from ae_malloc()
+// state != NULL, allocation errors are handled by throwing exception from ae_malloc()
    AE_CRITICAL_ASSERT(state != NULL);
 
 // assert that pool was seeded
@@ -5279,7 +5278,7 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
 // vector and scalar.
 //
 // IMPORTANT:
-// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
 // * A must be stored in row-major order with stride equal to alglib_r_block
 void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
 // Handle special cases:
@@ -5421,7 +5420,7 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
 // vector and scalar.
 //
 // IMPORTANT:
-// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
 // * A must be stored in row-major order with stride equal to alglib_r_block
 // * y may be non-aligned
 // * both A and x must have same offset with respect to 16-byte boundary:
@@ -5701,7 +5700,7 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
 // important when A or x contain infinities/NANs).
 //
 // IMPORTANT:
-// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
 // * A must be stored in row-major order, as sequence of double precision
 //   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
 //   in doubles).
@@ -5757,7 +5756,7 @@ void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_c
 // important when A or x contain infinities/NANs).
 //
 // IMPORTANT:
-// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
 // * A must be stored in row-major order, as sequence of double precision
 //   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
 //   in doubles).
@@ -6670,9 +6669,9 @@ bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, 
       return true;
 
 // copy A and C, task is transformed to "A*A^H"-form.
-// if beta==0, then C is filled by zeros (and not referenced)
+// if beta == 0, then C is filled by zeros (and not referenced)
 //
-// alpha==0 or k==0 are correctly processed (A is not referenced)
+// alpha == 0 or k == 0 are correctly processed (A is not referenced)
    c_alpha.x = alpha;
    c_alpha.y = 0;
    c_beta.x = beta;
@@ -6728,9 +6727,9 @@ bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_i
       return true;
 
 // copy A and C, task is transformed to "A*A^T"-form.
-// if beta==0, then C is filled by zeros (and not referenced)
+// if beta == 0, then C is filled by zeros (and not referenced)
 //
-// alpha==0 or k==0 are correctly processed (A is not referenced)
+// alpha == 0 or k == 0 are correctly processed (A is not referenced)
    if (alpha == 0)
       k = 0;
    if (k > 0) {
@@ -7004,7 +7003,7 @@ bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, a
 // by-row storage given by dst.
 //
 // It can handle following special cases:
-// * col1==NULL    in this case second column of A is filled by zeros
+// * col1 == NULL    in this case second column of A is filled by zeros
 void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
    ae_int_t n2, j, stride2;
 
@@ -7043,9 +7042,9 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 // dst must be aligned, col0 and col1 may be non-aligned.
 //
 // It can handle following special cases:
-// * col1==NULL        in this case second column of A is filled by zeros
-// * src_stride==1     efficient SSE-based code is used
-// * col1-col0==1      efficient SSE-based code is used
+// * col1 == NULL        in this case second column of A is filled by zeros
+// * src_stride == 1     efficient SSE-based code is used
+// * col1-col0 == 1      efficient SSE-based code is used
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
@@ -7058,7 +7057,7 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
    ae_int_t n2, j, stride2;
 
-// handle special case: col1==NULL
+// handle special case: col1 == NULL
    if (col1 == NULL) {
       for (j = 0; j < n; j++) {
          dst[0] = *col0;
@@ -7087,7 +7086,7 @@ void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_
       }
       return;
    }
-// handle col1-col0==1
+// handle col1-col0 == 1
    if (col1 - col0 == 1) {
       __m128d v0, v1;
       n2 = n / 2;
@@ -8670,7 +8669,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //              and so on is performed
 //
 // Inputs:
-//     N   -   matrix size, N>=0
+//     N   -   matrix size, N >= 0
 //     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
 //     IA      -   submatrix offset
 //     JA      -   submatrix offset
@@ -8909,7 +8908,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 // * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
 //   it has 3 or 4 columns)
 // * U is a uHeight*B matrix
-// * Uc' is a B*C matrix, with C<=A
+// * Uc' is a B*C matrix, with C <= A
 // * scatter() scatters rows and columns of U*Uc'
 //
 // Return Value:

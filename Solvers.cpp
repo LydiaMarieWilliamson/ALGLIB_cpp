@@ -256,7 +256,7 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -317,7 +317,7 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
@@ -404,7 +404,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
 //     Info    -   return code:
 //                 * -3    A is ill conditioned or singular.
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -482,7 +482,7 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     Rep     -   additional report, following fields are set:
 //                 * rep.r1    condition number in 1-norm
@@ -584,7 +584,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -644,7 +644,7 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
@@ -716,7 +716,7 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -772,7 +772,7 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
@@ -841,7 +841,7 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -901,7 +901,7 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -969,7 +969,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1038,7 +1038,7 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
@@ -1131,7 +1131,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1185,7 +1185,7 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
@@ -1265,7 +1265,7 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1317,7 +1317,7 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
@@ -1402,7 +1402,7 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1459,7 +1459,7 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
@@ -1513,7 +1513,7 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1557,7 +1557,7 @@ void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatri
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1634,7 +1634,7 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or non-SPD.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1716,7 +1716,7 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
 // Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N,M], it contains:
 //                 * info>0    =>  solution
@@ -1800,7 +1800,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
 // Outputs:
 //     Info    -   return code:
 //                 * -3    matrix is very badly conditioned or non-SPD.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved (but matrix A may be ill-conditioned,
 //                         check R1/RInf parameters for condition numbers).
 //     Rep     -   additional report, following fields are set:
@@ -1856,7 +1856,7 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
 // Outputs:
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or non-SPD
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N], it contains:
 //                 * info>0    =>  solution
@@ -1936,7 +1936,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or badly conditioned
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     Rep     -   additional report, following fields are set:
 //                 * rep.r1    condition number in 1-norm
@@ -1990,7 +1990,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b,
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or badly conditioned
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
 //                 * for info>0 overwritten by solution
@@ -2070,7 +2070,7 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     Rep     -   additional report, following fields are set:
 //                 * rep.r1    condition number in 1-norm
@@ -2127,7 +2127,7 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, 
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * for info>0  - overwritten by solution
@@ -2271,7 +2271,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
 //     Info    -   return code:
 //                 * -3    A is is exactly  singular or is not positive definite.
 //                         B is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[0..N-1]:
 //                 * overwritten by solution
@@ -2405,7 +2405,7 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or not positive definite
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[0..N-1]:
 //                 * overwritten by solution
@@ -2487,7 +2487,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 //     Info    -   return code:
 //                 * -3    A is singular, or VERY close to singular.
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     Rep     -   additional report, following fields are set:
 //                 * rep.r1    condition number in 1-norm
@@ -2542,7 +2542,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b,
 //     Info    -   return code:
 //                 * -3    A is singular, or VERY close to singular.
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
 //                 * for info>0 overwritten by solution
@@ -2622,7 +2622,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         X is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     Rep     -   additional report, following fields are set:
 //                 * rep.r1    condition number in 1-norm
@@ -2679,7 +2679,7 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, 
 //     Info    -   return code:
 //                 * -3    A is is exactly singular or ill conditioned
 //                         B is filled by zeros in such cases.
-//                 * -1    N<=0 was passed
+//                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * for info>0  - overwritten by solution
@@ -2734,7 +2734,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 // Outputs:
 //     Info    -   return code:
 //                 * -4    SVD subroutine failed
-//                 * -1    if NRows<=0 or NCols<=0 or Threshold<0 was passed
+//                 * -1    if NRows <= 0 or NCols <= 0 or Threshold<0 was passed
 //                 *  1    if task is solved
 //     Rep     -   solver report, see below for more info
 //     X       -   array[0..N-1,0..M-1], it contains:
@@ -4859,12 +4859,12 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
 //                 * IsUpper=False => only lower triangle is used and upper
 //                                    triangle is not referenced at all
 //     B       -   right part, array[N]
-//     K       -   k parameter for  GMRES(k), k>=0.  Zero  value  means  that
+//     K       -   k parameter for  GMRES(k), k >= 0.  Zero  value  means  that
 //                 algorithm will choose it automatically.
-//     EpsF    -   stopping condition, EpsF>=0. The algorithm will stop  when
+//     EpsF    -   stopping condition, EpsF >= 0. The algorithm will stop  when
 //                 residual will decrease below EpsF*|B|. Having EpsF=0 means
 //                 that this stopping condition is ignored.
-//     MaxIts  -   stopping condition, MaxIts>=0.  The  algorithm  will  stop
+//     MaxIts  -   stopping condition, MaxIts >= 0.  The  algorithm  will  stop
 //                 after performing MaxIts iterations. Zero  value  means  no
 //                 limit.
 //
@@ -4879,7 +4879,7 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
 //                             positive definite
 //                     * -4    overflow/underflow during solution
 //                             (ill conditioned problem)
-//                     *  1    ||residual||<=EpsF*||b||
+//                     *  1    ||residual|| <= EpsF*||b||
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             best point found is returned
@@ -4948,12 +4948,12 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 //                 (where  N  is  a  size   specified  during  solver  object
 //                 creation).
 //     B       -   right part, array[N]
-//     K       -   k parameter for  GMRES(k), k>=0.  Zero  value  means  that
+//     K       -   k parameter for  GMRES(k), k >= 0.  Zero  value  means  that
 //                 algorithm will choose it automatically.
-//     EpsF    -   stopping condition, EpsF>=0. The algorithm will stop  when
+//     EpsF    -   stopping condition, EpsF >= 0. The algorithm will stop  when
 //                 residual will decrease below EpsF*|B|. Having EpsF=0 means
 //                 that this stopping condition is ignored.
-//     MaxIts  -   stopping condition, MaxIts>=0.  The  algorithm  will  stop
+//     MaxIts  -   stopping condition, MaxIts >= 0.  The  algorithm  will  stop
 //                 after performing MaxIts iterations. Zero  value  means  no
 //                 limit.
 //
@@ -4968,7 +4968,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 //                             positive definite
 //                     * -4    overflow/underflow during solution
 //                             (ill conditioned problem)
-//                     *  1    ||residual||<=EpsF*||b||
+//                     *  1    ||residual|| <= EpsF*||b||
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             best point found is returned
@@ -5112,7 +5112,7 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) 
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     K       -   GMRES parameter, K>=0:
+//     K       -   GMRES parameter, K >= 0:
 //                 * recommended values are in 10..100 range
 //                 * larger values up to N are possible but have little sense
 //                   - the algorithm will be slower than any dense solver.
@@ -5311,7 +5311,7 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b, ae
 //                             positive definite
 //                     * -4    overflow/underflow during solution
 //                             (ill conditioned problem)
-//                     *  1    ||residual||<=EpsF*||b||
+//                     *  1    ||residual|| <= EpsF*||b||
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             best point found is returned
@@ -5556,7 +5556,7 @@ void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax, ae_state *
 //                             positive definite
 //                     * -4    overflow/underflow during solution
 //                             (ill conditioned problem)
-//                     *  1    ||residual||<=EpsF*||b||
+//                     *  1    ||residual|| <= EpsF*||b||
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             best point found is returned
@@ -6869,7 +6869,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 //                             too large or too small
 //                     * -4    overflow/underflow during solution
 //                             (ill conditioned problem)
-//                     *  1    ||residual||<=EpsF*||b||
+//                     *  1    ||residual|| <= EpsF*||b||
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             best point found is returned
@@ -6915,7 +6915,7 @@ void lincgsetrestartfreq(lincgstate *state, ae_int_t srf, ae_state *_state) {
 // change it
 //
 // Inputs:
-//     Freq    -   desired update frequency, Freq>=0.
+//     Freq    -   desired update frequency, Freq >= 0.
 //                 Zero value means that no updates will be done.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 // API: void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq, const xparams _xparams = xdefault);
@@ -7456,7 +7456,7 @@ void linlsqrsetprecdiag(linlsqrstate *state, ae_state *_state) {
 // It is zero by default.
 //
 // Inputs:
-//     LambdaI -   regularization factor, LambdaI>=0
+//     LambdaI -   regularization factor, LambdaI >= 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -7606,8 +7606,8 @@ lbl_13:
 // NOTE:
 // There are three criteria for stopping:
 // (S0) maximum number of iterations
-// (S1) ||Rk||<=EpsB*||B||;
-// (S2) ||A^T*Rk||/(||A||*||Rk||)<=EpsA.
+// (S1) ||Rk|| <= EpsB*||B||;
+// (S2) ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
 // It is very important that S2 always checked AFTER S1. It is necessary
 // to avoid division by zero when Rk=0.
    state->betai = bnorm;
@@ -7772,8 +7772,8 @@ lbl_17:
 
 // Check stopping criteria
 // 1. achieved required number of iterations;
-// 2. ||Rk||<=EpsB*||B||;
-// 3. ||A^T*Rk||/(||A||*||Rk||)<=EpsA;
+// 2. ||Rk|| <= EpsB*||B||;
+// 3. ||A^T*Rk||/(||A||*||Rk||) <= EpsA;
    if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
 
    // Achieved required number of iterations
@@ -7784,7 +7784,7 @@ lbl_17:
    }
    if (ae_fp_less_eq(state->phibarip1, state->epsb * bnorm)) {
 
-   // ||Rk||<=EpsB*||B||, here ||Rk||=PhiBar
+   // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
       state->running = false;
       state->repterminationtype = 1;
       result = false;
@@ -7792,7 +7792,7 @@ lbl_17:
    }
    if (ae_fp_less_eq(state->alphaip1 * ae_fabs(state->ci, _state) / state->anorm, state->epsa)) {
 
-   // ||A^T*Rk||/(||A||*||Rk||)<=EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
+   // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
       state->running = false;
       state->repterminationtype = 4;
       result = false;
@@ -7931,8 +7931,8 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
 // This function sets stopping criteria.
 //
 // Inputs:
-//     EpsA    -   algorithm will be stopped if ||A^T*Rk||/(||A||*||Rk||)<=EpsA.
-//     EpsB    -   algorithm will be stopped if ||Rk||<=EpsB*||B||
+//     EpsA    -   algorithm will be stopped if ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
+//     EpsB    -   algorithm will be stopped if ||Rk|| <= EpsB*||B||
 //     MaxIts  -   algorithm will be stopped if number of iterations
 //                 more than MaxIts.
 //
@@ -7971,8 +7971,8 @@ void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxi
 //     X       -   array[N], solution
 //     Rep     -   optimization report:
 //                 * Rep.TerminationType completetion code:
-//                     *  1    ||Rk||<=EpsB*||B||
-//                     *  4    ||A^T*Rk||/(||A||*||Rk||)<=EpsA
+//                     *  1    ||Rk|| <= EpsB*||B||
+//                     *  4    ||A^T*Rk||/(||A||*||Rk||) <= EpsA
 //                     *  5    MaxIts steps was taken
 //                     *  7    rounding errors prevent further progress,
 //                             X contains best point found so far.
@@ -8559,9 +8559,9 @@ void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsF    -   >=0
+//     EpsF    - >= 0
 //                 The subroutine finishes  its work if on k+1-th iteration
-//                 the condition ||F||<=EpsF is satisfied
+//                 the condition ||F|| <= EpsF is satisfied
 //     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
 //                 iterations is unlimited.
 //
@@ -8602,7 +8602,7 @@ void nleqsetxrep(nleqstate *state, bool needxrep, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when target function  contains  exp()  or  other  fast
@@ -8777,7 +8777,7 @@ lbl_9:
 // * if step is good, we decrease Lambda and move on.
 //
 // We can break this cycle on two occasions:
-// * step is so small that x+step==x (in floating point arithmetics)
+// * step is so small that x+step == x (in floating point arithmetics)
 // * lambda is so large
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_addd(&state->x.ptr.p_double[0], 1, &state->candstep.ptr.p_double[0], 1, ae_v_len(0, n - 1), stepnorm);
@@ -8890,7 +8890,7 @@ lbl_rcomm:
 //                             stationary point Xf which is local minimum  of
 //                             f=F[0]^2+...+F[m-1]^2, but is not solution  of
 //                             nonlinear system.
-//                     *  1    sqrt(f)<=EpsF.
+//                     *  1    sqrt(f) <= EpsF.
 //                     *  5    MaxIts steps was taken
 //                     *  7    stopping conditions are too stringent,
 //                             further improvement is impossible

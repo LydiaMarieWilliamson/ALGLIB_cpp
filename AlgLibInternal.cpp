@@ -942,7 +942,7 @@ double safepythag3(double x, double y, double z, ae_state *_state) {
 // This function attempts to calculate R=X/Y without overflow.
 //
 // It returns:
-// * +1, if abs(X/Y)>=MaxRealNumber or undefined - overflow-like situation
+// * +1, if abs(X/Y) >= MaxRealNumber or undefined - overflow-like situation
 //       (no overlfow is generated, R is either NAN, PosINF, NegINF)
 // *  0, if MinRealNumber<abs(X/Y)<MaxRealNumber or X=0, Y<>0
 //       (R contains result, may be zero)
@@ -1016,7 +1016,7 @@ double safeminposrv(double x, double y, double v, ae_state *_state) {
 
    if (ae_fp_greater_eq(y, (double)(1))) {
 
-   // Y>=1, we can safely divide by Y
+   // Y >= 1, we can safely divide by Y
       r = x / y;
       result = v;
       if (ae_fp_greater(v, r)) {
@@ -1740,10 +1740,10 @@ void unsetrealmatrix(RMatrix *a, ae_state *_state) {
 // task into two smaller tasks.
 //
 // It has following properties:
-// * it works only for TaskSize>=2 and TaskSize>TileSize (assertion is thrown otherwise)
+// * it works only for TaskSize >= 2 and TaskSize>TileSize (assertion is thrown otherwise)
 // * Task0+Task1=TaskSize, Task0>0, Task1>0
 // * Task0 and Task1 are close to each other
-// * Task0>=Task1
+// * Task0 >= Task1
 // * Task0 is always divisible by TileSize
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
@@ -1816,11 +1816,11 @@ ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_
 // task into two smaller tasks.
 //
 // It has following properties:
-// * it works only for TaskSize>=2 (assertion is thrown otherwise)
+// * it works only for TaskSize >= 2 (assertion is thrown otherwise)
 // * for TaskSize=2, it returns Task0=1, Task1=1
 // * in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
 // * in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
-//   and both Task0 and Task1 are even, Task0>=Task1
+//   and both Task0 and Task1 are even, Task0 >= Task1
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
 
@@ -1853,7 +1853,7 @@ void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_sta
 }
 
 // This function is used to calculate number of chunks (including partial,
-// non-complete chunks) in some set. It expects that ChunkSize>=1, TaskSize>=0.
+// non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
 // Assertion is thrown otherwise.
 //
 // Function result is equivalent to Ceil(TaskSize/ChunkSize), but with guarantees
@@ -1943,7 +1943,7 @@ double spawnlevel(ae_state *_state) {
 // task into two smaller tasks.
 //
 // It has following properties:
-// * it works only for TaskSize>=2 and ChunkSize>=2
+// * it works only for TaskSize >= 2 and ChunkSize >= 2
 //   (assertion is thrown otherwise)
 // * Task0+Task1=TaskSize, Task0>0, Task1>0
 // * Task0 and Task1 are close to each other
@@ -3164,7 +3164,7 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) 
 //     X       -   possibly preallocated array
 //
 // Outputs:
-//     X       -   length(X)>=N
+//     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
 
@@ -3181,7 +3181,7 @@ void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
 //     X       -   possibly preallocated array
 //
 // Outputs:
-//     X       -   length(X)>=N
+//     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void iallocv(ae_int_t n, ZVector *x, ae_state *_state) {
 
@@ -3198,7 +3198,7 @@ void iallocv(ae_int_t n, ZVector *x, ae_state *_state) {
 //     X       -   possibly preallocated array
 //
 // Outputs:
-//     X       -   length(X)>=N
+//     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void ballocv(ae_int_t n, BVector *x, ae_state *_state) {
 
@@ -3951,7 +3951,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //              and so on is performed
 //
 // Inputs:
-//     N   -   matrix size, N>=0
+//     N   -   matrix size, N >= 0
 //     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
 //     IA      -   submatrix offset
 //     JA      -   submatrix offset
@@ -7014,7 +7014,7 @@ void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t 
 //     A       -   heap itself, must be at least array[0..N-1]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
-//     N       -   size of the heap, N>=1
+//     N       -   size of the heap, N >= 1
 //
 // On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
 // decreased by 1.
@@ -7161,7 +7161,7 @@ static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector
       return;
    }
 // Quicksort: choose pivot
-// Here we assume that I2-I1>=2
+// Here we assume that I2-I1 >= 2
    v0 = a->ptr.p_double[i1];
    v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
    v2 = a->ptr.p_double[i2];
@@ -7292,7 +7292,7 @@ static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector
       return;
    }
 // Quicksort: choose pivot
-// Here we assume that I2-I1>=16
+// Here we assume that I2-I1 >= 16
    v0 = a->ptr.p_double[i1];
    v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
    v2 = a->ptr.p_double[i2];
@@ -7419,7 +7419,7 @@ static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_
       return;
    }
 // Quicksort: choose pivot
-// Here we assume that I2-I1>=16
+// Here we assume that I2-I1 >= 16
    v0 = a->ptr.p_double[i1];
    v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
    v2 = a->ptr.p_double[i2];
@@ -9457,7 +9457,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
    ln2 = ae_log((double)(2), _state);
    *rerr = mx * ae_machineepsilon;
 
-// 1. find S such that 0.5<=S*MX<1
+// 1. find S such that 0.5 <= S*MX<1
 // 2. multiply W by S, so task is normalized in some sense
 // 3. S:=1/S so we can obtain original vector multiplying by S
    k = ae_round(ae_log(mx, _state) / ln2, _state);
@@ -10779,8 +10779,8 @@ static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t least
 // This subroutine generates FFT plan for K complex FFT's with length N each.
 //
 // Inputs:
-//     N           -   FFT length (in complex numbers), N>=1
-//     K           -   number of repetitions, K>=1
+//     N           -   FFT length (in complex numbers), N >= 1
+//     K           -   number of repetitions, K >= 1
 //
 // Outputs:
 //     Plan        -   plan
@@ -10815,7 +10815,7 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state 
 // * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
 //   real entries to store precomputed Quantities for Bluestein's
 //   transformation
-// * prime factor F<=RaderThreshold does NOT require
+// * prime factor F <= RaderThreshold does NOT require
 //   precomputed storage
    precrsize = 0;
    precisize = 0;
@@ -10869,7 +10869,7 @@ void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t r
 
 // Returns good factorization N=N1*N2.
 //
-// Usually N1<=N2 (but not always - small N's may be exception).
+// Usually N1 <= N2 (but not always - small N's may be exception).
 // if N1<>1 then N2<>1.
 //
 // Factorization is chosen depending on task type and codelets we have.
@@ -11006,7 +11006,7 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 // * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
 //   real entries to store precomputed Quantities for Bluestein's
 //   transformation
-// * prime factor F<=RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
+// * prime factor F <= RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
 //   precomputed storage
    ncur = n;
    for (i = 2; i <= ftbase_maxradix; i++) {
@@ -11033,8 +11033,8 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 // recursively builds transformation plan
 //
 // Inputs:
-//     N           -   FFT length (in complex numbers), N>=1
-//     K           -   number of repetitions, K>=1
+//     N           -   FFT length (in complex numbers), N >= 1
+//     K           -   number of repetitions, K >= 1
 //     ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
 //                     plan header/footer.
 //     TopmostPlan -   if True, plan generator assumes that it is topmost plan:
@@ -11371,7 +11371,7 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 //     A           -   array, must be large enough for plan to work
 //     ABase       -   base offset in array A, this value points to start of
 //                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
 //                     This is an offset within large PlanLength-subarray of
 //                     the chunk to process.
 //     Buf         -   temporary buffer whose length is equal to plan length
@@ -12444,7 +12444,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *pr
 //     A           -   array, must be large enough for plan to work
 //     ABase       -   base offset in array A, this value points to start of
 //                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
 //                     This is an offset within large PlanLength-subarray of
 //                     the chunk to process.
 //     OperandsCnt -   number of repeated operands (length N each)
@@ -12584,7 +12584,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 //     A           -   array, must be large enough for plan to work
 //     ABase       -   base offset in array A, this value points to start of
 //                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
 //                     This is an offset within large PlanLength-subarray of
 //                     the chunk to process.
 //     OperandsCnt -   number of repeated operands (length N each)
@@ -12702,8 +12702,8 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t aba
 // Outputs:
 //     N1, N2  -   such numbers that:
 //                 * for prime N:                  N1=N2=0
-//                 * for composite N<=MaxRadix:    N1=N2=0
-//                 * for composite N>MaxRadix:     1<=N1<=N2, N1*N2=N
+//                 * for composite N <= MaxRadix:    N1=N2=0
+//                 * for composite N>MaxRadix:     1 <= N1 <= N2, N1*N2=N
 // ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
 static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state) {
    ae_int_t j;

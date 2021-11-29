@@ -65,8 +65,8 @@ double barycentriccalc(barycentricinterpolant *b, double t, ae_state *_state) {
       return result;
    }
 // Here we assume that task is normalized, i.e.:
-// 1. abs(Y[i])<=1
-// 2. abs(W[i])<=1
+// 1. abs(Y[i]) <= 1
+// 2. abs(W[i]) <= 1
 // 3. X[] is ordered
    s = ae_fabs(t - b->x.ptr.p_double[0], _state);
    for (i = 0; i <= b->n - 1; i++) {
@@ -482,7 +482,7 @@ void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycen
 //     N   -   number of nodes, N>0.
 //     D   -   order of the interpolation scheme, 0 <= D <= N-1.
 //             D<0 will cause an error.
-//             D>=N it will be replaced with D=N-1.
+//             D >= N it will be replaced with D=N-1.
 //             if you don't know what D to choose, use small value about 3-5.
 //
 // Outputs:
@@ -620,7 +620,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b, ae_state *_st
    ae_vector_init(&p1, 0, DT_INT, _state, true);
    ae_vector_init(&p2, 0, DT_INT, _state, true);
 
-// Normalize task: |Y|<=1, |W|<=1, sort X[]
+// Normalize task: |Y| <= 1, |W| <= 1, sort X[]
    b->sy = (double)(0);
    for (i = 0; i <= b->n - 1; i++) {
       b->sy = ae_maxreal(b->sy, ae_fabs(b->y.ptr.p_double[i], _state), _state);
@@ -934,9 +934,9 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state) {
 // * finally, model construction is performed with idwfit() function.
 //
 // Inputs:
-//     NX  -   dimensionality of the argument, NX>=1
-//     NY  -   dimensionality of the function being modeled, NY>=1;
-//             NY=1 corresponds to classic scalar function, NY>=1 corresponds
+//     NX  -   dimensionality of the argument, NX >= 1
+//     NY  -   dimensionality of the function being modeled, NY >= 1;
+//             NY=1 corresponds to classic scalar function, NY >= 1 corresponds
 //             to vector-valued function.
 //
 // Outputs:
@@ -988,7 +988,7 @@ void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_st
 //
 // Inputs:
 //     State   -   builder object
-//     NLayers -   NLayers>=1, the number of layers used by the model.
+//     NLayers -   NLayers >= 1, the number of layers used by the model.
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const xparams _xparams = xdefault);
 void idwbuildersetnlayers(idwbuilder *state, ae_int_t nlayers, ae_state *_state) {
@@ -1009,7 +1009,7 @@ void idwbuildersetnlayers(idwbuilder *state, ae_int_t nlayers, ae_state *_state)
 //                 NY elements are function values. Array may  be larger than
 //                 specified, in  this  case  only leading [N,NX+NY] elements
 //                 will be used.
-//     N       -   number of points in the dataset, N>=0.
+//     N       -   number of points in the dataset, N >= 0.
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);
 // API: void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const xparams _xparams = xdefault);
@@ -1044,7 +1044,7 @@ void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n, ae_state *_
 //    * MSTAB shows almost no strange  fitting  artifacts  like  ripples  and
 //      sharp spikes (unlike N-dimensional splines and HRBFs)
 //    * MSTAB does not return function values far from the  interval  spanned
-//      by the dataset; say, if all your points have |f|<=1, you  can be sure
+//      by the dataset; say, if all your points have |f| <= 1, you  can be sure
 //      that model value won't deviate too much from [-1,+1]
 // 3) good model construction time competing with that of HRBFs  and  bicubic
 //    splines
@@ -3684,7 +3684,7 @@ void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricin
 // Inputs:
 //     X   -   abscissas, array[0..N-1]
 //     Y   -   function values, array[0..N-1]
-//     N   -   number of points, N>=1
+//     N   -   number of points, N >= 1
 //
 // Outputs:
 //     P   -   barycentric model which represents Lagrange interpolant
@@ -3771,7 +3771,7 @@ void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant 
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1]
-//     N   -   number of points, N>=1
+//     N   -   number of points, N >= 1
 //             for N=1 a constant model is constructed.
 //
 // Outputs:
@@ -3835,7 +3835,7 @@ void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentr
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1],
 //             Y[I] = Y(0.5*(B+A) + 0.5*(B-A)*Cos(PI*(2*i+1)/(2*n)))
-//     N   -   number of points, N>=1
+//     N   -   number of points, N >= 1
 //             for N=1 a constant model is constructed.
 //
 // Outputs:
@@ -3899,7 +3899,7 @@ void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentri
 //     B   -   right boundary of [A,B]
 //     Y   -   function values at the nodes, array[0..N-1],
 //             Y[I] = Y(0.5*(B+A) + 0.5*(B-A)*Cos(PI*i/(n-1)))
-//     N   -   number of points, N>=1
+//     N   -   number of points, N >= 1
 //             for N=1 a constant model is constructed.
 //
 // Outputs:
@@ -3963,7 +3963,7 @@ void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentri
 //     A   -   left boundary of [A,B]
 //     B   -   right boundary of [A,B]
 //     F   -   function values, array[0..N-1]
-//     N   -   number of points on equidistant grid, N>=1
+//     N   -   number of points on equidistant grid, N >= 1
 //             for N=1 a constant model is constructed.
 //     T   -   position where P(x) is calculated
 //
@@ -4804,7 +4804,7 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //     X   -   spline nodes, array[0..N-1]
 //     Y   -   function values, array[0..N-1]
 //     N   -   points count (optional):
-//             * N>=2
+//             * N >= 2
 //             * if given, only first N points are used to build spline
 //             * if not given, automatically detected from X/Y sizes
 //               (len(X) must be equal to len(Y))
@@ -4873,7 +4873,7 @@ void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used to build spline
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5004,7 +5004,7 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5138,7 +5138,7 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5309,7 +5309,7 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points from X/Y are used
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5320,7 +5320,7 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //     N2          -   new points count:
-//                     * N2>=2
+//                     * N2 >= 2
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
@@ -5483,7 +5483,7 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points from X/Y are used
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5494,7 +5494,7 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //     N2          -   new points count:
-//                     * N2>=2
+//                     * N2 >= 2
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
@@ -5661,7 +5661,7 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points from X/Y are used
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5672,7 +5672,7 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //     BoundR      -   right boundary condition (first or second derivative,
 //                     depending on the BoundRType)
 //     N2          -   new points count:
-//                     * N2>=2
+//                     * N2 >= 2
 //                     * if given, only first N2 points from X2 are used
 //                     * if not given, automatically detected from X2 size
 //
@@ -5834,7 +5834,7 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //
 // Optional Parameters:
 //     N           -   points count:
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used to build spline
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -5950,7 +5950,7 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 //     Y           -   function values, array[0..N-1]
 //     D           -   derivatives, array[0..N-1]
 //     N           -   points count (optional):
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used to build spline
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -6029,7 +6029,7 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 //     X           -   spline nodes, array[0..N-1]
 //     Y           -   function values, array[0..N-1]
 //     N           -   points count (optional):
-//                     * N>=2
+//                     * N >= 2
 //                     * if given, only first N points are used to build spline
 //                     * if not given, automatically detected from X/Y sizes
 //                       (len(X) must be equal to len(Y))
@@ -6504,8 +6504,8 @@ double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state) {
 //                     * N>0
 //                     * if given, only first N elements of X/Y are processed
 //                     * if not given, automatically determined from lengths
-//     M           -   number of basis functions ( = number_of_nodes), M>=4.
-//     LambdaNS    -   LambdaNS>=0, regularization  constant  passed by user.
+//     M           -   number of basis functions ( = number_of_nodes), M >= 4.
+//     LambdaNS    -   LambdaNS >= 0, regularization  constant  passed by user.
 //                     It penalizes nonlinearity in the regression spline.
 //                     Possible values to start from are 0.00001, 0.1, 1
 //
@@ -6993,7 +6993,7 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
 // Outputs:
 //     R           -   array[NR], contains roots of the spline.
 //                     In case there is no roots, this array has zero length.
-//     NR          -   number of roots, >=0
+//     NR          -   number of roots, >= 0
 //     DR          -   is set to True in case there is at least one interval
 //                     where spline is just a zero constant. Such degenerate
 //                     cases are not reported in the R/NR
@@ -7003,7 +7003,7 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
 //     ET          -   array[NE], extrema types:
 //                     * ET[i]>0 in case I-th extrema is a minimum
 //                     * ET[i]<0 in case I-th extrema is a maximum
-//     NE          -   number of extrema, >=0
+//     NE          -   number of extrema, >= 0
 //     DE          -   is set to True in case there is at least one interval
 //                     where spline is a constant. Such degenerate cases are
 //                     not reported in the E/NE.
@@ -7186,7 +7186,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
       }
    } else {
 
-   // case, when C.Continuity>=1
+   // case, when C.Continuity >= 1
    // 'TmpR ' - it stores a time value for roots
    // 'TmpC' - it stores a time value for extremums and
    // their function value (TmpC={EX0,F(EX0), EX1,F(EX1), ..., EXn,F(EXn)};)
@@ -8022,7 +8022,7 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
 //     X           -   spline nodes, array[0..N-1]. Subroutine automatically
 //                     sorts points, so caller may pass unsorted array.
 //     Y           -   function values, array[0..N-1]
-//     N           -   the number of points(N>=2).
+//     N           -   the number of points(N >= 2).
 //
 // Outputs:
 //     C           -   spline interpolant.
@@ -9294,9 +9294,9 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
 //                 has length NSections+1 or zero (for NSections=0).
 //     Y2      -   Y-values of corner points,
 //                 has length NSections+1 or zero (for NSections=0).
-//     NSections-  number of sections found by algorithm, NSections<=M,
+//     NSections-  number of sections found by algorithm, NSections <= M,
 //                 NSections can be zero for degenerate datasets
-//                 (N<=1 or all X[] are non-distinct).
+//                 (N <= 1 or all X[] are non-distinct).
 //
 // NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
 //       curve, (X2[NSection-1],Y2[NSection-1]) is the last point.
@@ -9490,7 +9490,7 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
 //                 has length NSections+1 or zero (for NSections=0).
 //     NSections-  number of sections found by algorithm,
 //                 NSections can be zero for degenerate datasets
-//                 (N<=1 or all X[] are non-distinct).
+//                 (N <= 1 or all X[] are non-distinct).
 //
 // NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
 //       curve, (X2[NSection-1],Y2[NSection-1]) is the last point.
@@ -9609,12 +9609,12 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
 //     N   -   number of points, N>0
 //             * if given, only leading N elements of X/Y are used
 //             * if not given, automatically determined from sizes of X/Y
-//     M   -   number of basis functions (= polynomial_degree + 1), M>=1
+//     M   -   number of basis functions (= polynomial_degree + 1), M >= 1
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //     P   -   interpolant in barycentric form.
 //     Rep -   report, same format as in LSFitLinearW() subroutine.
@@ -9697,14 +9697,14 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 //             * DC[i]=0   means that P(XC[i])=YC[i]
 //             * DC[i]=1   means that P'(XC[i])=YC[i]
 //             SEE BELOW FOR IMPORTANT INFORMATION ON CONSTRAINTS
-//     K   -   number of constraints, 0<=K<M.
+//     K   -   number of constraints, 0 <= K<M.
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
-//     M   -   number of basis functions (= polynomial_degree + 1), M>=1
+//     M   -   number of basis functions (= polynomial_degree + 1), M >= 1
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //     P   -   interpolant in barycentric form.
@@ -9904,8 +9904,8 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 //     F(x|A,B,C,D) = D+(A-D)/(1+Power(x/C,B))
 //
 // Inputs:
-//     X       -   current point, X>=0:
-//                 * zero X is correctly handled even for B<=0
+//     X       -   current point, X >= 0:
+//                 * zero X is correctly handled even for B <= 0
 //                 * negative X results in exception.
 //     A, B, C, D- parameters of 4PL model:
 //                 * A is unconstrained
@@ -9964,8 +9964,8 @@ double logisticcalc4(double x, double a, double b, double c, double d, ae_state 
 //     F(x|A,B,C,D,G) = D+(A-D)/Power(1+Power(x/C,B),G)
 //
 // Inputs:
-//     X       -   current point, X>=0:
-//                 * zero X is correctly handled even for B<=0
+//     X       -   current point, X >= 0:
+//                 * zero X is correctly handled even for B <= 0
 //                 * negative X results in exception.
 //     A, B, C, D, G- parameters of 5PL model:
 //                 * A is unconstrained
@@ -10028,7 +10028,7 @@ double logisticcalc5(double x, double a, double b, double c, double d, double g,
 //
 // Here:
 //     * A, D - unconstrained (see LogisticFit4EC() for constrained 4PL)
-//     * B>=0
+//     * B >= 0
 //     * C>0
 //
 // IMPORTANT: output of this function is constrained in  such  way that  B>0.
@@ -10126,7 +10126,7 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 //
 // Here:
 //     * A, D - with optional equality constraints
-//     * B>=0
+//     * B >= 0
 //     * C>0
 //
 // IMPORTANT: output of this function is constrained in  such  way that  B>0.
@@ -10215,7 +10215,7 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // Parameter  CnstrLeft  contains  left  constraint (or NAN for unconstrained
 // fitting), and CnstrRight contains right  one.  For  4PL,  left  constraint
 // ALWAYS corresponds to parameter A, and right one is ALWAYS  constraint  on
-// D. That's because 4PL model is normalized in such way that B>=0.
+// D. That's because 4PL model is normalized in such way that B >= 0.
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state) {
@@ -10488,7 +10488,7 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //
 // Here:
 //     * A, D - unconstrained
-//     * B>=0 for 4PL, unconstrained for 5PL
+//     * B >= 0 for 4PL, unconstrained for 5PL
 //     * C>0
 //     * G>0 (if present)
 //
@@ -10513,16 +10513,16 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //                 See  below,  section  "EQUALITY  CONSTRAINTS"   for   more
 //                 information about constraints.
 //     Is4PL   -   whether 4PL or 5PL models are fitted
-//     LambdaV -   regularization coefficient, LambdaV>=0.
+//     LambdaV -   regularization coefficient, LambdaV >= 0.
 //                 Set it to zero unless you know what you are doing.
-//     EpsX    -   stopping condition (step size), EpsX>=0.
+//     EpsX    -   stopping condition (step size), EpsX >= 0.
 //                 Zero value means that small step is automatically chosen.
 //                 See notes below for more information.
 //     RsCnt   -   number of repeated restarts from  random  points.  4PL/5PL
 //                 models are prone to problem of bad local extrema. Utilizing
 //                 multiple random restarts allows  us  to  improve algorithm
 //                 convergence.
-//                 RsCnt>=0.
+//                 RsCnt >= 0.
 //                 Zero value means that function automatically choose  small
 //                 amount of restarts (recommended).
 //
@@ -10564,7 +10564,7 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // Parameter  CnstrLeft  contains  left  constraint (or NAN for unconstrained
 // fitting), and CnstrRight contains right  one.  For  4PL,  left  constraint
 // ALWAYS corresponds to parameter A, and right one is ALWAYS  constraint  on
-// D. That's because 4PL model is normalized in such way that B>=0.
+// D. That's because 4PL model is normalized in such way that B >= 0.
 //
 // For 5PL model things are different. Unlike  4PL  one,  5PL  model  is  NOT
 // symmetric with respect to  change  in  sign  of  B. Thus, negative B's are
@@ -11031,18 +11031,18 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //             * DC[i]=0   means that S(XC[i])=YC[i]
 //             * DC[i]=1   means that S'(XC[i])=YC[i]
 //             SEE BELOW FOR IMPORTANT INFORMATION ON CONSTRAINTS
-//     K   -   number of constraints, 0<=K<M.
+//     K   -   number of constraints, 0 <= K<M.
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
-//     M   -   number of basis functions ( = number_of_nodes), M>=2.
+//     M   -   number of basis functions ( = number_of_nodes), M >= 2.
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //                         -1 means another errors in parameters passed
-//                            (N<=0, for example)
+//                            (N <= 0, for example)
 //     B   -   barycentric interpolant.
 //     Rep -   report, same format as in LSFitLinearWC() subroutine.
 //             Following fields are set:
@@ -11172,12 +11172,12 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
 //     X   -   points, array[0..N-1].
 //     Y   -   function values, array[0..N-1].
 //     N   -   number of points, N>0.
-//     M   -   number of basis functions ( = number_of_nodes), M>=2.
+//     M   -   number of basis functions ( = number_of_nodes), M >= 2.
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //     B   -   barycentric interpolant.
@@ -11264,16 +11264,16 @@ void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m
 //             * DC[i]=1   means that S'(XC[i])=YC[i]
 //             SEE BELOW FOR IMPORTANT INFORMATION ON CONSTRAINTS
 //     K   -   number of constraints (optional):
-//             * 0<=K<M.
+//             * 0 <= K<M.
 //             * K=0 means no constraints (XC/YC/DC are not used)
 //             * if given, only first K elements of XC/YC/DC are used
 //             * if not given, automatically determined from XC/YC/DC
-//     M   -   number of basis functions ( = number_of_nodes+2), M>=4.
+//     M   -   number of basis functions ( = number_of_nodes+2), M >= 4.
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearWC() subroutine.
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //     S   -   spline interpolant.
@@ -11386,23 +11386,23 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 //             * DC[i]=1   means that S'(XC[i])=YC[i]
 //             SEE BELOW FOR IMPORTANT INFORMATION ON CONSTRAINTS
 //     K   -   number of constraints (optional):
-//             * 0<=K<M.
+//             * 0 <= K<M.
 //             * K=0 means no constraints (XC/YC/DC are not used)
 //             * if given, only first K elements of XC/YC/DC are used
 //             * if not given, automatically determined from XC/YC/DC
 //     M   -   number of basis functions (= 2 * number of nodes),
-//             M>=4,
+//             M >= 4,
 //             M IS EVEN!
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //                         -2 means odd M was passed (which is not supported)
 //                         -1 means another errors in parameters passed
-//                            (N<=0, for example)
+//                            (N <= 0, for example)
 //     S   -   spline interpolant.
 //     Rep -   report, same format as in LSFitLinearW() subroutine.
 //             Following fields are set:
@@ -11441,9 +11441,9 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 //   constraints will be consistent
 // * in the general case, consistency of constraints is NOT GUARANTEED.
 // * in the several special cases, however, we can guarantee consistency.
-// * one of this cases is  M>=4  and   constraints  on   the  function  value
+// * one of this cases is  M >= 4  and   constraints  on   the  function  value
 //   (AND/OR its derivative) at the interval boundaries.
-// * another special case is M>=4  and  ONE  constraint on the function value
+// * another special case is M >= 4  and  ONE  constraint on the function value
 //   (OR, BUT NOT AND, derivative) anywhere in [min(x),max(x)]
 //
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
@@ -11589,8 +11589,8 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 //                 corresponding weight.
 //     FMatrix -   a table of basis functions values, array[0..N-1, 0..M-1].
 //                 FMatrix[I, J] - value of J-th basis function in I-th point.
-//     N       -   number of points used. N>=1.
-//     M       -   number of basis functions, M>=1.
+//     N       -   number of points used. N >= 1.
+//     M       -   number of basis functions, M >= 1.
 //
 // Outputs:
 //     Info    -   error code:
@@ -11689,8 +11689,8 @@ void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t
 //     CMatrix -   a table of constaints, array[0..K-1,0..M].
 //                 I-th row of CMatrix corresponds to I-th linear constraint:
 //                 CMatrix[I,0]*C[0] + ... + CMatrix[I,M-1]*C[M-1] = CMatrix[I,M]
-//     N       -   number of points used. N>=1.
-//     M       -   number of basis functions, M>=1.
+//     N       -   number of points used. N >= 1.
+//     M       -   number of basis functions, M >= 1.
 //     K       -   number of constraints, 0 <= K < M
 //                 K=0 corresponds to absence of constraints.
 //
@@ -11889,8 +11889,8 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
 //     Y       -   array[0..N-1] Function values in  N  points.
 //     FMatrix -   a table of basis functions values, array[0..N-1, 0..M-1].
 //                 FMatrix[I, J] - value of J-th basis function in I-th point.
-//     N       -   number of points used. N>=1.
-//     M       -   number of basis functions, M>=1.
+//     N       -   number of points used. N >= 1.
+//     M       -   number of basis functions, M >= 1.
 //
 // Outputs:
 //     Info    -   error code:
@@ -11993,8 +11993,8 @@ void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t 
 //     CMatrix -   a table of constaints, array[0..K-1,0..M].
 //                 I-th row of CMatrix corresponds to I-th linear constraint:
 //                 CMatrix[I,0]*C[0] + ... + CMatrix[I,M-1]*C[M-1] = CMatrix[I,M]
-//     N       -   number of points used. N>=1.
-//     M       -   number of basis functions, M>=1.
+//     N       -   number of points used. N >= 1.
+//     M       -   number of basis functions, M >= 1.
 //     K       -   number of constraints, 0 <= K < M
 //                 K=0 corresponds to absence of constraints.
 //
@@ -12684,9 +12684,9 @@ void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, 
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsX    -   >=0
+//     EpsX    - >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - ste pvector, dx=X(k+1)-X(k)
@@ -12716,7 +12716,7 @@ void lsfitsetcond(lsfitstate *state, double epsx, ae_int_t maxits, ae_state *_st
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -12846,7 +12846,7 @@ void lsfitsetbc(lsfitstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -12893,7 +12893,7 @@ void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
@@ -14316,7 +14316,7 @@ static void lsfit_lsfitlinearinternal(RVector *y, RVector *w, RMatrix *fmatrix, 
       ae_frame_leave(_state);
       return;
    }
-// N>=M. Generate design matrix and reduce to N=M using
+// N >= M. Generate design matrix and reduce to N=M using
 // QR decomposition.
    ae_matrix_set_length(&ft, n, m, _state);
    ae_vector_set_length(&b, n, _state);
@@ -14467,8 +14467,8 @@ static void lsfit_barycentriccalcbasis(barycentricinterpolant *b, double t, RVec
       return;
    }
 // Here we assume that task is normalized, i.e.:
-// 1. abs(Y[i])<=1
-// 2. abs(W[i])<=1
+// 1. abs(Y[i]) <= 1
+// 2. abs(W[i]) <= 1
 // 3. X[] is ordered
 //
 // First, we decide: should we use "safe" formula (guarded
@@ -14521,14 +14521,14 @@ static void lsfit_barycentriccalcbasis(barycentricinterpolant *b, double t, RVec
 //     DC  -   array[0..K-1], types of constraints:
 //             * DC[i]=0   means that P(XC[i])=YC[i]
 //             * DC[i]=1   means that P'(XC[i])=YC[i]
-//     K   -   number of constraints, 0<=K<M.
+//     K   -   number of constraints, 0 <= K<M.
 //             K=0 means no constraints (XC/YC/DC are not used in such cases)
-//     M   -   number of basis functions (= polynomial_degree + 1), M>=1
+//     M   -   number of basis functions (= polynomial_degree + 1), M >= 1
 //
 // Outputs:
 //     Info-   same format as in LSFitLinearW() subroutine:
 //             * Info>0    task is solved
-//             * Info<=0   an error occured:
+//             * Info <= 0   an error occured:
 //                         -4 means inconvergence of internal SVD
 //                         -3 means inconsistent constraints
 //     C   -   interpolant in Chebyshev form; [-1,+1] is used as base interval
@@ -17054,7 +17054,7 @@ void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // order to move away from non-smoothness we use following reformulation:
 //
 //         [   ]                  [         ]2
-//     min [ R ] subject to R>=0, [ XY[i]-C ]  <= R^2
+//     min [ R ] subject to R >= 0, [ XY[i]-C ]  <= R^2
 //     C,R [   ]                  [         ]
 //
 // i.e. it becomes smooth quadratically constrained optimization problem with
@@ -17773,7 +17773,7 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
 //     XY  -   points, array[0..N-1,0..1].
 //             XY[I,0:1] corresponds to the Ith point.
 //             Order of points is important!
-//     N   -   points count, N>=5 for Akima splines, N>=2 for other types  of
+//     N   -   points count, N >= 5 for Akima splines, N >= 2 for other types  of
 //             splines.
 //     ST  -   spline type:
 //             * 0     Akima spline
@@ -17921,7 +17921,7 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 //             XY[I,0:1] corresponds to the Ith point.
 //             XY[N-1,0:1] must be different from XY[0,0:1].
 //             Order of points is important!
-//     N   -   points count, N>=3 for other types of splines.
+//     N   -   points count, N >= 3 for other types of splines.
 //     ST  -   spline type:
 //             * 1     Catmull-Rom spline (Tension=0) with cyclic boundary conditions
 //             * 2     cubic spline with cyclic boundary conditions
@@ -18539,9 +18539,9 @@ double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_
 //                 * elements of Idx2 can be treated as parameter values
 //                   which should be used when building new parametric curve
 //                 * Idx2[0]=0, Idx2[NSections]=N-1
-//     NSections-  number of sections found by algorithm, NSections<=M,
+//     NSections-  number of sections found by algorithm, NSections <= M,
 //                 NSections can be zero for degenerate datasets
-//                 (N<=1 or all X[] are non-distinct).
+//                 (N <= 1 or all X[] are non-distinct).
 //
 // NOTE: algorithm stops after:
 //       a) dividing curve into StopM sections
@@ -19296,7 +19296,7 @@ static void rbfv1_buildrbfmlayersmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, 
 //
 // Inputs:
 //     NX      -   dimension of the space, NX=2 or NX=3
-//     NY      -   function dimension, NY>=1
+//     NY      -   function dimension, NY >= 1
 //
 // Outputs:
 //     S       -   RBF model (initially equals to zero)
@@ -22466,8 +22466,8 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
 //             * next D elements store D values at (X[1],Y[0])
 //             * general form - D function values at (X[i],Y[j]) are stored
 //               at F[D*(J*N+I)...D*(J*N+I)+D-1].
-//     M,N -   grid size, M>=2, N>=2
-//     D   -   vector dimension, D>=1
+//     M,N -   grid size, M >= 2, N >= 2
+//     D   -   vector dimension, D >= 1
 //
 // Outputs:
 //     C   -   spline interpolant
@@ -22562,8 +22562,8 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
 //             * next D elements store D values at (X[1],Y[0])
 //             * general form - D function values at (X[i],Y[j]) are stored
 //               at F[D*(J*N+I)...D*(J*N+I)+D-1].
-//     M,N -   grid size, M>=2, N>=2
-//     D   -   vector dimension, D>=1
+//     M,N -   grid size, M >= 2, N >= 2
+//     D   -   vector dimension, D >= 1
 //
 // Outputs:
 //     C   -   spline interpolant
@@ -23387,11 +23387,11 @@ void spline2dbuildersetgrid(spline2dbuilder *state, ae_int_t kx, ae_int_t ky, ae
 // Inputs:
 //     S       -   spline 2D builder object
 //     NLayers -   number of layers in the model:
-//                 * NLayers>=1 means that up  to  chosen  number  of  bottom
+//                 * NLayers >= 1 means that up  to  chosen  number  of  bottom
 //                   layers is fitted
 //                 * NLayers=0 means that maximum number of layers is  chosen
 //                   (according to current grid size)
-//                 * NLayers<=-1 means that up to |NLayers| topmost layers is
+//                 * NLayers <= -1 means that up to |NLayers| topmost layers is
 //                   skipped
 //                 Recommendations:
 //                 * good "default" value is 2 layers
@@ -23405,7 +23405,7 @@ void spline2dbuildersetgrid(spline2dbuilder *state, ae_int_t kx, ae_int_t ky, ae
 //                   results in complete hierarchy of layers being generated.
 //     LambdaV -   regularization coefficient, chosen in such a way  that  it
 //                 penalizes bottom layers (fine details) first.
-//                 LambdaV>=0, zero value means that no penalty is applied.
+//                 LambdaV >= 0, zero value means that no penalty is applied.
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 // API: void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav, const xparams _xparams = xdefault);
 void spline2dbuildersetalgofastddm(spline2dbuilder *state, ae_int_t nlayers, double lambdav, ae_state *_state) {
@@ -24089,10 +24089,10 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
 // Inputs:
 //     XY          -   array[NPoints*(2+D)]; dataset after scaling  in  such
 //                     way that grid step is equal to 1.0 in both dimensions.
-//     NPoints     -   dataset size, NPoints>=1
-//     KX, KY      -   grid size, KX,KY>=4
-//     Smoothing   -   nonlinearity penalty coefficient, >=0
-//     LambdaReg   -   regularization coefficient, >=0
+//     NPoints     -   dataset size, NPoints >= 1
+//     KX, KY      -   grid size, KX,KY >= 4
+//     Smoothing   -   nonlinearity penalty coefficient, >= 0
+//     LambdaReg   -   regularization coefficient, >= 0
 //     Basis1      -   basis spline, expected to be non-zero only at [-2,+2]
 //     AV, AH      -   possibly preallocated buffers
 //
@@ -24332,7 +24332,7 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
 //     TileSize    -   tile size
 //     InterfaceSize-  interface size
 //     NPoints     -   points count
-//     D           -   number of components in vector-valued spline, D>=1
+//     D           -   number of components in vector-valued spline, D >= 1
 //     LSQRCnt     -   number of iterations, non-zero:
 //                     * LSQRCnt>0 means that specified amount of  preconditioned
 //                       LSQR  iterations  will  be  performed  to solve problem;
@@ -24713,7 +24713,7 @@ bool _trypexec_spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalex
 //     XY      -   array[NPoints*(2+D)], dataset
 //     KX, KY  -   grid size
 //     NPoints -   points count
-//     D       -   number of components in vector-valued spline, D>=1
+//     D       -   number of components in vector-valued spline, D >= 1
 //     LSQRCnt -   number of iterations, non-zero:
 //                 * LSQRCnt>0 means that specified amount of  preconditioned
 //                   LSQR  iterations  will  be  performed  to solve problem;
@@ -24906,7 +24906,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
 //     XY      -   array[NPoints*(2+D)], dataset
 //     KX, KY  -   grid size
 //     NPoints -   points count
-//     D       -   number of components in vector-valued spline, D>=1
+//     D       -   number of components in vector-valued spline, D >= 1
 //     LSQRCnt -   number of iterations, non-zero:
 //                 * LSQRCnt>0 means that specified amount of  preconditioned
 //                   LSQR  iterations  will  be  performed  to solve problem;
@@ -25771,7 +25771,7 @@ bool _trypexec_spline2d_reorderdatasetandbuildindexrec(RVector *xy, ae_int_t d, 
 //     KY0, KY1-   Y-indices of basis functions to select and fit;
 //                 range [KY0,KY1) is processed
 //     KYTotal -   total number of indexes in the entire grid
-//     D       -   number of components in vector-valued spline, D>=1
+//     D       -   number of components in vector-valued spline, D >= 1
 //     LambdaReg-  regularization coefficient
 //     LambdaNS-   nonlinearity penalty, exactly zero value is specially handled
 //                 (entire set of rows is not added to the matrix)
@@ -27230,7 +27230,7 @@ static void rbfv2_zerofill(rbfv2model *s, ae_int_t nx, ae_int_t ny, ae_int_t bf,
 //
 // Inputs:
 //     NX      -   dimension of the space, NX=2 or NX=3
-//     NY      -   function dimension, NY>=1
+//     NY      -   function dimension, NY >= 1
 //
 // Outputs:
 //     S       -   RBF model (initially equals to zero)
@@ -27990,7 +27990,7 @@ double rbfv2nearradius(ae_int_t bf, ae_state *_state) {
 }
 
 // Returns basis function value.
-// Assumes that D2>=0
+// Assumes that D2 >= 0
 double rbfv2basisfunc(ae_int_t bf, double d2, ae_state *_state) {
    double v;
    double result;
@@ -28019,7 +28019,7 @@ double rbfv2basisfunc(ae_int_t bf, double d2, ae_state *_state) {
 }
 
 // Returns basis function value, first and second derivatives
-// Assumes that D2>=0
+// Assumes that D2 >= 0
 void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *d2f, ae_state *_state) {
    double v;
 
@@ -30623,8 +30623,8 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
 //             * general form - D function values at (X[i],Y[j]) are stored
 //               at F[D*(N*(M*K+J)+I)...D*(N*(M*K+J)+I)+D-1].
 //     M,N,
-//     L   -   grid size, M>=2, N>=2, L>=2
-//     D   -   vector dimension, D>=1
+//     L   -   grid size, M >= 2, N >= 2, L >= 2
+//     D   -   vector dimension, D >= 1
 //
 // Outputs:
 //     C   -   spline interpolant
@@ -31861,7 +31861,7 @@ static void rbf_initializev2(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *
 static void rbf_clearreportfields(rbfreport *rep, ae_state *_state);
 
 // This function creates RBF  model  for  a  scalar (NY=1)  or  vector (NY>1)
-// function in a NX-dimensional space (NX>=1).
+// function in a NX-dimensional space (NX >= 1).
 //
 // Newly created model is empty. It can be used for interpolation right after
 // creation, but it just returns zeros. You have to add points to the  model,
@@ -31896,8 +31896,8 @@ static void rbf_clearreportfields(rbfreport *rep, ae_state *_state);
 //            and RBF-ML) are still backward-compatible.
 //
 // Inputs:
-//     NX      -   dimension of the space, NX>=1
-//     NY      -   function dimension, NY>=1
+//     NX      -   dimension of the space, NX >= 1
+//     NY      -   function dimension, NY >= 1
 //
 // Outputs:
 //     S       -   RBF model (initially equals to zero)
@@ -31913,8 +31913,8 @@ static void rbf_clearreportfields(rbfreport *rep, ae_state *_state);
 //         NX=3. Any  attempt  to  create  single-dimensional  or  more  than
 //         3-dimensional RBF model resulted in exception.
 //
-//         ALGLIB 3.11 supports any NX>0, but models created with  NX!=2  and
-//         NX!=3 are incompatible with (a) older versions of ALGLIB, (b)  old
+//         ALGLIB 3.11 supports any NX>0, but models created with  NX != 2  and
+//         NX != 3 are incompatible with (a) older versions of ALGLIB, (b)  old
 //         model construction algorithms (QNN or RBF-ML).
 //
 //         So, if you create a model with NX=2 or NX=3,  then,  depending  on
@@ -32355,7 +32355,7 @@ void rbfsetalgomultilayer(rbfmodel *s, double rbase, ae_int_t nlayers, double la
 //     RBase   -   RBase parameter, RBase>0
 //     NLayers -   NLayers parameter, NLayers>0, recommended value  to  start
 //                 with - about 5.
-//     LambdaNS-   >=0, nonlinearity penalty coefficient, negative values are
+//     LambdaNS- >= 0, nonlinearity penalty coefficient, negative values are
 //                 not allowed. This parameter adds controllable smoothing to
 //                 the problem, which may reduce noise. Specification of non-
 //                 zero lambda means that in addition to fitting error solver
@@ -32523,7 +32523,7 @@ void rbfsetv2its(rbfmodel *s, ae_int_t maxits, ae_state *_state) {
 //
 // Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
-//     R       -   support radius coefficient, >=0.
+//     R       -   support radius coefficient, >= 0.
 //                 Recommended values are [0.1,0.4] range, with 0.1 being
 //                 default value.
 // ALGLIB: Copyright 01.02.2017 by Sergey Bochkanov
@@ -32539,15 +32539,15 @@ void rbfsetv2supportr(rbfmodel *s, double r, ae_state *_state) {
 //
 // Inputs:
 //     S       -   RBF model, initialized by RBFCreate() call
-//     EpsOrt  -   orthogonality stopping criterion, EpsOrt>=0. Algorithm will
-//                 stop when ||A'*r||<=EpsOrt where A' is a transpose of  the
+//     EpsOrt  -   orthogonality stopping criterion, EpsOrt >= 0. Algorithm will
+//                 stop when ||A'*r|| <= EpsOrt where A' is a transpose of  the
 //                 system matrix, r is a residual vector.
 //                 Recommended value of EpsOrt is equal to 1E-6.
 //                 This criterion will stop algorithm when we have "bad fit"
 //                 situation, i.e. when we should stop in a point with large,
 //                 nonzero residual.
 //     EpsErr  -   residual stopping  criterion.  Algorithm  will  stop  when
-//                 ||r||<=EpsErr*||b||, where r is a residual vector, b is  a
+//                 ||r|| <= EpsErr*||b||, where r is a residual vector, b is  a
 //                 right part of the system (function values).
 //                 Recommended value of EpsErr is equal to 1E-3 or 1E-6.
 //                 This  criterion  will  stop  algorithm  in  a  "good  fit"

@@ -39,7 +39,7 @@ bool _trypexec_basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, 
 //
 // Inputs:
 //     X       -   sample
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
@@ -118,7 +118,7 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 //
 // Inputs:
 //     X       -   sample
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
@@ -145,7 +145,7 @@ double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // Inputs:
 //     X       -   sample
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
@@ -172,7 +172,7 @@ double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // Inputs:
 //     X       -   sample
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
@@ -199,7 +199,7 @@ double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // Inputs:
 //     X       -   sample
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only leading N elements of X are processed
 //                 * if not given, automatically determined from size of X
 //
@@ -226,7 +226,7 @@ double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
 //
 // Inputs:
 //     X   -   sample
-//     N   -   N>=0, sample size:
+//     N   -   N >= 0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
 //
@@ -268,7 +268,7 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
 //
 // Inputs:
 //     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
+//     N   -   N >= 0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
 //
@@ -315,7 +315,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
       ae_frame_leave(_state);
       return;
    }
-// Common case, N>=3.
+// Common case, N >= 3.
 // Choose X[(N-1)/2]
    l = 0;
    ir = n - 1;
@@ -400,10 +400,10 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 //
 // Inputs:
 //     X   -   sample (array indexes: [0..N-1])
-//     N   -   N>=0, sample size:
+//     N   -   N >= 0, sample size:
 //             * if given, only leading N elements of X are processed
 //             * if not given, automatically determined from size of X
-//     P   -   percentile (0<=P<=1)
+//     P   -   percentile (0 <= P <= 1)
 //
 // Outputs:
 //     V   -   percentile
@@ -453,7 +453,7 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
 // Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only N leading elements of X/Y are processed
 //                 * if not given, automatically determined from input sizes
 //
@@ -528,7 +528,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only N leading elements of X/Y are processed
 //                 * if not given, automatically determined from input sizes
 //
@@ -618,7 +618,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // Inputs:
 //     X       -   sample 1 (array indexes: [0..N-1])
 //     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N>=0, sample size:
+//     N       -   N >= 0, sample size:
 //                 * if given, only N leading elements of X/Y are processed
 //                 * if not given, automatically determined from input sizes
 //
@@ -670,7 +670,7 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
 //     M   -   M>0, number of variables:
@@ -710,7 +710,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!", _state);
    ae_assert(apservisfinitematrix(x, n, m, _state), "CovM: X contains infinite/NAN elements", _state);
 
-// N<=1, return zero
+// N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m, m, _state);
       for (i = 0; i <= m - 1; i++) {
@@ -764,7 +764,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
 //     M   -   M>0, number of variables:
@@ -817,7 +817,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
 //     M   -   M>0, number of variables:
@@ -856,7 +856,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
    ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!", _state);
    ae_assert(apservisfinitematrix(x, n, m, _state), "SpearmanCorrM: X contains infinite/NAN elements", _state);
 
-// N<=1, return zero
+// N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m, m, _state);
       for (i = 0; i <= m - 1; i++) {
@@ -943,7 +943,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 //     Y   -   array[N,M2], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
 //     M1  -   M1>0, number of variables in X:
@@ -1000,7 +1000,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
    ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y)<M2!", _state);
    ae_assert(apservisfinitematrix(y, n, m2, _state), "CovM2: X contains infinite/NAN elements", _state);
 
-// N<=1, return zero
+// N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2, _state);
       for (i = 0; i <= m1 - 1; i++) {
@@ -1081,7 +1081,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 //     Y   -   array[N,M2], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
 //     M1  -   M1>0, number of variables in X:
@@ -1144,7 +1144,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
    ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y)<M2!", _state);
    ae_assert(apservisfinitematrix(y, n, m2, _state), "PearsonCorrM2: X contains infinite/NAN elements", _state);
 
-// N<=1, return zero
+// N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2, _state);
       for (i = 0; i <= m1 - 1; i++) {
@@ -1260,7 +1260,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 //     Y   -   array[N,M2], sample matrix:
 //             * J-th column corresponds to J-th variable
 //             * I-th row corresponds to I-th observation
-//     N   -   N>=0, number of observations:
+//     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
 //     M1  -   M1>0, number of variables in X:
@@ -1317,7 +1317,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y)<M2!", _state);
    ae_assert(apservisfinitematrix(y, n, m2, _state), "SpearmanCorrM2: X contains infinite/NAN elements", _state);
 
-// N<=1, return zero
+// N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2, _state);
       for (i = 0; i <= m1 - 1; i++) {
@@ -2529,7 +2529,7 @@ static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_sta
 //
 // Inputs:
 //     R   -   Pearson's correlation coefficient for X and Y
-//     N   -   number of elements in samples, N>=5.
+//     N   -   number of elements in samples, N >= 5.
 //
 // Outputs:
 //     BothTails   -   p-value for two-tailed test.
@@ -2599,7 +2599,7 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
 //
 // Inputs:
 //     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N>=5.
+//     N   -   number of elements in samples, N >= 5.
 //
 // Outputs:
 //     BothTails   -   p-value for two-tailed test.
@@ -3132,14 +3132,14 @@ static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, doubl
 //
 // Inputs:
 //     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N>=5
+//     N   -   size of the sample. N >= 5
 //
 // Outputs:
 //     P           -   p-value for the test
 //
-// Accuracy of the approximation used (5<=N<=1951):
+// Accuracy of the approximation used (5 <= N <= 1951):
 //
-// p-value          relative error (5<=N<=1951)
+// p-value          relative error (5 <= N <= 1951)
 // [1, 0.1]            < 1%
 // [0.1, 0.01]         < 2%
 // [0.01, 0.001]       < 6%
@@ -9940,7 +9940,7 @@ static double wsr_w200(double s, ae_state *_state) {
    return result;
 }
 
-// Tail(S,N), S>=0
+// Tail(S,N), S >= 0
 static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
    double f0;
    double f1;
@@ -10225,9 +10225,9 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //
 // Inputs:
 //     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N>=5
+//     N   -   size of the sample. N >= 5
 //     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   size of the sample. M>=5
+//     M   -   size of the sample. M >= 5
 //
 // Outputs:
 //     BothTails   -   p-value for two-tailed test.
@@ -10258,7 +10258,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 // account characteristics of asymptotic approximation used, precision should
 // not be sharply different from the values for interval [5, 100].
 //
-// NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
+// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
 //       P's outside of this interval are enforced to these bounds. Say,  you
 //       may quite often get P equal to exactly 0.25 or 0.0001.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
@@ -14081,7 +14081,7 @@ namespace alglib_impl {
 //
 // Inputs:
 //     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of sample, N>=0
+//     N       -   size of sample, N >= 0
 //     Mean    -   assumed value of the mean.
 //
 // Outputs:

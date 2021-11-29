@@ -50,12 +50,12 @@ namespace alglib_impl {
 //                 Zero-indexed element is not used and may be arbitrary.
 //                 Beta[I]>0.
 //     Mu0     -   zeroth moment of the weight function.
-//     N       -   number of nodes of the quadrature formula, N>=1
+//     N       -   number of nodes of the quadrature formula, N >= 1
 //
 // Outputs:
 //     Info    -   error code:
 //                 * -3    internal eigenproblem solver hasn't converged
-//                 * -2    Beta[i]<=0
+//                 * -2    Beta[i] <= 0
 //                 * -1    incorrect N was passed
 //                 *  1    OK
 //     X       -   array[0..N-1] - array of quadrature nodes,
@@ -140,13 +140,13 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
 //     B       -   right boundary of the integration interval.
-//     N       -   number of nodes of the quadrature formula, N>=3
+//     N       -   number of nodes of the quadrature formula, N >= 3
 //                 (including the left and right boundary nodes).
 //
 // Outputs:
 //     Info    -   error code:
 //                 * -3    internal eigenproblem solver hasn't converged
-//                 * -2    Beta[i]<=0
+//                 * -2    Beta[i] <= 0
 //                 * -1    incorrect N was passed
 //                 *  1    OK
 //     X       -   array[0..N-1] - array of quadrature nodes,
@@ -298,13 +298,13 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
 //                 Beta[I]>0
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
-//     N       -   number of nodes of the quadrature formula, N>=2
+//     N       -   number of nodes of the quadrature formula, N >= 2
 //                 (including the left boundary node).
 //
 // Outputs:
 //     Info    -   error code:
 //                 * -3    internal eigenproblem solver hasn't converged
-//                 * -2    Beta[i]<=0
+//                 * -2    Beta[i] <= 0
 //                 * -1    incorrect N was passed
 //                 *  1    OK
 //     X       -   array[0..N-1] - array of quadrature nodes,
@@ -393,7 +393,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
 // nodes.
 //
 // Inputs:
-//     N           -   number of nodes, >=1
+//     N           -   number of nodes, >= 1
 //
 // Outputs:
 //     Info        -   error code:
@@ -458,7 +458,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
 // function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
 //
 // Inputs:
-//     N           -   number of nodes, >=1
+//     N           -   number of nodes, >= 1
 //     Alpha       -   power-law coefficient, Alpha>-1
 //     Beta        -   power-law coefficient, Beta>-1
 //
@@ -543,7 +543,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 // weight function W(x)=Power(x,Alpha)*Exp(-x)
 //
 // Inputs:
-//     N           -   number of nodes, >=1
+//     N           -   number of nodes, >= 1
 //     Alpha       -   power-law coefficient, Alpha>-1
 //
 // Outputs:
@@ -619,7 +619,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 // weight function W(x)=Exp(-x*x)
 //
 // Inputs:
-//     N           -   number of nodes, >=1
+//     N           -   number of nodes, >= 1
 //
 // Outputs:
 //     Info        -   error code:
@@ -857,7 +857,7 @@ namespace alglib_impl {
 //                     * -4    N is too large, task may be ill  conditioned -
 //                             x[i]=x[i+1] found.
 //                     * -3    internal eigenproblem solver hasn't converged
-//                     * -2    Beta[i]<=0
+//                     * -2    Beta[i] <= 0
 //                     * -1    incorrect N was passed
 //                     * +1    OK
 //     X           -   array[0..N-1] - array of quadrature nodes,
@@ -1032,7 +1032,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // used depending on machine precision and number of nodes.
 //
 // Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
 //
 // Outputs:
 //     Info        -   error code:
@@ -1072,7 +1072,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
 //     W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
 //
 // Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
 //     Alpha       -   power-law coefficient, Alpha>-1
 //     Beta        -   power-law coefficient, Beta>-1
 //
@@ -1176,7 +1176,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
 // Reduction to tridiagonal eigenproblem is used.
 //
 // Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
 //
 // Outputs:
 //     Info        -   error code:

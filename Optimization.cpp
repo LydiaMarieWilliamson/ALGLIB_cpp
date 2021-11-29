@@ -803,7 +803,7 @@ void trimprepare(double f, double *threshold, ae_state *_state) {
 //
 //                    { {F,G}          if F<Threshold
 //     {F_tr, G_tr} = {
-//                    { {Threshold, 0} if F>=Threshold
+//                    { {Threshold, 0} if F >= Threshold
 //
 // Such transformation allows us to  solve  problems  with  singularities  by
 // redefining function in such way that it becomes bounded from above.
@@ -886,8 +886,8 @@ bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVecto
 // Outputs:
 //     G       -   projection of G. Components of G which satisfy one of the
 //                 following
-//                     (1) (X[I]<=BndL[I]) and (G[I]>0), OR
-//                     (2) (X[I]>=BndU[I]) and (G[I]<0)
+//                     (1) (X[I] <= BndL[I]) and (G[I]>0), OR
+//                     (2) (X[I] >= BndU[I]) and (G[I]<0)
 //                 are replaced by zeros.
 //
 // NOTE 1: this function assumes that constraints are feasible. It throws
@@ -1055,7 +1055,7 @@ void calculatestepbound(RVector *x, RVector *d, double alpha, RVector *bndl, BVe
 //     ValueToFreeze-  result of CalculateStepBound()
 //     StepTaken   -   actual step length (actual step is equal to the possibly
 //                     non-unit step direction vector times this parameter).
-//                     StepTaken<=MaxStepLen.
+//                     StepTaken <= MaxStepLen.
 //     MaxStepLen  -   result of CalculateStepBound()
 //
 // Outputs:
@@ -1141,7 +1141,7 @@ ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVect
 //     S           -   array[NMain+NSlack], scaling of the variables
 //     NMain       -   number of main variables
 //     NSlack      -   number of slack variables
-//     DropTol     -   drop tolerance, >=0
+//     DropTol     -   drop tolerance, >= 0
 //
 // Outputs:
 //     X           -   point bounded with respect to constraints.
@@ -1898,7 +1898,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
 // parameters DF0 and DF1 from segment [A;B] to [0;1]. Then it builds Hermite
 // spline and derivative of it in 0.5. Search scale as Max(DF0,DF1, |F0-F1|).
 // Right derivative has to satisfy condition:
-//     |H-F|/S<=0,001, |H'-F'|/S<=0,001.
+//     |H-F|/S <= 0,001, |H'-F'|/S <= 0,001.
 //
 // Inputs:
 //     F0  -   function's value in X-TestStep point;
@@ -4107,10 +4107,10 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
 // Inputs:
 //     N       -   problem dimension. N>0
 //     M       -   number of corrections in the BFGS scheme of Hessian
-//                 approximation update. Recommended value:  3<=M<=7. The smaller
+//                 approximation update. Recommended value:  3 <= M <= 7. The smaller
 //                 value causes worse convergence, the bigger will  not  cause  a
 //                 considerably better convergence, but will cause a fall in  the
-//                 performance. M<=N.
+//                 performance. M <= N.
 //     X       -   initial solution approximation, array[0..N-1].
 //
 //
@@ -4151,10 +4151,10 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of corrections in the BFGS scheme of Hessian
-//                 approximation update. Recommended value:  3<=M<=7. The smaller
+//                 approximation update. Recommended value:  3 <= M <= 7. The smaller
 //                 value causes worse convergence, the bigger will  not  cause  a
 //                 considerably better convergence, but will cause a fall in  the
-//                 performance. M<=N.
+//                 performance. M <= N.
 //     X       -   starting point, array[0..N-1].
 //     DiffStep-   differentiation step, >0
 //
@@ -4202,20 +4202,20 @@ void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbf
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinLBFGSSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes  its work if on k+1-th iteration
-//                 the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+//                 the  condition  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
 //                 is satisfied.
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - ste pvector, dx=X(k+1)-X(k)
@@ -4264,7 +4264,7 @@ void minlbfgssetxrep(minlbfgsstate *state, bool needxrep, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0 (default),  if
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0 (default),  if
 //                 you don't want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -7697,7 +7697,7 @@ void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *b
 //     AR              -   ranges for constraints, can be zero (equality
 //                         constraint), positive (range constraint) or +INF
 //                         (lower bound constraint), array[M]
-//     M               -   constraint count, M>=0
+//     M               -   constraint count, M >= 0
 //
 // Outputs:
 //     DenseA          -   replaced by scaled/shifted constraints, array[M,N]
@@ -7736,10 +7736,10 @@ void scaleshiftdensebrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, RMatri
 //     N               -   number of variables.
 //     SparseA         -   sparse MSparse*N constraint matrix in CRS format;
 //                         ignored if MSparse=0.
-//     MSparse         -   dense constraint count, MSparse>=0
+//     MSparse         -   dense constraint count, MSparse >= 0
 //     DenseA          -   array[MDense,N], constraint matrix;
 //                         ignored if MDense=0.
-//     MDense          -   dense constraint count, MDense>=0
+//     MDense          -   dense constraint count, MDense >= 0
 //     AB              -   lower bounds for constraints, always present and
 //                         finite, array[MSparse+MDense]
 //     AR              -   ranges for constraints, can be zero (equality
@@ -7800,9 +7800,9 @@ void scaleshiftmixedbrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, sparse
 //     N               -   number of variables.
 //     DenseA          -   array[NMain,NMain], quadratic term
 //     IsUpper         -   whether upper or lower triangle is present
-//     NMain           -   number of nonslack vars, 1<=NMain<=NTotal
+//     NMain           -   number of nonslack vars, 1 <= NMain <= NTotal
 //     DenseB          -   array[NTotal], linear term
-//     NTotal          -   total number of variables, NTotal>=1
+//     NTotal          -   total number of variables, NTotal >= 1
 //     S               -   scale vector, array[NTotal]:
 //                         * I-th element contains scale of I-th variable,
 //                         * SC[I]>0
@@ -7882,8 +7882,8 @@ void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector
 //     AR              -   ranges for constraints, can be zero (equality
 //                         constraint), positive (range constraint) or +INF
 //                         (lower bound constraint), array[M]
-//     N               -   number of variables, N>=1.
-//     M               -   constraint count, M>=0
+//     N               -   number of variables, N >= 1.
+//     M               -   constraint count, M >= 0
 //     NeedNorms       -   whether we need row norms or not
 //
 // Outputs:
@@ -7933,16 +7933,16 @@ void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int
 // Inputs:
 //     SparseA         -   sparse MSparse*N constraint matrix in CRS format;
 //                         ignored if MSparse=0.
-//     MSparse         -   dense constraint count, MSparse>=0
+//     MSparse         -   dense constraint count, MSparse >= 0
 //     DenseA          -   array[MDense,N], constraint matrix;
 //                         ignored if MDense=0.
-//     MDense          -   dense constraint count, MDense>=0
+//     MDense          -   dense constraint count, MDense >= 0
 //     AB              -   lower bounds for constraints, always present and
 //                         finite, array[MSparse+MDense]
 //     AR              -   ranges for constraints, can be zero (equality
 //                         constraint), positive (range constraint) or +INF
 //                         (lower bound constraint), array[MSparse+MDense]
-//     N               -   number of variables, N>=1.
+//     N               -   number of variables, N >= 1.
 //     LimitedAmplification-   whether row amplification is limited or not:
 //                         * if False, rows with small norms (less than 1.0)
 //                           are always normalized
@@ -8068,7 +8068,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
 // Inputs:
 //     DenseA          -   array[NMain,NMain], quadratic term
 //     IsUpper         -   whether upper or lower triangle is present
-//     NMain           -   number of nonslack vars, 1<=NMain<=NTotal
+//     NMain           -   number of nonslack vars, 1 <= NMain <= NTotal
 //     DenseB          -   array[NTotal], linear term
 //     NTotal          -   total number of variables.
 //
@@ -8255,12 +8255,12 @@ void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s, a
 //
 //         ( [ 1     |      ]   [   ]   [   ] )^2
 //         ( [   1   |      ]   [   ]   [   ] )
-//     min ( [     1 |  Ad  ] * [ x ] - [ b ] )    s.t. x>=0
+//     min ( [     1 |  Ad  ] * [ x ] - [ b ] )    s.t. x >= 0
 //         ( [       |      ]   [   ]   [   ] )
 //         ( [       |      ]   [   ]   [   ] )
 //
 // where:
-// * identity matrix has NS*NS size (NS<=NR, NS can be zero)
+// * identity matrix has NS*NS size (NS <= NR, NS can be zero)
 // * dense matrix Ad has NR*ND size
 // * b is NR*1 vector
 // * x is (NS+ND)*1 vector
@@ -8274,8 +8274,8 @@ void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s, a
 //     S   -   SNNLS solver, must be initialized with SNNLSInit() call
 //     A   -   array[NR,ND], dense part of the system
 //     B   -   array[NR], right part
-//     NS  -   size of the sparse part of the system, 0<=NS<=NR
-//     ND  -   size of the dense part of the system, ND>=0
+//     NS  -   size of the sparse part of the system, 0 <= NS <= NR
+//     ND  -   size of the dense part of the system, ND >= 0
 //     NR  -   rows count, NR>0
 //
 // NOTE:
@@ -8321,7 +8321,7 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
 // Inputs:
 //     S   -   SNNLS solver, must be initialized with SNNLSInit() call,
 //             problem must be set with SNNLSSetProblem() call.
-//     Idx -   constraint index, 0<=IDX<NS+ND
+//     Idx -   constraint index, 0 <= IDX<NS+ND
 // ALGLIB: Copyright 10.10.2012 by Sergey Bochkanov
 void snnlsdropnnc(snnlssolver *s, ae_int_t idx, ae_state *_state) {
 
@@ -9227,7 +9227,7 @@ void sassetbc(sactiveset *state, RVector *bndl, RVector *bndu, ae_state *_state)
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0
+//     K       -   number of equality/inequality constraints, K >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately:
 // * there always exists some minor violation (about Epsilon in magnitude)
@@ -9266,7 +9266,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
@@ -9305,8 +9305,8 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
 //                 First NEC rows store equality constraints, next NIC -  are
 //                 inequality ones.
 //                 All elements of C (including right part) must be finite.
-//     NEC     -   number of equality constraints, NEC>=0
-//     NIC     -   number of inequality constraints, NIC>=0
+//     NEC     -   number of equality constraints, NEC >= 0
+//     NIC     -   number of inequality constraints, NIC >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately:
 // * there always exists some minor violation (about Epsilon in magnitude)
@@ -9543,7 +9543,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
 //     CIdx        -   -1 for unlimited step, in [0,N+NEC+NIC) in case of
 //                     limited step.
 //     VVal        -   value which is assigned to X[CIdx] during activation.
-//                     For CIdx<0 or CIdx>=N some dummy value is assigned to
+//                     For CIdx<0 or CIdx >= N some dummy value is assigned to
 //                     this parameter.
 void sasexploredirection(sactiveset *state, RVector *d, double *stpmax, ae_int_t *cidx, double *vval, ae_state *_state) {
    ae_int_t n;
@@ -10871,7 +10871,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
 
          // NOTE: it is important to check for non-strict inequality
          //       because we have to correctly handle zero constraint
-         //       0*x<=0
+         //       0*x <= 0
             continue;
          }
       }
@@ -11768,7 +11768,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 
             // Function is unbounded from below:
             // * D1<0 (verified by previous block)
-            // * D2Est<=0, which means that either D2<0 - or it can not
+            // * D2Est <= 0, which means that either D2<0 - or it can not
             //   be reliably distinguished from zero.
             // * step is unconstrained
             //
@@ -11790,7 +11790,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          // So, if function is convex (D2>0):
          // * FullStp = -D1/(2*D2)
          // * RestStp = restricted FullStp
-         // * 0<=RestStp<=FullStp
+         // * 0 <= RestStp <= FullStp
          //
          // If function is non-convex, but bounded from below under constraints:
          // * RestStp = step length subject to constraints
@@ -11937,7 +11937,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 
                // Function is unbounded from below:
                // * D1<0 (verified by previous block)
-               // * D2Est<=0, which means that either D2<0 - or it can not
+               // * D2Est <= 0, which means that either D2<0 - or it can not
                //   be reliably distinguished from zero.
                // * step is unconstrained
                //
@@ -12218,7 +12218,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
 //     CVal    -   if NeedAct is True, stores constrained value;
 //                 SAS.XC[CIdx] is forced to be equal to CVal.
 //     AddSteps-   array[AddStepsCnt] of additional steps:
-//                 * AddSteps[]<=Stp are ignored
+//                 * AddSteps[] <= Stp are ignored
 //                 * AddSteps[]>Stp are tried
 //     Activated-  possibly preallocated buffer; previously allocated memory
 //                 will be reused.
@@ -12233,7 +12233,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
 //     Activated-  elements of this array are set to True, if I-th constraint
 //                 as inactive at previous point, but become  active  in  the
 //                 new one.
-//                 Situations when we deactivate xi>=0 and activate xi<=1 are
+//                 Situations when we deactivate xi >= 0 and activate xi <= 1 are
 //                 considered as activation of previously inactive constraint
 // ALGLIB: Copyright 14.05.2014 by Sergey Bochkanov
 static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state) {
@@ -14257,7 +14257,7 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, 
 // * starting point X0 must be feasible or
 //   not too far away from the feasible set
 // * grad(f) must be Lipschitz continuous on a level set:
-//   L = { x : f(x)<=f(x0) }
+//   L = { x : f(x) <= f(x0) }
 // * function must be defined everywhere on the feasible set F
 //
 // USAGE:
@@ -14455,7 +14455,7 @@ void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu, ae_state 
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -14499,7 +14499,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
@@ -14541,20 +14541,20 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinBLEICSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes  its work if on k+1-th iteration
-//                 the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+//                 the  condition  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
 //                 is satisfied.
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - step vector, dx=X(k+1)-X(k)
@@ -14734,7 +14734,7 @@ void minbleicsetdrep(minbleicstate *state, bool needdrep, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -17562,7 +17562,7 @@ void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, a
 //
 // The solver is configured to work internally with dense NxN problem divided
 // into two distinct parts - "main" and slack one:
-// * dense quadratic term  is  a  NMain*NMain  matrix  (NMain<=N),  quadratic
+// * dense quadratic term  is  a  NMain*NMain  matrix  (NMain <= N),  quadratic
 //   coefficients are zero for variables outside of [0,NMain) range)
 // * linear term is general vector of length N
 // * linear constraints have special structure for variable with  indexes  in
@@ -17585,7 +17585,7 @@ void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, a
 //
 //                     The terms A and b (as well as constraints) will be
 //                     specified later with separate calls.
-//     NMain       -   number of "main" variables, 1<=NMain<=N
+//     NMain       -   number of "main" variables, 1 <= NMain <= N
 //     N           -   total number of variables including slack ones
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t nmain, ae_int_t n, ae_state *_state) {
@@ -17618,7 +17618,7 @@ void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_
 //                     >
 //                     The terms A and b (as well as constraints) will be
 //                     specified later with separate calls.
-//     N           -   total number of variables, N>=1
+//     N           -   total number of variables, N >= 1
 //
 // This optimization mode assumes that no slack variables is present.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
@@ -17984,10 +17984,10 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
             // It can be either equality constraint (no slacks) or range constraint
             // (two pairs of slacks variables).
             //
-            // Try to arrange things in such a way that |CU|>=|CL| (it can be done
+            // Try to arrange things in such a way that |CU| >= |CL| (it can be done
             // by multiplication by -1 and boundaries swap).
             //
-            // Having |CU|>=|CL| will allow us to drop huge irrelevant bound CU,
+            // Having |CU| >= |CL| will allow us to drop huge irrelevant bound CU,
             // if we find it irrelevant during computations. Due to limitations
             // of our slack variable substitution, it can be done only for CU.
                if (ae_fp_greater_eq(ae_fabs(cu->ptr.p_double[i], _state), ae_fabs(cl->ptr.p_double[i], _state))) {
@@ -18129,15 +18129,15 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
 //     State               -   instance initialized with one of the initialization
 //                             functions
 //     EpsP                -   maximum primal error allowed in the  solution,
-//                             EpsP>=0. Zero will be  automatically  replaced
+//                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
 //                             to 10*Sqrt(Epsilon) in the current version
 //     EpsD                -   maximum  dual  error allowed in the  solution,
-//                             EpsP>=0. Zero will be  automatically  replaced
+//                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
 //                             to 10*Sqrt(Epsilon) in the current version
 //     EpsGap              -   maximum  duality gap allowed in the  solution,
-//                             EpsP>=0. Zero will be  automatically  replaced
+//                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
 //                             to 10*Sqrt(Epsilon) in the current version
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
@@ -18424,9 +18424,9 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
             }
 
          // Drop irrelevant linear constraints. Due to specifics of the solver
-         // we can drop only right part part of b<=Ax<=b+r.
+         // we can drop only right part part of b <= Ax <= b+r.
          //
-         // We can't drop b<=A from b<=A<=b+r because it impossible with our choice of
+         // We can't drop b <= A from b <= A <= b+r because it impossible with our choice of
          // slack variables. Usually we do not need to do so because we reorder constraints
          // during initialization in such a way that |b+r|>|b| and because typical
          // applications do not have excessively large lower AND upper bound (user may
@@ -19215,20 +19215,20 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
       vrhs = state->b.ptr.p_double[i] - state->tmp1.ptr.p_double[i];
       if (state->hasr.ptr.p_bool[i]) {
 
-      // Range constraint b<=Ax<=b+r
+      // Range constraint b <= Ax <= b+r
          if (ae_fp_greater_eq(vrhs, (double)(0))) {
 
-         // 0<=b<=b+r, select target at lower bound
+         // 0 <= b <= b+r, select target at lower bound
             v = vrhs;
          } else {
 
-         // b<=0, b+r can have any sign.
+         // b <= 0, b+r can have any sign.
          // Select zero target if possible, if not - one with smallest absolute value.
             v = ae_minreal(vrhs + state->r.ptr.p_double[i], 0.0, _state);
          }
       } else {
 
-      // Single-sided constraint Ax>=b.
+      // Single-sided constraint Ax >= b.
       // Select zero target if possible, if not - one with smallest absolute value.
          v = ae_maxreal(vrhs, 0.0, _state);
       }
@@ -21693,7 +21693,7 @@ void minqpsetscaleautodiag(minqpstate *state, ae_state *_state) {
 // * supports box and general linear equality/inequality constraints
 // * can solve all types of problems  (convex,  semidefinite,  nonconvex)  as
 //   long as they are bounded from below under constraints.
-//   Say, it is possible to solve "min{-x^2} subject to -1<=x<=+1".
+//   Say, it is possible to solve "min{-x^2} subject to -1 <= x <= +1".
 //   Of course, global  minimum  is found only  for  positive  definite   and
 //   semidefinite  problems.  As  for indefinite ones - only local minimum is
 //   found.
@@ -21721,18 +21721,18 @@ void minqpsetscaleautodiag(minqpstate *state, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinQPSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes its work if exploratory steepest
 //                 descent  step  on  k+1-th iteration  satisfies   following
-//                 condition:  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
-//     EpsX    -   >=0
+//                 condition:  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
+//     EpsX    -   >= 0
 //                 The  subroutine  finishes its work if exploratory steepest
 //                 descent  step  on  k+1-th iteration  satisfies   following
 //                 condition:
@@ -21821,7 +21821,7 @@ void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx,
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsX    -   >=0, stopping criteria for inner optimizer.
+//     EpsX    -   >= 0, stopping criteria for inner optimizer.
 //                 Inner  iterations  are  stopped  when  step  length  (with
 //                 variable scaling being applied) is less than EpsX.
 //                 See  minqpsetscale()  for  more  information  on  variable
@@ -21913,7 +21913,7 @@ void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t i
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     Eps     -   >=0, stopping criteria. The algorithm stops  when   primal
+//     Eps     -   >= 0, stopping criteria. The algorithm stops  when   primal
 //                 and dual infeasiblities as well as complementarity gap are
 //                 less than Eps.
 //
@@ -22008,7 +22008,7 @@ void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     Eps     -   >=0, stopping criteria. The algorithm stops  when   primal
+//     Eps     -   >= 0, stopping criteria. The algorithm stops  when   primal
 //                 and dual infeasiblities as well as complementarity gap are
 //                 less than Eps.
 //
@@ -22063,7 +22063,7 @@ void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
 //   supported by this solver
 // * can solve all types of problems  (convex,  semidefinite,  nonconvex)  as
 //   long as they are bounded from below under constraints.
-//   Say, it is possible to solve "min{-x^2} subject to -1<=x<=+1".
+//   Say, it is possible to solve "min{-x^2} subject to -1 <= x <= +1".
 //   In convex/semidefinite case global minimum  is  returned,  in  nonconvex
 //   case - algorithm returns one of the local minimums.
 //
@@ -22105,18 +22105,18 @@ void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinQPSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes its work if exploratory steepest
 //                 descent  step  on  k+1-th iteration  satisfies   following
-//                 condition:  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
-//     EpsX    -   >=0
+//                 condition:  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
+//     EpsX    -   >= 0
 //                 The  subroutine  finishes its work if exploratory steepest
 //                 descent  step  on  k+1-th iteration  satisfies   following
 //                 condition:
@@ -22179,9 +22179,9 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i]<=x[i]           BndU[i]=+INF
-//     upper bound         x[i]<=BndU[i]           BndL[i]=-INF
-//     range               BndL[i]<=x[i]<=BndU[i]  ...
+//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
+//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     range               BndL[i] <= x[i] <= BndU[i]  ...
 //     free variable       -                       BndL[I]=-INF, BndU[I]+INF
 //
 // Inputs:
@@ -22238,9 +22238,9 @@ void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd                BndL=BndU
-//     lower bound         BndL<=x[i]              BndU=+INF
-//     upper bound         x[i]<=BndU              BndL=-INF
-//     range               BndL<=x[i]<=BndU        ...
+//     lower bound         BndL <= x[i]              BndU=+INF
+//     upper bound         x[i] <= BndU              BndL=-INF
+//     range               BndL <= x[i] <= BndU        ...
 //     free variable       -                       BndL=-INF, BndU+INF
 //
 // Inputs:
@@ -22281,9 +22281,9 @@ void minqpsetbcall(minqpstate *state, double bndl, double bndu, ae_state *_state
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd                BndL=BndU
-//     lower bound         BndL<=x[i]              BndU=+INF
-//     upper bound         x[i]<=BndU              BndL=-INF
-//     range               BndL<=x[i]<=BndU        ...
+//     lower bound         BndL <= x[i]              BndU=+INF
+//     upper bound         x[i] <= BndU              BndL=-INF
+//     range               BndL <= x[i] <= BndU        ...
 //     free variable       -                       BndL=-INF, BndU+INF
 //
 // Inputs:
@@ -22335,7 +22335,7 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -22385,7 +22385,7 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0
+//     K       -   number of equality/inequality constraints, K >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately  -
 //         there always exists some violation due  to  numerical  errors  and
@@ -22432,7 +22432,7 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 //                 * if SparseCT[i]>0, then I-th constraint is SparseC[i,*]*x >= SparseC[i,n+1]
 //                 * if SparseCT[i]=0, then I-th constraint is SparseC[i,*]*x  = SparseC[i,n+1]
 //                 * if SparseCT[i]<0, then I-th constraint is SparseC[i,*]*x <= SparseC[i,n+1]
-//     SparseK -   number of sparse equality/inequality constraints, K>=0
+//     SparseK -   number of sparse equality/inequality constraints, K >= 0
 //     DenseC  -   dense linear constraints, array[K,N+1].
 //                 Each row of DenseC represents one constraint, either equality
 //                 or inequality (see below):
@@ -22443,7 +22443,7 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 //                 * if DenseCT[i]>0, then I-th constraint is DenseC[i,*]*x >= DenseC[i,n+1]
 //                 * if DenseCT[i]=0, then I-th constraint is DenseC[i,*]*x  = DenseC[i,n+1]
 //                 * if DenseCT[i]<0, then I-th constraint is DenseC[i,*]*x <= DenseC[i,n+1]
-//     DenseK  -   number of equality/inequality constraints, DenseK>=0
+//     DenseK  -   number of equality/inequality constraints, DenseK >= 0
 //
 // NOTE 1: linear (non-box) constraints  are  satisfied only approximately  -
 //         there always exists some violation due  to  numerical  errors  and
@@ -22652,11 +22652,11 @@ void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect,
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number of equality/inequality constraints,  K>=0;  if  not
+//     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
@@ -22679,11 +22679,11 @@ void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K>=0.  If  K=0
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
@@ -22710,19 +22710,19 @@ void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //     SparseA -   sparse matrix with size [K,N] (exactly!).
 //                 Each row of A represents one general linear constraint.
 //                 A can be stored in any sparse storage format.
-//     SparseK -   number of sparse constraints, SparseK>=0
+//     SparseK -   number of sparse constraints, SparseK >= 0
 //     DenseA  -   linear constraints, array[K,N], set of dense constraints.
 //                 Each row of A represents one general linear constraint.
-//     DenseK  -   number of dense constraints, DenseK>=0
+//     DenseK  -   number of dense constraints, DenseK >= 0
 //     AL, AU  -   lower and upper bounds, array[SparseK+DenseK], with former
 //                 SparseK elements corresponding to sparse constraints,  and
 //                 latter DenseK elements corresponding to dense constraints;
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K>=0.  If  K=0
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams);
@@ -22790,9 +22790,9 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
 //                 included.
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL<=A*x<=AU
-//                 * AL=-INF  => one-sided constraint Ai*x<=AU
-//                 * AU=+INF  => one-sided constraint AL<=Ai*x
+//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL=-INF  => one-sided constraint Ai*x <= AU
+//                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams);
@@ -22835,9 +22835,9 @@ void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au, ae_st
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL<=A*x<=AU
-//                 * AL=-INF  => one-sided constraint A*x<=AU
-//                 * AU=+INF  => one-sided constraint AL<=A*x
+//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL=-INF  => one-sided constraint A*x <= AU
+//                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams);
@@ -22970,9 +22970,9 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 //     DA      -   array[N], constraint vector
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL<=A*x<=AU
-//                 * AL=-INF  => one-sided constraint A*x<=AU
-//                 * AU=+INF  => one-sided constraint AL<=A*x
+//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL=-INF  => one-sided constraint A*x <= AU
+//                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams);
@@ -23284,7 +23284,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
          }
          if (ae_isfinite(state->cl.ptr.p_double[i], _state)) {
 
-         // Offload inequality constraint of the form CL<=C*x, convert it to -C*x<=-CL
+         // Offload inequality constraint of the form CL <= C*x, convert it to -C*x <= -CL
             if (i < state->msparse) {
                for (j = 0; j <= n - 1; j++) {
                   state->ecleic.ptr.pp_double[curicpos][j] = (double)(0);
@@ -23306,7 +23306,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
          }
          if (ae_isfinite(state->cu.ptr.p_double[i], _state)) {
 
-         // Offload inequality constraint of the form C*x<=CU
+         // Offload inequality constraint of the form C*x <= CU
             if (i < state->msparse) {
                for (j = 0; j <= n - 1; j++) {
                   state->ecleic.ptr.pp_double[curicpos][j] = (double)(0);
@@ -24800,9 +24800,9 @@ void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state)
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - ste pvector, dx=X(k+1)-X(k)
@@ -24853,7 +24853,7 @@ void minlmsetxrep(minlmstate *state, bool needxrep, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -24968,7 +24968,7 @@ void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -25018,7 +25018,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
@@ -26074,7 +26074,7 @@ lbl_86:
 // DeltaX, which is used for secant updates, is initialized here.
 //
 // This code is a bit tricky because sometimes XDir<>0, but
-// it is so small that XDir+XBase==XBase (in finite precision
+// it is so small that XDir+XBase == XBase (in finite precision
 // arithmetics). So we set DeltaX to XBase, then
 // add XDir, and then subtract XBase to get exact value of
 // DeltaX.
@@ -27022,7 +27022,7 @@ lbl_2:
 // DeltaX, which is used for secant updates, is initialized here.
 //
 // This code is a bit tricky because sometimes XDir<>0, but
-// it is so small that XDir+XBase==XBase (in finite precision
+// it is so small that XDir+XBase == XBase (in finite precision
 // arithmetics). So we set DeltaX to XBase, then
 // add XDir, and then subtract XBase to get exact value of
 // DeltaX.
@@ -28263,7 +28263,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 //
 // These CG methods are globally convergent (even on non-convex functions) as
 // long as grad(f) is Lipschitz continuous in  a  some  neighborhood  of  the
-// L = { x : f(x)<=f(x0) }.
+// L = { x : f(x) <= f(x0) }.
 //
 //
 // REQUIREMENTS:
@@ -28362,20 +28362,20 @@ void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinCGSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes  its work if on k+1-th iteration
-//                 the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+//                 the  condition  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
 //                 is satisfied.
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - ste pvector, dx=X(k+1)-X(k)
@@ -28497,7 +28497,7 @@ void mincgsetcgtype(mincgstate *state, ae_int_t cgtype, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -31415,7 +31415,7 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
       mxhs = ae_maxreal(mxhs, ae_fabs(subsolver->tmp0.ptr.p_double[i], _state), _state);
    }
 
-// Skip updates if (Sk,Yk)<=0 or Sk*H*Sk<=0
+// Skip updates if (Sk,Yk) <= 0 or Sk*H*Sk <= 0
 //
 // NOTE: we use 0.5*(SY+RawSY) in place of (Sk,Yk) which allows us to have slight
 //       nonconvexity due to numerical noise.
@@ -31438,7 +31438,7 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
    }
 // Too large Hessian updates sometimes may come from noisy or nonsmooth problems.
 //
-// Skip updates with max(Yk)^2/(Yk,Sk)>=BIG or max(H*Sk)^2/(Sk*H*Sk)>=BIG
+// Skip updates with max(Yk)^2/(Yk,Sk) >= BIG or max(H*Sk)^2/(Sk*H*Sk) >= BIG
    if (ae_fp_greater_eq(ae_sqr(mxy, _state) / sy, big)) {
       return result;
    }
@@ -31819,7 +31819,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
 
    // Use dense IPM.
    //
-   // We always treat its result as a valid solution, even for TerminationType<=0.
+   // We always treat its result as a valid solution, even for TerminationType <= 0.
    // In case anything is wrong with solution vector, we will detect it during line
    // search phase (merit function does not increase).
    //
@@ -33182,7 +33182,7 @@ namespace alglib_impl {
 //     SparseA     -   matrix[K,N], sparse constraints
 //     AL          -   array[K], lower constraint bounds (may contain -INF)
 //     AU          -   array[K], upper constraint bounds (may contain +INF)
-//     K           -   constraint count, K>=0
+//     K           -   constraint count, K >= 0
 //     Info        -   presolve info structure; temporaries allocated during
 //                     previous calls may be reused by this function.
 //
@@ -33192,11 +33192,11 @@ namespace alglib_impl {
 //                     transformation.
 //                     Following fields can be acessed:
 //                     * Info.NewN>0  for transformed problem size
-//                     * Info.NewM>=0 for transformed constraint count
+//                     * Info.NewM >= 0 for transformed constraint count
 //                     * always:          Info.C, Info.BndL, Info.BndU - array[NewN]
 //                     * for Info.NewM>0: Info.SparseA, Info.AL, Info.AU
 //
-// NOTE: this routine does not reallocate arrays if NNew<=NOld and/or KNew<=KOld.
+// NOTE: this routine does not reallocate arrays if NNew <= NOld and/or KNew <= KOld.
 // ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
 void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info, ae_state *_state) {
    ae_int_t i;
@@ -33306,7 +33306,7 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
 //     LagBC       -   array[NOld], Lagrange multipliers
 //     LagLC       -   array[KOld], Lagrange multipliers
 //
-// NOTE: this routine does not reallocate arrays if NOld<=NNew and/or KOld<=KNew.
+// NOTE: this routine does not reallocate arrays if NOld <= NNew and/or KOld <= KNew.
 // ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
 void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc, RVector *laglc, ae_state *_state) {
    ae_int_t n;
@@ -33542,7 +33542,7 @@ void dssinit(ae_int_t n, dualsimplexstate *s, ae_state *_state) {
 //     SparseA -   sparse linear constraints, sparsematrix[K,N] in CRS format
 //     AKind   -   type of A: 0 for dense, 1 for sparse
 //     AL, AU  -   lower and upper bounds, array[K]
-//     K       -   number of equality/inequality constraints, K>=0.
+//     K       -   number of equality/inequality constraints, K >= 0.
 //
 //     ProposedBasis- basis to import from (if BasisType=2)
 //     BasisInitType-  what to do with basis:
@@ -38146,7 +38146,7 @@ void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
 //
 // Inputs:
 //     State   -   optimizer
-//     Eps     -   stopping condition, Eps>=0:
+//     Eps     -   stopping condition, Eps >= 0:
 //                 * should be small number about 1E-6 or 1E-7.
 //                 * zero value means that solver automatically selects good
 //                   value (can be different in different ALGLIB versions)
@@ -38203,7 +38203,7 @@ void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
 //
 // Inputs:
 //     State   -   optimizer
-//     Eps     -   stopping condition, Eps>=0:
+//     Eps     -   stopping condition, Eps >= 0:
 //                 * should be small number about 1E-7 or 1E-8.
 //                 * zero value means that solver automatically selects good
 //                   value (can be different in different ALGLIB versions)
@@ -38310,9 +38310,9 @@ void minlpsetscale(minlpstate *state, RVector *s, ae_state *_state) {
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i]<=x[i]           BndU[i]=+INF
-//     upper bound         x[i]<=BndU[i]           BndL[i]=-INF
-//     range               BndL[i]<=x[i]<=BndU[i]  ...
+//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
+//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     range               BndL[i] <= x[i] <= BndU[i]  ...
 //     free variable       -                       BndL[I]=-INF, BndU[I]+INF
 //
 // Inputs:
@@ -38361,9 +38361,9 @@ void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i]<=x[i]           BndU[i]=+INF
-//     upper bound         x[i]<=BndU[i]           BndL[i]=-INF
-//     range               BndL[i]<=x[i]<=BndU[i]  ...
+//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
+//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     range               BndL[i] <= x[i] <= BndU[i]  ...
 //     free variable       -                       BndL[I]=-INF, BndU[I]+INF
 //
 // Inputs:
@@ -38408,9 +38408,9 @@ void minlpsetbcall(minlpstate *state, double bndl, double bndu, ae_state *_state
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
 //     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i]<=x[i]           BndU[i]=+INF
-//     upper bound         x[i]<=BndU[i]           BndL[i]=-INF
-//     range               BndL[i]<=x[i]<=BndU[i]  ...
+//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
+//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     range               BndL[i] <= x[i] <= BndU[i]  ...
 //     free variable       -                       BndL[I]=-INF, BndU[I]+INF
 //
 // Inputs:
@@ -38465,7 +38465,7 @@ void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 //                 * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
 //                 * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
 //                 * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
-//     K       -   number of equality/inequality constraints,  K>=0;  if  not
+//     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A and CT.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
@@ -38542,11 +38542,11 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number of equality/inequality constraints,  K>=0;  if  not
+//     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
@@ -38571,7 +38571,7 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
    ae_assert(au->cnt >= k, "MinLPSetLC2Dense: Length(AU)<K", _state);
    ae_assert(apservisfinitematrix(a, k, n, _state), "MinLPSetLC2Dense: A contains infinite or NaN values!", _state);
 
-// Count actual (different from -INF<=A*x<=+INF) constraints;
+// Count actual (different from -INF <= A*x <= +INF) constraints;
 // count non-zero elements in each row.
    ae_vector_set_length(&nrs, k, _state);
    state->m = k;
@@ -38620,11 +38620,11 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K>=0.  If  K=0
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
@@ -38676,9 +38676,9 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //                 included.
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL<=A*x<=AU
-//                 * AL=-INF  => one-sided constraint Ai*x<=AU
-//                 * AU=+INF  => one-sided constraint AL<=Ai*x
+//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL=-INF  => one-sided constraint Ai*x <= AU
+//                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams);
@@ -38722,9 +38722,9 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_st
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL<=A*x<=AU
-//                 * AL=-INF  => one-sided constraint A*x<=AU
-//                 * AU=+INF  => one-sided constraint AL<=A*x
+//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL=-INF  => one-sided constraint A*x <= AU
+//                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams);
@@ -42777,7 +42777,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
 // * linear inequality constraints
 // * linear equality constraints
 // * nonlinear equality constraints Gi(x)=0
-// * nonlinear inequality constraints Hi(x)<=0
+// * nonlinear inequality constraints Hi(x) <= 0
 //
 // REQUIREMENTS:
 // * user must provide function value and gradient for F(), H(), G()
@@ -42786,7 +42786,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
 // * F(), G(), H() are continuously differentiable on the  feasible  set  and
 //   its neighborhood
 // * nonlinear constraints G() and H() must have non-zero gradient at  G(x)=0
-//   and at H(x)=0. Say, constraint like x^2>=1 is supported, but x^2>=0   is
+//   and at H(x)=0. Say, constraint like x^2 >= 1 is supported, but x^2 >= 0   is
 //   NOT supported.
 //
 // USAGE:
@@ -43015,7 +43015,7 @@ void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu, ae_state *_st
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -43050,7 +43050,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    ivectorsetlengthatleast(&state->lcsrcidx, k, _state);
    state->nec = 0;
@@ -43086,7 +43086,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
 // * next NLEC components of F[] (and rows  of  J)  correspond  to  nonlinear
 //   equality constraints G_i(x)=0
 // * next NLIC components of F[] (and rows  of  J)  correspond  to  nonlinear
-//   inequality constraints H_i(x)<=0
+//   inequality constraints H_i(x) <= 0
 //
 // NOTE: you may combine nonlinear constraints with linear/boundary ones.  If
 //       your problem has mixed constraints, you  may explicitly specify some
@@ -43095,8 +43095,8 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
 //
 // Inputs:
 //     State   -   structure previously allocated with MinNLCCreate call.
-//     NLEC    -   number of Non-Linear Equality Constraints (NLEC), >=0
-//     NLIC    -   number of Non-Linear Inquality Constraints (NLIC), >=0
+//     NLEC    -   number of Non-Linear Equality Constraints (NLEC), >= 0
+//     NLIC    -   number of Non-Linear Inquality Constraints (NLIC), >= 0
 //
 // NOTE 1: when you solve your problem  with  augmented  Lagrangian   solver,
 //         nonlinear constraints are satisfied only  approximately!   It   is
@@ -43134,9 +43134,9 @@ void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_s
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - step vector, dx=X(k+1)-X(k)
@@ -43245,9 +43245,9 @@ void minnlcsetprecinexact(minnlcstate *state, ae_state *_state) {
 // quadratic model of the penalized function. It has following features:
 // * no special assumptions about orthogonality of constraints
 // * preconditioner evaluation is optimized for K<<N. Its cost  is  O(N*K^2),
-//   so it may become prohibitively slow for K>=N.
+//   so it may become prohibitively slow for K >= N.
 // * finally, stability of the process is guaranteed only for K<<N.  Woodbury
-//   update often fail for K>=N due to degeneracy of  intermediate  matrices.
+//   update often fail for K >= N due to degeneracy of  intermediate  matrices.
 //   That's why we recommend to use "exact robust"  preconditioner  for  such
 //   cases.
 //
@@ -43302,7 +43302,7 @@ void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq, ae_state
 // This preconditioner has following features:
 // * no special assumptions about constraint structure
 // * preconditioner is optimized  for  stability;  unlike  "exact  low  rank"
-//   version which fails for K>=N, this one works well for any value of K.
+//   version which fails for K >= N, this one works well for any value of K.
 // * the only drawback is that is takes O(N^3+K*N^2) time  to  build  it.  No
 //   economical  Woodbury update is applied even when it  makes  sense,  thus
 //   there  are  exist situations (K<<N) when "exact low rank" preconditioner
@@ -43362,7 +43362,7 @@ void minnlcsetprecnone(minnlcstate *state, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0 (default),  if
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0 (default),  if
 //                 you don't want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()
@@ -43481,8 +43481,8 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax, ae_state *_state) {
 //   ones (which are NOT violated in the true solution) can push final  point
 //   too far in the inner area of the feasible set.
 //
-//   For example, if you have constraint x0>=0 and true solution  x0=1,  then
-//   merely a presence of "x0>=0" will introduce a bias towards larger values
+//   For example, if you have constraint x0 >= 0 and true solution  x0=1,  then
+//   merely a presence of "x0 >= 0" will introduce a bias towards larger values
 //   of x0. Say, algorithm may stop at x0=1.5 instead of 1.0.
 //
 // * after you found good Rho, you may increase number of  outer  iterations.
@@ -43507,12 +43507,12 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax, ae_state *_state) {
 // penalty  functions, it  is   important  to   rescale  both  variables  AND
 // constraints.
 //
-// Say,  if  you  minimize f(x)=x^2 subject to 1000000*x>=0,  then  you  have
+// Say,  if  you  minimize f(x)=x^2 subject to 1000000*x >= 0,  then  you  have
 // constraint whose scale is different from that of target  function (another
-// example is 0.000001*x>=0). It is also possible to have constraints   whose
-// scales  are   misaligned:   1000000*x0>=0, 0.000001*x1<=0.   Inappropriate
-// scaling may ruin convergence because minimizing x^2 subject to x>=0 is NOT
-// same as minimizing it subject to 1000000*x>=0.
+// example is 0.000001*x >= 0). It is also possible to have constraints   whose
+// scales  are   misaligned:   1000000*x0 >= 0, 0.000001*x1 <= 0.   Inappropriate
+// scaling may ruin convergence because minimizing x^2 subject to x >= 0 is NOT
+// same as minimizing it subject to 1000000*x >= 0.
 //
 // Because we  know  coefficients  of  boundary/linear  constraints,  we  can
 // automatically rescale and normalize them. However,  there  is  no  way  to
@@ -43557,10 +43557,10 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax, ae_state *_state) {
 // out subtle degeneracies in constraint matrix.
 //
 // Third reason is tricky and hard to diagnose. Consider situation  when  you
-// minimize  f=x^2  subject to constraint x>=0.  Unconstrained   extremum  is
+// minimize  f=x^2  subject to constraint x >= 0.  Unconstrained   extremum  is
 // located  exactly  at  the  boundary  of  constrained  area.  In  this case
 // algorithm will tend to oscillate between negative  and  positive  x.  Each
-// time it stops at x<0 it "reinforces" constraint x>=0, and each time it  is
+// time it stops at x<0 it "reinforces" constraint x >= 0, and each time it  is
 // bounced to x>0 it "relaxes" constraint (and is  attracted  to  x<0).
 //
 // Such situation  sometimes  happens  in  problems  with  hidden  symetries.
@@ -44884,8 +44884,8 @@ void minnlcrestartfrom(minnlcstate *state, RVector *x, ae_state *_state) {
 // Penalty function for equality constraints.
 // Inputs:
 //     Alpha   -   function argument. Penalty function becomes large when
-//                 Alpha approaches -1 or +1. It is defined for Alpha<=-1 or
-//                 Alpha>=+1 - in this case infinite value is returned.
+//                 Alpha approaches -1 or +1. It is defined for Alpha <= -1 or
+//                 Alpha >= +1 - in this case infinite value is returned.
 //
 // Outputs:
 //     F       -   depending on Alpha:
@@ -45352,7 +45352,7 @@ static void minnlc_penaltylc(RVector *x, RMatrix *cleic, RVector *nulc, ae_int_t
 //     Fi[] - function vector:
 //           * 1 component for function being minimized
 //           * NG components for equality constraints G_i(x)=0
-//           * NH components for inequality constraints H_i(x)<=0
+//           * NH components for inequality constraints H_i(x) <= 0
 //     J[]  - Jacobian matrix, array[1+NG+NH,N]
 //     NuNLC[]  -   Lagrange multipliers corresponding to constraints,
 //                 array[NG+NH]
@@ -46922,7 +46922,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state
 // * linear inequality constraints
 // * linear equality constraints
 // * nonlinear equality constraints Gi(x)=0
-// * nonlinear inequality constraints Hi(x)<=0
+// * nonlinear inequality constraints Hi(x) <= 0
 //
 // IMPORTANT: see MinNSSetAlgoAGS for important  information  on  performance
 //            restrictions of AGS solver.
@@ -47123,7 +47123,7 @@ void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
 //                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 //
@@ -47167,7 +47167,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // are stored in the next NIC rows.
 //
 // NOTE: we convert inequality constraints to the form
-// A*x<=b before copying them.
+// A*x <= b before copying them.
    rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
@@ -47200,7 +47200,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // * next NLEC components of F[] (and rows  of  J)  correspond  to  nonlinear
 //   equality constraints G_i(x)=0
 // * next NLIC components of F[] (and rows  of  J)  correspond  to  nonlinear
-//   inequality constraints H_i(x)<=0
+//   inequality constraints H_i(x) <= 0
 //
 // NOTE: you may combine nonlinear constraints with linear/boundary ones.  If
 //       your problem has mixed constraints, you  may explicitly specify some
@@ -47209,8 +47209,8 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //
 // Inputs:
 //     State   -   structure previously allocated with minnscreate() call.
-//     NLEC    -   number of Non-Linear Equality Constraints (NLEC), >=0
-//     NLIC    -   number of Non-Linear Inquality Constraints (NLIC), >=0
+//     NLEC    -   number of Non-Linear Equality Constraints (NLEC), >= 0
+//     NLIC    -   number of Non-Linear Inquality Constraints (NLIC), >= 0
 //
 // NOTE 1: nonlinear constraints are satisfied only  approximately!   It   is
 //         possible   that  algorithm  will  evaluate  function  outside   of
@@ -47259,7 +47259,7 @@ void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_sta
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The AGS solver finishes its work if  on  k+1-th  iteration
 //                 sampling radius decreases below EpsX.
 //     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
@@ -47338,7 +47338,7 @@ void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     Radius  -   initial sampling radius, >=0.
+//     Radius  -   initial sampling radius, >= 0.
 //
 //                 Internally multiplied  by  vector of  per-variable  scales
 //                 specified by minnssetscale()).
@@ -48700,7 +48700,7 @@ static void minns_unscalepointbc(minnsstate *state, RVector *x, ae_state *_state
 // This function solves QP problem of the form
 //
 //         [                        ]
-//     min [ 0.5*c'*(G*inv(H)*G')*c ] s.t. c[i]>=0, SUM(c[i])=1.0
+//     min [ 0.5*c'*(G*inv(H)*G')*c ] s.t. c[i] >= 0, SUM(c[i])=1.0
 //         [                        ]
 //
 // where G is stored in SampleG[] array, diagonal H is stored in DiagH[].
@@ -48852,7 +48852,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // and to perform additional integrity check.
    //
    // After this stage we are pretty sure that:
-   // * if x[i]=0.0, then d[i]>=0.0
+   // * if x[i]=0.0, then d[i] >= 0.0
    // * if d[i]<0.0, then x[i]>0.0
       for (i = 0; i <= n - 1; i++) {
          if (ae_fp_eq(state->xc.ptr.p_double[i], 0.0) && ae_fp_less(state->d.ptr.p_double[i], 0.0)) {
@@ -50669,7 +50669,7 @@ lbl_59:
 // want to 'unstick' at the end of the iteration and there
 // were no changes in the active set.
 //
-// NOTE: consition |G|>=Mu*|D1| must be exactly opposite
+// NOTE: consition |G| >= Mu*|D1| must be exactly opposite
 // to the condition used to switch back to GPA. At least
 // one inequality must be strict, otherwise infinite cycle
 // may occur when |G|=Mu*|D1| (we DON'T test stopping
@@ -51450,7 +51450,7 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
 // * starting point X0 must be feasible or
 //   not too far away from the feasible set
 // * grad(f) must be Lipschitz continuous on a level set:
-//   L = { x : f(x)<=f(x0) }
+//   L = { x : f(x) <= f(x0) }
 // * function must be defined everywhere on the feasible set F
 //
 // USAGE:
@@ -51616,20 +51616,20 @@ void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     EpsG    -   >=0
+//     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
 //                 |v|<EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinBCSetScale()
-//     EpsF    -   >=0
+//     EpsF    -   >= 0
 //                 The  subroutine  finishes  its work if on k+1-th iteration
-//                 the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+//                 the  condition  |F(k+1)-F(k)| <= EpsF*max{|F(k)|,|F(k+1)|,1}
 //                 is satisfied.
-//     EpsX    -   >=0
+//     EpsX    -   >= 0
 //                 The subroutine finishes its work if  on  k+1-th  iteration
-//                 the condition |v|<=EpsX is fulfilled, where:
+//                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled step vector, v[i]=dx[i]/s[i]
 //                 * dx - step vector, dx=X(k+1)-X(k)
@@ -51784,7 +51784,7 @@ void minbcsetxrep(minbcstate *state, bool needxrep, ae_state *_state) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
 //                 want to limit step length.
 //
 // Use this subroutine when you optimize target function which contains exp()

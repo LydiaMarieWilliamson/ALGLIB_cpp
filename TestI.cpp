@@ -1727,7 +1727,7 @@ int main() {
          //
          // subject to box constraints
          //
-         //     -1<=x<=+1, -1<=y<=+1
+         //     -1 <= x <= +1, -1 <= y <= +1
          //
          // using BLEIC optimizer with:
          // * initial point x=[0,0]
@@ -1864,8 +1864,8 @@ int main() {
          //
          // subject to inequality constraints
          //
-         // * x>=2 (posed as general linear constraint),
-         // * x+y>=6
+         // * x >= 2 (posed as general linear constraint),
+         // * x+y >= 6
          //
          // using BLEIC optimizer with
          // * initial point x=[0,0]
@@ -2007,7 +2007,7 @@ int main() {
          //
          // subject to box constraints
          //
-         //     -1<=x<=+1, -1<=y<=+1
+         //     -1 <= x <= +1, -1 <= y <= +1
          //
          // using BLEIC optimizer with:
          // * numerical differentiation being used
@@ -2278,7 +2278,7 @@ int main() {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
-         // subject to bound constraints 0<=x0<=2.5, 0<=x1<=2.5
+         // subject to bound constraints 0 <= x0 <= 2.5, 0 <= x1 <= 2.5
          //
          // Exact solution is [x0,x1] = [2.5,2]
          //
@@ -2429,7 +2429,7 @@ int main() {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
-         // subject to linear constraint x0+x1<=2
+         // subject to linear constraint x0+x1 <= 2
          //
          // Exact solution is [x0,x1] = [1.5,0.5]
          //
@@ -3677,8 +3677,8 @@ int main() {
          //
          // We use dual simplex solver provided by ALGLIB for this task. Box
          // constraints are specified by means of constraint vectors bndl and
-         // bndu (we have bndl<=x<=bndu). General linear constraints are
-         // specified as AL<=A*x<=AU, with AL/AU being 2x1 vectors and A being
+         // bndu (we have bndl <= x <= bndu). General linear constraints are
+         // specified as AL <= A*x <= AU, with AL/AU being 2x1 vectors and A being
          // 2x2 matrix.
          //
          // NOTE: some/all components of AL/AU can be +-INF, same applies to
@@ -3790,7 +3790,7 @@ int main() {
          //
          // subject to box constraints
          //
-         //    x0>=0, x1>=0
+         //    x0 >= 0, x1 >= 0
          //
          // and nonlinear inequality constraint
          //
@@ -4286,7 +4286,7 @@ int main() {
          //         [ 2*x0    2*x1      0 ]
          //
          // with f0 being target function, f1 being equality constraint "f1=0",
-         // f2 being inequality constraint "f2<=0". Number of equality/inequality
+         // f2 being inequality constraint "f2 <= 0". Number of equality/inequality
          // constraints is specified by minnlcsetnlc(), with equality ones always
          // being first, inequality ones being last.
          //
@@ -4835,7 +4835,7 @@ int main() {
          // minnssetlc() calls).
          //
          // Nonlinear equality constraints have form Gi(x)=0, inequality ones
-         // have form Hi(x)<=0, so we may have to "normalize" constraints prior
+         // have form Hi(x) <= 0, so we may have to "normalize" constraints prior
          // to passing them to optimizer (right side is zero, constraints are
          // sorted, multiplied by -1 when needed).
          //
@@ -4851,11 +4851,11 @@ int main() {
          //
          // which means that we have optimization problem
          //
-         //     min{f0} subject to f1=0, f2<=0
+         //     min{f0} subject to f1=0, f2 <= 0
          //
          // which is essentially same as
          //
-         //     min { 2*|x0|+|x1| } subject to x0=1, x1>=-1
+         //     min { 2*|x0|+|x1| } subject to x0=1, x1 >= -1
          //
          // NOTE: AGS solver used by us can handle nonsmooth and nonconvex
          //       optimization problems. It has convergence guarantees, i.e. it will
@@ -4908,7 +4908,7 @@ int main() {
          //
          // subject to box constraints
          //
-         //     -1<=x<=+1, -1<=y<=+1
+         //     -1 <= x <= +1, -1 <= y <= +1
          //
          // using MinBC optimizer with:
          // * initial point x=[0,0]
@@ -5044,7 +5044,7 @@ int main() {
          //
          // subject to box constraints
          //
-         //    -1<=x<=+1, -1<=y<=+1
+         //    -1 <= x <= +1, -1 <= y <= +1
          //
          // using MinBC optimizer with:
          // * numerical differentiation being used
@@ -10908,7 +10908,7 @@ int main() {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
-         // as ones with x>=0 and ones with x<0 (y is ignored, but our classifier
+         // as ones with x >= 0 and ones with x<0 (y is ignored, but our classifier
          // has to find out it).
          //
          // First, we have to create decision forest builder object, load dataset and
@@ -10922,7 +10922,7 @@ int main() {
          //
          // Here xi and yi can be any values (and in fact you can have any number of
          // independent variables), and classi MUST be integer number in [0,NClasses)
-         // range. In our example we denote points with x>=0 as class #0, and
+         // range. In our example we denote points with x >= 0 as class #0, and
          // ones with negative xi as class #1.
          //
          // NOTE: if you want to solve regression problem, specify NClasses=1. In
@@ -11670,7 +11670,7 @@ int main() {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
-         // as ones with x>=0 and ones with x<0 (y is ignored, but our classifier
+         // as ones with x >= 0 and ones with x<0 (y is ignored, but our classifier
          // has to find out it).
          //
          // First, we have to create KNN builder object, load dataset and specify
@@ -11684,7 +11684,7 @@ int main() {
          //
          // Here xi and yi can be any values (and in fact you can have any number of
          // independent variables), and classi MUST be integer number in [0,NClasses)
-         // range. In our example we denote points with x>=0 as class #0, and
+         // range. In our example we denote points with x >= 0 as class #0, and
          // ones with negative xi as class #1.
          //
          // NOTE: if you want to solve regression problem, specify dataset in similar
@@ -12073,7 +12073,7 @@ int main() {
          // For -1 we expect to get [P0,P1] = [0,1]
          //
          // Following properties are guaranteed by network architecture:
-         // * P0>=0, P1>=0   non-negativity
+         // * P0 >= 0, P1 >= 0   non-negativity
          // * P0+P1=1        normalization
          //
             x = "[1]";
@@ -12187,7 +12187,7 @@ int main() {
          // and for 0 we will get [P0,P1,P2] = [0,0,1].
          //
          // Following properties are guaranteed by network architecture:
-         // * P0>=0, P1>=0, P2>=0    non-negativity
+         // * P0 >= 0, P1 >= 0, P2 >= 0    non-negativity
          // * P0+P1+P2=1             normalization
          //
             x = "[1]";
@@ -12510,8 +12510,8 @@ int main() {
          // In order to use multithreading, you have to:
          // 1) Install SMP edition of ALGLIB.
          // 2) This step is specific for C++ users: you should activate OS-specific
-         //    capabilities of ALGLIB by defining AE_OS=AE_POSIX (for *nix systems)
-         //    or AE_OS=AE_WINDOWS (for Windows systems).
+         //    capabilities of ALGLIB by defining AE_OS = AE_POSIX (for *nix systems)
+         //    or AE_OS = AE_WINDOWS (for Windows systems).
          //    C# users do not have to perform this step because C# programs are
          //    portable across different systems without OS-specific tuning.
          // 3) Tell ALGLIB that you want it to use multithreading by means of

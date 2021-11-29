@@ -108,10 +108,10 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
    ae_assert(n > 0, "HQRNDUniformI: N<=0!", _state);
    maxcnt = hqrnd_hqrndmax + 1;
 
-// Two branches: one for N<=MaxCnt, another for N>MaxCnt.
+// Two branches: one for N <= MaxCnt, another for N>MaxCnt.
    if (n > maxcnt) {
 
-   // N>=MaxCnt.
+   // N >= MaxCnt.
    //
    // We have two options here:
    // a) N is exactly divisible by MaxCnt
@@ -167,7 +167,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
       }
    } else {
 
-   // N<=MaxCnt
+   // N <= MaxCnt
    //
    // Code below is a bit complicated because we can not simply
    // return "HQRNDIntegerBase() mod N" - it will be skewed for
@@ -335,7 +335,7 @@ double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
 //     State   -   high quality random number generator, must be
 //                 initialized with HQRNDRandomize() or HQRNDSeed().
 //         X   -   finite sample
-//         N   -   number of elements to use, N>=1
+//         N   -   number of elements to use, N >= 1
 //
 // RESULT
 //     this function returns one of the X[i] for random i=0..N-1
@@ -359,11 +359,11 @@ double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state
 //         X   -   finite sample, array[N] (can be larger, in this  case only
 //                 leading N elements are used). THIS ARRAY MUST BE SORTED BY
 //                 ASCENDING.
-//         N   -   number of elements to use, N>=1
+//         N   -   number of elements to use, N >= 1
 //
 // RESULT
 //     this function returns random number from continuous distribution which
-//     tries to approximate X as mush as possible. min(X)<=Result<=max(X).
+//     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
 // API: double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
 double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state) {
@@ -2177,9 +2177,9 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
 //                 one row corresponds to one point.
 //                 first NX columns contain X-values, next NY (NY may be zero)
 //                 columns may contain associated Y-values
-//     N       -   number of points, N>=0.
-//     NX      -   space dimension, NX>=1.
-//     NY      -   number of optional Y-values, NY>=0.
+//     N       -   number of points, N >= 0.
+//     NX      -   space dimension, NX >= 1.
+//     NY      -   number of optional Y-values, NY >= 0.
 //     NormType-   norm type:
 //                 * 0 denotes infinity-norm
 //                 * 1 denotes 1-norm
@@ -2241,9 +2241,9 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
 //                 columns may contain associated Y-values
 //     Tags    -   tags, array[0..N-1], contains integer tags associated
 //                 with points.
-//     N       -   number of points, N>=0
-//     NX      -   space dimension, NX>=1.
-//     NY      -   number of optional Y-values, NY>=0.
+//     N       -   number of points, N >= 0
+//     NX      -   space dimension, NX >= 1.
+//     NY      -   number of optional Y-values, NY >= 0.
 //     NormType-   norm type:
 //                 * 0 denotes infinity-norm
 //                 * 1 denotes 1-norm
@@ -2373,7 +2373,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *
 // Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
-//     K           -   number of neighbors to return, K>=1
+//     K           -   number of neighbors to return, K >= 1
 //     SelfMatch   -   whether self-matches are allowed:
 //                     * if True, nearest neighbor may be the point itself
 //                       (if it exists in original dataset)
@@ -2416,7 +2416,7 @@ ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, ae_
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
 //                     function.
 //     X           -   point, array[0..NX-1].
-//     K           -   number of neighbors to return, K>=1
+//     K           -   number of neighbors to return, K >= 1
 //     SelfMatch   -   whether self-matches are allowed:
 //                     * if True, nearest neighbor may be the point itself
 //                       (if it exists in original dataset)
@@ -2478,7 +2478,7 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_
 //                     * if not given, considered True
 //
 // RESULT
-//     number of neighbors found, >=0
+//     number of neighbors found, >= 0
 //
 // This  subroutine  performs  query  and  stores  its result in the internal
 // structures of the KD-tree. You can use  following  subroutines  to  obtain
@@ -2522,7 +2522,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_st
 //                     * if not given, considered True
 //
 // RESULT
-//     number of neighbors found, >=0
+//     number of neighbors found, >= 0
 //
 // This  subroutine  performs  query  and  stores  its result in the internal
 // structures of the KD-tree. You can use  following  subroutines  to  obtain
@@ -2572,7 +2572,7 @@ ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_s
 //                     * if not given, considered True
 //
 // RESULT
-//     number of neighbors found, >=0
+//     number of neighbors found, >= 0
 //
 // This  subroutine  performs  query  and  stores  its result in the internal
 // structures  of  the  buffer object. You can use following  subroutines  to
@@ -2623,7 +2623,7 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, dou
 //                     * if not given, considered True
 //
 // RESULT
-//     number of neighbors found, >=0
+//     number of neighbors found, >= 0
 //
 // This  subroutine  performs  query  and  stores  its result in the internal
 // structures  of  the  buffer object. You can use following  subroutines  to
@@ -2664,14 +2664,14 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, do
 // Inputs:
 //     KDT         -   KD-tree
 //     X           -   point, array[0..NX-1].
-//     K           -   number of neighbors to return, K>=1
+//     K           -   number of neighbors to return, K >= 1
 //     SelfMatch   -   whether self-matches are allowed:
 //                     * if True, nearest neighbor may be the point itself
 //                       (if it exists in original dataset)
 //                     * if False, then only points with non-zero distance
 //                       are returned
 //                     * if not given, considered True
-//     Eps         -   approximation factor, Eps>=0. eps-approximate  nearest
+//     Eps         -   approximation factor, Eps >= 0. eps-approximate  nearest
 //                     neighbor  is  a  neighbor  whose distance from X is at
 //                     most (1+eps) times distance of true nearest neighbor.
 //
@@ -2711,14 +2711,14 @@ ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, do
 //                     instance of kd-tree structure with kdtreecreaterequestbuffer()
 //                     function.
 //     X           -   point, array[0..NX-1].
-//     K           -   number of neighbors to return, K>=1
+//     K           -   number of neighbors to return, K >= 1
 //     SelfMatch   -   whether self-matches are allowed:
 //                     * if True, nearest neighbor may be the point itself
 //                       (if it exists in original dataset)
 //                     * if False, then only points with non-zero distance
 //                       are returned
 //                     * if not given, considered True
-//     Eps         -   approximation factor, Eps>=0. eps-approximate  nearest
+//     Eps         -   approximation factor, Eps >= 0. eps-approximate  nearest
 //                     neighbor  is  a  neighbor  whose distance from X is at
 //                     most (1+eps) times distance of true nearest neighbor.
 //
@@ -3567,7 +3567,7 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
 //                     * if not given, considered True
 //
 // RESULT
-//     number of neighbors found, >=0
+//     number of neighbors found, >= 0
 //
 // This  subroutine  performs  query  and  stores  its result in the internal
 // structures  of  the  buffer object. You can use following  subroutines  to

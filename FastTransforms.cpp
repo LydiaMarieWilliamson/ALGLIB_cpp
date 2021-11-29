@@ -730,7 +730,7 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_stat
 
    ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer that B.
    if (m < n) {
       convc1d(b, n, a, m, r, _state);
@@ -747,7 +747,7 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_stat
 //     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - response
-//     N   -   response length, N<=M
+//     N   -   response length, N <= M
 //
 // Outputs:
 //     R   -   deconvolved signal. array[0..M-N].
@@ -864,7 +864,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
@@ -937,7 +937,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&cbuf, m, _state);
@@ -1017,7 +1017,7 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
 
    ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer that B.
    if (m < n) {
       convr1d(b, n, a, m, r, _state);
@@ -1034,7 +1034,7 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
 //     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
 //     M   -   convolved signal length
 //     B   -   array[0..N-1] - response
-//     N   -   response length, N<=M
+//     N   -   response length, N <= M
 //
 // Outputs:
 //     R   -   deconvolved signal. array[0..M-N].
@@ -1138,7 +1138,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
@@ -1217,7 +1217,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 
    ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
@@ -1291,7 +1291,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 //     A   -   array[0..M-1] - complex function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex function to be transformed
-//     N   -   problem size, N<=M
+//     N   -   problem size, N <= M
 //     Alg -   algorithm type:
 //             *-2     auto-select Q for overlap-add
 //             *-1     auto-select algorithm and parameters
@@ -1654,7 +1654,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //     A   -   array[0..M-1] - complex function to be transformed
 //     M   -   problem size
 //     B   -   array[0..N-1] - complex function to be transformed
-//     N   -   problem size, N<=M
+//     N   -   problem size, N <= M
 //     Alg -   algorithm type:
 //             *-2     auto-select Q for overlap-add
 //             *-1     auto-select algorithm and parameters
@@ -2246,7 +2246,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&b, m, _state);
@@ -2379,7 +2379,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
-// normalize task: make M>=N,
+// normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&b, m, _state);

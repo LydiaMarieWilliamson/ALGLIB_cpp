@@ -48,8 +48,8 @@ namespace alglib_impl {
 // Inputs:
 //     X           -   dataset, array[0..NPoints-1,0..NVars-1].
 //                     matrix contains ONLY INDEPENDENT VARIABLES.
-//     NPoints     -   dataset size, NPoints>=0
-//     NVars       -   number of independent variables, NVars>=1
+//     NPoints     -   dataset size, NPoints >= 0
+//     NVars       -   number of independent variables, NVars >= 1
 //
 // Outputs:
 //     Info        -   return code:
@@ -168,8 +168,8 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
 // Inputs:
 //     X           -   dataset, array[0..NPoints-1,0..NVars-1].
 //                     matrix contains ONLY INDEPENDENT VARIABLES.
-//     NPoints     -   dataset size, NPoints>=0
-//     NVars       -   number of independent variables, NVars>=1
+//     NPoints     -   dataset size, NPoints >= 0
+//     NVars       -   number of independent variables, NVars >= 1
 //     NNeeded     -   number of requested components, in [1,NVars] range;
 //                     this function is efficient only for NNeeded<<NVars.
 //     Eps         -   desired  precision  of  vectors  returned;  underlying
@@ -301,8 +301,8 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 //                     input will be internally converted to CRS.
 //                     Matrix contains ONLY INDEPENDENT VARIABLES,  and  must
 //                     be EXACTLY npoints*nvars.
-//     NPoints     -   dataset size, NPoints>=0
-//     NVars       -   number of independent variables, NVars>=1
+//     NPoints     -   dataset size, NPoints >= 0
+//     NVars       -   number of independent variables, NVars >= 1
 //     NNeeded     -   number of requested components, in [1,NVars] range;
 //                     this function is efficient only for NNeeded<<NVars.
 //     Eps         -   desired  precision  of  vectors  returned;  underlying
@@ -826,13 +826,13 @@ void dstiefasti(RVector *a, ZVector *b, ae_int_t n, ZVector *ties, ae_int_t *tie
 //     Info    -   completetion code:
 //                 * -3, all values of A[] are same (partition is impossible)
 //                 * -2, one of C[] is incorrect (<0, >1)
-//                 * -1, incorrect pararemets were passed (N<=0).
+//                 * -1, incorrect pararemets were passed (N <= 0).
 //                 *  1, OK
 //     Threshold-  partiton boundary. Left part contains values which are
 //                 strictly less than Threshold. Right part contains values
 //                 which are greater than or equal to Threshold.
 //     PAL, PBL-   probabilities P(0|v<Threshold) and P(1|v<Threshold)
-//     PAR, PBR-   probabilities P(0|v>=Threshold) and P(1|v>=Threshold)
+//     PAR, PBR-   probabilities P(0|v >= Threshold) and P(1|v >= Threshold)
 //     CVE     -   cross-validation estimate of cross-entropy
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
 // API: void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve, const xparams _xparams = xdefault);
@@ -997,7 +997,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 //     C       array[0..N-1]       array of class labels
 //     TiesBuf array[0..N]         temporaries (ties)
 //     CntBuf  array[0..2*NC-1]    temporaries (counts)
-//     Alpha                       centering factor (0<=alpha<=1, recommended value - 0.05)
+//     Alpha                       centering factor (0 <= alpha <= 1, recommended value - 0.05)
 //     BufR    array[0..N-1]       temporaries
 //     BufI    array[0..N-1]       temporaries
 //
@@ -1778,7 +1778,7 @@ void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mul
 //
 // Activation function of the output layer takes values:
 //
-//     (B, +INF), if D>=0
+//     (B, +INF), if D >= 0
 //
 // or
 //
@@ -3044,7 +3044,7 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
 //     XY      -   original dataset; one sample = one row;
 //                 first NIn columns contain inputs,
 //                 next NOut columns - desired outputs.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Idx     -   subset of SubsetSize elements, array[SubsetSize]:
 //                 * Idx[I] stores row index in the original dataset which is
 //                   given by XY. Gradient is calculated with respect to rows
@@ -3181,7 +3181,7 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
 //                 one sample = one row;
 //                 first NIn columns contain inputs,
 //                 next NOut columns - desired outputs.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Idx     -   subset of SubsetSize elements, array[SubsetSize]:
 //                 * Idx[I] stores row index in the original dataset which is
 //                   given by XY. Gradient is calculated with respect to rows
@@ -3883,7 +3883,7 @@ double mlperror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, ae
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     NPoints     -   points count, >=0
+//     NPoints     -   points count, >= 0
 //
 // Result:
 //     sum-of-squares error, SUM(sqr(y[i]-desired_y[i])/2)
@@ -4069,7 +4069,7 @@ double mlprelclserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoin
 //     XY          -   training  set,  see  below  for  information  on   the
 //                     training set format. Sparse matrix must use CRS format
 //                     for storage.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // Result:
 // Percent   of incorrectly   classified  cases.  Works  both  for classifier
@@ -4169,7 +4169,7 @@ double mlpavgce(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, ae
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // Result:
 // CrossEntropy/(NPoints*LN(2)).
@@ -4269,7 +4269,7 @@ double mlprmserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // Result:
 // Root mean  square error. Its meaning for regression task is obvious. As for
@@ -4369,7 +4369,7 @@ double mlpavgerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // Result:
 // Its meaning for regression task is obvious. As for classification task, it
@@ -4469,7 +4469,7 @@ double mlpavgrelerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoin
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // Result:
 // Its meaning for regression task is obvious. As for classification task, it
@@ -4764,7 +4764,7 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
 //                   desired outputs.
 //                 * for classification problem, next column (just one!)
 //                   stores class number.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Idx     -   subset of SubsetSize elements, array[SubsetSize]:
 //                 * Idx[I] stores row index in the original dataset which is
 //                   given by XY. Gradient is calculated with respect to rows
@@ -4861,7 +4861,7 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
 //                   desired outputs.
 //                 * for classification problem, next column (just one!)
 //                   stores class number.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Idx     -   subset of SubsetSize elements, array[SubsetSize]:
 //                 * Idx[I] stores row index in the original dataset which is
 //                   given by XY. Gradient is calculated with respect to rows
@@ -5453,7 +5453,7 @@ void mlpunserialize(ae_serializer *s, multilayerperceptron *network, ae_state *_
 //     XY      -   original dataset; one sample = one row;
 //                 first NIn columns contain inputs,
 //                 next NOut columns - desired outputs.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Subset  -   subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize- number of elements in Subset[] array:
 //                 * if SubsetSize>0, rows of XY with indices Subset[0]...
@@ -5501,7 +5501,7 @@ void mlpallerrorssubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
 //                 one sample = one row;
 //                 first NIn columns contain inputs,
 //                 next NOut columns - desired outputs.
-//     SetSize -   real size of XY, SetSize>=0;
+//     SetSize -   real size of XY, SetSize >= 0;
 //     Subset  -   subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize- number of elements in Subset[] array:
 //                 * if SubsetSize>0, rows of XY with indices Subset[0]...
@@ -5548,7 +5548,7 @@ void mlpallerrorssparsesubset(multilayerperceptron *network, sparsematrix *xy, a
 //     Network   -     neural network;
 //     XY        -     training  set,  see  below  for  information  on   the
 //                     training set format;
-//     SetSize   -     real size of XY, SetSize>=0;
+//     SetSize   -     real size of XY, SetSize >= 0;
 //     Subset    -     subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize-     number of elements in Subset[] array:
 //                     * if SubsetSize>0, rows of XY with indices Subset[0]...
@@ -5617,7 +5617,7 @@ double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsi
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
-//     SetSize   -     real size of XY, SetSize>=0;
+//     SetSize   -     real size of XY, SetSize >= 0;
 //                     it is used when SubsetSize<0;
 //     Subset    -     subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize-     number of elements in Subset[] array:
@@ -8534,8 +8534,8 @@ void clusterizercreate(clusterizerstate *s, ae_state *_state) {
 // Inputs:
 //     S       -   clusterizer state, initialized by ClusterizerCreate()
 //     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points, >=0
-//     NFeatures-  number of features, >=1
+//     NPoints -   number of points, >= 0
+//     NFeatures-  number of features, >= 1
 //     DistType-   distance function:
 //                 *  0    Chebyshev distance  (L-inf norm)
 //                 *  1    city block distance (L1 norm)
@@ -8679,11 +8679,11 @@ void clusterizersetahcalgo(clusterizerstate *s, ae_int_t algo, ae_state *_state)
 //
 // Inputs:
 //     S       -   clusterizer state, initialized by ClusterizerCreate()
-//     Restarts-   restarts count, >=1.
+//     Restarts-   restarts count, >= 1.
 //                 k-means++ algorithm performs several restarts and  chooses
 //                 best set of centers (one with minimum squared distance).
 //     MaxIts  -   maximum number of k-means iterations performed during  one
-//                 run. >=0, zero value means that algorithm performs unlimited
+//                 run. >= 0, zero value means that algorithm performs unlimited
 //                 number of iterations.
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 // API: void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits, const xparams _xparams = xdefault);
@@ -8780,7 +8780,7 @@ void clusterizerrunahc(clusterizerstate *s, ahcreport *rep, ae_state *_state) {
    npoints = s->npoints;
    nfeatures = s->nfeatures;
 
-// Fill Rep.NPoints, quick exit when NPoints<=1
+// Fill Rep.NPoints, quick exit when NPoints <= 1
    rep->npoints = npoints;
    if (npoints == 0) {
       ae_vector_set_length(&rep->p, 0, _state);
@@ -8841,7 +8841,7 @@ void clusterizerrunahc(clusterizerstate *s, ahcreport *rep, ae_state *_state) {
 //
 // Inputs:
 //     S       -   clusterizer state, initialized by ClusterizerCreate()
-//     K       -   number of clusters, K>=0.
+//     K       -   number of clusters, K >= 0.
 //                 K  can  be  zero only when algorithm is called  for  empty
 //                 dataset,  in   this   case   completion  code  is  set  to
 //                 success (+1).
@@ -8908,7 +8908,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep, ae
       return;
    }
 // Normal case:
-// 1<=K<=NPoints, Euclidean distance
+// 1 <= K <= NPoints, Euclidean distance
    rep->npoints = s->npoints;
    rep->nfeatures = s->nfeatures;
    rep->k = k;
@@ -8922,8 +8922,8 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep, ae
 //
 // Inputs:
 //     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points, >=0
-//     NFeatures-  number of features, >=1
+//     NPoints -   number of points, >= 0
+//     NFeatures-  number of features, >= 1
 //     DistType-   distance function:
 //                 *  0    Chebyshev distance  (L-inf norm)
 //                 *  1    city block distance (L1 norm)
@@ -9156,7 +9156,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
 //
 // Inputs:
 //     Rep     -   report from ClusterizerRunAHC() performed on XY
-//     K       -   desired number of clusters, 1<=K<=NPoints.
+//     K       -   desired number of clusters, 1 <= K <= NPoints.
 //                 K can be zero only when NPoints=0.
 //
 // Outputs:
@@ -9305,10 +9305,10 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
 //
 // Inputs:
 //     Rep     -   report from ClusterizerRunAHC() performed on XY
-//     R       -   desired minimum intercluster distance, R>=0
+//     R       -   desired minimum intercluster distance, R >= 0
 //
 // Outputs:
-//     K       -   number of clusters, 1<=K<=NPoints
+//     K       -   number of clusters, 1 <= K <= NPoints
 //     CIdx    -   array[NPoints], I-th element contains cluster index  (from
 //                 0 to K-1) for I-th point of the dataset.
 //     CZ      -   array[K]. This array allows  to  convert  cluster  indexes
@@ -9365,10 +9365,10 @@ void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *
 //
 // Inputs:
 //     Rep     -   report from ClusterizerRunAHC() performed on XY
-//     R       -   desired maximum intercluster correlation, -1<=R<=+1
+//     R       -   desired maximum intercluster correlation, -1 <= R <= +1
 //
 // Outputs:
-//     K       -   number of clusters, 1<=K<=NPoints
+//     K       -   number of clusters, 1 <= K <= NPoints
 //     CIdx    -   array[NPoints], I-th element contains cluster index  (from
 //                 0 to K-1) for I-th point of the dataset.
 //     CZ      -   array[K]. This array allows  to  convert  cluster  indexes
@@ -9440,9 +9440,9 @@ void kmeansinitbuf(kmeansbuffers *buf, ae_state *_state) {
 //
 // Inputs:
 //     XY          -   dataset, array [0..NPoints-1,0..NVars-1].
-//     NPoints     -   dataset size, NPoints>=K
-//     NVars       -   number of variables, NVars>=1
-//     K           -   desired number of clusters, K>=1
+//     NPoints     -   dataset size, NPoints >= K
+//     NVars       -   number of variables, NVars >= 1
+//     K           -   desired number of clusters, K >= 1
 //     InitAlgo    -   initialization algorithm:
 //                     * 0 - automatic selection of best algorithm
 //                     * 1 - random selection of centers
@@ -9456,7 +9456,7 @@ void kmeansinitbuf(kmeansbuffers *buf, ae_state *_state) {
 //                     * zero or negative value means  that random  seed   is
 //                       generated
 //     MaxIts      -   iterations limit or zero for no limit
-//     Restarts    -   number of restarts, Restarts>=1
+//     Restarts    -   number of restarts, Restarts >= 1
 //     KMeansDbgNoIts- debug flag; if set, Lloyd's iteration is not performed,
 //                     only initialization phase.
 //     Buf         -   special reusable structure which stores previously allocated
@@ -9672,7 +9672,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
 //     XY          -   dataset, array [0..NPoints-1,0..NVars-1].
 //     Idx0,Idx1   -   define range of dataset [Idx0,Idx1) to process;
 //                     right boundary is not included.
-//     NVars       -   number of variables, NVars>=1
+//     NVars       -   number of variables, NVars >= 1
 //     CT          -   matrix of centers, centers are stored in rows
 //     CIdx0,CIdx1 -   define range of centers [CIdx0,CIdx1) to process;
 //                     right boundary is not included.
@@ -9940,7 +9940,7 @@ bool _trypexec_kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, 
 // Inputs:
 //     XY          -   dataset, array [0..NPoints-1,0..NVars-1].
 //     NPoints     -   points count
-//     NVars       -   number of variables, NVars>=1
+//     NVars       -   number of variables, NVars >= 1
 //     InitAlgo    -   initialization algorithm:
 //                     * 0 - automatic selection of best algorithm
 //                     * 1 - random selection
@@ -9948,7 +9948,7 @@ bool _trypexec_kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, 
 //                     * 3 - fast-greedy init
 //                     *-1 - first K rows of dataset are used (debug algorithm)
 //     RS          -   RNG used to select centers
-//     K           -   number of centers, K>=1
+//     K           -   number of centers, K >= 1
 //     CT          -   possibly preallocated output buffer, resized if needed
 //     InitBuf     -   internal buffer, possibly unitialized instance of
 //                     APBuffers. It is recommended to use this instance only
@@ -10187,10 +10187,10 @@ static void clustering_selectinitialcenters(RMatrix *xy, ae_int_t npoints, ae_in
 //
 // Inputs:
 //     XY          -   dataset, array [0..NPoints-1,0..NVars-1].
-//     NPoints     -   points count, >=1
-//     NVars       -   number of variables, NVars>=1
+//     NPoints     -   points count, >= 1
+//     NVars       -   number of variables, NVars >= 1
 //     CT          -   centers
-//     K           -   number of centers, K>=1
+//     K           -   number of centers, K >= 1
 //     InitBuf     -   internal buffer, possibly unitialized instance of
 //                     APBuffers. It is recommended to use this instance only
 //                     with SelectInitialCenters() and FixCenters() functions,
@@ -10336,7 +10336,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
 
    npoints = s->npoints;
 
-// Fill Rep.NPoints, quick exit when NPoints<=1
+// Fill Rep.NPoints, quick exit when NPoints <= 1
    rep->npoints = npoints;
    if (npoints == 0) {
       ae_vector_set_length(&rep->p, 0, _state);
@@ -10599,7 +10599,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
 //
 // Inputs:
 //     XY      -   array[?,NFeatures], dataset
-//     NFeatures-  number of features, >=1
+//     NFeatures-  number of features, >= 1
 //     DistType-   distance function:
 //                 *  0    Chebyshev distance  (L-inf norm)
 //                 *  1    city block distance (L1 norm)
@@ -10651,7 +10651,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
 // Try to process in parallel. Two condtions must hold in order to
 // activate parallel processing:
 // 1. I1-I0>2 or J1-J0>2
-// 2. (I1-I0)*(J1-J0)*NFeatures>=ParallelComplexity
+// 2. (I1-I0)*(J1-J0)*NFeatures >= ParallelComplexity
 //
 // NOTE: all quantities are converted to reals in order to avoid
 //       integer overflow during multiplication
@@ -11027,10 +11027,10 @@ void dfbuildercreate(decisionforestbuilder *s, ae_state *_state) {
 //                       independent variables
 //                     * last  column  store class number (in 0...NClasses-1)
 //                       or real value of the dependent variable
-//     NPoints     -   number of rows in the dataset, NPoints>=1
-//     NVars       -   number of independent variables, NVars>=1
+//     NPoints     -   number of rows in the dataset, NPoints >= 1
+//     NVars       -   number of independent variables, NVars >= 1
 //     NClasses    -   indicates type of the problem being solved:
-//                     * NClasses>=2 means  that  classification  problem  is
+//                     * NClasses >= 2 means  that  classification  problem  is
 //                       solved  (last  column  of  the  dataset stores class
 //                       number)
 //                     * NClasses=1 means that regression problem  is  solved
@@ -11486,7 +11486,7 @@ double dfbuilderpeekprogress(decisionforestbuilder *s, ae_state *_state) {
 //
 // Inputs:
 //     S           -   decision forest builder object
-//     NTrees      -   NTrees>=1, number of trees to train
+//     NTrees      -   NTrees >= 1, number of trees to train
 //
 // Outputs:
 //     DF          -   decision forest. You can compress this forest to  more
@@ -13166,7 +13166,7 @@ static void dforest_cleanreport(decisionforestbuilder *s, dfreport *rep, ae_stat
 //
 // Result:
 //     sum of squared residuals;
-//     for NClasses>=2 it coincides with Gini impurity times (Idx1-Idx0)
+//     for NClasses >= 2 it coincides with Gini impurity times (Idx1-Idx0)
 //
 // Following fields of WorkBuf are used as temporaries:
 // * TmpMeanNRMS2
@@ -13774,7 +13774,7 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
 // Returns split: either deterministic split at the middle of [A,B], or randomly
 // chosen split.
 //
-// It is guaranteed that A<Split<=B.
+// It is guaranteed that A<Split <= B.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static double dforest_getsplit(decisionforestbuilder *s, double a, double b, hqrndstate *rs, ae_state *_state) {
    double result;
@@ -13920,7 +13920,7 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s, ae_sta
 //
 // Inputs:
 //     S           -   decision forest builder object
-//     NTrees      -   NTrees>=1, number of trees to train
+//     NTrees      -   NTrees >= 1, number of trees to train
 //
 // Outputs:
 //     DF          -   decision forest
@@ -14381,7 +14381,7 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
       // Child #1 comes first because it is shorter:
       // * stream variable index used for splitting + NVars;
       //   value in [NVars,2*NVars) range indicates that split is
-      //   "if VAR>=VAL then BRANCH0 else BRANCH1"
+      //   "if VAR >= VAL then BRANCH0 else BRANCH1"
       // * stream value used for splitting
       // * stream children #0 and #1
          dforest_streamuint(buf, dstoffs, varidx + df->nvars, _state);
@@ -14718,7 +14718,7 @@ static void dforest_dfprocessinternalcompressed(decisionforest *df, ae_int_t off
          }
       } else {
 
-      // The split rule is "if VAR>=VAL then BRANCH0 else BRANCH1"
+      // The split rule is "if VAR >= VAL then BRANCH0 else BRANCH1"
          varidx = varidx - df->nvars;
          if (x->ptr.p_double[varidx] < splitval) {
             offs = offs + jmplen;
@@ -15327,7 +15327,7 @@ void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, line
 //                     * -255, in case of unknown internal error
 //                     * -4, if internal SVD subroutine haven't converged
 //                     * -1, if incorrect parameters was passed (NPoints<NVars+2, NVars<1).
-//                     * -2, if S[I]<=0
+//                     * -2, if S[I] <= 0
 //                     *  1, if subroutine successfully finished
 //     LM          -   linear model in the ALGLIB format. Use subroutines of
 //                     this unit to work with the model.
@@ -16255,8 +16255,8 @@ namespace alglib_impl {
 // Inputs:
 //     X           -   array[N], array to process. It can be larger than N,
 //                     in this case only first N points are processed.
-//     N           -   points count, N>=0
-//     K           -   K>=1 (K can be larger than N ,  such  cases  will  be
+//     N           -   points count, N >= 0
+//     K           -   K >= 1 (K can be larger than N ,  such  cases  will  be
 //                     correctly handled). Window width. K=1 corresponds  to
 //                     identity transformation (nothing changes).
 //
@@ -16317,7 +16317,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
 // * I              element being processed
 // * RunningSum     current value of the running sum
 //                  (including I-th element)
-// * TermsInSum     number of terms in sum, 0<=TermsInSum<=K
+// * TermsInSum     number of terms in sum, 0 <= TermsInSum <= K
 // * ZeroPrefix     length of the sequence of zero elements
 //                  which starts at X[I-K+1] and continues towards X[I].
 //                  Equal to zero in case X[I-K+1] is non-zero.
@@ -16365,8 +16365,8 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
 // Inputs:
 //     X           -   array[N], array to process. It can be larger than N,
 //                     in this case only first N points are processed.
-//     N           -   points count, N>=0
-//     alpha       -   0<alpha<=1, smoothing parameter.
+//     N           -   points count, N >= 0
+//     alpha       -   0<alpha <= 1, smoothing parameter.
 //
 // Outputs:
 //     X           -   array, whose first N elements were processed
@@ -16415,8 +16415,8 @@ void filterema(RVector *x, ae_int_t n, double alpha, ae_state *_state) {
 // Inputs:
 //     X           -   array[N], array to process. It can be larger than N,
 //                     in this case only first N points are processed.
-//     N           -   points count, N>=0
-//     K           -   K>=1 (K can be larger than N ,  such  cases  will  be
+//     N           -   points count, N >= 0
+//     K           -   K >= 1 (K can be larger than N ,  such  cases  will  be
 //                     correctly handled). Window width. K=1 corresponds  to
 //                     identity transformation (nothing changes).
 //
@@ -16584,7 +16584,7 @@ void ssacreate(ssamodel *s, ae_state *_state) {
 //
 // Inputs:
 //     S               -   SSA model created with ssacreate()
-//     WindowWidth     -   >=1, new window width
+//     WindowWidth     - >= 1, new window width
 //
 // Outputs:
 //     S               -   SSA model, updated
@@ -16666,7 +16666,7 @@ void ssasetpoweruplength(ssamodel *s, ae_int_t pwlen, ae_state *_state) {
 //
 // Inputs:
 //     S       -   SSA model
-//     MemLimit-   memory limit, >=0. Zero value means no limit.
+//     MemLimit-   memory limit, >= 0. Zero value means no limit.
 // ALGLIB: Copyright 20.12.2017 by Sergey Bochkanov
 // API: void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit, const xparams _xparams = xdefault);
 void ssasetmemorylimit(ssamodel *s, ae_int_t memlimit, ae_state *_state) {
@@ -16708,7 +16708,7 @@ void ssasetmemorylimit(ssamodel *s, ae_int_t memlimit, ae_state *_state) {
 //     X               -   array[N], data, can be larger (additional values
 //                         are ignored)
 //     N               -   data length, can be automatically determined from
-//                         the array length. N>=0.
+//                         the array length. N >= 0.
 //
 // Outputs:
 //     S               -   SSA model, updated
@@ -16758,7 +16758,7 @@ void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n, ae_state *_state) {
 // Inputs:
 //     S               -   SSA model created with ssacreate()
 //     X               -   new point
-//     UpdateIts       -   >=0,  floating  point (!)  value,  desired  update
+//     UpdateIts       - >= 0,  floating  point (!)  value,  desired  update
 //                         frequency:
 //                         * zero value means that point is  stored,  but  no
 //                           update is performed
@@ -16767,7 +16767,7 @@ void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n, ae_state *_state) {
 //                         * fractional part of  the  value  means  that  one
 //                           iteration is performed with this probability.
 //
-//                         Recommended value: 0<UpdateIts<=1.  Values  larger
+//                         Recommended value: 0<UpdateIts <= 1.  Values  larger
 //                         than 1 are VERY seldom  needed.  If  your  dataset
 //                         changes slowly, you can set it  to  0.1  and  skip
 //                         90% of updates.
@@ -16842,8 +16842,8 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits, ae_state *
 // Inputs:
 //     S               -   SSA model created with ssacreate()
 //     X               -   new sequence, array[NTicks] or larget
-//     NTicks          -   >=1, number of ticks in the sequence
-//     UpdateIts       -   >=0,  floating  point (!)  value,  desired  update
+//     NTicks          - >= 1, number of ticks in the sequence
+//     UpdateIts       - >= 0,  floating  point (!)  value,  desired  update
 //                         frequency:
 //                         * zero value means that point is  stored,  but  no
 //                           update is performed
@@ -16852,7 +16852,7 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits, ae_state *
 //                         * fractional part of  the  value  means  that  one
 //                           iteration is performed with this probability.
 //
-//                         Recommended value: 0<UpdateIts<=1.  Values  larger
+//                         Recommended value: 0<UpdateIts <= 1.  Values  larger
 //                         than 1 are VERY seldom  needed.  If  your  dataset
 //                         changes slowly, you can set it  to  0.1  and  skip
 //                         90% of updates.
@@ -16937,8 +16937,8 @@ void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double
 //                         does NOT perform any kind of  renormalization.  It
 //                         is your responsibility to provide it with  correct
 //                         basis.
-//     WindowWidth     -   window width, >=1
-//     NBasis          -   number of basis vectors, 1<=NBasis<=WindowWidth
+//     WindowWidth     -   window width, >= 1
+//     NBasis          -   number of basis vectors, 1 <= NBasis <= WindowWidth
 //
 // Outputs:
 //     S               -   updated model
@@ -16983,7 +16983,7 @@ void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int
 //
 // Inputs:
 //     S               -   SSA model
-//     TopK            -   number of components to analyze; TopK>=1.
+//     TopK            -   number of components to analyze; TopK >= 1.
 //
 // Outputs:
 //     S               -   updated model
@@ -17030,7 +17030,7 @@ void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk, ae_state *_state) {
 //
 // Inputs:
 //     S               -   SSA model
-//     TopK            -   number of components to analyze; TopK>=1.
+//     TopK            -   number of components to analyze; TopK >= 1.
 //
 // Outputs:
 //     S               -   updated model
@@ -17373,8 +17373,8 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //
 // Inputs:
 //     S               -   SSA model
-//     NTicks          -   number of ticks to analyze, Nticks>=1.
-//                         * special case of NTicks<=WindowWidth  is  handled
+//     NTicks          -   number of ticks to analyze, Nticks >= 1.
+//                         * special case of NTicks <= WindowWidth  is  handled
 //                           by analyzing last window and  returning   NTicks
 //                           last ticks.
 //                         * special case NTicks>LastSequenceLen  is  handled
@@ -17455,7 +17455,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
       }
       return;
    }
-// Fast exit: NTicks<=WindowWidth, just last window is analyzed
+// Fast exit: NTicks <= WindowWidth, just last window is analyzed
    if (nticks <= s->windowwidth) {
       ssaanalyzelastwindow(s, &s->alongtrend, &s->alongnoise, &cnt, _state);
       offs = s->windowwidth - nticks;
@@ -17511,7 +17511,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 //     S               -   SSA model
 //     Data            -   array[NTicks], can be larger (only NTicks  leading
 //                         elements will be used)
-//     NTicks          -   number of ticks to analyze, Nticks>=1.
+//     NTicks          -   number of ticks to analyze, Nticks >= 1.
 //                         * special case of NTicks<WindowWidth  is   handled
 //                           by returning zeros as trend, and signal as noise
 //
@@ -17615,7 +17615,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 //
 // Inputs:
 //     S               -   SSA model
-//     NTicks          -   number of ticks to forecast, NTicks>=1
+//     NTicks          -   number of ticks to forecast, NTicks >= 1
 //
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
@@ -17762,8 +17762,8 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend, ae_state *_st
 // Inputs:
 //     S               -   SSA model
 //     Data            -   array[NTicks], data to forecast
-//     DataLen         -   number of ticks in the data, DataLen>=1
-//     ForecastLen     -   number of ticks to predict, ForecastLen>=1
+//     DataLen         -   number of ticks in the data, DataLen >= 1
+//     ForecastLen     -   number of ticks to predict, ForecastLen >= 1
 //     ApplySmoothing  -   whether to apply smoothing trend extraction or not;
 //                         if you do not know what to specify, pass True.
 //
@@ -17911,10 +17911,10 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 //
 // Inputs:
 //     S               -   SSA model
-//     M               -   number  of  sliding  windows  to combine, M>=1. If
+//     M               -   number  of  sliding  windows  to combine, M >= 1. If
 //                         your dataset has less than M sliding windows, this
 //                         parameter will be silently reduced.
-//     NTicks          -   number of ticks to forecast, NTicks>=1
+//     NTicks          -   number of ticks to forecast, NTicks >= 1
 //
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
@@ -18043,11 +18043,11 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // Inputs:
 //     S               -   SSA model
 //     Data            -   array[NTicks], data to forecast
-//     DataLen         -   number of ticks in the data, DataLen>=1
-//     M               -   number  of  sliding  windows  to combine, M>=1. If
+//     DataLen         -   number of ticks in the data, DataLen >= 1
+//     M               -   number  of  sliding  windows  to combine, M >= 1. If
 //                         your dataset has less than M sliding windows, this
 //                         parameter will be silently reduced.
-//     ForecastLen     -   number of ticks to predict, ForecastLen>=1
+//     ForecastLen     -   number of ticks to predict, ForecastLen >= 1
 //     ApplySmoothing  -   whether to apply smoothing trend extraction or not.
 //                         if you do not know what to specify, pass true.
 //
@@ -18525,7 +18525,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits, a
 //     S                   -   model
 //     Data                -   array which holds data in elements [I0,I1):
 //                             * right bound is not included.
-//                             * I1-I0>=WindowWidth (assertion is performed).
+//                             * I1-I0 >= WindowWidth (assertion is performed).
 //     Trend               -   preallocated output array, large enough
 //     Noise               -   preallocated output array, large enough
 //     Offs                -   offset in Trend/Noise where result is stored;
@@ -18623,11 +18623,11 @@ static void ssa_analyzesequence(ssamodel *s, RVector *data, ae_int_t i0, ae_int_
 //     S                   -   model
 //     Data                -   array which holds data in elements [I0,I1):
 //                             * right bound is not included.
-//                             * I1-I0>=WindowWidth (assertion is performed).
-//     M                   -   number  of  sliding  windows  to combine, M>=1. If
+//                             * I1-I0 >= WindowWidth (assertion is performed).
+//     M                   -   number  of  sliding  windows  to combine, M >= 1. If
 //                             your dataset has less than M sliding windows, this
 //                             parameter will be silently reduced.
-//     ForecastLen         -   number of ticks to predict, ForecastLen>=1
+//     ForecastLen         -   number of ticks to predict, ForecastLen >= 1
 //     Trend               -   preallocated output array, large enough
 //     Offs                -   offset in Trend where result is stored;
 //                             I1-I0 elements are written starting at offset
@@ -18704,8 +18704,8 @@ static void ssa_forecastavgsequence(ssamodel *s, RVector *data, ae_int_t i0, ae_
 //
 // Inputs:
 //     S                   -   model
-//     Beta                -   >=0, coefficient to premultiply XXT
-//     Cnt                 -   0<Cnt<=S.RTQueueCnt, number of updates to extract
+//     Beta                - >= 0, coefficient to premultiply XXT
+//     Cnt                 -   0<Cnt <= S.RTQueueCnt, number of updates to extract
 //                             from the end of the queue
 //
 // Outputs:
@@ -18980,9 +18980,9 @@ namespace alglib_impl {
 //                     variables, next column stores number of class (from 0
 //                     to NClasses-1) which dataset element belongs to. Fractional
 //                     values are rounded to nearest integer.
-//     NPoints     -   training set size, NPoints>=0
-//     NVars       -   number of independent variables, NVars>=1
-//     NClasses    -   number of classes, NClasses>=2
+//     NPoints     -   training set size, NPoints >= 0
+//     NVars       -   number of independent variables, NVars >= 1
+//     NClasses    -   number of classes, NClasses >= 2
 //
 //
 // Outputs:
@@ -19028,9 +19028,9 @@ void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 //                     variables, next column stores number of class (from 0
 //                     to NClasses-1) which dataset element belongs to. Fractional
 //                     values are rounded to nearest integer.
-//     NPoints     -   training set size, NPoints>=0
-//     NVars       -   number of independent variables, NVars>=1
-//     NClasses    -   number of classes, NClasses>=2
+//     NPoints     -   training set size, NPoints >= 0
+//     NVars       -   number of independent variables, NVars >= 1
+//     NClasses    -   number of classes, NClasses >= 2
 //
 //
 // Outputs:
@@ -19129,7 +19129,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
    }
    *info = 1;
 
-// Special case: NPoints<=1
+// Special case: NPoints <= 1
 // Degenerate task.
    if (npoints <= 1) {
       *info = 2;
@@ -19230,7 +19230,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
    ae_matrix_set_length(w, nvars, nvars, _state);
    if (ae_fp_less_eq(d.ptr.p_double[nvars - 1], (double)(0)) || ae_fp_less_eq(d.ptr.p_double[0], 1000 * ae_machineepsilon * d.ptr.p_double[nvars - 1])) {
 
-   // Special case: D[NVars-1]<=0
+   // Special case: D[NVars-1] <= 0
    // Degenerate task (all variables takes the same value).
       if (ae_fp_less_eq(d.ptr.p_double[nvars - 1], (double)(0))) {
          *info = 2;
@@ -19376,7 +19376,7 @@ static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, m
 // 6. User calls MCPDResults() to get solution
 //
 // Inputs:
-//     N       -   problem dimension, N>=1
+//     N       -   problem dimension, N >= 1
 //
 // Outputs:
 //     State   -   structure stores algorithm state
@@ -19426,7 +19426,7 @@ void mcpdcreate(ae_int_t n, mcpdstate *s, ae_state *_state) {
 // http://www.alglib.net/dataanalysis/ for more data).
 //
 // Inputs:
-//     N       -   problem dimension, N>=2
+//     N       -   problem dimension, N >= 2
 //     EntryState- index of entry state, in 0..N-1
 //
 // Outputs:
@@ -19479,7 +19479,7 @@ void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s, ae_state *_s
 // http://www.alglib.net/dataanalysis/ for more data).
 //
 // Inputs:
-//     N       -   problem dimension, N>=2
+//     N       -   problem dimension, N >= 2
 //     ExitState-  index of exit state, in 0..N-1
 //
 // Outputs:
@@ -19542,7 +19542,7 @@ void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s, ae_state *_sta
 // http://www.alglib.net/dataanalysis/ for more data).
 //
 // Inputs:
-//     N       -   problem dimension, N>=2
+//     N       -   problem dimension, N >= 2
 //     EntryState- index of entry state, in 0..N-1
 //     ExitState-  index of exit state, in 0..N-1
 //
@@ -19653,13 +19653,13 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k, ae_state *_state) {
 // * user-specified bound constraints (optional)
 // * user-specified general linear constraints (optional)
 // * basic constraints (always present):
-//   * non-negativity: P[i,j]>=0
+//   * non-negativity: P[i,j] >= 0
 //   * consistency: every column of P sums to 1.0
 //
 // Final  constraints  which  are  passed  to  the  underlying  optimizer are
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
-//     0.1<=P[0,0]<=0.9
+//     0.1 <= P[0,0] <= 0.9
 //     P[0,0]=0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
 // intersection, which is P[0,0]=0.5.
@@ -19722,13 +19722,13 @@ void mcpdsetec(mcpdstate *s, RMatrix *ec, ae_state *_state) {
 // * user-specified bound constraints (optional)
 // * user-specified general linear constraints (optional)
 // * basic constraints (always present):
-//   * non-negativity: P[i,j]>=0
+//   * non-negativity: P[i,j] >= 0
 //   * consistency: every column of P sums to 1.0
 //
 // Final  constraints  which  are  passed  to  the  underlying  optimizer are
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
-//     0.1<=P[0,0]<=0.9
+//     0.1 <= P[0,0] <= 0.9
 //     P[0,0]=0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
 // intersection, which is P[0,0]=0.5.
@@ -19781,13 +19781,13 @@ void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c, ae_state *_state)
 // * user-specified bound constraints (optional)
 // * user-specified general linear constraints (optional)
 // * basic constraints (always present):
-//   * non-negativity: P[i,j]>=0
+//   * non-negativity: P[i,j] >= 0
 //   * consistency: every column of P sums to 1.0
 //
 // Final  constraints  which  are  passed  to  the  underlying  optimizer are
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
-//     0.1<=P[0,0]<=0.9
+//     0.1 <= P[0,0] <= 0.9
 //     P[0,0]=0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
 // intersection, which is P[0,0]=0.5.
@@ -19795,7 +19795,7 @@ void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c, ae_state *_state)
 // This  function  can  be  used  to  place bound   constraints  on arbitrary
 // subset  of  elements  of  P.  Set of constraints is specified by BndL/BndU
 // matrices, which may contain arbitrary combination  of  finite  numbers  or
-// infinities (like -INF<x<=0.5 or 0.1<=x<+INF).
+// infinities (like -INF<x <= 0.5 or 0.1 <= x<+INF).
 //
 // You can also use MCPDAddBC() function which allows to ADD bound constraint
 // for one element of P without changing constraints for other elements.
@@ -19846,13 +19846,13 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu, ae_state *_state) {
 // * user-specified bound constraints (optional)
 // * user-specified general linear constraints (optional)
 // * basic constraints (always present):
-//   * non-negativity: P[i,j]>=0
+//   * non-negativity: P[i,j] >= 0
 //   * consistency: every column of P sums to 1.0
 //
 // Final  constraints  which  are  passed  to  the  underlying  optimizer are
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
-//     0.1<=P[0,0]<=0.9
+//     0.1 <= P[0,0] <= 0.9
 //     P[0,0]=0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
 // intersection, which is P[0,0]=0.5.
@@ -19863,7 +19863,7 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu, ae_state *_state) {
 // You  can  also  use  MCPDSetBC()  function  which  allows to  place  bound
 // constraints  on arbitrary subset of elements of P.   Set of constraints is
 // specified  by  BndL/BndU matrices, which may contain arbitrary combination
-// of finite numbers or infinities (like -INF<x<=0.5 or 0.1<=x<+INF).
+// of finite numbers or infinities (like -INF<x <= 0.5 or 0.1 <= x<+INF).
 //
 // These functions (MCPDSetBC and MCPDAddBC) interact as follows:
 // * there is internal matrix of bound constraints which is stored in the
@@ -19928,7 +19928,7 @@ void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu, a
 //                 (see above for complete description)
 //     CT      -   array[K] - constraint types
 //                 (see above for complete description)
-//     K       -   number of equality/inequality constraints, K>=0:
+//     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
@@ -20489,9 +20489,9 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
 //                     variables, next column stores number of class (from 0
 //                     to NClasses-1) which dataset element belongs to. Fractional
 //                     values are rounded to nearest integer.
-//     NPoints     -   training set size, NPoints>=1
-//     NVars       -   number of independent variables, NVars>=1
-//     NClasses    -   number of classes, NClasses>=2
+//     NPoints     -   training set size, NPoints >= 1
+//     NVars       -   number of independent variables, NVars >= 1
+//     NClasses    -   number of classes, NClasses >= 2
 //
 // Outputs:
 //     Info        -   return code:
@@ -21788,9 +21788,9 @@ void knnbuildercreate(knnbuilder *s, ae_state *_state) {
 //                       independent variables
 //                     * next NOut elements store  values  of  the  dependent
 //                       variables
-//     NPoints     -   number of rows in the dataset, NPoints>=1
-//     NVars       -   number of independent variables, NVars>=1
-//     NOut        -   number of dependent variables, NOut>=1
+//     NPoints     -   number of rows in the dataset, NPoints >= 1
+//     NVars       -   number of independent variables, NVars >= 1
+//     NOut        -   number of dependent variables, NOut >= 1
 //
 // Outputs:
 //     S           -   KNN builder
@@ -21842,9 +21842,9 @@ void knnbuildersetdatasetreg(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
 //                     * first NVars elements of each row store values of the
 //                       independent variables
 //                     * next element stores class index, in [0,NClasses)
-//     NPoints     -   number of rows in the dataset, NPoints>=1
-//     NVars       -   number of independent variables, NVars>=1
-//     NClasses    -   number of classes, NClasses>=2
+//     NPoints     -   number of rows in the dataset, NPoints >= 1
+//     NVars       -   number of independent variables, NVars >= 1
+//     NClasses    -   number of classes, NClasses >= 2
 //
 // Outputs:
 //     S           -   KNN builder
@@ -21910,7 +21910,7 @@ void knnbuildersetnorm(knnbuilder *s, ae_int_t nrmtype, ae_state *_state) {
 // neighbors search algorithm, with:
 // * K=1,  Eps=0 corresponding to the "nearest neighbor algorithm"
 // * K>1,  Eps=0 corresponding to the "K nearest neighbors algorithm"
-// * K>=1, Eps>0 corresponding to "approximate nearest neighbors algorithm"
+// * K >= 1, Eps>0 corresponding to "approximate nearest neighbors algorithm"
 //
 // An approximate KNN is a good option for high-dimensional  datasets  (exact
 // KNN works slowly when dimensions count grows).
@@ -21919,7 +21919,7 @@ void knnbuildersetnorm(knnbuilder *s, ae_int_t nrmtype, ae_state *_state) {
 //
 // Inputs:
 //     S       -   KNN builder object
-//     K       -   number of neighbors to search for, K>=1
+//     K       -   number of neighbors to search for, K >= 1
 //     Eps     -   approximation factor:
 //                 * Eps=0 means that exact kNN search is performed
 //                 * Eps>0 means that (1+Eps)-approximate search is performed
@@ -22019,7 +22019,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
 //
 // Inputs:
 //     Model   -   KNN model
-//     K       -   K>=1, neighbors count
+//     K       -   K >= 1, neighbors count
 //     EPS     -   accuracy of the EPS-approximate NN search. Set to 0.0,  if
 //                 you want to perform "classic" KNN search.  Specify  larger
 //                 values  if  you  need  to  speed-up  high-dimensional  KNN
@@ -22391,7 +22391,7 @@ double knnavgrelerror(knnmodel *model, RMatrix *xy, ae_int_t npoints, ae_state *
 //                     classification problems
 //                   * next NOut columns  store  dependent  variables  -  for
 //                     regression problems
-//     NPoints -   test set size, NPoints>=0
+//     NPoints -   test set size, NPoints >= 0
 //
 // Outputs:
 //     Rep     -   following fields are loaded with errors for both regression
@@ -22809,7 +22809,7 @@ static void mlptrain_initmlpetrnsessions(multilayerperceptron *individualnetwork
 //     Network     -   neural network with initialized geometry
 //     XY          -   training set
 //     NPoints     -   training set size
-//     Decay       -   weight decay constant, >=0.001
+//     Decay       -   weight decay constant, >= 0.001
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
 //                     If you don't know what Decay to choose, use 0.001.
@@ -23116,7 +23116,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 //     Network     -   neural network with initialized geometry
 //     XY          -   training set
 //     NPoints     -   training set size
-//     Decay       -   weight decay constant, >=0.001
+//     Decay       -   weight decay constant, >= 0.001
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
 //                     If you don't know what Decay to choose, use 0.001.
@@ -23243,7 +23243,7 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 //     TrnSize     -   training set size, TrnSize>0
 //     ValXY       -   validation set
 //     ValSize     -   validation set size, ValSize>0
-//     Decay       -   weight decay constant, >=0.001
+//     Decay       -   weight decay constant, >= 0.001
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
 //                     If you don't know what Decay to choose, use 0.001.
@@ -23435,7 +23435,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
 //     WStep       -   stopping criterion, same as in MLPTrainLBFGS
 //     MaxIts      -   stopping criterion, same as in MLPTrainLBFGS
 //     FoldsCount  -   number of folds in k-fold cross-validation,
-//                     2<=FoldsCount<=SSize.
+//                     2 <= FoldsCount <= SSize.
 //                     recommended value: 10.
 //
 // Outputs:
@@ -23468,7 +23468,7 @@ void mlpkfoldcvlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoint
 //                     restarts are counted for each partition separately, so
 //                     total number of restarts will be Restarts*FoldsCount.
 //     FoldsCount  -   number of folds in k-fold cross-validation,
-//                     2<=FoldsCount<=SSize.
+//                     2 <= FoldsCount <= SSize.
 //                     recommended value: 10.
 //
 // Outputs:
@@ -23498,14 +23498,14 @@ void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, 
 //                     representative of its architecture. I.e., we  estimate
 //                     generalization properties of  ARCHITECTURE,  not  some
 //                     specific network.
-//     NRestarts   -   number of restarts, >=0:
+//     NRestarts   -   number of restarts, >= 0:
 //                     * NRestarts>0  means  that  for  each cross-validation
 //                       round   specified  number   of  random  restarts  is
 //                       performed,  with  best  network  being  chosen after
 //                       training.
 //                     * NRestarts=0 is same as NRestarts=1
 //     FoldsCount  -   number of folds in k-fold cross-validation:
-//                     * 2<=FoldsCount<=size of dataset
+//                     * 2 <= FoldsCount <= size of dataset
 //                     * recommended value: 10.
 //                     * values larger than dataset size will be silently
 //                       truncated down to dataset size
@@ -23679,8 +23679,8 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
 // Creation of the network trainer object for regression networks
 //
 // Inputs:
-//     NIn         -   number of inputs, NIn>=1
-//     NOut        -   number of outputs, NOut>=1
+//     NIn         -   number of inputs, NIn >= 1
+//     NOut        -   number of outputs, NOut >= 1
 //
 // Outputs:
 //     S           -   neural network trainer object.
@@ -23708,8 +23708,8 @@ void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s, ae_state *_sta
 // Creation of the network trainer object for classification networks
 //
 // Inputs:
-//     NIn         -   number of inputs, NIn>=1
-//     NClasses    -   number of classes, NClasses>=2
+//     NIn         -   number of inputs, NIn >= 1
+//     NClasses    -   number of classes, NClasses >= 2
 //
 // Outputs:
 //     S           -   neural network trainer object.
@@ -23744,7 +23744,7 @@ void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s, ae_stat
 //                     of  the  dataset  (no  NANs/INFs,  class  numbers  are
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed.
-//     NPoints     -   points count, >=0.
+//     NPoints     -   points count, >= 0.
 //
 // DATASET FORMAT:
 //
@@ -23811,7 +23811,7 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints, ae_state *_stat
 //                     correct) and throws exception when  incorrect  dataset
 //                     is passed. Any  sparse  storage  format  can be  used:
 //                     Hash-table, CRS...
-//     NPoints     -   points count, >=0
+//     NPoints     -   points count, >= 0
 //
 // DATASET FORMAT:
 //
@@ -23878,7 +23878,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints, ae_s
 //
 // Inputs:
 //     S           -   trainer object
-//     Decay       -   weight  decay  coefficient,  >=0.  Weight  decay  term
+//     Decay       -   weight  decay  coefficient, >= 0.  Weight  decay  term
 //                     'Decay*||Weights||^2' is added to error  function.  If
 //                     you don't know what Decay to choose, use 1.0E-3.
 //                     Weight decay can be set to zero,  in this case network
@@ -23901,11 +23901,11 @@ void mlpsetdecay(mlptrainer *s, double decay, ae_state *_state) {
 //     WStep       -   stopping criterion. Algorithm stops if  step  size  is
 //                     less than WStep. Recommended value - 0.01.  Zero  step
 //                     size means stopping after MaxIts iterations.
-//                     WStep>=0.
+//                     WStep >= 0.
 //     MaxIts      -   stopping   criterion.  Algorithm  stops  after  MaxIts
 //                     epochs (full passes over entire dataset).  Zero MaxIts
 //                     means stopping when step is sufficiently small.
-//                     MaxIts>=0.
+//                     MaxIts >= 0.
 //
 // NOTE: by default, WStep=0.005 and MaxIts=0 are used. These values are also
 //       used when MLPSetCond() is called with WStep=0 and MaxIts=0.
@@ -23962,7 +23962,7 @@ void mlpsetalgobatch(mlptrainer *s, ae_state *_state) {
 //     Network     -   neural network. It must have same number of inputs and
 //                     output/classes as was specified during creation of the
 //                     trainer object.
-//     NRestarts   -   number of restarts, >=0:
+//     NRestarts   -   number of restarts, >= 0:
 //                     * NRestarts>0 means that specified  number  of  random
 //                       restarts are performed, best network is chosen after
 //                       training
@@ -24193,7 +24193,7 @@ bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network, ae_state 
 //     Ensemble    -   model with initialized geometry
 //     XY          -   training set
 //     NPoints     -   training set size
-//     Decay       -   weight decay coefficient, >=0.001
+//     Decay       -   weight decay coefficient, >= 0.001
 //     Restarts    -   restarts, >0.
 //
 // Outputs:
@@ -24224,7 +24224,7 @@ void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double 
 //     Ensemble    -   model with initialized geometry
 //     XY          -   training set
 //     NPoints     -   training set size
-//     Decay       -   weight decay coefficient, >=0.001
+//     Decay       -   weight decay coefficient, >= 0.001
 //     Restarts    -   restarts, >0.
 //     WStep       -   stopping criterion, same as in MLPTrainLBFGS
 //     MaxIts      -   stopping criterion, same as in MLPTrainLBFGS
@@ -24257,7 +24257,7 @@ void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, doub
 //     Ensemble    -   model with initialized geometry
 //     XY          -   training set
 //     NPoints     -   training set size
-//     Decay       -   weight decay coefficient, >=0.001
+//     Decay       -   weight decay coefficient, >= 0.001
 //     Restarts    -   restarts, >0.
 //
 // Outputs:
@@ -24391,7 +24391,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
 //     Ensemble    -   neural network ensemble. It must have same  number  of
 //                     inputs and outputs/classes  as  was  specified  during
 //                     creation of the trainer object.
-//     NRestarts   -   number of restarts, >=0:
+//     NRestarts   -   number of restarts, >= 0:
 //                     * NRestarts>0 means that specified  number  of  random
 //                       restarts are performed during each ES round;
 //                     * NRestarts=0 is silently replaced by 1.
@@ -24691,10 +24691,10 @@ static void mlptrain_mlpkfoldsplit(RMatrix *xy, ae_int_t npoints, ae_int_t nclas
 // Inputs:
 //     S         -   trainer object;
 //     RowSize   -   row size(eitherNIn+NOut or NIn+1);
-//     NRestarts -   number of restarts(>=0);
+//     NRestarts -   number of restarts( >= 0);
 //     Folds     -   cross-validation set;
-//     Fold      -   the number of first cross-validation(>=0);
-//     DFold     -   the number of second cross-validation(>=Fold+1);
+//     Fold      -   the number of first cross-validation( >= 0);
+//     DFold     -   the number of second cross-validation( >= Fold+1);
 //     CVY       -   parameter which stores  the result is returned by network,
 //                   training on I-th cross-validation set.
 //                   It has to be preallocated.
@@ -28100,7 +28100,7 @@ DefClass(clusterizerstate, )
 //                     * indexes stored in PM are given for dataset sorted
 //                       according to permutation P
 //                     * PM[I,1]=PM[I,2]-1 (only adjacent clusters are merged)
-//                     * PM[I,0]<=PM[I,1], PM[I,2]<=PM[I,3], i.e. both
+//                     * PM[I,0] <= PM[I,1], PM[I,2] <= PM[I,3], i.e. both
 //                       clusters contain at least one point
 //                     * heights of "subdendrograms" corresponding  to  C0/C1
 //                       are stored in PM[I,4]  and  PM[I,5].  Subdendrograms
@@ -28129,8 +28129,8 @@ DefClass(ahcreport, DecVal(terminationtype) DecVal(npoints) DecVar(p) DecVar(z) 
 // * CIdx, which maps points of the original dataset to clusters
 //
 // FORMAL DESCRIPTION OF FIELDS:
-//     NPoints         number of points, >=0
-//     NFeatures       number of variables, >=1
+//     NPoints         number of points, >= 0
+//     NFeatures       number of variables, >= 1
 //     TerminationType completion code:
 //                     * -5 if  distance  type  is  anything  different  from
 //                          Euclidean metric

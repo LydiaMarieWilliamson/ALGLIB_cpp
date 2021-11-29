@@ -2048,7 +2048,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          fflush(stdout);
       //
       // soft failure:
-      // // if( !passed )
+      // // if (!passed)
       // //   return 1;
       //
       } else {

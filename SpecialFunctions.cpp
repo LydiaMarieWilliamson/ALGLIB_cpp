@@ -4090,7 +4090,7 @@ namespace alglib_impl {
 //
 // Parameters:
 //     r   -   polynomial kind, either 1 or 2.
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument, -1 <= x <= 1
 //
 // Result:
@@ -4122,7 +4122,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
       result = b;
       return result;
    }
-// General case: N>=2
+// General case: N >= 2
    for (i = 2; i <= n; i++) {
       result = 2 * x * b - a;
       a = b;
@@ -4141,7 +4141,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
 //
 // Parameters:
 //     r   -   polynomial kind, either 1 or 2.
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -4171,7 +4171,7 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 // Representation of Tn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Inputs:
-//     N   -   polynomial degree, n>=0
+//     N   -   polynomial degree, n >= 0
 //
 // Outputs:
 //     C   -   coefficients
@@ -4202,7 +4202,7 @@ void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 //
 // Inputs:
 //     A   -   Chebyshev series coefficients
-//     N   -   degree, N>=0
+//     N   -   degree, N >= 0
 //
 // Outputs:
 //     B   -   power series coefficients
@@ -5391,7 +5391,7 @@ namespace alglib_impl {
 // Calculation of the value of the Hermite polynomial.
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -5418,7 +5418,7 @@ double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
       result = b;
       return result;
    }
-// General case: N>=2
+// General case: N >= 2
    for (i = 2; i <= n; i++) {
       result = 2 * x * b - 2 * (i - 1) * a;
       a = b;
@@ -5433,7 +5433,7 @@ double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
 //     c[0]*H0(x) + c[1]*H1(x) + ... + c[N]*HN(x)
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -5459,7 +5459,7 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Representation of Hn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Inputs:
-//     N   -   polynomial degree, n>=0
+//     N   -   polynomial degree, n >= 0
 //
 // Outputs:
 //     C   -   coefficients
@@ -5547,7 +5547,7 @@ namespace alglib_impl {
 // Calculation of the value of the Legendre polynomial Pn.
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -5584,7 +5584,7 @@ double legendrecalculate(ae_int_t n, double x, ae_state *_state) {
 //     c[0]*P0(x) + c[1]*P1(x) + ... + c[N]*PN(x)
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -5610,7 +5610,7 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Representation of Pn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Inputs:
-//     N   -   polynomial degree, n>=0
+//     N   -   polynomial degree, n >= 0
 //
 // Outputs:
 //     C   -   coefficients
@@ -6984,7 +6984,7 @@ namespace alglib_impl {
 // Calculation of the value of the Laguerre polynomial.
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -7017,7 +7017,7 @@ double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
 // This routine calculates c[0]*L0(x) + c[1]*L1(x) + ... + c[N]*LN(x)
 //
 // Parameters:
-//     n   -   degree, n>=0
+//     n   -   degree, n >= 0
 //     x   -   argument
 //
 // Result:
@@ -7043,7 +7043,7 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Representation of Ln as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Inputs:
-//     N   -   polynomial degree, n>=0
+//     N   -   polynomial degree, n >= 0
 //
 // Outputs:
 //     C   -   coefficients
