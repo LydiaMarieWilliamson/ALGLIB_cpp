@@ -55,10 +55,9 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntbuf, RVector *bufr, ZVector *bufi, ae_int_t n, ae_int_t nc, double alpha, ae_int_t *info, double *threshold, double *rms, double *cvrms, ae_state *_state);
 void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve, ae_state *_state);
 void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve, ae_state *_state);
-void _cvreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _cvreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _cvreport_clear(void *_p);
-void _cvreport_destroy(void *_p);
+void cvreport_init(void *_p, ae_state *_state, bool make_automatic);
+void cvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void cvreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -193,18 +192,15 @@ double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsi
 double mlperrorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, ae_state *_state);
 void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep, ae_state *_state);
 bool _trypexec_mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep, ae_state *_state);
-void _modelerrors_init(void *_p, ae_state *_state, bool make_automatic);
-void _modelerrors_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _modelerrors_clear(void *_p);
-void _modelerrors_destroy(void *_p);
-void _smlpgrad_init(void *_p, ae_state *_state, bool make_automatic);
-void _smlpgrad_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _smlpgrad_clear(void *_p);
-void _smlpgrad_destroy(void *_p);
-void _multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic);
-void _multilayerperceptron_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _multilayerperceptron_clear(void *_p);
-void _multilayerperceptron_destroy(void *_p);
+void modelerrors_init(void *_p, ae_state *_state, bool make_automatic);
+void modelerrors_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void modelerrors_free(void *_p, bool make_automatic);
+void smlpgrad_init(void *_p, ae_state *_state, bool make_automatic);
+void smlpgrad_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void smlpgrad_free(void *_p, bool make_automatic);
+void multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic);
+void multilayerperceptron_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void multilayerperceptron_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -320,10 +316,9 @@ double mlpeavgrelerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, ae_
 void mlpealloc(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
 void mlpeserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
 void mlpeunserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
-void _mlpensemble_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpensemble_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpensemble_clear(void *_p);
-void _mlpensemble_destroy(void *_p);
+void mlpensemble_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpensemble_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpensemble_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -427,22 +422,18 @@ void kmeansinitbuf(kmeansbuffers *buf, ae_state *_state);
 void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t initalgo, ae_int_t seed, ae_int_t maxits, ae_int_t restarts, bool kmeansdbgnoits, ae_int_t *info, ae_int_t *iterationscount, RMatrix *ccol, bool needccol, RMatrix *crow, bool needcrow, ZVector *xyc, double *energy, kmeansbuffers *buf, ae_state *_state);
 void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool, ae_state *_state);
 bool _trypexec_kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool, ae_state *_state);
-void _kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _kmeansbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _kmeansbuffers_clear(void *_p);
-void _kmeansbuffers_destroy(void *_p);
-void _clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _clusterizerstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _clusterizerstate_clear(void *_p);
-void _clusterizerstate_destroy(void *_p);
-void _ahcreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _ahcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _ahcreport_clear(void *_p);
-void _ahcreport_destroy(void *_p);
-void _kmeansreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _kmeansreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _kmeansreport_clear(void *_p);
-void _kmeansreport_destroy(void *_p);
+void kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void kmeansbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kmeansbuffers_free(void *_p, bool make_automatic);
+void clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic);
+void clusterizerstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void clusterizerstate_free(void *_p, bool make_automatic);
+void ahcreport_init(void *_p, ae_state *_state, bool make_automatic);
+void ahcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void ahcreport_free(void *_p, bool make_automatic);
+void kmeansreport_init(void *_p, ae_state *_state, bool make_automatic);
+void kmeansreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kmeansreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -628,42 +619,33 @@ void dfunserialize(ae_serializer *s, decisionforest *forest, ae_state *_state);
 void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, double r, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
 void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t nrndvars, double r, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
 void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t samplesize, ae_int_t nfeatures, ae_int_t flags, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
-void _decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void _decisionforestbuilder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _decisionforestbuilder_clear(void *_p);
-void _decisionforestbuilder_destroy(void *_p);
-void _dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void _dfworkbuf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dfworkbuf_clear(void *_p);
-void _dfworkbuf_destroy(void *_p);
-void _dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic);
-void _dfvotebuf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dfvotebuf_clear(void *_p);
-void _dfvotebuf_destroy(void *_p);
-void _dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void _dfpermimpbuf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dfpermimpbuf_clear(void *_p);
-void _dfpermimpbuf_destroy(void *_p);
-void _dftreebuf_init(void *_p, ae_state *_state, bool make_automatic);
-void _dftreebuf_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dftreebuf_clear(void *_p);
-void _dftreebuf_destroy(void *_p);
-void _decisionforestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void _decisionforestbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _decisionforestbuffer_clear(void *_p);
-void _decisionforestbuffer_destroy(void *_p);
-void _decisionforest_init(void *_p, ae_state *_state, bool make_automatic);
-void _decisionforest_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _decisionforest_clear(void *_p);
-void _decisionforest_destroy(void *_p);
-void _dfreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _dfreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dfreport_clear(void *_p);
-void _dfreport_destroy(void *_p);
-void _dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _dfinternalbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dfinternalbuffers_clear(void *_p);
-void _dfinternalbuffers_destroy(void *_p);
+void decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforestbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforestbuilder_free(void *_p, bool make_automatic);
+void dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfworkbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfworkbuf_free(void *_p, bool make_automatic);
+void dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfvotebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfvotebuf_free(void *_p, bool make_automatic);
+void dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfpermimpbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfpermimpbuf_free(void *_p, bool make_automatic);
+void dftreebuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dftreebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dftreebuf_free(void *_p, bool make_automatic);
+void decisionforestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforestbuffer_free(void *_p, bool make_automatic);
+void decisionforest_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforest_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforest_free(void *_p, bool make_automatic);
+void dfreport_init(void *_p, ae_state *_state, bool make_automatic);
+void dfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfreport_free(void *_p, bool make_automatic);
+void dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void dfinternalbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfinternalbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -741,14 +723,12 @@ double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_
 void lrcopy(linearmodel *lm1, linearmodel *lm2, ae_state *_state);
 void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, double *b, double *vara, double *varb, double *covab, double *corrab, double *p, ae_state *_state);
 void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b, ae_state *_state);
-void _linearmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _linearmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _linearmodel_clear(void *_p);
-void _linearmodel_destroy(void *_p);
-void _lrreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _lrreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lrreport_clear(void *_p);
-void _lrreport_destroy(void *_p);
+void linearmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void linearmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void linearmodel_free(void *_p, bool make_automatic);
+void lrreport_init(void *_p, ae_state *_state, bool make_automatic);
+void lrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lrreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -852,10 +832,9 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend, ae_state *_st
 void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t forecastlen, bool applysmoothing, RVector *trend, ae_state *_state);
 void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend, ae_state *_state);
 void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t m, ae_int_t forecastlen, bool applysmoothing, RVector *trend, ae_state *_state);
-void _ssamodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _ssamodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _ssamodel_clear(void *_p);
-void _ssamodel_destroy(void *_p);
+void ssamodel_init(void *_p, ae_state *_state, bool make_automatic);
+void ssamodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void ssamodel_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -956,14 +935,12 @@ void mcpdsetprior(mcpdstate *s, RMatrix *pp, ae_state *_state);
 void mcpdsetpredictionweights(mcpdstate *s, RVector *pw, ae_state *_state);
 void mcpdsolve(mcpdstate *s, ae_state *_state);
 void mcpdresults(mcpdstate *s, RMatrix *p, mcpdreport *rep, ae_state *_state);
-void _mcpdstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _mcpdstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mcpdstate_clear(void *_p);
-void _mcpdstate_destroy(void *_p);
-void _mcpdreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _mcpdreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mcpdreport_clear(void *_p);
-void _mcpdreport_destroy(void *_p);
+void mcpdstate_init(void *_p, ae_state *_state, bool make_automatic);
+void mcpdstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mcpdstate_free(void *_p, bool make_automatic);
+void mcpdreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mcpdreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mcpdreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1040,18 +1017,15 @@ double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_sta
 double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize, ae_state *_state);
 ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state);
-void _logitmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _logitmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _logitmodel_clear(void *_p);
-void _logitmodel_destroy(void *_p);
-void _logitmcstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _logitmcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _logitmcstate_clear(void *_p);
-void _logitmcstate_destroy(void *_p);
-void _mnlreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _mnlreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mnlreport_clear(void *_p);
-void _mnlreport_destroy(void *_p);
+void logitmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void logitmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void logitmodel_free(void *_p, bool make_automatic);
+void logitmcstate_init(void *_p, ae_state *_state, bool make_automatic);
+void logitmcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void logitmcstate_free(void *_p, bool make_automatic);
+void mnlreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mnlreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mnlreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1132,22 +1106,18 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
 void knnalloc(ae_serializer *s, knnmodel *model, ae_state *_state);
 void knnserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
 void knnunserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
-void _knnbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void _knnbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _knnbuffer_clear(void *_p);
-void _knnbuffer_destroy(void *_p);
-void _knnbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void _knnbuilder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _knnbuilder_clear(void *_p);
-void _knnbuilder_destroy(void *_p);
-void _knnmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _knnmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _knnmodel_clear(void *_p);
-void _knnmodel_destroy(void *_p);
-void _knnreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _knnreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _knnreport_clear(void *_p);
-void _knnreport_destroy(void *_p);
+void knnbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void knnbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnbuffer_free(void *_p, bool make_automatic);
+void knnbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void knnbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnbuilder_free(void *_p, bool make_automatic);
+void knnmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void knnmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnmodel_free(void *_p, bool make_automatic);
+void knnreport_init(void *_p, ae_state *_state, bool make_automatic);
+void knnreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1277,30 +1247,24 @@ void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double 
 void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors, ae_state *_state);
 void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep, ae_state *_state);
 void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts, mlpreport *rep, ae_state *_state);
-void _mlpreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpreport_clear(void *_p);
-void _mlpreport_destroy(void *_p);
-void _mlpcvreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpcvreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpcvreport_clear(void *_p);
-void _mlpcvreport_destroy(void *_p);
-void _smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic);
-void _smlptrnsession_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _smlptrnsession_clear(void *_p);
-void _smlptrnsession_destroy(void *_p);
-void _mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpetrnsession_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpetrnsession_clear(void *_p);
-void _mlpetrnsession_destroy(void *_p);
-void _mlptrainer_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlptrainer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlptrainer_clear(void *_p);
-void _mlptrainer_destroy(void *_p);
-void _mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpparallelizationcv_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpparallelizationcv_clear(void *_p);
-void _mlpparallelizationcv_destroy(void *_p);
+void mlpreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpreport_free(void *_p, bool make_automatic);
+void mlpcvreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpcvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpcvreport_free(void *_p, bool make_automatic);
+void smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic);
+void smlptrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void smlptrnsession_free(void *_p, bool make_automatic);
+void mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpetrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpetrnsession_free(void *_p, bool make_automatic);
+void mlptrainer_init(void *_p, ae_state *_state, bool make_automatic);
+void mlptrainer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlptrainer_free(void *_p, bool make_automatic);
+void mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpparallelizationcv_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpparallelizationcv_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

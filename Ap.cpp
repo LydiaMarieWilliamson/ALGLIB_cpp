@@ -1156,7 +1156,7 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_stat
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic) {
+void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
 
    ae_vector_init(dst, src->cnt, src->datatype, state, make_automatic);
@@ -1285,11 +1285,10 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
    if (bytes_total > 0)
       memmove(tmp.ptr.p_ptr, dst->ptr.p_ptr, bytes_total);
    ae_swap_vectors(dst, &tmp);
-   ae_vector_clear(&tmp);
+   ae_vector_free(&tmp, true);
 }
 
-// This  function  provides  "CLEAR"  functionality  for vector (contents is
-// cleared, but structure still left in valid state).
+// This function provides the "FREE" functionality for vector (the contents are cleared).
 //
 // The  function clears vector contents (releases all dynamically  allocated
 // memory). Vector may be in automatic management list  -  in this  case  it
@@ -1300,20 +1299,11 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
 // ae_vector_set_length().
 //
 // dst                 destination vector
-void ae_vector_clear(ae_vector *dst) {
+void ae_vector_free(ae_vector *dst, bool/* make_automatic*/) {
    dst->cnt = 0;
    ae_db_free(&dst->data);
    dst->ptr.p_ptr = 0;
    dst->is_attached = false;
-}
-
-// This  function  provides "DESTROY"  functionality for vector (contents is
-// cleared, all internal structures are destroyed). For vectors it  is  same
-// as CLEAR.
-//
-// dst                 destination vector
-void ae_vector_destroy(ae_vector *dst) {
-   ae_vector_clear(dst);
 }
 
 // This function efficiently swaps contents of two vectors, leaving other
@@ -1400,7 +1390,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic) {
+void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic) {
    ae_int_t i;
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, state, make_automatic);
    if (src->rows != 0 && src->cols != 0) {
@@ -1546,8 +1536,7 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
    ae_matrix_update_row_pointers(dst, ae_align((char *)dst->data.ptr + dst->rows * sizeof(void *), AE_DATA_ALIGN));
 }
 
-// This  function  provides  "CLEAR"  functionality  for vector (contents is
-// cleared, but structure still left in valid state).
+// This function provides the "FREE" functionality for matrix (the contents are cleared).
 //
 // The  function clears matrix contents (releases all dynamically  allocated
 // memory). Matrix may be in automatic management list  -  in this  case  it
@@ -1558,23 +1547,13 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
 // ae_matrix_set_length().
 //
 // dst                 destination matrix
-void ae_matrix_clear(ae_matrix *dst) {
+void ae_matrix_free(ae_matrix *dst, bool/* make_automatic*/) {
    dst->rows = 0;
    dst->cols = 0;
    dst->stride = 0;
    ae_db_free(&dst->data);
    dst->ptr.p_ptr = 0;
    dst->is_attached = false;
-}
-
-// This  function  provides  "DESTROY" functionality for matrix (contents is
-// cleared, but structure still left in valid state).
-//
-// For matrices it is same as CLEAR.
-//
-// dst                 destination matrix
-void ae_matrix_destroy(ae_matrix *dst) {
-   ae_matrix_clear(dst);
 }
 
 // This function efficiently swaps contents of two vectors, leaving other
@@ -1636,39 +1615,32 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bo
       *(dst->subscriber) = dst->ptr;
    dst->is_owner = false;
    dst->is_dynamic = false;
-   dst->frame_entry.deallocator = ae_smart_ptr_destroy;
+   dst->frame_entry.deallocator = ae_smart_ptr_free;
    dst->frame_entry.ptr = dst;
    if (make_automatic)
       ae_db_attach(&dst->frame_entry, state);
 }
 
-// This function clears smart pointer structure.
+// This function frees the smart pointer structure.
 //
 // dst                 destination smart pointer.
 //
 // After call to this function smart pointer contains NULL reference,  which
 // is  propagated  to  its  subscriber  (in  cases  non-NULL  subscruber was
 // specified during pointer creation).
-void ae_smart_ptr_clear(void *_dst) {
+void ae_smart_ptr_free(void *_dst) {
    ae_smart_ptr *dst = (ae_smart_ptr *) _dst;
    if (dst->is_owner && dst->ptr != NULL) {
-      dst->destroy(dst->ptr);
+      dst->free(dst->ptr, false);
       if (dst->is_dynamic)
          ae_free(dst->ptr);
    }
    dst->is_owner = false;
    dst->is_dynamic = false;
    dst->ptr = NULL;
-   dst->destroy = NULL;
+   dst->free = NULL;
    if (dst->subscriber != NULL)
       *(dst->subscriber) = NULL;
-}
-
-// This function dstroys smart pointer structure (same as clearing it).
-//
-// dst                 destination smart pointer.
-void ae_smart_ptr_destroy(void *_dst) {
-   ae_smart_ptr_clear(_dst);
 }
 
 // This function assigns pointer to ae_smart_ptr structure.
@@ -1679,7 +1651,7 @@ void ae_smart_ptr_destroy(void *_dst) {
 // is_dynamic          whether object is dynamic - clearing such object
 //                     requires BOTH calling destructor function AND calling
 //                     ae_free() for memory occupied by object.
-// destroy             destructor function
+// free                destructor function
 //
 // In case smart pointer already contains non-NULL value and owns this value,
 // it is freed before assigning new pointer.
@@ -1688,23 +1660,17 @@ void ae_smart_ptr_destroy(void *_dst) {
 // subscriber was specified during pointer creation).
 //
 // You can specify NULL new_ptr, in which case is_owner/destroy are ignored.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*destroy)(void *)) {
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic)) {
    if (dst->is_owner && dst->ptr != NULL) {
-      dst->destroy(dst->ptr);
+      dst->free(dst->ptr, false);
       if (dst->is_dynamic)
          ae_free(dst->ptr);
    }
-   if (new_ptr != NULL) {
-      dst->ptr = new_ptr;
-      dst->is_owner = is_owner;
-      dst->is_dynamic = is_dynamic;
-      dst->destroy = destroy;
-   } else {
-      dst->ptr = NULL;
-      dst->is_owner = false;
-      dst->is_dynamic = false;
-      dst->destroy = NULL;
-   }
+   bool not_null = new_ptr != NULL;
+   dst->ptr = new_ptr;
+   dst->is_owner = not_null && is_owner;
+   dst->is_dynamic = not_null && is_dynamic;
+   dst->free = not_null? free: NULL;
    if (dst->subscriber != NULL)
       *(dst->subscriber) = dst->ptr;
 }
@@ -1722,7 +1688,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
    dst->is_owner = false;
    dst->is_dynamic = false;
    dst->ptr = NULL;
-   dst->destroy = NULL;
+   dst->free = NULL;
    if (dst->subscriber != NULL)
       *(dst->subscriber) = NULL;
 }
@@ -1896,7 +1862,7 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
 // ALGLIB environment.
 //
 // dst                 vector
-void x_vector_clear(x_vector *dst) {
+void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
    if (dst->owner == OWN_AE)
       aligned_free(dst->x_ptr.p_ptr);
    dst->x_ptr.p_ptr = NULL;
@@ -3599,6 +3565,11 @@ void ae_free_lock(ae_lock *lock) {
    ae_db_free(&lock->db);
 }
 
+// A reduced form ae_shared_pool_free() suitable for use as the deallocation function on a frame.
+static void ae_shared_pool_destroy(void *_dst) {
+   ae_shared_pool_free(_dst, false);
+}
+
 // This function creates ae_shared_pool structure.
 //
 // dst                 destination shared pool, must be zero-filled
@@ -3628,8 +3599,8 @@ void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic) {
    dst->enumeration_counter = NULL;
    dst->size_of_object = 0;
    dst->init = NULL;
-   dst->init_copy = NULL;
-   dst->destroy = NULL;
+   dst->copy = NULL;
+   dst->free = NULL;
    dst->frame_entry.deallocator = ae_shared_pool_destroy;
    dst->frame_entry.ptr = dst;
    if (make_automatic)
@@ -3641,25 +3612,23 @@ void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic) {
 // for the lock. It does NOT try to acquire pool_lock.
 //
 // NOTE: this function is NOT thread-safe, it is not protected by lock.
-static void ae_shared_pool_internalclear(ae_shared_pool *dst) {
+static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automatic) {
    ae_shared_pool_entry *ptr, *tmp;
-
-// destroy seed
+// Free the seed
    if (dst->seed_object != NULL) {
-      dst->destroy((void *)dst->seed_object);
+      dst->free((void *)dst->seed_object, make_automatic);
       ae_free((void *)dst->seed_object);
       dst->seed_object = NULL;
    }
 // destroy recycled objects
    for (ptr = dst->recycled_objects; ptr != NULL;) {
       tmp = (ae_shared_pool_entry *) ptr->next_entry;
-      dst->destroy(ptr->obj);
+      dst->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
       ptr = tmp;
    }
    dst->recycled_objects = NULL;
-
 // destroy recycled entries
    for (ptr = dst->recycled_entries; ptr != NULL;) {
       tmp = (ae_shared_pool_entry *) ptr->next_entry;
@@ -3683,7 +3652,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst) {
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make_automatic) {
+void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_automatic) {
    ae_shared_pool *dst, *src;
    ae_shared_pool_entry *ptr;
 
@@ -3697,14 +3666,14 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make
 // copy non-pointer fields
    dst->size_of_object = src->size_of_object;
    dst->init = src->init;
-   dst->init_copy = src->init_copy;
-   dst->destroy = src->destroy;
+   dst->copy = src->copy;
+   dst->free = src->free;
 
 // copy seed object
    if (src->seed_object != NULL) {
       dst->seed_object = ae_malloc(dst->size_of_object, state);
       memset(dst->seed_object, 0, dst->size_of_object);
-      dst->init_copy(dst->seed_object, src->seed_object, state, false);
+      dst->copy(dst->seed_object, src->seed_object, state, false);
    }
 // copy recycled objects
    dst->recycled_objects = NULL;
@@ -3718,10 +3687,10 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
 
-   // prepare place for object, init_copy() it
+   // prepare place for object, copy() it
       tmp->obj = ae_malloc(dst->size_of_object, state);
       memset(tmp->obj, 0, dst->size_of_object);
-      dst->init_copy(tmp->obj, ptr->obj, state, false);
+      dst->copy(tmp->obj, ptr->obj, state, false);
    }
 
 // recycled entries are not copied because they do not store any information
@@ -3735,16 +3704,14 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make
    dst->frame_entry.ptr = dst;
 }
 
-// This function performs destruction of the pool object.
+// This function frees the pool object.
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when pool can be used by another thread.
-void ae_shared_pool_clear(void *_dst) {
+void ae_shared_pool_free(void *_dst, bool make_automatic) {
    ae_shared_pool *dst = (ae_shared_pool *) _dst;
-
 // clear seed and lists
-   ae_shared_pool_internalclear(dst);
-
+   ae_shared_pool_internalclear(dst, make_automatic);
 // clear fields
    dst->seed_object = NULL;
    dst->recycled_objects = NULL;
@@ -3752,14 +3719,9 @@ void ae_shared_pool_clear(void *_dst) {
    dst->enumeration_counter = NULL;
    dst->size_of_object = 0;
    dst->init = NULL;
-   dst->init_copy = NULL;
-   dst->destroy = NULL;
-}
-
-void ae_shared_pool_destroy(void *_dst) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
-   ae_shared_pool_clear(_dst);
-   ae_free_lock(&dst->pool_lock);
+   dst->copy = NULL;
+   dst->free = NULL;
+   if (!make_automatic) ae_free_lock(&dst->pool_lock);
 }
 
 // This function returns True, if internal seed object was set.  It  returns
@@ -3781,29 +3743,26 @@ bool ae_shared_pool_is_initialized(void *_dst) {
 // seed_object         new seed object
 // size_of_object      sizeof(), used to allocate memory
 // init                constructor function
-// init_copy           copy constructor
-// clear               destructor function
+// copy                copy constructor
+// free                destructor function
 // state               ALGLIB environment state
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*destroy)(void *ptr), ae_state *state) {
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*free)(void *ptr, bool make_automatic), ae_state *state) {
 // state != NULL, allocation errors result in exception
    AE_CRITICAL_ASSERT(state != NULL);
-
 // destroy internal objects
-   ae_shared_pool_internalclear(dst);
-
+   ae_shared_pool_internalclear(dst, false);
 // set non-pointer fields
    dst->size_of_object = size_of_object;
    dst->init = init;
-   dst->init_copy = init_copy;
-   dst->destroy = destroy;
-
+   dst->copy = copy;
+   dst->free = free;
 // set seed object
    dst->seed_object = ae_malloc(size_of_object, state);
    memset(dst->seed_object, 0, size_of_object);
-   init_copy(dst->seed_object, seed_object, state, false);
+   copy(dst->seed_object, seed_object, state, false);
 }
 
 // This  function  retrieves  a  copy  of  the seed object from the pool and
@@ -3849,7 +3808,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
       ae_release_lock(&pool->pool_lock);
 
    // assign object to smart pointer
-      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->destroy);
+      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
       return;
    }
 // release lock; we do not need it anymore because copy constructor does not modify source variable
@@ -3859,10 +3818,10 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
 // (do not want to lose it in case of future failures)
    new_obj = ae_malloc(pool->size_of_object, state);
    memset(new_obj, 0, pool->size_of_object);
-   ae_smart_ptr_assign(pptr, new_obj, true, true, pool->destroy);
+   ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
 
 // perform actual copying; before this line smartptr points to zero-filled instance
-   pool->init_copy(new_obj, pool->seed_object, state, false);
+   pool->copy(new_obj, pool->seed_object, state, false);
 }
 
 // This function recycles object owned by smart  pointer  by  moving  it  to
@@ -3928,13 +3887,13 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-void ae_shared_pool_clear_recycled(ae_shared_pool *pool, ae_state *state) {
+void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic, ae_state *state) {
    ae_shared_pool_entry *ptr, *tmp;
 
 // clear recycled objects
    for (ptr = pool->recycled_objects; ptr != NULL;) {
       tmp = (ae_shared_pool_entry *) ptr->next_entry;
-      pool->destroy(ptr->obj);
+      pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
       ptr = tmp;
@@ -3969,7 +3928,7 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_
       return;
    }
 // assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->destroy);
+   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
 }
 
 // This function allows to enumerate recycled elements of the  shared  pool.
@@ -4004,7 +3963,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_s
       return;
    }
 // assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->destroy);
+   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
 }
 
 // This function clears internal list of recycled objects and  seed  object.
@@ -4017,7 +3976,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_s
 //       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_reset(ae_shared_pool *pool, ae_state *state) {
 // clear seed and lists
-   ae_shared_pool_internalclear(pool);
+   ae_shared_pool_internalclear(pool, false);
 
 // clear fields
    pool->seed_object = NULL;
@@ -4026,8 +3985,8 @@ void ae_shared_pool_reset(ae_shared_pool *pool, ae_state *state) {
    pool->enumeration_counter = NULL;
    pool->size_of_object = 0;
    pool->init = NULL;
-   pool->init_copy = NULL;
-   pool->destroy = NULL;
+   pool->copy = NULL;
+   pool->free = NULL;
 }
 
 // This function initializes serializer
@@ -4035,9 +3994,6 @@ void ae_serializer_init(ae_serializer *serializer) {
    serializer->mode = AE_SM_DEFAULT;
    serializer->entries_needed = 0;
    serializer->bytes_asked = 0;
-}
-
-void ae_serializer_clear(ae_serializer *serializer) {
 }
 
 void ae_serializer_alloc_start(ae_serializer *serializer) {
@@ -5144,7 +5100,7 @@ ae_int_t ae_v_len(ae_int_t a, ae_int_t b) {
 }
 
 // RComm functions
-void _rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
+void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
 // initial zero-filling
    memset(&p->ba, 0, sizeof(p->ba));
    memset(&p->ia, 0, sizeof(p->ia));
@@ -5158,7 +5114,7 @@ void _rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->ca, 0, DT_COMPLEX, _state, make_automatic);
 }
 
-void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic) {
+void rcommstate_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic) {
 // initial zero-filling
    memset(&dst->ba, 0, sizeof(dst->ba));
    memset(&dst->ia, 0, sizeof(dst->ia));
@@ -5166,22 +5122,18 @@ void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, b
    memset(&dst->ca, 0, sizeof(dst->ca));
 
 // initialization
-   ae_vector_init_copy(&dst->ba, &src->ba, _state, make_automatic);
-   ae_vector_init_copy(&dst->ia, &src->ia, _state, make_automatic);
-   ae_vector_init_copy(&dst->ra, &src->ra, _state, make_automatic);
-   ae_vector_init_copy(&dst->ca, &src->ca, _state, make_automatic);
+   ae_vector_copy(&dst->ba, &src->ba, _state, make_automatic);
+   ae_vector_copy(&dst->ia, &src->ia, _state, make_automatic);
+   ae_vector_copy(&dst->ra, &src->ra, _state, make_automatic);
+   ae_vector_copy(&dst->ca, &src->ca, _state, make_automatic);
    dst->stage = src->stage;
 }
 
-void _rcommstate_clear(rcommstate *p) {
-   ae_vector_clear(&p->ba);
-   ae_vector_clear(&p->ia);
-   ae_vector_clear(&p->ra);
-   ae_vector_clear(&p->ca);
-}
-
-void _rcommstate_destroy(rcommstate *p) {
-   _rcommstate_clear(p);
+void rcommstate_free(rcommstate *p, bool make_automatic) {
+   ae_vector_free(&p->ba, make_automatic);
+   ae_vector_free(&p->ia, make_automatic);
+   ae_vector_free(&p->ra, make_automatic);
+   ae_vector_free(&p->ca, make_automatic);
 }
 
 // Optimized shared C/C++ linear algebra code.
@@ -10339,13 +10291,13 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
    ptr = &inner_vec;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init_copy(ptr, rhs.ptr, &_state, false);
+   ae_vector_copy(ptr, rhs.ptr, &_state, false);
    ae_state_clear(&_state);
 }
 
 ae_vector_wrapper::~ae_vector_wrapper() {
    if (ptr == &inner_vec)
-      ae_vector_clear(ptr);
+      ae_vector_free(ptr, true);
 }
 
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
@@ -10375,7 +10327,7 @@ ae_int_t ae_vector_wrapper::length() const {
 
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state) {
    if (ptr == &inner_vec)
-      ae_vector_clear(ptr);
+      ae_vector_free(ptr, true);
    ptr = &inner_vec;
    memset(ptr, 0, sizeof(*ptr));
    ae_vector_init_attach_to_x(ptr, new_ptr, _state, false);
@@ -10801,14 +10753,14 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
    if (rhs.ptr != NULL) {
       ptr = &inner_mat;
       memset(ptr, 0, sizeof(*ptr));
-      ae_matrix_init_copy(ptr, rhs.ptr, &_state, false);
+      ae_matrix_copy(ptr, rhs.ptr, &_state, false);
    }
    ae_state_clear(&_state);
 }
 
 ae_matrix_wrapper::~ae_matrix_wrapper() {
    if (ptr == &inner_mat)
-      ae_matrix_clear(ptr);
+      ae_matrix_free(ptr, true);
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10902,7 +10854,7 @@ ae_int_t ae_matrix_wrapper::getstride() const {
 
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state) {
    if (ptr == &inner_mat)
-      ae_matrix_clear(ptr);
+      ae_matrix_free(ptr, true);
    ptr = &inner_mat;
    memset(ptr, 0, sizeof(*ptr));
    ae_matrix_init_attach_to_x(ptr, new_ptr, _state, false);

@@ -24,10 +24,9 @@ typedef struct {
 } polynomialsolverreport;
 
 void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep, ae_state *_state);
-void _polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _polynomialsolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _polynomialsolverreport_clear(void *_p);
-void _polynomialsolverreport_destroy(void *_p);
+void polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void polynomialsolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void polynomialsolverreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -88,14 +87,12 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
 void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state);
 void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, ae_state *_state);
 void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, double threshold, ae_int_t *info, densesolverlsreport *rep, RVector *x, ae_state *_state);
-void _densesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _densesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _densesolverreport_clear(void *_p);
-void _densesolverreport_destroy(void *_p);
-void _densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _densesolverlsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _densesolverlsreport_clear(void *_p);
-void _densesolverlsreport_destroy(void *_p);
+void densesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void densesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void densesolverreport_free(void *_p, bool make_automatic);
+void densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic);
+void densesolverlsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void densesolverlsreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -157,10 +154,9 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
 void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state);
 void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state);
 void initsparsesolverreport(sparsesolverreport *rep, ae_state *_state);
-void _sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _sparsesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sparsesolverreport_clear(void *_p);
-void _sparsesolverreport_destroy(void *_p);
+void sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void sparsesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sparsesolverreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -221,10 +217,9 @@ void sparsesolveroocgetrequestdata1(sparsesolverstate *state, double *v, ae_stat
 void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax, ae_state *_state);
 void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverreport *rep, ae_state *_state);
 void sparsesolverrequesttermination(sparsesolverstate *state, ae_state *_state);
-void _sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _sparsesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sparsesolverstate_clear(void *_p);
-void _sparsesolverstate_destroy(void *_p);
+void sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
+void sparsesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sparsesolverstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -311,14 +306,12 @@ void lincgsetrestartfreq(lincgstate *state, ae_int_t srf, ae_state *_state);
 void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq, ae_state *_state);
 void lincgsetxrep(lincgstate *state, bool needxrep, ae_state *_state);
 void lincgrestart(lincgstate *state, ae_state *_state);
-void _lincgstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _lincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lincgstate_clear(void *_p);
-void _lincgstate_destroy(void *_p);
-void _lincgreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _lincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lincgreport_clear(void *_p);
-void _lincgreport_destroy(void *_p);
+void lincgstate_init(void *_p, ae_state *_state, bool make_automatic);
+void lincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lincgstate_free(void *_p, bool make_automatic);
+void lincgreport_init(void *_p, ae_state *_state, bool make_automatic);
+void lincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lincgreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -415,14 +408,12 @@ void linlsqrsetxrep(linlsqrstate *state, bool needxrep, ae_state *_state);
 void linlsqrrestart(linlsqrstate *state, ae_state *_state);
 ae_int_t linlsqrpeekiterationscount(linlsqrstate *s, ae_state *_state);
 void linlsqrrequesttermination(linlsqrstate *state, ae_state *_state);
-void _linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _linlsqrstate_clear(void *_p);
-void _linlsqrstate_destroy(void *_p);
-void _linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _linlsqrreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _linlsqrreport_clear(void *_p);
-void _linlsqrreport_destroy(void *_p);
+void linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic);
+void linlsqrstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void linlsqrstate_free(void *_p, bool make_automatic);
+void linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic);
+void linlsqrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void linlsqrreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -487,14 +478,12 @@ bool nleqiteration(nleqstate *state, ae_state *_state);
 void nleqresults(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_state);
 void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_state);
 void nleqrestartfrom(nleqstate *state, RVector *x, ae_state *_state);
-void _nleqstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _nleqstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _nleqstate_clear(void *_p);
-void _nleqstate_destroy(void *_p);
-void _nleqreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _nleqreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _nleqreport_clear(void *_p);
-void _nleqreport_destroy(void *_p);
+void nleqstate_init(void *_p, ae_state *_state, bool make_automatic);
+void nleqstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void nleqstate_free(void *_p, bool make_automatic);
+void nleqreport_init(void *_p, ae_state *_state, bool make_automatic);
+void nleqreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void nleqreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

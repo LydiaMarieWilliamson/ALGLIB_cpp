@@ -166,42 +166,33 @@ void tracerownrm1autoprec(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_
 void tracevectore6(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
 void tracevectore615(RVector *a, ae_int_t i0, ae_int_t i1, bool usee15, ae_state *_state);
 void tracerownrm1e6(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1, ae_state *_state);
-void _apbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _apbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _apbuffers_clear(void *_p);
-void _apbuffers_destroy(void *_p);
-void _sboolean_init(void *_p, ae_state *_state, bool make_automatic);
-void _sboolean_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sboolean_clear(void *_p);
-void _sboolean_destroy(void *_p);
-void _sbooleanarray_init(void *_p, ae_state *_state, bool make_automatic);
-void _sbooleanarray_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sbooleanarray_clear(void *_p);
-void _sbooleanarray_destroy(void *_p);
-void _sinteger_init(void *_p, ae_state *_state, bool make_automatic);
-void _sinteger_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sinteger_clear(void *_p);
-void _sinteger_destroy(void *_p);
-void _sintegerarray_init(void *_p, ae_state *_state, bool make_automatic);
-void _sintegerarray_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sintegerarray_clear(void *_p);
-void _sintegerarray_destroy(void *_p);
-void _sreal_init(void *_p, ae_state *_state, bool make_automatic);
-void _sreal_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sreal_clear(void *_p);
-void _sreal_destroy(void *_p);
-void _srealarray_init(void *_p, ae_state *_state, bool make_automatic);
-void _srealarray_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _srealarray_clear(void *_p);
-void _srealarray_destroy(void *_p);
-void _scomplex_init(void *_p, ae_state *_state, bool make_automatic);
-void _scomplex_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _scomplex_clear(void *_p);
-void _scomplex_destroy(void *_p);
-void _scomplexarray_init(void *_p, ae_state *_state, bool make_automatic);
-void _scomplexarray_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _scomplexarray_clear(void *_p);
-void _scomplexarray_destroy(void *_p);
+void apbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void apbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void apbuffers_free(void *_p, bool make_automatic);
+void sboolean_init(void *_p, ae_state *_state, bool make_automatic);
+void sboolean_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sboolean_free(void *_p, bool make_automatic);
+void sbooleanarray_init(void *_p, ae_state *_state, bool make_automatic);
+void sbooleanarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sbooleanarray_free(void *_p, bool make_automatic);
+void sinteger_init(void *_p, ae_state *_state, bool make_automatic);
+void sinteger_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sinteger_free(void *_p, bool make_automatic);
+void sintegerarray_init(void *_p, ae_state *_state, bool make_automatic);
+void sintegerarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sintegerarray_free(void *_p, bool make_automatic);
+void sreal_init(void *_p, ae_state *_state, bool make_automatic);
+void sreal_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sreal_free(void *_p, bool make_automatic);
+void srealarray_init(void *_p, ae_state *_state, bool make_automatic);
+void srealarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void srealarray_free(void *_p, bool make_automatic);
+void scomplex_init(void *_p, ae_state *_state, bool make_automatic);
+void scomplex_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void scomplex_free(void *_p, bool make_automatic);
+void scomplexarray_init(void *_p, ae_state *_state, bool make_automatic);
+void scomplexarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void scomplexarray_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===
@@ -489,14 +480,12 @@ void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *s
 void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, double stpmax, ae_int_t fmax, armijostate *state, ae_state *_state);
 bool armijoiteration(armijostate *state, ae_state *_state);
 void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f, ae_state *_state);
-void _linminstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _linminstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _linminstate_clear(void *_p);
-void _linminstate_destroy(void *_p);
-void _armijostate_init(void *_p, ae_state *_state, bool make_automatic);
-void _armijostate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _armijostate_clear(void *_p);
-void _armijostate_destroy(void *_p);
+void linminstate_init(void *_p, ae_state *_state, bool make_automatic);
+void linminstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void linminstate_free(void *_p, bool make_automatic);
+void armijostate_init(void *_p, ae_state *_state, bool make_automatic);
+void armijostate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void armijostate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === NEARUNITYUNIT Package ===
@@ -529,10 +518,9 @@ bool ftbaseissmooth(ae_int_t n, ae_state *_state);
 ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state);
 ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state);
 double ftbasegetflopestimate(ae_int_t n, ae_state *_state);
-void _fasttransformplan_init(void *_p, ae_state *_state, bool make_automatic);
-void _fasttransformplan_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _fasttransformplan_clear(void *_p);
-void _fasttransformplan_destroy(void *_p);
+void fasttransformplan_init(void *_p, ae_state *_state, bool make_automatic);
+void fasttransformplan_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void fasttransformplan_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === HPCCORES Package ===
@@ -560,10 +548,9 @@ void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntota
 void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad, ae_state *_state);
 bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc, ae_state *_state);
 bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, ae_state *_state);
-void _mlpbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _mlpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mlpbuffers_clear(void *_p);
-void _mlpbuffers_destroy(void *_p);
+void mlpbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 #endif // OnceOnly

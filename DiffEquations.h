@@ -54,14 +54,12 @@ typedef struct {
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
 bool odesolveriteration(odesolverstate *state, ae_state *_state);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state);
-void _odesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _odesolverstate_clear(void *_p);
-void _odesolverstate_destroy(void *_p);
-void _odesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _odesolverreport_clear(void *_p);
-void _odesolverreport_destroy(void *_p);
+void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
+void odesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void odesolverstate_free(void *_p, bool make_automatic);
+void odesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void odesolverreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

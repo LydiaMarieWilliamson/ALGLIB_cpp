@@ -190,7 +190,7 @@ bool optguardallclear(optguardreport *rep, ae_state *_state) {
    return result;
 }
 
-void _optguardreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void optguardreport_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardreport *p = (optguardreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->badgradxbase, 0, DT_REAL, _state, make_automatic);
@@ -198,7 +198,7 @@ void _optguardreport_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->badgradnum, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void optguardreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardreport *dst = (optguardreport *) _dst;
    optguardreport *src = (optguardreport *) _src;
    dst->nonc0suspected = src->nonc0suspected;
@@ -213,28 +213,20 @@ void _optguardreport_init_copy(void *_dst, void *_src, ae_state *_state, bool ma
    dst->badgradsuspected = src->badgradsuspected;
    dst->badgradfidx = src->badgradfidx;
    dst->badgradvidx = src->badgradvidx;
-   ae_vector_init_copy(&dst->badgradxbase, &src->badgradxbase, _state, make_automatic);
-   ae_matrix_init_copy(&dst->badgraduser, &src->badgraduser, _state, make_automatic);
-   ae_matrix_init_copy(&dst->badgradnum, &src->badgradnum, _state, make_automatic);
+   ae_vector_copy(&dst->badgradxbase, &src->badgradxbase, _state, make_automatic);
+   ae_matrix_copy(&dst->badgraduser, &src->badgraduser, _state, make_automatic);
+   ae_matrix_copy(&dst->badgradnum, &src->badgradnum, _state, make_automatic);
 }
 
-void _optguardreport_clear(void *_p) {
+void optguardreport_free(void *_p, bool make_automatic) {
    optguardreport *p = (optguardreport *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->badgradxbase);
-   ae_matrix_clear(&p->badgraduser);
-   ae_matrix_clear(&p->badgradnum);
+   ae_vector_free(&p->badgradxbase, make_automatic);
+   ae_matrix_free(&p->badgraduser, make_automatic);
+   ae_matrix_free(&p->badgradnum, make_automatic);
 }
 
-void _optguardreport_destroy(void *_p) {
-   optguardreport *p = (optguardreport *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->badgradxbase);
-   ae_matrix_destroy(&p->badgraduser);
-   ae_matrix_destroy(&p->badgradnum);
-}
-
-void _optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic) {
+void optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc0report *p = (optguardnonc0report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -243,40 +235,31 @@ void _optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic) 
    ae_vector_init(&p->f, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void optguardnonc0report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc0report *dst = (optguardnonc0report *) _dst;
    optguardnonc0report *src = (optguardnonc0report *) _src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
-   ae_vector_init_copy(&dst->x0, &src->x0, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->x0, &src->x0, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->n = src->n;
-   ae_vector_init_copy(&dst->stp, &src->stp, _state, make_automatic);
-   ae_vector_init_copy(&dst->f, &src->f, _state, make_automatic);
+   ae_vector_copy(&dst->stp, &src->stp, _state, make_automatic);
+   ae_vector_copy(&dst->f, &src->f, _state, make_automatic);
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
 }
 
-void _optguardnonc0report_clear(void *_p) {
+void optguardnonc0report_free(void *_p, bool make_automatic) {
    optguardnonc0report *p = (optguardnonc0report *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x0);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->stp);
-   ae_vector_clear(&p->f);
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->stp, make_automatic);
+   ae_vector_free(&p->f, make_automatic);
 }
 
-void _optguardnonc0report_destroy(void *_p) {
-   optguardnonc0report *p = (optguardnonc0report *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x0);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->stp);
-   ae_vector_destroy(&p->f);
-}
-
-void _optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic) {
+void optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test0report *p = (optguardnonc1test0report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -285,40 +268,31 @@ void _optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automa
    ae_vector_init(&p->f, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc1test0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void optguardnonc1test0report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc1test0report *dst = (optguardnonc1test0report *) _dst;
    optguardnonc1test0report *src = (optguardnonc1test0report *) _src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
-   ae_vector_init_copy(&dst->x0, &src->x0, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->x0, &src->x0, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->n = src->n;
-   ae_vector_init_copy(&dst->stp, &src->stp, _state, make_automatic);
-   ae_vector_init_copy(&dst->f, &src->f, _state, make_automatic);
+   ae_vector_copy(&dst->stp, &src->stp, _state, make_automatic);
+   ae_vector_copy(&dst->f, &src->f, _state, make_automatic);
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
 }
 
-void _optguardnonc1test0report_clear(void *_p) {
+void optguardnonc1test0report_free(void *_p, bool make_automatic) {
    optguardnonc1test0report *p = (optguardnonc1test0report *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x0);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->stp);
-   ae_vector_clear(&p->f);
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->stp, make_automatic);
+   ae_vector_free(&p->f, make_automatic);
 }
 
-void _optguardnonc1test0report_destroy(void *_p) {
-   optguardnonc1test0report *p = (optguardnonc1test0report *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x0);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->stp);
-   ae_vector_destroy(&p->f);
-}
-
-void _optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic) {
+void optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test1report *p = (optguardnonc1test1report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -327,38 +301,29 @@ void _optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automa
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc1test1report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void optguardnonc1test1report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc1test1report *dst = (optguardnonc1test1report *) _dst;
    optguardnonc1test1report *src = (optguardnonc1test1report *) _src;
    dst->positive = src->positive;
    dst->fidx = src->fidx;
    dst->vidx = src->vidx;
-   ae_vector_init_copy(&dst->x0, &src->x0, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->x0, &src->x0, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->n = src->n;
-   ae_vector_init_copy(&dst->stp, &src->stp, _state, make_automatic);
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->stp, &src->stp, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->cnt = src->cnt;
    dst->stpidxa = src->stpidxa;
    dst->stpidxb = src->stpidxb;
 }
 
-void _optguardnonc1test1report_clear(void *_p) {
+void optguardnonc1test1report_free(void *_p, bool make_automatic) {
    optguardnonc1test1report *p = (optguardnonc1test1report *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x0);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->stp);
-   ae_vector_clear(&p->g);
-}
-
-void _optguardnonc1test1report_destroy(void *_p) {
-   optguardnonc1test1report *p = (optguardnonc1test1report *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x0);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->stp);
-   ae_vector_destroy(&p->g);
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->stp, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -1327,7 +1292,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    memset(&buf, 0, sizeof(buf));
    memset(&permce, 0, sizeof(permce));
    memset(&q, 0, sizeof(q));
-   ae_matrix_init_copy(&_ce, ce, _state, true);
+   ae_matrix_copy(&_ce, ce, _state, true);
    ce = &_ce;
    *qpits = 0;
    *gpaits = 0;
@@ -1344,7 +1309,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    ae_vector_init(&colnorms, 0, DT_REAL, _state, true);
    ae_vector_init(&p1, 0, DT_INT, _state, true);
    ae_vector_init(&p2, 0, DT_INT, _state, true);
-   _apbuffers_init(&buf, _state, true);
+   apbuffers_init(&buf, _state, true);
    ae_matrix_init(&permce, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&q, 0, 0, DT_REAL, _state, true);
 
@@ -3738,7 +3703,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
    }
 }
 
-void _precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic) {
+void precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->norms, 0, DT_REAL, _state, make_automatic);
@@ -3750,43 +3715,31 @@ void _precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->bufb, 0, DT_INT, _state, make_automatic);
 }
 
-void _precbuflbfgs_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void precbuflbfgs_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    precbuflbfgs *dst = (precbuflbfgs *) _dst;
    precbuflbfgs *src = (precbuflbfgs *) _src;
-   ae_vector_init_copy(&dst->norms, &src->norms, _state, make_automatic);
-   ae_vector_init_copy(&dst->alpha, &src->alpha, _state, make_automatic);
-   ae_vector_init_copy(&dst->rho, &src->rho, _state, make_automatic);
-   ae_matrix_init_copy(&dst->yk, &src->yk, _state, make_automatic);
-   ae_vector_init_copy(&dst->idx, &src->idx, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufa, &src->bufa, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufb, &src->bufb, _state, make_automatic);
+   ae_vector_copy(&dst->norms, &src->norms, _state, make_automatic);
+   ae_vector_copy(&dst->alpha, &src->alpha, _state, make_automatic);
+   ae_vector_copy(&dst->rho, &src->rho, _state, make_automatic);
+   ae_matrix_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, _state, make_automatic);
+   ae_vector_copy(&dst->bufa, &src->bufa, _state, make_automatic);
+   ae_vector_copy(&dst->bufb, &src->bufb, _state, make_automatic);
 }
 
-void _precbuflbfgs_clear(void *_p) {
+void precbuflbfgs_free(void *_p, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->norms);
-   ae_vector_clear(&p->alpha);
-   ae_vector_clear(&p->rho);
-   ae_matrix_clear(&p->yk);
-   ae_vector_clear(&p->idx);
-   ae_vector_clear(&p->bufa);
-   ae_vector_clear(&p->bufb);
+   ae_vector_free(&p->norms, make_automatic);
+   ae_vector_free(&p->alpha, make_automatic);
+   ae_vector_free(&p->rho, make_automatic);
+   ae_matrix_free(&p->yk, make_automatic);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->bufa, make_automatic);
+   ae_vector_free(&p->bufb, make_automatic);
 }
 
-void _precbuflbfgs_destroy(void *_p) {
-   precbuflbfgs *p = (precbuflbfgs *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->norms);
-   ae_vector_destroy(&p->alpha);
-   ae_vector_destroy(&p->rho);
-   ae_matrix_destroy(&p->yk);
-   ae_vector_destroy(&p->idx);
-   ae_vector_destroy(&p->bufa);
-   ae_vector_destroy(&p->bufb);
-}
-
-void _precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic) {
+void precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflowrank *p = (precbuflowrank *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -3797,42 +3750,31 @@ void _precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmp, 0, DT_REAL, _state, make_automatic);
 }
 
-void _precbuflowrank_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void precbuflowrank_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    precbuflowrank *dst = (precbuflowrank *) _dst;
    precbuflowrank *src = (precbuflowrank *) _src;
    dst->n = src->n;
    dst->k = src->k;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_matrix_init_copy(&dst->v, &src->v, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufc, &src->bufc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufz, &src->bufz, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufw, &src->bufw, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp, &src->tmp, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_matrix_copy(&dst->v, &src->v, _state, make_automatic);
+   ae_vector_copy(&dst->bufc, &src->bufc, _state, make_automatic);
+   ae_matrix_copy(&dst->bufz, &src->bufz, _state, make_automatic);
+   ae_matrix_copy(&dst->bufw, &src->bufw, _state, make_automatic);
+   ae_vector_copy(&dst->tmp, &src->tmp, _state, make_automatic);
 }
 
-void _precbuflowrank_clear(void *_p) {
+void precbuflowrank_free(void *_p, bool make_automatic) {
    precbuflowrank *p = (precbuflowrank *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->d);
-   ae_matrix_clear(&p->v);
-   ae_vector_clear(&p->bufc);
-   ae_matrix_clear(&p->bufz);
-   ae_matrix_clear(&p->bufw);
-   ae_vector_clear(&p->tmp);
+   ae_vector_free(&p->d, make_automatic);
+   ae_matrix_free(&p->v, make_automatic);
+   ae_vector_free(&p->bufc, make_automatic);
+   ae_matrix_free(&p->bufz, make_automatic);
+   ae_matrix_free(&p->bufw, make_automatic);
+   ae_vector_free(&p->tmp, make_automatic);
 }
 
-void _precbuflowrank_destroy(void *_p) {
-   precbuflowrank *p = (precbuflowrank *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->d);
-   ae_matrix_destroy(&p->v);
-   ae_vector_destroy(&p->bufc);
-   ae_matrix_destroy(&p->bufz);
-   ae_matrix_destroy(&p->bufw);
-   ae_vector_destroy(&p->tmp);
-}
-
-void _smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
+void smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -3847,18 +3789,18 @@ void _smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->probingsteps, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->probingvalues, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->probingslopes, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->probingrcomm, _state, make_automatic);
-   _optguardreport_init(&p->rep, _state, make_automatic);
-   _optguardnonc0report_init(&p->nonc0strrep, _state, make_automatic);
-   _optguardnonc0report_init(&p->nonc0lngrep, _state, make_automatic);
-   _optguardnonc1test0report_init(&p->nonc1test0strrep, _state, make_automatic);
-   _optguardnonc1test0report_init(&p->nonc1test0lngrep, _state, make_automatic);
-   _optguardnonc1test1report_init(&p->nonc1test1strrep, _state, make_automatic);
-   _optguardnonc1test1report_init(&p->nonc1test1lngrep, _state, make_automatic);
+   rcommstate_init(&p->probingrcomm, _state, make_automatic);
+   optguardreport_init(&p->rep, _state, make_automatic);
+   optguardnonc0report_init(&p->nonc0strrep, _state, make_automatic);
+   optguardnonc0report_init(&p->nonc0lngrep, _state, make_automatic);
+   optguardnonc1test0report_init(&p->nonc1test0strrep, _state, make_automatic);
+   optguardnonc1test0report_init(&p->nonc1test0lngrep, _state, make_automatic);
+   optguardnonc1test1report_init(&p->nonc1test1strrep, _state, make_automatic);
+   optguardnonc1test1report_init(&p->nonc1test1lngrep, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstateg0, _state, make_automatic);
+   rcommstate_init(&p->rstateg0, _state, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fbase, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fm, 0, DT_REAL, _state, make_automatic);
@@ -3882,176 +3824,126 @@ void _smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->j0, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _smoothnessmonitor_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void smoothnessmonitor_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    smoothnessmonitor *dst = (smoothnessmonitor *) _dst;
    smoothnessmonitor *src = (smoothnessmonitor *) _src;
    dst->n = src->n;
    dst->k = src->k;
    dst->checksmoothness = src->checksmoothness;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->dcur, &src->dcur, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->dcur, &src->dcur, _state, make_automatic);
    dst->enqueuedcnt = src->enqueuedcnt;
-   ae_vector_init_copy(&dst->enqueuedstp, &src->enqueuedstp, _state, make_automatic);
-   ae_vector_init_copy(&dst->enqueuedx, &src->enqueuedx, _state, make_automatic);
-   ae_vector_init_copy(&dst->enqueuedfunc, &src->enqueuedfunc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->enqueuedjac, &src->enqueuedjac, _state, make_automatic);
-   ae_vector_init_copy(&dst->sortedstp, &src->sortedstp, _state, make_automatic);
-   ae_vector_init_copy(&dst->sortedidx, &src->sortedidx, _state, make_automatic);
+   ae_vector_copy(&dst->enqueuedstp, &src->enqueuedstp, _state, make_automatic);
+   ae_vector_copy(&dst->enqueuedx, &src->enqueuedx, _state, make_automatic);
+   ae_vector_copy(&dst->enqueuedfunc, &src->enqueuedfunc, _state, make_automatic);
+   ae_matrix_copy(&dst->enqueuedjac, &src->enqueuedjac, _state, make_automatic);
+   ae_vector_copy(&dst->sortedstp, &src->sortedstp, _state, make_automatic);
+   ae_vector_copy(&dst->sortedidx, &src->sortedidx, _state, make_automatic);
    dst->sortedcnt = src->sortedcnt;
    dst->probingstp = src->probingstp;
-   ae_vector_init_copy(&dst->probingf, &src->probingf, _state, make_automatic);
+   ae_vector_copy(&dst->probingf, &src->probingf, _state, make_automatic);
    dst->probingnvalues = src->probingnvalues;
    dst->probingstepmax = src->probingstepmax;
    dst->probingstepscale = src->probingstepscale;
    dst->probingnstepsstored = src->probingnstepsstored;
-   ae_vector_init_copy(&dst->probingsteps, &src->probingsteps, _state, make_automatic);
-   ae_matrix_init_copy(&dst->probingvalues, &src->probingvalues, _state, make_automatic);
-   ae_matrix_init_copy(&dst->probingslopes, &src->probingslopes, _state, make_automatic);
-   _rcommstate_init_copy(&dst->probingrcomm, &src->probingrcomm, _state, make_automatic);
+   ae_vector_copy(&dst->probingsteps, &src->probingsteps, _state, make_automatic);
+   ae_matrix_copy(&dst->probingvalues, &src->probingvalues, _state, make_automatic);
+   ae_matrix_copy(&dst->probingslopes, &src->probingslopes, _state, make_automatic);
+   rcommstate_copy(&dst->probingrcomm, &src->probingrcomm, _state, make_automatic);
    dst->linesearchspoiled = src->linesearchspoiled;
    dst->linesearchstarted = src->linesearchstarted;
    dst->nonc0currentrating = src->nonc0currentrating;
    dst->nonc1currentrating = src->nonc1currentrating;
    dst->badgradhasxj = src->badgradhasxj;
-   _optguardreport_init_copy(&dst->rep, &src->rep, _state, make_automatic);
+   optguardreport_copy(&dst->rep, &src->rep, _state, make_automatic);
    dst->nonc0strrating = src->nonc0strrating;
    dst->nonc0lngrating = src->nonc0lngrating;
-   _optguardnonc0report_init_copy(&dst->nonc0strrep, &src->nonc0strrep, _state, make_automatic);
-   _optguardnonc0report_init_copy(&dst->nonc0lngrep, &src->nonc0lngrep, _state, make_automatic);
+   optguardnonc0report_copy(&dst->nonc0strrep, &src->nonc0strrep, _state, make_automatic);
+   optguardnonc0report_copy(&dst->nonc0lngrep, &src->nonc0lngrep, _state, make_automatic);
    dst->nonc1test0strrating = src->nonc1test0strrating;
    dst->nonc1test0lngrating = src->nonc1test0lngrating;
-   _optguardnonc1test0report_init_copy(&dst->nonc1test0strrep, &src->nonc1test0strrep, _state, make_automatic);
-   _optguardnonc1test0report_init_copy(&dst->nonc1test0lngrep, &src->nonc1test0lngrep, _state, make_automatic);
+   optguardnonc1test0report_copy(&dst->nonc1test0strrep, &src->nonc1test0strrep, _state, make_automatic);
+   optguardnonc1test0report_copy(&dst->nonc1test0lngrep, &src->nonc1test0lngrep, _state, make_automatic);
    dst->nonc1test1strrating = src->nonc1test1strrating;
    dst->nonc1test1lngrating = src->nonc1test1lngrating;
-   _optguardnonc1test1report_init_copy(&dst->nonc1test1strrep, &src->nonc1test1strrep, _state, make_automatic);
-   _optguardnonc1test1report_init_copy(&dst->nonc1test1lngrep, &src->nonc1test1lngrep, _state, make_automatic);
+   optguardnonc1test1report_copy(&dst->nonc1test1strrep, &src->nonc1test1strrep, _state, make_automatic);
+   optguardnonc1test1report_copy(&dst->nonc1test1lngrep, &src->nonc1test1lngrep, _state, make_automatic);
    dst->needfij = src->needfij;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstateg0, &src->rstateg0, _state, make_automatic);
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fbase, &src->fbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fm, &src->fm, _state, make_automatic);
-   ae_vector_init_copy(&dst->fc, &src->fc, _state, make_automatic);
-   ae_vector_init_copy(&dst->fp, &src->fp, _state, make_automatic);
-   ae_vector_init_copy(&dst->jm, &src->jm, _state, make_automatic);
-   ae_vector_init_copy(&dst->jc, &src->jc, _state, make_automatic);
-   ae_vector_init_copy(&dst->jp, &src->jp, _state, make_automatic);
-   ae_matrix_init_copy(&dst->jbaseusr, &src->jbaseusr, _state, make_automatic);
-   ae_matrix_init_copy(&dst->jbasenum, &src->jbasenum, _state, make_automatic);
-   ae_vector_init_copy(&dst->stp, &src->stp, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufr, &src->bufr, _state, make_automatic);
-   ae_vector_init_copy(&dst->f, &src->f, _state, make_automatic);
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
-   ae_vector_init_copy(&dst->deltax, &src->deltax, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpidx, &src->tmpidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufi, &src->bufi, _state, make_automatic);
-   ae_vector_init_copy(&dst->xu, &src->xu, _state, make_automatic);
-   ae_vector_init_copy(&dst->du, &src->du, _state, make_automatic);
-   ae_vector_init_copy(&dst->f0, &src->f0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j0, &src->j0, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
+   rcommstate_copy(&dst->rstateg0, &src->rstateg0, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->fbase, &src->fbase, _state, make_automatic);
+   ae_vector_copy(&dst->fm, &src->fm, _state, make_automatic);
+   ae_vector_copy(&dst->fc, &src->fc, _state, make_automatic);
+   ae_vector_copy(&dst->fp, &src->fp, _state, make_automatic);
+   ae_vector_copy(&dst->jm, &src->jm, _state, make_automatic);
+   ae_vector_copy(&dst->jc, &src->jc, _state, make_automatic);
+   ae_vector_copy(&dst->jp, &src->jp, _state, make_automatic);
+   ae_matrix_copy(&dst->jbaseusr, &src->jbaseusr, _state, make_automatic);
+   ae_matrix_copy(&dst->jbasenum, &src->jbasenum, _state, make_automatic);
+   ae_vector_copy(&dst->stp, &src->stp, _state, make_automatic);
+   ae_vector_copy(&dst->bufr, &src->bufr, _state, make_automatic);
+   ae_vector_copy(&dst->f, &src->f, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->deltax, &src->deltax, _state, make_automatic);
+   ae_vector_copy(&dst->tmpidx, &src->tmpidx, _state, make_automatic);
+   ae_vector_copy(&dst->bufi, &src->bufi, _state, make_automatic);
+   ae_vector_copy(&dst->xu, &src->xu, _state, make_automatic);
+   ae_vector_copy(&dst->du, &src->du, _state, make_automatic);
+   ae_vector_copy(&dst->f0, &src->f0, _state, make_automatic);
+   ae_matrix_copy(&dst->j0, &src->j0, _state, make_automatic);
 }
 
-void _smoothnessmonitor_clear(void *_p) {
+void smoothnessmonitor_free(void *_p, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->dcur);
-   ae_vector_clear(&p->enqueuedstp);
-   ae_vector_clear(&p->enqueuedx);
-   ae_vector_clear(&p->enqueuedfunc);
-   ae_matrix_clear(&p->enqueuedjac);
-   ae_vector_clear(&p->sortedstp);
-   ae_vector_clear(&p->sortedidx);
-   ae_vector_clear(&p->probingf);
-   ae_vector_clear(&p->probingsteps);
-   ae_matrix_clear(&p->probingvalues);
-   ae_matrix_clear(&p->probingslopes);
-   _rcommstate_clear(&p->probingrcomm);
-   _optguardreport_clear(&p->rep);
-   _optguardnonc0report_clear(&p->nonc0strrep);
-   _optguardnonc0report_clear(&p->nonc0lngrep);
-   _optguardnonc1test0report_clear(&p->nonc1test0strrep);
-   _optguardnonc1test0report_clear(&p->nonc1test0lngrep);
-   _optguardnonc1test1report_clear(&p->nonc1test1strrep);
-   _optguardnonc1test1report_clear(&p->nonc1test1lngrep);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _rcommstate_clear(&p->rstateg0);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->fbase);
-   ae_vector_clear(&p->fm);
-   ae_vector_clear(&p->fc);
-   ae_vector_clear(&p->fp);
-   ae_vector_clear(&p->jm);
-   ae_vector_clear(&p->jc);
-   ae_vector_clear(&p->jp);
-   ae_matrix_clear(&p->jbaseusr);
-   ae_matrix_clear(&p->jbasenum);
-   ae_vector_clear(&p->stp);
-   ae_vector_clear(&p->bufr);
-   ae_vector_clear(&p->f);
-   ae_vector_clear(&p->g);
-   ae_vector_clear(&p->deltax);
-   ae_vector_clear(&p->tmpidx);
-   ae_vector_clear(&p->bufi);
-   ae_vector_clear(&p->xu);
-   ae_vector_clear(&p->du);
-   ae_vector_clear(&p->f0);
-   ae_matrix_clear(&p->j0);
-}
-
-void _smoothnessmonitor_destroy(void *_p) {
-   smoothnessmonitor *p = (smoothnessmonitor *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->dcur);
-   ae_vector_destroy(&p->enqueuedstp);
-   ae_vector_destroy(&p->enqueuedx);
-   ae_vector_destroy(&p->enqueuedfunc);
-   ae_matrix_destroy(&p->enqueuedjac);
-   ae_vector_destroy(&p->sortedstp);
-   ae_vector_destroy(&p->sortedidx);
-   ae_vector_destroy(&p->probingf);
-   ae_vector_destroy(&p->probingsteps);
-   ae_matrix_destroy(&p->probingvalues);
-   ae_matrix_destroy(&p->probingslopes);
-   _rcommstate_destroy(&p->probingrcomm);
-   _optguardreport_destroy(&p->rep);
-   _optguardnonc0report_destroy(&p->nonc0strrep);
-   _optguardnonc0report_destroy(&p->nonc0lngrep);
-   _optguardnonc1test0report_destroy(&p->nonc1test0strrep);
-   _optguardnonc1test0report_destroy(&p->nonc1test0lngrep);
-   _optguardnonc1test1report_destroy(&p->nonc1test1strrep);
-   _optguardnonc1test1report_destroy(&p->nonc1test1lngrep);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _rcommstate_destroy(&p->rstateg0);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->fbase);
-   ae_vector_destroy(&p->fm);
-   ae_vector_destroy(&p->fc);
-   ae_vector_destroy(&p->fp);
-   ae_vector_destroy(&p->jm);
-   ae_vector_destroy(&p->jc);
-   ae_vector_destroy(&p->jp);
-   ae_matrix_destroy(&p->jbaseusr);
-   ae_matrix_destroy(&p->jbasenum);
-   ae_vector_destroy(&p->stp);
-   ae_vector_destroy(&p->bufr);
-   ae_vector_destroy(&p->f);
-   ae_vector_destroy(&p->g);
-   ae_vector_destroy(&p->deltax);
-   ae_vector_destroy(&p->tmpidx);
-   ae_vector_destroy(&p->bufi);
-   ae_vector_destroy(&p->xu);
-   ae_vector_destroy(&p->du);
-   ae_vector_destroy(&p->f0);
-   ae_matrix_destroy(&p->j0);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->dcur, make_automatic);
+   ae_vector_free(&p->enqueuedstp, make_automatic);
+   ae_vector_free(&p->enqueuedx, make_automatic);
+   ae_vector_free(&p->enqueuedfunc, make_automatic);
+   ae_matrix_free(&p->enqueuedjac, make_automatic);
+   ae_vector_free(&p->sortedstp, make_automatic);
+   ae_vector_free(&p->sortedidx, make_automatic);
+   ae_vector_free(&p->probingf, make_automatic);
+   ae_vector_free(&p->probingsteps, make_automatic);
+   ae_matrix_free(&p->probingvalues, make_automatic);
+   ae_matrix_free(&p->probingslopes, make_automatic);
+   rcommstate_free(&p->probingrcomm, make_automatic);
+   optguardreport_free(&p->rep, make_automatic);
+   optguardnonc0report_free(&p->nonc0strrep, make_automatic);
+   optguardnonc0report_free(&p->nonc0lngrep, make_automatic);
+   optguardnonc1test0report_free(&p->nonc1test0strrep, make_automatic);
+   optguardnonc1test0report_free(&p->nonc1test0lngrep, make_automatic);
+   optguardnonc1test1report_free(&p->nonc1test1strrep, make_automatic);
+   optguardnonc1test1report_free(&p->nonc1test1lngrep, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   rcommstate_free(&p->rstateg0, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fbase, make_automatic);
+   ae_vector_free(&p->fm, make_automatic);
+   ae_vector_free(&p->fc, make_automatic);
+   ae_vector_free(&p->fp, make_automatic);
+   ae_vector_free(&p->jm, make_automatic);
+   ae_vector_free(&p->jc, make_automatic);
+   ae_vector_free(&p->jp, make_automatic);
+   ae_matrix_free(&p->jbaseusr, make_automatic);
+   ae_matrix_free(&p->jbasenum, make_automatic);
+   ae_vector_free(&p->stp, make_automatic);
+   ae_vector_free(&p->bufr, make_automatic);
+   ae_vector_free(&p->f, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   ae_vector_free(&p->deltax, make_automatic);
+   ae_vector_free(&p->tmpidx, make_automatic);
+   ae_vector_free(&p->bufi, make_automatic);
+   ae_vector_free(&p->xu, make_automatic);
+   ae_vector_free(&p->du, make_automatic);
+   ae_vector_free(&p->f0, make_automatic);
+   ae_matrix_free(&p->j0, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -4117,7 +4009,7 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
 // API: void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams);
 void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae_state *_state) {
 
-   _minlbfgsstate_clear(state);
+   minlbfgsstate_free(state, true);
 
    ae_assert(n >= 1, "MinLBFGSCreate: N<1!", _state);
    ae_assert(m >= 1, "MinLBFGSCreate: M<1", _state);
@@ -4174,7 +4066,7 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae
 // API: void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams);
 void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state, ae_state *_state) {
 
-   _minlbfgsstate_clear(state);
+   minlbfgsstate_free(state, true);
 
    ae_assert(n >= 1, "MinLBFGSCreateF: N too small!", _state);
    ae_assert(m >= 1, "MinLBFGSCreateF: M<1", _state);
@@ -5269,7 +5161,7 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 // API: void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams);
 void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -5316,8 +5208,8 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state
 // API: void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test0report_clear(strrep);
-   _optguardnonc1test0report_clear(lngrep);
+   optguardnonc1test0report_free(strrep, true);
+   optguardnonc1test0report_free(lngrep, true);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -5372,8 +5264,8 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 // API: void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test1report_clear(strrep);
-   _optguardnonc1test1report_clear(lngrep);
+   optguardnonc1test1report_free(strrep, true);
+   optguardnonc1test1report_free(lngrep, true);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -5410,8 +5302,8 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 // API: void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams);
 void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minlbfgsreport_clear(rep);
+   ae_vector_free(x, true);
+   minlbfgsreport_free(rep, true);
 
    minlbfgsresultsbuf(state, x, rep, _state);
 }
@@ -5491,7 +5383,7 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state) 
    state->xupdated = false;
 }
 
-void _minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlbfgsstate *p = (minlbfgsstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -5508,19 +5400,19 @@ void _minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->precc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->precd, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->precw, 0, 0, DT_REAL, _state, make_automatic);
-   _precbuflbfgs_init(&p->precbuf, _state, make_automatic);
-   _precbuflowrank_init(&p->lowrankbuf, _state, make_automatic);
+   precbuflbfgs_init(&p->precbuf, _state, make_automatic);
+   precbuflowrank_init(&p->lowrankbuf, _state, make_automatic);
    ae_vector_init(&p->autobuf, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
-   _linminstate_init(&p->lstate, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
+   linminstate_init(&p->lstate, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minlbfgsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlbfgsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlbfgsstate *dst = (minlbfgsstate *) _dst;
    minlbfgsstate *src = (minlbfgsstate *) _src;
    dst->n = src->n;
@@ -5531,123 +5423,94 @@ void _minlbfgsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->maxits = src->maxits;
    dst->xrep = src->xrep;
    dst->stpmax = src->stpmax;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
    dst->diffstep = src->diffstep;
    dst->nfev = src->nfev;
    dst->mcstage = src->mcstage;
    dst->k = src->k;
    dst->q = src->q;
    dst->p = src->p;
-   ae_vector_init_copy(&dst->rho, &src->rho, _state, make_automatic);
-   ae_matrix_init_copy(&dst->yk, &src->yk, _state, make_automatic);
-   ae_matrix_init_copy(&dst->sk, &src->sk, _state, make_automatic);
-   ae_vector_init_copy(&dst->xp, &src->xp, _state, make_automatic);
-   ae_vector_init_copy(&dst->theta, &src->theta, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->rho, &src->rho, _state, make_automatic);
+   ae_matrix_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_matrix_copy(&dst->sk, &src->sk, _state, make_automatic);
+   ae_vector_copy(&dst->xp, &src->xp, _state, make_automatic);
+   ae_vector_copy(&dst->theta, &src->theta, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->stp = src->stp;
-   ae_vector_init_copy(&dst->work, &src->work, _state, make_automatic);
+   ae_vector_copy(&dst->work, &src->work, _state, make_automatic);
    dst->fold = src->fold;
    dst->trimthreshold = src->trimthreshold;
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
    dst->prectype = src->prectype;
    dst->gammak = src->gammak;
-   ae_matrix_init_copy(&dst->denseh, &src->denseh, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagh, &src->diagh, _state, make_automatic);
-   ae_vector_init_copy(&dst->precc, &src->precc, _state, make_automatic);
-   ae_vector_init_copy(&dst->precd, &src->precd, _state, make_automatic);
-   ae_matrix_init_copy(&dst->precw, &src->precw, _state, make_automatic);
+   ae_matrix_copy(&dst->denseh, &src->denseh, _state, make_automatic);
+   ae_vector_copy(&dst->diagh, &src->diagh, _state, make_automatic);
+   ae_vector_copy(&dst->precc, &src->precc, _state, make_automatic);
+   ae_vector_copy(&dst->precd, &src->precd, _state, make_automatic);
+   ae_matrix_copy(&dst->precw, &src->precw, _state, make_automatic);
    dst->preck = src->preck;
-   _precbuflbfgs_init_copy(&dst->precbuf, &src->precbuf, _state, make_automatic);
-   _precbuflowrank_init_copy(&dst->lowrankbuf, &src->lowrankbuf, _state, make_automatic);
+   precbuflbfgs_copy(&dst->precbuf, &src->precbuf, _state, make_automatic);
+   precbuflowrank_copy(&dst->lowrankbuf, &src->lowrankbuf, _state, make_automatic);
    dst->fbase = src->fbase;
    dst->fm2 = src->fm2;
    dst->fm1 = src->fm1;
    dst->fp1 = src->fp1;
    dst->fp2 = src->fp2;
-   ae_vector_init_copy(&dst->autobuf, &src->autobuf, _state, make_automatic);
-   ae_vector_init_copy(&dst->invs, &src->invs, _state, make_automatic);
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->autobuf, &src->autobuf, _state, make_automatic);
+   ae_vector_copy(&dst->invs, &src->invs, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfg = src->needfg;
    dst->xupdated = src->xupdated;
    dst->userterminationneeded = src->userterminationneeded;
    dst->teststep = src->teststep;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnfev = src->repnfev;
    dst->repterminationtype = src->repterminationtype;
-   _linminstate_init_copy(&dst->lstate, &src->lstate, _state, make_automatic);
+   linminstate_copy(&dst->lstate, &src->lstate, _state, make_automatic);
    dst->smoothnessguardlevel = src->smoothnessguardlevel;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
 }
 
-void _minlbfgsstate_clear(void *_p) {
+void minlbfgsstate_free(void *_p, bool make_automatic) {
    minlbfgsstate *p = (minlbfgsstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->rho);
-   ae_matrix_clear(&p->yk);
-   ae_matrix_clear(&p->sk);
-   ae_vector_clear(&p->xp);
-   ae_vector_clear(&p->theta);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->work);
-   ae_vector_clear(&p->xbase);
-   ae_matrix_clear(&p->denseh);
-   ae_vector_clear(&p->diagh);
-   ae_vector_clear(&p->precc);
-   ae_vector_clear(&p->precd);
-   ae_matrix_clear(&p->precw);
-   _precbuflbfgs_clear(&p->precbuf);
-   _precbuflowrank_clear(&p->lowrankbuf);
-   ae_vector_clear(&p->autobuf);
-   ae_vector_clear(&p->invs);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   _rcommstate_clear(&p->rstate);
-   _linminstate_clear(&p->lstate);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->rho, make_automatic);
+   ae_matrix_free(&p->yk, make_automatic);
+   ae_matrix_free(&p->sk, make_automatic);
+   ae_vector_free(&p->xp, make_automatic);
+   ae_vector_free(&p->theta, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->work, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_matrix_free(&p->denseh, make_automatic);
+   ae_vector_free(&p->diagh, make_automatic);
+   ae_vector_free(&p->precc, make_automatic);
+   ae_vector_free(&p->precd, make_automatic);
+   ae_matrix_free(&p->precw, make_automatic);
+   precbuflbfgs_free(&p->precbuf, make_automatic);
+   precbuflowrank_free(&p->lowrankbuf, make_automatic);
+   ae_vector_free(&p->autobuf, make_automatic);
+   ae_vector_free(&p->invs, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   linminstate_free(&p->lstate, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
 }
 
-void _minlbfgsstate_destroy(void *_p) {
-   minlbfgsstate *p = (minlbfgsstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->rho);
-   ae_matrix_destroy(&p->yk);
-   ae_matrix_destroy(&p->sk);
-   ae_vector_destroy(&p->xp);
-   ae_vector_destroy(&p->theta);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->work);
-   ae_vector_destroy(&p->xbase);
-   ae_matrix_destroy(&p->denseh);
-   ae_vector_destroy(&p->diagh);
-   ae_vector_destroy(&p->precc);
-   ae_vector_destroy(&p->precd);
-   ae_matrix_destroy(&p->precw);
-   _precbuflbfgs_destroy(&p->precbuf);
-   _precbuflowrank_destroy(&p->lowrankbuf);
-   ae_vector_destroy(&p->autobuf);
-   ae_vector_destroy(&p->invs);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   _rcommstate_destroy(&p->rstate);
-   _linminstate_destroy(&p->lstate);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-}
-
-void _minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlbfgsreport *p = (minlbfgsreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minlbfgsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlbfgsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlbfgsreport *dst = (minlbfgsreport *) _dst;
    minlbfgsreport *src = (minlbfgsreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -5655,12 +5518,7 @@ void _minlbfgsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool ma
    dst->terminationtype = src->terminationtype;
 }
 
-void _minlbfgsreport_clear(void *_p) {
-   minlbfgsreport *p = (minlbfgsreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minlbfgsreport_destroy(void *_p) {
+void minlbfgsreport_free(void *_p, bool make_automatic) {
    minlbfgsreport *p = (minlbfgsreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -7496,7 +7354,7 @@ static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tm
    }
 }
 
-void _convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic) {
+void convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic) {
    convexquadraticmodel *p = (convexquadraticmodel *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->a, 0, 0, DT_REAL, _state, make_automatic);
@@ -7524,7 +7382,7 @@ void _convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic)
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _convexquadraticmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void convexquadraticmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    convexquadraticmodel *dst = (convexquadraticmodel *) _dst;
    convexquadraticmodel *src = (convexquadraticmodel *) _src;
    dst->n = src->n;
@@ -7532,94 +7390,66 @@ void _convexquadraticmodel_init_copy(void *_dst, void *_src, ae_state *_state, b
    dst->alpha = src->alpha;
    dst->tau = src->tau;
    dst->theta = src->theta;
-   ae_matrix_init_copy(&dst->a, &src->a, _state, make_automatic);
-   ae_matrix_init_copy(&dst->q, &src->q, _state, make_automatic);
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->r, &src->r, _state, make_automatic);
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->activeset, &src->activeset, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tq2dense, &src->tq2dense, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tk2, &src->tk2, _state, make_automatic);
-   ae_vector_init_copy(&dst->tq2diag, &src->tq2diag, _state, make_automatic);
-   ae_vector_init_copy(&dst->tq1, &src->tq1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tk1, &src->tk1, _state, make_automatic);
+   ae_matrix_copy(&dst->a, &src->a, _state, make_automatic);
+   ae_matrix_copy(&dst->q, &src->q, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->r, &src->r, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->activeset, &src->activeset, _state, make_automatic);
+   ae_matrix_copy(&dst->tq2dense, &src->tq2dense, _state, make_automatic);
+   ae_matrix_copy(&dst->tk2, &src->tk2, _state, make_automatic);
+   ae_vector_copy(&dst->tq2diag, &src->tq2diag, _state, make_automatic);
+   ae_vector_copy(&dst->tq1, &src->tq1, _state, make_automatic);
+   ae_vector_copy(&dst->tk1, &src->tk1, _state, make_automatic);
    dst->tq0 = src->tq0;
    dst->tk0 = src->tk0;
-   ae_vector_init_copy(&dst->txc, &src->txc, _state, make_automatic);
-   ae_vector_init_copy(&dst->tb, &src->tb, _state, make_automatic);
+   ae_vector_copy(&dst->txc, &src->txc, _state, make_automatic);
+   ae_vector_copy(&dst->tb, &src->tb, _state, make_automatic);
    dst->nfree = src->nfree;
    dst->ecakind = src->ecakind;
-   ae_matrix_init_copy(&dst->ecadense, &src->ecadense, _state, make_automatic);
-   ae_matrix_init_copy(&dst->eq, &src->eq, _state, make_automatic);
-   ae_matrix_init_copy(&dst->eccm, &src->eccm, _state, make_automatic);
-   ae_vector_init_copy(&dst->ecadiag, &src->ecadiag, _state, make_automatic);
-   ae_vector_init_copy(&dst->eb, &src->eb, _state, make_automatic);
+   ae_matrix_copy(&dst->ecadense, &src->ecadense, _state, make_automatic);
+   ae_matrix_copy(&dst->eq, &src->eq, _state, make_automatic);
+   ae_matrix_copy(&dst->eccm, &src->eccm, _state, make_automatic);
+   ae_vector_copy(&dst->ecadiag, &src->ecadiag, _state, make_automatic);
+   ae_vector_copy(&dst->eb, &src->eb, _state, make_automatic);
    dst->ec = src->ec;
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
+   ae_matrix_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
    dst->ismaintermchanged = src->ismaintermchanged;
    dst->issecondarytermchanged = src->issecondarytermchanged;
    dst->islineartermchanged = src->islineartermchanged;
    dst->isactivesetchanged = src->isactivesetchanged;
 }
 
-void _convexquadraticmodel_clear(void *_p) {
+void convexquadraticmodel_free(void *_p, bool make_automatic) {
    convexquadraticmodel *p = (convexquadraticmodel *) _p;
    ae_touch_ptr((void *)p);
-   ae_matrix_clear(&p->a);
-   ae_matrix_clear(&p->q);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->r);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->activeset);
-   ae_matrix_clear(&p->tq2dense);
-   ae_matrix_clear(&p->tk2);
-   ae_vector_clear(&p->tq2diag);
-   ae_vector_clear(&p->tq1);
-   ae_vector_clear(&p->tk1);
-   ae_vector_clear(&p->txc);
-   ae_vector_clear(&p->tb);
-   ae_matrix_clear(&p->ecadense);
-   ae_matrix_clear(&p->eq);
-   ae_matrix_clear(&p->eccm);
-   ae_vector_clear(&p->ecadiag);
-   ae_vector_clear(&p->eb);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmpg);
-   ae_matrix_clear(&p->tmp2);
-}
-
-void _convexquadraticmodel_destroy(void *_p) {
-   convexquadraticmodel *p = (convexquadraticmodel *) _p;
-   ae_touch_ptr((void *)p);
-   ae_matrix_destroy(&p->a);
-   ae_matrix_destroy(&p->q);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->r);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->activeset);
-   ae_matrix_destroy(&p->tq2dense);
-   ae_matrix_destroy(&p->tk2);
-   ae_vector_destroy(&p->tq2diag);
-   ae_vector_destroy(&p->tq1);
-   ae_vector_destroy(&p->tk1);
-   ae_vector_destroy(&p->txc);
-   ae_vector_destroy(&p->tb);
-   ae_matrix_destroy(&p->ecadense);
-   ae_matrix_destroy(&p->eq);
-   ae_matrix_destroy(&p->eccm);
-   ae_vector_destroy(&p->ecadiag);
-   ae_vector_destroy(&p->eb);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmpg);
-   ae_matrix_destroy(&p->tmp2);
+   ae_matrix_free(&p->a, make_automatic);
+   ae_matrix_free(&p->q, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->r, make_automatic);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->activeset, make_automatic);
+   ae_matrix_free(&p->tq2dense, make_automatic);
+   ae_matrix_free(&p->tk2, make_automatic);
+   ae_vector_free(&p->tq2diag, make_automatic);
+   ae_vector_free(&p->tq1, make_automatic);
+   ae_vector_free(&p->tk1, make_automatic);
+   ae_vector_free(&p->txc, make_automatic);
+   ae_vector_free(&p->tb, make_automatic);
+   ae_matrix_free(&p->ecadense, make_automatic);
+   ae_matrix_free(&p->eq, make_automatic);
+   ae_matrix_free(&p->eccm, make_automatic);
+   ae_vector_free(&p->ecadiag, make_automatic);
+   ae_vector_free(&p->eb, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmpg, make_automatic);
+   ae_matrix_free(&p->tmp2, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -8914,7 +8744,7 @@ static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_i
    }
 }
 
-void _snnlssolver_init(void *_p, ae_state *_state, bool make_automatic) {
+void snnlssolver_init(void *_p, ae_state *_state, bool make_automatic) {
    snnlssolver *p = (snnlssolver *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
@@ -8943,96 +8773,67 @@ void _snnlssolver_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->rdtmprowmap, 0, DT_INT, _state, make_automatic);
 }
 
-void _snnlssolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void snnlssolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    snnlssolver *dst = (snnlssolver *) _dst;
    snnlssolver *src = (snnlssolver *) _src;
    dst->ns = src->ns;
    dst->nd = src->nd;
    dst->nr = src->nr;
-   ae_matrix_init_copy(&dst->densea, &src->densea, _state, make_automatic);
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->nnc, &src->nnc, _state, make_automatic);
+   ae_matrix_copy(&dst->densea, &src->densea, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->nnc, &src->nnc, _state, make_automatic);
    dst->debugflops = src->debugflops;
    dst->debugmaxinnerits = src->debugmaxinnerits;
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->xp, &src->xp, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpca, &src->tmpca, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmplq, &src->tmplq, _state, make_automatic);
-   ae_matrix_init_copy(&dst->trda, &src->trda, _state, make_automatic);
-   ae_vector_init_copy(&dst->trdd, &src->trdd, _state, make_automatic);
-   ae_vector_init_copy(&dst->crb, &src->crb, _state, make_automatic);
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->dx, &src->dx, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagaa, &src->diagaa, _state, make_automatic);
-   ae_vector_init_copy(&dst->cb, &src->cb, _state, make_automatic);
-   ae_vector_init_copy(&dst->cx, &src->cx, _state, make_automatic);
-   ae_vector_init_copy(&dst->cborg, &src->cborg, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcholesky, &src->tmpcholesky, _state, make_automatic);
-   ae_vector_init_copy(&dst->r, &src->r, _state, make_automatic);
-   ae_vector_init_copy(&dst->regdiag, &src->regdiag, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->rdtmprowmap, &src->rdtmprowmap, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->xp, &src->xp, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpca, &src->tmpca, _state, make_automatic);
+   ae_matrix_copy(&dst->tmplq, &src->tmplq, _state, make_automatic);
+   ae_matrix_copy(&dst->trda, &src->trda, _state, make_automatic);
+   ae_vector_copy(&dst->trdd, &src->trdd, _state, make_automatic);
+   ae_vector_copy(&dst->crb, &src->crb, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->dx, &src->dx, _state, make_automatic);
+   ae_vector_copy(&dst->diagaa, &src->diagaa, _state, make_automatic);
+   ae_vector_copy(&dst->cb, &src->cb, _state, make_automatic);
+   ae_vector_copy(&dst->cx, &src->cx, _state, make_automatic);
+   ae_vector_copy(&dst->cborg, &src->cborg, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcholesky, &src->tmpcholesky, _state, make_automatic);
+   ae_vector_copy(&dst->r, &src->r, _state, make_automatic);
+   ae_vector_copy(&dst->regdiag, &src->regdiag, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_vector_copy(&dst->rdtmprowmap, &src->rdtmprowmap, _state, make_automatic);
 }
 
-void _snnlssolver_clear(void *_p) {
+void snnlssolver_free(void *_p, bool make_automatic) {
    snnlssolver *p = (snnlssolver *) _p;
    ae_touch_ptr((void *)p);
-   ae_matrix_clear(&p->densea);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->nnc);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->xp);
-   ae_matrix_clear(&p->tmpca);
-   ae_matrix_clear(&p->tmplq);
-   ae_matrix_clear(&p->trda);
-   ae_vector_clear(&p->trdd);
-   ae_vector_clear(&p->crb);
-   ae_vector_clear(&p->g);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->dx);
-   ae_vector_clear(&p->diagaa);
-   ae_vector_clear(&p->cb);
-   ae_vector_clear(&p->cx);
-   ae_vector_clear(&p->cborg);
-   ae_vector_clear(&p->tmpcholesky);
-   ae_vector_clear(&p->r);
-   ae_vector_clear(&p->regdiag);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmp2);
-   ae_vector_clear(&p->rdtmprowmap);
-}
-
-void _snnlssolver_destroy(void *_p) {
-   snnlssolver *p = (snnlssolver *) _p;
-   ae_touch_ptr((void *)p);
-   ae_matrix_destroy(&p->densea);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->nnc);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->xp);
-   ae_matrix_destroy(&p->tmpca);
-   ae_matrix_destroy(&p->tmplq);
-   ae_matrix_destroy(&p->trda);
-   ae_vector_destroy(&p->trdd);
-   ae_vector_destroy(&p->crb);
-   ae_vector_destroy(&p->g);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->dx);
-   ae_vector_destroy(&p->diagaa);
-   ae_vector_destroy(&p->cb);
-   ae_vector_destroy(&p->cx);
-   ae_vector_destroy(&p->cborg);
-   ae_vector_destroy(&p->tmpcholesky);
-   ae_vector_destroy(&p->r);
-   ae_vector_destroy(&p->regdiag);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmp2);
-   ae_vector_destroy(&p->rdtmprowmap);
+   ae_matrix_free(&p->densea, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->nnc, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->xp, make_automatic);
+   ae_matrix_free(&p->tmpca, make_automatic);
+   ae_matrix_free(&p->tmplq, make_automatic);
+   ae_matrix_free(&p->trda, make_automatic);
+   ae_vector_free(&p->trdd, make_automatic);
+   ae_vector_free(&p->crb, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->dx, make_automatic);
+   ae_vector_free(&p->diagaa, make_automatic);
+   ae_vector_free(&p->cb, make_automatic);
+   ae_vector_free(&p->cx, make_automatic);
+   ae_vector_free(&p->cborg, make_automatic);
+   ae_vector_free(&p->tmpcholesky, make_automatic);
+   ae_vector_free(&p->r, make_automatic);
+   ae_vector_free(&p->regdiag, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmp2, make_automatic);
+   ae_vector_free(&p->rdtmprowmap, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -10986,7 +10787,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    sasrebuildbasis(state, _state);
 }
 
-void _sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
+void sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
    sactiveset *p = (sactiveset *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
@@ -11008,7 +10809,7 @@ void _sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->cdtmp, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->corrtmp, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->unitdiagonal, 0, DT_REAL, _state, make_automatic);
-   _snnlssolver_init(&p->solver, _state, make_automatic);
+   snnlssolver_init(&p->solver, _state, make_automatic);
    ae_vector_init(&p->scntmp, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpfeas, 0, DT_REAL, _state, make_automatic);
@@ -11031,150 +10832,105 @@ void _sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmpci, 0, DT_REAL, _state, make_automatic);
 }
 
-void _sactiveset_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void sactiveset_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sactiveset *dst = (sactiveset *) _dst;
    sactiveset *src = (sactiveset *) _src;
    dst->n = src->n;
    dst->algostate = src->algostate;
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
    dst->hasxc = src->hasxc;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->h, &src->h, _state, make_automatic);
-   ae_vector_init_copy(&dst->cstatus, &src->cstatus, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->h, &src->h, _state, make_automatic);
+   ae_vector_copy(&dst->cstatus, &src->cstatus, _state, make_automatic);
    dst->basisisready = src->basisisready;
-   ae_matrix_init_copy(&dst->sdensebatch, &src->sdensebatch, _state, make_automatic);
-   ae_matrix_init_copy(&dst->pdensebatch, &src->pdensebatch, _state, make_automatic);
-   ae_matrix_init_copy(&dst->idensebatch, &src->idensebatch, _state, make_automatic);
+   ae_matrix_copy(&dst->sdensebatch, &src->sdensebatch, _state, make_automatic);
+   ae_matrix_copy(&dst->pdensebatch, &src->pdensebatch, _state, make_automatic);
+   ae_matrix_copy(&dst->idensebatch, &src->idensebatch, _state, make_automatic);
    dst->densebatchsize = src->densebatchsize;
-   ae_vector_init_copy(&dst->sparsebatch, &src->sparsebatch, _state, make_automatic);
+   ae_vector_copy(&dst->sparsebatch, &src->sparsebatch, _state, make_automatic);
    dst->sparsebatchsize = src->sparsebatchsize;
    dst->basisage = src->basisage;
    dst->feasinitpt = src->feasinitpt;
    dst->constraintschanged = src->constraintschanged;
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_matrix_init_copy(&dst->cleic, &src->cleic, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_matrix_copy(&dst->cleic, &src->cleic, _state, make_automatic);
    dst->nec = src->nec;
    dst->nic = src->nic;
-   ae_vector_init_copy(&dst->mtnew, &src->mtnew, _state, make_automatic);
-   ae_vector_init_copy(&dst->mtx, &src->mtx, _state, make_automatic);
-   ae_vector_init_copy(&dst->mtas, &src->mtas, _state, make_automatic);
-   ae_vector_init_copy(&dst->cdtmp, &src->cdtmp, _state, make_automatic);
-   ae_vector_init_copy(&dst->corrtmp, &src->corrtmp, _state, make_automatic);
-   ae_vector_init_copy(&dst->unitdiagonal, &src->unitdiagonal, _state, make_automatic);
-   _snnlssolver_init_copy(&dst->solver, &src->solver, _state, make_automatic);
-   ae_vector_init_copy(&dst->scntmp, &src->scntmp, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpfeas, &src->tmpfeas, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpm0, &src->tmpm0, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmps, &src->rctmps, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmpg, &src->rctmpg, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmprightpart, &src->rctmprightpart, _state, make_automatic);
-   ae_matrix_init_copy(&dst->rctmpdense0, &src->rctmpdense0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->rctmpdense1, &src->rctmpdense1, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmpisequality, &src->rctmpisequality, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmpconstraintidx, &src->rctmpconstraintidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->rctmplambdas, &src->rctmplambdas, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpbasis, &src->tmpbasis, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpnormestimates, &src->tmpnormestimates, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpreciph, &src->tmpreciph, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpprodp, &src->tmpprodp, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpprods, &src->tmpprods, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcp, &src->tmpcp, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcs, &src->tmpcs, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpci, &src->tmpci, _state, make_automatic);
+   ae_vector_copy(&dst->mtnew, &src->mtnew, _state, make_automatic);
+   ae_vector_copy(&dst->mtx, &src->mtx, _state, make_automatic);
+   ae_vector_copy(&dst->mtas, &src->mtas, _state, make_automatic);
+   ae_vector_copy(&dst->cdtmp, &src->cdtmp, _state, make_automatic);
+   ae_vector_copy(&dst->corrtmp, &src->corrtmp, _state, make_automatic);
+   ae_vector_copy(&dst->unitdiagonal, &src->unitdiagonal, _state, make_automatic);
+   snnlssolver_copy(&dst->solver, &src->solver, _state, make_automatic);
+   ae_vector_copy(&dst->scntmp, &src->scntmp, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpfeas, &src->tmpfeas, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpm0, &src->tmpm0, _state, make_automatic);
+   ae_vector_copy(&dst->rctmps, &src->rctmps, _state, make_automatic);
+   ae_vector_copy(&dst->rctmpg, &src->rctmpg, _state, make_automatic);
+   ae_vector_copy(&dst->rctmprightpart, &src->rctmprightpart, _state, make_automatic);
+   ae_matrix_copy(&dst->rctmpdense0, &src->rctmpdense0, _state, make_automatic);
+   ae_matrix_copy(&dst->rctmpdense1, &src->rctmpdense1, _state, make_automatic);
+   ae_vector_copy(&dst->rctmpisequality, &src->rctmpisequality, _state, make_automatic);
+   ae_vector_copy(&dst->rctmpconstraintidx, &src->rctmpconstraintidx, _state, make_automatic);
+   ae_vector_copy(&dst->rctmplambdas, &src->rctmplambdas, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpbasis, &src->tmpbasis, _state, make_automatic);
+   ae_vector_copy(&dst->tmpnormestimates, &src->tmpnormestimates, _state, make_automatic);
+   ae_vector_copy(&dst->tmpreciph, &src->tmpreciph, _state, make_automatic);
+   ae_vector_copy(&dst->tmpprodp, &src->tmpprodp, _state, make_automatic);
+   ae_vector_copy(&dst->tmpprods, &src->tmpprods, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcp, &src->tmpcp, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcs, &src->tmpcs, _state, make_automatic);
+   ae_vector_copy(&dst->tmpci, &src->tmpci, _state, make_automatic);
 }
 
-void _sactiveset_clear(void *_p) {
+void sactiveset_free(void *_p, bool make_automatic) {
    sactiveset *p = (sactiveset *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->h);
-   ae_vector_clear(&p->cstatus);
-   ae_matrix_clear(&p->sdensebatch);
-   ae_matrix_clear(&p->pdensebatch);
-   ae_matrix_clear(&p->idensebatch);
-   ae_vector_clear(&p->sparsebatch);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_matrix_clear(&p->cleic);
-   ae_vector_clear(&p->mtnew);
-   ae_vector_clear(&p->mtx);
-   ae_vector_clear(&p->mtas);
-   ae_vector_clear(&p->cdtmp);
-   ae_vector_clear(&p->corrtmp);
-   ae_vector_clear(&p->unitdiagonal);
-   _snnlssolver_clear(&p->solver);
-   ae_vector_clear(&p->scntmp);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmpfeas);
-   ae_matrix_clear(&p->tmpm0);
-   ae_vector_clear(&p->rctmps);
-   ae_vector_clear(&p->rctmpg);
-   ae_vector_clear(&p->rctmprightpart);
-   ae_matrix_clear(&p->rctmpdense0);
-   ae_matrix_clear(&p->rctmpdense1);
-   ae_vector_clear(&p->rctmpisequality);
-   ae_vector_clear(&p->rctmpconstraintidx);
-   ae_vector_clear(&p->rctmplambdas);
-   ae_matrix_clear(&p->tmpbasis);
-   ae_vector_clear(&p->tmpnormestimates);
-   ae_vector_clear(&p->tmpreciph);
-   ae_vector_clear(&p->tmpprodp);
-   ae_vector_clear(&p->tmpprods);
-   ae_vector_clear(&p->tmpcp);
-   ae_vector_clear(&p->tmpcs);
-   ae_vector_clear(&p->tmpci);
-}
-
-void _sactiveset_destroy(void *_p) {
-   sactiveset *p = (sactiveset *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->h);
-   ae_vector_destroy(&p->cstatus);
-   ae_matrix_destroy(&p->sdensebatch);
-   ae_matrix_destroy(&p->pdensebatch);
-   ae_matrix_destroy(&p->idensebatch);
-   ae_vector_destroy(&p->sparsebatch);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_matrix_destroy(&p->cleic);
-   ae_vector_destroy(&p->mtnew);
-   ae_vector_destroy(&p->mtx);
-   ae_vector_destroy(&p->mtas);
-   ae_vector_destroy(&p->cdtmp);
-   ae_vector_destroy(&p->corrtmp);
-   ae_vector_destroy(&p->unitdiagonal);
-   _snnlssolver_destroy(&p->solver);
-   ae_vector_destroy(&p->scntmp);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmpfeas);
-   ae_matrix_destroy(&p->tmpm0);
-   ae_vector_destroy(&p->rctmps);
-   ae_vector_destroy(&p->rctmpg);
-   ae_vector_destroy(&p->rctmprightpart);
-   ae_matrix_destroy(&p->rctmpdense0);
-   ae_matrix_destroy(&p->rctmpdense1);
-   ae_vector_destroy(&p->rctmpisequality);
-   ae_vector_destroy(&p->rctmpconstraintidx);
-   ae_vector_destroy(&p->rctmplambdas);
-   ae_matrix_destroy(&p->tmpbasis);
-   ae_vector_destroy(&p->tmpnormestimates);
-   ae_vector_destroy(&p->tmpreciph);
-   ae_vector_destroy(&p->tmpprodp);
-   ae_vector_destroy(&p->tmpprods);
-   ae_vector_destroy(&p->tmpcp);
-   ae_vector_destroy(&p->tmpcs);
-   ae_vector_destroy(&p->tmpci);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->h, make_automatic);
+   ae_vector_free(&p->cstatus, make_automatic);
+   ae_matrix_free(&p->sdensebatch, make_automatic);
+   ae_matrix_free(&p->pdensebatch, make_automatic);
+   ae_matrix_free(&p->idensebatch, make_automatic);
+   ae_vector_free(&p->sparsebatch, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_matrix_free(&p->cleic, make_automatic);
+   ae_vector_free(&p->mtnew, make_automatic);
+   ae_vector_free(&p->mtx, make_automatic);
+   ae_vector_free(&p->mtas, make_automatic);
+   ae_vector_free(&p->cdtmp, make_automatic);
+   ae_vector_free(&p->corrtmp, make_automatic);
+   ae_vector_free(&p->unitdiagonal, make_automatic);
+   snnlssolver_free(&p->solver, make_automatic);
+   ae_vector_free(&p->scntmp, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmpfeas, make_automatic);
+   ae_matrix_free(&p->tmpm0, make_automatic);
+   ae_vector_free(&p->rctmps, make_automatic);
+   ae_vector_free(&p->rctmpg, make_automatic);
+   ae_vector_free(&p->rctmprightpart, make_automatic);
+   ae_matrix_free(&p->rctmpdense0, make_automatic);
+   ae_matrix_free(&p->rctmpdense1, make_automatic);
+   ae_vector_free(&p->rctmpisequality, make_automatic);
+   ae_vector_free(&p->rctmpconstraintidx, make_automatic);
+   ae_vector_free(&p->rctmplambdas, make_automatic);
+   ae_matrix_free(&p->tmpbasis, make_automatic);
+   ae_vector_free(&p->tmpnormestimates, make_automatic);
+   ae_vector_free(&p->tmpreciph, make_automatic);
+   ae_vector_free(&p->tmpprodp, make_automatic);
+   ae_vector_free(&p->tmpprods, make_automatic);
+   ae_vector_free(&p->tmpcp, make_automatic);
+   ae_vector_free(&p->tmpcs, make_automatic);
+   ae_vector_free(&p->tmpci, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -12716,12 +12472,12 @@ static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVe
    return result;
 }
 
-void _qqpsettings_init(void *_p, ae_state *_state, bool make_automatic) {
+void qqpsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qqpsettings *p = (qqpsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qqpsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qqpsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qqpsettings *dst = (qqpsettings *) _dst;
    qqpsettings *src = (qqpsettings *) _src;
    dst->epsg = src->epsg;
@@ -12736,21 +12492,16 @@ void _qqpsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->sparsesolver = src->sparsesolver;
 }
 
-void _qqpsettings_clear(void *_p) {
+void qqpsettings_free(void *_p, bool make_automatic) {
    qqpsettings *p = (qqpsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qqpsettings_destroy(void *_p) {
-   qqpsettings *p = (qqpsettings *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
+void qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qqpbuffers *p = (qqpbuffers *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsea, _state, make_automatic);
+   sparsematrix_init(&p->sparsea, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -12764,10 +12515,10 @@ void _qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->dp, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cgc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cgp, 0, DT_REAL, _state, make_automatic);
-   _sactiveset_init(&p->sas, _state, make_automatic);
+   sactiveset_init(&p->sas, _state, make_automatic);
    ae_vector_init(&p->activated, 0, DT_BOOL, _state, make_automatic);
    ae_matrix_init(&p->densez, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsecca, _state, make_automatic);
+   sparsematrix_init(&p->sparsecca, _state, make_automatic);
    ae_vector_init(&p->yidx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->regdiag, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->regx0, 0, DT_REAL, _state, make_automatic);
@@ -12777,121 +12528,87 @@ void _qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stpbuf, 0, DT_REAL, _state, make_automatic);
-   _sparsebuffers_init(&p->sbuf, _state, make_automatic);
+   sparsebuffers_init(&p->sbuf, _state, make_automatic);
 }
 
-void _qqpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qqpbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qqpbuffers *dst = (qqpbuffers *) _dst;
    qqpbuffers *src = (qqpbuffers *) _src;
    dst->n = src->n;
    dst->akind = src->akind;
-   ae_matrix_init_copy(&dst->densea, &src->densea, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
+   ae_matrix_copy(&dst->densea, &src->densea, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
    dst->sparseupper = src->sparseupper;
    dst->absamax = src->absamax;
    dst->absasum = src->absasum;
    dst->absasum2 = src->absasum2;
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->xs, &src->xs, _state, make_automatic);
-   ae_vector_init_copy(&dst->xf, &src->xf, _state, make_automatic);
-   ae_vector_init_copy(&dst->gc, &src->gc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xp, &src->xp, _state, make_automatic);
-   ae_vector_init_copy(&dst->dc, &src->dc, _state, make_automatic);
-   ae_vector_init_copy(&dst->dp, &src->dp, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgc, &src->cgc, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgp, &src->cgp, _state, make_automatic);
-   _sactiveset_init_copy(&dst->sas, &src->sas, _state, make_automatic);
-   ae_vector_init_copy(&dst->activated, &src->activated, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
+   ae_vector_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
+   ae_vector_copy(&dst->xs, &src->xs, _state, make_automatic);
+   ae_vector_copy(&dst->xf, &src->xf, _state, make_automatic);
+   ae_vector_copy(&dst->gc, &src->gc, _state, make_automatic);
+   ae_vector_copy(&dst->xp, &src->xp, _state, make_automatic);
+   ae_vector_copy(&dst->dc, &src->dc, _state, make_automatic);
+   ae_vector_copy(&dst->dp, &src->dp, _state, make_automatic);
+   ae_vector_copy(&dst->cgc, &src->cgc, _state, make_automatic);
+   ae_vector_copy(&dst->cgp, &src->cgp, _state, make_automatic);
+   sactiveset_copy(&dst->sas, &src->sas, _state, make_automatic);
+   ae_vector_copy(&dst->activated, &src->activated, _state, make_automatic);
    dst->nfree = src->nfree;
    dst->cnmodelage = src->cnmodelage;
-   ae_matrix_init_copy(&dst->densez, &src->densez, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsecca, &src->sparsecca, _state, make_automatic);
-   ae_vector_init_copy(&dst->yidx, &src->yidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->regdiag, &src->regdiag, _state, make_automatic);
-   ae_vector_init_copy(&dst->regx0, &src->regx0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcn, &src->tmpcn, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcni, &src->tmpcni, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpcnb, &src->tmpcnb, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->stpbuf, &src->stpbuf, _state, make_automatic);
-   _sparsebuffers_init_copy(&dst->sbuf, &src->sbuf, _state, make_automatic);
+   ae_matrix_copy(&dst->densez, &src->densez, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsecca, &src->sparsecca, _state, make_automatic);
+   ae_vector_copy(&dst->yidx, &src->yidx, _state, make_automatic);
+   ae_vector_copy(&dst->regdiag, &src->regdiag, _state, make_automatic);
+   ae_vector_copy(&dst->regx0, &src->regx0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcn, &src->tmpcn, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcni, &src->tmpcni, _state, make_automatic);
+   ae_vector_copy(&dst->tmpcnb, &src->tmpcnb, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->stpbuf, &src->stpbuf, _state, make_automatic);
+   sparsebuffers_copy(&dst->sbuf, &src->sbuf, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repncholesky = src->repncholesky;
    dst->repncupdates = src->repncupdates;
 }
 
-void _qqpbuffers_clear(void *_p) {
+void qqpbuffers_free(void *_p, bool make_automatic) {
    qqpbuffers *p = (qqpbuffers *) _p;
    ae_touch_ptr((void *)p);
-   ae_matrix_clear(&p->densea);
-   _sparsematrix_clear(&p->sparsea);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->havebndl);
-   ae_vector_clear(&p->havebndu);
-   ae_vector_clear(&p->xs);
-   ae_vector_clear(&p->xf);
-   ae_vector_clear(&p->gc);
-   ae_vector_clear(&p->xp);
-   ae_vector_clear(&p->dc);
-   ae_vector_clear(&p->dp);
-   ae_vector_clear(&p->cgc);
-   ae_vector_clear(&p->cgp);
-   _sactiveset_clear(&p->sas);
-   ae_vector_clear(&p->activated);
-   ae_matrix_clear(&p->densez);
-   _sparsematrix_clear(&p->sparsecca);
-   ae_vector_clear(&p->yidx);
-   ae_vector_clear(&p->regdiag);
-   ae_vector_clear(&p->regx0);
-   ae_vector_clear(&p->tmpcn);
-   ae_vector_clear(&p->tmpcni);
-   ae_vector_clear(&p->tmpcnb);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->stpbuf);
-   _sparsebuffers_clear(&p->sbuf);
-}
-
-void _qqpbuffers_destroy(void *_p) {
-   qqpbuffers *p = (qqpbuffers *) _p;
-   ae_touch_ptr((void *)p);
-   ae_matrix_destroy(&p->densea);
-   _sparsematrix_destroy(&p->sparsea);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->havebndl);
-   ae_vector_destroy(&p->havebndu);
-   ae_vector_destroy(&p->xs);
-   ae_vector_destroy(&p->xf);
-   ae_vector_destroy(&p->gc);
-   ae_vector_destroy(&p->xp);
-   ae_vector_destroy(&p->dc);
-   ae_vector_destroy(&p->dp);
-   ae_vector_destroy(&p->cgc);
-   ae_vector_destroy(&p->cgp);
-   _sactiveset_destroy(&p->sas);
-   ae_vector_destroy(&p->activated);
-   ae_matrix_destroy(&p->densez);
-   _sparsematrix_destroy(&p->sparsecca);
-   ae_vector_destroy(&p->yidx);
-   ae_vector_destroy(&p->regdiag);
-   ae_vector_destroy(&p->regx0);
-   ae_vector_destroy(&p->tmpcn);
-   ae_vector_destroy(&p->tmpcni);
-   ae_vector_destroy(&p->tmpcnb);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->stpbuf);
-   _sparsebuffers_destroy(&p->sbuf);
+   ae_matrix_free(&p->densea, make_automatic);
+   sparsematrix_free(&p->sparsea, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->havebndl, make_automatic);
+   ae_vector_free(&p->havebndu, make_automatic);
+   ae_vector_free(&p->xs, make_automatic);
+   ae_vector_free(&p->xf, make_automatic);
+   ae_vector_free(&p->gc, make_automatic);
+   ae_vector_free(&p->xp, make_automatic);
+   ae_vector_free(&p->dc, make_automatic);
+   ae_vector_free(&p->dp, make_automatic);
+   ae_vector_free(&p->cgc, make_automatic);
+   ae_vector_free(&p->cgp, make_automatic);
+   sactiveset_free(&p->sas, make_automatic);
+   ae_vector_free(&p->activated, make_automatic);
+   ae_matrix_free(&p->densez, make_automatic);
+   sparsematrix_free(&p->sparsecca, make_automatic);
+   ae_vector_free(&p->yidx, make_automatic);
+   ae_vector_free(&p->regdiag, make_automatic);
+   ae_vector_free(&p->regx0, make_automatic);
+   ae_vector_free(&p->tmpcn, make_automatic);
+   ae_vector_free(&p->tmpcni, make_automatic);
+   ae_vector_free(&p->tmpcnb, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->stpbuf, make_automatic);
+   sparsebuffers_free(&p->sbuf, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -14020,12 +13737,12 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
    }
 }
 
-void _qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic) {
+void qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qpdenseaulsettings *p = (qpdenseaulsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpdenseaulsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qpdenseaulsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpdenseaulsettings *dst = (qpdenseaulsettings *) _dst;
    qpdenseaulsettings *src = (qpdenseaulsettings *) _src;
    dst->epsx = src->epsx;
@@ -14033,17 +13750,12 @@ void _qpdenseaulsettings_init_copy(void *_dst, void *_src, ae_state *_state, boo
    dst->rho = src->rho;
 }
 
-void _qpdenseaulsettings_clear(void *_p) {
+void qpdenseaulsettings_free(void *_p, bool make_automatic) {
    qpdenseaulsettings *p = (qpdenseaulsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpdenseaulsettings_destroy(void *_p) {
-   qpdenseaulsettings *p = (qpdenseaulsettings *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
+void qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpdenseaulbuffers *p = (qpdenseaulbuffers *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->nulc, 0, DT_REAL, _state, make_automatic);
@@ -14064,8 +13776,8 @@ void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->exbndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->exscale, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->exxorigin, 0, DT_REAL, _state, make_automatic);
-   _qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
-   _qqpbuffers_init(&p->qqpbuf, _state, make_automatic);
+   qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
+   qqpbuffers_init(&p->qqpbuf, _state, make_automatic);
    ae_vector_init(&p->nulcest, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpg, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
@@ -14073,8 +13785,8 @@ void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->modelg, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->deltax, 0, DT_REAL, _state, make_automatic);
-   _convexquadraticmodel_init(&p->dummycqm, _state, make_automatic);
-   _sparsematrix_init(&p->dummysparse, _state, make_automatic);
+   convexquadraticmodel_init(&p->dummycqm, _state, make_automatic);
+   sparsematrix_init(&p->dummysparse, _state, make_automatic);
    ae_matrix_init(&p->qrkkt, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->qrrightpart, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->qrtau, 0, DT_REAL, _state, make_automatic);
@@ -14084,45 +13796,45 @@ void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->nicnact, 0, DT_INT, _state, make_automatic);
 }
 
-void _qpdenseaulbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qpdenseaulbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpdenseaulbuffers *dst = (qpdenseaulbuffers *) _dst;
    qpdenseaulbuffers *src = (qpdenseaulbuffers *) _src;
-   ae_vector_init_copy(&dst->nulc, &src->nulc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->sclsfta, &src->sclsfta, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsftb, &src->sclsftb, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsfthasbndl, &src->sclsfthasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsfthasbndu, &src->sclsfthasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsftbndl, &src->sclsftbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsftbndu, &src->sclsftbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclsftxc, &src->sclsftxc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->sclsftcleic, &src->sclsftcleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->cidx, &src->cidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->cscales, &src->cscales, _state, make_automatic);
-   ae_matrix_init_copy(&dst->exa, &src->exa, _state, make_automatic);
-   ae_vector_init_copy(&dst->exb, &src->exb, _state, make_automatic);
-   ae_vector_init_copy(&dst->exxc, &src->exxc, _state, make_automatic);
-   ae_vector_init_copy(&dst->exbndl, &src->exbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->exbndu, &src->exbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->exscale, &src->exscale, _state, make_automatic);
-   ae_vector_init_copy(&dst->exxorigin, &src->exxorigin, _state, make_automatic);
-   _qqpsettings_init_copy(&dst->qqpsettingsuser, &src->qqpsettingsuser, _state, make_automatic);
-   _qqpbuffers_init_copy(&dst->qqpbuf, &src->qqpbuf, _state, make_automatic);
-   ae_vector_init_copy(&dst->nulcest, &src->nulcest, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->modelg, &src->modelg, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->deltax, &src->deltax, _state, make_automatic);
-   _convexquadraticmodel_init_copy(&dst->dummycqm, &src->dummycqm, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->dummysparse, &src->dummysparse, _state, make_automatic);
-   ae_matrix_init_copy(&dst->qrkkt, &src->qrkkt, _state, make_automatic);
-   ae_vector_init_copy(&dst->qrrightpart, &src->qrrightpart, _state, make_automatic);
-   ae_vector_init_copy(&dst->qrtau, &src->qrtau, _state, make_automatic);
-   ae_vector_init_copy(&dst->qrsv0, &src->qrsv0, _state, make_automatic);
-   ae_vector_init_copy(&dst->qrsvx1, &src->qrsvx1, _state, make_automatic);
-   ae_vector_init_copy(&dst->nicerr, &src->nicerr, _state, make_automatic);
-   ae_vector_init_copy(&dst->nicnact, &src->nicnact, _state, make_automatic);
+   ae_vector_copy(&dst->nulc, &src->nulc, _state, make_automatic);
+   ae_matrix_copy(&dst->sclsfta, &src->sclsfta, _state, make_automatic);
+   ae_vector_copy(&dst->sclsftb, &src->sclsftb, _state, make_automatic);
+   ae_vector_copy(&dst->sclsfthasbndl, &src->sclsfthasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->sclsfthasbndu, &src->sclsfthasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->sclsftbndl, &src->sclsftbndl, _state, make_automatic);
+   ae_vector_copy(&dst->sclsftbndu, &src->sclsftbndu, _state, make_automatic);
+   ae_vector_copy(&dst->sclsftxc, &src->sclsftxc, _state, make_automatic);
+   ae_matrix_copy(&dst->sclsftcleic, &src->sclsftcleic, _state, make_automatic);
+   ae_vector_copy(&dst->cidx, &src->cidx, _state, make_automatic);
+   ae_vector_copy(&dst->cscales, &src->cscales, _state, make_automatic);
+   ae_matrix_copy(&dst->exa, &src->exa, _state, make_automatic);
+   ae_vector_copy(&dst->exb, &src->exb, _state, make_automatic);
+   ae_vector_copy(&dst->exxc, &src->exxc, _state, make_automatic);
+   ae_vector_copy(&dst->exbndl, &src->exbndl, _state, make_automatic);
+   ae_vector_copy(&dst->exbndu, &src->exbndu, _state, make_automatic);
+   ae_vector_copy(&dst->exscale, &src->exscale, _state, make_automatic);
+   ae_vector_copy(&dst->exxorigin, &src->exxorigin, _state, make_automatic);
+   qqpsettings_copy(&dst->qqpsettingsuser, &src->qqpsettingsuser, _state, make_automatic);
+   qqpbuffers_copy(&dst->qqpbuf, &src->qqpbuf, _state, make_automatic);
+   ae_vector_copy(&dst->nulcest, &src->nulcest, _state, make_automatic);
+   ae_vector_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_matrix_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_vector_copy(&dst->modelg, &src->modelg, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->deltax, &src->deltax, _state, make_automatic);
+   convexquadraticmodel_copy(&dst->dummycqm, &src->dummycqm, _state, make_automatic);
+   sparsematrix_copy(&dst->dummysparse, &src->dummysparse, _state, make_automatic);
+   ae_matrix_copy(&dst->qrkkt, &src->qrkkt, _state, make_automatic);
+   ae_vector_copy(&dst->qrrightpart, &src->qrrightpart, _state, make_automatic);
+   ae_vector_copy(&dst->qrtau, &src->qrtau, _state, make_automatic);
+   ae_vector_copy(&dst->qrsv0, &src->qrsv0, _state, make_automatic);
+   ae_vector_copy(&dst->qrsvx1, &src->qrsvx1, _state, make_automatic);
+   ae_vector_copy(&dst->nicerr, &src->nicerr, _state, make_automatic);
+   ae_vector_copy(&dst->nicnact, &src->nicnact, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repncholesky = src->repncholesky;
@@ -14133,86 +13845,45 @@ void _qpdenseaulbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool
    dst->repnmv = src->repnmv;
 }
 
-void _qpdenseaulbuffers_clear(void *_p) {
+void qpdenseaulbuffers_free(void *_p, bool make_automatic) {
    qpdenseaulbuffers *p = (qpdenseaulbuffers *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->nulc);
-   ae_matrix_clear(&p->sclsfta);
-   ae_vector_clear(&p->sclsftb);
-   ae_vector_clear(&p->sclsfthasbndl);
-   ae_vector_clear(&p->sclsfthasbndu);
-   ae_vector_clear(&p->sclsftbndl);
-   ae_vector_clear(&p->sclsftbndu);
-   ae_vector_clear(&p->sclsftxc);
-   ae_matrix_clear(&p->sclsftcleic);
-   ae_vector_clear(&p->cidx);
-   ae_vector_clear(&p->cscales);
-   ae_matrix_clear(&p->exa);
-   ae_vector_clear(&p->exb);
-   ae_vector_clear(&p->exxc);
-   ae_vector_clear(&p->exbndl);
-   ae_vector_clear(&p->exbndu);
-   ae_vector_clear(&p->exscale);
-   ae_vector_clear(&p->exxorigin);
-   _qqpsettings_clear(&p->qqpsettingsuser);
-   _qqpbuffers_clear(&p->qqpbuf);
-   ae_vector_clear(&p->nulcest);
-   ae_vector_clear(&p->tmpg);
-   ae_vector_clear(&p->tmp0);
-   ae_matrix_clear(&p->tmp2);
-   ae_vector_clear(&p->modelg);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->deltax);
-   _convexquadraticmodel_clear(&p->dummycqm);
-   _sparsematrix_clear(&p->dummysparse);
-   ae_matrix_clear(&p->qrkkt);
-   ae_vector_clear(&p->qrrightpart);
-   ae_vector_clear(&p->qrtau);
-   ae_vector_clear(&p->qrsv0);
-   ae_vector_clear(&p->qrsvx1);
-   ae_vector_clear(&p->nicerr);
-   ae_vector_clear(&p->nicnact);
-}
-
-void _qpdenseaulbuffers_destroy(void *_p) {
-   qpdenseaulbuffers *p = (qpdenseaulbuffers *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->nulc);
-   ae_matrix_destroy(&p->sclsfta);
-   ae_vector_destroy(&p->sclsftb);
-   ae_vector_destroy(&p->sclsfthasbndl);
-   ae_vector_destroy(&p->sclsfthasbndu);
-   ae_vector_destroy(&p->sclsftbndl);
-   ae_vector_destroy(&p->sclsftbndu);
-   ae_vector_destroy(&p->sclsftxc);
-   ae_matrix_destroy(&p->sclsftcleic);
-   ae_vector_destroy(&p->cidx);
-   ae_vector_destroy(&p->cscales);
-   ae_matrix_destroy(&p->exa);
-   ae_vector_destroy(&p->exb);
-   ae_vector_destroy(&p->exxc);
-   ae_vector_destroy(&p->exbndl);
-   ae_vector_destroy(&p->exbndu);
-   ae_vector_destroy(&p->exscale);
-   ae_vector_destroy(&p->exxorigin);
-   _qqpsettings_destroy(&p->qqpsettingsuser);
-   _qqpbuffers_destroy(&p->qqpbuf);
-   ae_vector_destroy(&p->nulcest);
-   ae_vector_destroy(&p->tmpg);
-   ae_vector_destroy(&p->tmp0);
-   ae_matrix_destroy(&p->tmp2);
-   ae_vector_destroy(&p->modelg);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->deltax);
-   _convexquadraticmodel_destroy(&p->dummycqm);
-   _sparsematrix_destroy(&p->dummysparse);
-   ae_matrix_destroy(&p->qrkkt);
-   ae_vector_destroy(&p->qrrightpart);
-   ae_vector_destroy(&p->qrtau);
-   ae_vector_destroy(&p->qrsv0);
-   ae_vector_destroy(&p->qrsvx1);
-   ae_vector_destroy(&p->nicerr);
-   ae_vector_destroy(&p->nicnact);
+   ae_vector_free(&p->nulc, make_automatic);
+   ae_matrix_free(&p->sclsfta, make_automatic);
+   ae_vector_free(&p->sclsftb, make_automatic);
+   ae_vector_free(&p->sclsfthasbndl, make_automatic);
+   ae_vector_free(&p->sclsfthasbndu, make_automatic);
+   ae_vector_free(&p->sclsftbndl, make_automatic);
+   ae_vector_free(&p->sclsftbndu, make_automatic);
+   ae_vector_free(&p->sclsftxc, make_automatic);
+   ae_matrix_free(&p->sclsftcleic, make_automatic);
+   ae_vector_free(&p->cidx, make_automatic);
+   ae_vector_free(&p->cscales, make_automatic);
+   ae_matrix_free(&p->exa, make_automatic);
+   ae_vector_free(&p->exb, make_automatic);
+   ae_vector_free(&p->exxc, make_automatic);
+   ae_vector_free(&p->exbndl, make_automatic);
+   ae_vector_free(&p->exbndu, make_automatic);
+   ae_vector_free(&p->exscale, make_automatic);
+   ae_vector_free(&p->exxorigin, make_automatic);
+   qqpsettings_free(&p->qqpsettingsuser, make_automatic);
+   qqpbuffers_free(&p->qqpbuf, make_automatic);
+   ae_vector_free(&p->nulcest, make_automatic);
+   ae_vector_free(&p->tmpg, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_matrix_free(&p->tmp2, make_automatic);
+   ae_vector_free(&p->modelg, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->deltax, make_automatic);
+   convexquadraticmodel_free(&p->dummycqm, make_automatic);
+   sparsematrix_free(&p->dummysparse, make_automatic);
+   ae_matrix_free(&p->qrkkt, make_automatic);
+   ae_vector_free(&p->qrrightpart, make_automatic);
+   ae_vector_free(&p->qrtau, make_automatic);
+   ae_vector_free(&p->qrsv0, make_automatic);
+   ae_vector_free(&p->qrsvx1, make_automatic);
+   ae_vector_free(&p->nicerr, make_automatic);
+   ae_vector_free(&p->nicnact, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -14303,7 +13974,7 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_sta
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   _minbleicstate_clear(state);
+   minbleicstate_free(state, true);
    ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
    ae_vector_init(&ct, 0, DT_INT, _state, true);
 
@@ -14362,7 +14033,7 @@ void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *sta
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   _minbleicstate_clear(state);
+   minbleicstate_free(state, true);
    ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
    ae_vector_init(&ct, 0, DT_INT, _state, true);
 
@@ -15841,7 +15512,7 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 // API: void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams);
 void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -15888,8 +15559,8 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state
 // API: void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test0report_clear(strrep);
-   _optguardnonc1test0report_clear(lngrep);
+   optguardnonc1test0report_free(strrep, true);
+   optguardnonc1test0report_free(lngrep, true);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -15944,8 +15615,8 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 // API: void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test1report_clear(strrep);
-   _optguardnonc1test1report_clear(lngrep);
+   optguardnonc1test1report_free(strrep, true);
+   optguardnonc1test1report_free(lngrep, true);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -15980,8 +15651,8 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 // API: void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams);
 void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minbleicreport_clear(rep);
+   ae_vector_free(x, true);
+   minbleicreport_free(rep, true);
 
    minbleicresultsbuf(state, x, rep, _state);
 }
@@ -16183,15 +15854,15 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, 
    *estimate = newstep;
 }
 
-void _minbleicstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minbleicstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbleicstate *p = (minbleicstate *) _p;
    ae_touch_ptr((void *)p);
-   _sactiveset_init(&p->sas, _state, make_automatic);
+   sactiveset_init(&p->sas, _state, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
    ae_vector_init(&p->ugc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cgc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xn, 0, DT_REAL, _state, make_automatic);
@@ -16205,21 +15876,21 @@ void _minbleicstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xstart, 0, DT_REAL, _state, make_automatic);
-   _snnlssolver_init(&p->solver, _state, make_automatic);
+   snnlssolver_init(&p->solver, _state, make_automatic);
    ae_vector_init(&p->tmpprec, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->work, 0, DT_REAL, _state, make_automatic);
-   _linminstate_init(&p->lstate, _state, make_automatic);
+   linminstate_init(&p->lstate, _state, make_automatic);
    ae_matrix_init(&p->bufyk, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->bufsk, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bufrho, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->buftheta, 0, DT_REAL, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minbleicstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbleicstate *dst = (minbleicstate *) _dst;
    minbleicstate *src = (minbleicstate *) _src;
    dst->nmain = src->nmain;
@@ -16232,13 +15903,13 @@ void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->drep = src->drep;
    dst->stpmax = src->stpmax;
    dst->diffstep = src->diffstep;
-   _sactiveset_init_copy(&dst->sas, &src->sas, _state, make_automatic);
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
+   sactiveset_copy(&dst->sas, &src->sas, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
    dst->prectype = src->prectype;
-   ae_vector_init_copy(&dst->diagh, &src->diagh, _state, make_automatic);
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->diagh, &src->diagh, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfg = src->needfg;
    dst->xupdated = src->xupdated;
@@ -16246,27 +15917,27 @@ void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->steepestdescentstep = src->steepestdescentstep;
    dst->boundedstep = src->boundedstep;
    dst->userterminationneeded = src->userterminationneeded;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   ae_vector_init_copy(&dst->ugc, &src->ugc, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgc, &src->cgc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->ugn, &src->ugn, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgn, &src->cgn, _state, make_automatic);
-   ae_vector_init_copy(&dst->xp, &src->xp, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->ugc, &src->ugc, _state, make_automatic);
+   ae_vector_copy(&dst->cgc, &src->cgc, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->ugn, &src->ugn, _state, make_automatic);
+   ae_vector_copy(&dst->cgn, &src->cgn, _state, make_automatic);
+   ae_vector_copy(&dst->xp, &src->xp, _state, make_automatic);
    dst->fc = src->fc;
    dst->fn = src->fn;
    dst->fp = src->fp;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_matrix_init_copy(&dst->cleic, &src->cleic, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_matrix_copy(&dst->cleic, &src->cleic, _state, make_automatic);
    dst->nec = src->nec;
    dst->nic = src->nic;
    dst->lastgoodstep = src->lastgoodstep;
    dst->lastscaledgoodstep = src->lastscaledgoodstep;
    dst->maxscaledgrad = src->maxscaledgrad;
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repnfev = src->repnfev;
@@ -16278,8 +15949,8 @@ void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->repdebugdx = src->repdebugdx;
    dst->repdebugfeasqpits = src->repdebugfeasqpits;
    dst->repdebugfeasgpaits = src->repdebugfeasgpaits;
-   ae_vector_init_copy(&dst->xstart, &src->xstart, _state, make_automatic);
-   _snnlssolver_init_copy(&dst->solver, &src->solver, _state, make_automatic);
+   ae_vector_copy(&dst->xstart, &src->xstart, _state, make_automatic);
+   snnlssolver_copy(&dst->solver, &src->solver, _state, make_automatic);
    dst->fbase = src->fbase;
    dst->fm2 = src->fm2;
    dst->fm1 = src->fm1;
@@ -16291,107 +15962,71 @@ void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->gp1 = src->gp1;
    dst->cidx = src->cidx;
    dst->cval = src->cval;
-   ae_vector_init_copy(&dst->tmpprec, &src->tmpprec, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpprec, &src->tmpprec, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
    dst->nfev = src->nfev;
    dst->mcstage = src->mcstage;
    dst->stp = src->stp;
    dst->curstpmax = src->curstpmax;
    dst->activationstep = src->activationstep;
-   ae_vector_init_copy(&dst->work, &src->work, _state, make_automatic);
-   _linminstate_init_copy(&dst->lstate, &src->lstate, _state, make_automatic);
+   ae_vector_copy(&dst->work, &src->work, _state, make_automatic);
+   linminstate_copy(&dst->lstate, &src->lstate, _state, make_automatic);
    dst->trimthreshold = src->trimthreshold;
    dst->nonmonotoniccnt = src->nonmonotoniccnt;
-   ae_matrix_init_copy(&dst->bufyk, &src->bufyk, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufsk, &src->bufsk, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufrho, &src->bufrho, _state, make_automatic);
-   ae_vector_init_copy(&dst->buftheta, &src->buftheta, _state, make_automatic);
+   ae_matrix_copy(&dst->bufyk, &src->bufyk, _state, make_automatic);
+   ae_matrix_copy(&dst->bufsk, &src->bufsk, _state, make_automatic);
+   ae_vector_copy(&dst->bufrho, &src->bufrho, _state, make_automatic);
+   ae_vector_copy(&dst->buftheta, &src->buftheta, _state, make_automatic);
    dst->bufsize = src->bufsize;
    dst->teststep = src->teststep;
    dst->smoothnessguardlevel = src->smoothnessguardlevel;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
-   ae_vector_init_copy(&dst->invs, &src->invs, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   ae_vector_copy(&dst->invs, &src->invs, _state, make_automatic);
 }
 
-void _minbleicstate_clear(void *_p) {
+void minbleicstate_free(void *_p, bool make_automatic) {
    minbleicstate *p = (minbleicstate *) _p;
    ae_touch_ptr((void *)p);
-   _sactiveset_clear(&p->sas);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->diagh);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   _rcommstate_clear(&p->rstate);
-   ae_vector_clear(&p->ugc);
-   ae_vector_clear(&p->cgc);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->ugn);
-   ae_vector_clear(&p->cgn);
-   ae_vector_clear(&p->xp);
-   ae_vector_clear(&p->d);
-   ae_matrix_clear(&p->cleic);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->xstart);
-   _snnlssolver_clear(&p->solver);
-   ae_vector_clear(&p->tmpprec);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->work);
-   _linminstate_clear(&p->lstate);
-   ae_matrix_clear(&p->bufyk);
-   ae_matrix_clear(&p->bufsk);
-   ae_vector_clear(&p->bufrho);
-   ae_vector_clear(&p->buftheta);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
-   ae_vector_clear(&p->invs);
+   sactiveset_free(&p->sas, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->diagh, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   ae_vector_free(&p->ugc, make_automatic);
+   ae_vector_free(&p->cgc, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->ugn, make_automatic);
+   ae_vector_free(&p->cgn, make_automatic);
+   ae_vector_free(&p->xp, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_matrix_free(&p->cleic, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->xstart, make_automatic);
+   snnlssolver_free(&p->solver, make_automatic);
+   ae_vector_free(&p->tmpprec, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->work, make_automatic);
+   linminstate_free(&p->lstate, make_automatic);
+   ae_matrix_free(&p->bufyk, make_automatic);
+   ae_matrix_free(&p->bufsk, make_automatic);
+   ae_vector_free(&p->bufrho, make_automatic);
+   ae_vector_free(&p->buftheta, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
+   ae_vector_free(&p->invs, make_automatic);
 }
 
-void _minbleicstate_destroy(void *_p) {
-   minbleicstate *p = (minbleicstate *) _p;
-   ae_touch_ptr((void *)p);
-   _sactiveset_destroy(&p->sas);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->diagh);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   _rcommstate_destroy(&p->rstate);
-   ae_vector_destroy(&p->ugc);
-   ae_vector_destroy(&p->cgc);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->ugn);
-   ae_vector_destroy(&p->cgn);
-   ae_vector_destroy(&p->xp);
-   ae_vector_destroy(&p->d);
-   ae_matrix_destroy(&p->cleic);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->xstart);
-   _snnlssolver_destroy(&p->solver);
-   ae_vector_destroy(&p->tmpprec);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->work);
-   _linminstate_destroy(&p->lstate);
-   ae_matrix_destroy(&p->bufyk);
-   ae_matrix_destroy(&p->bufsk);
-   ae_vector_destroy(&p->bufrho);
-   ae_vector_destroy(&p->buftheta);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-   ae_vector_destroy(&p->invs);
-}
-
-void _minbleicreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minbleicreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minbleicreport *p = (minbleicreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minbleicreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minbleicreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbleicreport *dst = (minbleicreport *) _dst;
    minbleicreport *src = (minbleicreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -16408,12 +16043,7 @@ void _minbleicreport_init_copy(void *_dst, void *_src, ae_state *_state, bool ma
    dst->outeriterationscount = src->outeriterationscount;
 }
 
-void _minbleicreport_clear(void *_p) {
-   minbleicreport *p = (minbleicreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minbleicreport_destroy(void *_p) {
+void minbleicreport_free(void *_p, bool make_automatic) {
    minbleicreport *p = (minbleicreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -17392,12 +17022,12 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
    }
 }
 
-void _qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic) {
+void qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qpbleicsettings *p = (qpbleicsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpbleicsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qpbleicsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpbleicsettings *dst = (qpbleicsettings *) _dst;
    qpbleicsettings *src = (qpbleicsettings *) _src;
    dst->epsg = src->epsg;
@@ -17406,56 +17036,41 @@ void _qpbleicsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool m
    dst->maxits = src->maxits;
 }
 
-void _qpbleicsettings_clear(void *_p) {
+void qpbleicsettings_free(void *_p, bool make_automatic) {
    qpbleicsettings *p = (qpbleicsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpbleicsettings_destroy(void *_p) {
-   qpbleicsettings *p = (qpbleicsettings *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
+void qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpbleicbuffers *p = (qpbleicbuffers *) _p;
    ae_touch_ptr((void *)p);
-   _minbleicstate_init(&p->solver, _state, make_automatic);
-   _minbleicreport_init(&p->solverrep, _state, make_automatic);
+   minbleicstate_init(&p->solver, _state, make_automatic);
+   minbleicreport_init(&p->solverrep, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpi, 0, DT_INT, _state, make_automatic);
 }
 
-void _qpbleicbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void qpbleicbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpbleicbuffers *dst = (qpbleicbuffers *) _dst;
    qpbleicbuffers *src = (qpbleicbuffers *) _src;
-   _minbleicstate_init_copy(&dst->solver, &src->solver, _state, make_automatic);
-   _minbleicreport_init_copy(&dst->solverrep, &src->solverrep, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
+   minbleicstate_copy(&dst->solver, &src->solver, _state, make_automatic);
+   minbleicreport_copy(&dst->solverrep, &src->solverrep, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
 }
 
-void _qpbleicbuffers_clear(void *_p) {
+void qpbleicbuffers_free(void *_p, bool make_automatic) {
    qpbleicbuffers *p = (qpbleicbuffers *) _p;
    ae_touch_ptr((void *)p);
-   _minbleicstate_clear(&p->solver);
-   _minbleicreport_clear(&p->solverrep);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmpi);
-}
-
-void _qpbleicbuffers_destroy(void *_p) {
-   qpbleicbuffers *p = (qpbleicbuffers *) _p;
-   ae_touch_ptr((void *)p);
-   _minbleicstate_destroy(&p->solver);
-   _minbleicreport_destroy(&p->solverrep);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmpi);
+   minbleicstate_free(&p->solver, make_automatic);
+   minbleicreport_free(&p->solverrep, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmpi, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -20844,7 +20459,7 @@ static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
    return result;
 }
 
-void _vipmvars_init(void *_p, ae_state *_state, bool make_automatic) {
+void vipmvars_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmvars *p = (vipmvars *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -20859,54 +20474,39 @@ void _vipmvars_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->q, 0, DT_REAL, _state, make_automatic);
 }
 
-void _vipmvars_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void vipmvars_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmvars *dst = (vipmvars *) _dst;
    vipmvars *src = (vipmvars *) _src;
    dst->n = src->n;
    dst->m = src->m;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
-   ae_vector_init_copy(&dst->w, &src->w, _state, make_automatic);
-   ae_vector_init_copy(&dst->t, &src->t, _state, make_automatic);
-   ae_vector_init_copy(&dst->p, &src->p, _state, make_automatic);
-   ae_vector_init_copy(&dst->y, &src->y, _state, make_automatic);
-   ae_vector_init_copy(&dst->z, &src->z, _state, make_automatic);
-   ae_vector_init_copy(&dst->v, &src->v, _state, make_automatic);
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->q, &src->q, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->w, &src->w, _state, make_automatic);
+   ae_vector_copy(&dst->t, &src->t, _state, make_automatic);
+   ae_vector_copy(&dst->p, &src->p, _state, make_automatic);
+   ae_vector_copy(&dst->y, &src->y, _state, make_automatic);
+   ae_vector_copy(&dst->z, &src->z, _state, make_automatic);
+   ae_vector_copy(&dst->v, &src->v, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->q, &src->q, _state, make_automatic);
 }
 
-void _vipmvars_clear(void *_p) {
+void vipmvars_free(void *_p, bool make_automatic) {
    vipmvars *p = (vipmvars *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   ae_vector_clear(&p->w);
-   ae_vector_clear(&p->t);
-   ae_vector_clear(&p->p);
-   ae_vector_clear(&p->y);
-   ae_vector_clear(&p->z);
-   ae_vector_clear(&p->v);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->q);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   ae_vector_free(&p->w, make_automatic);
+   ae_vector_free(&p->t, make_automatic);
+   ae_vector_free(&p->p, make_automatic);
+   ae_vector_free(&p->y, make_automatic);
+   ae_vector_free(&p->z, make_automatic);
+   ae_vector_free(&p->v, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->q, make_automatic);
 }
 
-void _vipmvars_destroy(void *_p) {
-   vipmvars *p = (vipmvars *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   ae_vector_destroy(&p->w);
-   ae_vector_destroy(&p->t);
-   ae_vector_destroy(&p->p);
-   ae_vector_destroy(&p->y);
-   ae_vector_destroy(&p->z);
-   ae_vector_destroy(&p->v);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->q);
-}
-
-void _vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic) {
+void vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sigma, 0, DT_REAL, _state, make_automatic);
@@ -20921,52 +20521,37 @@ void _vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->gammaq, 0, DT_REAL, _state, make_automatic);
 }
 
-void _vipmrighthandside_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void vipmrighthandside_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmrighthandside *dst = (vipmrighthandside *) _dst;
    vipmrighthandside *src = (vipmrighthandside *) _src;
-   ae_vector_init_copy(&dst->sigma, &src->sigma, _state, make_automatic);
-   ae_vector_init_copy(&dst->beta, &src->beta, _state, make_automatic);
-   ae_vector_init_copy(&dst->rho, &src->rho, _state, make_automatic);
-   ae_vector_init_copy(&dst->nu, &src->nu, _state, make_automatic);
-   ae_vector_init_copy(&dst->tau, &src->tau, _state, make_automatic);
-   ae_vector_init_copy(&dst->alpha, &src->alpha, _state, make_automatic);
-   ae_vector_init_copy(&dst->gammaz, &src->gammaz, _state, make_automatic);
-   ae_vector_init_copy(&dst->gammas, &src->gammas, _state, make_automatic);
-   ae_vector_init_copy(&dst->gammaw, &src->gammaw, _state, make_automatic);
-   ae_vector_init_copy(&dst->gammaq, &src->gammaq, _state, make_automatic);
+   ae_vector_copy(&dst->sigma, &src->sigma, _state, make_automatic);
+   ae_vector_copy(&dst->beta, &src->beta, _state, make_automatic);
+   ae_vector_copy(&dst->rho, &src->rho, _state, make_automatic);
+   ae_vector_copy(&dst->nu, &src->nu, _state, make_automatic);
+   ae_vector_copy(&dst->tau, &src->tau, _state, make_automatic);
+   ae_vector_copy(&dst->alpha, &src->alpha, _state, make_automatic);
+   ae_vector_copy(&dst->gammaz, &src->gammaz, _state, make_automatic);
+   ae_vector_copy(&dst->gammas, &src->gammas, _state, make_automatic);
+   ae_vector_copy(&dst->gammaw, &src->gammaw, _state, make_automatic);
+   ae_vector_copy(&dst->gammaq, &src->gammaq, _state, make_automatic);
 }
 
-void _vipmrighthandside_clear(void *_p) {
+void vipmrighthandside_free(void *_p, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->sigma);
-   ae_vector_clear(&p->beta);
-   ae_vector_clear(&p->rho);
-   ae_vector_clear(&p->nu);
-   ae_vector_clear(&p->tau);
-   ae_vector_clear(&p->alpha);
-   ae_vector_clear(&p->gammaz);
-   ae_vector_clear(&p->gammas);
-   ae_vector_clear(&p->gammaw);
-   ae_vector_clear(&p->gammaq);
+   ae_vector_free(&p->sigma, make_automatic);
+   ae_vector_free(&p->beta, make_automatic);
+   ae_vector_free(&p->rho, make_automatic);
+   ae_vector_free(&p->nu, make_automatic);
+   ae_vector_free(&p->tau, make_automatic);
+   ae_vector_free(&p->alpha, make_automatic);
+   ae_vector_free(&p->gammaz, make_automatic);
+   ae_vector_free(&p->gammas, make_automatic);
+   ae_vector_free(&p->gammaw, make_automatic);
+   ae_vector_free(&p->gammaq, make_automatic);
 }
 
-void _vipmrighthandside_destroy(void *_p) {
-   vipmrighthandside *p = (vipmrighthandside *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->sigma);
-   ae_vector_destroy(&p->beta);
-   ae_vector_destroy(&p->rho);
-   ae_vector_destroy(&p->nu);
-   ae_vector_destroy(&p->tau);
-   ae_vector_destroy(&p->alpha);
-   ae_vector_destroy(&p->gammaz);
-   ae_vector_destroy(&p->gammas);
-   ae_vector_destroy(&p->gammaw);
-   ae_vector_destroy(&p->gammaq);
-}
-
-void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmstate *p = (vipmstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->scl, 0, DT_REAL, _state, make_automatic);
@@ -20974,7 +20559,7 @@ void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xorigin, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->denseh, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparseh, _state, make_automatic);
+   sparsematrix_init(&p->sparseh, _state, make_automatic);
    ae_vector_init(&p->diagr, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -20984,20 +20569,20 @@ void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->hasbndu, 0, DT_BOOL, _state, make_automatic);
    ae_matrix_init(&p->denseafull, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->denseamain, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparseafull, _state, make_automatic);
-   _sparsematrix_init(&p->sparseamain, _state, make_automatic);
-   _sparsematrix_init(&p->combinedaslack, _state, make_automatic);
+   sparsematrix_init(&p->sparseafull, _state, make_automatic);
+   sparsematrix_init(&p->sparseamain, _state, make_automatic);
+   sparsematrix_init(&p->combinedaslack, _state, make_automatic);
    ae_vector_init(&p->ascales, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->aflips, 0, DT_BOOL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->r, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->hasr, 0, DT_BOOL, _state, make_automatic);
-   _vipmvars_init(&p->x0, _state, make_automatic);
-   _vipmvars_init(&p->current, _state, make_automatic);
-   _vipmvars_init(&p->best, _state, make_automatic);
-   _vipmvars_init(&p->trial, _state, make_automatic);
-   _vipmvars_init(&p->deltaaff, _state, make_automatic);
-   _vipmvars_init(&p->deltacorr, _state, make_automatic);
+   vipmvars_init(&p->x0, _state, make_automatic);
+   vipmvars_init(&p->current, _state, make_automatic);
+   vipmvars_init(&p->best, _state, make_automatic);
+   vipmvars_init(&p->trial, _state, make_automatic);
+   vipmvars_init(&p->deltaaff, _state, make_automatic);
+   vipmvars_init(&p->deltacorr, _state, make_automatic);
    ae_vector_init(&p->isfrozen, 0, DT_BOOL, _state, make_automatic);
    ae_vector_init(&p->hasgz, 0, DT_BOOL, _state, make_automatic);
    ae_vector_init(&p->hasts, 0, DT_BOOL, _state, make_automatic);
@@ -21022,13 +20607,13 @@ void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->factregdhrh, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->factinvregdzrz, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->factregewave, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->factsparsekkttmpl, _state, make_automatic);
-   _sparsematrix_init(&p->factsparsekkt, _state, make_automatic);
+   sparsematrix_init(&p->factsparsekkttmpl, _state, make_automatic);
+   sparsematrix_init(&p->factsparsekkt, _state, make_automatic);
    ae_vector_init(&p->factsparsekktpivp, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->facttmpdiag, 0, DT_REAL, _state, make_automatic);
-   _spcholanalysis_init(&p->ldltanalysis, _state, make_automatic);
+   spcholanalysis_init(&p->ldltanalysis, _state, make_automatic);
    ae_vector_init(&p->factsparsediagd, 0, DT_REAL, _state, make_automatic);
-   _vipmrighthandside_init(&p->rhs, _state, make_automatic);
+   vipmrighthandside_init(&p->rhs, _state, make_automatic);
    ae_vector_init(&p->rhsalphacap, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rhsbetacap, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rhsnucap, 0, DT_REAL, _state, make_automatic);
@@ -21037,7 +20622,7 @@ void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmphx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpax, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpaty, 0, DT_REAL, _state, make_automatic);
-   _vipmvars_init(&p->zerovars, _state, make_automatic);
+   vipmvars_init(&p->zerovars, _state, make_automatic);
    ae_vector_init(&p->dummyr, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpy, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
@@ -21046,10 +20631,10 @@ void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->tmpr2, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmplaggrad, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpi, 0, DT_INT, _state, make_automatic);
-   _sparsematrix_init(&p->tmpsparse0, _state, make_automatic);
+   sparsematrix_init(&p->tmpsparse0, _state, make_automatic);
 }
 
-void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void vipmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmstate *dst = (vipmstate *) _dst;
    vipmstate *src = (vipmstate *) _src;
    dst->slacksforequalityconstraints = src->slacksforequalityconstraints;
@@ -21059,44 +20644,44 @@ void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_au
    dst->epsd = src->epsd;
    dst->epsgap = src->epsgap;
    dst->islinear = src->islinear;
-   ae_vector_init_copy(&dst->scl, &src->scl, _state, make_automatic);
-   ae_vector_init_copy(&dst->invscl, &src->invscl, _state, make_automatic);
-   ae_vector_init_copy(&dst->xorigin, &src->xorigin, _state, make_automatic);
+   ae_vector_copy(&dst->scl, &src->scl, _state, make_automatic);
+   ae_vector_copy(&dst->invscl, &src->invscl, _state, make_automatic);
+   ae_vector_copy(&dst->xorigin, &src->xorigin, _state, make_automatic);
    dst->targetscale = src->targetscale;
-   ae_vector_init_copy(&dst->c, &src->c, _state, make_automatic);
-   ae_matrix_init_copy(&dst->denseh, &src->denseh, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseh, &src->sparseh, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagr, &src->diagr, _state, make_automatic);
+   ae_vector_copy(&dst->c, &src->c, _state, make_automatic);
+   ae_matrix_copy(&dst->denseh, &src->denseh, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseh, &src->sparseh, _state, make_automatic);
+   ae_vector_copy(&dst->diagr, &src->diagr, _state, make_automatic);
    dst->hkind = src->hkind;
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_matrix_init_copy(&dst->denseafull, &src->denseafull, _state, make_automatic);
-   ae_matrix_init_copy(&dst->denseamain, &src->denseamain, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseafull, &src->sparseafull, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseamain, &src->sparseamain, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->combinedaslack, &src->combinedaslack, _state, make_automatic);
-   ae_vector_init_copy(&dst->ascales, &src->ascales, _state, make_automatic);
-   ae_vector_init_copy(&dst->aflips, &src->aflips, _state, make_automatic);
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->r, &src->r, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasr, &src->hasr, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_matrix_copy(&dst->denseafull, &src->denseafull, _state, make_automatic);
+   ae_matrix_copy(&dst->denseamain, &src->denseamain, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseafull, &src->sparseafull, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseamain, &src->sparseamain, _state, make_automatic);
+   sparsematrix_copy(&dst->combinedaslack, &src->combinedaslack, _state, make_automatic);
+   ae_vector_copy(&dst->ascales, &src->ascales, _state, make_automatic);
+   ae_vector_copy(&dst->aflips, &src->aflips, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->r, &src->r, _state, make_automatic);
+   ae_vector_copy(&dst->hasr, &src->hasr, _state, make_automatic);
    dst->mdense = src->mdense;
    dst->msparse = src->msparse;
-   _vipmvars_init_copy(&dst->x0, &src->x0, _state, make_automatic);
-   _vipmvars_init_copy(&dst->current, &src->current, _state, make_automatic);
-   _vipmvars_init_copy(&dst->best, &src->best, _state, make_automatic);
-   _vipmvars_init_copy(&dst->trial, &src->trial, _state, make_automatic);
-   _vipmvars_init_copy(&dst->deltaaff, &src->deltaaff, _state, make_automatic);
-   _vipmvars_init_copy(&dst->deltacorr, &src->deltacorr, _state, make_automatic);
-   ae_vector_init_copy(&dst->isfrozen, &src->isfrozen, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasgz, &src->hasgz, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasts, &src->hasts, _state, make_automatic);
-   ae_vector_init_copy(&dst->haswv, &src->haswv, _state, make_automatic);
-   ae_vector_init_copy(&dst->haspq, &src->haspq, _state, make_automatic);
+   vipmvars_copy(&dst->x0, &src->x0, _state, make_automatic);
+   vipmvars_copy(&dst->current, &src->current, _state, make_automatic);
+   vipmvars_copy(&dst->best, &src->best, _state, make_automatic);
+   vipmvars_copy(&dst->trial, &src->trial, _state, make_automatic);
+   vipmvars_copy(&dst->deltaaff, &src->deltaaff, _state, make_automatic);
+   vipmvars_copy(&dst->deltacorr, &src->deltacorr, _state, make_automatic);
+   ae_vector_copy(&dst->isfrozen, &src->isfrozen, _state, make_automatic);
+   ae_vector_copy(&dst->hasgz, &src->hasgz, _state, make_automatic);
+   ae_vector_copy(&dst->hasts, &src->hasts, _state, make_automatic);
+   ae_vector_copy(&dst->haswv, &src->haswv, _state, make_automatic);
+   ae_vector_copy(&dst->haspq, &src->haspq, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repncholesky = src->repncholesky;
    dst->dotrace = src->dotrace;
@@ -21104,216 +20689,133 @@ void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_au
    dst->factorizationtype = src->factorizationtype;
    dst->factorizationpoweredup = src->factorizationpoweredup;
    dst->factorizationpresent = src->factorizationpresent;
-   ae_vector_init_copy(&dst->diagdz, &src->diagdz, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdzi, &src->diagdzi, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdziri, &src->diagdziri, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagds, &src->diagds, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdsi, &src->diagdsi, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdsiri, &src->diagdsiri, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdw, &src->diagdw, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdwi, &src->diagdwi, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdwir, &src->diagdwir, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdq, &src->diagdq, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdqi, &src->diagdqi, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagdqiri, &src->diagdqiri, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagddr, &src->diagddr, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagde, &src->diagde, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagder, &src->diagder, _state, make_automatic);
-   ae_matrix_init_copy(&dst->factdensehaug, &src->factdensehaug, _state, make_automatic);
-   ae_vector_init_copy(&dst->factregdhrh, &src->factregdhrh, _state, make_automatic);
-   ae_vector_init_copy(&dst->factinvregdzrz, &src->factinvregdzrz, _state, make_automatic);
-   ae_vector_init_copy(&dst->factregewave, &src->factregewave, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->factsparsekkttmpl, &src->factsparsekkttmpl, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->factsparsekkt, &src->factsparsekkt, _state, make_automatic);
-   ae_vector_init_copy(&dst->factsparsekktpivp, &src->factsparsekktpivp, _state, make_automatic);
-   ae_vector_init_copy(&dst->facttmpdiag, &src->facttmpdiag, _state, make_automatic);
-   _spcholanalysis_init_copy(&dst->ldltanalysis, &src->ldltanalysis, _state, make_automatic);
-   ae_vector_init_copy(&dst->factsparsediagd, &src->factsparsediagd, _state, make_automatic);
-   _vipmrighthandside_init_copy(&dst->rhs, &src->rhs, _state, make_automatic);
-   ae_vector_init_copy(&dst->rhsalphacap, &src->rhsalphacap, _state, make_automatic);
-   ae_vector_init_copy(&dst->rhsbetacap, &src->rhsbetacap, _state, make_automatic);
-   ae_vector_init_copy(&dst->rhsnucap, &src->rhsnucap, _state, make_automatic);
-   ae_vector_init_copy(&dst->rhstaucap, &src->rhstaucap, _state, make_automatic);
-   ae_vector_init_copy(&dst->deltaxy, &src->deltaxy, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmphx, &src->tmphx, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpax, &src->tmpax, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpaty, &src->tmpaty, _state, make_automatic);
-   _vipmvars_init_copy(&dst->zerovars, &src->zerovars, _state, make_automatic);
-   ae_vector_init_copy(&dst->dummyr, &src->dummyr, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpy, &src->tmpy, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpr2, &src->tmpr2, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmplaggrad, &src->tmplaggrad, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->tmpsparse0, &src->tmpsparse0, _state, make_automatic);
+   ae_vector_copy(&dst->diagdz, &src->diagdz, _state, make_automatic);
+   ae_vector_copy(&dst->diagdzi, &src->diagdzi, _state, make_automatic);
+   ae_vector_copy(&dst->diagdziri, &src->diagdziri, _state, make_automatic);
+   ae_vector_copy(&dst->diagds, &src->diagds, _state, make_automatic);
+   ae_vector_copy(&dst->diagdsi, &src->diagdsi, _state, make_automatic);
+   ae_vector_copy(&dst->diagdsiri, &src->diagdsiri, _state, make_automatic);
+   ae_vector_copy(&dst->diagdw, &src->diagdw, _state, make_automatic);
+   ae_vector_copy(&dst->diagdwi, &src->diagdwi, _state, make_automatic);
+   ae_vector_copy(&dst->diagdwir, &src->diagdwir, _state, make_automatic);
+   ae_vector_copy(&dst->diagdq, &src->diagdq, _state, make_automatic);
+   ae_vector_copy(&dst->diagdqi, &src->diagdqi, _state, make_automatic);
+   ae_vector_copy(&dst->diagdqiri, &src->diagdqiri, _state, make_automatic);
+   ae_vector_copy(&dst->diagddr, &src->diagddr, _state, make_automatic);
+   ae_vector_copy(&dst->diagde, &src->diagde, _state, make_automatic);
+   ae_vector_copy(&dst->diagder, &src->diagder, _state, make_automatic);
+   ae_matrix_copy(&dst->factdensehaug, &src->factdensehaug, _state, make_automatic);
+   ae_vector_copy(&dst->factregdhrh, &src->factregdhrh, _state, make_automatic);
+   ae_vector_copy(&dst->factinvregdzrz, &src->factinvregdzrz, _state, make_automatic);
+   ae_vector_copy(&dst->factregewave, &src->factregewave, _state, make_automatic);
+   sparsematrix_copy(&dst->factsparsekkttmpl, &src->factsparsekkttmpl, _state, make_automatic);
+   sparsematrix_copy(&dst->factsparsekkt, &src->factsparsekkt, _state, make_automatic);
+   ae_vector_copy(&dst->factsparsekktpivp, &src->factsparsekktpivp, _state, make_automatic);
+   ae_vector_copy(&dst->facttmpdiag, &src->facttmpdiag, _state, make_automatic);
+   spcholanalysis_copy(&dst->ldltanalysis, &src->ldltanalysis, _state, make_automatic);
+   ae_vector_copy(&dst->factsparsediagd, &src->factsparsediagd, _state, make_automatic);
+   vipmrighthandside_copy(&dst->rhs, &src->rhs, _state, make_automatic);
+   ae_vector_copy(&dst->rhsalphacap, &src->rhsalphacap, _state, make_automatic);
+   ae_vector_copy(&dst->rhsbetacap, &src->rhsbetacap, _state, make_automatic);
+   ae_vector_copy(&dst->rhsnucap, &src->rhsnucap, _state, make_automatic);
+   ae_vector_copy(&dst->rhstaucap, &src->rhstaucap, _state, make_automatic);
+   ae_vector_copy(&dst->deltaxy, &src->deltaxy, _state, make_automatic);
+   ae_vector_copy(&dst->tmphx, &src->tmphx, _state, make_automatic);
+   ae_vector_copy(&dst->tmpax, &src->tmpax, _state, make_automatic);
+   ae_vector_copy(&dst->tmpaty, &src->tmpaty, _state, make_automatic);
+   vipmvars_copy(&dst->zerovars, &src->zerovars, _state, make_automatic);
+   ae_vector_copy(&dst->dummyr, &src->dummyr, _state, make_automatic);
+   ae_vector_copy(&dst->tmpy, &src->tmpy, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpr2, &src->tmpr2, _state, make_automatic);
+   ae_vector_copy(&dst->tmplaggrad, &src->tmplaggrad, _state, make_automatic);
+   ae_vector_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
+   sparsematrix_copy(&dst->tmpsparse0, &src->tmpsparse0, _state, make_automatic);
 }
 
-void _vipmstate_clear(void *_p) {
+void vipmstate_free(void *_p, bool make_automatic) {
    vipmstate *p = (vipmstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->scl);
-   ae_vector_clear(&p->invscl);
-   ae_vector_clear(&p->xorigin);
-   ae_vector_clear(&p->c);
-   ae_matrix_clear(&p->denseh);
-   _sparsematrix_clear(&p->sparseh);
-   ae_vector_clear(&p->diagr);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->rawbndl);
-   ae_vector_clear(&p->rawbndu);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_matrix_clear(&p->denseafull);
-   ae_matrix_clear(&p->denseamain);
-   _sparsematrix_clear(&p->sparseafull);
-   _sparsematrix_clear(&p->sparseamain);
-   _sparsematrix_clear(&p->combinedaslack);
-   ae_vector_clear(&p->ascales);
-   ae_vector_clear(&p->aflips);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->r);
-   ae_vector_clear(&p->hasr);
-   _vipmvars_clear(&p->x0);
-   _vipmvars_clear(&p->current);
-   _vipmvars_clear(&p->best);
-   _vipmvars_clear(&p->trial);
-   _vipmvars_clear(&p->deltaaff);
-   _vipmvars_clear(&p->deltacorr);
-   ae_vector_clear(&p->isfrozen);
-   ae_vector_clear(&p->hasgz);
-   ae_vector_clear(&p->hasts);
-   ae_vector_clear(&p->haswv);
-   ae_vector_clear(&p->haspq);
-   ae_vector_clear(&p->diagdz);
-   ae_vector_clear(&p->diagdzi);
-   ae_vector_clear(&p->diagdziri);
-   ae_vector_clear(&p->diagds);
-   ae_vector_clear(&p->diagdsi);
-   ae_vector_clear(&p->diagdsiri);
-   ae_vector_clear(&p->diagdw);
-   ae_vector_clear(&p->diagdwi);
-   ae_vector_clear(&p->diagdwir);
-   ae_vector_clear(&p->diagdq);
-   ae_vector_clear(&p->diagdqi);
-   ae_vector_clear(&p->diagdqiri);
-   ae_vector_clear(&p->diagddr);
-   ae_vector_clear(&p->diagde);
-   ae_vector_clear(&p->diagder);
-   ae_matrix_clear(&p->factdensehaug);
-   ae_vector_clear(&p->factregdhrh);
-   ae_vector_clear(&p->factinvregdzrz);
-   ae_vector_clear(&p->factregewave);
-   _sparsematrix_clear(&p->factsparsekkttmpl);
-   _sparsematrix_clear(&p->factsparsekkt);
-   ae_vector_clear(&p->factsparsekktpivp);
-   ae_vector_clear(&p->facttmpdiag);
-   _spcholanalysis_clear(&p->ldltanalysis);
-   ae_vector_clear(&p->factsparsediagd);
-   _vipmrighthandside_clear(&p->rhs);
-   ae_vector_clear(&p->rhsalphacap);
-   ae_vector_clear(&p->rhsbetacap);
-   ae_vector_clear(&p->rhsnucap);
-   ae_vector_clear(&p->rhstaucap);
-   ae_vector_clear(&p->deltaxy);
-   ae_vector_clear(&p->tmphx);
-   ae_vector_clear(&p->tmpax);
-   ae_vector_clear(&p->tmpaty);
-   _vipmvars_clear(&p->zerovars);
-   ae_vector_clear(&p->dummyr);
-   ae_vector_clear(&p->tmpy);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmp2);
-   ae_matrix_clear(&p->tmpr2);
-   ae_vector_clear(&p->tmplaggrad);
-   ae_vector_clear(&p->tmpi);
-   _sparsematrix_clear(&p->tmpsparse0);
-}
-
-void _vipmstate_destroy(void *_p) {
-   vipmstate *p = (vipmstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->scl);
-   ae_vector_destroy(&p->invscl);
-   ae_vector_destroy(&p->xorigin);
-   ae_vector_destroy(&p->c);
-   ae_matrix_destroy(&p->denseh);
-   _sparsematrix_destroy(&p->sparseh);
-   ae_vector_destroy(&p->diagr);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->rawbndl);
-   ae_vector_destroy(&p->rawbndu);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_matrix_destroy(&p->denseafull);
-   ae_matrix_destroy(&p->denseamain);
-   _sparsematrix_destroy(&p->sparseafull);
-   _sparsematrix_destroy(&p->sparseamain);
-   _sparsematrix_destroy(&p->combinedaslack);
-   ae_vector_destroy(&p->ascales);
-   ae_vector_destroy(&p->aflips);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->r);
-   ae_vector_destroy(&p->hasr);
-   _vipmvars_destroy(&p->x0);
-   _vipmvars_destroy(&p->current);
-   _vipmvars_destroy(&p->best);
-   _vipmvars_destroy(&p->trial);
-   _vipmvars_destroy(&p->deltaaff);
-   _vipmvars_destroy(&p->deltacorr);
-   ae_vector_destroy(&p->isfrozen);
-   ae_vector_destroy(&p->hasgz);
-   ae_vector_destroy(&p->hasts);
-   ae_vector_destroy(&p->haswv);
-   ae_vector_destroy(&p->haspq);
-   ae_vector_destroy(&p->diagdz);
-   ae_vector_destroy(&p->diagdzi);
-   ae_vector_destroy(&p->diagdziri);
-   ae_vector_destroy(&p->diagds);
-   ae_vector_destroy(&p->diagdsi);
-   ae_vector_destroy(&p->diagdsiri);
-   ae_vector_destroy(&p->diagdw);
-   ae_vector_destroy(&p->diagdwi);
-   ae_vector_destroy(&p->diagdwir);
-   ae_vector_destroy(&p->diagdq);
-   ae_vector_destroy(&p->diagdqi);
-   ae_vector_destroy(&p->diagdqiri);
-   ae_vector_destroy(&p->diagddr);
-   ae_vector_destroy(&p->diagde);
-   ae_vector_destroy(&p->diagder);
-   ae_matrix_destroy(&p->factdensehaug);
-   ae_vector_destroy(&p->factregdhrh);
-   ae_vector_destroy(&p->factinvregdzrz);
-   ae_vector_destroy(&p->factregewave);
-   _sparsematrix_destroy(&p->factsparsekkttmpl);
-   _sparsematrix_destroy(&p->factsparsekkt);
-   ae_vector_destroy(&p->factsparsekktpivp);
-   ae_vector_destroy(&p->facttmpdiag);
-   _spcholanalysis_destroy(&p->ldltanalysis);
-   ae_vector_destroy(&p->factsparsediagd);
-   _vipmrighthandside_destroy(&p->rhs);
-   ae_vector_destroy(&p->rhsalphacap);
-   ae_vector_destroy(&p->rhsbetacap);
-   ae_vector_destroy(&p->rhsnucap);
-   ae_vector_destroy(&p->rhstaucap);
-   ae_vector_destroy(&p->deltaxy);
-   ae_vector_destroy(&p->tmphx);
-   ae_vector_destroy(&p->tmpax);
-   ae_vector_destroy(&p->tmpaty);
-   _vipmvars_destroy(&p->zerovars);
-   ae_vector_destroy(&p->dummyr);
-   ae_vector_destroy(&p->tmpy);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmp2);
-   ae_matrix_destroy(&p->tmpr2);
-   ae_vector_destroy(&p->tmplaggrad);
-   ae_vector_destroy(&p->tmpi);
-   _sparsematrix_destroy(&p->tmpsparse0);
+   ae_vector_free(&p->scl, make_automatic);
+   ae_vector_free(&p->invscl, make_automatic);
+   ae_vector_free(&p->xorigin, make_automatic);
+   ae_vector_free(&p->c, make_automatic);
+   ae_matrix_free(&p->denseh, make_automatic);
+   sparsematrix_free(&p->sparseh, make_automatic);
+   ae_vector_free(&p->diagr, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->rawbndl, make_automatic);
+   ae_vector_free(&p->rawbndu, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_matrix_free(&p->denseafull, make_automatic);
+   ae_matrix_free(&p->denseamain, make_automatic);
+   sparsematrix_free(&p->sparseafull, make_automatic);
+   sparsematrix_free(&p->sparseamain, make_automatic);
+   sparsematrix_free(&p->combinedaslack, make_automatic);
+   ae_vector_free(&p->ascales, make_automatic);
+   ae_vector_free(&p->aflips, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->r, make_automatic);
+   ae_vector_free(&p->hasr, make_automatic);
+   vipmvars_free(&p->x0, make_automatic);
+   vipmvars_free(&p->current, make_automatic);
+   vipmvars_free(&p->best, make_automatic);
+   vipmvars_free(&p->trial, make_automatic);
+   vipmvars_free(&p->deltaaff, make_automatic);
+   vipmvars_free(&p->deltacorr, make_automatic);
+   ae_vector_free(&p->isfrozen, make_automatic);
+   ae_vector_free(&p->hasgz, make_automatic);
+   ae_vector_free(&p->hasts, make_automatic);
+   ae_vector_free(&p->haswv, make_automatic);
+   ae_vector_free(&p->haspq, make_automatic);
+   ae_vector_free(&p->diagdz, make_automatic);
+   ae_vector_free(&p->diagdzi, make_automatic);
+   ae_vector_free(&p->diagdziri, make_automatic);
+   ae_vector_free(&p->diagds, make_automatic);
+   ae_vector_free(&p->diagdsi, make_automatic);
+   ae_vector_free(&p->diagdsiri, make_automatic);
+   ae_vector_free(&p->diagdw, make_automatic);
+   ae_vector_free(&p->diagdwi, make_automatic);
+   ae_vector_free(&p->diagdwir, make_automatic);
+   ae_vector_free(&p->diagdq, make_automatic);
+   ae_vector_free(&p->diagdqi, make_automatic);
+   ae_vector_free(&p->diagdqiri, make_automatic);
+   ae_vector_free(&p->diagddr, make_automatic);
+   ae_vector_free(&p->diagde, make_automatic);
+   ae_vector_free(&p->diagder, make_automatic);
+   ae_matrix_free(&p->factdensehaug, make_automatic);
+   ae_vector_free(&p->factregdhrh, make_automatic);
+   ae_vector_free(&p->factinvregdzrz, make_automatic);
+   ae_vector_free(&p->factregewave, make_automatic);
+   sparsematrix_free(&p->factsparsekkttmpl, make_automatic);
+   sparsematrix_free(&p->factsparsekkt, make_automatic);
+   ae_vector_free(&p->factsparsekktpivp, make_automatic);
+   ae_vector_free(&p->facttmpdiag, make_automatic);
+   spcholanalysis_free(&p->ldltanalysis, make_automatic);
+   ae_vector_free(&p->factsparsediagd, make_automatic);
+   vipmrighthandside_free(&p->rhs, make_automatic);
+   ae_vector_free(&p->rhsalphacap, make_automatic);
+   ae_vector_free(&p->rhsbetacap, make_automatic);
+   ae_vector_free(&p->rhsnucap, make_automatic);
+   ae_vector_free(&p->rhstaucap, make_automatic);
+   ae_vector_free(&p->deltaxy, make_automatic);
+   ae_vector_free(&p->tmphx, make_automatic);
+   ae_vector_free(&p->tmpax, make_automatic);
+   ae_vector_free(&p->tmpaty, make_automatic);
+   vipmvars_free(&p->zerovars, make_automatic);
+   ae_vector_free(&p->dummyr, make_automatic);
+   ae_vector_free(&p->tmpy, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmp2, make_automatic);
+   ae_matrix_free(&p->tmpr2, make_automatic);
+   ae_vector_free(&p->tmplaggrad, make_automatic);
+   ae_vector_free(&p->tmpi, make_automatic);
+   sparsematrix_free(&p->tmpsparse0, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -21378,7 +20880,7 @@ namespace alglib_impl {
 void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    ae_int_t i;
 
-   _minqpstate_clear(state);
+   minqpstate_free(state, true);
 
    ae_assert(n >= 1, "MinQPCreate: N<1", _state);
 
@@ -22342,7 +21844,7 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
    ae_frame_make(_state, &_frame_block);
    memset(&dummyc, 0, sizeof(dummyc));
    memset(&dummyct, 0, sizeof(dummyct));
-   _sparsematrix_init(&dummyc, _state, true);
+   sparsematrix_init(&dummyc, _state, true);
    ae_vector_init(&dummyct, 0, DT_INT, _state, true);
 
    minqpsetlcmixed(state, &dummyc, &dummyct, 0, c, ct, k, _state);
@@ -23425,8 +22927,8 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
 // API: void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams);
 void minqpresults(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minqpreport_clear(rep);
+   ae_vector_free(x, true);
+   minqpreport_free(rep, true);
 
    minqpresultsbuf(state, x, rep, _state);
 }
@@ -23549,14 +23051,14 @@ void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state) {
    ae_v_move(&state->xorigin.ptr.p_double[0], 1, &xorigin->ptr.p_double[0], 1, ae_v_len(0, n - 1));
 }
 
-void _minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpstate *p = (minqpstate *) _p;
    ae_touch_ptr((void *)p);
-   _qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
-   _qpbleicsettings_init(&p->qpbleicsettingsuser, _state, make_automatic);
-   _qpdenseaulsettings_init(&p->qpdenseaulsettingsuser, _state, make_automatic);
-   _convexquadraticmodel_init(&p->a, _state, make_automatic);
-   _sparsematrix_init(&p->sparsea, _state, make_automatic);
+   qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
+   qpbleicsettings_init(&p->qpbleicsettingsuser, _state, make_automatic);
+   qpdenseaulsettings_init(&p->qpdenseaulsettingsuser, _state, make_automatic);
+   convexquadraticmodel_init(&p->a, _state, make_automatic);
+   sparsematrix_init(&p->sparsea, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -23566,7 +23068,7 @@ void _minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xorigin, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->startx, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->densec, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsec, _state, make_automatic);
+   sparsematrix_init(&p->sparsec, _state, make_automatic);
    ae_vector_init(&p->cl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xs, 0, DT_REAL, _state, make_automatic);
@@ -23579,179 +23081,135 @@ void _minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->elagmlt, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->elagidx, 0, DT_INT, _state, make_automatic);
    ae_matrix_init(&p->dummyr2, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->dummysparse, _state, make_automatic);
+   sparsematrix_init(&p->dummysparse, _state, make_automatic);
    ae_matrix_init(&p->tmpr2, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wrkbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wrkbndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wrkcl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wrkcu, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->wrkdensec, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->wrksparsec, _state, make_automatic);
-   _qpbleicbuffers_init(&p->qpbleicbuf, _state, make_automatic);
-   _qqpbuffers_init(&p->qqpbuf, _state, make_automatic);
-   _qpdenseaulbuffers_init(&p->qpdenseaulbuf, _state, make_automatic);
-   _vipmstate_init(&p->vsolver, _state, make_automatic);
+   sparsematrix_init(&p->wrksparsec, _state, make_automatic);
+   qpbleicbuffers_init(&p->qpbleicbuf, _state, make_automatic);
+   qqpbuffers_init(&p->qqpbuf, _state, make_automatic);
+   qpdenseaulbuffers_init(&p->qpdenseaulbuf, _state, make_automatic);
+   vipmstate_init(&p->vsolver, _state, make_automatic);
 }
 
-void _minqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minqpstate *dst = (minqpstate *) _dst;
    minqpstate *src = (minqpstate *) _src;
    dst->n = src->n;
-   _qqpsettings_init_copy(&dst->qqpsettingsuser, &src->qqpsettingsuser, _state, make_automatic);
-   _qpbleicsettings_init_copy(&dst->qpbleicsettingsuser, &src->qpbleicsettingsuser, _state, make_automatic);
-   _qpdenseaulsettings_init_copy(&dst->qpdenseaulsettingsuser, &src->qpdenseaulsettingsuser, _state, make_automatic);
+   qqpsettings_copy(&dst->qqpsettingsuser, &src->qqpsettingsuser, _state, make_automatic);
+   qpbleicsettings_copy(&dst->qpbleicsettingsuser, &src->qpbleicsettingsuser, _state, make_automatic);
+   qpdenseaulsettings_copy(&dst->qpdenseaulsettingsuser, &src->qpdenseaulsettingsuser, _state, make_automatic);
    dst->veps = src->veps;
    dst->dbgskipconstraintnormalization = src->dbgskipconstraintnormalization;
    dst->algokind = src->algokind;
    dst->akind = src->akind;
-   _convexquadraticmodel_init_copy(&dst->a, &src->a, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
+   convexquadraticmodel_copy(&dst->a, &src->a, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
    dst->sparseaupper = src->sparseaupper;
    dst->absamax = src->absamax;
    dst->absasum = src->absasum;
    dst->absasum2 = src->absasum2;
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->stype = src->stype;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->xorigin, &src->xorigin, _state, make_automatic);
-   ae_vector_init_copy(&dst->startx, &src->startx, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
+   ae_vector_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
+   ae_vector_copy(&dst->xorigin, &src->xorigin, _state, make_automatic);
+   ae_vector_copy(&dst->startx, &src->startx, _state, make_automatic);
    dst->havex = src->havex;
-   ae_matrix_init_copy(&dst->densec, &src->densec, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsec, &src->sparsec, _state, make_automatic);
-   ae_vector_init_copy(&dst->cl, &src->cl, _state, make_automatic);
-   ae_vector_init_copy(&dst->cu, &src->cu, _state, make_automatic);
+   ae_matrix_copy(&dst->densec, &src->densec, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsec, &src->sparsec, _state, make_automatic);
+   ae_vector_copy(&dst->cl, &src->cl, _state, make_automatic);
+   ae_vector_copy(&dst->cu, &src->cu, _state, make_automatic);
    dst->mdense = src->mdense;
    dst->msparse = src->msparse;
-   ae_vector_init_copy(&dst->xs, &src->xs, _state, make_automatic);
+   ae_vector_copy(&dst->xs, &src->xs, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repncholesky = src->repncholesky;
    dst->repnmv = src->repnmv;
    dst->repterminationtype = src->repterminationtype;
-   ae_vector_init_copy(&dst->replagbc, &src->replagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->replaglc, &src->replaglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->effectives, &src->effectives, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->ecleic, &src->ecleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->elaglc, &src->elaglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->elagmlt, &src->elagmlt, _state, make_automatic);
-   ae_vector_init_copy(&dst->elagidx, &src->elagidx, _state, make_automatic);
-   ae_matrix_init_copy(&dst->dummyr2, &src->dummyr2, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->dummysparse, &src->dummysparse, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpr2, &src->tmpr2, _state, make_automatic);
-   ae_vector_init_copy(&dst->wrkbndl, &src->wrkbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->wrkbndu, &src->wrkbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->wrkcl, &src->wrkcl, _state, make_automatic);
-   ae_vector_init_copy(&dst->wrkcu, &src->wrkcu, _state, make_automatic);
-   ae_matrix_init_copy(&dst->wrkdensec, &src->wrkdensec, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->wrksparsec, &src->wrksparsec, _state, make_automatic);
+   ae_vector_copy(&dst->replagbc, &src->replagbc, _state, make_automatic);
+   ae_vector_copy(&dst->replaglc, &src->replaglc, _state, make_automatic);
+   ae_vector_copy(&dst->effectives, &src->effectives, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_matrix_copy(&dst->ecleic, &src->ecleic, _state, make_automatic);
+   ae_vector_copy(&dst->elaglc, &src->elaglc, _state, make_automatic);
+   ae_vector_copy(&dst->elagmlt, &src->elagmlt, _state, make_automatic);
+   ae_vector_copy(&dst->elagidx, &src->elagidx, _state, make_automatic);
+   ae_matrix_copy(&dst->dummyr2, &src->dummyr2, _state, make_automatic);
+   sparsematrix_copy(&dst->dummysparse, &src->dummysparse, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpr2, &src->tmpr2, _state, make_automatic);
+   ae_vector_copy(&dst->wrkbndl, &src->wrkbndl, _state, make_automatic);
+   ae_vector_copy(&dst->wrkbndu, &src->wrkbndu, _state, make_automatic);
+   ae_vector_copy(&dst->wrkcl, &src->wrkcl, _state, make_automatic);
+   ae_vector_copy(&dst->wrkcu, &src->wrkcu, _state, make_automatic);
+   ae_matrix_copy(&dst->wrkdensec, &src->wrkdensec, _state, make_automatic);
+   sparsematrix_copy(&dst->wrksparsec, &src->wrksparsec, _state, make_automatic);
    dst->qpbleicfirstcall = src->qpbleicfirstcall;
-   _qpbleicbuffers_init_copy(&dst->qpbleicbuf, &src->qpbleicbuf, _state, make_automatic);
-   _qqpbuffers_init_copy(&dst->qqpbuf, &src->qqpbuf, _state, make_automatic);
-   _qpdenseaulbuffers_init_copy(&dst->qpdenseaulbuf, &src->qpdenseaulbuf, _state, make_automatic);
-   _vipmstate_init_copy(&dst->vsolver, &src->vsolver, _state, make_automatic);
+   qpbleicbuffers_copy(&dst->qpbleicbuf, &src->qpbleicbuf, _state, make_automatic);
+   qqpbuffers_copy(&dst->qqpbuf, &src->qqpbuf, _state, make_automatic);
+   qpdenseaulbuffers_copy(&dst->qpdenseaulbuf, &src->qpdenseaulbuf, _state, make_automatic);
+   vipmstate_copy(&dst->vsolver, &src->vsolver, _state, make_automatic);
 }
 
-void _minqpstate_clear(void *_p) {
+void minqpstate_free(void *_p, bool make_automatic) {
    minqpstate *p = (minqpstate *) _p;
    ae_touch_ptr((void *)p);
-   _qqpsettings_clear(&p->qqpsettingsuser);
-   _qpbleicsettings_clear(&p->qpbleicsettingsuser);
-   _qpdenseaulsettings_clear(&p->qpdenseaulsettingsuser);
-   _convexquadraticmodel_clear(&p->a);
-   _sparsematrix_clear(&p->sparsea);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->havebndl);
-   ae_vector_clear(&p->havebndu);
-   ae_vector_clear(&p->xorigin);
-   ae_vector_clear(&p->startx);
-   ae_matrix_clear(&p->densec);
-   _sparsematrix_clear(&p->sparsec);
-   ae_vector_clear(&p->cl);
-   ae_vector_clear(&p->cu);
-   ae_vector_clear(&p->xs);
-   ae_vector_clear(&p->replagbc);
-   ae_vector_clear(&p->replaglc);
-   ae_vector_clear(&p->effectives);
-   ae_vector_clear(&p->tmp0);
-   ae_matrix_clear(&p->ecleic);
-   ae_vector_clear(&p->elaglc);
-   ae_vector_clear(&p->elagmlt);
-   ae_vector_clear(&p->elagidx);
-   ae_matrix_clear(&p->dummyr2);
-   _sparsematrix_clear(&p->dummysparse);
-   ae_matrix_clear(&p->tmpr2);
-   ae_vector_clear(&p->wrkbndl);
-   ae_vector_clear(&p->wrkbndu);
-   ae_vector_clear(&p->wrkcl);
-   ae_vector_clear(&p->wrkcu);
-   ae_matrix_clear(&p->wrkdensec);
-   _sparsematrix_clear(&p->wrksparsec);
-   _qpbleicbuffers_clear(&p->qpbleicbuf);
-   _qqpbuffers_clear(&p->qqpbuf);
-   _qpdenseaulbuffers_clear(&p->qpdenseaulbuf);
-   _vipmstate_clear(&p->vsolver);
+   qqpsettings_free(&p->qqpsettingsuser, make_automatic);
+   qpbleicsettings_free(&p->qpbleicsettingsuser, make_automatic);
+   qpdenseaulsettings_free(&p->qpdenseaulsettingsuser, make_automatic);
+   convexquadraticmodel_free(&p->a, make_automatic);
+   sparsematrix_free(&p->sparsea, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->havebndl, make_automatic);
+   ae_vector_free(&p->havebndu, make_automatic);
+   ae_vector_free(&p->xorigin, make_automatic);
+   ae_vector_free(&p->startx, make_automatic);
+   ae_matrix_free(&p->densec, make_automatic);
+   sparsematrix_free(&p->sparsec, make_automatic);
+   ae_vector_free(&p->cl, make_automatic);
+   ae_vector_free(&p->cu, make_automatic);
+   ae_vector_free(&p->xs, make_automatic);
+   ae_vector_free(&p->replagbc, make_automatic);
+   ae_vector_free(&p->replaglc, make_automatic);
+   ae_vector_free(&p->effectives, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_matrix_free(&p->ecleic, make_automatic);
+   ae_vector_free(&p->elaglc, make_automatic);
+   ae_vector_free(&p->elagmlt, make_automatic);
+   ae_vector_free(&p->elagidx, make_automatic);
+   ae_matrix_free(&p->dummyr2, make_automatic);
+   sparsematrix_free(&p->dummysparse, make_automatic);
+   ae_matrix_free(&p->tmpr2, make_automatic);
+   ae_vector_free(&p->wrkbndl, make_automatic);
+   ae_vector_free(&p->wrkbndu, make_automatic);
+   ae_vector_free(&p->wrkcl, make_automatic);
+   ae_vector_free(&p->wrkcu, make_automatic);
+   ae_matrix_free(&p->wrkdensec, make_automatic);
+   sparsematrix_free(&p->wrksparsec, make_automatic);
+   qpbleicbuffers_free(&p->qpbleicbuf, make_automatic);
+   qqpbuffers_free(&p->qqpbuf, make_automatic);
+   qpdenseaulbuffers_free(&p->qpdenseaulbuf, make_automatic);
+   vipmstate_free(&p->vsolver, make_automatic);
 }
 
-void _minqpstate_destroy(void *_p) {
-   minqpstate *p = (minqpstate *) _p;
-   ae_touch_ptr((void *)p);
-   _qqpsettings_destroy(&p->qqpsettingsuser);
-   _qpbleicsettings_destroy(&p->qpbleicsettingsuser);
-   _qpdenseaulsettings_destroy(&p->qpdenseaulsettingsuser);
-   _convexquadraticmodel_destroy(&p->a);
-   _sparsematrix_destroy(&p->sparsea);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->havebndl);
-   ae_vector_destroy(&p->havebndu);
-   ae_vector_destroy(&p->xorigin);
-   ae_vector_destroy(&p->startx);
-   ae_matrix_destroy(&p->densec);
-   _sparsematrix_destroy(&p->sparsec);
-   ae_vector_destroy(&p->cl);
-   ae_vector_destroy(&p->cu);
-   ae_vector_destroy(&p->xs);
-   ae_vector_destroy(&p->replagbc);
-   ae_vector_destroy(&p->replaglc);
-   ae_vector_destroy(&p->effectives);
-   ae_vector_destroy(&p->tmp0);
-   ae_matrix_destroy(&p->ecleic);
-   ae_vector_destroy(&p->elaglc);
-   ae_vector_destroy(&p->elagmlt);
-   ae_vector_destroy(&p->elagidx);
-   ae_matrix_destroy(&p->dummyr2);
-   _sparsematrix_destroy(&p->dummysparse);
-   ae_matrix_destroy(&p->tmpr2);
-   ae_vector_destroy(&p->wrkbndl);
-   ae_vector_destroy(&p->wrkbndu);
-   ae_vector_destroy(&p->wrkcl);
-   ae_vector_destroy(&p->wrkcu);
-   ae_matrix_destroy(&p->wrkdensec);
-   _sparsematrix_destroy(&p->wrksparsec);
-   _qpbleicbuffers_destroy(&p->qpbleicbuf);
-   _qqpbuffers_destroy(&p->qqpbuf);
-   _qpdenseaulbuffers_destroy(&p->qpdenseaulbuf);
-   _vipmstate_destroy(&p->vsolver);
-}
-
-void _minqpreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minqpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpreport *p = (minqpreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->laglc, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minqpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minqpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minqpreport *dst = (minqpreport *) _dst;
    minqpreport *src = (minqpreport *) _src;
    dst->inneriterationscount = src->inneriterationscount;
@@ -23759,22 +23217,15 @@ void _minqpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->nmv = src->nmv;
    dst->ncholesky = src->ncholesky;
    dst->terminationtype = src->terminationtype;
-   ae_vector_init_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->laglc, &src->laglc, _state, make_automatic);
+   ae_vector_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
+   ae_vector_copy(&dst->laglc, &src->laglc, _state, make_automatic);
 }
 
-void _minqpreport_clear(void *_p) {
+void minqpreport_free(void *_p, bool make_automatic) {
    minqpreport *p = (minqpreport *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->lagbc);
-   ae_vector_clear(&p->laglc);
-}
-
-void _minqpreport_destroy(void *_p) {
-   minqpreport *p = (minqpreport *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->lagbc);
-   ae_vector_destroy(&p->laglc);
+   ae_vector_free(&p->lagbc, make_automatic);
+   ae_vector_free(&p->laglc, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -24583,7 +24034,7 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
 // API: void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    ae_assert(n >= 1, "MinLMCreateVJ: N<1!", _state);
    ae_assert(m >= 1, "MinLMCreateVJ: M<1!", _state);
@@ -24669,7 +24120,7 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
 // API: void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams);
 void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    ae_assert(ae_isfinite(diffstep, _state), "MinLMCreateV: DiffStep is not finite!", _state);
    ae_assert(ae_fp_greater(diffstep, (double)(0)), "MinLMCreateV: DiffStep <= 0!", _state);
@@ -24759,7 +24210,7 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 // API: void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    ae_assert(n >= 1, "MinLMCreateFGH: N<1!", _state);
    ae_assert(x->cnt >= n, "MinLMCreateFGH: Length(X)<N!", _state);
@@ -26407,7 +25858,7 @@ void minlmoptguardgradient(minlmstate *state, double teststep, ae_state *_state)
 // API: void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams);
 void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -26441,8 +25892,8 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_sta
 // API: void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams);
 void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minlmreport_clear(rep);
+   ae_vector_free(x, true);
+   minlmreport_free(rep, true);
 
    minlmresultsbuf(state, x, rep, _state);
 }
@@ -26528,7 +25979,7 @@ void minlmrequesttermination(minlmstate *state, ae_state *_state) {
 // API: void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    minlmcreatevj(n, m, x, state, _state);
 }
@@ -26541,7 +25992,7 @@ void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_st
 // API: void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    minlmcreatefj(n, m, x, state, _state);
 }
@@ -26554,7 +26005,7 @@ void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_st
 // API: void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   _minlmstate_clear(state);
+   minlmstate_free(state, true);
 
    ae_assert(n >= 1, "MinLMCreateFJ: N<1!", _state);
    ae_assert(m >= 1, "MinLMCreateFJ: M<1!", _state);
@@ -27110,7 +26561,7 @@ lbl_rcomm:
    return result;
 }
 
-void _minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstepfinder *p = (minlmstepfinder *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -27123,17 +26574,17 @@ void _minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->havebndl, 0, DT_BOOL, _state, make_automatic);
    ae_vector_init(&p->havebndu, 0, DT_BOOL, _state, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
    ae_vector_init(&p->xdir, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->choleskybuf, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpct, 0, DT_INT, _state, make_automatic);
-   _minqpstate_init(&p->qpstate, _state, make_automatic);
-   _minqpreport_init(&p->qprep, _state, make_automatic);
-   _sparsematrix_init(&p->tmpsp, _state, make_automatic);
+   minqpstate_init(&p->qpstate, _state, make_automatic);
+   minqpreport_init(&p->qprep, _state, make_automatic);
+   sparsematrix_init(&p->tmpsp, _state, make_automatic);
 }
 
-void _minlmstepfinder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlmstepfinder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmstepfinder *dst = (minlmstepfinder *) _dst;
    minlmstepfinder *src = (minlmstepfinder *) _src;
    dst->n = src->n;
@@ -27143,79 +26594,56 @@ void _minlmstepfinder_init_copy(void *_dst, void *_src, ae_state *_state, bool m
    dst->maxmodelage = src->maxmodelage;
    dst->hasfi = src->hasfi;
    dst->epsx = src->epsx;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfi = src->needfi;
    dst->fbase = src->fbase;
-   ae_vector_init_copy(&dst->modeldiag, &src->modeldiag, _state, make_automatic);
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fibase, &src->fibase, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   ae_vector_init_copy(&dst->xdir, &src->xdir, _state, make_automatic);
-   ae_vector_init_copy(&dst->choleskybuf, &src->choleskybuf, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpct, &src->tmpct, _state, make_automatic);
+   ae_vector_copy(&dst->modeldiag, &src->modeldiag, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->fibase, &src->fibase, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
+   ae_vector_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->xdir, &src->xdir, _state, make_automatic);
+   ae_vector_copy(&dst->choleskybuf, &src->choleskybuf, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpct, &src->tmpct, _state, make_automatic);
    dst->actualdecrease = src->actualdecrease;
    dst->predicteddecrease = src->predicteddecrease;
-   _minqpstate_init_copy(&dst->qpstate, &src->qpstate, _state, make_automatic);
-   _minqpreport_init_copy(&dst->qprep, &src->qprep, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->tmpsp, &src->tmpsp, _state, make_automatic);
+   minqpstate_copy(&dst->qpstate, &src->qpstate, _state, make_automatic);
+   minqpreport_copy(&dst->qprep, &src->qprep, _state, make_automatic);
+   sparsematrix_copy(&dst->tmpsp, &src->tmpsp, _state, make_automatic);
 }
 
-void _minlmstepfinder_clear(void *_p) {
+void minlmstepfinder_free(void *_p, bool make_automatic) {
    minlmstepfinder *p = (minlmstepfinder *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_vector_clear(&p->modeldiag);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->fibase);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->havebndl);
-   ae_vector_clear(&p->havebndu);
-   ae_vector_clear(&p->s);
-   _rcommstate_clear(&p->rstate);
-   ae_vector_clear(&p->xdir);
-   ae_vector_clear(&p->choleskybuf);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmpct);
-   _minqpstate_clear(&p->qpstate);
-   _minqpreport_clear(&p->qprep);
-   _sparsematrix_clear(&p->tmpsp);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_vector_free(&p->modeldiag, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fibase, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->havebndl, make_automatic);
+   ae_vector_free(&p->havebndu, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   ae_vector_free(&p->xdir, make_automatic);
+   ae_vector_free(&p->choleskybuf, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmpct, make_automatic);
+   minqpstate_free(&p->qpstate, make_automatic);
+   minqpreport_free(&p->qprep, make_automatic);
+   sparsematrix_free(&p->tmpsp, make_automatic);
 }
 
-void _minlmstepfinder_destroy(void *_p) {
-   minlmstepfinder *p = (minlmstepfinder *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_vector_destroy(&p->modeldiag);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->fibase);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->havebndl);
-   ae_vector_destroy(&p->havebndu);
-   ae_vector_destroy(&p->s);
-   _rcommstate_destroy(&p->rstate);
-   ae_vector_destroy(&p->xdir);
-   ae_vector_destroy(&p->choleskybuf);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmpct);
-   _minqpstate_destroy(&p->qpstate);
-   _minqpreport_destroy(&p->qprep);
-   _sparsematrix_destroy(&p->tmpsp);
-}
-
-void _minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstate *p = (minlmstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -27237,9 +26665,9 @@ void _minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xdir, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->deltax, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->deltaf, 0, DT_REAL, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
    ae_vector_init(&p->choleskybuf, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fm1, 0, DT_REAL, _state, make_automatic);
@@ -27248,14 +26676,14 @@ void _minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->gm1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->gp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->gc1, 0, DT_REAL, _state, make_automatic);
-   _minlbfgsstate_init(&p->internalstate, _state, make_automatic);
-   _minlbfgsreport_init(&p->internalrep, _state, make_automatic);
-   _minqpstate_init(&p->qpstate, _state, make_automatic);
-   _minqpreport_init(&p->qprep, _state, make_automatic);
-   _minlmstepfinder_init(&p->finderstate, _state, make_automatic);
+   minlbfgsstate_init(&p->internalstate, _state, make_automatic);
+   minlbfgsreport_init(&p->internalrep, _state, make_automatic);
+   minqpstate_init(&p->qpstate, _state, make_automatic);
+   minqpreport_init(&p->qprep, _state, make_automatic);
+   minlmstepfinder_init(&p->finderstate, _state, make_automatic);
 }
 
-void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmstate *dst = (minlmstate *) _dst;
    minlmstate *src = (minlmstate *) _src;
    dst->n = src->n;
@@ -27267,12 +26695,12 @@ void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->stpmax = src->stpmax;
    dst->maxmodelage = src->maxmodelage;
    dst->makeadditers = src->makeadditers;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
-   ae_matrix_init_copy(&dst->h, &src->h, _state, make_automatic);
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_matrix_copy(&dst->h, &src->h, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfg = src->needfg;
    dst->needfgh = src->needfgh;
@@ -27284,31 +26712,31 @@ void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->hasf = src->hasf;
    dst->hasfi = src->hasfi;
    dst->hasg = src->hasg;
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
    dst->fbase = src->fbase;
-   ae_vector_init_copy(&dst->fibase, &src->fibase, _state, make_automatic);
-   ae_vector_init_copy(&dst->gbase, &src->gbase, _state, make_automatic);
-   ae_matrix_init_copy(&dst->quadraticmodel, &src->quadraticmodel, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_matrix_init_copy(&dst->cleic, &src->cleic, _state, make_automatic);
+   ae_vector_copy(&dst->fibase, &src->fibase, _state, make_automatic);
+   ae_vector_copy(&dst->gbase, &src->gbase, _state, make_automatic);
+   ae_matrix_copy(&dst->quadraticmodel, &src->quadraticmodel, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->havebndl, &src->havebndl, _state, make_automatic);
+   ae_vector_copy(&dst->havebndu, &src->havebndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_matrix_copy(&dst->cleic, &src->cleic, _state, make_automatic);
    dst->nec = src->nec;
    dst->nic = src->nic;
    dst->lambdav = src->lambdav;
    dst->nu = src->nu;
    dst->modelage = src->modelage;
-   ae_vector_init_copy(&dst->xnew, &src->xnew, _state, make_automatic);
-   ae_vector_init_copy(&dst->xdir, &src->xdir, _state, make_automatic);
-   ae_vector_init_copy(&dst->deltax, &src->deltax, _state, make_automatic);
-   ae_vector_init_copy(&dst->deltaf, &src->deltaf, _state, make_automatic);
+   ae_vector_copy(&dst->xnew, &src->xnew, _state, make_automatic);
+   ae_vector_copy(&dst->xdir, &src->xdir, _state, make_automatic);
+   ae_vector_copy(&dst->deltax, &src->deltax, _state, make_automatic);
+   ae_vector_copy(&dst->deltaf, &src->deltaf, _state, make_automatic);
    dst->deltaxready = src->deltaxready;
    dst->deltafready = src->deltafready;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
    dst->teststep = src->teststep;
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repterminationtype = src->repterminationtype;
    dst->repnfunc = src->repnfunc;
@@ -27316,112 +26744,72 @@ void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->repngrad = src->repngrad;
    dst->repnhess = src->repnhess;
    dst->repncholesky = src->repncholesky;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   ae_vector_init_copy(&dst->choleskybuf, &src->choleskybuf, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->choleskybuf, &src->choleskybuf, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
    dst->actualdecrease = src->actualdecrease;
    dst->predicteddecrease = src->predicteddecrease;
    dst->xm1 = src->xm1;
    dst->xp1 = src->xp1;
-   ae_vector_init_copy(&dst->fm1, &src->fm1, _state, make_automatic);
-   ae_vector_init_copy(&dst->fp1, &src->fp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->fc1, &src->fc1, _state, make_automatic);
-   ae_vector_init_copy(&dst->gm1, &src->gm1, _state, make_automatic);
-   ae_vector_init_copy(&dst->gp1, &src->gp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->gc1, &src->gc1, _state, make_automatic);
-   _minlbfgsstate_init_copy(&dst->internalstate, &src->internalstate, _state, make_automatic);
-   _minlbfgsreport_init_copy(&dst->internalrep, &src->internalrep, _state, make_automatic);
-   _minqpstate_init_copy(&dst->qpstate, &src->qpstate, _state, make_automatic);
-   _minqpreport_init_copy(&dst->qprep, &src->qprep, _state, make_automatic);
-   _minlmstepfinder_init_copy(&dst->finderstate, &src->finderstate, _state, make_automatic);
+   ae_vector_copy(&dst->fm1, &src->fm1, _state, make_automatic);
+   ae_vector_copy(&dst->fp1, &src->fp1, _state, make_automatic);
+   ae_vector_copy(&dst->fc1, &src->fc1, _state, make_automatic);
+   ae_vector_copy(&dst->gm1, &src->gm1, _state, make_automatic);
+   ae_vector_copy(&dst->gp1, &src->gp1, _state, make_automatic);
+   ae_vector_copy(&dst->gc1, &src->gc1, _state, make_automatic);
+   minlbfgsstate_copy(&dst->internalstate, &src->internalstate, _state, make_automatic);
+   minlbfgsreport_copy(&dst->internalrep, &src->internalrep, _state, make_automatic);
+   minqpstate_copy(&dst->qpstate, &src->qpstate, _state, make_automatic);
+   minqpreport_copy(&dst->qprep, &src->qprep, _state, make_automatic);
+   minlmstepfinder_copy(&dst->finderstate, &src->finderstate, _state, make_automatic);
 }
 
-void _minlmstate_clear(void *_p) {
+void minlmstate_free(void *_p, bool make_automatic) {
    minlmstate *p = (minlmstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   ae_matrix_clear(&p->h);
-   ae_vector_clear(&p->g);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->fibase);
-   ae_vector_clear(&p->gbase);
-   ae_matrix_clear(&p->quadraticmodel);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->havebndl);
-   ae_vector_clear(&p->havebndu);
-   ae_vector_clear(&p->s);
-   ae_matrix_clear(&p->cleic);
-   ae_vector_clear(&p->xnew);
-   ae_vector_clear(&p->xdir);
-   ae_vector_clear(&p->deltax);
-   ae_vector_clear(&p->deltaf);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
-   _rcommstate_clear(&p->rstate);
-   ae_vector_clear(&p->choleskybuf);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->fm1);
-   ae_vector_clear(&p->fp1);
-   ae_vector_clear(&p->fc1);
-   ae_vector_clear(&p->gm1);
-   ae_vector_clear(&p->gp1);
-   ae_vector_clear(&p->gc1);
-   _minlbfgsstate_clear(&p->internalstate);
-   _minlbfgsreport_clear(&p->internalrep);
-   _minqpstate_clear(&p->qpstate);
-   _minqpreport_clear(&p->qprep);
-   _minlmstepfinder_clear(&p->finderstate);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   ae_matrix_free(&p->h, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fibase, make_automatic);
+   ae_vector_free(&p->gbase, make_automatic);
+   ae_matrix_free(&p->quadraticmodel, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->havebndl, make_automatic);
+   ae_vector_free(&p->havebndu, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_matrix_free(&p->cleic, make_automatic);
+   ae_vector_free(&p->xnew, make_automatic);
+   ae_vector_free(&p->xdir, make_automatic);
+   ae_vector_free(&p->deltax, make_automatic);
+   ae_vector_free(&p->deltaf, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   ae_vector_free(&p->choleskybuf, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->fm1, make_automatic);
+   ae_vector_free(&p->fp1, make_automatic);
+   ae_vector_free(&p->fc1, make_automatic);
+   ae_vector_free(&p->gm1, make_automatic);
+   ae_vector_free(&p->gp1, make_automatic);
+   ae_vector_free(&p->gc1, make_automatic);
+   minlbfgsstate_free(&p->internalstate, make_automatic);
+   minlbfgsreport_free(&p->internalrep, make_automatic);
+   minqpstate_free(&p->qpstate, make_automatic);
+   minqpreport_free(&p->qprep, make_automatic);
+   minlmstepfinder_free(&p->finderstate, make_automatic);
 }
 
-void _minlmstate_destroy(void *_p) {
-   minlmstate *p = (minlmstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   ae_matrix_destroy(&p->h);
-   ae_vector_destroy(&p->g);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->fibase);
-   ae_vector_destroy(&p->gbase);
-   ae_matrix_destroy(&p->quadraticmodel);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->havebndl);
-   ae_vector_destroy(&p->havebndu);
-   ae_vector_destroy(&p->s);
-   ae_matrix_destroy(&p->cleic);
-   ae_vector_destroy(&p->xnew);
-   ae_vector_destroy(&p->xdir);
-   ae_vector_destroy(&p->deltax);
-   ae_vector_destroy(&p->deltaf);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-   _rcommstate_destroy(&p->rstate);
-   ae_vector_destroy(&p->choleskybuf);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->fm1);
-   ae_vector_destroy(&p->fp1);
-   ae_vector_destroy(&p->fc1);
-   ae_vector_destroy(&p->gm1);
-   ae_vector_destroy(&p->gp1);
-   ae_vector_destroy(&p->gc1);
-   _minlbfgsstate_destroy(&p->internalstate);
-   _minlbfgsreport_destroy(&p->internalrep);
-   _minqpstate_destroy(&p->qpstate);
-   _minqpreport_destroy(&p->qprep);
-   _minlmstepfinder_destroy(&p->finderstate);
-}
-
-void _minlmreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlmreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmreport *p = (minlmreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minlmreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlmreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmreport *dst = (minlmreport *) _dst;
    minlmreport *src = (minlmreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -27433,12 +26821,7 @@ void _minlmreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->ncholesky = src->ncholesky;
 }
 
-void _minlmreport_clear(void *_p) {
-   minlmreport *p = (minlmreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minlmreport_destroy(void *_p) {
+void minlmreport_free(void *_p, bool make_automatic) {
    minlmreport *p = (minlmreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -28284,7 +27667,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 // API: void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams);
 void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
 
-   _mincgstate_clear(state);
+   mincgstate_free(state, true);
 
    ae_assert(n >= 1, "MinCGCreate: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!", _state);
@@ -28335,7 +27718,7 @@ void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
 // API: void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams);
 void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae_state *_state) {
 
-   _mincgstate_clear(state);
+   mincgstate_free(state, true);
 
    ae_assert(n >= 1, "MinCGCreateF: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreateF: Length(X)<N!", _state);
@@ -29392,7 +28775,7 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 // API: void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams);
 void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -29439,8 +28822,8 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_sta
 // API: void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test0report_clear(strrep);
-   _optguardnonc1test0report_clear(lngrep);
+   optguardnonc1test0report_free(strrep, true);
+   optguardnonc1test0report_free(lngrep, true);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -29495,8 +28878,8 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 // API: void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test1report_clear(strrep);
-   _optguardnonc1test1report_clear(lngrep);
+   optguardnonc1test1report_free(strrep, true);
+   optguardnonc1test1report_free(lngrep, true);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -29531,8 +28914,8 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 // API: void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams);
 void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _mincgreport_clear(rep);
+   ae_vector_free(x, true);
+   mincgreport_free(rep, true);
 
    mincgresultsbuf(state, x, rep, _state);
 }
@@ -29869,7 +29252,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
    }
 }
 
-void _mincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void mincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    mincgstate *p = (mincgstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
@@ -29885,16 +29268,16 @@ void _mincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xbase, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
-   _linminstate_init(&p->lstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
+   linminstate_init(&p->lstate, _state, make_automatic);
    ae_vector_init(&p->work0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->work1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void mincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    mincgstate *dst = (mincgstate *) _dst;
    mincgstate *src = (mincgstate *) _src;
    dst->n = src->n;
@@ -29908,35 +29291,35 @@ void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->drep = src->drep;
    dst->cgtype = src->cgtype;
    dst->prectype = src->prectype;
-   ae_vector_init_copy(&dst->diagh, &src->diagh, _state, make_automatic);
-   ae_vector_init_copy(&dst->diaghl2, &src->diaghl2, _state, make_automatic);
-   ae_matrix_init_copy(&dst->vcorr, &src->vcorr, _state, make_automatic);
+   ae_vector_copy(&dst->diagh, &src->diagh, _state, make_automatic);
+   ae_vector_copy(&dst->diaghl2, &src->diaghl2, _state, make_automatic);
+   ae_matrix_copy(&dst->vcorr, &src->vcorr, _state, make_automatic);
    dst->vcnt = src->vcnt;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
    dst->diffstep = src->diffstep;
    dst->nfev = src->nfev;
    dst->mcstage = src->mcstage;
    dst->k = src->k;
-   ae_vector_init_copy(&dst->xk, &src->xk, _state, make_automatic);
-   ae_vector_init_copy(&dst->dk, &src->dk, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->dn, &src->dn, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->xk, &src->xk, _state, make_automatic);
+   ae_vector_copy(&dst->dk, &src->dk, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->dn, &src->dn, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->fold = src->fold;
    dst->stp = src->stp;
    dst->curstpmax = src->curstpmax;
-   ae_vector_init_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_vector_copy(&dst->yk, &src->yk, _state, make_automatic);
    dst->lastgoodstep = src->lastgoodstep;
    dst->lastscaledstep = src->lastscaledstep;
    dst->mcinfo = src->mcinfo;
    dst->innerresetneeded = src->innerresetneeded;
    dst->terminationneeded = src->terminationneeded;
    dst->trimthreshold = src->trimthreshold;
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
    dst->rstimer = src->rstimer;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfg = src->needfg;
    dst->xupdated = src->xupdated;
@@ -29944,12 +29327,12 @@ void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->lsstart = src->lsstart;
    dst->lsend = src->lsend;
    dst->userterminationneeded = src->userterminationneeded;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnfev = src->repnfev;
    dst->repterminationtype = src->repterminationtype;
    dst->debugrestartscount = src->debugrestartscount;
-   _linminstate_init_copy(&dst->lstate, &src->lstate, _state, make_automatic);
+   linminstate_copy(&dst->lstate, &src->lstate, _state, make_automatic);
    dst->fbase = src->fbase;
    dst->fm2 = src->fm2;
    dst->fm1 = src->fm1;
@@ -29957,71 +29340,46 @@ void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->fp2 = src->fp2;
    dst->betahs = src->betahs;
    dst->betady = src->betady;
-   ae_vector_init_copy(&dst->work0, &src->work0, _state, make_automatic);
-   ae_vector_init_copy(&dst->work1, &src->work1, _state, make_automatic);
-   ae_vector_init_copy(&dst->invs, &src->invs, _state, make_automatic);
+   ae_vector_copy(&dst->work0, &src->work0, _state, make_automatic);
+   ae_vector_copy(&dst->work1, &src->work1, _state, make_automatic);
+   ae_vector_copy(&dst->invs, &src->invs, _state, make_automatic);
    dst->teststep = src->teststep;
    dst->smoothnessguardlevel = src->smoothnessguardlevel;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
 }
 
-void _mincgstate_clear(void *_p) {
+void mincgstate_free(void *_p, bool make_automatic) {
    mincgstate *p = (mincgstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->diagh);
-   ae_vector_clear(&p->diaghl2);
-   ae_matrix_clear(&p->vcorr);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->xk);
-   ae_vector_clear(&p->dk);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->dn);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->yk);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   _rcommstate_clear(&p->rstate);
-   _linminstate_clear(&p->lstate);
-   ae_vector_clear(&p->work0);
-   ae_vector_clear(&p->work1);
-   ae_vector_clear(&p->invs);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
+   ae_vector_free(&p->diagh, make_automatic);
+   ae_vector_free(&p->diaghl2, make_automatic);
+   ae_matrix_free(&p->vcorr, make_automatic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->xk, make_automatic);
+   ae_vector_free(&p->dk, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->dn, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->yk, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   linminstate_free(&p->lstate, make_automatic);
+   ae_vector_free(&p->work0, make_automatic);
+   ae_vector_free(&p->work1, make_automatic);
+   ae_vector_free(&p->invs, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
 }
 
-void _mincgstate_destroy(void *_p) {
-   mincgstate *p = (mincgstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->diagh);
-   ae_vector_destroy(&p->diaghl2);
-   ae_matrix_destroy(&p->vcorr);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->xk);
-   ae_vector_destroy(&p->dk);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->dn);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->yk);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   _rcommstate_destroy(&p->rstate);
-   _linminstate_destroy(&p->lstate);
-   ae_vector_destroy(&p->work0);
-   ae_vector_destroy(&p->work1);
-   ae_vector_destroy(&p->invs);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-}
-
-void _mincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void mincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
    mincgreport *p = (mincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _mincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void mincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    mincgreport *dst = (mincgreport *) _dst;
    mincgreport *src = (mincgreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -30029,12 +29387,7 @@ void _mincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->terminationtype = src->terminationtype;
 }
 
-void _mincgreport_clear(void *_p) {
-   mincgreport *p = (mincgreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _mincgreport_destroy(void *_p) {
+void mincgreport_free(void *_p, bool make_automatic) {
    mincgreport *p = (mincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -32726,21 +32079,21 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x,
    }
 }
 
-void _minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
+void minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpsubsolver *p = (minsqpsubsolver *) _p;
    ae_touch_ptr((void *)p);
-   _vipmstate_init(&p->ipmsolver, _state, make_automatic);
+   vipmstate_init(&p->ipmsolver, _state, make_automatic);
    ae_vector_init(&p->curb, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curbndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cural, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curau, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparserawlc, _state, make_automatic);
-   _sparsematrix_init(&p->sparseefflc, _state, make_automatic);
+   sparsematrix_init(&p->sparserawlc, _state, make_automatic);
+   sparsematrix_init(&p->sparseefflc, _state, make_automatic);
    ae_vector_init(&p->d0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->h, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->densedummy, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsedummy, _state, make_automatic);
+   sparsematrix_init(&p->sparsedummy, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp2, 0, DT_REAL, _state, make_automatic);
@@ -32755,148 +32108,106 @@ void _minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->activeidx, 0, DT_INT, _state, make_automatic);
 }
 
-void _minsqpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minsqpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpsubsolver *dst = (minsqpsubsolver *) _dst;
    minsqpsubsolver *src = (minsqpsubsolver *) _src;
    dst->algokind = src->algokind;
-   _vipmstate_init_copy(&dst->ipmsolver, &src->ipmsolver, _state, make_automatic);
-   ae_vector_init_copy(&dst->curb, &src->curb, _state, make_automatic);
-   ae_vector_init_copy(&dst->curbndl, &src->curbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->curbndu, &src->curbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->cural, &src->cural, _state, make_automatic);
-   ae_vector_init_copy(&dst->curau, &src->curau, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparserawlc, &src->sparserawlc, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseefflc, &src->sparseefflc, _state, make_automatic);
-   ae_vector_init_copy(&dst->d0, &src->d0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->h, &src->h, _state, make_automatic);
-   ae_matrix_init_copy(&dst->densedummy, &src->densedummy, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsedummy, &src->sparsedummy, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->sk, &src->sk, _state, make_automatic);
-   ae_vector_init_copy(&dst->yk, &src->yk, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasal, &src->hasal, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasau, &src->hasau, _state, make_automatic);
-   ae_matrix_init_copy(&dst->activea, &src->activea, _state, make_automatic);
-   ae_vector_init_copy(&dst->activerhs, &src->activerhs, _state, make_automatic);
-   ae_vector_init_copy(&dst->activeidx, &src->activeidx, _state, make_automatic);
+   vipmstate_copy(&dst->ipmsolver, &src->ipmsolver, _state, make_automatic);
+   ae_vector_copy(&dst->curb, &src->curb, _state, make_automatic);
+   ae_vector_copy(&dst->curbndl, &src->curbndl, _state, make_automatic);
+   ae_vector_copy(&dst->curbndu, &src->curbndu, _state, make_automatic);
+   ae_vector_copy(&dst->cural, &src->cural, _state, make_automatic);
+   ae_vector_copy(&dst->curau, &src->curau, _state, make_automatic);
+   sparsematrix_copy(&dst->sparserawlc, &src->sparserawlc, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseefflc, &src->sparseefflc, _state, make_automatic);
+   ae_vector_copy(&dst->d0, &src->d0, _state, make_automatic);
+   ae_matrix_copy(&dst->h, &src->h, _state, make_automatic);
+   ae_matrix_copy(&dst->densedummy, &src->densedummy, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsedummy, &src->sparsedummy, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_vector_copy(&dst->sk, &src->sk, _state, make_automatic);
+   ae_vector_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasal, &src->hasal, _state, make_automatic);
+   ae_vector_copy(&dst->hasau, &src->hasau, _state, make_automatic);
+   ae_matrix_copy(&dst->activea, &src->activea, _state, make_automatic);
+   ae_vector_copy(&dst->activerhs, &src->activerhs, _state, make_automatic);
+   ae_vector_copy(&dst->activeidx, &src->activeidx, _state, make_automatic);
    dst->activesetsize = src->activesetsize;
 }
 
-void _minsqpsubsolver_clear(void *_p) {
+void minsqpsubsolver_free(void *_p, bool make_automatic) {
    minsqpsubsolver *p = (minsqpsubsolver *) _p;
    ae_touch_ptr((void *)p);
-   _vipmstate_clear(&p->ipmsolver);
-   ae_vector_clear(&p->curb);
-   ae_vector_clear(&p->curbndl);
-   ae_vector_clear(&p->curbndu);
-   ae_vector_clear(&p->cural);
-   ae_vector_clear(&p->curau);
-   _sparsematrix_clear(&p->sparserawlc);
-   _sparsematrix_clear(&p->sparseefflc);
-   ae_vector_clear(&p->d0);
-   ae_matrix_clear(&p->h);
-   ae_matrix_clear(&p->densedummy);
-   _sparsematrix_clear(&p->sparsedummy);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmp2);
-   ae_vector_clear(&p->sk);
-   ae_vector_clear(&p->yk);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->hasal);
-   ae_vector_clear(&p->hasau);
-   ae_matrix_clear(&p->activea);
-   ae_vector_clear(&p->activerhs);
-   ae_vector_clear(&p->activeidx);
+   vipmstate_free(&p->ipmsolver, make_automatic);
+   ae_vector_free(&p->curb, make_automatic);
+   ae_vector_free(&p->curbndl, make_automatic);
+   ae_vector_free(&p->curbndu, make_automatic);
+   ae_vector_free(&p->cural, make_automatic);
+   ae_vector_free(&p->curau, make_automatic);
+   sparsematrix_free(&p->sparserawlc, make_automatic);
+   sparsematrix_free(&p->sparseefflc, make_automatic);
+   ae_vector_free(&p->d0, make_automatic);
+   ae_matrix_free(&p->h, make_automatic);
+   ae_matrix_free(&p->densedummy, make_automatic);
+   sparsematrix_free(&p->sparsedummy, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmp2, make_automatic);
+   ae_vector_free(&p->sk, make_automatic);
+   ae_vector_free(&p->yk, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->hasal, make_automatic);
+   ae_vector_free(&p->hasau, make_automatic);
+   ae_matrix_free(&p->activea, make_automatic);
+   ae_vector_free(&p->activerhs, make_automatic);
+   ae_vector_free(&p->activeidx, make_automatic);
 }
 
-void _minsqpsubsolver_destroy(void *_p) {
-   minsqpsubsolver *p = (minsqpsubsolver *) _p;
-   ae_touch_ptr((void *)p);
-   _vipmstate_destroy(&p->ipmsolver);
-   ae_vector_destroy(&p->curb);
-   ae_vector_destroy(&p->curbndl);
-   ae_vector_destroy(&p->curbndu);
-   ae_vector_destroy(&p->cural);
-   ae_vector_destroy(&p->curau);
-   _sparsematrix_destroy(&p->sparserawlc);
-   _sparsematrix_destroy(&p->sparseefflc);
-   ae_vector_destroy(&p->d0);
-   ae_matrix_destroy(&p->h);
-   ae_matrix_destroy(&p->densedummy);
-   _sparsematrix_destroy(&p->sparsedummy);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmp2);
-   ae_vector_destroy(&p->sk);
-   ae_vector_destroy(&p->yk);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->hasal);
-   ae_vector_destroy(&p->hasau);
-   ae_matrix_destroy(&p->activea);
-   ae_vector_destroy(&p->activerhs);
-   ae_vector_destroy(&p->activeidx);
-}
-
-void _minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
+void minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmplagrangian *p = (minsqptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minsqptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minsqptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqptmplagrangian *dst = (minsqptmplagrangian *) _dst;
    minsqptmplagrangian *src = (minsqptmplagrangian *) _src;
-   ae_vector_init_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclagtmp1, &src->sclagtmp1, _state, make_automatic);
+   ae_vector_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
+   ae_vector_copy(&dst->sclagtmp1, &src->sclagtmp1, _state, make_automatic);
 }
 
-void _minsqptmplagrangian_clear(void *_p) {
+void minsqptmplagrangian_free(void *_p, bool make_automatic) {
    minsqptmplagrangian *p = (minsqptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->sclagtmp0);
-   ae_vector_clear(&p->sclagtmp1);
+   ae_vector_free(&p->sclagtmp0, make_automatic);
+   ae_vector_free(&p->sclagtmp1, make_automatic);
 }
 
-void _minsqptmplagrangian_destroy(void *_p) {
-   minsqptmplagrangian *p = (minsqptmplagrangian *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->sclagtmp0);
-   ae_vector_destroy(&p->sclagtmp1);
-}
-
-void _minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
+void minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmpmerit *p = (minsqptmpmerit *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minsqptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minsqptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqptmpmerit *dst = (minsqptmpmerit *) _dst;
    minsqptmpmerit *src = (minsqptmpmerit *) _src;
-   ae_vector_init_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
+   ae_vector_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
 }
 
-void _minsqptmpmerit_clear(void *_p) {
+void minsqptmpmerit_free(void *_p, bool make_automatic) {
    minsqptmpmerit *p = (minsqptmpmerit *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->mftmp0);
+   ae_vector_free(&p->mftmp0, make_automatic);
 }
 
-void _minsqptmpmerit_destroy(void *_p) {
-   minsqptmpmerit *p = (minsqptmpmerit *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->mftmp0);
-}
-
-void _minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -32913,14 +32224,14 @@ void _minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic
    ae_vector_init(&p->lagmult, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dummylagmult, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->penalties, 0, DT_REAL, _state, make_automatic);
-   _minsqptmpmerit_init(&p->tmpmerit, _state, make_automatic);
-   _minsqptmplagrangian_init(&p->tmplagrangianfg, _state, make_automatic);
+   minsqptmpmerit_init(&p->tmpmerit, _state, make_automatic);
+   minsqptmplagrangian_init(&p->tmplagrangianfg, _state, make_automatic);
    ae_vector_init(&p->stepklaggrad, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepknlaggrad, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rmeritphasestate, _state, make_automatic);
+   rcommstate_init(&p->rmeritphasestate, _state, make_automatic);
 }
 
-void _minsqpmeritphasestate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minsqpmeritphasestate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpmeritphasestate *dst = (minsqpmeritphasestate *) _dst;
    minsqpmeritphasestate *src = (minsqpmeritphasestate *) _src;
    dst->n = src->n;
@@ -32928,78 +32239,54 @@ void _minsqpmeritphasestate_init_copy(void *_dst, void *_src, ae_state *_state, 
    dst->nic = src->nic;
    dst->nlec = src->nlec;
    dst->nlic = src->nlic;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->dx, &src->dx, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
-   ae_vector_init_copy(&dst->lagmult, &src->lagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->penalties, &src->penalties, _state, make_automatic);
-   _minsqptmpmerit_init_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
-   _minsqptmplagrangian_init_copy(&dst->tmplagrangianfg, &src->tmplagrangianfg, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepklaggrad, &src->stepklaggrad, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepknlaggrad, &src->stepknlaggrad, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->dx, &src->dx, _state, make_automatic);
+   ae_vector_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
+   ae_vector_copy(&dst->lagmult, &src->lagmult, _state, make_automatic);
+   ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
+   ae_vector_copy(&dst->penalties, &src->penalties, _state, make_automatic);
+   minsqptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
+   minsqptmplagrangian_copy(&dst->tmplagrangianfg, &src->tmplagrangianfg, _state, make_automatic);
+   ae_vector_copy(&dst->stepklaggrad, &src->stepklaggrad, _state, make_automatic);
+   ae_vector_copy(&dst->stepknlaggrad, &src->stepknlaggrad, _state, make_automatic);
    dst->status = src->status;
    dst->increasebigc = src->increasebigc;
-   _rcommstate_init_copy(&dst->rmeritphasestate, &src->rmeritphasestate, _state, make_automatic);
+   rcommstate_copy(&dst->rmeritphasestate, &src->rmeritphasestate, _state, make_automatic);
 }
 
-void _minsqpmeritphasestate_clear(void *_p) {
+void minsqpmeritphasestate_free(void *_p, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->dx);
-   ae_vector_clear(&p->stepkx);
-   ae_vector_clear(&p->stepkxc);
-   ae_vector_clear(&p->stepkxn);
-   ae_vector_clear(&p->stepkfi);
-   ae_vector_clear(&p->stepkfic);
-   ae_vector_clear(&p->stepkfin);
-   ae_matrix_clear(&p->stepkj);
-   ae_matrix_clear(&p->stepkjc);
-   ae_matrix_clear(&p->stepkjn);
-   ae_vector_clear(&p->lagmult);
-   ae_vector_clear(&p->dummylagmult);
-   ae_vector_clear(&p->penalties);
-   _minsqptmpmerit_clear(&p->tmpmerit);
-   _minsqptmplagrangian_clear(&p->tmplagrangianfg);
-   ae_vector_clear(&p->stepklaggrad);
-   ae_vector_clear(&p->stepknlaggrad);
-   _rcommstate_clear(&p->rmeritphasestate);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->dx, make_automatic);
+   ae_vector_free(&p->stepkx, make_automatic);
+   ae_vector_free(&p->stepkxc, make_automatic);
+   ae_vector_free(&p->stepkxn, make_automatic);
+   ae_vector_free(&p->stepkfi, make_automatic);
+   ae_vector_free(&p->stepkfic, make_automatic);
+   ae_vector_free(&p->stepkfin, make_automatic);
+   ae_matrix_free(&p->stepkj, make_automatic);
+   ae_matrix_free(&p->stepkjc, make_automatic);
+   ae_matrix_free(&p->stepkjn, make_automatic);
+   ae_vector_free(&p->lagmult, make_automatic);
+   ae_vector_free(&p->dummylagmult, make_automatic);
+   ae_vector_free(&p->penalties, make_automatic);
+   minsqptmpmerit_free(&p->tmpmerit, make_automatic);
+   minsqptmplagrangian_free(&p->tmplagrangianfg, make_automatic);
+   ae_vector_free(&p->stepklaggrad, make_automatic);
+   ae_vector_free(&p->stepknlaggrad, make_automatic);
+   rcommstate_free(&p->rmeritphasestate, make_automatic);
 }
 
-void _minsqpmeritphasestate_destroy(void *_p) {
-   minsqpmeritphasestate *p = (minsqpmeritphasestate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->dx);
-   ae_vector_destroy(&p->stepkx);
-   ae_vector_destroy(&p->stepkxc);
-   ae_vector_destroy(&p->stepkxn);
-   ae_vector_destroy(&p->stepkfi);
-   ae_vector_destroy(&p->stepkfic);
-   ae_vector_destroy(&p->stepkfin);
-   ae_matrix_destroy(&p->stepkj);
-   ae_matrix_destroy(&p->stepkjc);
-   ae_matrix_destroy(&p->stepkjn);
-   ae_vector_destroy(&p->lagmult);
-   ae_vector_destroy(&p->dummylagmult);
-   ae_vector_destroy(&p->penalties);
-   _minsqptmpmerit_destroy(&p->tmpmerit);
-   _minsqptmplagrangian_destroy(&p->tmplagrangianfg);
-   ae_vector_destroy(&p->stepklaggrad);
-   ae_vector_destroy(&p->stepknlaggrad);
-   _rcommstate_destroy(&p->rmeritphasestate);
-}
-
-void _minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpstate *p = (minsqpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -33012,7 +32299,7 @@ void _minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _minsqpmeritphasestate_init(&p->meritstate, _state, make_automatic);
+   minsqpmeritphasestate_init(&p->meritstate, _state, make_automatic);
    ae_vector_init(&p->step0x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->backupx, 0, DT_REAL, _state, make_automatic);
@@ -33026,12 +32313,12 @@ void _minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->abslagmemory, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fscales, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tracegamma, 0, DT_REAL, _state, make_automatic);
-   _minsqpsubsolver_init(&p->subsolver, _state, make_automatic);
-   _minsqptmpmerit_init(&p->tmpmerit, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   minsqpsubsolver_init(&p->subsolver, _state, make_automatic);
+   minsqptmpmerit_init(&p->tmpmerit, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minsqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpstate *dst = (minsqpstate *) _dst;
    minsqpstate *src = (minsqpstate *) _src;
    dst->n = src->n;
@@ -33039,42 +32326,42 @@ void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->nic = src->nic;
    dst->nlec = src->nlec;
    dst->nlic = src->nlic;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_matrix_init_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_matrix_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
+   ae_vector_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
    dst->epsx = src->epsx;
    dst->maxits = src->maxits;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
    dst->f = src->f;
    dst->needfij = src->needfij;
    dst->xupdated = src->xupdated;
-   _minsqpmeritphasestate_init_copy(&dst->meritstate, &src->meritstate, _state, make_automatic);
+   minsqpmeritphasestate_copy(&dst->meritstate, &src->meritstate, _state, make_automatic);
    dst->bigc = src->bigc;
    dst->trustrad = src->trustrad;
    dst->trustradstagnationcnt = src->trustradstagnationcnt;
    dst->fstagnationcnt = src->fstagnationcnt;
-   ae_vector_init_copy(&dst->step0x, &src->step0x, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
-   ae_vector_init_copy(&dst->backupx, &src->backupx, _state, make_automatic);
-   ae_vector_init_copy(&dst->step0fi, &src->step0fi, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
-   ae_vector_init_copy(&dst->backupfi, &src->backupfi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->step0j, &src->step0j, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
+   ae_vector_copy(&dst->step0x, &src->step0x, _state, make_automatic);
+   ae_vector_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
+   ae_vector_copy(&dst->backupx, &src->backupx, _state, make_automatic);
+   ae_vector_copy(&dst->step0fi, &src->step0fi, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
+   ae_vector_copy(&dst->backupfi, &src->backupfi, _state, make_automatic);
+   ae_matrix_copy(&dst->step0j, &src->step0j, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
    dst->haslagmult = src->haslagmult;
-   ae_vector_init_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
-   ae_matrix_init_copy(&dst->abslagmemory, &src->abslagmemory, _state, make_automatic);
-   ae_vector_init_copy(&dst->fscales, &src->fscales, _state, make_automatic);
-   ae_vector_init_copy(&dst->tracegamma, &src->tracegamma, _state, make_automatic);
-   _minsqpsubsolver_init_copy(&dst->subsolver, &src->subsolver, _state, make_automatic);
-   _minsqptmpmerit_init_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
+   ae_vector_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
+   ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
+   ae_matrix_copy(&dst->abslagmemory, &src->abslagmemory, _state, make_automatic);
+   ae_vector_copy(&dst->fscales, &src->fscales, _state, make_automatic);
+   ae_vector_copy(&dst->tracegamma, &src->tracegamma, _state, make_automatic);
+   minsqpsubsolver_copy(&dst->subsolver, &src->subsolver, _state, make_automatic);
+   minsqptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
    dst->repsimplexiterations = src->repsimplexiterations;
    dst->repsimplexiterations1 = src->repsimplexiterations1;
    dst->repsimplexiterations2 = src->repsimplexiterations2;
@@ -33087,71 +32374,39 @@ void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->replcidx = src->replcidx;
    dst->repnlcerr = src->repnlcerr;
    dst->repnlcidx = src->repnlcidx;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _minsqpstate_clear(void *_p) {
+void minsqpstate_free(void *_p, bool make_automatic) {
    minsqpstate *p = (minsqpstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_matrix_clear(&p->scaledcleic);
-   ae_vector_clear(&p->lcsrcidx);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->scaledbndl);
-   ae_vector_clear(&p->scaledbndu);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _minsqpmeritphasestate_clear(&p->meritstate);
-   ae_vector_clear(&p->step0x);
-   ae_vector_clear(&p->stepkx);
-   ae_vector_clear(&p->backupx);
-   ae_vector_clear(&p->step0fi);
-   ae_vector_clear(&p->stepkfi);
-   ae_vector_clear(&p->backupfi);
-   ae_matrix_clear(&p->step0j);
-   ae_matrix_clear(&p->stepkj);
-   ae_vector_clear(&p->meritlagmult);
-   ae_vector_clear(&p->dummylagmult);
-   ae_matrix_clear(&p->abslagmemory);
-   ae_vector_clear(&p->fscales);
-   ae_vector_clear(&p->tracegamma);
-   _minsqpsubsolver_clear(&p->subsolver);
-   _minsqptmpmerit_clear(&p->tmpmerit);
-   _rcommstate_clear(&p->rstate);
-}
-
-void _minsqpstate_destroy(void *_p) {
-   minsqpstate *p = (minsqpstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_matrix_destroy(&p->scaledcleic);
-   ae_vector_destroy(&p->lcsrcidx);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->scaledbndl);
-   ae_vector_destroy(&p->scaledbndu);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _minsqpmeritphasestate_destroy(&p->meritstate);
-   ae_vector_destroy(&p->step0x);
-   ae_vector_destroy(&p->stepkx);
-   ae_vector_destroy(&p->backupx);
-   ae_vector_destroy(&p->step0fi);
-   ae_vector_destroy(&p->stepkfi);
-   ae_vector_destroy(&p->backupfi);
-   ae_matrix_destroy(&p->step0j);
-   ae_matrix_destroy(&p->stepkj);
-   ae_vector_destroy(&p->meritlagmult);
-   ae_vector_destroy(&p->dummylagmult);
-   ae_matrix_destroy(&p->abslagmemory);
-   ae_vector_destroy(&p->fscales);
-   ae_vector_destroy(&p->tracegamma);
-   _minsqpsubsolver_destroy(&p->subsolver);
-   _minsqptmpmerit_destroy(&p->tmpmerit);
-   _rcommstate_destroy(&p->rstate);
+   ae_vector_free(&p->s, make_automatic);
+   ae_matrix_free(&p->scaledcleic, make_automatic);
+   ae_vector_free(&p->lcsrcidx, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->scaledbndl, make_automatic);
+   ae_vector_free(&p->scaledbndu, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   minsqpmeritphasestate_free(&p->meritstate, make_automatic);
+   ae_vector_free(&p->step0x, make_automatic);
+   ae_vector_free(&p->stepkx, make_automatic);
+   ae_vector_free(&p->backupx, make_automatic);
+   ae_vector_free(&p->step0fi, make_automatic);
+   ae_vector_free(&p->stepkfi, make_automatic);
+   ae_vector_free(&p->backupfi, make_automatic);
+   ae_matrix_free(&p->step0j, make_automatic);
+   ae_matrix_free(&p->stepkj, make_automatic);
+   ae_vector_free(&p->meritlagmult, make_automatic);
+   ae_vector_free(&p->dummylagmult, make_automatic);
+   ae_matrix_free(&p->abslagmemory, make_automatic);
+   ae_vector_free(&p->fscales, make_automatic);
+   ae_vector_free(&p->tracegamma, make_automatic);
+   minsqpsubsolver_free(&p->subsolver, make_automatic);
+   minsqptmpmerit_free(&p->tmpmerit, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -33330,7 +32585,7 @@ void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc,
    }
 }
 
-void _presolveinfo_init(void *_p, ae_state *_state, bool make_automatic) {
+void presolveinfo_init(void *_p, ae_state *_state, bool make_automatic) {
    presolveinfo *p = (presolveinfo *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, _state, make_automatic);
@@ -33340,59 +32595,44 @@ void _presolveinfo_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsea, _state, make_automatic);
+   sparsematrix_init(&p->sparsea, _state, make_automatic);
    ae_vector_init(&p->al, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->au, 0, DT_REAL, _state, make_automatic);
 }
 
-void _presolveinfo_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void presolveinfo_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    presolveinfo *dst = (presolveinfo *) _dst;
    presolveinfo *src = (presolveinfo *) _src;
    dst->newn = src->newn;
    dst->oldn = src->oldn;
    dst->newm = src->newm;
    dst->oldm = src->oldm;
-   ae_vector_init_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->colscales, &src->colscales, _state, make_automatic);
-   ae_vector_init_copy(&dst->rowscales, &src->rowscales, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
+   ae_vector_copy(&dst->colscales, &src->colscales, _state, make_automatic);
+   ae_vector_copy(&dst->rowscales, &src->rowscales, _state, make_automatic);
    dst->costscale = src->costscale;
-   ae_vector_init_copy(&dst->c, &src->c, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
-   ae_vector_init_copy(&dst->al, &src->al, _state, make_automatic);
-   ae_vector_init_copy(&dst->au, &src->au, _state, make_automatic);
+   ae_vector_copy(&dst->c, &src->c, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsea, &src->sparsea, _state, make_automatic);
+   ae_vector_copy(&dst->al, &src->al, _state, make_automatic);
+   ae_vector_copy(&dst->au, &src->au, _state, make_automatic);
 }
 
-void _presolveinfo_clear(void *_p) {
+void presolveinfo_free(void *_p, bool make_automatic) {
    presolveinfo *p = (presolveinfo *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->rawbndl);
-   ae_vector_clear(&p->rawbndu);
-   ae_vector_clear(&p->colscales);
-   ae_vector_clear(&p->rowscales);
-   ae_vector_clear(&p->c);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   _sparsematrix_clear(&p->sparsea);
-   ae_vector_clear(&p->al);
-   ae_vector_clear(&p->au);
-}
-
-void _presolveinfo_destroy(void *_p) {
-   presolveinfo *p = (presolveinfo *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->rawbndl);
-   ae_vector_destroy(&p->rawbndu);
-   ae_vector_destroy(&p->colscales);
-   ae_vector_destroy(&p->rowscales);
-   ae_vector_destroy(&p->c);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   _sparsematrix_destroy(&p->sparsea);
-   ae_vector_destroy(&p->al);
-   ae_vector_destroy(&p->au);
+   ae_vector_free(&p->rawbndl, make_automatic);
+   ae_vector_free(&p->rawbndu, make_automatic);
+   ae_vector_free(&p->colscales, make_automatic);
+   ae_vector_free(&p->rowscales, make_automatic);
+   ae_vector_free(&p->c, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   sparsematrix_free(&p->sparsea, make_automatic);
+   ae_vector_free(&p->al, make_automatic);
+   ae_vector_free(&p->au, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -35728,7 +34968,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
 
    ae_frame_make(_state, &_frame_block);
    memset(&rs, 0, sizeof(rs));
-   _hqrndstate_init(&rs, _state, true);
+   hqrndstate_init(&rs, _state, true);
 
    nx = state->primary.ns + state->primary.m;
    m = state->primary.m;
@@ -37589,12 +36829,12 @@ static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t 
    *cnt = *cnt + 1;
 }
 
-void _dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic) {
+void dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexsettings *p = (dualsimplexsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _dualsimplexsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void dualsimplexsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexsettings *dst = (dualsimplexsettings *) _dst;
    dualsimplexsettings *src = (dualsimplexsettings *) _src;
    dst->pivottol = src->pivottol;
@@ -37609,17 +36849,12 @@ void _dualsimplexsettings_init_copy(void *_dst, void *_src, ae_state *_state, bo
    dst->dtolabs = src->dtolabs;
 }
 
-void _dualsimplexsettings_clear(void *_p) {
+void dualsimplexsettings_free(void *_p, bool make_automatic) {
    dualsimplexsettings *p = (dualsimplexsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _dualsimplexsettings_destroy(void *_p) {
-   dualsimplexsettings *p = (dualsimplexsettings *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _dssvector_init(void *_p, ae_state *_state, bool make_automatic) {
+void dssvector_init(void *_p, ae_state *_state, bool make_automatic) {
    dssvector *p = (dssvector *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
@@ -37627,42 +36862,34 @@ void _dssvector_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->dense, 0, DT_REAL, _state, make_automatic);
 }
 
-void _dssvector_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void dssvector_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dssvector *dst = (dssvector *) _dst;
    dssvector *src = (dssvector *) _src;
    dst->n = src->n;
    dst->k = src->k;
-   ae_vector_init_copy(&dst->idx, &src->idx, _state, make_automatic);
-   ae_vector_init_copy(&dst->vals, &src->vals, _state, make_automatic);
-   ae_vector_init_copy(&dst->dense, &src->dense, _state, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, _state, make_automatic);
+   ae_vector_copy(&dst->vals, &src->vals, _state, make_automatic);
+   ae_vector_copy(&dst->dense, &src->dense, _state, make_automatic);
 }
 
-void _dssvector_clear(void *_p) {
+void dssvector_free(void *_p, bool make_automatic) {
    dssvector *p = (dssvector *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->idx);
-   ae_vector_clear(&p->vals);
-   ae_vector_clear(&p->dense);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->vals, make_automatic);
+   ae_vector_free(&p->dense, make_automatic);
 }
 
-void _dssvector_destroy(void *_p) {
-   dssvector *p = (dssvector *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->idx);
-   ae_vector_destroy(&p->vals);
-   ae_vector_destroy(&p->dense);
-}
-
-void _dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic) {
+void dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexbasis *p = (dualsimplexbasis *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->nidx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->isbasic, 0, DT_BOOL, _state, make_automatic);
    ae_matrix_init(&p->denselu, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsel, _state, make_automatic);
-   _sparsematrix_init(&p->sparseu, _state, make_automatic);
-   _sparsematrix_init(&p->sparseut, _state, make_automatic);
+   sparsematrix_init(&p->sparsel, _state, make_automatic);
+   sparsematrix_init(&p->sparseu, _state, make_automatic);
+   sparsematrix_init(&p->sparseut, _state, make_automatic);
    ae_vector_init(&p->rowpermbwd, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->colpermbwd, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->densepfieta, 0, DT_REAL, _state, make_automatic);
@@ -37678,128 +36905,94 @@ void _dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->denselu2, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->densep2, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->densep2c, 0, DT_INT, _state, make_automatic);
-   _sparsematrix_init(&p->sparselu1, _state, make_automatic);
-   _sparsematrix_init(&p->sparselu2, _state, make_automatic);
-   _sluv2buffer_init(&p->lubuf2, _state, make_automatic);
+   sparsematrix_init(&p->sparselu1, _state, make_automatic);
+   sparsematrix_init(&p->sparselu2, _state, make_automatic);
+   sluv2buffer_init(&p->lubuf2, _state, make_automatic);
    ae_vector_init(&p->tmpi, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->utmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->utmpi, 0, DT_INT, _state, make_automatic);
-   _sparsematrix_init(&p->sparseludbg, _state, make_automatic);
+   sparsematrix_init(&p->sparseludbg, _state, make_automatic);
 }
 
-void _dualsimplexbasis_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void dualsimplexbasis_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexbasis *dst = (dualsimplexbasis *) _dst;
    dualsimplexbasis *src = (dualsimplexbasis *) _src;
    dst->ns = src->ns;
    dst->m = src->m;
-   ae_vector_init_copy(&dst->idx, &src->idx, _state, make_automatic);
-   ae_vector_init_copy(&dst->nidx, &src->nidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->isbasic, &src->isbasic, _state, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, _state, make_automatic);
+   ae_vector_copy(&dst->nidx, &src->nidx, _state, make_automatic);
+   ae_vector_copy(&dst->isbasic, &src->isbasic, _state, make_automatic);
    dst->trftype = src->trftype;
    dst->isvalidtrf = src->isvalidtrf;
    dst->trfage = src->trfage;
-   ae_matrix_init_copy(&dst->denselu, &src->denselu, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsel, &src->sparsel, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseu, &src->sparseu, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseut, &src->sparseut, _state, make_automatic);
-   ae_vector_init_copy(&dst->rowpermbwd, &src->rowpermbwd, _state, make_automatic);
-   ae_vector_init_copy(&dst->colpermbwd, &src->colpermbwd, _state, make_automatic);
-   ae_vector_init_copy(&dst->densepfieta, &src->densepfieta, _state, make_automatic);
-   ae_vector_init_copy(&dst->densemu, &src->densemu, _state, make_automatic);
-   ae_vector_init_copy(&dst->rk, &src->rk, _state, make_automatic);
-   ae_vector_init_copy(&dst->dk, &src->dk, _state, make_automatic);
-   ae_vector_init_copy(&dst->dseweights, &src->dseweights, _state, make_automatic);
+   ae_matrix_copy(&dst->denselu, &src->denselu, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsel, &src->sparsel, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseu, &src->sparseu, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseut, &src->sparseut, _state, make_automatic);
+   ae_vector_copy(&dst->rowpermbwd, &src->rowpermbwd, _state, make_automatic);
+   ae_vector_copy(&dst->colpermbwd, &src->colpermbwd, _state, make_automatic);
+   ae_vector_copy(&dst->densepfieta, &src->densepfieta, _state, make_automatic);
+   ae_vector_copy(&dst->densemu, &src->densemu, _state, make_automatic);
+   ae_vector_copy(&dst->rk, &src->rk, _state, make_automatic);
+   ae_vector_copy(&dst->dk, &src->dk, _state, make_automatic);
+   ae_vector_copy(&dst->dseweights, &src->dseweights, _state, make_automatic);
    dst->dsevalid = src->dsevalid;
    dst->eminu = src->eminu;
    dst->statfact = src->statfact;
    dst->statupdt = src->statupdt;
    dst->statoffdiag = src->statoffdiag;
-   ae_vector_init_copy(&dst->wtmp0, &src->wtmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->wtmp1, &src->wtmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->wtmp2, &src->wtmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->nrs, &src->nrs, _state, make_automatic);
-   ae_vector_init_copy(&dst->tcinvidx, &src->tcinvidx, _state, make_automatic);
-   ae_matrix_init_copy(&dst->denselu2, &src->denselu2, _state, make_automatic);
-   ae_vector_init_copy(&dst->densep2, &src->densep2, _state, make_automatic);
-   ae_vector_init_copy(&dst->densep2c, &src->densep2c, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparselu1, &src->sparselu1, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparselu2, &src->sparselu2, _state, make_automatic);
-   _sluv2buffer_init_copy(&dst->lubuf2, &src->lubuf2, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
-   ae_vector_init_copy(&dst->utmp0, &src->utmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->utmpi, &src->utmpi, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseludbg, &src->sparseludbg, _state, make_automatic);
+   ae_vector_copy(&dst->wtmp0, &src->wtmp0, _state, make_automatic);
+   ae_vector_copy(&dst->wtmp1, &src->wtmp1, _state, make_automatic);
+   ae_vector_copy(&dst->wtmp2, &src->wtmp2, _state, make_automatic);
+   ae_vector_copy(&dst->nrs, &src->nrs, _state, make_automatic);
+   ae_vector_copy(&dst->tcinvidx, &src->tcinvidx, _state, make_automatic);
+   ae_matrix_copy(&dst->denselu2, &src->denselu2, _state, make_automatic);
+   ae_vector_copy(&dst->densep2, &src->densep2, _state, make_automatic);
+   ae_vector_copy(&dst->densep2c, &src->densep2c, _state, make_automatic);
+   sparsematrix_copy(&dst->sparselu1, &src->sparselu1, _state, make_automatic);
+   sparsematrix_copy(&dst->sparselu2, &src->sparselu2, _state, make_automatic);
+   sluv2buffer_copy(&dst->lubuf2, &src->lubuf2, _state, make_automatic);
+   ae_vector_copy(&dst->tmpi, &src->tmpi, _state, make_automatic);
+   ae_vector_copy(&dst->utmp0, &src->utmp0, _state, make_automatic);
+   ae_vector_copy(&dst->utmpi, &src->utmpi, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseludbg, &src->sparseludbg, _state, make_automatic);
 }
 
-void _dualsimplexbasis_clear(void *_p) {
+void dualsimplexbasis_free(void *_p, bool make_automatic) {
    dualsimplexbasis *p = (dualsimplexbasis *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->idx);
-   ae_vector_clear(&p->nidx);
-   ae_vector_clear(&p->isbasic);
-   ae_matrix_clear(&p->denselu);
-   _sparsematrix_clear(&p->sparsel);
-   _sparsematrix_clear(&p->sparseu);
-   _sparsematrix_clear(&p->sparseut);
-   ae_vector_clear(&p->rowpermbwd);
-   ae_vector_clear(&p->colpermbwd);
-   ae_vector_clear(&p->densepfieta);
-   ae_vector_clear(&p->densemu);
-   ae_vector_clear(&p->rk);
-   ae_vector_clear(&p->dk);
-   ae_vector_clear(&p->dseweights);
-   ae_vector_clear(&p->wtmp0);
-   ae_vector_clear(&p->wtmp1);
-   ae_vector_clear(&p->wtmp2);
-   ae_vector_clear(&p->nrs);
-   ae_vector_clear(&p->tcinvidx);
-   ae_matrix_clear(&p->denselu2);
-   ae_vector_clear(&p->densep2);
-   ae_vector_clear(&p->densep2c);
-   _sparsematrix_clear(&p->sparselu1);
-   _sparsematrix_clear(&p->sparselu2);
-   _sluv2buffer_clear(&p->lubuf2);
-   ae_vector_clear(&p->tmpi);
-   ae_vector_clear(&p->utmp0);
-   ae_vector_clear(&p->utmpi);
-   _sparsematrix_clear(&p->sparseludbg);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->nidx, make_automatic);
+   ae_vector_free(&p->isbasic, make_automatic);
+   ae_matrix_free(&p->denselu, make_automatic);
+   sparsematrix_free(&p->sparsel, make_automatic);
+   sparsematrix_free(&p->sparseu, make_automatic);
+   sparsematrix_free(&p->sparseut, make_automatic);
+   ae_vector_free(&p->rowpermbwd, make_automatic);
+   ae_vector_free(&p->colpermbwd, make_automatic);
+   ae_vector_free(&p->densepfieta, make_automatic);
+   ae_vector_free(&p->densemu, make_automatic);
+   ae_vector_free(&p->rk, make_automatic);
+   ae_vector_free(&p->dk, make_automatic);
+   ae_vector_free(&p->dseweights, make_automatic);
+   ae_vector_free(&p->wtmp0, make_automatic);
+   ae_vector_free(&p->wtmp1, make_automatic);
+   ae_vector_free(&p->wtmp2, make_automatic);
+   ae_vector_free(&p->nrs, make_automatic);
+   ae_vector_free(&p->tcinvidx, make_automatic);
+   ae_matrix_free(&p->denselu2, make_automatic);
+   ae_vector_free(&p->densep2, make_automatic);
+   ae_vector_free(&p->densep2c, make_automatic);
+   sparsematrix_free(&p->sparselu1, make_automatic);
+   sparsematrix_free(&p->sparselu2, make_automatic);
+   sluv2buffer_free(&p->lubuf2, make_automatic);
+   ae_vector_free(&p->tmpi, make_automatic);
+   ae_vector_free(&p->utmp0, make_automatic);
+   ae_vector_free(&p->utmpi, make_automatic);
+   sparsematrix_free(&p->sparseludbg, make_automatic);
 }
 
-void _dualsimplexbasis_destroy(void *_p) {
-   dualsimplexbasis *p = (dualsimplexbasis *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->idx);
-   ae_vector_destroy(&p->nidx);
-   ae_vector_destroy(&p->isbasic);
-   ae_matrix_destroy(&p->denselu);
-   _sparsematrix_destroy(&p->sparsel);
-   _sparsematrix_destroy(&p->sparseu);
-   _sparsematrix_destroy(&p->sparseut);
-   ae_vector_destroy(&p->rowpermbwd);
-   ae_vector_destroy(&p->colpermbwd);
-   ae_vector_destroy(&p->densepfieta);
-   ae_vector_destroy(&p->densemu);
-   ae_vector_destroy(&p->rk);
-   ae_vector_destroy(&p->dk);
-   ae_vector_destroy(&p->dseweights);
-   ae_vector_destroy(&p->wtmp0);
-   ae_vector_destroy(&p->wtmp1);
-   ae_vector_destroy(&p->wtmp2);
-   ae_vector_destroy(&p->nrs);
-   ae_vector_destroy(&p->tcinvidx);
-   ae_matrix_destroy(&p->denselu2);
-   ae_vector_destroy(&p->densep2);
-   ae_vector_destroy(&p->densep2c);
-   _sparsematrix_destroy(&p->sparselu1);
-   _sparsematrix_destroy(&p->sparselu2);
-   _sluv2buffer_destroy(&p->lubuf2);
-   ae_vector_destroy(&p->tmpi);
-   ae_vector_destroy(&p->utmp0);
-   ae_vector_destroy(&p->utmpi);
-   _sparsematrix_destroy(&p->sparseludbg);
-}
-
-void _dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic) {
+void dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexsubproblem *p = (dualsimplexsubproblem *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawc, 0, DT_REAL, _state, make_automatic);
@@ -37817,75 +37010,57 @@ void _dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic
    ae_vector_init(&p->effc, 0, DT_REAL, _state, make_automatic);
 }
 
-void _dualsimplexsubproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void dualsimplexsubproblem_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexsubproblem *dst = (dualsimplexsubproblem *) _dst;
    dualsimplexsubproblem *src = (dualsimplexsubproblem *) _src;
    dst->ns = src->ns;
    dst->m = src->m;
-   ae_vector_init_copy(&dst->rawc, &src->rawc, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndt, &src->bndt, _state, make_automatic);
-   ae_vector_init_copy(&dst->xa, &src->xa, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->rawc, &src->rawc, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->bndt, &src->bndt, _state, make_automatic);
+   ae_vector_copy(&dst->xa, &src->xa, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->state = src->state;
-   ae_vector_init_copy(&dst->xb, &src->xb, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndlb, &src->bndlb, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndub, &src->bndub, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndtb, &src->bndtb, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndtollb, &src->bndtollb, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndtolub, &src->bndtolub, _state, make_automatic);
-   ae_vector_init_copy(&dst->effc, &src->effc, _state, make_automatic);
+   ae_vector_copy(&dst->xb, &src->xb, _state, make_automatic);
+   ae_vector_copy(&dst->bndlb, &src->bndlb, _state, make_automatic);
+   ae_vector_copy(&dst->bndub, &src->bndub, _state, make_automatic);
+   ae_vector_copy(&dst->bndtb, &src->bndtb, _state, make_automatic);
+   ae_vector_copy(&dst->bndtollb, &src->bndtollb, _state, make_automatic);
+   ae_vector_copy(&dst->bndtolub, &src->bndtolub, _state, make_automatic);
+   ae_vector_copy(&dst->effc, &src->effc, _state, make_automatic);
 }
 
-void _dualsimplexsubproblem_clear(void *_p) {
+void dualsimplexsubproblem_free(void *_p, bool make_automatic) {
    dualsimplexsubproblem *p = (dualsimplexsubproblem *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->rawc);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->bndt);
-   ae_vector_clear(&p->xa);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->xb);
-   ae_vector_clear(&p->bndlb);
-   ae_vector_clear(&p->bndub);
-   ae_vector_clear(&p->bndtb);
-   ae_vector_clear(&p->bndtollb);
-   ae_vector_clear(&p->bndtolub);
-   ae_vector_clear(&p->effc);
+   ae_vector_free(&p->rawc, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->bndt, make_automatic);
+   ae_vector_free(&p->xa, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->xb, make_automatic);
+   ae_vector_free(&p->bndlb, make_automatic);
+   ae_vector_free(&p->bndub, make_automatic);
+   ae_vector_free(&p->bndtb, make_automatic);
+   ae_vector_free(&p->bndtollb, make_automatic);
+   ae_vector_free(&p->bndtolub, make_automatic);
+   ae_vector_free(&p->effc, make_automatic);
 }
 
-void _dualsimplexsubproblem_destroy(void *_p) {
-   dualsimplexsubproblem *p = (dualsimplexsubproblem *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->rawc);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->bndt);
-   ae_vector_destroy(&p->xa);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->xb);
-   ae_vector_destroy(&p->bndlb);
-   ae_vector_destroy(&p->bndub);
-   ae_vector_destroy(&p->bndtb);
-   ae_vector_destroy(&p->bndtollb);
-   ae_vector_destroy(&p->bndtolub);
-   ae_vector_destroy(&p->effc);
-}
-
-void _dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexstate *p = (dualsimplexstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rowscales, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rawbndu, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->a, _state, make_automatic);
-   _sparsematrix_init(&p->at, _state, make_automatic);
-   _dualsimplexbasis_init(&p->basis, _state, make_automatic);
-   _dualsimplexsubproblem_init(&p->primary, _state, make_automatic);
-   _dualsimplexsubproblem_init(&p->phase1, _state, make_automatic);
-   _dualsimplexsubproblem_init(&p->phase3, _state, make_automatic);
+   sparsematrix_init(&p->a, _state, make_automatic);
+   sparsematrix_init(&p->at, _state, make_automatic);
+   dualsimplexbasis_init(&p->basis, _state, make_automatic);
+   dualsimplexsubproblem_init(&p->primary, _state, make_automatic);
+   dualsimplexsubproblem_init(&p->phase1, _state, make_automatic);
+   dualsimplexsubproblem_init(&p->phase3, _state, make_automatic);
    ae_vector_init(&p->repx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->replagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->replaglc, 0, DT_REAL, _state, make_automatic);
@@ -37900,12 +37075,12 @@ void _dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->dfctmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dfctmp2, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->ustmpi, 0, DT_INT, _state, make_automatic);
-   _apbuffers_init(&p->xydsbuf, _state, make_automatic);
+   apbuffers_init(&p->xydsbuf, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp2, 0, DT_REAL, _state, make_automatic);
-   _dssvector_init(&p->alphar, _state, make_automatic);
-   _dssvector_init(&p->rhor, _state, make_automatic);
+   dssvector_init(&p->alphar, _state, make_automatic);
+   dssvector_init(&p->rhor, _state, make_automatic);
    ae_vector_init(&p->tau, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->alphaq, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->alphaqim, 0, DT_REAL, _state, make_automatic);
@@ -37913,24 +37088,24 @@ void _dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->harrisset, 0, DT_INT, _state, make_automatic);
 }
 
-void _dualsimplexstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void dualsimplexstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexstate *dst = (dualsimplexstate *) _dst;
    dualsimplexstate *src = (dualsimplexstate *) _src;
-   ae_vector_init_copy(&dst->rowscales, &src->rowscales, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
+   ae_vector_copy(&dst->rowscales, &src->rowscales, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndl, &src->rawbndl, _state, make_automatic);
+   ae_vector_copy(&dst->rawbndu, &src->rawbndu, _state, make_automatic);
    dst->ns = src->ns;
    dst->m = src->m;
-   _sparsematrix_init_copy(&dst->a, &src->a, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->at, &src->at, _state, make_automatic);
-   _dualsimplexbasis_init_copy(&dst->basis, &src->basis, _state, make_automatic);
-   _dualsimplexsubproblem_init_copy(&dst->primary, &src->primary, _state, make_automatic);
-   _dualsimplexsubproblem_init_copy(&dst->phase1, &src->phase1, _state, make_automatic);
-   _dualsimplexsubproblem_init_copy(&dst->phase3, &src->phase3, _state, make_automatic);
-   ae_vector_init_copy(&dst->repx, &src->repx, _state, make_automatic);
-   ae_vector_init_copy(&dst->replagbc, &src->replagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->replaglc, &src->replaglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->repstats, &src->repstats, _state, make_automatic);
+   sparsematrix_copy(&dst->a, &src->a, _state, make_automatic);
+   sparsematrix_copy(&dst->at, &src->at, _state, make_automatic);
+   dualsimplexbasis_copy(&dst->basis, &src->basis, _state, make_automatic);
+   dualsimplexsubproblem_copy(&dst->primary, &src->primary, _state, make_automatic);
+   dualsimplexsubproblem_copy(&dst->phase1, &src->phase1, _state, make_automatic);
+   dualsimplexsubproblem_copy(&dst->phase3, &src->phase3, _state, make_automatic);
+   ae_vector_copy(&dst->repx, &src->repx, _state, make_automatic);
+   ae_vector_copy(&dst->replagbc, &src->replagbc, _state, make_automatic);
+   ae_vector_copy(&dst->replaglc, &src->replaglc, _state, make_automatic);
+   ae_vector_copy(&dst->repstats, &src->repstats, _state, make_automatic);
    dst->repterminationtype = src->repterminationtype;
    dst->repiterationscount = src->repiterationscount;
    dst->repiterationscount1 = src->repiterationscount1;
@@ -37954,106 +37129,67 @@ void _dualsimplexstate_init_copy(void *_dst, void *_src, ae_state *_state, bool 
    dst->dotrace = src->dotrace;
    dst->dodetailedtrace = src->dodetailedtrace;
    dst->dotimers = src->dotimers;
-   ae_vector_init_copy(&dst->btrantmp0, &src->btrantmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->btrantmp1, &src->btrantmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->btrantmp2, &src->btrantmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->ftrantmp0, &src->ftrantmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->ftrantmp1, &src->ftrantmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->possibleflips, &src->possibleflips, _state, make_automatic);
+   ae_vector_copy(&dst->btrantmp0, &src->btrantmp0, _state, make_automatic);
+   ae_vector_copy(&dst->btrantmp1, &src->btrantmp1, _state, make_automatic);
+   ae_vector_copy(&dst->btrantmp2, &src->btrantmp2, _state, make_automatic);
+   ae_vector_copy(&dst->ftrantmp0, &src->ftrantmp0, _state, make_automatic);
+   ae_vector_copy(&dst->ftrantmp1, &src->ftrantmp1, _state, make_automatic);
+   ae_vector_copy(&dst->possibleflips, &src->possibleflips, _state, make_automatic);
    dst->possibleflipscnt = src->possibleflipscnt;
-   ae_vector_init_copy(&dst->dfctmp0, &src->dfctmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->dfctmp1, &src->dfctmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->dfctmp2, &src->dfctmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->ustmpi, &src->ustmpi, _state, make_automatic);
-   _apbuffers_init_copy(&dst->xydsbuf, &src->xydsbuf, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   _dssvector_init_copy(&dst->alphar, &src->alphar, _state, make_automatic);
-   _dssvector_init_copy(&dst->rhor, &src->rhor, _state, make_automatic);
-   ae_vector_init_copy(&dst->tau, &src->tau, _state, make_automatic);
-   ae_vector_init_copy(&dst->alphaq, &src->alphaq, _state, make_automatic);
-   ae_vector_init_copy(&dst->alphaqim, &src->alphaqim, _state, make_automatic);
-   ae_vector_init_copy(&dst->eligiblealphar, &src->eligiblealphar, _state, make_automatic);
-   ae_vector_init_copy(&dst->harrisset, &src->harrisset, _state, make_automatic);
+   ae_vector_copy(&dst->dfctmp0, &src->dfctmp0, _state, make_automatic);
+   ae_vector_copy(&dst->dfctmp1, &src->dfctmp1, _state, make_automatic);
+   ae_vector_copy(&dst->dfctmp2, &src->dfctmp2, _state, make_automatic);
+   ae_vector_copy(&dst->ustmpi, &src->ustmpi, _state, make_automatic);
+   apbuffers_copy(&dst->xydsbuf, &src->xydsbuf, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   dssvector_copy(&dst->alphar, &src->alphar, _state, make_automatic);
+   dssvector_copy(&dst->rhor, &src->rhor, _state, make_automatic);
+   ae_vector_copy(&dst->tau, &src->tau, _state, make_automatic);
+   ae_vector_copy(&dst->alphaq, &src->alphaq, _state, make_automatic);
+   ae_vector_copy(&dst->alphaqim, &src->alphaqim, _state, make_automatic);
+   ae_vector_copy(&dst->eligiblealphar, &src->eligiblealphar, _state, make_automatic);
+   ae_vector_copy(&dst->harrisset, &src->harrisset, _state, make_automatic);
 }
 
-void _dualsimplexstate_clear(void *_p) {
+void dualsimplexstate_free(void *_p, bool make_automatic) {
    dualsimplexstate *p = (dualsimplexstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->rowscales);
-   ae_vector_clear(&p->rawbndl);
-   ae_vector_clear(&p->rawbndu);
-   _sparsematrix_clear(&p->a);
-   _sparsematrix_clear(&p->at);
-   _dualsimplexbasis_clear(&p->basis);
-   _dualsimplexsubproblem_clear(&p->primary);
-   _dualsimplexsubproblem_clear(&p->phase1);
-   _dualsimplexsubproblem_clear(&p->phase3);
-   ae_vector_clear(&p->repx);
-   ae_vector_clear(&p->replagbc);
-   ae_vector_clear(&p->replaglc);
-   ae_vector_clear(&p->repstats);
-   ae_vector_clear(&p->btrantmp0);
-   ae_vector_clear(&p->btrantmp1);
-   ae_vector_clear(&p->btrantmp2);
-   ae_vector_clear(&p->ftrantmp0);
-   ae_vector_clear(&p->ftrantmp1);
-   ae_vector_clear(&p->possibleflips);
-   ae_vector_clear(&p->dfctmp0);
-   ae_vector_clear(&p->dfctmp1);
-   ae_vector_clear(&p->dfctmp2);
-   ae_vector_clear(&p->ustmpi);
-   _apbuffers_clear(&p->xydsbuf);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->tmp2);
-   _dssvector_clear(&p->alphar);
-   _dssvector_clear(&p->rhor);
-   ae_vector_clear(&p->tau);
-   ae_vector_clear(&p->alphaq);
-   ae_vector_clear(&p->alphaqim);
-   ae_vector_clear(&p->eligiblealphar);
-   ae_vector_clear(&p->harrisset);
-}
-
-void _dualsimplexstate_destroy(void *_p) {
-   dualsimplexstate *p = (dualsimplexstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->rowscales);
-   ae_vector_destroy(&p->rawbndl);
-   ae_vector_destroy(&p->rawbndu);
-   _sparsematrix_destroy(&p->a);
-   _sparsematrix_destroy(&p->at);
-   _dualsimplexbasis_destroy(&p->basis);
-   _dualsimplexsubproblem_destroy(&p->primary);
-   _dualsimplexsubproblem_destroy(&p->phase1);
-   _dualsimplexsubproblem_destroy(&p->phase3);
-   ae_vector_destroy(&p->repx);
-   ae_vector_destroy(&p->replagbc);
-   ae_vector_destroy(&p->replaglc);
-   ae_vector_destroy(&p->repstats);
-   ae_vector_destroy(&p->btrantmp0);
-   ae_vector_destroy(&p->btrantmp1);
-   ae_vector_destroy(&p->btrantmp2);
-   ae_vector_destroy(&p->ftrantmp0);
-   ae_vector_destroy(&p->ftrantmp1);
-   ae_vector_destroy(&p->possibleflips);
-   ae_vector_destroy(&p->dfctmp0);
-   ae_vector_destroy(&p->dfctmp1);
-   ae_vector_destroy(&p->dfctmp2);
-   ae_vector_destroy(&p->ustmpi);
-   _apbuffers_destroy(&p->xydsbuf);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->tmp2);
-   _dssvector_destroy(&p->alphar);
-   _dssvector_destroy(&p->rhor);
-   ae_vector_destroy(&p->tau);
-   ae_vector_destroy(&p->alphaq);
-   ae_vector_destroy(&p->alphaqim);
-   ae_vector_destroy(&p->eligiblealphar);
-   ae_vector_destroy(&p->harrisset);
+   ae_vector_free(&p->rowscales, make_automatic);
+   ae_vector_free(&p->rawbndl, make_automatic);
+   ae_vector_free(&p->rawbndu, make_automatic);
+   sparsematrix_free(&p->a, make_automatic);
+   sparsematrix_free(&p->at, make_automatic);
+   dualsimplexbasis_free(&p->basis, make_automatic);
+   dualsimplexsubproblem_free(&p->primary, make_automatic);
+   dualsimplexsubproblem_free(&p->phase1, make_automatic);
+   dualsimplexsubproblem_free(&p->phase3, make_automatic);
+   ae_vector_free(&p->repx, make_automatic);
+   ae_vector_free(&p->replagbc, make_automatic);
+   ae_vector_free(&p->replaglc, make_automatic);
+   ae_vector_free(&p->repstats, make_automatic);
+   ae_vector_free(&p->btrantmp0, make_automatic);
+   ae_vector_free(&p->btrantmp1, make_automatic);
+   ae_vector_free(&p->btrantmp2, make_automatic);
+   ae_vector_free(&p->ftrantmp0, make_automatic);
+   ae_vector_free(&p->ftrantmp1, make_automatic);
+   ae_vector_free(&p->possibleflips, make_automatic);
+   ae_vector_free(&p->dfctmp0, make_automatic);
+   ae_vector_free(&p->dfctmp1, make_automatic);
+   ae_vector_free(&p->dfctmp2, make_automatic);
+   ae_vector_free(&p->ustmpi, make_automatic);
+   apbuffers_free(&p->xydsbuf, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmp2, make_automatic);
+   dssvector_free(&p->alphar, make_automatic);
+   dssvector_free(&p->rhor, make_automatic);
+   ae_vector_free(&p->tau, make_automatic);
+   ae_vector_free(&p->alphaq, make_automatic);
+   ae_vector_free(&p->alphaqim, make_automatic);
+   ae_vector_free(&p->eligiblealphar, make_automatic);
+   ae_vector_free(&p->harrisset, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -38102,7 +37238,7 @@ static void minlp_clearreportfields(minlpstate *state, ae_state *_state);
 void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
    ae_int_t i;
 
-   _minlpstate_clear(state);
+   minlpstate_free(state, true);
 
    ae_assert(n >= 1, "MinLPCreate: N<1", _state);
 
@@ -38851,9 +37987,9 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
    memset(&settings, 0, sizeof(settings));
    memset(&dummy, 0, sizeof(dummy));
    memset(&dummybasis, 0, sizeof(dummybasis));
-   _dualsimplexsettings_init(&settings, _state, true);
+   dualsimplexsettings_init(&settings, _state, true);
    ae_matrix_init(&dummy, 0, 0, DT_REAL, _state, true);
-   _dualsimplexbasis_init(&dummybasis, _state, true);
+   dualsimplexbasis_init(&dummybasis, _state, true);
 
    n = state->n;
    m = state->m;
@@ -39030,8 +38166,8 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
 // API: void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams);
 void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minlpreport_clear(rep);
+   ae_vector_free(x, true);
+   minlpreport_free(rep, true);
 
    minlpresultsbuf(state, x, rep, _state);
 }
@@ -39088,50 +38224,50 @@ static void minlp_clearreportfields(minlpstate *state, ae_state *_state) {
    state->repm = 0;
 }
 
-void _minlpstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpstate *p = (minlpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->a, _state, make_automatic);
+   sparsematrix_init(&p->a, _state, make_automatic);
    ae_vector_init(&p->al, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->au, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xs, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->laglc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cs, 0, DT_INT, _state, make_automatic);
-   _dualsimplexstate_init(&p->dss, _state, make_automatic);
-   _vipmstate_init(&p->ipm, _state, make_automatic);
+   dualsimplexstate_init(&p->dss, _state, make_automatic);
+   vipmstate_init(&p->ipm, _state, make_automatic);
    ae_vector_init(&p->adddtmpi, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->adddtmpr, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpax, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpg, 0, DT_REAL, _state, make_automatic);
-   _presolveinfo_init(&p->presolver, _state, make_automatic);
+   presolveinfo_init(&p->presolver, _state, make_automatic);
    ae_vector_init(&p->zeroorigin, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->units, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->ipmquadratic, _state, make_automatic);
+   sparsematrix_init(&p->ipmquadratic, _state, make_automatic);
 }
 
-void _minlpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlpstate *dst = (minlpstate *) _dst;
    minlpstate *src = (minlpstate *) _src;
    dst->n = src->n;
    dst->algokind = src->algokind;
    dst->ipmlambda = src->ipmlambda;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->c, &src->c, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->c, &src->c, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->m = src->m;
-   _sparsematrix_init_copy(&dst->a, &src->a, _state, make_automatic);
-   ae_vector_init_copy(&dst->al, &src->al, _state, make_automatic);
-   ae_vector_init_copy(&dst->au, &src->au, _state, make_automatic);
-   ae_vector_init_copy(&dst->xs, &src->xs, _state, make_automatic);
-   ae_vector_init_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->laglc, &src->laglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->cs, &src->cs, _state, make_automatic);
+   sparsematrix_copy(&dst->a, &src->a, _state, make_automatic);
+   ae_vector_copy(&dst->al, &src->al, _state, make_automatic);
+   ae_vector_copy(&dst->au, &src->au, _state, make_automatic);
+   ae_vector_copy(&dst->xs, &src->xs, _state, make_automatic);
+   ae_vector_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
+   ae_vector_copy(&dst->laglc, &src->laglc, _state, make_automatic);
+   ae_vector_copy(&dst->cs, &src->cs, _state, make_automatic);
    dst->repf = src->repf;
    dst->repprimalerror = src->repprimalerror;
    dst->repdualerror = src->repdualerror;
@@ -39142,71 +38278,45 @@ void _minlpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->repm = src->repm;
    dst->dsseps = src->dsseps;
    dst->ipmeps = src->ipmeps;
-   _dualsimplexstate_init_copy(&dst->dss, &src->dss, _state, make_automatic);
-   _vipmstate_init_copy(&dst->ipm, &src->ipm, _state, make_automatic);
-   ae_vector_init_copy(&dst->adddtmpi, &src->adddtmpi, _state, make_automatic);
-   ae_vector_init_copy(&dst->adddtmpr, &src->adddtmpr, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpax, &src->tmpax, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
-   _presolveinfo_init_copy(&dst->presolver, &src->presolver, _state, make_automatic);
-   ae_vector_init_copy(&dst->zeroorigin, &src->zeroorigin, _state, make_automatic);
-   ae_vector_init_copy(&dst->units, &src->units, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->ipmquadratic, &src->ipmquadratic, _state, make_automatic);
+   dualsimplexstate_copy(&dst->dss, &src->dss, _state, make_automatic);
+   vipmstate_copy(&dst->ipm, &src->ipm, _state, make_automatic);
+   ae_vector_copy(&dst->adddtmpi, &src->adddtmpi, _state, make_automatic);
+   ae_vector_copy(&dst->adddtmpr, &src->adddtmpr, _state, make_automatic);
+   ae_vector_copy(&dst->tmpax, &src->tmpax, _state, make_automatic);
+   ae_vector_copy(&dst->tmpg, &src->tmpg, _state, make_automatic);
+   presolveinfo_copy(&dst->presolver, &src->presolver, _state, make_automatic);
+   ae_vector_copy(&dst->zeroorigin, &src->zeroorigin, _state, make_automatic);
+   ae_vector_copy(&dst->units, &src->units, _state, make_automatic);
+   sparsematrix_copy(&dst->ipmquadratic, &src->ipmquadratic, _state, make_automatic);
 }
 
-void _minlpstate_clear(void *_p) {
+void minlpstate_free(void *_p, bool make_automatic) {
    minlpstate *p = (minlpstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->c);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   _sparsematrix_clear(&p->a);
-   ae_vector_clear(&p->al);
-   ae_vector_clear(&p->au);
-   ae_vector_clear(&p->xs);
-   ae_vector_clear(&p->lagbc);
-   ae_vector_clear(&p->laglc);
-   ae_vector_clear(&p->cs);
-   _dualsimplexstate_clear(&p->dss);
-   _vipmstate_clear(&p->ipm);
-   ae_vector_clear(&p->adddtmpi);
-   ae_vector_clear(&p->adddtmpr);
-   ae_vector_clear(&p->tmpax);
-   ae_vector_clear(&p->tmpg);
-   _presolveinfo_clear(&p->presolver);
-   ae_vector_clear(&p->zeroorigin);
-   ae_vector_clear(&p->units);
-   _sparsematrix_clear(&p->ipmquadratic);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->c, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   sparsematrix_free(&p->a, make_automatic);
+   ae_vector_free(&p->al, make_automatic);
+   ae_vector_free(&p->au, make_automatic);
+   ae_vector_free(&p->xs, make_automatic);
+   ae_vector_free(&p->lagbc, make_automatic);
+   ae_vector_free(&p->laglc, make_automatic);
+   ae_vector_free(&p->cs, make_automatic);
+   dualsimplexstate_free(&p->dss, make_automatic);
+   vipmstate_free(&p->ipm, make_automatic);
+   ae_vector_free(&p->adddtmpi, make_automatic);
+   ae_vector_free(&p->adddtmpr, make_automatic);
+   ae_vector_free(&p->tmpax, make_automatic);
+   ae_vector_free(&p->tmpg, make_automatic);
+   presolveinfo_free(&p->presolver, make_automatic);
+   ae_vector_free(&p->zeroorigin, make_automatic);
+   ae_vector_free(&p->units, make_automatic);
+   sparsematrix_free(&p->ipmquadratic, make_automatic);
 }
 
-void _minlpstate_destroy(void *_p) {
-   minlpstate *p = (minlpstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->c);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   _sparsematrix_destroy(&p->a);
-   ae_vector_destroy(&p->al);
-   ae_vector_destroy(&p->au);
-   ae_vector_destroy(&p->xs);
-   ae_vector_destroy(&p->lagbc);
-   ae_vector_destroy(&p->laglc);
-   ae_vector_destroy(&p->cs);
-   _dualsimplexstate_destroy(&p->dss);
-   _vipmstate_destroy(&p->ipm);
-   ae_vector_destroy(&p->adddtmpi);
-   ae_vector_destroy(&p->adddtmpr);
-   ae_vector_destroy(&p->tmpax);
-   ae_vector_destroy(&p->tmpg);
-   _presolveinfo_destroy(&p->presolver);
-   ae_vector_destroy(&p->zeroorigin);
-   ae_vector_destroy(&p->units);
-   _sparsematrix_destroy(&p->ipmquadratic);
-}
-
-void _minlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpreport *p = (minlpreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
@@ -39215,14 +38325,14 @@ void _minlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->stats, 0, DT_INT, _state, make_automatic);
 }
 
-void _minlpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlpreport *dst = (minlpreport *) _dst;
    minlpreport *src = (minlpreport *) _src;
    dst->f = src->f;
-   ae_vector_init_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->laglc, &src->laglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->y, &src->y, _state, make_automatic);
-   ae_vector_init_copy(&dst->stats, &src->stats, _state, make_automatic);
+   ae_vector_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
+   ae_vector_copy(&dst->laglc, &src->laglc, _state, make_automatic);
+   ae_vector_copy(&dst->y, &src->y, _state, make_automatic);
+   ae_vector_copy(&dst->stats, &src->stats, _state, make_automatic);
    dst->primalerror = src->primalerror;
    dst->dualerror = src->dualerror;
    dst->slackerror = src->slackerror;
@@ -39230,22 +38340,13 @@ void _minlpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->terminationtype = src->terminationtype;
 }
 
-void _minlpreport_clear(void *_p) {
+void minlpreport_free(void *_p, bool make_automatic) {
    minlpreport *p = (minlpreport *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->lagbc);
-   ae_vector_clear(&p->laglc);
-   ae_vector_clear(&p->y);
-   ae_vector_clear(&p->stats);
-}
-
-void _minlpreport_destroy(void *_p) {
-   minlpreport *p = (minlpreport *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->lagbc);
-   ae_vector_destroy(&p->laglc);
-   ae_vector_destroy(&p->y);
-   ae_vector_destroy(&p->stats);
+   ae_vector_free(&p->lagbc, make_automatic);
+   ae_vector_free(&p->laglc, make_automatic);
+   ae_vector_free(&p->y, make_automatic);
+   ae_vector_free(&p->stats, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -42247,25 +41348,25 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
    }
 }
 
-void _minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpsubsolver *p = (minslpsubsolver *) _p;
    ae_touch_ptr((void *)p);
-   _presolveinfo_init(&p->presolver, _state, make_automatic);
-   _dualsimplexstate_init(&p->dss, _state, make_automatic);
-   _dualsimplexsettings_init(&p->dsssettings, _state, make_automatic);
-   _dualsimplexbasis_init(&p->lastbasis, _state, make_automatic);
+   presolveinfo_init(&p->presolver, _state, make_automatic);
+   dualsimplexstate_init(&p->dss, _state, make_automatic);
+   dualsimplexsettings_init(&p->dsssettings, _state, make_automatic);
+   dualsimplexbasis_init(&p->lastbasis, _state, make_automatic);
    ae_matrix_init(&p->curd, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curb, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curbndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cural, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curau, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparserawlc, _state, make_automatic);
-   _sparsematrix_init(&p->sparseefflc, _state, make_automatic);
+   sparsematrix_init(&p->sparserawlc, _state, make_automatic);
+   sparsematrix_init(&p->sparseefflc, _state, make_automatic);
    ae_matrix_init(&p->h, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->curhd, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->densedummy, 0, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->sparsedummy, _state, make_automatic);
+   sparsematrix_init(&p->sparsedummy, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sk, 0, DT_REAL, _state, make_automatic);
@@ -42276,149 +41377,107 @@ void _minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->cs, 0, DT_INT, _state, make_automatic);
 }
 
-void _minslpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpsubsolver *dst = (minslpsubsolver *) _dst;
    minslpsubsolver *src = (minslpsubsolver *) _src;
-   _presolveinfo_init_copy(&dst->presolver, &src->presolver, _state, make_automatic);
-   _dualsimplexstate_init_copy(&dst->dss, &src->dss, _state, make_automatic);
-   _dualsimplexsettings_init_copy(&dst->dsssettings, &src->dsssettings, _state, make_automatic);
-   _dualsimplexbasis_init_copy(&dst->lastbasis, &src->lastbasis, _state, make_automatic);
+   presolveinfo_copy(&dst->presolver, &src->presolver, _state, make_automatic);
+   dualsimplexstate_copy(&dst->dss, &src->dss, _state, make_automatic);
+   dualsimplexsettings_copy(&dst->dsssettings, &src->dsssettings, _state, make_automatic);
+   dualsimplexbasis_copy(&dst->lastbasis, &src->lastbasis, _state, make_automatic);
    dst->basispresent = src->basispresent;
-   ae_matrix_init_copy(&dst->curd, &src->curd, _state, make_automatic);
+   ae_matrix_copy(&dst->curd, &src->curd, _state, make_automatic);
    dst->curdcnt = src->curdcnt;
-   ae_vector_init_copy(&dst->curb, &src->curb, _state, make_automatic);
-   ae_vector_init_copy(&dst->curbndl, &src->curbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->curbndu, &src->curbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->cural, &src->cural, _state, make_automatic);
-   ae_vector_init_copy(&dst->curau, &src->curau, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparserawlc, &src->sparserawlc, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparseefflc, &src->sparseefflc, _state, make_automatic);
+   ae_vector_copy(&dst->curb, &src->curb, _state, make_automatic);
+   ae_vector_copy(&dst->curbndl, &src->curbndl, _state, make_automatic);
+   ae_vector_copy(&dst->curbndu, &src->curbndu, _state, make_automatic);
+   ae_vector_copy(&dst->cural, &src->cural, _state, make_automatic);
+   ae_vector_copy(&dst->curau, &src->curau, _state, make_automatic);
+   sparsematrix_copy(&dst->sparserawlc, &src->sparserawlc, _state, make_automatic);
+   sparsematrix_copy(&dst->sparseefflc, &src->sparseefflc, _state, make_automatic);
    dst->hessiantype = src->hessiantype;
-   ae_matrix_init_copy(&dst->h, &src->h, _state, make_automatic);
-   ae_matrix_init_copy(&dst->curhd, &src->curhd, _state, make_automatic);
-   ae_matrix_init_copy(&dst->densedummy, &src->densedummy, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->sparsedummy, &src->sparsedummy, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->sk, &src->sk, _state, make_automatic);
-   ae_vector_init_copy(&dst->yk, &src->yk, _state, make_automatic);
-   ae_vector_init_copy(&dst->xs, &src->xs, _state, make_automatic);
-   ae_vector_init_copy(&dst->laglc, &src->laglc, _state, make_automatic);
-   ae_vector_init_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->cs, &src->cs, _state, make_automatic);
+   ae_matrix_copy(&dst->h, &src->h, _state, make_automatic);
+   ae_matrix_copy(&dst->curhd, &src->curhd, _state, make_automatic);
+   ae_matrix_copy(&dst->densedummy, &src->densedummy, _state, make_automatic);
+   sparsematrix_copy(&dst->sparsedummy, &src->sparsedummy, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_vector_copy(&dst->sk, &src->sk, _state, make_automatic);
+   ae_vector_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_vector_copy(&dst->xs, &src->xs, _state, make_automatic);
+   ae_vector_copy(&dst->laglc, &src->laglc, _state, make_automatic);
+   ae_vector_copy(&dst->lagbc, &src->lagbc, _state, make_automatic);
+   ae_vector_copy(&dst->cs, &src->cs, _state, make_automatic);
 }
 
-void _minslpsubsolver_clear(void *_p) {
+void minslpsubsolver_free(void *_p, bool make_automatic) {
    minslpsubsolver *p = (minslpsubsolver *) _p;
    ae_touch_ptr((void *)p);
-   _presolveinfo_clear(&p->presolver);
-   _dualsimplexstate_clear(&p->dss);
-   _dualsimplexsettings_clear(&p->dsssettings);
-   _dualsimplexbasis_clear(&p->lastbasis);
-   ae_matrix_clear(&p->curd);
-   ae_vector_clear(&p->curb);
-   ae_vector_clear(&p->curbndl);
-   ae_vector_clear(&p->curbndu);
-   ae_vector_clear(&p->cural);
-   ae_vector_clear(&p->curau);
-   _sparsematrix_clear(&p->sparserawlc);
-   _sparsematrix_clear(&p->sparseefflc);
-   ae_matrix_clear(&p->h);
-   ae_matrix_clear(&p->curhd);
-   ae_matrix_clear(&p->densedummy);
-   _sparsematrix_clear(&p->sparsedummy);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_vector_clear(&p->sk);
-   ae_vector_clear(&p->yk);
-   ae_vector_clear(&p->xs);
-   ae_vector_clear(&p->laglc);
-   ae_vector_clear(&p->lagbc);
-   ae_vector_clear(&p->cs);
+   presolveinfo_free(&p->presolver, make_automatic);
+   dualsimplexstate_free(&p->dss, make_automatic);
+   dualsimplexsettings_free(&p->dsssettings, make_automatic);
+   dualsimplexbasis_free(&p->lastbasis, make_automatic);
+   ae_matrix_free(&p->curd, make_automatic);
+   ae_vector_free(&p->curb, make_automatic);
+   ae_vector_free(&p->curbndl, make_automatic);
+   ae_vector_free(&p->curbndu, make_automatic);
+   ae_vector_free(&p->cural, make_automatic);
+   ae_vector_free(&p->curau, make_automatic);
+   sparsematrix_free(&p->sparserawlc, make_automatic);
+   sparsematrix_free(&p->sparseefflc, make_automatic);
+   ae_matrix_free(&p->h, make_automatic);
+   ae_matrix_free(&p->curhd, make_automatic);
+   ae_matrix_free(&p->densedummy, make_automatic);
+   sparsematrix_free(&p->sparsedummy, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->sk, make_automatic);
+   ae_vector_free(&p->yk, make_automatic);
+   ae_vector_free(&p->xs, make_automatic);
+   ae_vector_free(&p->laglc, make_automatic);
+   ae_vector_free(&p->lagbc, make_automatic);
+   ae_vector_free(&p->cs, make_automatic);
 }
 
-void _minslpsubsolver_destroy(void *_p) {
-   minslpsubsolver *p = (minslpsubsolver *) _p;
-   ae_touch_ptr((void *)p);
-   _presolveinfo_destroy(&p->presolver);
-   _dualsimplexstate_destroy(&p->dss);
-   _dualsimplexsettings_destroy(&p->dsssettings);
-   _dualsimplexbasis_destroy(&p->lastbasis);
-   ae_matrix_destroy(&p->curd);
-   ae_vector_destroy(&p->curb);
-   ae_vector_destroy(&p->curbndl);
-   ae_vector_destroy(&p->curbndu);
-   ae_vector_destroy(&p->cural);
-   ae_vector_destroy(&p->curau);
-   _sparsematrix_destroy(&p->sparserawlc);
-   _sparsematrix_destroy(&p->sparseefflc);
-   ae_matrix_destroy(&p->h);
-   ae_matrix_destroy(&p->curhd);
-   ae_matrix_destroy(&p->densedummy);
-   _sparsematrix_destroy(&p->sparsedummy);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_vector_destroy(&p->sk);
-   ae_vector_destroy(&p->yk);
-   ae_vector_destroy(&p->xs);
-   ae_vector_destroy(&p->laglc);
-   ae_vector_destroy(&p->lagbc);
-   ae_vector_destroy(&p->cs);
-}
-
-void _minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmplagrangian *p = (minslptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minslptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslptmplagrangian *dst = (minslptmplagrangian *) _dst;
    minslptmplagrangian *src = (minslptmplagrangian *) _src;
-   ae_vector_init_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->sclagtmp1, &src->sclagtmp1, _state, make_automatic);
+   ae_vector_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
+   ae_vector_copy(&dst->sclagtmp1, &src->sclagtmp1, _state, make_automatic);
 }
 
-void _minslptmplagrangian_clear(void *_p) {
+void minslptmplagrangian_free(void *_p, bool make_automatic) {
    minslptmplagrangian *p = (minslptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->sclagtmp0);
-   ae_vector_clear(&p->sclagtmp1);
+   ae_vector_free(&p->sclagtmp0, make_automatic);
+   ae_vector_free(&p->sclagtmp1, make_automatic);
 }
 
-void _minslptmplagrangian_destroy(void *_p) {
-   minslptmplagrangian *p = (minslptmplagrangian *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->sclagtmp0);
-   ae_vector_destroy(&p->sclagtmp1);
-}
-
-void _minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmpmerit *p = (minslptmpmerit *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minslptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslptmpmerit *dst = (minslptmpmerit *) _dst;
    minslptmpmerit *src = (minslptmpmerit *) _src;
-   ae_vector_init_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
+   ae_vector_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
 }
 
-void _minslptmpmerit_clear(void *_p) {
+void minslptmpmerit_free(void *_p, bool make_automatic) {
    minslptmpmerit *p = (minslptmpmerit *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->mftmp0);
+   ae_vector_free(&p->mftmp0, make_automatic);
 }
 
-void _minslptmpmerit_destroy(void *_p) {
-   minslptmpmerit *p = (minslptmpmerit *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->mftmp0);
-}
-
-void _minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase13state *p = (minslpphase13state *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -42430,60 +41489,44 @@ void _minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->stepkjc, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->stepkjn, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dummylagmult, 0, DT_REAL, _state, make_automatic);
-   _minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
-   _rcommstate_init(&p->rphase13state, _state, make_automatic);
+   minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
+   rcommstate_init(&p->rphase13state, _state, make_automatic);
 }
 
-void _minslpphase13state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslpphase13state_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpphase13state *dst = (minslpphase13state *) _dst;
    minslpphase13state *src = (minslpphase13state *) _src;
    dst->usecorrection = src->usecorrection;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->dx, &src->dx, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
-   ae_vector_init_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
-   _minslptmpmerit_init_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rphase13state, &src->rphase13state, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->dx, &src->dx, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
+   ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
+   minslptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
+   rcommstate_copy(&dst->rphase13state, &src->rphase13state, _state, make_automatic);
 }
 
-void _minslpphase13state_clear(void *_p) {
+void minslpphase13state_free(void *_p, bool make_automatic) {
    minslpphase13state *p = (minslpphase13state *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->dx);
-   ae_vector_clear(&p->stepkxc);
-   ae_vector_clear(&p->stepkxn);
-   ae_vector_clear(&p->stepkfic);
-   ae_vector_clear(&p->stepkfin);
-   ae_matrix_clear(&p->stepkjc);
-   ae_matrix_clear(&p->stepkjn);
-   ae_vector_clear(&p->dummylagmult);
-   _minslptmpmerit_clear(&p->tmpmerit);
-   _rcommstate_clear(&p->rphase13state);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->dx, make_automatic);
+   ae_vector_free(&p->stepkxc, make_automatic);
+   ae_vector_free(&p->stepkxn, make_automatic);
+   ae_vector_free(&p->stepkfic, make_automatic);
+   ae_vector_free(&p->stepkfin, make_automatic);
+   ae_matrix_free(&p->stepkjc, make_automatic);
+   ae_matrix_free(&p->stepkjn, make_automatic);
+   ae_vector_free(&p->dummylagmult, make_automatic);
+   minslptmpmerit_free(&p->tmpmerit, make_automatic);
+   rcommstate_free(&p->rphase13state, make_automatic);
 }
 
-void _minslpphase13state_destroy(void *_p) {
-   minslpphase13state *p = (minslpphase13state *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->dx);
-   ae_vector_destroy(&p->stepkxc);
-   ae_vector_destroy(&p->stepkxn);
-   ae_vector_destroy(&p->stepkfic);
-   ae_vector_destroy(&p->stepkfin);
-   ae_matrix_destroy(&p->stepkjc);
-   ae_matrix_destroy(&p->stepkjn);
-   ae_vector_destroy(&p->dummylagmult);
-   _minslptmpmerit_destroy(&p->tmpmerit);
-   _rcommstate_destroy(&p->rphase13state);
-}
-
-void _minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase2state *p = (minslpphase2state *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->stepkxn, 0, DT_REAL, _state, make_automatic);
@@ -42496,82 +41539,61 @@ void _minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->stepknlaggrad, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepknlagmult, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->meritlagmult, 0, DT_REAL, _state, make_automatic);
-   _minslptmplagrangian_init(&p->tmplagrangianfg, _state, make_automatic);
+   minslptmplagrangian_init(&p->tmplagrangianfg, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
-   _linminstate_init(&p->mcstate, _state, make_automatic);
-   _minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
-   _rcommstate_init(&p->rphase2state, _state, make_automatic);
+   linminstate_init(&p->mcstate, _state, make_automatic);
+   minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
+   rcommstate_init(&p->rphase2state, _state, make_automatic);
 }
 
-void _minslpphase2state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslpphase2state_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpphase2state *dst = (minslpphase2state *) _dst;
    minslpphase2state *src = (minslpphase2state *) _src;
-   ae_vector_init_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepklaggrad, &src->stepklaggrad, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepknlaggrad, &src->stepknlaggrad, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepknlagmult, &src->stepknlagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
-   _minslptmplagrangian_init_copy(&dst->tmplagrangianfg, &src->tmplagrangianfg, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
+   ae_vector_copy(&dst->stepkxc, &src->stepkxc, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfin, &src->stepkfin, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfic, &src->stepkfic, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjn, &src->stepkjn, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkjc, &src->stepkjc, _state, make_automatic);
+   ae_vector_copy(&dst->stepklaggrad, &src->stepklaggrad, _state, make_automatic);
+   ae_vector_copy(&dst->stepknlaggrad, &src->stepknlaggrad, _state, make_automatic);
+   ae_vector_copy(&dst->stepknlagmult, &src->stepknlagmult, _state, make_automatic);
+   ae_vector_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
+   minslptmplagrangian_copy(&dst->tmplagrangianfg, &src->tmplagrangianfg, _state, make_automatic);
    dst->lastlcerr = src->lastlcerr;
    dst->lastlcidx = src->lastlcidx;
    dst->lastnlcerr = src->lastnlcerr;
    dst->lastnlcidx = src->lastnlcidx;
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   _linminstate_init_copy(&dst->mcstate, &src->mcstate, _state, make_automatic);
-   _minslptmpmerit_init_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rphase2state, &src->rphase2state, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   linminstate_copy(&dst->mcstate, &src->mcstate, _state, make_automatic);
+   minslptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
+   rcommstate_copy(&dst->rphase2state, &src->rphase2state, _state, make_automatic);
 }
 
-void _minslpphase2state_clear(void *_p) {
+void minslpphase2state_free(void *_p, bool make_automatic) {
    minslpphase2state *p = (minslpphase2state *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->stepkxn);
-   ae_vector_clear(&p->stepkxc);
-   ae_vector_clear(&p->stepkfin);
-   ae_vector_clear(&p->stepkfic);
-   ae_matrix_clear(&p->stepkjn);
-   ae_matrix_clear(&p->stepkjc);
-   ae_vector_clear(&p->stepklaggrad);
-   ae_vector_clear(&p->stepknlaggrad);
-   ae_vector_clear(&p->stepknlagmult);
-   ae_vector_clear(&p->meritlagmult);
-   _minslptmplagrangian_clear(&p->tmplagrangianfg);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->d);
-   _linminstate_clear(&p->mcstate);
-   _minslptmpmerit_clear(&p->tmpmerit);
-   _rcommstate_clear(&p->rphase2state);
+   ae_vector_free(&p->stepkxn, make_automatic);
+   ae_vector_free(&p->stepkxc, make_automatic);
+   ae_vector_free(&p->stepkfin, make_automatic);
+   ae_vector_free(&p->stepkfic, make_automatic);
+   ae_matrix_free(&p->stepkjn, make_automatic);
+   ae_matrix_free(&p->stepkjc, make_automatic);
+   ae_vector_free(&p->stepklaggrad, make_automatic);
+   ae_vector_free(&p->stepknlaggrad, make_automatic);
+   ae_vector_free(&p->stepknlagmult, make_automatic);
+   ae_vector_free(&p->meritlagmult, make_automatic);
+   minslptmplagrangian_free(&p->tmplagrangianfg, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   linminstate_free(&p->mcstate, make_automatic);
+   minslptmpmerit_free(&p->tmpmerit, make_automatic);
+   rcommstate_free(&p->rphase2state, make_automatic);
 }
 
-void _minslpphase2state_destroy(void *_p) {
-   minslpphase2state *p = (minslpphase2state *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->stepkxn);
-   ae_vector_destroy(&p->stepkxc);
-   ae_vector_destroy(&p->stepkfin);
-   ae_vector_destroy(&p->stepkfic);
-   ae_matrix_destroy(&p->stepkjn);
-   ae_matrix_destroy(&p->stepkjc);
-   ae_vector_destroy(&p->stepklaggrad);
-   ae_vector_destroy(&p->stepknlaggrad);
-   ae_vector_destroy(&p->stepknlagmult);
-   ae_vector_destroy(&p->meritlagmult);
-   _minslptmplagrangian_destroy(&p->tmplagrangianfg);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->d);
-   _linminstate_destroy(&p->mcstate);
-   _minslptmpmerit_destroy(&p->tmpmerit);
-   _rcommstate_destroy(&p->rphase2state);
-}
-
-void _minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpstate *p = (minslpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -42584,8 +41606,8 @@ void _minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _minslpphase13state_init(&p->state13, _state, make_automatic);
-   _minslpphase2state_init(&p->state2, _state, make_automatic);
+   minslpphase13state_init(&p->state13, _state, make_automatic);
+   minslpphase2state_init(&p->state2, _state, make_automatic);
    ae_vector_init(&p->step0x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->backupx, 0, DT_REAL, _state, make_automatic);
@@ -42600,12 +41622,12 @@ void _minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->fscales, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->meritfunctionhistory, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->maxlaghistory, 0, DT_REAL, _state, make_automatic);
-   _minslpsubsolver_init(&p->subsolver, _state, make_automatic);
-   _minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   minslpsubsolver_init(&p->subsolver, _state, make_automatic);
+   minslptmpmerit_init(&p->tmpmerit, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minslpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpstate *dst = (minslpstate *) _dst;
    minslpstate *src = (minslpstate *) _src;
    dst->n = src->n;
@@ -42613,44 +41635,44 @@ void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->nic = src->nic;
    dst->nlec = src->nlec;
    dst->nlic = src->nlic;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_matrix_init_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_matrix_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
+   ae_vector_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
    dst->epsx = src->epsx;
    dst->maxits = src->maxits;
    dst->hessiantype = src->hessiantype;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
    dst->f = src->f;
    dst->needfij = src->needfij;
    dst->xupdated = src->xupdated;
-   _minslpphase13state_init_copy(&dst->state13, &src->state13, _state, make_automatic);
-   _minslpphase2state_init_copy(&dst->state2, &src->state2, _state, make_automatic);
+   minslpphase13state_copy(&dst->state13, &src->state13, _state, make_automatic);
+   minslpphase2state_copy(&dst->state2, &src->state2, _state, make_automatic);
    dst->trustrad = src->trustrad;
    dst->lpfailurecnt = src->lpfailurecnt;
    dst->fstagnationcnt = src->fstagnationcnt;
-   ae_vector_init_copy(&dst->step0x, &src->step0x, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
-   ae_vector_init_copy(&dst->backupx, &src->backupx, _state, make_automatic);
-   ae_vector_init_copy(&dst->step0fi, &src->step0fi, _state, make_automatic);
-   ae_vector_init_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
-   ae_vector_init_copy(&dst->backupfi, &src->backupfi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->step0j, &src->step0j, _state, make_automatic);
-   ae_matrix_init_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
-   ae_matrix_init_copy(&dst->backupj, &src->backupj, _state, make_automatic);
-   ae_vector_init_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
-   ae_vector_init_copy(&dst->fscales, &src->fscales, _state, make_automatic);
-   ae_vector_init_copy(&dst->meritfunctionhistory, &src->meritfunctionhistory, _state, make_automatic);
-   ae_vector_init_copy(&dst->maxlaghistory, &src->maxlaghistory, _state, make_automatic);
+   ae_vector_copy(&dst->step0x, &src->step0x, _state, make_automatic);
+   ae_vector_copy(&dst->stepkx, &src->stepkx, _state, make_automatic);
+   ae_vector_copy(&dst->backupx, &src->backupx, _state, make_automatic);
+   ae_vector_copy(&dst->step0fi, &src->step0fi, _state, make_automatic);
+   ae_vector_copy(&dst->stepkfi, &src->stepkfi, _state, make_automatic);
+   ae_vector_copy(&dst->backupfi, &src->backupfi, _state, make_automatic);
+   ae_matrix_copy(&dst->step0j, &src->step0j, _state, make_automatic);
+   ae_matrix_copy(&dst->stepkj, &src->stepkj, _state, make_automatic);
+   ae_matrix_copy(&dst->backupj, &src->backupj, _state, make_automatic);
+   ae_vector_copy(&dst->meritlagmult, &src->meritlagmult, _state, make_automatic);
+   ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
+   ae_vector_copy(&dst->fscales, &src->fscales, _state, make_automatic);
+   ae_vector_copy(&dst->meritfunctionhistory, &src->meritfunctionhistory, _state, make_automatic);
+   ae_vector_copy(&dst->maxlaghistory, &src->maxlaghistory, _state, make_automatic);
    dst->historylen = src->historylen;
-   _minslpsubsolver_init_copy(&dst->subsolver, &src->subsolver, _state, make_automatic);
-   _minslptmpmerit_init_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
+   minslpsubsolver_copy(&dst->subsolver, &src->subsolver, _state, make_automatic);
+   minslptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
    dst->repsimplexiterations = src->repsimplexiterations;
    dst->repsimplexiterations1 = src->repsimplexiterations1;
    dst->repsimplexiterations2 = src->repsimplexiterations2;
@@ -42664,75 +41686,41 @@ void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->replcidx = src->replcidx;
    dst->repnlcerr = src->repnlcerr;
    dst->repnlcidx = src->repnlcidx;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _minslpstate_clear(void *_p) {
+void minslpstate_free(void *_p, bool make_automatic) {
    minslpstate *p = (minslpstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_matrix_clear(&p->scaledcleic);
-   ae_vector_clear(&p->lcsrcidx);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->scaledbndl);
-   ae_vector_clear(&p->scaledbndu);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _minslpphase13state_clear(&p->state13);
-   _minslpphase2state_clear(&p->state2);
-   ae_vector_clear(&p->step0x);
-   ae_vector_clear(&p->stepkx);
-   ae_vector_clear(&p->backupx);
-   ae_vector_clear(&p->step0fi);
-   ae_vector_clear(&p->stepkfi);
-   ae_vector_clear(&p->backupfi);
-   ae_matrix_clear(&p->step0j);
-   ae_matrix_clear(&p->stepkj);
-   ae_matrix_clear(&p->backupj);
-   ae_vector_clear(&p->meritlagmult);
-   ae_vector_clear(&p->dummylagmult);
-   ae_vector_clear(&p->fscales);
-   ae_vector_clear(&p->meritfunctionhistory);
-   ae_vector_clear(&p->maxlaghistory);
-   _minslpsubsolver_clear(&p->subsolver);
-   _minslptmpmerit_clear(&p->tmpmerit);
-   _rcommstate_clear(&p->rstate);
-}
-
-void _minslpstate_destroy(void *_p) {
-   minslpstate *p = (minslpstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_matrix_destroy(&p->scaledcleic);
-   ae_vector_destroy(&p->lcsrcidx);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->scaledbndl);
-   ae_vector_destroy(&p->scaledbndu);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _minslpphase13state_destroy(&p->state13);
-   _minslpphase2state_destroy(&p->state2);
-   ae_vector_destroy(&p->step0x);
-   ae_vector_destroy(&p->stepkx);
-   ae_vector_destroy(&p->backupx);
-   ae_vector_destroy(&p->step0fi);
-   ae_vector_destroy(&p->stepkfi);
-   ae_vector_destroy(&p->backupfi);
-   ae_matrix_destroy(&p->step0j);
-   ae_matrix_destroy(&p->stepkj);
-   ae_matrix_destroy(&p->backupj);
-   ae_vector_destroy(&p->meritlagmult);
-   ae_vector_destroy(&p->dummylagmult);
-   ae_vector_destroy(&p->fscales);
-   ae_vector_destroy(&p->meritfunctionhistory);
-   ae_vector_destroy(&p->maxlaghistory);
-   _minslpsubsolver_destroy(&p->subsolver);
-   _minslptmpmerit_destroy(&p->tmpmerit);
-   _rcommstate_destroy(&p->rstate);
+   ae_vector_free(&p->s, make_automatic);
+   ae_matrix_free(&p->scaledcleic, make_automatic);
+   ae_vector_free(&p->lcsrcidx, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->scaledbndl, make_automatic);
+   ae_vector_free(&p->scaledbndu, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   minslpphase13state_free(&p->state13, make_automatic);
+   minslpphase2state_free(&p->state2, make_automatic);
+   ae_vector_free(&p->step0x, make_automatic);
+   ae_vector_free(&p->stepkx, make_automatic);
+   ae_vector_free(&p->backupx, make_automatic);
+   ae_vector_free(&p->step0fi, make_automatic);
+   ae_vector_free(&p->stepkfi, make_automatic);
+   ae_vector_free(&p->backupfi, make_automatic);
+   ae_matrix_free(&p->step0j, make_automatic);
+   ae_matrix_free(&p->stepkj, make_automatic);
+   ae_matrix_free(&p->backupj, make_automatic);
+   ae_vector_free(&p->meritlagmult, make_automatic);
+   ae_vector_free(&p->dummylagmult, make_automatic);
+   ae_vector_free(&p->fscales, make_automatic);
+   ae_vector_free(&p->meritfunctionhistory, make_automatic);
+   ae_vector_free(&p->maxlaghistory, make_automatic);
+   minslpsubsolver_free(&p->subsolver, make_automatic);
+   minslptmpmerit_free(&p->tmpmerit, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -42873,7 +41861,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
 // API: void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams);
 void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) {
 
-   _minnlcstate_clear(state);
+   minnlcstate_free(state, true);
 
    ae_assert(n >= 1, "MinNLCCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinNLCCreate: Length(X)<N", _state);
@@ -42926,7 +41914,7 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) 
 // API: void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams);
 void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state) {
 
-   _minnlcstate_clear(state);
+   minnlcstate_free(state, true);
 
    ae_assert(n >= 1, "MinNLCCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinNLCCreateF: Length(X)<N", _state);
@@ -44613,7 +43601,7 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 // API: void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams);
 void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -44662,8 +43650,8 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_s
 // API: void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test0report_clear(strrep);
-   _optguardnonc1test0report_clear(lngrep);
+   optguardnonc1test0report_free(strrep, true);
+   optguardnonc1test0report_free(lngrep, true);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -44720,8 +43708,8 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 // API: void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test1report_clear(strrep);
-   _optguardnonc1test1report_clear(lngrep);
+   optguardnonc1test1report_free(strrep, true);
+   optguardnonc1test1report_free(lngrep, true);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -44773,8 +43761,8 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 // API: void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams);
 void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minnlcreport_clear(rep);
+   ae_vector_free(x, true);
+   minnlcreport_free(rep, true);
 
    minnlcresultsbuf(state, x, rep, _state);
 }
@@ -45859,7 +44847,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
    }
 }
 
-void _minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnlcstate *p = (minnlcstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -45872,9 +44860,9 @@ void _minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
-   _rcommstate_init(&p->rstateaul, _state, make_automatic);
-   _rcommstate_init(&p->rstateslp, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstateaul, _state, make_automatic);
+   rcommstate_init(&p->rstateslp, _state, make_automatic);
    ae_vector_init(&p->scaledbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->scaledbndu, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->scaledcleic, 0, 0, DT_REAL, _state, make_automatic);
@@ -45898,18 +44886,18 @@ void _minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xk1, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->gk, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->gk1, 0, DT_REAL, _state, make_automatic);
-   _minlbfgsstate_init(&p->auloptimizer, _state, make_automatic);
-   _minlbfgsreport_init(&p->aulreport, _state, make_automatic);
+   minlbfgsstate_init(&p->auloptimizer, _state, make_automatic);
+   minlbfgsreport_init(&p->aulreport, _state, make_automatic);
    ae_vector_init(&p->nubc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->nulc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->nunlc, 0, DT_REAL, _state, make_automatic);
-   _minslpstate_init(&p->slpsolverstate, _state, make_automatic);
-   _minsqpstate_init(&p->sqpsolverstate, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   minslpstate_init(&p->slpsolverstate, _state, make_automatic);
+   minsqpstate_init(&p->sqpsolverstate, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minnlcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnlcstate *dst = (minnlcstate *) _dst;
    minnlcstate *src = (minnlcstate *) _src;
    dst->stabilizingpoint = src->stabilizingpoint;
@@ -45926,63 +44914,63 @@ void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->stpmax = src->stpmax;
    dst->diffstep = src->diffstep;
    dst->teststep = src->teststep;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
    dst->nec = src->nec;
    dst->nic = src->nic;
-   ae_matrix_init_copy(&dst->cleic, &src->cleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
+   ae_matrix_copy(&dst->cleic, &src->cleic, _state, make_automatic);
+   ae_vector_copy(&dst->lcsrcidx, &src->lcsrcidx, _state, make_automatic);
    dst->ng = src->ng;
    dst->nh = src->nh;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
    dst->needfij = src->needfij;
    dst->needfi = src->needfi;
    dst->xupdated = src->xupdated;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstateaul, &src->rstateaul, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstateslp, &src->rstateslp, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
-   ae_matrix_init_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xstart, &src->xstart, _state, make_automatic);
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fbase, &src->fbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->dfbase, &src->dfbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fm2, &src->fm2, _state, make_automatic);
-   ae_vector_init_copy(&dst->fm1, &src->fm1, _state, make_automatic);
-   ae_vector_init_copy(&dst->fp1, &src->fp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->fp2, &src->fp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->dfm1, &src->dfm1, _state, make_automatic);
-   ae_vector_init_copy(&dst->dfp1, &src->dfp1, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufd, &src->bufd, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufc, &src->bufc, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufw, &src->bufw, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufz, &src->bufz, _state, make_automatic);
-   ae_vector_init_copy(&dst->xk, &src->xk, _state, make_automatic);
-   ae_vector_init_copy(&dst->xk1, &src->xk1, _state, make_automatic);
-   ae_vector_init_copy(&dst->gk, &src->gk, _state, make_automatic);
-   ae_vector_init_copy(&dst->gk1, &src->gk1, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstateaul, &src->rstateaul, _state, make_automatic);
+   rcommstate_copy(&dst->rstateslp, &src->rstateslp, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
+   ae_matrix_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->xstart, &src->xstart, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->fbase, &src->fbase, _state, make_automatic);
+   ae_vector_copy(&dst->dfbase, &src->dfbase, _state, make_automatic);
+   ae_vector_copy(&dst->fm2, &src->fm2, _state, make_automatic);
+   ae_vector_copy(&dst->fm1, &src->fm1, _state, make_automatic);
+   ae_vector_copy(&dst->fp1, &src->fp1, _state, make_automatic);
+   ae_vector_copy(&dst->fp2, &src->fp2, _state, make_automatic);
+   ae_vector_copy(&dst->dfm1, &src->dfm1, _state, make_automatic);
+   ae_vector_copy(&dst->dfp1, &src->dfp1, _state, make_automatic);
+   ae_vector_copy(&dst->bufd, &src->bufd, _state, make_automatic);
+   ae_vector_copy(&dst->bufc, &src->bufc, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_matrix_copy(&dst->bufw, &src->bufw, _state, make_automatic);
+   ae_matrix_copy(&dst->bufz, &src->bufz, _state, make_automatic);
+   ae_vector_copy(&dst->xk, &src->xk, _state, make_automatic);
+   ae_vector_copy(&dst->xk1, &src->xk1, _state, make_automatic);
+   ae_vector_copy(&dst->gk, &src->gk, _state, make_automatic);
+   ae_vector_copy(&dst->gk1, &src->gk1, _state, make_automatic);
    dst->gammak = src->gammak;
    dst->xkpresent = src->xkpresent;
-   _minlbfgsstate_init_copy(&dst->auloptimizer, &src->auloptimizer, _state, make_automatic);
-   _minlbfgsreport_init_copy(&dst->aulreport, &src->aulreport, _state, make_automatic);
-   ae_vector_init_copy(&dst->nubc, &src->nubc, _state, make_automatic);
-   ae_vector_init_copy(&dst->nulc, &src->nulc, _state, make_automatic);
-   ae_vector_init_copy(&dst->nunlc, &src->nunlc, _state, make_automatic);
+   minlbfgsstate_copy(&dst->auloptimizer, &src->auloptimizer, _state, make_automatic);
+   minlbfgsreport_copy(&dst->aulreport, &src->aulreport, _state, make_automatic);
+   ae_vector_copy(&dst->nubc, &src->nubc, _state, make_automatic);
+   ae_vector_copy(&dst->nulc, &src->nulc, _state, make_automatic);
+   ae_vector_copy(&dst->nunlc, &src->nunlc, _state, make_automatic);
    dst->userterminationneeded = src->userterminationneeded;
-   _minslpstate_init_copy(&dst->slpsolverstate, &src->slpsolverstate, _state, make_automatic);
-   _minsqpstate_init_copy(&dst->sqpsolverstate, &src->sqpsolverstate, _state, make_automatic);
+   minslpstate_copy(&dst->slpsolverstate, &src->slpsolverstate, _state, make_automatic);
+   minsqpstate_copy(&dst->sqpsolverstate, &src->sqpsolverstate, _state, make_automatic);
    dst->smoothnessguardlevel = src->smoothnessguardlevel;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repnfev = src->repnfev;
@@ -45996,112 +44984,62 @@ void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->repdbgphase0its = src->repdbgphase0its;
 }
 
-void _minnlcstate_clear(void *_p) {
+void minnlcstate_free(void *_p, bool make_automatic) {
    minnlcstate *p = (minnlcstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_matrix_clear(&p->cleic);
-   ae_vector_clear(&p->lcsrcidx);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _rcommstate_clear(&p->rstate);
-   _rcommstate_clear(&p->rstateaul);
-   _rcommstate_clear(&p->rstateslp);
-   ae_vector_clear(&p->scaledbndl);
-   ae_vector_clear(&p->scaledbndu);
-   ae_matrix_clear(&p->scaledcleic);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->xstart);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->fbase);
-   ae_vector_clear(&p->dfbase);
-   ae_vector_clear(&p->fm2);
-   ae_vector_clear(&p->fm1);
-   ae_vector_clear(&p->fp1);
-   ae_vector_clear(&p->fp2);
-   ae_vector_clear(&p->dfm1);
-   ae_vector_clear(&p->dfp1);
-   ae_vector_clear(&p->bufd);
-   ae_vector_clear(&p->bufc);
-   ae_vector_clear(&p->tmp0);
-   ae_matrix_clear(&p->bufw);
-   ae_matrix_clear(&p->bufz);
-   ae_vector_clear(&p->xk);
-   ae_vector_clear(&p->xk1);
-   ae_vector_clear(&p->gk);
-   ae_vector_clear(&p->gk1);
-   _minlbfgsstate_clear(&p->auloptimizer);
-   _minlbfgsreport_clear(&p->aulreport);
-   ae_vector_clear(&p->nubc);
-   ae_vector_clear(&p->nulc);
-   ae_vector_clear(&p->nunlc);
-   _minslpstate_clear(&p->slpsolverstate);
-   _minsqpstate_clear(&p->sqpsolverstate);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_matrix_free(&p->cleic, make_automatic);
+   ae_vector_free(&p->lcsrcidx, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   rcommstate_free(&p->rstateaul, make_automatic);
+   rcommstate_free(&p->rstateslp, make_automatic);
+   ae_vector_free(&p->scaledbndl, make_automatic);
+   ae_vector_free(&p->scaledbndu, make_automatic);
+   ae_matrix_free(&p->scaledcleic, make_automatic);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->xstart, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fbase, make_automatic);
+   ae_vector_free(&p->dfbase, make_automatic);
+   ae_vector_free(&p->fm2, make_automatic);
+   ae_vector_free(&p->fm1, make_automatic);
+   ae_vector_free(&p->fp1, make_automatic);
+   ae_vector_free(&p->fp2, make_automatic);
+   ae_vector_free(&p->dfm1, make_automatic);
+   ae_vector_free(&p->dfp1, make_automatic);
+   ae_vector_free(&p->bufd, make_automatic);
+   ae_vector_free(&p->bufc, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_matrix_free(&p->bufw, make_automatic);
+   ae_matrix_free(&p->bufz, make_automatic);
+   ae_vector_free(&p->xk, make_automatic);
+   ae_vector_free(&p->xk1, make_automatic);
+   ae_vector_free(&p->gk, make_automatic);
+   ae_vector_free(&p->gk1, make_automatic);
+   minlbfgsstate_free(&p->auloptimizer, make_automatic);
+   minlbfgsreport_free(&p->aulreport, make_automatic);
+   ae_vector_free(&p->nubc, make_automatic);
+   ae_vector_free(&p->nulc, make_automatic);
+   ae_vector_free(&p->nunlc, make_automatic);
+   minslpstate_free(&p->slpsolverstate, make_automatic);
+   minsqpstate_free(&p->sqpsolverstate, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
 }
 
-void _minnlcstate_destroy(void *_p) {
-   minnlcstate *p = (minnlcstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_matrix_destroy(&p->cleic);
-   ae_vector_destroy(&p->lcsrcidx);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _rcommstate_destroy(&p->rstate);
-   _rcommstate_destroy(&p->rstateaul);
-   _rcommstate_destroy(&p->rstateslp);
-   ae_vector_destroy(&p->scaledbndl);
-   ae_vector_destroy(&p->scaledbndu);
-   ae_matrix_destroy(&p->scaledcleic);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->xstart);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->fbase);
-   ae_vector_destroy(&p->dfbase);
-   ae_vector_destroy(&p->fm2);
-   ae_vector_destroy(&p->fm1);
-   ae_vector_destroy(&p->fp1);
-   ae_vector_destroy(&p->fp2);
-   ae_vector_destroy(&p->dfm1);
-   ae_vector_destroy(&p->dfp1);
-   ae_vector_destroy(&p->bufd);
-   ae_vector_destroy(&p->bufc);
-   ae_vector_destroy(&p->tmp0);
-   ae_matrix_destroy(&p->bufw);
-   ae_matrix_destroy(&p->bufz);
-   ae_vector_destroy(&p->xk);
-   ae_vector_destroy(&p->xk1);
-   ae_vector_destroy(&p->gk);
-   ae_vector_destroy(&p->gk1);
-   _minlbfgsstate_destroy(&p->auloptimizer);
-   _minlbfgsreport_destroy(&p->aulreport);
-   ae_vector_destroy(&p->nubc);
-   ae_vector_destroy(&p->nulc);
-   ae_vector_destroy(&p->nunlc);
-   _minslpstate_destroy(&p->slpsolverstate);
-   _minsqpstate_destroy(&p->sqpsolverstate);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-}
-
-void _minnlcreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minnlcreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minnlcreport *p = (minnlcreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minnlcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minnlcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnlcreport *dst = (minnlcreport *) _dst;
    minnlcreport *src = (minnlcreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -46116,12 +45054,7 @@ void _minnlcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make
    dst->dbgphase0its = src->dbgphase0its;
 }
 
-void _minnlcreport_clear(void *_p) {
-   minnlcreport *p = (minnlcreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minnlcreport_destroy(void *_p) {
+void minnlcreport_free(void *_p, bool make_automatic) {
    minnlcreport *p = (minnlcreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -47005,7 +45938,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state
 // API: void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams);
 void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
 
-   _minnsstate_clear(state);
+   minnsstate_free(state, true);
 
    ae_assert(n >= 1, "MinNSCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinNSCreate: Length(X)<N", _state);
@@ -47043,7 +45976,7 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
 // API: void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams);
 void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state) {
 
-   _minnsstate_clear(state);
+   minnsstate_free(state, true);
 
    ae_assert(n >= 1, "MinNSCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinNSCreateF: Length(X)<N", _state);
@@ -47734,8 +46667,8 @@ lbl_rcomm:
 // API: void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams);
 void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minnsreport_clear(rep);
+   ae_vector_free(x, true);
+   minnsreport_free(rep, true);
 
    minnsresultsbuf(state, x, rep, _state);
 }
@@ -49154,7 +48087,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state
    }
 }
 
-void _minnsqp_init(void *_p, ae_state *_state, bool make_automatic) {
+void minnsqp_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsqp *p = (minnsqp *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
@@ -49173,78 +48106,56 @@ void _minnsqp_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmplambdas, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->tmpc2, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpb, 0, DT_BOOL, _state, make_automatic);
-   _snnlssolver_init(&p->nnls, _state, make_automatic);
+   snnlssolver_init(&p->nnls, _state, make_automatic);
 }
 
-void _minnsqp_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minnsqp_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsqp *dst = (minnsqp *) _dst;
    minnsqp *src = (minnsqp *) _src;
    dst->fc = src->fc;
    dst->fn = src->fn;
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->x0, &src->x0, _state, make_automatic);
-   ae_vector_init_copy(&dst->gc, &src->gc, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_matrix_init_copy(&dst->uh, &src->uh, _state, make_automatic);
-   ae_matrix_init_copy(&dst->ch, &src->ch, _state, make_automatic);
-   ae_matrix_init_copy(&dst->rk, &src->rk, _state, make_automatic);
-   ae_vector_init_copy(&dst->invutc, &src->invutc, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpidx, &src->tmpidx, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpc, &src->tmpc, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmplambdas, &src->tmplambdas, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmpc2, &src->tmpc2, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpb, &src->tmpb, _state, make_automatic);
-   _snnlssolver_init_copy(&dst->nnls, &src->nnls, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->x0, &src->x0, _state, make_automatic);
+   ae_vector_copy(&dst->gc, &src->gc, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_matrix_copy(&dst->uh, &src->uh, _state, make_automatic);
+   ae_matrix_copy(&dst->ch, &src->ch, _state, make_automatic);
+   ae_matrix_copy(&dst->rk, &src->rk, _state, make_automatic);
+   ae_vector_copy(&dst->invutc, &src->invutc, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpidx, &src->tmpidx, _state, make_automatic);
+   ae_vector_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
+   ae_vector_copy(&dst->tmpc, &src->tmpc, _state, make_automatic);
+   ae_vector_copy(&dst->tmplambdas, &src->tmplambdas, _state, make_automatic);
+   ae_matrix_copy(&dst->tmpc2, &src->tmpc2, _state, make_automatic);
+   ae_vector_copy(&dst->tmpb, &src->tmpb, _state, make_automatic);
+   snnlssolver_copy(&dst->nnls, &src->nnls, _state, make_automatic);
 }
 
-void _minnsqp_clear(void *_p) {
+void minnsqp_free(void *_p, bool make_automatic) {
    minnsqp *p = (minnsqp *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->x0);
-   ae_vector_clear(&p->gc);
-   ae_vector_clear(&p->d);
-   ae_matrix_clear(&p->uh);
-   ae_matrix_clear(&p->ch);
-   ae_matrix_clear(&p->rk);
-   ae_vector_clear(&p->invutc);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmpidx);
-   ae_vector_clear(&p->tmpd);
-   ae_vector_clear(&p->tmpc);
-   ae_vector_clear(&p->tmplambdas);
-   ae_matrix_clear(&p->tmpc2);
-   ae_vector_clear(&p->tmpb);
-   _snnlssolver_clear(&p->nnls);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->gc, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_matrix_free(&p->uh, make_automatic);
+   ae_matrix_free(&p->ch, make_automatic);
+   ae_matrix_free(&p->rk, make_automatic);
+   ae_vector_free(&p->invutc, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmpidx, make_automatic);
+   ae_vector_free(&p->tmpd, make_automatic);
+   ae_vector_free(&p->tmpc, make_automatic);
+   ae_vector_free(&p->tmplambdas, make_automatic);
+   ae_matrix_free(&p->tmpc2, make_automatic);
+   ae_vector_free(&p->tmpb, make_automatic);
+   snnlssolver_free(&p->nnls, make_automatic);
 }
 
-void _minnsqp_destroy(void *_p) {
-   minnsqp *p = (minnsqp *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->x0);
-   ae_vector_destroy(&p->gc);
-   ae_vector_destroy(&p->d);
-   ae_matrix_destroy(&p->uh);
-   ae_matrix_destroy(&p->ch);
-   ae_matrix_destroy(&p->rk);
-   ae_vector_destroy(&p->invutc);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmpidx);
-   ae_vector_destroy(&p->tmpd);
-   ae_vector_destroy(&p->tmpc);
-   ae_vector_destroy(&p->tmplambdas);
-   ae_matrix_destroy(&p->tmpc2);
-   ae_vector_destroy(&p->tmpb);
-   _snnlssolver_destroy(&p->nnls);
-}
-
-void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsstate *p = (minnsstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -49256,9 +48167,9 @@ void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
-   _rcommstate_init(&p->rstateags, _state, make_automatic);
-   _hqrndstate_init(&p->agsrs, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstateags, _state, make_automatic);
+   hqrndstate_init(&p->agsrs, _state, make_automatic);
    ae_vector_init(&p->xstart, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xn, 0, DT_REAL, _state, make_automatic);
@@ -49276,7 +48187,7 @@ void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_matrix_init(&p->samplegm, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->samplegmbc, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->samplef, 0, DT_REAL, _state, make_automatic);
-   _minnsqp_init(&p->nsqp, _state, make_automatic);
+   minnsqp_init(&p->nsqp, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, _state, make_automatic);
@@ -49288,7 +48199,7 @@ void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->xscaled, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minnsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsstate *dst = (minnsstate *) _dst;
    minnsstate *src = (minnsstate *) _src;
    dst->solvertype = src->solvertype;
@@ -49297,26 +48208,26 @@ void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->maxits = src->maxits;
    dst->xrep = src->xrep;
    dst->diffstep = src->diffstep;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
    dst->nec = src->nec;
    dst->nic = src->nic;
-   ae_matrix_init_copy(&dst->cleic, &src->cleic, _state, make_automatic);
+   ae_matrix_copy(&dst->cleic, &src->cleic, _state, make_automatic);
    dst->ng = src->ng;
    dst->nh = src->nh;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
    dst->needfij = src->needfij;
    dst->needfi = src->needfi;
    dst->xupdated = src->xupdated;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstateags, &src->rstateags, _state, make_automatic);
-   _hqrndstate_init_copy(&dst->agsrs, &src->agsrs, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstateags, &src->rstateags, _state, make_automatic);
+   hqrndstate_copy(&dst->agsrs, &src->agsrs, _state, make_automatic);
    dst->agsradius = src->agsradius;
    dst->agssamplesize = src->agssamplesize;
    dst->agsraddecay = src->agsraddecay;
@@ -49335,37 +48246,37 @@ void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->agsmaxbacktracknonfull = src->agsmaxbacktracknonfull;
    dst->agspenaltylevel = src->agspenaltylevel;
    dst->agspenaltyincrease = src->agspenaltyincrease;
-   ae_vector_init_copy(&dst->xstart, &src->xstart, _state, make_automatic);
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->rawg, &src->rawg, _state, make_automatic);
-   ae_vector_init_copy(&dst->meritg, &src->meritg, _state, make_automatic);
+   ae_vector_copy(&dst->xstart, &src->xstart, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->rawg, &src->rawg, _state, make_automatic);
+   ae_vector_copy(&dst->meritg, &src->meritg, _state, make_automatic);
    dst->rawf = src->rawf;
    dst->meritf = src->meritf;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
-   ae_vector_init_copy(&dst->colmax, &src->colmax, _state, make_automatic);
-   ae_vector_init_copy(&dst->diagh, &src->diagh, _state, make_automatic);
-   ae_vector_init_copy(&dst->signmin, &src->signmin, _state, make_automatic);
-   ae_vector_init_copy(&dst->signmax, &src->signmax, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->colmax, &src->colmax, _state, make_automatic);
+   ae_vector_copy(&dst->diagh, &src->diagh, _state, make_automatic);
+   ae_vector_copy(&dst->signmin, &src->signmin, _state, make_automatic);
+   ae_vector_copy(&dst->signmax, &src->signmax, _state, make_automatic);
    dst->userterminationneeded = src->userterminationneeded;
-   ae_vector_init_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
-   ae_matrix_init_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndl, &src->scaledbndl, _state, make_automatic);
+   ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, _state, make_automatic);
+   ae_matrix_copy(&dst->scaledcleic, &src->scaledcleic, _state, make_automatic);
    dst->rholinear = src->rholinear;
-   ae_matrix_init_copy(&dst->samplex, &src->samplex, _state, make_automatic);
-   ae_matrix_init_copy(&dst->samplegm, &src->samplegm, _state, make_automatic);
-   ae_matrix_init_copy(&dst->samplegmbc, &src->samplegmbc, _state, make_automatic);
-   ae_vector_init_copy(&dst->samplef, &src->samplef, _state, make_automatic);
-   _minnsqp_init_copy(&dst->nsqp, &src->nsqp, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
-   ae_matrix_init_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp3, &src->tmp3, _state, make_automatic);
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fbase, &src->fbase, _state, make_automatic);
-   ae_vector_init_copy(&dst->fp, &src->fp, _state, make_automatic);
-   ae_vector_init_copy(&dst->fm, &src->fm, _state, make_automatic);
-   ae_vector_init_copy(&dst->xscaled, &src->xscaled, _state, make_automatic);
+   ae_matrix_copy(&dst->samplex, &src->samplex, _state, make_automatic);
+   ae_matrix_copy(&dst->samplegm, &src->samplegm, _state, make_automatic);
+   ae_matrix_copy(&dst->samplegmbc, &src->samplegmbc, _state, make_automatic);
+   ae_vector_copy(&dst->samplef, &src->samplef, _state, make_automatic);
+   minnsqp_copy(&dst->nsqp, &src->nsqp, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, _state, make_automatic);
+   ae_matrix_copy(&dst->tmp2, &src->tmp2, _state, make_automatic);
+   ae_vector_copy(&dst->tmp3, &src->tmp3, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->fbase, &src->fbase, _state, make_automatic);
+   ae_vector_copy(&dst->fp, &src->fp, _state, make_automatic);
+   ae_vector_copy(&dst->fm, &src->fm, _state, make_automatic);
+   ae_vector_copy(&dst->xscaled, &src->xscaled, _state, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repnfev = src->repnfev;
@@ -49377,100 +48288,56 @@ void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->dbgncholesky = src->dbgncholesky;
 }
 
-void _minnsstate_clear(void *_p) {
+void minnsstate_free(void *_p, bool make_automatic) {
    minnsstate *p = (minnsstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_matrix_clear(&p->cleic);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _rcommstate_clear(&p->rstate);
-   _rcommstate_clear(&p->rstateags);
-   _hqrndstate_clear(&p->agsrs);
-   ae_vector_clear(&p->xstart);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->rawg);
-   ae_vector_clear(&p->meritg);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->colmax);
-   ae_vector_clear(&p->diagh);
-   ae_vector_clear(&p->signmin);
-   ae_vector_clear(&p->signmax);
-   ae_vector_clear(&p->scaledbndl);
-   ae_vector_clear(&p->scaledbndu);
-   ae_matrix_clear(&p->scaledcleic);
-   ae_matrix_clear(&p->samplex);
-   ae_matrix_clear(&p->samplegm);
-   ae_matrix_clear(&p->samplegmbc);
-   ae_vector_clear(&p->samplef);
-   _minnsqp_clear(&p->nsqp);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->tmp1);
-   ae_matrix_clear(&p->tmp2);
-   ae_vector_clear(&p->tmp3);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->fbase);
-   ae_vector_clear(&p->fp);
-   ae_vector_clear(&p->fm);
-   ae_vector_clear(&p->xscaled);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_matrix_free(&p->cleic, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   rcommstate_free(&p->rstateags, make_automatic);
+   hqrndstate_free(&p->agsrs, make_automatic);
+   ae_vector_free(&p->xstart, make_automatic);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->rawg, make_automatic);
+   ae_vector_free(&p->meritg, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->colmax, make_automatic);
+   ae_vector_free(&p->diagh, make_automatic);
+   ae_vector_free(&p->signmin, make_automatic);
+   ae_vector_free(&p->signmax, make_automatic);
+   ae_vector_free(&p->scaledbndl, make_automatic);
+   ae_vector_free(&p->scaledbndu, make_automatic);
+   ae_matrix_free(&p->scaledcleic, make_automatic);
+   ae_matrix_free(&p->samplex, make_automatic);
+   ae_matrix_free(&p->samplegm, make_automatic);
+   ae_matrix_free(&p->samplegmbc, make_automatic);
+   ae_vector_free(&p->samplef, make_automatic);
+   minnsqp_free(&p->nsqp, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_matrix_free(&p->tmp2, make_automatic);
+   ae_vector_free(&p->tmp3, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fbase, make_automatic);
+   ae_vector_free(&p->fp, make_automatic);
+   ae_vector_free(&p->fm, make_automatic);
+   ae_vector_free(&p->xscaled, make_automatic);
 }
 
-void _minnsstate_destroy(void *_p) {
-   minnsstate *p = (minnsstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_matrix_destroy(&p->cleic);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _rcommstate_destroy(&p->rstate);
-   _rcommstate_destroy(&p->rstateags);
-   _hqrndstate_destroy(&p->agsrs);
-   ae_vector_destroy(&p->xstart);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->rawg);
-   ae_vector_destroy(&p->meritg);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->colmax);
-   ae_vector_destroy(&p->diagh);
-   ae_vector_destroy(&p->signmin);
-   ae_vector_destroy(&p->signmax);
-   ae_vector_destroy(&p->scaledbndl);
-   ae_vector_destroy(&p->scaledbndu);
-   ae_matrix_destroy(&p->scaledcleic);
-   ae_matrix_destroy(&p->samplex);
-   ae_matrix_destroy(&p->samplegm);
-   ae_matrix_destroy(&p->samplegmbc);
-   ae_vector_destroy(&p->samplef);
-   _minnsqp_destroy(&p->nsqp);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->tmp1);
-   ae_matrix_destroy(&p->tmp2);
-   ae_vector_destroy(&p->tmp3);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->fbase);
-   ae_vector_destroy(&p->fp);
-   ae_vector_destroy(&p->fm);
-   ae_vector_destroy(&p->xscaled);
-}
-
-void _minnsreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minnsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsreport *p = (minnsreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minnsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minnsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsreport *dst = (minnsreport *) _dst;
    minnsreport *src = (minnsreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -49483,12 +48350,7 @@ void _minnsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->funcidx = src->funcidx;
 }
 
-void _minnsreport_clear(void *_p) {
-   minnsreport *p = (minnsreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minnsreport_destroy(void *_p) {
+void minnsreport_free(void *_p, bool make_automatic) {
    minnsreport *p = (minnsreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -50027,7 +48889,7 @@ void minbleicsetbarrierdecay(minbleicstate *state, double mudecay, ae_state *_st
 void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasastate *state, ae_state *_state) {
    ae_int_t i;
 
-   _minasastate_clear(state);
+   minasastate_free(state, true);
 
    ae_assert(n >= 1, "MinASA: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!", _state);
@@ -50781,8 +49643,8 @@ lbl_rcomm:
 // API: void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams);
 void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minasareport_clear(rep);
+   ae_vector_free(x, true);
+   minasareport_free(rep, true);
 
    minasaresultsbuf(state, x, rep, _state);
 }
@@ -50939,7 +49801,7 @@ static void mincomp_clearrequestfields(minasastate *state, ae_state *_state) {
    state->xupdated = false;
 }
 
-void _minasastate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minasastate_init(void *_p, ae_state *_state, bool make_automatic) {
    minasastate *p = (minasastate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
@@ -50956,11 +49818,11 @@ void _minasastate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->gc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
-   _linminstate_init(&p->lstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
+   linminstate_init(&p->lstate, _state, make_automatic);
 }
 
-void _minasastate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minasastate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minasastate *dst = (minasastate *) _dst;
    minasastate *src = (minasastate *) _src;
    dst->n = src->n;
@@ -50974,89 +49836,68 @@ void _minasastate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->k = src->k;
    dst->nfev = src->nfev;
    dst->mcstage = src->mcstage;
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->curalgo = src->curalgo;
    dst->acount = src->acount;
    dst->mu = src->mu;
    dst->finit = src->finit;
    dst->dginit = src->dginit;
-   ae_vector_init_copy(&dst->ak, &src->ak, _state, make_automatic);
-   ae_vector_init_copy(&dst->xk, &src->xk, _state, make_automatic);
-   ae_vector_init_copy(&dst->dk, &src->dk, _state, make_automatic);
-   ae_vector_init_copy(&dst->an, &src->an, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->dn, &src->dn, _state, make_automatic);
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->ak, &src->ak, _state, make_automatic);
+   ae_vector_copy(&dst->xk, &src->xk, _state, make_automatic);
+   ae_vector_copy(&dst->dk, &src->dk, _state, make_automatic);
+   ae_vector_copy(&dst->an, &src->an, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->dn, &src->dn, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->fold = src->fold;
    dst->stp = src->stp;
-   ae_vector_init_copy(&dst->work, &src->work, _state, make_automatic);
-   ae_vector_init_copy(&dst->yk, &src->yk, _state, make_automatic);
-   ae_vector_init_copy(&dst->gc, &src->gc, _state, make_automatic);
+   ae_vector_copy(&dst->work, &src->work, _state, make_automatic);
+   ae_vector_copy(&dst->yk, &src->yk, _state, make_automatic);
+   ae_vector_copy(&dst->gc, &src->gc, _state, make_automatic);
    dst->laststep = src->laststep;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needfg = src->needfg;
    dst->xupdated = src->xupdated;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnfev = src->repnfev;
    dst->repterminationtype = src->repterminationtype;
    dst->debugrestartscount = src->debugrestartscount;
-   _linminstate_init_copy(&dst->lstate, &src->lstate, _state, make_automatic);
+   linminstate_copy(&dst->lstate, &src->lstate, _state, make_automatic);
    dst->betahs = src->betahs;
    dst->betady = src->betady;
 }
 
-void _minasastate_clear(void *_p) {
+void minasastate_free(void *_p, bool make_automatic) {
    minasastate *p = (minasastate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->ak);
-   ae_vector_clear(&p->xk);
-   ae_vector_clear(&p->dk);
-   ae_vector_clear(&p->an);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->dn);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->work);
-   ae_vector_clear(&p->yk);
-   ae_vector_clear(&p->gc);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   _rcommstate_clear(&p->rstate);
-   _linminstate_clear(&p->lstate);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->ak, make_automatic);
+   ae_vector_free(&p->xk, make_automatic);
+   ae_vector_free(&p->dk, make_automatic);
+   ae_vector_free(&p->an, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->dn, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->work, make_automatic);
+   ae_vector_free(&p->yk, make_automatic);
+   ae_vector_free(&p->gc, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   linminstate_free(&p->lstate, make_automatic);
 }
 
-void _minasastate_destroy(void *_p) {
-   minasastate *p = (minasastate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->ak);
-   ae_vector_destroy(&p->xk);
-   ae_vector_destroy(&p->dk);
-   ae_vector_destroy(&p->an);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->dn);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->work);
-   ae_vector_destroy(&p->yk);
-   ae_vector_destroy(&p->gc);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   _rcommstate_destroy(&p->rstate);
-   _linminstate_destroy(&p->lstate);
-}
-
-void _minasareport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minasareport_init(void *_p, ae_state *_state, bool make_automatic) {
    minasareport *p = (minasareport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minasareport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minasareport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minasareport *dst = (minasareport *) _dst;
    minasareport *src = (minasareport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -51065,12 +49906,7 @@ void _minasareport_init_copy(void *_dst, void *_src, ae_state *_state, bool make
    dst->activeconstraints = src->activeconstraints;
 }
 
-void _minasareport_clear(void *_p) {
-   minasareport *p = (minasareport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minasareport_destroy(void *_p) {
+void minasareport_free(void *_p, bool make_automatic) {
    minasareport *p = (minasareport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -51487,7 +50323,7 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   _minbcstate_clear(state);
+   minbcstate_free(state, true);
    ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
    ae_vector_init(&ct, 0, DT_INT, _state, true);
 
@@ -51546,7 +50382,7 @@ void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   _minbcstate_clear(state);
+   minbcstate_free(state, true);
    ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
    ae_vector_init(&ct, 0, DT_INT, _state, true);
 
@@ -53050,7 +51886,7 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 // API: void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams);
 void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_state) {
 
-   _optguardreport_clear(rep);
+   optguardreport_free(rep, true);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -53097,8 +51933,8 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_sta
 // API: void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test0report_clear(strrep);
-   _optguardnonc1test0report_clear(lngrep);
+   optguardnonc1test0report_free(strrep, true);
+   optguardnonc1test0report_free(lngrep, true);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -53153,8 +51989,8 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 // API: void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   _optguardnonc1test1report_clear(strrep);
-   _optguardnonc1test1report_clear(lngrep);
+   optguardnonc1test1report_free(strrep, true);
+   optguardnonc1test1report_free(lngrep, true);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -53187,8 +52023,8 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 // API: void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams);
 void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _minbcreport_clear(rep);
+   ae_vector_free(x, true);
+   minbcreport_free(rep, true);
 
    minbcresultsbuf(state, x, rep, _state);
 }
@@ -53367,14 +52203,14 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
    *estimate = newstep;
 }
 
-void _minbcstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void minbcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbcstate *p = (minbcstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->ugc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cgc, 0, DT_REAL, _state, make_automatic);
@@ -53391,17 +52227,17 @@ void _minbcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->tmpprec, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->work, 0, DT_REAL, _state, make_automatic);
-   _linminstate_init(&p->lstate, _state, make_automatic);
+   linminstate_init(&p->lstate, _state, make_automatic);
    ae_matrix_init(&p->bufyk, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->bufsk, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bufrho, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->buftheta, 0, DT_REAL, _state, make_automatic);
-   _smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
+   smoothnessmonitor_init(&p->smonitor, _state, make_automatic);
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minbcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbcstate *dst = (minbcstate *) _dst;
    minbcstate *src = (minbcstate *) _src;
    dst->nmain = src->nmain;
@@ -53412,38 +52248,38 @@ void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->xrep = src->xrep;
    dst->stpmax = src->stpmax;
    dst->diffstep = src->diffstep;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
    dst->prectype = src->prectype;
-   ae_vector_init_copy(&dst->diagh, &src->diagh, _state, make_automatic);
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->diagh, &src->diagh, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->g, &src->g, _state, make_automatic);
+   ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfg = src->needfg;
    dst->xupdated = src->xupdated;
    dst->userterminationneeded = src->userterminationneeded;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
-   ae_vector_init_copy(&dst->xc, &src->xc, _state, make_automatic);
-   ae_vector_init_copy(&dst->ugc, &src->ugc, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgc, &src->cgc, _state, make_automatic);
-   ae_vector_init_copy(&dst->xn, &src->xn, _state, make_automatic);
-   ae_vector_init_copy(&dst->ugn, &src->ugn, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgn, &src->cgn, _state, make_automatic);
-   ae_vector_init_copy(&dst->xp, &src->xp, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->xc, &src->xc, _state, make_automatic);
+   ae_vector_copy(&dst->ugc, &src->ugc, _state, make_automatic);
+   ae_vector_copy(&dst->cgc, &src->cgc, _state, make_automatic);
+   ae_vector_copy(&dst->xn, &src->xn, _state, make_automatic);
+   ae_vector_copy(&dst->ugn, &src->ugn, _state, make_automatic);
+   ae_vector_copy(&dst->cgn, &src->cgn, _state, make_automatic);
+   ae_vector_copy(&dst->xp, &src->xp, _state, make_automatic);
    dst->fc = src->fc;
    dst->fn = src->fn;
    dst->fp = src->fp;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->lastscaledgoodstep = src->lastscaledgoodstep;
-   ae_vector_init_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndl, &src->hasbndl, _state, make_automatic);
+   ae_vector_copy(&dst->hasbndu, &src->hasbndu, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnfev = src->repnfev;
    dst->repvaridx = src->repvaridx;
    dst->repterminationtype = src->repterminationtype;
-   ae_vector_init_copy(&dst->xstart, &src->xstart, _state, make_automatic);
+   ae_vector_copy(&dst->xstart, &src->xstart, _state, make_automatic);
    dst->fbase = src->fbase;
    dst->fm2 = src->fm2;
    dst->fm1 = src->fm1;
@@ -53453,102 +52289,68 @@ void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->xp1 = src->xp1;
    dst->gm1 = src->gm1;
    dst->gp1 = src->gp1;
-   ae_vector_init_copy(&dst->tmpprec, &src->tmpprec, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
+   ae_vector_copy(&dst->tmpprec, &src->tmpprec, _state, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, _state, make_automatic);
    dst->nfev = src->nfev;
    dst->mcstage = src->mcstage;
    dst->stp = src->stp;
    dst->curstpmax = src->curstpmax;
-   ae_vector_init_copy(&dst->work, &src->work, _state, make_automatic);
-   _linminstate_init_copy(&dst->lstate, &src->lstate, _state, make_automatic);
+   ae_vector_copy(&dst->work, &src->work, _state, make_automatic);
+   linminstate_copy(&dst->lstate, &src->lstate, _state, make_automatic);
    dst->trimthreshold = src->trimthreshold;
    dst->nonmonotoniccnt = src->nonmonotoniccnt;
-   ae_matrix_init_copy(&dst->bufyk, &src->bufyk, _state, make_automatic);
-   ae_matrix_init_copy(&dst->bufsk, &src->bufsk, _state, make_automatic);
-   ae_vector_init_copy(&dst->bufrho, &src->bufrho, _state, make_automatic);
-   ae_vector_init_copy(&dst->buftheta, &src->buftheta, _state, make_automatic);
+   ae_matrix_copy(&dst->bufyk, &src->bufyk, _state, make_automatic);
+   ae_matrix_copy(&dst->bufsk, &src->bufsk, _state, make_automatic);
+   ae_vector_copy(&dst->bufrho, &src->bufrho, _state, make_automatic);
+   ae_vector_copy(&dst->buftheta, &src->buftheta, _state, make_automatic);
    dst->bufsize = src->bufsize;
    dst->teststep = src->teststep;
    dst->smoothnessguardlevel = src->smoothnessguardlevel;
-   _smoothnessmonitor_init_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
-   ae_vector_init_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
-   ae_vector_init_copy(&dst->invs, &src->invs, _state, make_automatic);
+   smoothnessmonitor_copy(&dst->smonitor, &src->smonitor, _state, make_automatic);
+   ae_vector_copy(&dst->lastscaleused, &src->lastscaleused, _state, make_automatic);
+   ae_vector_copy(&dst->invs, &src->invs, _state, make_automatic);
 }
 
-void _minbcstate_clear(void *_p) {
+void minbcstate_free(void *_p, bool make_automatic) {
    minbcstate *p = (minbcstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->diagh);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->g);
-   _rcommstate_clear(&p->rstate);
-   ae_vector_clear(&p->xc);
-   ae_vector_clear(&p->ugc);
-   ae_vector_clear(&p->cgc);
-   ae_vector_clear(&p->xn);
-   ae_vector_clear(&p->ugn);
-   ae_vector_clear(&p->cgn);
-   ae_vector_clear(&p->xp);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->hasbndl);
-   ae_vector_clear(&p->hasbndu);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   ae_vector_clear(&p->xstart);
-   ae_vector_clear(&p->tmpprec);
-   ae_vector_clear(&p->tmp0);
-   ae_vector_clear(&p->work);
-   _linminstate_clear(&p->lstate);
-   ae_matrix_clear(&p->bufyk);
-   ae_matrix_clear(&p->bufsk);
-   ae_vector_clear(&p->bufrho);
-   ae_vector_clear(&p->buftheta);
-   _smoothnessmonitor_clear(&p->smonitor);
-   ae_vector_clear(&p->lastscaleused);
-   ae_vector_clear(&p->invs);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->diagh, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   ae_vector_free(&p->xc, make_automatic);
+   ae_vector_free(&p->ugc, make_automatic);
+   ae_vector_free(&p->cgc, make_automatic);
+   ae_vector_free(&p->xn, make_automatic);
+   ae_vector_free(&p->ugn, make_automatic);
+   ae_vector_free(&p->cgn, make_automatic);
+   ae_vector_free(&p->xp, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->hasbndl, make_automatic);
+   ae_vector_free(&p->hasbndu, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   ae_vector_free(&p->xstart, make_automatic);
+   ae_vector_free(&p->tmpprec, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->work, make_automatic);
+   linminstate_free(&p->lstate, make_automatic);
+   ae_matrix_free(&p->bufyk, make_automatic);
+   ae_matrix_free(&p->bufsk, make_automatic);
+   ae_vector_free(&p->bufrho, make_automatic);
+   ae_vector_free(&p->buftheta, make_automatic);
+   smoothnessmonitor_free(&p->smonitor, make_automatic);
+   ae_vector_free(&p->lastscaleused, make_automatic);
+   ae_vector_free(&p->invs, make_automatic);
 }
 
-void _minbcstate_destroy(void *_p) {
-   minbcstate *p = (minbcstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->diagh);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->g);
-   _rcommstate_destroy(&p->rstate);
-   ae_vector_destroy(&p->xc);
-   ae_vector_destroy(&p->ugc);
-   ae_vector_destroy(&p->cgc);
-   ae_vector_destroy(&p->xn);
-   ae_vector_destroy(&p->ugn);
-   ae_vector_destroy(&p->cgn);
-   ae_vector_destroy(&p->xp);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->hasbndl);
-   ae_vector_destroy(&p->hasbndu);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   ae_vector_destroy(&p->xstart);
-   ae_vector_destroy(&p->tmpprec);
-   ae_vector_destroy(&p->tmp0);
-   ae_vector_destroy(&p->work);
-   _linminstate_destroy(&p->lstate);
-   ae_matrix_destroy(&p->bufyk);
-   ae_matrix_destroy(&p->bufsk);
-   ae_vector_destroy(&p->bufrho);
-   ae_vector_destroy(&p->buftheta);
-   _smoothnessmonitor_destroy(&p->smonitor);
-   ae_vector_destroy(&p->lastscaleused);
-   ae_vector_destroy(&p->invs);
-}
-
-void _minbcreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void minbcreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minbcreport *p = (minbcreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minbcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void minbcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbcreport *dst = (minbcreport *) _dst;
    minbcreport *src = (minbcreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -53557,12 +52359,7 @@ void _minbcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->terminationtype = src->terminationtype;
 }
 
-void _minbcreport_clear(void *_p) {
-   minbcreport *p = (minbcreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _minbcreport_destroy(void *_p) {
+void minbcreport_free(void *_p, bool make_automatic) {
    minbcreport *p = (minbcreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -54173,7 +52970,7 @@ namespace alglib_impl {
 // API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams);
 void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p, ae_state *_state) {
 
-   _lptestproblem_clear(p);
+   lptestproblem_free(p, true);
 
    ae_assert(n >= 1, "LPTestProblemCreate: N<1", _state);
    p->n = n;
@@ -54317,7 +53114,7 @@ void lptestproblemserialize(ae_serializer *s, lptestproblem *p, ae_state *_state
 void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_state) {
    ae_int_t k;
 
-   _lptestproblem_clear(p);
+   lptestproblem_free(p, true);
 
    ae_serializer_unserialize_int(s, &k, _state);
    ae_assert(k == getlptestserializationcode(_state), "LPTestProblemUnserialize: stream header corrupted", _state);
@@ -54347,7 +53144,7 @@ void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_sta
 // API: void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams);
 void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_state *_state) {
 
-   _minlpstate_clear(state);
+   minlpstate_free(state, true);
 
    minlpcreate(p->n, state, _state);
    minlpsetscale(state, &p->s, _state);
@@ -54356,56 +53153,44 @@ void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_stat
    minlpsetlc2(state, &p->a, &p->al, &p->au, p->m, _state);
 }
 
-void _lptestproblem_init(void *_p, ae_state *_state, bool make_automatic) {
+void lptestproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    lptestproblem *p = (lptestproblem *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->a, _state, make_automatic);
+   sparsematrix_init(&p->a, _state, make_automatic);
    ae_vector_init(&p->al, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->au, 0, DT_REAL, _state, make_automatic);
 }
 
-void _lptestproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void lptestproblem_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lptestproblem *dst = (lptestproblem *) _dst;
    lptestproblem *src = (lptestproblem *) _src;
    dst->n = src->n;
    dst->hasknowntarget = src->hasknowntarget;
    dst->targetf = src->targetf;
-   ae_vector_init_copy(&dst->s, &src->s, _state, make_automatic);
-   ae_vector_init_copy(&dst->c, &src->c, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndl, &src->bndl, _state, make_automatic);
-   ae_vector_init_copy(&dst->bndu, &src->bndu, _state, make_automatic);
+   ae_vector_copy(&dst->s, &src->s, _state, make_automatic);
+   ae_vector_copy(&dst->c, &src->c, _state, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, _state, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, _state, make_automatic);
    dst->m = src->m;
-   _sparsematrix_init_copy(&dst->a, &src->a, _state, make_automatic);
-   ae_vector_init_copy(&dst->al, &src->al, _state, make_automatic);
-   ae_vector_init_copy(&dst->au, &src->au, _state, make_automatic);
+   sparsematrix_copy(&dst->a, &src->a, _state, make_automatic);
+   ae_vector_copy(&dst->al, &src->al, _state, make_automatic);
+   ae_vector_copy(&dst->au, &src->au, _state, make_automatic);
 }
 
-void _lptestproblem_clear(void *_p) {
+void lptestproblem_free(void *_p, bool make_automatic) {
    lptestproblem *p = (lptestproblem *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->s);
-   ae_vector_clear(&p->c);
-   ae_vector_clear(&p->bndl);
-   ae_vector_clear(&p->bndu);
-   _sparsematrix_clear(&p->a);
-   ae_vector_clear(&p->al);
-   ae_vector_clear(&p->au);
-}
-
-void _lptestproblem_destroy(void *_p) {
-   lptestproblem *p = (lptestproblem *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->s);
-   ae_vector_destroy(&p->c);
-   ae_vector_destroy(&p->bndl);
-   ae_vector_destroy(&p->bndu);
-   _sparsematrix_destroy(&p->a);
-   ae_vector_destroy(&p->al);
-   ae_vector_destroy(&p->au);
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->c, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   sparsematrix_free(&p->a, make_automatic);
+   ae_vector_free(&p->al, make_automatic);
+   ae_vector_free(&p->au, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -54440,7 +53225,6 @@ void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
    alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
@@ -54465,7 +53249,6 @@ void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
    alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
    alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 
@@ -54488,7 +53271,6 @@ void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
@@ -54510,7 +53292,6 @@ void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 

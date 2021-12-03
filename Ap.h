@@ -26,7 +26,6 @@
 #include <cstring>
 #include <iostream>
 #include <math.h>
-
 #if defined __CODEGEARC__
 #   include <list>
 #   include <vector>
@@ -541,20 +540,15 @@ typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 typedef struct ae_smart_ptr {
 // pointer to subscriber; all changes in ptr are translated to subscriber
    void **subscriber;
-
 // pointer to object
    void *ptr;
-
 // whether smart pointer owns ptr
    bool is_owner;
-
 // whether object pointed by ptr is dynamic - clearing such object requires BOTH
 // calling destructor function AND calling ae_free for memory occupied by object.
    bool is_dynamic;
-
 // destructor function for pointer; clears all dynamically allocated memory
-   void (*destroy)(void *);
-
+   void (*free)(void *, bool make_automatic);
 // frame entry; used to ensure automatic deallocation of smart pointer in case of exception/exit
    ae_dyn_block frame_entry;
 } ae_smart_ptr;
@@ -597,38 +591,29 @@ typedef struct ae_shared_pool_entry {
 typedef struct ae_shared_pool {
 // lock object which protects pool
    ae_lock pool_lock;
-
 // seed object (used to create new instances of temporaries)
    void *volatile seed_object;
-
 // list of recycled OBJECTS:
 // 1. entries in this list store pointers to recycled objects
 // 2. every time we retrieve object, we retrieve first entry from this list,
 //    move it to recycled_entries and return its obj field to caller/
    ae_shared_pool_entry *volatile recycled_objects;
-
 // list of recycled ENTRIES:
 // 1. this list holds entries which are not used to store recycled objects;
 //    every time recycled object is retrieved, its entry is moved to this list.
 // 2. every time object is recycled, we try to fetch entry for him from this list
 //    before allocating it with malloc()
    ae_shared_pool_entry *volatile recycled_entries;
-
 // enumeration pointer, points to current recycled object
    ae_shared_pool_entry *volatile enumeration_counter;
-
 // size of object; this field is used when we call malloc() for new objects
    ae_int_t size_of_object;
-
 // initializer function; accepts pointer to malloc'ed object, initializes its fields
    void (*init)(void *dst, ae_state *state, bool make_automatic);
-
 // copy constructor; accepts pointer to malloc'ed, but not initialized object
-   void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic);
-
+   void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic);
 // destructor function;
-   void (*destroy)(void *ptr);
-
+   void (*free)(void *ptr, bool make_automatic);
 // frame entry; contains pointer to the pool object itself
    ae_dyn_block frame_entry;
 } ae_shared_pool;
@@ -691,28 +676,25 @@ void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
 
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic);
-void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic);
+void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic);
 void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
 void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state);
-void ae_vector_clear(ae_vector *dst);
-void ae_vector_destroy(ae_vector *dst);
+void ae_vector_free(ae_vector *dst, bool make_automatic);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
 
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic);
-void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic);
+void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic);
 void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
 void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state *state);
-void ae_matrix_clear(ae_matrix *dst);
-void ae_matrix_destroy(ae_matrix *dst);
+void ae_matrix_free(ae_matrix *dst, bool make_automatic);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bool make_automatic);
-void ae_smart_ptr_clear(void *_dst); // accepts ae_smart_ptr*
-void ae_smart_ptr_destroy(void *_dst);
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*destroy)(void *));
+void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
 void ae_smart_ptr_release(ae_smart_ptr *dst);
 
 void ae_yield();
@@ -723,14 +705,13 @@ void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
 
 void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic);
-void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make_automatic);
-void ae_shared_pool_clear(void *dst);
-void ae_shared_pool_destroy(void *dst);
+void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_automatic);
+void ae_shared_pool_free(void *dst, bool make_automatic);
 bool ae_shared_pool_is_initialized(void *_dst);
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*destroy)(void *ptr), ae_state *state);
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*free)(void *ptr, bool make_automatic), ae_state *state);
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
-void ae_shared_pool_clear_recycled(ae_shared_pool *pool, ae_state *state);
+void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic, ae_state *state);
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_reset(ae_shared_pool *pool, ae_state *state);
@@ -740,7 +721,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src);
 
-void x_vector_clear(x_vector *dst);
+void x_vector_free(x_vector *dst, bool make_automatic);
 
 bool x_is_symmetric(x_matrix *a);
 bool x_is_hermitian(x_matrix *a);
@@ -752,8 +733,6 @@ bool ae_force_symmetric(ae_matrix *a);
 bool ae_force_hermitian(ae_matrix *a);
 
 void ae_serializer_init(ae_serializer *serializer);
-void ae_serializer_clear(ae_serializer *serializer);
-
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
 void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes);
@@ -918,10 +897,9 @@ typedef struct rcommstate {
    ae_vector ra;
    ae_vector ca;
 } rcommstate;
-void _rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic);
-void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic);
-void _rcommstate_clear(rcommstate *p);
-void _rcommstate_destroy(rcommstate *p);
+void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic);
+void rcommstate_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic);
+void rcommstate_free(rcommstate *p, bool make_automatic);
 
 // Allocation counters, inactive by default.
 // Turned on when needed for debugging purposes.
@@ -1219,23 +1197,23 @@ struct Type: public Type##I { \
 Type##I::Type##I() { \
    alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
    TryX(Q) { \
-      if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), alglib_impl::ae_free(Obj), Obj = NULL; \
+      if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
       ThrowErrorMsg(Q, ); \
    } \
    Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init(Obj, &Q, false); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_init(Obj, &Q, false); \
    ae_state_clear(&Q); \
 } \
 Type##I::Type##I(const Type##I &A) { \
    alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
    TryX(Q) { \
-      if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), alglib_impl::ae_free(Obj), Obj = NULL; \
+      if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
       ThrowErrorMsg(Q, ); \
    } \
    Obj = NULL; \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)", &Q); \
    Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
    ae_state_clear(&Q); \
 } \
 Type##I &Type##I::operator=(const Type##I &A) { \
@@ -1244,13 +1222,13 @@ Type##I &Type##I::operator=(const Type##I &A) { \
    TryCatch(Q, *this); \
    alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)", &Q); \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)", &Q); \
-   alglib_impl::_##Type##_destroy(Obj); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   alglib_impl::Type##_free(Obj, false); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
    ae_state_clear(&Q); \
    return *this; \
 } \
 Type##I::~Type##I() { \
-   if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), ae_free(Obj); \
+   if (Obj != NULL) alglib_impl::Type##_free(Obj, false), ae_free(Obj); \
 } \
 alglib_impl::Type *Type##I::c_ptr() { return Obj; } \
 alglib_impl::Type *Type##I::c_ptr() const { return const_cast<alglib_impl::Type *>(Obj); } \
@@ -2072,4 +2050,5 @@ void clear_error_flag();
 #endif
 } // end of namespace alglib
 
+// Declarations for optimized linear algebra codes, which is shared between the C++ and pure C libraries.
 #endif // OnceOnly

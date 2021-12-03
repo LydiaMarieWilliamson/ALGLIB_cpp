@@ -31,7 +31,7 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
    ae_int_t s0;
    ae_int_t s1;
 
-   _hqrndstate_clear(state);
+   hqrndstate_free(state, true);
 
    s0 = ae_randominteger(hqrnd_hqrndm1, _state);
    s1 = ae_randominteger(hqrnd_hqrndm2, _state);
@@ -43,7 +43,7 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
 // API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = xdefault);
 void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state, ae_state *_state) {
 
-   _hqrndstate_clear(state);
+   hqrndstate_free(state, true);
 
 // Protection against negative seeds:
 //
@@ -201,7 +201,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x, ae_state *_state) {
    double v1;
    double v2;
 
-   ae_vector_clear(x);
+   ae_vector_free(x, true);
 
    n2 = n / 2;
    rallocv(n, x, _state);
@@ -230,7 +230,7 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x, ae_stat
    double v1;
    double v2;
 
-   ae_matrix_clear(x);
+   ae_matrix_free(x, true);
 
    n2 = n / 2;
    ae_matrix_set_length(x, m, n, _state);
@@ -405,12 +405,12 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state, ae_state *_state) {
    return result;
 }
 
-void _hqrndstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void hqrndstate_init(void *_p, ae_state *_state, bool make_automatic) {
    hqrndstate *p = (hqrndstate *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _hqrndstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    hqrndstate *dst = (hqrndstate *) _dst;
    hqrndstate *src = (hqrndstate *) _src;
    dst->s1 = src->s1;
@@ -418,12 +418,7 @@ void _hqrndstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->magicv = src->magicv;
 }
 
-void _hqrndstate_clear(void *_p) {
-   hqrndstate *p = (hqrndstate *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _hqrndstate_destroy(void *_p) {
+void hqrndstate_free(void *_p, bool make_automatic) {
    hqrndstate *p = (hqrndstate *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -693,7 +688,7 @@ namespace alglib_impl {
 // API: void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams = xdefault);
 void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state) {
 
-   _xdebugrecord1_clear(rec1);
+   xdebugrecord1_free(rec1, true);
 
    rec1->i = 1;
    rec1->c.x = (double)(1);
@@ -774,7 +769,7 @@ void xdebugb1appendcopy(BVector *a, ae_state *_state) {
 void xdebugb1outeven(ae_int_t n, BVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(a);
+   ae_vector_free(a, true);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -853,7 +848,7 @@ void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
 void xdebugi1outeven(ae_int_t n, ZVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(a);
+   ae_vector_free(a, true);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -936,7 +931,7 @@ void xdebugr1appendcopy(RVector *a, ae_state *_state) {
 void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(a);
+   ae_vector_free(a, true);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -1019,7 +1014,7 @@ void xdebugc1appendcopy(CVector *a, ae_state *_state) {
 void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(a);
+   ae_vector_free(a, true);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -1115,7 +1110,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_clear(a);
+   ae_matrix_free(a, true);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1206,7 +1201,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_clear(a);
+   ae_matrix_free(a, true);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1297,7 +1292,7 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_clear(a);
+   ae_matrix_free(a, true);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1388,7 +1383,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_clear(a);
+   ae_matrix_free(a, true);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1427,30 +1422,24 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix 
    return result;
 }
 
-void _xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic) {
+void xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic) {
    xdebugrecord1 *p = (xdebugrecord1 *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->a, 0, DT_REAL, _state, make_automatic);
 }
 
-void _xdebugrecord1_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void xdebugrecord1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    xdebugrecord1 *dst = (xdebugrecord1 *) _dst;
    xdebugrecord1 *src = (xdebugrecord1 *) _src;
    dst->i = src->i;
    dst->c = src->c;
-   ae_vector_init_copy(&dst->a, &src->a, _state, make_automatic);
+   ae_vector_copy(&dst->a, &src->a, _state, make_automatic);
 }
 
-void _xdebugrecord1_clear(void *_p) {
+void xdebugrecord1_free(void *_p, bool make_automatic) {
    xdebugrecord1 *p = (xdebugrecord1 *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->a);
-}
-
-void _xdebugrecord1_destroy(void *_p) {
-   xdebugrecord1 *p = (xdebugrecord1 *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->a);
+   ae_vector_free(&p->a, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -2197,7 +2186,7 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
 
    ae_frame_make(_state, &_frame_block);
    memset(&tags, 0, sizeof(tags));
-   _kdtree_clear(kdt);
+   kdtree_free(kdt, true);
    ae_vector_init(&tags, 0, DT_INT, _state, true);
 
    ae_assert(n >= 0, "KDTreeBuild: N<0", _state);
@@ -2258,7 +2247,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    ae_int_t nodesoffs;
    ae_int_t splitsoffs;
 
-   _kdtree_clear(kdt);
+   kdtree_free(kdt, true);
 
    ae_assert(n >= 0, "KDTreeBuildTagged: N<0", _state);
    ae_assert(nx >= 1, "KDTreeBuildTagged: NX<1", _state);
@@ -2337,7 +2326,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 // API: void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams = xdefault);
 void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *_state) {
 
-   _kdtreerequestbuffer_clear(buf);
+   kdtreerequestbuffer_free(buf, true);
 
    ae_vector_set_length(&buf->x, kdt->nx, _state);
    ae_vector_set_length(&buf->boxmin, kdt->nx, _state);
@@ -3256,7 +3245,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // API: void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams = xdefault);
 void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
 
-   ae_matrix_clear(x);
+   ae_matrix_free(x, true);
 
    kdtreequeryresultsx(kdt, x, _state);
 }
@@ -3272,7 +3261,7 @@ void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
 // API: void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = xdefault);
 void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 
-   ae_matrix_clear(xy);
+   ae_matrix_free(xy, true);
 
    kdtreequeryresultsxy(kdt, xy, _state);
 }
@@ -3288,7 +3277,7 @@ void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 // API: void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = xdefault);
 void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
 
-   ae_vector_clear(tags);
+   ae_vector_free(tags, true);
 
    kdtreequeryresultstags(kdt, tags, _state);
 }
@@ -3304,7 +3293,7 @@ void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
 // API: void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams = xdefault);
 void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r, ae_state *_state) {
 
-   ae_vector_clear(r);
+   ae_vector_free(r, true);
 
    kdtreequeryresultsdistances(kdt, r, _state);
 }
@@ -3507,7 +3496,7 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
    ae_int_t i0;
    ae_int_t i1;
 
-   _kdtree_clear(tree);
+   kdtree_free(tree, true);
 
 // check correctness of header
    ae_serializer_unserialize_int(s, &i0, _state);
@@ -4223,7 +4212,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
    ae_assert(buf->curboxmax.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
 }
 
-void _kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
+void kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
    kdtreerequestbuffer *p = (kdtreerequestbuffer *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -4236,52 +4225,39 @@ void _kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic) 
    ae_vector_init(&p->curboxmax, 0, DT_REAL, _state, make_automatic);
 }
 
-void _kdtreerequestbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void kdtreerequestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    kdtreerequestbuffer *dst = (kdtreerequestbuffer *) _dst;
    kdtreerequestbuffer *src = (kdtreerequestbuffer *) _src;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->boxmin, &src->boxmin, _state, make_automatic);
-   ae_vector_init_copy(&dst->boxmax, &src->boxmax, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->boxmin, &src->boxmin, _state, make_automatic);
+   ae_vector_copy(&dst->boxmax, &src->boxmax, _state, make_automatic);
    dst->kneeded = src->kneeded;
    dst->rneeded = src->rneeded;
    dst->selfmatch = src->selfmatch;
    dst->approxf = src->approxf;
    dst->kcur = src->kcur;
-   ae_vector_init_copy(&dst->idx, &src->idx, _state, make_automatic);
-   ae_vector_init_copy(&dst->r, &src->r, _state, make_automatic);
-   ae_vector_init_copy(&dst->buf, &src->buf, _state, make_automatic);
-   ae_vector_init_copy(&dst->curboxmin, &src->curboxmin, _state, make_automatic);
-   ae_vector_init_copy(&dst->curboxmax, &src->curboxmax, _state, make_automatic);
+   ae_vector_copy(&dst->idx, &src->idx, _state, make_automatic);
+   ae_vector_copy(&dst->r, &src->r, _state, make_automatic);
+   ae_vector_copy(&dst->buf, &src->buf, _state, make_automatic);
+   ae_vector_copy(&dst->curboxmin, &src->curboxmin, _state, make_automatic);
+   ae_vector_copy(&dst->curboxmax, &src->curboxmax, _state, make_automatic);
    dst->curdist = src->curdist;
 }
 
-void _kdtreerequestbuffer_clear(void *_p) {
+void kdtreerequestbuffer_free(void *_p, bool make_automatic) {
    kdtreerequestbuffer *p = (kdtreerequestbuffer *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->boxmin);
-   ae_vector_clear(&p->boxmax);
-   ae_vector_clear(&p->idx);
-   ae_vector_clear(&p->r);
-   ae_vector_clear(&p->buf);
-   ae_vector_clear(&p->curboxmin);
-   ae_vector_clear(&p->curboxmax);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->boxmin, make_automatic);
+   ae_vector_free(&p->boxmax, make_automatic);
+   ae_vector_free(&p->idx, make_automatic);
+   ae_vector_free(&p->r, make_automatic);
+   ae_vector_free(&p->buf, make_automatic);
+   ae_vector_free(&p->curboxmin, make_automatic);
+   ae_vector_free(&p->curboxmax, make_automatic);
 }
 
-void _kdtreerequestbuffer_destroy(void *_p) {
-   kdtreerequestbuffer *p = (kdtreerequestbuffer *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->boxmin);
-   ae_vector_destroy(&p->boxmax);
-   ae_vector_destroy(&p->idx);
-   ae_vector_destroy(&p->r);
-   ae_vector_destroy(&p->buf);
-   ae_vector_destroy(&p->curboxmin);
-   ae_vector_destroy(&p->curboxmax);
-}
-
-void _kdtree_init(void *_p, ae_state *_state, bool make_automatic) {
+void kdtree_init(void *_p, ae_state *_state, bool make_automatic) {
    kdtree *p = (kdtree *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->xy, 0, 0, DT_REAL, _state, make_automatic);
@@ -4290,48 +4266,36 @@ void _kdtree_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->boxmax, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->nodes, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->splits, 0, DT_REAL, _state, make_automatic);
-   _kdtreerequestbuffer_init(&p->innerbuf, _state, make_automatic);
+   kdtreerequestbuffer_init(&p->innerbuf, _state, make_automatic);
 }
 
-void _kdtree_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void kdtree_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    kdtree *dst = (kdtree *) _dst;
    kdtree *src = (kdtree *) _src;
    dst->n = src->n;
    dst->nx = src->nx;
    dst->ny = src->ny;
    dst->normtype = src->normtype;
-   ae_matrix_init_copy(&dst->xy, &src->xy, _state, make_automatic);
-   ae_vector_init_copy(&dst->tags, &src->tags, _state, make_automatic);
-   ae_vector_init_copy(&dst->boxmin, &src->boxmin, _state, make_automatic);
-   ae_vector_init_copy(&dst->boxmax, &src->boxmax, _state, make_automatic);
-   ae_vector_init_copy(&dst->nodes, &src->nodes, _state, make_automatic);
-   ae_vector_init_copy(&dst->splits, &src->splits, _state, make_automatic);
-   _kdtreerequestbuffer_init_copy(&dst->innerbuf, &src->innerbuf, _state, make_automatic);
+   ae_matrix_copy(&dst->xy, &src->xy, _state, make_automatic);
+   ae_vector_copy(&dst->tags, &src->tags, _state, make_automatic);
+   ae_vector_copy(&dst->boxmin, &src->boxmin, _state, make_automatic);
+   ae_vector_copy(&dst->boxmax, &src->boxmax, _state, make_automatic);
+   ae_vector_copy(&dst->nodes, &src->nodes, _state, make_automatic);
+   ae_vector_copy(&dst->splits, &src->splits, _state, make_automatic);
+   kdtreerequestbuffer_copy(&dst->innerbuf, &src->innerbuf, _state, make_automatic);
    dst->debugcounter = src->debugcounter;
 }
 
-void _kdtree_clear(void *_p) {
+void kdtree_free(void *_p, bool make_automatic) {
    kdtree *p = (kdtree *) _p;
    ae_touch_ptr((void *)p);
-   ae_matrix_clear(&p->xy);
-   ae_vector_clear(&p->tags);
-   ae_vector_clear(&p->boxmin);
-   ae_vector_clear(&p->boxmax);
-   ae_vector_clear(&p->nodes);
-   ae_vector_clear(&p->splits);
-   _kdtreerequestbuffer_clear(&p->innerbuf);
-}
-
-void _kdtree_destroy(void *_p) {
-   kdtree *p = (kdtree *) _p;
-   ae_touch_ptr((void *)p);
-   ae_matrix_destroy(&p->xy);
-   ae_vector_destroy(&p->tags);
-   ae_vector_destroy(&p->boxmin);
-   ae_vector_destroy(&p->boxmax);
-   ae_vector_destroy(&p->nodes);
-   ae_vector_destroy(&p->splits);
-   _kdtreerequestbuffer_destroy(&p->innerbuf);
+   ae_matrix_free(&p->xy, make_automatic);
+   ae_vector_free(&p->tags, make_automatic);
+   ae_vector_free(&p->boxmin, make_automatic);
+   ae_vector_free(&p->boxmax, make_automatic);
+   ae_vector_free(&p->nodes, make_automatic);
+   ae_vector_free(&p->splits, make_automatic);
+   kdtreerequestbuffer_free(&p->innerbuf, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -4371,7 +4335,6 @@ void kdtreeserialize(kdtree &obj, std::string &s_out) {
    alglib_impl::kdtreeserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error", &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
@@ -4396,7 +4359,6 @@ void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
    alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
    alglib_impl::kdtreeserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 
@@ -4419,7 +4381,6 @@ void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
@@ -4441,7 +4402,6 @@ void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear(&state);
 }
 

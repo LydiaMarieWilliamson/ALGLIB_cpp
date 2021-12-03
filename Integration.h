@@ -113,18 +113,15 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state);
 bool autogkiteration(autogkstate *state, ae_state *_state);
 void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state);
-void _autogkreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _autogkreport_clear(void *_p);
-void _autogkreport_destroy(void *_p);
-void _autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _autogkinternalstate_clear(void *_p);
-void _autogkinternalstate_destroy(void *_p);
-void _autogkstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _autogkstate_clear(void *_p);
-void _autogkstate_destroy(void *_p);
+void autogkreport_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkreport_free(void *_p, bool make_automatic);
+void autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkinternalstate_free(void *_p, bool make_automatic);
+void autogkstate_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

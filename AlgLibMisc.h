@@ -37,10 +37,9 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state);
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state);
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state);
 double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state);
-void _hqrndstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _hqrndstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _hqrndstate_clear(void *_p);
-void _hqrndstate_destroy(void *_p);
+void hqrndstate_init(void *_p, ae_state *_state, bool make_automatic);
+void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void hqrndstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -102,10 +101,9 @@ void xdebugc2neg(CMatrix *a, ae_state *_state);
 void xdebugc2transpose(CMatrix *a, ae_state *_state);
 void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state);
 double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c, ae_state *_state);
-void _xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic);
-void _xdebugrecord1_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _xdebugrecord1_clear(void *_p);
-void _xdebugrecord1_destroy(void *_p);
+void xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic);
+void xdebugrecord1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void xdebugrecord1_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -213,14 +211,12 @@ void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_i
 void kdtreealloc(ae_serializer *s, kdtree *tree, ae_state *_state);
 void kdtreeserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
 void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
-void _kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void _kdtreerequestbuffer_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _kdtreerequestbuffer_clear(void *_p);
-void _kdtreerequestbuffer_destroy(void *_p);
-void _kdtree_init(void *_p, ae_state *_state, bool make_automatic);
-void _kdtree_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _kdtree_clear(void *_p);
-void _kdtree_destroy(void *_p);
+void kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void kdtreerequestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kdtreerequestbuffer_free(void *_p, bool make_automatic);
+void kdtree_init(void *_p, ae_state *_state, bool make_automatic);
+void kdtree_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kdtree_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

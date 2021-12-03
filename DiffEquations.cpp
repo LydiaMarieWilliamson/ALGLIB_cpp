@@ -68,7 +68,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
 
-   _odesolverstate_clear(state);
+   odesolverstate_free(state, true);
 
    ae_assert(n >= 1, "ODESolverRKCK: N<1!", _state);
    ae_assert(m >= 1, "ODESolverRKCK: M<1!", _state);
@@ -388,9 +388,9 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
    ae_int_t i;
 
    *m = 0;
-   ae_vector_clear(xtbl);
-   ae_matrix_clear(ytbl);
-   _odesolverreport_clear(rep);
+   ae_vector_free(xtbl, true);
+   ae_matrix_free(ytbl, true);
+   odesolverreport_free(rep, true);
 
    rep->terminationtype = state->repterminationtype;
    if (rep->terminationtype > 0) {
@@ -413,7 +413,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    ae_int_t i;
    double v;
 
-   _odesolverstate_clear(state);
+   odesolverstate_free(state, true);
 
 // Prepare RComm
    ae_vector_set_length(&state->rstate.ia, 5 + 1, _state);
@@ -485,7 +485,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    ae_vector_set_length(&state->dy, n, _state);
 }
 
-void _odesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    odesolverstate *p = (odesolverstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->yc, 0, DT_REAL, _state, make_automatic);
@@ -501,10 +501,10 @@ void _odesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->rkcs, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->rkb, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->rkk, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void odesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    odesolverstate *dst = (odesolverstate *) _dst;
    odesolverstate *src = (odesolverstate *) _src;
    dst->n = src->n;
@@ -513,83 +513,59 @@ void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool ma
    dst->h = src->h;
    dst->eps = src->eps;
    dst->fraceps = src->fraceps;
-   ae_vector_init_copy(&dst->yc, &src->yc, _state, make_automatic);
-   ae_vector_init_copy(&dst->escale, &src->escale, _state, make_automatic);
-   ae_vector_init_copy(&dst->xg, &src->xg, _state, make_automatic);
+   ae_vector_copy(&dst->yc, &src->yc, _state, make_automatic);
+   ae_vector_copy(&dst->escale, &src->escale, _state, make_automatic);
+   ae_vector_copy(&dst->xg, &src->xg, _state, make_automatic);
    dst->solvertype = src->solvertype;
    dst->needdy = src->needdy;
    dst->x = src->x;
-   ae_vector_init_copy(&dst->y, &src->y, _state, make_automatic);
-   ae_vector_init_copy(&dst->dy, &src->dy, _state, make_automatic);
-   ae_matrix_init_copy(&dst->ytbl, &src->ytbl, _state, make_automatic);
+   ae_vector_copy(&dst->y, &src->y, _state, make_automatic);
+   ae_vector_copy(&dst->dy, &src->dy, _state, make_automatic);
+   ae_matrix_copy(&dst->ytbl, &src->ytbl, _state, make_automatic);
    dst->repterminationtype = src->repterminationtype;
    dst->repnfev = src->repnfev;
-   ae_vector_init_copy(&dst->yn, &src->yn, _state, make_automatic);
-   ae_vector_init_copy(&dst->yns, &src->yns, _state, make_automatic);
-   ae_vector_init_copy(&dst->rka, &src->rka, _state, make_automatic);
-   ae_vector_init_copy(&dst->rkc, &src->rkc, _state, make_automatic);
-   ae_vector_init_copy(&dst->rkcs, &src->rkcs, _state, make_automatic);
-   ae_matrix_init_copy(&dst->rkb, &src->rkb, _state, make_automatic);
-   ae_matrix_init_copy(&dst->rkk, &src->rkk, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->yn, &src->yn, _state, make_automatic);
+   ae_vector_copy(&dst->yns, &src->yns, _state, make_automatic);
+   ae_vector_copy(&dst->rka, &src->rka, _state, make_automatic);
+   ae_vector_copy(&dst->rkc, &src->rkc, _state, make_automatic);
+   ae_vector_copy(&dst->rkcs, &src->rkcs, _state, make_automatic);
+   ae_matrix_copy(&dst->rkb, &src->rkb, _state, make_automatic);
+   ae_matrix_copy(&dst->rkk, &src->rkk, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _odesolverstate_clear(void *_p) {
+void odesolverstate_free(void *_p, bool make_automatic) {
    odesolverstate *p = (odesolverstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->yc);
-   ae_vector_clear(&p->escale);
-   ae_vector_clear(&p->xg);
-   ae_vector_clear(&p->y);
-   ae_vector_clear(&p->dy);
-   ae_matrix_clear(&p->ytbl);
-   ae_vector_clear(&p->yn);
-   ae_vector_clear(&p->yns);
-   ae_vector_clear(&p->rka);
-   ae_vector_clear(&p->rkc);
-   ae_vector_clear(&p->rkcs);
-   ae_matrix_clear(&p->rkb);
-   ae_matrix_clear(&p->rkk);
-   _rcommstate_clear(&p->rstate);
+   ae_vector_free(&p->yc, make_automatic);
+   ae_vector_free(&p->escale, make_automatic);
+   ae_vector_free(&p->xg, make_automatic);
+   ae_vector_free(&p->y, make_automatic);
+   ae_vector_free(&p->dy, make_automatic);
+   ae_matrix_free(&p->ytbl, make_automatic);
+   ae_vector_free(&p->yn, make_automatic);
+   ae_vector_free(&p->yns, make_automatic);
+   ae_vector_free(&p->rka, make_automatic);
+   ae_vector_free(&p->rkc, make_automatic);
+   ae_vector_free(&p->rkcs, make_automatic);
+   ae_matrix_free(&p->rkb, make_automatic);
+   ae_matrix_free(&p->rkk, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 
-void _odesolverstate_destroy(void *_p) {
-   odesolverstate *p = (odesolverstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->yc);
-   ae_vector_destroy(&p->escale);
-   ae_vector_destroy(&p->xg);
-   ae_vector_destroy(&p->y);
-   ae_vector_destroy(&p->dy);
-   ae_matrix_destroy(&p->ytbl);
-   ae_vector_destroy(&p->yn);
-   ae_vector_destroy(&p->yns);
-   ae_vector_destroy(&p->rka);
-   ae_vector_destroy(&p->rkc);
-   ae_vector_destroy(&p->rkcs);
-   ae_matrix_destroy(&p->rkb);
-   ae_matrix_destroy(&p->rkk);
-   _rcommstate_destroy(&p->rstate);
-}
-
-void _odesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void odesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    odesolverreport *p = (odesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    odesolverreport *dst = (odesolverreport *) _dst;
    odesolverreport *src = (odesolverreport *) _src;
    dst->nfev = src->nfev;
    dst->terminationtype = src->terminationtype;
 }
 
-void _odesolverreport_clear(void *_p) {
-   odesolverreport *p = (odesolverreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _odesolverreport_destroy(void *_p) {
+void odesolverreport_free(void *_p, bool make_automatic) {
    odesolverreport *p = (odesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }

@@ -4167,7 +4167,7 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(c);
+   ae_vector_free(c, true);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -4201,7 +4201,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
    double e;
    double d;
 
-   ae_vector_clear(b);
+   ae_vector_free(b, true);
 
    ae_vector_set_length(b, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -5455,7 +5455,7 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(c);
+   ae_vector_free(c, true);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -5606,7 +5606,7 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(c);
+   ae_vector_free(c, true);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -7039,7 +7039,7 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_clear(c);
+   ae_vector_free(c, true);
 
    ae_vector_set_length(c, n + 1, _state);
    c->ptr.p_double[0] = (double)(1);

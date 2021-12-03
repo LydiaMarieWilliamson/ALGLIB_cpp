@@ -79,22 +79,18 @@ void optguardexportreport(optguardreport *srcrep, ae_int_t n, ae_int_t k, bool b
 void smoothnessmonitorexportc1test0report(optguardnonc1test0report *srcrep, RVector *s, optguardnonc1test0report *dstrep, ae_state *_state);
 void smoothnessmonitorexportc1test1report(optguardnonc1test1report *srcrep, RVector *s, optguardnonc1test1report *dstrep, ae_state *_state);
 bool optguardallclear(optguardreport *rep, ae_state *_state);
-void _optguardreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _optguardreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _optguardreport_clear(void *_p);
-void _optguardreport_destroy(void *_p);
-void _optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic);
-void _optguardnonc0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _optguardnonc0report_clear(void *_p);
-void _optguardnonc0report_destroy(void *_p);
-void _optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic);
-void _optguardnonc1test0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _optguardnonc1test0report_clear(void *_p);
-void _optguardnonc1test0report_destroy(void *_p);
-void _optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic);
-void _optguardnonc1test1report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _optguardnonc1test1report_clear(void *_p);
-void _optguardnonc1test1report_destroy(void *_p);
+void optguardreport_init(void *_p, ae_state *_state, bool make_automatic);
+void optguardreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void optguardreport_free(void *_p, bool make_automatic);
+void optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic);
+void optguardnonc0report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void optguardnonc0report_free(void *_p, bool make_automatic);
+void optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic);
+void optguardnonc1test0report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void optguardnonc1test0report_free(void *_p, bool make_automatic);
+void optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic);
+void optguardnonc1test1report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void optguardnonc1test1report_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -227,18 +223,15 @@ void smoothnessmonitortraceprobingresults(smoothnessmonitor *monitor, ae_state *
 void smoothnessmonitortracestatus(smoothnessmonitor *monitor, bool callersuggeststrace, ae_state *_state);
 void smoothnessmonitorexportreport(smoothnessmonitor *monitor, optguardreport *rep, ae_state *_state);
 bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, bool hasboxconstraints, double teststep, ae_state *_state);
-void _precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic);
-void _precbuflbfgs_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _precbuflbfgs_clear(void *_p);
-void _precbuflbfgs_destroy(void *_p);
-void _precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic);
-void _precbuflowrank_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _precbuflowrank_clear(void *_p);
-void _precbuflowrank_destroy(void *_p);
-void _smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic);
-void _smoothnessmonitor_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _smoothnessmonitor_clear(void *_p);
-void _smoothnessmonitor_destroy(void *_p);
+void precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic);
+void precbuflbfgs_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void precbuflbfgs_free(void *_p, bool make_automatic);
+void precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic);
+void precbuflowrank_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void precbuflowrank_free(void *_p, bool make_automatic);
+void smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic);
+void smoothnessmonitor_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void smoothnessmonitor_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === MINLBFGS Package ===
@@ -336,14 +329,12 @@ void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_s
 void minlbfgsresultsbuf(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state);
 void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x, ae_state *_state);
 void minlbfgsrequesttermination(minlbfgsstate *state, ae_state *_state);
-void _minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlbfgsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlbfgsstate_clear(void *_p);
-void _minlbfgsstate_destroy(void *_p);
-void _minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlbfgsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlbfgsreport_clear(void *_p);
-void _minlbfgsreport_destroy(void *_p);
+void minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minlbfgsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlbfgsstate_free(void *_p, bool make_automatic);
+void minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minlbfgsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlbfgsreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -439,10 +430,9 @@ void cqmscalevector(convexquadraticmodel *s, RVector *x, ae_state *_state);
 void cqmgetdiaga(convexquadraticmodel *s, RVector *x, ae_state *_state);
 double cqmdebugconstrainedevalt(convexquadraticmodel *s, RVector *x, ae_state *_state);
 double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x, ae_state *_state);
-void _convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void _convexquadraticmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _convexquadraticmodel_clear(void *_p);
-void _convexquadraticmodel_destroy(void *_p);
+void convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void convexquadraticmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void convexquadraticmodel_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === LPQPSERV Package ===
@@ -499,10 +489,9 @@ void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s, a
 void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int_t nd, ae_int_t nr, ae_state *_state);
 void snnlsdropnnc(snnlssolver *s, ae_int_t idx, ae_state *_state);
 void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state);
-void _snnlssolver_init(void *_p, ae_state *_state, bool make_automatic);
-void _snnlssolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _snnlssolver_clear(void *_p);
-void _snnlssolver_destroy(void *_p);
+void snnlssolver_init(void *_p, ae_state *_state, bool make_automatic);
+void snnlssolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void snnlssolver_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === SACTIVESETS Package ===
@@ -584,10 +573,9 @@ void sasreactivateconstraints(sactiveset *state, RVector *gc, ae_state *_state);
 void sasreactivateconstraintsprec(sactiveset *state, RVector *gc, ae_state *_state);
 void sasrebuildbasis(sactiveset *state, ae_state *_state);
 void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state);
-void _sactiveset_init(void *_p, ae_state *_state, bool make_automatic);
-void _sactiveset_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _sactiveset_clear(void *_p);
-void _sactiveset_destroy(void *_p);
+void sactiveset_init(void *_p, ae_state *_state, bool make_automatic);
+void sactiveset_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void sactiveset_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === QQPSOLVER Package ===
@@ -653,14 +641,12 @@ void qqploaddefaults(ae_int_t n, qqpsettings *s, ae_state *_state);
 void qqpcopysettings(qqpsettings *src, qqpsettings *dst, ae_state *_state);
 void qqppreallocategrowdense(qqpbuffers *sstate, ae_int_t nexpected, ae_int_t ngrowto, ae_state *_state);
 void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *denseac, ae_int_t akind, bool isupper, RVector *bc, RVector *bndlc, RVector *bnduc, RVector *sc, RVector *xoriginc, ae_int_t nc, qqpsettings *settings, qqpbuffers *sstate, RVector *xs, ae_int_t *terminationtype, ae_state *_state);
-void _qqpsettings_init(void *_p, ae_state *_state, bool make_automatic);
-void _qqpsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qqpsettings_clear(void *_p);
-void _qqpsettings_destroy(void *_p);
-void _qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _qqpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qqpbuffers_clear(void *_p);
-void _qqpbuffers_destroy(void *_p);
+void qqpsettings_init(void *_p, ae_state *_state, bool make_automatic);
+void qqpsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qqpsettings_free(void *_p, bool make_automatic);
+void qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void qqpbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qqpbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === QPDENSEAULSOLVER Package ===
@@ -721,14 +707,12 @@ typedef struct {
 
 void qpdenseaulloaddefaults(ae_int_t nmain, qpdenseaulsettings *s, ae_state *_state);
 void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nn, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulsettings *settings, qpdenseaulbuffers *state, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state);
-void _qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic);
-void _qpdenseaulsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qpdenseaulsettings_clear(void *_p);
-void _qpdenseaulsettings_destroy(void *_p);
-void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _qpdenseaulbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qpdenseaulbuffers_clear(void *_p);
-void _qpdenseaulbuffers_destroy(void *_p);
+void qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic);
+void qpdenseaulsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qpdenseaulsettings_free(void *_p, bool make_automatic);
+void qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void qpdenseaulbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qpdenseaulbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === MINBLEIC Package ===
@@ -865,14 +849,12 @@ void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep, a
 void minbleicrestartfrom(minbleicstate *state, RVector *x, ae_state *_state);
 void minbleicrequesttermination(minbleicstate *state, ae_state *_state);
 void minbleicemergencytermination(minbleicstate *state, ae_state *_state);
-void _minbleicstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minbleicstate_clear(void *_p);
-void _minbleicstate_destroy(void *_p);
-void _minbleicreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minbleicreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minbleicreport_clear(void *_p);
-void _minbleicreport_destroy(void *_p);
+void minbleicstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minbleicstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minbleicstate_free(void *_p, bool make_automatic);
+void minbleicreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minbleicreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minbleicreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -930,14 +912,12 @@ typedef struct {
 void qpbleicloaddefaults(ae_int_t nmain, qpbleicsettings *s, ae_state *_state);
 void qpbleiccopysettings(qpbleicsettings *src, qpbleicsettings *dst, ae_state *_state);
 void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, double absasum, double absasum2, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, qpbleicsettings *settings, qpbleicbuffers *sstate, bool *firstcall, RVector *xs, ae_int_t *terminationtype, ae_state *_state);
-void _qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic);
-void _qpbleicsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qpbleicsettings_clear(void *_p);
-void _qpbleicsettings_destroy(void *_p);
-void _qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void _qpbleicbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _qpbleicbuffers_clear(void *_p);
-void _qpbleicbuffers_destroy(void *_p);
+void qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic);
+void qpbleicsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qpbleicsettings_free(void *_p, bool make_automatic);
+void qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void qpbleicbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void qpbleicbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === VIPMSOLVER Package ===
@@ -1076,18 +1056,15 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
 void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *cl, RVector *cu, ae_state *_state);
 void vipmsetcond(vipmstate *state, double epsp, double epsd, double epsgap, ae_state *_state);
 void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state);
-void _vipmvars_init(void *_p, ae_state *_state, bool make_automatic);
-void _vipmvars_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _vipmvars_clear(void *_p);
-void _vipmvars_destroy(void *_p);
-void _vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic);
-void _vipmrighthandside_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _vipmrighthandside_clear(void *_p);
-void _vipmrighthandside_destroy(void *_p);
-void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _vipmstate_clear(void *_p);
-void _vipmstate_destroy(void *_p);
+void vipmvars_init(void *_p, ae_state *_state, bool make_automatic);
+void vipmvars_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void vipmvars_free(void *_p, bool make_automatic);
+void vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic);
+void vipmrighthandside_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void vipmrighthandside_free(void *_p, bool make_automatic);
+void vipmstate_init(void *_p, ae_state *_state, bool make_automatic);
+void vipmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void vipmstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === MINQP Package ===
@@ -1197,14 +1174,12 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, doub
 void minqprewritediagonal(minqpstate *state, RVector *s, ae_state *_state);
 void minqpsetstartingpointfast(minqpstate *state, RVector *x, ae_state *_state);
 void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state);
-void _minqpstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minqpstate_clear(void *_p);
-void _minqpstate_destroy(void *_p);
-void _minqpreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minqpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minqpreport_clear(void *_p);
-void _minqpreport_destroy(void *_p);
+void minqpstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minqpstate_free(void *_p, bool make_automatic);
+void minqpreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minqpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minqpreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1389,18 +1364,15 @@ void minlmrequesttermination(minlmstate *state, ae_state *_state);
 void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
 void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
 void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
-void _minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlmstepfinder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlmstepfinder_clear(void *_p);
-void _minlmstepfinder_destroy(void *_p);
-void _minlmstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlmstate_clear(void *_p);
-void _minlmstate_destroy(void *_p);
-void _minlmreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlmreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlmreport_clear(void *_p);
-void _minlmreport_destroy(void *_p);
+void minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic);
+void minlmstepfinder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlmstepfinder_free(void *_p, bool make_automatic);
+void minlmstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minlmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlmstate_free(void *_p, bool make_automatic);
+void minlmreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minlmreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlmreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1546,14 +1518,12 @@ void mincgrequesttermination(mincgstate *state, ae_state *_state);
 void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state);
 void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix *v, ae_int_t vcnt, ae_state *_state);
 void mincgsetprecvarpart(mincgstate *state, RVector *d2, ae_state *_state);
-void _mincgstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mincgstate_clear(void *_p);
-void _mincgstate_destroy(void *_p);
-void _mincgreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _mincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _mincgreport_clear(void *_p);
-void _mincgreport_destroy(void *_p);
+void mincgstate_init(void *_p, ae_state *_state, bool make_automatic);
+void mincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mincgstate_free(void *_p, bool make_automatic);
+void mincgreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mincgreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1713,26 +1683,21 @@ typedef struct {
 
 void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minsqpstate *state, ae_state *_state);
 bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state);
-void _minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic);
-void _minsqpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minsqpsubsolver_clear(void *_p);
-void _minsqpsubsolver_destroy(void *_p);
-void _minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic);
-void _minsqptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minsqptmplagrangian_clear(void *_p);
-void _minsqptmplagrangian_destroy(void *_p);
-void _minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic);
-void _minsqptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minsqptmpmerit_clear(void *_p);
-void _minsqptmpmerit_destroy(void *_p);
-void _minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minsqpmeritphasestate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minsqpmeritphasestate_clear(void *_p);
-void _minsqpmeritphasestate_destroy(void *_p);
-void _minsqpstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minsqpstate_clear(void *_p);
-void _minsqpstate_destroy(void *_p);
+void minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic);
+void minsqpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minsqpsubsolver_free(void *_p, bool make_automatic);
+void minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic);
+void minsqptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minsqptmplagrangian_free(void *_p, bool make_automatic);
+void minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic);
+void minsqptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minsqptmpmerit_free(void *_p, bool make_automatic);
+void minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic);
+void minsqpmeritphasestate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minsqpmeritphasestate_free(void *_p, bool make_automatic);
+void minsqpstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minsqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minsqpstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === LPQPPRESOLVE Package ===
@@ -1758,10 +1723,9 @@ typedef struct {
 
 void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, sparsematrix *sparsea, RVector *al, RVector *au, ae_int_t k, presolveinfo *info, ae_state *_state);
 void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc, RVector *laglc, ae_state *_state);
-void _presolveinfo_init(void *_p, ae_state *_state, bool make_automatic);
-void _presolveinfo_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _presolveinfo_clear(void *_p);
-void _presolveinfo_destroy(void *_p);
+void presolveinfo_init(void *_p, ae_state *_state, bool make_automatic);
+void presolveinfo_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void presolveinfo_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === REVISEDDUALSIMPLEX Package ===
@@ -1914,26 +1878,21 @@ void dssinit(ae_int_t n, dualsimplexstate *s, ae_state *_state);
 void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *bndu, RMatrix *densea, sparsematrix *sparsea, ae_int_t akind, RVector *al, RVector *au, ae_int_t k, dualsimplexbasis *proposedbasis, ae_int_t basisinittype, dualsimplexsettings *settings, ae_state *_state);
 void dssexportbasis(dualsimplexstate *state, dualsimplexbasis *basis, ae_state *_state);
 void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
-void _dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic);
-void _dualsimplexsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dualsimplexsettings_clear(void *_p);
-void _dualsimplexsettings_destroy(void *_p);
-void _dssvector_init(void *_p, ae_state *_state, bool make_automatic);
-void _dssvector_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dssvector_clear(void *_p);
-void _dssvector_destroy(void *_p);
-void _dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic);
-void _dualsimplexbasis_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dualsimplexbasis_clear(void *_p);
-void _dualsimplexbasis_destroy(void *_p);
-void _dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic);
-void _dualsimplexsubproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dualsimplexsubproblem_clear(void *_p);
-void _dualsimplexsubproblem_destroy(void *_p);
-void _dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _dualsimplexstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _dualsimplexstate_clear(void *_p);
-void _dualsimplexstate_destroy(void *_p);
+void dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic);
+void dualsimplexsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dualsimplexsettings_free(void *_p, bool make_automatic);
+void dssvector_init(void *_p, ae_state *_state, bool make_automatic);
+void dssvector_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dssvector_free(void *_p, bool make_automatic);
+void dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic);
+void dualsimplexbasis_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dualsimplexbasis_free(void *_p, bool make_automatic);
+void dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic);
+void dualsimplexsubproblem_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dualsimplexsubproblem_free(void *_p, bool make_automatic);
+void dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic);
+void dualsimplexstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dualsimplexstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === MINLP Package ===
@@ -2005,14 +1964,12 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 void minlpoptimize(minlpstate *state, ae_state *_state);
 void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state);
 void minlpresultsbuf(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state);
-void _minlpstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlpstate_clear(void *_p);
-void _minlpstate_destroy(void *_p);
-void _minlpreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minlpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minlpreport_clear(void *_p);
-void _minlpreport_destroy(void *_p);
+void minlpstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minlpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlpstate_free(void *_p, bool make_automatic);
+void minlpreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minlpreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2178,30 +2135,24 @@ typedef struct {
 
 void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minslpstate *state, ae_state *_state);
 bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state);
-void _minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslpsubsolver_clear(void *_p);
-void _minslpsubsolver_destroy(void *_p);
-void _minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslptmplagrangian_clear(void *_p);
-void _minslptmplagrangian_destroy(void *_p);
-void _minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslptmpmerit_clear(void *_p);
-void _minslptmpmerit_destroy(void *_p);
-void _minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslpphase13state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslpphase13state_clear(void *_p);
-void _minslpphase13state_destroy(void *_p);
-void _minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslpphase2state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslpphase2state_clear(void *_p);
-void _minslpphase2state_destroy(void *_p);
-void _minslpstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minslpstate_clear(void *_p);
-void _minslpstate_destroy(void *_p);
+void minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic);
+void minslpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslpsubsolver_free(void *_p, bool make_automatic);
+void minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic);
+void minslptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslptmplagrangian_free(void *_p, bool make_automatic);
+void minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic);
+void minslptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslptmpmerit_free(void *_p, bool make_automatic);
+void minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic);
+void minslpphase13state_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslpphase13state_free(void *_p, bool make_automatic);
+void minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic);
+void minslpphase2state_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslpphase2state_free(void *_p, bool make_automatic);
+void minslpstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minslpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minslpstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2336,14 +2287,12 @@ void minnlcrestartfrom(minnlcstate *state, RVector *x, ae_state *_state);
 void minnlcequalitypenaltyfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
 void minnlcinequalitypenaltyfunction(double alpha, double stabilizingpoint, double *f, double *df, double *d2f, ae_state *_state);
 void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
-void _minnlcstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minnlcstate_clear(void *_p);
-void _minnlcstate_destroy(void *_p);
-void _minnlcreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minnlcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minnlcreport_clear(void *_p);
-void _minnlcreport_destroy(void *_p);
+void minnlcstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minnlcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minnlcstate_free(void *_p, bool make_automatic);
+void minnlcreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minnlcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minnlcreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2519,18 +2468,15 @@ bool minnsiteration(minnsstate *state, ae_state *_state);
 void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state);
 void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state);
 void minnsrestartfrom(minnsstate *state, RVector *x, ae_state *_state);
-void _minnsqp_init(void *_p, ae_state *_state, bool make_automatic);
-void _minnsqp_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minnsqp_clear(void *_p);
-void _minnsqp_destroy(void *_p);
-void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minnsstate_clear(void *_p);
-void _minnsstate_destroy(void *_p);
-void _minnsreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minnsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minnsreport_clear(void *_p);
-void _minnsreport_destroy(void *_p);
+void minnsqp_init(void *_p, ae_state *_state, bool make_automatic);
+void minnsqp_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minnsqp_free(void *_p, bool make_automatic);
+void minnsstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minnsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minnsstate_free(void *_p, bool make_automatic);
+void minnsreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minnsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minnsreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2627,14 +2573,12 @@ bool minasaiteration(minasastate *state, ae_state *_state);
 void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
 void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
 void minasarestartfrom(minasastate *state, RVector *x, RVector *bndl, RVector *bndu, ae_state *_state);
-void _minasastate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minasastate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minasastate_clear(void *_p);
-void _minasastate_destroy(void *_p);
-void _minasareport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minasareport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minasareport_clear(void *_p);
-void _minasareport_destroy(void *_p);
+void minasastate_init(void *_p, ae_state *_state, bool make_automatic);
+void minasastate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minasastate_free(void *_p, bool make_automatic);
+void minasareport_init(void *_p, ae_state *_state, bool make_automatic);
+void minasareport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minasareport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2760,14 +2704,12 @@ void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_st
 void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state);
 void minbcrestartfrom(minbcstate *state, RVector *x, ae_state *_state);
 void minbcrequesttermination(minbcstate *state, ae_state *_state);
-void _minbcstate_init(void *_p, ae_state *_state, bool make_automatic);
-void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minbcstate_clear(void *_p);
-void _minbcstate_destroy(void *_p);
-void _minbcreport_init(void *_p, ae_state *_state, bool make_automatic);
-void _minbcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _minbcreport_clear(void *_p);
-void _minbcreport_destroy(void *_p);
+void minbcstate_init(void *_p, ae_state *_state, bool make_automatic);
+void minbcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minbcstate_free(void *_p, bool make_automatic);
+void minbcreport_init(void *_p, ae_state *_state, bool make_automatic);
+void minbcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void minbcreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2827,10 +2769,9 @@ void lptestproblemalloc(ae_serializer *s, lptestproblem *p, ae_state *_state);
 void lptestproblemserialize(ae_serializer *s, lptestproblem *p, ae_state *_state);
 void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_state);
 void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_state *_state);
-void _lptestproblem_init(void *_p, ae_state *_state, bool make_automatic);
-void _lptestproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void _lptestproblem_clear(void *_p);
-void _lptestproblem_destroy(void *_p);
+void lptestproblem_init(void *_p, ae_state *_state, bool make_automatic);
+void lptestproblem_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lptestproblem_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

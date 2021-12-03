@@ -77,10 +77,10 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    memset(&vr, 0, sizeof(vr));
    memset(&wr, 0, sizeof(wr));
    memset(&wi, 0, sizeof(wi));
-   ae_vector_init_copy(&_a, a, _state, true);
+   ae_vector_copy(&_a, a, _state, true);
    a = &_a;
-   ae_vector_clear(x);
-   _polynomialsolverreport_clear(rep);
+   ae_vector_free(x, true);
+   polynomialsolverreport_free(rep, true);
    ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&vl, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&vr, 0, 0, DT_REAL, _state, true);
@@ -148,23 +148,18 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_frame_leave(_state);
 }
 
-void _polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    polynomialsolverreport *p = (polynomialsolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _polynomialsolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void polynomialsolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    polynomialsolverreport *dst = (polynomialsolverreport *) _dst;
    polynomialsolverreport *src = (polynomialsolverreport *) _src;
    dst->maxerr = src->maxerr;
 }
 
-void _polynomialsolverreport_clear(void *_p) {
-   polynomialsolverreport *p = (polynomialsolverreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _polynomialsolverreport_destroy(void *_p) {
+void polynomialsolverreport_free(void *_p, bool make_automatic) {
    polynomialsolverreport *p = (polynomialsolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -264,8 +259,8 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
@@ -322,7 +317,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -415,8 +410,8 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
    memset(&emptya, 0, sizeof(emptya));
    memset(&p, 0, sizeof(p));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -492,7 +487,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -592,8 +587,8 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
@@ -722,8 +717,8 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -849,8 +844,8 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
@@ -903,8 +898,8 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
 
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -980,8 +975,8 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
    memset(&emptya, 0, sizeof(emptya));
    memset(&p, 0, sizeof(p));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -1045,7 +1040,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -1139,8 +1134,8 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
@@ -1190,7 +1185,7 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
    ae_vector_init(&p, 0, DT_INT, _state, true);
@@ -1271,8 +1266,8 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -1410,8 +1405,8 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
@@ -1515,8 +1510,8 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
 void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
 
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -1565,8 +1560,8 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
@@ -1644,8 +1639,8 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&da, 0, sizeof(da));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -1719,7 +1714,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -1808,8 +1803,8 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
@@ -1858,7 +1853,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -1941,8 +1936,8 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b,
    ae_frame_make(_state, &_frame_block);
    memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -2077,8 +2072,8 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, 
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
@@ -2199,8 +2194,8 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&da, 0, sizeof(da));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -2274,7 +2269,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -2356,8 +2351,8 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
@@ -2408,7 +2403,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, true);
+   ae_matrix_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -2492,8 +2487,8 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b,
    ae_frame_make(_state, &_frame_block);
    memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
@@ -2629,8 +2624,8 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, 
    memset(&bm, 0, sizeof(bm));
    memset(&xm, 0, sizeof(xm));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
    ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
@@ -2778,8 +2773,8 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    memset(&buf, 0, sizeof(buf));
    memset(&w, 0, sizeof(w));
    *info = 0;
-   _densesolverlsreport_clear(rep);
-   ae_vector_clear(x);
+   densesolverlsreport_free(rep, true);
+   ae_vector_free(x, true);
    ae_vector_init(&sv, 0, DT_REAL, _state, true);
    ae_matrix_init(&u, 0, 0, DT_REAL, _state, true);
    ae_matrix_init(&vt, 0, 0, DT_REAL, _state, true);
@@ -2958,8 +2953,8 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    memset(&xb, 0, sizeof(xb));
    memset(&tx, 0, sizeof(tx));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_vector_init(&xc, 0, DT_REAL, _state, true);
    ae_vector_init(&y, 0, DT_REAL, _state, true);
    ae_vector_init(&bc, 0, DT_REAL, _state, true);
@@ -3065,8 +3060,8 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
    ae_int_t j;
 
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -3136,8 +3131,8 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    memset(&tx, 0, sizeof(tx));
    memset(&tmpbuf, 0, sizeof(tmpbuf));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
    ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
    ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
@@ -3270,8 +3265,8 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    memset(&xb, 0, sizeof(xb));
    memset(&tx, 0, sizeof(tx));
    *info = 0;
-   _densesolverreport_clear(rep);
-   ae_matrix_clear(x);
+   densesolverreport_free(rep, true);
+   ae_matrix_free(x, true);
    ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
    ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
    ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
@@ -3511,53 +3506,42 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
    }
 }
 
-void _densesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void densesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    densesolverreport *p = (densesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _densesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void densesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    densesolverreport *dst = (densesolverreport *) _dst;
    densesolverreport *src = (densesolverreport *) _src;
    dst->r1 = src->r1;
    dst->rinf = src->rinf;
 }
 
-void _densesolverreport_clear(void *_p) {
+void densesolverreport_free(void *_p, bool make_automatic) {
    densesolverreport *p = (densesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _densesolverreport_destroy(void *_p) {
-   densesolverreport *p = (densesolverreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    densesolverlsreport *p = (densesolverlsreport *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->cx, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _densesolverlsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void densesolverlsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    densesolverlsreport *dst = (densesolverlsreport *) _dst;
    densesolverlsreport *src = (densesolverlsreport *) _src;
    dst->r2 = src->r2;
-   ae_matrix_init_copy(&dst->cx, &src->cx, _state, make_automatic);
+   ae_matrix_copy(&dst->cx, &src->cx, _state, make_automatic);
    dst->n = src->n;
    dst->k = src->k;
 }
 
-void _densesolverlsreport_clear(void *_p) {
+void densesolverlsreport_free(void *_p, bool make_automatic) {
    densesolverlsreport *p = (densesolverlsreport *) _p;
    ae_touch_ptr((void *)p);
-   ae_matrix_clear(&p->cx);
-}
-
-void _densesolverlsreport_destroy(void *_p) {
-   densesolverlsreport *p = (densesolverlsreport *) _p;
-   ae_touch_ptr((void *)p);
-   ae_matrix_destroy(&p->cx);
+   ae_matrix_free(&p->cx, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -4342,9 +4326,9 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
 
    ae_frame_make(_state, &_frame_block);
    memset(&a2, 0, sizeof(a2));
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, true);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
+   sparsematrix_init(&a2, _state, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDSolveSKS: N <= 0", _state);
@@ -4411,9 +4395,9 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    ae_frame_make(_state, &_frame_block);
    memset(&a2, 0, sizeof(a2));
    memset(&p, 0, sizeof(p));
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, true);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
+   sparsematrix_init(&a2, _state, true);
    ae_vector_init(&p, 0, DT_INT, _state, true);
 
    n = sparsegetnrows(a, _state);
@@ -4480,8 +4464,8 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
    ae_int_t i;
    ae_int_t n;
 
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDCholeskySolve: N <= 0", _state);
@@ -4548,9 +4532,9 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    memset(&a2, 0, sizeof(a2));
    memset(&pivp, 0, sizeof(pivp));
    memset(&pivq, 0, sizeof(pivq));
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, true);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
+   sparsematrix_init(&a2, _state, true);
    ae_vector_init(&pivp, 0, DT_INT, _state, true);
    ae_vector_init(&pivq, 0, DT_INT, _state, true);
 
@@ -4621,8 +4605,8 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
    double v;
    ae_int_t n;
 
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseLUSolve: N <= 0", _state);
@@ -4678,12 +4662,12 @@ void initsparsesolverreport(sparsesolverreport *rep, ae_state *_state) {
    rep->r2 = (double)(0);
 }
 
-void _sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    sparsesolverreport *p = (sparsesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _sparsesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void sparsesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sparsesolverreport *dst = (sparsesolverreport *) _dst;
    sparsesolverreport *src = (sparsesolverreport *) _src;
    dst->terminationtype = src->terminationtype;
@@ -4692,12 +4676,7 @@ void _sparsesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, boo
    dst->r2 = src->r2;
 }
 
-void _sparsesolverreport_clear(void *_p) {
-   sparsesolverreport *p = (sparsesolverreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _sparsesolverreport_destroy(void *_p) {
+void sparsesolverreport_free(void *_p, bool make_automatic) {
    sparsesolverreport *p = (sparsesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -4888,10 +4867,10 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
    ae_frame_make(_state, &_frame_block);
    memset(&convbuf, 0, sizeof(convbuf));
    memset(&solver, 0, sizeof(solver));
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&convbuf, _state, true);
-   _sparsesolverstate_init(&solver, _state, true);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
+   sparsematrix_init(&convbuf, _state, true);
+   sparsesolverstate_init(&solver, _state, true);
 
    n = sparsegetnrows(a, _state);
 
@@ -4977,10 +4956,10 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    ae_frame_make(_state, &_frame_block);
    memset(&convbuf, 0, sizeof(convbuf));
    memset(&solver, 0, sizeof(solver));
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&convbuf, _state, true);
-   _sparsesolverstate_init(&solver, _state, true);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
+   sparsematrix_init(&convbuf, _state, true);
+   sparsesolverstate_init(&solver, _state, true);
 
    n = sparsegetnrows(a, _state);
 
@@ -5072,7 +5051,7 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
 // API: void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state, const xparams _xparams = xdefault);
 void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) {
 
-   _sparsesolverstate_clear(state);
+   sparsesolverstate_free(state, true);
 
    ae_assert(n >= 1, "SparseSolverCreate: N <= 0", _state);
    state->n = n;
@@ -5314,8 +5293,8 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b, ae
 // API: void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
 void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
 
    sparsesolveroocstop(state, x, rep, _state);
 }
@@ -5558,8 +5537,8 @@ void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax, ae_state *
 // API: void sparsesolveroocstop(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
 void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _sparsesolverreport_clear(rep);
+   ae_vector_free(x, true);
+   sparsesolverreport_free(rep, true);
 
    ae_assert(!state->running, "SparseSolverOOCStop: the solver is still running", _state);
    ae_vector_set_length(x, state->n, _state);
@@ -5808,7 +5787,7 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
    state->repr2 = (double)(0);
 }
 
-void _sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    sparsesolverstate *p = (sparsesolverstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -5817,16 +5796,16 @@ void _sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->ax, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wrkb, 0, DT_REAL, _state, make_automatic);
-   _sparsematrix_init(&p->convbuf, _state, make_automatic);
-   _fblsgmresstate_init(&p->gmressolver, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   sparsematrix_init(&p->convbuf, _state, make_automatic);
+   fblsgmresstate_init(&p->gmressolver, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _sparsesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void sparsesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sparsesolverstate *dst = (sparsesolverstate *) _dst;
    sparsesolverstate *src = (sparsesolverstate *) _src;
    dst->n = src->n;
-   ae_vector_init_copy(&dst->x0, &src->x0, _state, make_automatic);
+   ae_vector_copy(&dst->x0, &src->x0, _state, make_automatic);
    dst->epsf = src->epsf;
    dst->maxits = src->maxits;
    dst->algotype = src->algotype;
@@ -5834,48 +5813,34 @@ void _sparsesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool
    dst->xrep = src->xrep;
    dst->running = src->running;
    dst->userterminationneeded = src->userterminationneeded;
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
-   ae_vector_init_copy(&dst->xf, &src->xf, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->xf, &src->xf, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnmv = src->repnmv;
    dst->repterminationtype = src->repterminationtype;
    dst->repr2 = src->repr2;
    dst->requesttype = src->requesttype;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->ax, &src->ax, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->ax, &src->ax, _state, make_automatic);
    dst->reply1 = src->reply1;
-   ae_vector_init_copy(&dst->wrkb, &src->wrkb, _state, make_automatic);
-   _sparsematrix_init_copy(&dst->convbuf, &src->convbuf, _state, make_automatic);
-   _fblsgmresstate_init_copy(&dst->gmressolver, &src->gmressolver, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->wrkb, &src->wrkb, _state, make_automatic);
+   sparsematrix_copy(&dst->convbuf, &src->convbuf, _state, make_automatic);
+   fblsgmresstate_copy(&dst->gmressolver, &src->gmressolver, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _sparsesolverstate_clear(void *_p) {
+void sparsesolverstate_free(void *_p, bool make_automatic) {
    sparsesolverstate *p = (sparsesolverstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x0);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->xf);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->ax);
-   ae_vector_clear(&p->wrkb);
-   _sparsematrix_clear(&p->convbuf);
-   _fblsgmresstate_clear(&p->gmressolver);
-   _rcommstate_clear(&p->rstate);
-}
-
-void _sparsesolverstate_destroy(void *_p) {
-   sparsesolverstate *p = (sparsesolverstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x0);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->xf);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->ax);
-   ae_vector_destroy(&p->wrkb);
-   _sparsematrix_destroy(&p->convbuf);
-   _fblsgmresstate_destroy(&p->gmressolver);
-   _rcommstate_destroy(&p->rstate);
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->xf, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->ax, make_automatic);
+   ae_vector_free(&p->wrkb, make_automatic);
+   sparsematrix_free(&p->convbuf, make_automatic);
+   fblsgmresstate_free(&p->gmressolver, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -6280,7 +6245,7 @@ static void lincg_updateitersdata(lincgstate *state, ae_state *_state);
 void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
    ae_int_t i;
 
-   _lincgstate_clear(state);
+   lincgstate_free(state, true);
 
    ae_assert(n > 0, "LinCGCreate: N <= 0", _state);
    state->n = n;
@@ -6867,8 +6832,8 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 // API: void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep, const xparams _xparams = xdefault);
 void lincgresults(lincgstate *state, RVector *x, lincgreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _lincgreport_clear(rep);
+   ae_vector_free(x, true);
+   lincgreport_free(rep, true);
 
    ae_assert(!state->running, "LinCGResult: you can not get result, because function LinCGIteration has been launched!", _state);
    if (x->cnt < state->n) {
@@ -6958,7 +6923,7 @@ static void lincg_updateitersdata(lincgstate *state, ae_state *_state) {
    state->repterminationtype = 0;
 }
 
-void _lincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void lincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    lincgstate *p = (lincgstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rx, 0, DT_REAL, _state, make_automatic);
@@ -6974,31 +6939,31 @@ void _lincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->pv, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->startx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpd, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _lincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void lincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lincgstate *dst = (lincgstate *) _dst;
    lincgstate *src = (lincgstate *) _src;
-   ae_vector_init_copy(&dst->rx, &src->rx, _state, make_automatic);
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
+   ae_vector_copy(&dst->rx, &src->rx, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
    dst->n = src->n;
    dst->prectype = src->prectype;
-   ae_vector_init_copy(&dst->cx, &src->cx, _state, make_automatic);
-   ae_vector_init_copy(&dst->cr, &src->cr, _state, make_automatic);
-   ae_vector_init_copy(&dst->cz, &src->cz, _state, make_automatic);
-   ae_vector_init_copy(&dst->p, &src->p, _state, make_automatic);
-   ae_vector_init_copy(&dst->r, &src->r, _state, make_automatic);
-   ae_vector_init_copy(&dst->z, &src->z, _state, make_automatic);
+   ae_vector_copy(&dst->cx, &src->cx, _state, make_automatic);
+   ae_vector_copy(&dst->cr, &src->cr, _state, make_automatic);
+   ae_vector_copy(&dst->cz, &src->cz, _state, make_automatic);
+   ae_vector_copy(&dst->p, &src->p, _state, make_automatic);
+   ae_vector_copy(&dst->r, &src->r, _state, make_automatic);
+   ae_vector_copy(&dst->z, &src->z, _state, make_automatic);
    dst->alpha = src->alpha;
    dst->beta = src->beta;
    dst->r2 = src->r2;
    dst->meritfunction = src->meritfunction;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->mv, &src->mv, _state, make_automatic);
-   ae_vector_init_copy(&dst->pv, &src->pv, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->mv, &src->mv, _state, make_automatic);
+   ae_vector_copy(&dst->pv, &src->pv, _state, make_automatic);
    dst->vmv = src->vmv;
-   ae_vector_init_copy(&dst->startx, &src->startx, _state, make_automatic);
+   ae_vector_copy(&dst->startx, &src->startx, _state, make_automatic);
    dst->epsf = src->epsf;
    dst->maxits = src->maxits;
    dst->itsbeforerestart = src->itsbeforerestart;
@@ -7014,54 +6979,35 @@ void _lincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->repnmv = src->repnmv;
    dst->repterminationtype = src->repterminationtype;
    dst->running = src->running;
-   ae_vector_init_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _lincgstate_clear(void *_p) {
+void lincgstate_free(void *_p, bool make_automatic) {
    lincgstate *p = (lincgstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->rx);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->cx);
-   ae_vector_clear(&p->cr);
-   ae_vector_clear(&p->cz);
-   ae_vector_clear(&p->p);
-   ae_vector_clear(&p->r);
-   ae_vector_clear(&p->z);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->mv);
-   ae_vector_clear(&p->pv);
-   ae_vector_clear(&p->startx);
-   ae_vector_clear(&p->tmpd);
-   _rcommstate_clear(&p->rstate);
+   ae_vector_free(&p->rx, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->cx, make_automatic);
+   ae_vector_free(&p->cr, make_automatic);
+   ae_vector_free(&p->cz, make_automatic);
+   ae_vector_free(&p->p, make_automatic);
+   ae_vector_free(&p->r, make_automatic);
+   ae_vector_free(&p->z, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->mv, make_automatic);
+   ae_vector_free(&p->pv, make_automatic);
+   ae_vector_free(&p->startx, make_automatic);
+   ae_vector_free(&p->tmpd, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 
-void _lincgstate_destroy(void *_p) {
-   lincgstate *p = (lincgstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->rx);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->cx);
-   ae_vector_destroy(&p->cr);
-   ae_vector_destroy(&p->cz);
-   ae_vector_destroy(&p->p);
-   ae_vector_destroy(&p->r);
-   ae_vector_destroy(&p->z);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->mv);
-   ae_vector_destroy(&p->pv);
-   ae_vector_destroy(&p->startx);
-   ae_vector_destroy(&p->tmpd);
-   _rcommstate_destroy(&p->rstate);
-}
-
-void _lincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void lincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
    lincgreport *p = (lincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _lincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void lincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lincgreport *dst = (lincgreport *) _dst;
    lincgreport *src = (lincgreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -7070,12 +7016,7 @@ void _lincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_
    dst->r2 = src->r2;
 }
 
-void _lincgreport_clear(void *_p) {
-   lincgreport *p = (lincgreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _lincgreport_destroy(void *_p) {
+void lincgreport_free(void *_p, bool make_automatic) {
    lincgreport *p = (lincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -7326,7 +7267,7 @@ static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state);
 // API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams = xdefault);
 void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state) {
 
-   _linlsqrstate_clear(state);
+   linlsqrstate_free(state, true);
 
    ae_assert(m > 0, "LinLSQRCreate: M <= 0", _state);
    ae_assert(n > 0, "LinLSQRCreate: N <= 0", _state);
@@ -7973,8 +7914,8 @@ void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxi
 // API: void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep, const xparams _xparams = xdefault);
 void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _linlsqrreport_clear(rep);
+   ae_vector_free(x, true);
+   linlsqrreport_free(rep, true);
 
    ae_assert(!state->running, "LinLSQRResult: you can not call this function when LinLSQRIteration is running", _state);
    if (x->cnt < state->n) {
@@ -8069,10 +8010,10 @@ static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state) {
    state->needprec = false;
 }
 
-void _linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic) {
    linlsqrstate *p = (linlsqrstate *) _p;
    ae_touch_ptr((void *)p);
-   _normestimatorstate_init(&p->nes, _state, make_automatic);
+   normestimatorstate_init(&p->nes, _state, make_automatic);
    ae_vector_init(&p->rx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->ui, 0, DT_REAL, _state, make_automatic);
@@ -8087,24 +8028,24 @@ void _linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->mtv, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpd, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tmpx, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void linlsqrstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    linlsqrstate *dst = (linlsqrstate *) _dst;
    linlsqrstate *src = (linlsqrstate *) _src;
-   _normestimatorstate_init_copy(&dst->nes, &src->nes, _state, make_automatic);
-   ae_vector_init_copy(&dst->rx, &src->rx, _state, make_automatic);
-   ae_vector_init_copy(&dst->b, &src->b, _state, make_automatic);
+   normestimatorstate_copy(&dst->nes, &src->nes, _state, make_automatic);
+   ae_vector_copy(&dst->rx, &src->rx, _state, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, _state, make_automatic);
    dst->n = src->n;
    dst->m = src->m;
    dst->prectype = src->prectype;
-   ae_vector_init_copy(&dst->ui, &src->ui, _state, make_automatic);
-   ae_vector_init_copy(&dst->uip1, &src->uip1, _state, make_automatic);
-   ae_vector_init_copy(&dst->vi, &src->vi, _state, make_automatic);
-   ae_vector_init_copy(&dst->vip1, &src->vip1, _state, make_automatic);
-   ae_vector_init_copy(&dst->omegai, &src->omegai, _state, make_automatic);
-   ae_vector_init_copy(&dst->omegaip1, &src->omegaip1, _state, make_automatic);
+   ae_vector_copy(&dst->ui, &src->ui, _state, make_automatic);
+   ae_vector_copy(&dst->uip1, &src->uip1, _state, make_automatic);
+   ae_vector_copy(&dst->vi, &src->vi, _state, make_automatic);
+   ae_vector_copy(&dst->vip1, &src->vip1, _state, make_automatic);
+   ae_vector_copy(&dst->omegai, &src->omegai, _state, make_automatic);
+   ae_vector_copy(&dst->omegaip1, &src->omegaip1, _state, make_automatic);
    dst->alphai = src->alphai;
    dst->alphaip1 = src->alphaip1;
    dst->betai = src->betai;
@@ -8119,14 +8060,14 @@ void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make
    dst->si = src->si;
    dst->theta = src->theta;
    dst->lambdai = src->lambdai;
-   ae_vector_init_copy(&dst->d, &src->d, _state, make_automatic);
+   ae_vector_copy(&dst->d, &src->d, _state, make_automatic);
    dst->anorm = src->anorm;
    dst->bnorm2 = src->bnorm2;
    dst->dnorm = src->dnorm;
    dst->r2 = src->r2;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
-   ae_vector_init_copy(&dst->mv, &src->mv, _state, make_automatic);
-   ae_vector_init_copy(&dst->mtv, &src->mtv, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->mv, &src->mv, _state, make_automatic);
+   ae_vector_copy(&dst->mtv, &src->mtv, _state, make_automatic);
    dst->epsa = src->epsa;
    dst->epsb = src->epsb;
    dst->epsc = src->epsc;
@@ -8143,59 +8084,38 @@ void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make
    dst->repterminationtype = src->repterminationtype;
    dst->running = src->running;
    dst->userterminationneeded = src->userterminationneeded;
-   ae_vector_init_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
-   ae_vector_init_copy(&dst->tmpx, &src->tmpx, _state, make_automatic);
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   ae_vector_copy(&dst->tmpd, &src->tmpd, _state, make_automatic);
+   ae_vector_copy(&dst->tmpx, &src->tmpx, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
 }
 
-void _linlsqrstate_clear(void *_p) {
+void linlsqrstate_free(void *_p, bool make_automatic) {
    linlsqrstate *p = (linlsqrstate *) _p;
    ae_touch_ptr((void *)p);
-   _normestimatorstate_clear(&p->nes);
-   ae_vector_clear(&p->rx);
-   ae_vector_clear(&p->b);
-   ae_vector_clear(&p->ui);
-   ae_vector_clear(&p->uip1);
-   ae_vector_clear(&p->vi);
-   ae_vector_clear(&p->vip1);
-   ae_vector_clear(&p->omegai);
-   ae_vector_clear(&p->omegaip1);
-   ae_vector_clear(&p->d);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->mv);
-   ae_vector_clear(&p->mtv);
-   ae_vector_clear(&p->tmpd);
-   ae_vector_clear(&p->tmpx);
-   _rcommstate_clear(&p->rstate);
+   normestimatorstate_free(&p->nes, make_automatic);
+   ae_vector_free(&p->rx, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->ui, make_automatic);
+   ae_vector_free(&p->uip1, make_automatic);
+   ae_vector_free(&p->vi, make_automatic);
+   ae_vector_free(&p->vip1, make_automatic);
+   ae_vector_free(&p->omegai, make_automatic);
+   ae_vector_free(&p->omegaip1, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->mv, make_automatic);
+   ae_vector_free(&p->mtv, make_automatic);
+   ae_vector_free(&p->tmpd, make_automatic);
+   ae_vector_free(&p->tmpx, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
 }
 
-void _linlsqrstate_destroy(void *_p) {
-   linlsqrstate *p = (linlsqrstate *) _p;
-   ae_touch_ptr((void *)p);
-   _normestimatorstate_destroy(&p->nes);
-   ae_vector_destroy(&p->rx);
-   ae_vector_destroy(&p->b);
-   ae_vector_destroy(&p->ui);
-   ae_vector_destroy(&p->uip1);
-   ae_vector_destroy(&p->vi);
-   ae_vector_destroy(&p->vip1);
-   ae_vector_destroy(&p->omegai);
-   ae_vector_destroy(&p->omegaip1);
-   ae_vector_destroy(&p->d);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->mv);
-   ae_vector_destroy(&p->mtv);
-   ae_vector_destroy(&p->tmpd);
-   ae_vector_destroy(&p->tmpx);
-   _rcommstate_destroy(&p->rstate);
-}
-
-void _linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic) {
    linlsqrreport *p = (linlsqrreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _linlsqrreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void linlsqrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    linlsqrreport *dst = (linlsqrreport *) _dst;
    linlsqrreport *src = (linlsqrreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -8203,12 +8123,7 @@ void _linlsqrreport_init_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->terminationtype = src->terminationtype;
 }
 
-void _linlsqrreport_clear(void *_p) {
-   linlsqrreport *p = (linlsqrreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _linlsqrreport_destroy(void *_p) {
+void linlsqrreport_free(void *_p, bool make_automatic) {
    linlsqrreport *p = (linlsqrreport *) _p;
    ae_touch_ptr((void *)p);
 }
@@ -8521,7 +8436,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
 // API: void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = xdefault);
 void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state *_state) {
 
-   _nleqstate_clear(state);
+   nleqstate_free(state, true);
 
    ae_assert(n >= 1, "NLEQCreateLM: N<1!", _state);
    ae_assert(m >= 1, "NLEQCreateLM: M<1!", _state);
@@ -8889,8 +8804,8 @@ lbl_rcomm:
 // API: void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = xdefault);
 void nleqresults(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_state) {
 
-   ae_vector_clear(x);
-   _nleqreport_clear(rep);
+   ae_vector_free(x, true);
+   nleqreport_free(rep, true);
 
    nleqresultsbuf(state, x, rep, _state);
 }
@@ -8985,20 +8900,20 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
    }
 }
 
-void _nleqstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void nleqstate_init(void *_p, ae_state *_state, bool make_automatic) {
    nleqstate *p = (nleqstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
-   _rcommstate_init(&p->rstate, _state, make_automatic);
+   rcommstate_init(&p->rstate, _state, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->candstep, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rightpart, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cgbuf, 0, DT_REAL, _state, make_automatic);
 }
 
-void _nleqstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void nleqstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    nleqstate *dst = (nleqstate *) _dst;
    nleqstate *src = (nleqstate *) _src;
    dst->n = src->n;
@@ -9007,58 +8922,45 @@ void _nleqstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_au
    dst->maxits = src->maxits;
    dst->xrep = src->xrep;
    dst->stpmax = src->stpmax;
-   ae_vector_init_copy(&dst->x, &src->x, _state, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    dst->f = src->f;
-   ae_vector_init_copy(&dst->fi, &src->fi, _state, make_automatic);
-   ae_matrix_init_copy(&dst->j, &src->j, _state, make_automatic);
+   ae_vector_copy(&dst->fi, &src->fi, _state, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, _state, make_automatic);
    dst->needf = src->needf;
    dst->needfij = src->needfij;
    dst->xupdated = src->xupdated;
-   _rcommstate_init_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repnfunc = src->repnfunc;
    dst->repnjac = src->repnjac;
    dst->repterminationtype = src->repterminationtype;
-   ae_vector_init_copy(&dst->xbase, &src->xbase, _state, make_automatic);
+   ae_vector_copy(&dst->xbase, &src->xbase, _state, make_automatic);
    dst->fbase = src->fbase;
    dst->fprev = src->fprev;
-   ae_vector_init_copy(&dst->candstep, &src->candstep, _state, make_automatic);
-   ae_vector_init_copy(&dst->rightpart, &src->rightpart, _state, make_automatic);
-   ae_vector_init_copy(&dst->cgbuf, &src->cgbuf, _state, make_automatic);
+   ae_vector_copy(&dst->candstep, &src->candstep, _state, make_automatic);
+   ae_vector_copy(&dst->rightpart, &src->rightpart, _state, make_automatic);
+   ae_vector_copy(&dst->cgbuf, &src->cgbuf, _state, make_automatic);
 }
 
-void _nleqstate_clear(void *_p) {
+void nleqstate_free(void *_p, bool make_automatic) {
    nleqstate *p = (nleqstate *) _p;
    ae_touch_ptr((void *)p);
-   ae_vector_clear(&p->x);
-   ae_vector_clear(&p->fi);
-   ae_matrix_clear(&p->j);
-   _rcommstate_clear(&p->rstate);
-   ae_vector_clear(&p->xbase);
-   ae_vector_clear(&p->candstep);
-   ae_vector_clear(&p->rightpart);
-   ae_vector_clear(&p->cgbuf);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   rcommstate_free(&p->rstate, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->candstep, make_automatic);
+   ae_vector_free(&p->rightpart, make_automatic);
+   ae_vector_free(&p->cgbuf, make_automatic);
 }
 
-void _nleqstate_destroy(void *_p) {
-   nleqstate *p = (nleqstate *) _p;
-   ae_touch_ptr((void *)p);
-   ae_vector_destroy(&p->x);
-   ae_vector_destroy(&p->fi);
-   ae_matrix_destroy(&p->j);
-   _rcommstate_destroy(&p->rstate);
-   ae_vector_destroy(&p->xbase);
-   ae_vector_destroy(&p->candstep);
-   ae_vector_destroy(&p->rightpart);
-   ae_vector_destroy(&p->cgbuf);
-}
-
-void _nleqreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void nleqreport_init(void *_p, ae_state *_state, bool make_automatic) {
    nleqreport *p = (nleqreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _nleqreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void nleqreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    nleqreport *dst = (nleqreport *) _dst;
    nleqreport *src = (nleqreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -9067,12 +8969,7 @@ void _nleqreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->terminationtype = src->terminationtype;
 }
 
-void _nleqreport_clear(void *_p) {
-   nleqreport *p = (nleqreport *) _p;
-   ae_touch_ptr((void *)p);
-}
-
-void _nleqreport_destroy(void *_p) {
+void nleqreport_free(void *_p, bool make_automatic) {
    nleqreport *p = (nleqreport *) _p;
    ae_touch_ptr((void *)p);
 }

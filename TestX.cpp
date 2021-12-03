@@ -41,61 +41,48 @@ typedef struct {
     alglib_impl::ae_shared_pool pool;
 } seedrec;
 
-void _innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
+void innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, _state, make_automatic);
 }
 
-void _innerrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
+void innerrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *dst = (innerrec *) _dst;
    innerrec *src = (innerrec *) _src;
    dst->cval = src->cval;
    dst->rval = src->rval;
    dst->ival = src->ival;
    dst->bval = src->bval;
-   alglib_impl::ae_vector_init_copy(&dst->i1val, &src->i1val, _state, make_automatic);
+   alglib_impl::ae_vector_copy(&dst->i1val, &src->i1val, _state, make_automatic);
 }
 
-void _innerrec_clear(void *_p) {
+void innerrec_free(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
-   alglib_impl::ae_vector_clear(&p->i1val);
+   alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
-void _innerrec_destroy(void *_p) {
-   innerrec *p = (innerrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
-   alglib_impl::ae_vector_destroy(&p->i1val);
-}
-
-void _seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
+void seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
-   _innerrec_init(&p->recval, _state, make_automatic);
+   innerrec_init(&p->recval, _state, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, _state, make_automatic);
 }
 
-void _seedrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
+void seedrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *dst = (seedrec *) _dst;
    seedrec *src = (seedrec *) _src;
    dst->bval = src->bval;
-   _innerrec_init_copy(&dst->recval, &src->recval, _state, make_automatic);
-   alglib_impl::ae_shared_pool_init_copy(&dst->pool, &src->pool, _state, make_automatic);
+   innerrec_copy(&dst->recval, &src->recval, _state, make_automatic);
+   alglib_impl::ae_shared_pool_copy(&dst->pool, &src->pool, _state, make_automatic);
 }
 
-void _seedrec_clear(void *_p) {
+void seedrec_free(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
-   _innerrec_clear(&p->recval);
-   alglib_impl::ae_shared_pool_clear(&p->pool);
-}
-
-void _seedrec_destroy(void *_p) {
-   seedrec *p = (seedrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
-   _innerrec_destroy(&p->recval);
-   alglib_impl::ae_shared_pool_destroy(&p->pool);
+   innerrec_free(&p->recval, make_automatic);
+   alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
 }
 
 void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
@@ -2085,8 +2072,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          memset(&pool, 0, sizeof(pool));
          memset(&seed, 0, sizeof(seed));
          alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         _seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
+         seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
 
@@ -2099,8 +2086,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          memset(&ptr0, 0, sizeof(ptr0));
          alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
          alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         _seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
+         seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
@@ -2116,8 +2103,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
          alglib_impl::ae_smart_ptr_init(&ptr1, (void **)&p1, &_alglib_env_state, true);
          alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         _seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
+         seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr1, &_alglib_env_state);
          alglib_impl::ae_shared_pool_recycle(&pool, &ptr0, &_alglib_env_state);
@@ -2142,7 +2129,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // fields.
    //
    // Unfixed ALGLIB crashes because of unneeded assertion in the
-   // ae_shared_pool_init_copy() function.
+   // ae_shared_pool_copy() function.
    //
       try {
          multilayerperceptron net0, net1;
@@ -2229,8 +2216,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          memset(&seed, 0, sizeof(seed));
          alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
          alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         _seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
+         seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
          alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
