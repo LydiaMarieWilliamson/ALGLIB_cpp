@@ -1150,29 +1150,51 @@ typedef alglib_impl::ae_int_t ae_int_t;
 
 ae_int_t vlen(ae_int_t n1, ae_int_t n2);
 
-// Exception class.
+// Exception class and exception-handling macros.
 #if !defined AE_NO_EXCEPTIONS
+// Exception-based code.
 class ap_error {
 public:
    std::string msg;
-
    ap_error();
-   ap_error(const char *s);
-   static void make_assertion(bool bClause);
-   static void make_assertion(bool bClause, const char *p_msg);
+   ap_error(const char *Msg);
+   static void make_assertion(bool Cond);
+   static void make_assertion(bool Cond, const char *MsgP);
 private:
 };
+#   define ThrowError(Msg)	throw ap_error(Msg)
 #   define ThrowErrorMsg(Q, X)	throw ap_error((Q).error_msg)
+#   define BegPoll		{ try {
+#   define EndPoll		} catch(...) { ae_clean_up_before_breaking(&_alglib_env_state); throw; } }
 #else
+// Exception-free code.
 #   define ThrowErrorMsg(Q, X)	set_error_flag((Q).error_msg); return X
+//(@) The following restriction is unnecessary.
+// #   if AE_OS != AE_UNKNOWN
+// #      error Exception-free mode can not be combined with AE_OS definition
+// #   endif
+#   if AE_THREADING != AE_SERIAL_UNSAFE
+#      error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
+#   endif
+#   define BegPoll	{
+#   define EndPoll	}
+// Set the error flag and (optionally) the error message.
+void set_error_flag(const char *Msg = NULL);
+// Get the error flag and optionally the error message (as *MsgP);
+// If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
+bool get_error_flag(const char **p_msg = NULL);
+// Clear the error flag (it is not cleared until explicit call to this function).
+void clear_error_flag();
 #endif
-
 #define TryX(Q)		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&(Q), &BreakAt); else
 #define TryCatch(Q, X)	TryX(Q) { ThrowErrorMsg(Q, X); }
 
-#define DecVal(X)	, X(Obj->X)
-#define DecVar(X)	, X(&Obj->X)
-#define DecComplex(X)	, X(*(complex *)&Obj->X)
+// Class declaration/definition macros.
+#define DecVal(X)       , X(Obj->X)
+#define DecVar(X)       , X(&Obj->X)
+#define DecComplex(X)   , X(*(complex *)&Obj->X)
+#define ConstT(T, Val)  (const_cast<alglib_impl::T *>((Val).c_ptr()))
+#define ComplexOf(Val)  (*reinterpret_cast<complex *>(&(Val)))
 
 #define DecClass(Type, Pars) \
 struct Type##I { \
@@ -1213,7 +1235,7 @@ Type##I::Type##I(const Type##I &A) { \
    Obj = NULL; \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)", &Q); \
    Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), &Q, false); \
    ae_state_clear(&Q); \
 } \
 Type##I &Type##I::operator=(const Type##I &A) { \
@@ -1223,7 +1245,7 @@ Type##I &Type##I::operator=(const Type##I &A) { \
    alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)", &Q); \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)", &Q); \
    alglib_impl::Type##_free(Obj, false); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), &Q, false); \
    ae_state_clear(&Q); \
    return *this; \
 } \
@@ -2012,42 +2034,6 @@ bool fp_isposinf(double x);
 bool fp_isneginf(double x);
 bool fp_isinf(double x);
 bool fp_isfinite(double x);
-
-// Exception handling macros
-#if !defined AE_NO_EXCEPTIONS
-///////////////////////////////////////
-// exception-based code
-//////////////////////////////
-#   define _ALGLIB_CPP_EXCEPTION(msg) throw ap_error(msg)
-#   define _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN          try{
-#   define _ALGLIB_CALLBACK_EXCEPTION_GUARD_END            }catch(...){ ae_clean_up_before_breaking(&_alglib_env_state); throw; }
-
-#else
-
-///////////////////////////////////////
-// Exception-free version
-//////////////////////////////
-//(@) The following restriction is unnecessary.
-// #   if AE_OS != AE_UNKNOWN
-// #      error Exception-free mode can not be combined with AE_OS definition
-// #   endif
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
-#   endif
-#   define _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN
-#   define _ALGLIB_CALLBACK_EXCEPTION_GUARD_END
-#   define _ALGLIB_SET_ERROR_FLAG(s) set_error_flag(s)
-
-// sets eror flag and (optionally) sets error message
-void set_error_flag(const char *s = NULL);
-
-// returns error flag and optionally returns error message (loaded to *p_msg);
-// if error flag is not set (or p_msg is NULL) *p_msg is not changed.
-bool get_error_flag(const char **p_msg = NULL);
-
-// clears error flag (it is not cleared until explicit call to this function)
-void clear_error_flag();
-#endif
 } // end of namespace alglib
 
 // Declarations for optimized linear algebra codes, which is shared between the C++ and pure C libraries.

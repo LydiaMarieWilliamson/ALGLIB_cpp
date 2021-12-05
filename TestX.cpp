@@ -2058,7 +2058,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 #ifdef AE_USE_ALLOC_COUNTER
       try {
          int alloc_cnt;
-         alglib_impl::ae_state _alglib_env_state;
          alglib_impl::ae_frame _frame_block;
          alglib_impl::ae_shared_pool pool;
          alglib_impl::ae_smart_ptr ptr0, ptr1;
@@ -2067,7 +2066,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 
       // case #0: just seeding the pool
          alloc_cnt = alglib_impl::_alloc_counter;
-         alglib_impl::ae_state_init(&_alglib_env_state);
+         alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
          memset(&pool, 0, sizeof(pool));
          memset(&seed, 0, sizeof(seed));
@@ -2200,7 +2199,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 #ifdef AE_USE_ALLOC_COUNTER
       try {
          int alloc_cnt;
-         alglib_impl::ae_state _alglib_env_state;
          alglib_impl::ae_frame _frame_block;
          alglib_impl::ae_shared_pool pool;
          alglib_impl::ae_smart_ptr ptr0;
@@ -2209,7 +2207,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 
       // seeding shared pool and retrieving twice to same pointer, no recycling
          alloc_cnt = alglib_impl::_alloc_counter;
-         alglib_impl::ae_state_init(&_alglib_env_state);
+         alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
          memset(&ptr0, 0, sizeof(ptr0));
          memset(&pool, 0, sizeof(pool));

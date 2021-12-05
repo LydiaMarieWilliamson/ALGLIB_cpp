@@ -675,163 +675,76 @@ namespace alglib {
 DefClass(barycentricinterpolant, )
 
 double barycentriccalc(const barycentricinterpolant &b, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::barycentriccalc(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), t, &_alglib_env_state);
+   double D = alglib_impl::barycentriccalc(ConstT(barycentricinterpolant, b), t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricdiff1(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), t, &f, &df, &_alglib_env_state);
+   alglib_impl::barycentricdiff1(ConstT(barycentricinterpolant, b), t, &f, &df, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricdiff2(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), t, &f, &df, &d2f, &_alglib_env_state);
+   alglib_impl::barycentricdiff2(ConstT(barycentricinterpolant, b), t, &f, &df, &d2f, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentriclintransx(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), ca, cb, &_alglib_env_state);
+   alglib_impl::barycentriclintransx(ConstT(barycentricinterpolant, b), ca, cb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentriclintransy(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), ca, cb, &_alglib_env_state);
+   alglib_impl::barycentriclintransy(ConstT(barycentricinterpolant, b), ca, cb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricunpack(const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), &n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
+   alglib_impl::barycentricunpack(ConstT(barycentricinterpolant, b), &n, ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricbuildxyw(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::barycentricbuildxyw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(barycentricinterpolant, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricbuildfloaterhormann(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, d, const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::barycentricbuildfloaterhormann(ConstT(ae_vector, x), ConstT(ae_vector, y), n, d, ConstT(barycentricinterpolant, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -2233,21 +2146,11 @@ DefClass(idwbuilder, )
 DefClass(idwreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void idwserialize(idwmodel &obj, std::string &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
@@ -2261,20 +2164,10 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void idwserialize(idwmodel &obj, std::ostream &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
@@ -2286,20 +2179,10 @@ void idwserialize(idwmodel &obj, std::ostream &s_out) {
 }
 
 void idwunserialize(const std::string &s_in, idwmodel &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
@@ -2307,20 +2190,10 @@ void idwunserialize(const std::string &s_in, idwmodel &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 void idwunserialize(const std::istream &s_in, idwmodel &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
@@ -2329,362 +2202,170 @@ void idwunserialize(const std::istream &s_in, idwmodel &obj) {
 }
 
 void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwcreatecalcbuffer(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), const_cast < alglib_impl::idwcalcbuffer * >(buf.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwcreatecalcbuffer(ConstT(idwmodel, s), ConstT(idwcalcbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildercreate(nx, ny, const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwbuildercreate(nx, ny, ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetnlayers(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), nlayers, &_alglib_env_state);
+   alglib_impl::idwbuildersetnlayers(ConstT(idwbuilder, state), nlayers, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetpoints(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::idwbuildersetpoints(ConstT(idwbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = xy.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = xy.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetpoints(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, &_alglib_env_state);
-
+   alglib_impl::idwbuildersetpoints(ConstT(idwbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void idwbuildersetalgomstab(const idwbuilder &state, const double srad, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetalgomstab(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), srad, &_alglib_env_state);
+   alglib_impl::idwbuildersetalgomstab(ConstT(idwbuilder, state), srad, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetalgotextbookshepard(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), p, &_alglib_env_state);
+   alglib_impl::idwbuildersetalgotextbookshepard(ConstT(idwbuilder, state), p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetalgotextbookmodshepard(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), r, &_alglib_env_state);
+   alglib_impl::idwbuildersetalgotextbookmodshepard(ConstT(idwbuilder, state), r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetuserterm(const idwbuilder &state, const double v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetuserterm(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), v, &_alglib_env_state);
+   alglib_impl::idwbuildersetuserterm(ConstT(idwbuilder, state), v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetconstterm(const idwbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetconstterm(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwbuildersetconstterm(ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwbuildersetzeroterm(const idwbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwbuildersetzeroterm(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwbuildersetzeroterm(ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 double idwcalc1(const idwmodel &s, const double x0, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::idwcalc1(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), x0, &_alglib_env_state);
+   double D = alglib_impl::idwcalc1(ConstT(idwmodel, s), x0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double idwcalc2(const idwmodel &s, const double x0, const double x1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::idwcalc2(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), x0, x1, &_alglib_env_state);
+   double D = alglib_impl::idwcalc2(ConstT(idwmodel, s), x0, x1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double idwcalc3(const idwmodel &s, const double x0, const double x1, const double x2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::idwcalc3(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), x0, x1, x2, &_alglib_env_state);
+   double D = alglib_impl::idwcalc3(ConstT(idwmodel, s), x0, x1, x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwcalc(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwcalc(ConstT(idwmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwcalcbuf(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwcalcbuf(ConstT(idwmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwtscalcbuf(const_cast < alglib_impl::idwmodel * >(s.c_ptr()), const_cast < alglib_impl::idwcalcbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwtscalcbuf(ConstT(idwmodel, s), ConstT(idwcalcbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::idwfit(const_cast < alglib_impl::idwbuilder * >(state.c_ptr()), const_cast < alglib_impl::idwmodel * >(model.c_ptr()), const_cast < alglib_impl::idwreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::idwfit(ConstT(idwbuilder, state), ConstT(idwmodel, model), ConstT(idwreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -4299,419 +3980,221 @@ double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t,
 
 namespace alglib {
 void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbar2cheb(const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), a, b, const_cast < alglib_impl::ae_vector * >(t.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbar2cheb(ConstT(barycentricinterpolant, p), a, b, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialcheb2bar(const_cast < alglib_impl::ae_vector * >(t.c_ptr()), n, a, b, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialcheb2bar(ConstT(ae_vector, t), n, a, b, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = t.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = t.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialcheb2bar(const_cast < alglib_impl::ae_vector * >(t.c_ptr()), n, a, b, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialcheb2bar(ConstT(ae_vector, t), n, a, b, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbar2pow(const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), c, s, const_cast < alglib_impl::ae_vector * >(a.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbar2pow(ConstT(barycentricinterpolant, p), c, s, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   double c;
-   double s;
-
-   c = 0;
-   s = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   double c = 0.0;
+   double s = 1.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbar2pow(const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), c, s, const_cast < alglib_impl::ae_vector * >(a.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialbar2pow(ConstT(barycentricinterpolant, p), c, s, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialpow2bar(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), n, c, s, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialpow2bar(ConstT(ae_vector, a), n, c, s, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   double c;
-   double s;
-
-   n = a.length();
-   c = 0;
-   s = 1;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = a.length();
+   double c = 0.0;
+   double s = 1.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialpow2bar(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), n, c, s, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialpow2bar(ConstT(ae_vector, a), n, c, s, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuild(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbuild(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'polynomialbuild': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'polynomialbuild': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuild(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialbuild(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildeqdist(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbuildeqdist(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = y.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = y.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildeqdist(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialbuildeqdist(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildcheb1(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbuildcheb1(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = y.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = y.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildcheb1(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialbuildcheb1(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildcheb2(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialbuildcheb2(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = y.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = y.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialbuildcheb2(a, b, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialbuildcheb2(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalceqdist(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
+   double D = alglib_impl::polynomialcalceqdist(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = f.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = f.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalceqdist(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
-
+   double D = alglib_impl::polynomialcalceqdist(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #endif
 
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalccheb1(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
+   double D = alglib_impl::polynomialcalccheb1(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = f.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = f.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalccheb1(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
-
+   double D = alglib_impl::polynomialcalccheb1(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #endif
 
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalccheb2(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
+   double D = alglib_impl::polynomialcalccheb2(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = f.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = f.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::polynomialcalccheb2(a, b, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), n, t, &_alglib_env_state);
-
+   double D = alglib_impl::polynomialcalccheb2(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 #endif
 } // end of namespace alglib
@@ -8506,660 +7989,339 @@ DefClass(spline1dinterpolant, )
 DefClass(spline1dfitreport, DecVal(taskrcond) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(maxerror))
 
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildlinear(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildlinear(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildlinear': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildlinear': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildlinear(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildlinear(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildcubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildcubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dgriddiffcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dgriddiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dgriddiffcubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dgriddiffcubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dgriddiffcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(d.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dgriddiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d1, real_1d_array &d2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dgriddiff2cubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(d1.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dgriddiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d1), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dgriddiff2cubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dgriddiff2cubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dgriddiff2cubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(d1.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dgriddiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d1), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dconvcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   ae_int_t n2;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dconvcubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   n2 = x2.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dconvcubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   ae_int_t n2 = x2.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dconvcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvdiffcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dconvdiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   ae_int_t n2;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dconvdiffcubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   n2 = x2.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dconvdiffcubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   ae_int_t n2 = x2.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvdiffcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dconvdiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvdiff2cubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), const_cast < alglib_impl::ae_vector * >(dd2.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dconvdiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), ConstT(ae_vector, dd2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundltype;
-   double boundl;
-   ae_int_t boundrtype;
-   double boundr;
-   ae_int_t n2;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dconvdiff2cubic': looks like one of arguments has wrong size");
-   n = x.length();
-   boundltype = 0;
-   boundl = 0;
-   boundrtype = 0;
-   boundr = 0;
-   n2 = x2.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dconvdiff2cubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundltype = 0;
+   double boundl = 0.0;
+   ae_int_t boundrtype = 0;
+   double boundr = 0.0;
+   ae_int_t n2 = x2.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dconvdiff2cubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundltype, boundl, boundrtype, boundr, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), const_cast < alglib_impl::ae_vector * >(d2.c_ptr()), const_cast < alglib_impl::ae_vector * >(dd2.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dconvdiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), ConstT(ae_vector, dd2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundtype, const double tension, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildcatmullrom(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundtype, tension, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildcatmullrom(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundtype, tension, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t boundtype;
-   double tension;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildcatmullrom': looks like one of arguments has wrong size");
-   n = x.length();
-   boundtype = 0;
-   tension = 0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildcatmullrom': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t boundtype = 0;
+   double tension = 0.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildcatmullrom(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, boundtype, tension, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildcatmullrom(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundtype, tension, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildhermite(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildhermite(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, d), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()) || (x.length() != d.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildhermite': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length() || x.length() != d.length()) ThrowError("Error while calling 'spline1dbuildhermite': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildhermite(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(d.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildhermite(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, d), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildakima(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildakima(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildakima': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildakima': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildakima(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildakima(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 double spline1dcalc(const spline1dinterpolant &c, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spline1dcalc(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), x, &_alglib_env_state);
+   double D = alglib_impl::spline1dcalc(ConstT(spline1dinterpolant, c), x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, double &ds, double &d2s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1ddiff(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), x, &s, &ds, &d2s, &_alglib_env_state);
+   alglib_impl::spline1ddiff(ConstT(spline1dinterpolant, c), x, &s, &ds, &d2s, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tbl, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dunpack(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &n, const_cast < alglib_impl::ae_matrix * >(tbl.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dunpack(ConstT(spline1dinterpolant, c), &n, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dlintransx(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), a, b, &_alglib_env_state);
+   alglib_impl::spline1dlintransx(ConstT(spline1dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dlintransy(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), a, b, &_alglib_env_state);
+   alglib_impl::spline1dlintransy(ConstT(spline1dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 double spline1dintegrate(const spline1dinterpolant &c, const double x, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spline1dintegrate(const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), x, &_alglib_env_state);
+   double D = alglib_impl::spline1dintegrate(ConstT(spline1dinterpolant, c), x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfit(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, lambdans, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, lambdans, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfit': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfit': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfit(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, lambdans, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, lambdans, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildmonotone(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dbuildmonotone(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dbuildmonotone': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildmonotone': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dbuildmonotone(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::spline1dinterpolant * >(c.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dbuildmonotone(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 } // end of namespace alglib
@@ -15419,1075 +14581,542 @@ DefClass(lsfitreport, DecVal(taskrcond) DecVal(iterationscount) DecVal(varidx) D
 DefClass(lsfitstate, DecVal(needf) DecVal(needfg) DecVal(needfgh) DecVal(xupdated) DecVar(c) DecVal(f) DecVar(g) DecVar(h) DecVar(x))
 
 void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lstfitpiecewiselinearrdpfixed(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), &nsections, &_alglib_env_state);
+   alglib_impl::lstfitpiecewiselinearrdpfixed(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, ConstT(ae_vector, x2), ConstT(ae_vector, y2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lstfitpiecewiselinearrdp(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, eps, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), const_cast < alglib_impl::ae_vector * >(y2.c_ptr()), &nsections, &_alglib_env_state);
+   alglib_impl::lstfitpiecewiselinearrdp(ConstT(ae_vector, x), ConstT(ae_vector, y), n, eps, ConstT(ae_vector, x2), ConstT(ae_vector, y2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialfit(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), const_cast < alglib_impl::polynomialfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'polynomialfit': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'polynomialfit': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialfit(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), const_cast < alglib_impl::polynomialfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialfitwc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), const_cast < alglib_impl::polynomialfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::polynomialfitwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t k;
-   if ((x.length() != y.length()) || (x.length() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'polynomialfitwc': looks like one of arguments has wrong size");
-   if ((xc.length() != yc.length()) || (xc.length() != dc.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'polynomialfitwc': looks like one of arguments has wrong size");
-   n = x.length();
-   k = xc.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'polynomialfitwc': looks like one of arguments has wrong size");
+   if (xc.length() != yc.length() || xc.length() != dc.length()) ThrowError("Error while calling 'polynomialfitwc': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t k = xc.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::polynomialfitwc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(p.c_ptr()), const_cast < alglib_impl::polynomialfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::polynomialfitwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 double logisticcalc4(const double x, const double a, const double b, const double c, const double d, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::logisticcalc4(x, a, b, c, d, &_alglib_env_state);
+   double D = alglib_impl::logisticcalc4(x, a, b, c, d, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double logisticcalc5(const double x, const double a, const double b, const double c, const double d, const double g, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::logisticcalc5(x, a, b, c, d, g, &_alglib_env_state);
+   double D = alglib_impl::logisticcalc5(x, a, b, c, d, g, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::logisticfit4(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, &a, &b, &c, &d, const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::logisticfit4(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &a, &b, &c, &d, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::logisticfit4ec(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, cnstrleft, cnstrright, &a, &b, &c, &d, const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::logisticfit4ec(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, &a, &b, &c, &d, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::logisticfit5(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, &a, &b, &c, &d, &g, const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::logisticfit5(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::logisticfit5ec(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, cnstrleft, cnstrright, &a, &b, &c, &d, &g, const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::logisticfit5ec(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::logisticfit45x(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, cnstrleft, cnstrright, is4pl, lambdav, epsx, rscnt, &a, &b, &c, &d, &g, const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::logisticfit45x(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, is4pl, lambdav, epsx, rscnt, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricfitfloaterhormannwc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), const_cast < alglib_impl::barycentricfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::barycentricfitfloaterhormannwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, b), ConstT(barycentricfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::barycentricfitfloaterhormann(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::barycentricinterpolant * >(b.c_ptr()), const_cast < alglib_impl::barycentricfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::barycentricfitfloaterhormann(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, b), ConstT(barycentricfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitcubicwc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfitcubicwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t k;
-   if ((x.length() != y.length()) || (x.length() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfitcubicwc': looks like one of arguments has wrong size");
-   if ((xc.length() != yc.length()) || (xc.length() != dc.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfitcubicwc': looks like one of arguments has wrong size");
-   n = x.length();
-   k = xc.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfitcubicwc': looks like one of arguments has wrong size");
+   if (xc.length() != yc.length() || xc.length() != dc.length()) ThrowError("Error while calling 'spline1dfitcubicwc': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t k = xc.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitcubicwc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfitcubicwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfithermitewc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfithermitewc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t k;
-   if ((x.length() != y.length()) || (x.length() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfithermitewc': looks like one of arguments has wrong size");
-   if ((xc.length() != yc.length()) || (xc.length() != dc.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfithermitewc': looks like one of arguments has wrong size");
-   n = x.length();
-   k = xc.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfithermitewc': looks like one of arguments has wrong size");
+   if (xc.length() != yc.length() || xc.length() != dc.length()) ThrowError("Error while calling 'spline1dfithermitewc': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   ae_int_t k = xc.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfithermitewc(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(xc.c_ptr()), const_cast < alglib_impl::ae_vector * >(yc.c_ptr()), const_cast < alglib_impl::ae_vector * >(dc.c_ptr()), k, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfithermitewc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfitcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfitcubic': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitcubic': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitcubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfitcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfithermite(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfithermite(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfithermite': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfithermite': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfithermite(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfithermite(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearw(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), n, m, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitlinearw(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   if ((y.length() != w.length()) || (y.length() != fmatrix.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinearw': looks like one of arguments has wrong size");
-   n = y.length();
-   m = fmatrix.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (y.length() != w.length() || y.length() != fmatrix.rows()) ThrowError("Error while calling 'lsfitlinearw': looks like one of arguments has wrong size");
+   ae_int_t n = y.length();
+   ae_int_t m = fmatrix.cols();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearw(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), n, m, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitlinearw(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearwc(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), const_cast < alglib_impl::ae_matrix * >(cmatrix.c_ptr()), n, m, k, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitlinearwc(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((y.length() != w.length()) || (y.length() != fmatrix.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinearwc': looks like one of arguments has wrong size");
-   if ((fmatrix.cols() != cmatrix.cols() - 1))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinearwc': looks like one of arguments has wrong size");
-   n = y.length();
-   m = fmatrix.cols();
-   k = cmatrix.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (y.length() != w.length() || y.length() != fmatrix.rows()) ThrowError("Error while calling 'lsfitlinearwc': looks like one of arguments has wrong size");
+   if (fmatrix.cols() != cmatrix.cols() - 1) ThrowError("Error while calling 'lsfitlinearwc': looks like one of arguments has wrong size");
+   ae_int_t n = y.length();
+   ae_int_t m = fmatrix.cols();
+   ae_int_t k = cmatrix.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearwc(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), const_cast < alglib_impl::ae_matrix * >(cmatrix.c_ptr()), n, m, k, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitlinearwc(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinear(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), n, m, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitlinear(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   if ((y.length() != fmatrix.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinear': looks like one of arguments has wrong size");
-   n = y.length();
-   m = fmatrix.cols();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (y.length() != fmatrix.rows()) ThrowError("Error while calling 'lsfitlinear': looks like one of arguments has wrong size");
+   ae_int_t n = y.length();
+   ae_int_t m = fmatrix.cols();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinear(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), n, m, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitlinear(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearc(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), const_cast < alglib_impl::ae_matrix * >(cmatrix.c_ptr()), n, m, k, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitlinearc(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((y.length() != fmatrix.rows()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinearc': looks like one of arguments has wrong size");
-   if ((fmatrix.cols() != cmatrix.cols() - 1))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitlinearc': looks like one of arguments has wrong size");
-   n = y.length();
-   m = fmatrix.cols();
-   k = cmatrix.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (y.length() != fmatrix.rows()) ThrowError("Error while calling 'lsfitlinearc': looks like one of arguments has wrong size");
+   if (fmatrix.cols() != cmatrix.cols() - 1) ThrowError("Error while calling 'lsfitlinearc': looks like one of arguments has wrong size");
+   ae_int_t n = y.length();
+   ae_int_t m = fmatrix.cols();
+   ae_int_t k = cmatrix.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitlinearc(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(fmatrix.c_ptr()), const_cast < alglib_impl::ae_matrix * >(cmatrix.c_ptr()), n, m, k, &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitlinearc(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewf(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, diffstep, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatewf(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()) || (x.rows() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatewf': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length() || x.rows() != w.length()) ThrowError("Error while calling 'lsfitcreatewf': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewf(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, diffstep, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatewf(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatef(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, diffstep, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatef(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const double diffstep, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatef': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length()) ThrowError("Error while calling 'lsfitcreatef': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatef(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, diffstep, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatef(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewfg(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, cheapfg, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatewfg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()) || (x.rows() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatewfg': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length() || x.rows() != w.length()) ThrowError("Error while calling 'lsfitcreatewfg': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewfg(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, cheapfg, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatewfg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatefg(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, cheapfg, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatefg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const bool cheapfg, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatefg': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length()) ThrowError("Error while calling 'lsfitcreatefg': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatefg(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, cheapfg, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatefg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewfgh(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatewfgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()) || (x.rows() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatewfgh': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length() || x.rows() != w.length()) ThrowError("Error while calling 'lsfitcreatewfgh': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatewfgh(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatewfgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatefgh(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitcreatefgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   if ((x.rows() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitcreatefgh': looks like one of arguments has wrong size");
-   n = x.rows();
-   m = x.cols();
-   k = c.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.rows() != y.length()) ThrowError("Error while calling 'lsfitcreatefgh': looks like one of arguments has wrong size");
+   ae_int_t n = x.rows();
+   ae_int_t m = x.cols();
+   ae_int_t k = c.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitcreatefgh(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), n, m, k, const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::lsfitcreatefgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetcond(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), epsx, maxits, &_alglib_env_state);
+   alglib_impl::lsfitsetcond(ConstT(lsfitstate, state), epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetstpmax(const lsfitstate &state, const double stpmax, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetstpmax(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), stpmax, &_alglib_env_state);
+   alglib_impl::lsfitsetstpmax(ConstT(lsfitstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetxrep(const lsfitstate &state, const bool needxrep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetxrep(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), needxrep, &_alglib_env_state);
+   alglib_impl::lsfitsetxrep(ConstT(lsfitstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetscale(const lsfitstate &state, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetscale(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitsetscale(ConstT(lsfitstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetbc(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitsetbc(ConstT(lsfitstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetlc(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
+   alglib_impl::lsfitsetlc(ConstT(lsfitstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t k;
-   if ((c.rows() != ct.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'lsfitsetlc': looks like one of arguments has wrong size");
-   k = c.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (c.rows() != ct.length()) ThrowError("Error while calling 'lsfitsetlc': looks like one of arguments has wrong size");
+   ae_int_t k = c.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetlc(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(ct.c_ptr()), k, &_alglib_env_state);
-
+   alglib_impl::lsfitsetlc(ConstT(lsfitstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 bool lsfititeration(const lsfitstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, false)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::lsfititeration(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &_alglib_env_state);
+   bool Ok = alglib_impl::lsfititeration(ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
+   return Ok;
 }
 
 // This family of functions is used to launcn iterations of nonlinear fitter
@@ -16540,152 +15169,70 @@ bool lsfititeration(const lsfitstate &state, const xparams _xparams) {
 //    compile time - you can see them at runtime only.
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.c, state.x, state.f, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.c, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   }
+   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state))
+   BegPoll
+      if (state.needf) func(state.c, state.x, state.f, ptr);
+      else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
+      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
+   EndPoll
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)", &_alglib_env_state);
-   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.c, state.x, state.f, ptr);
-         continue;
-      }
-      if (state.needfg) {
-         grad(state.c, state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.c, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   }
+   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state))
+   BegPoll
+      if (state.needf) func(state.c, state.x, state.f, ptr);
+      else if (state.needfg) grad(state.c, state.x, state.f, state.g, ptr);
+      else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
+      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
+   EndPoll
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'lsfitfit()' (hess is NULL)", &_alglib_env_state);
-   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needf) {
-         func(state.c, state.x, state.f, ptr);
-         continue;
-      }
-      if (state.needfg) {
-         grad(state.c, state.x, state.f, state.g, ptr);
-         continue;
-      }
-      if (state.needfgh) {
-         hess(state.c, state.x, state.f, state.g, state.h, ptr);
-         continue;
-      }
-      if (state.xupdated) {
-         if (rep != NULL)
-            rep(state.c, state.f, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   }
+   while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state))
+   BegPoll
+      if (state.needf) func(state.c, state.x, state.f, ptr);
+      else if (state.needfg) grad(state.c, state.x, state.f, state.g, ptr);
+      else if (state.needfgh) hess(state.c, state.x, state.f, state.g, state.h, ptr);
+      else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
+      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
+   EndPoll
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitresults(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), &info, const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::lsfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::lsfitresults(ConstT(lsfitstate, state), &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lsfitsetgradientcheck(const_cast < alglib_impl::lsfitstate * >(state.c_ptr()), teststep, &_alglib_env_state);
+   alglib_impl::lsfitsetgradientcheck(ConstT(lsfitstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -17527,103 +16074,48 @@ void fitsphereinternalreport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fitspherels(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &r, &_alglib_env_state);
+   alglib_impl::fitspherels(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fitspheremc(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rhi, &_alglib_env_state);
+   alglib_impl::fitspheremc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fitspheremi(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &_alglib_env_state);
+   alglib_impl::fitspheremi(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fitspheremz(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &rhi, &_alglib_env_state);
+   alglib_impl::fitspheremz(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::fitspherex(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, problemtype, epsx, aulits, penalty, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &rhi, &_alglib_env_state);
+   alglib_impl::fitspherex(ConstT(ae_matrix, xy), npoints, nx, problemtype, epsx, aulits, penalty, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -18790,343 +17282,158 @@ DefClass(pspline2interpolant, )
 DefClass(pspline3interpolant, )
 
 void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2build(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, st, pt, const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline2build(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline2interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3build(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, st, pt, const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline3build(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline3interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2buildperiodic(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, st, pt, const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline2buildperiodic(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline2interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3buildperiodic(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, st, pt, const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline3buildperiodic(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline3interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2parametervalues(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), &n, const_cast < alglib_impl::ae_vector * >(t.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline2parametervalues(ConstT(pspline2interpolant, p), &n, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3parametervalues(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), &n, const_cast < alglib_impl::ae_vector * >(t.c_ptr()), &_alglib_env_state);
+   alglib_impl::pspline3parametervalues(ConstT(pspline3interpolant, p), &n, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2calc(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), t, &x, &y, &_alglib_env_state);
+   alglib_impl::pspline2calc(ConstT(pspline2interpolant, p), t, &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3calc(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), t, &x, &y, &z, &_alglib_env_state);
+   alglib_impl::pspline3calc(ConstT(pspline3interpolant, p), t, &x, &y, &z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2tangent(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), t, &x, &y, &_alglib_env_state);
+   alglib_impl::pspline2tangent(ConstT(pspline2interpolant, p), t, &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3tangent(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), t, &x, &y, &z, &_alglib_env_state);
+   alglib_impl::pspline3tangent(ConstT(pspline3interpolant, p), t, &x, &y, &z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2diff(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), t, &x, &dx, &y, &dy, &_alglib_env_state);
+   alglib_impl::pspline2diff(ConstT(pspline2interpolant, p), t, &x, &dx, &y, &dy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3diff(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), t, &x, &dx, &y, &dy, &z, &dz, &_alglib_env_state);
+   alglib_impl::pspline3diff(ConstT(pspline3interpolant, p), t, &x, &dx, &y, &dy, &z, &dz, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline2diff2(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), t, &x, &dx, &d2x, &y, &dy, &d2y, &_alglib_env_state);
+   alglib_impl::pspline2diff2(ConstT(pspline2interpolant, p), t, &x, &dx, &d2x, &y, &dy, &d2y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pspline3diff2(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), t, &x, &dx, &d2x, &y, &dy, &d2y, &z, &dz, &d2z, &_alglib_env_state);
+   alglib_impl::pspline3diff2(ConstT(pspline3interpolant, p), t, &x, &dx, &d2x, &y, &dy, &d2y, &z, &dz, &d2z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 double pspline2arclength(const pspline2interpolant &p, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::pspline2arclength(const_cast < alglib_impl::pspline2interpolant * >(p.c_ptr()), a, b, &_alglib_env_state);
+   double D = alglib_impl::pspline2arclength(ConstT(pspline2interpolant, p), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double pspline3arclength(const pspline3interpolant &p, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::pspline3arclength(const_cast < alglib_impl::pspline3interpolant * >(p.c_ptr()), a, b, &_alglib_env_state);
+   double D = alglib_impl::pspline3arclength(ConstT(pspline3interpolant, p), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::parametricrdpfixed(const_cast < alglib_impl::ae_matrix * >(x.c_ptr()), n, d, stopm, stopeps, const_cast < alglib_impl::ae_matrix * >(x2.c_ptr()), const_cast < alglib_impl::ae_vector * >(idx2.c_ptr()), &nsections, &_alglib_env_state);
+   alglib_impl::parametricrdpfixed(ConstT(ae_matrix, x), n, d, stopm, stopeps, ConstT(ae_matrix, x2), ConstT(ae_vector, idx2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -26255,21 +24562,11 @@ DefClass(spline2dbuilder, )
 DefClass(spline2dfitreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
@@ -26283,20 +24580,10 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
@@ -26308,20 +24595,10 @@ void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
 }
 
 void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
@@ -26329,20 +24606,10 @@ void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
@@ -26351,603 +24618,275 @@ void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
 }
 
 double spline2dcalc(const spline2dinterpolant &c, const double x, const double y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spline2dcalc(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, &_alglib_env_state);
+   double D = alglib_impl::spline2dcalc(ConstT(spline2dinterpolant, c), x, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2ddiff(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, &f, &fx, &fy, &fxy, &_alglib_env_state);
+   alglib_impl::spline2ddiff(ConstT(spline2dinterpolant, c), x, y, &f, &fx, &fy, &fxy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dcalcvbuf(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dcalcvbuf(ConstT(spline2dinterpolant, c), x, y, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spline2dcalcvi(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, i, &_alglib_env_state);
+   double D = alglib_impl::spline2dcalcvi(ConstT(spline2dinterpolant, c), x, y, i, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dcalcv(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dcalcv(ConstT(spline2dinterpolant, c), x, y, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, double &f, double &fx, double &fy, double &fxy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2ddiffvi(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), x, y, i, &f, &fx, &fy, &fxy, &_alglib_env_state);
+   alglib_impl::spline2ddiffvi(ConstT(spline2dinterpolant, c), x, y, i, &f, &fx, &fy, &fxy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dlintransxy(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), ax, bx, ay, by, &_alglib_env_state);
+   alglib_impl::spline2dlintransxy(ConstT(spline2dinterpolant, c), ax, bx, ay, by, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dlintransf(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), a, b, &_alglib_env_state);
+   alglib_impl::spline2dlintransf(ConstT(spline2dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dcopy(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), const_cast < alglib_impl::spline2dinterpolant * >(cc.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dcopy(ConstT(spline2dinterpolant, c), ConstT(spline2dinterpolant, cc), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dresamplebicubic(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), oldheight, oldwidth, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), newheight, newwidth, &_alglib_env_state);
+   alglib_impl::spline2dresamplebicubic(ConstT(ae_matrix, a), oldheight, oldwidth, ConstT(ae_matrix, b), newheight, newwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dresamplebilinear(const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), oldheight, oldwidth, const_cast < alglib_impl::ae_matrix * >(b.c_ptr()), newheight, newwidth, &_alglib_env_state);
+   alglib_impl::spline2dresamplebilinear(ConstT(ae_matrix, a), oldheight, oldwidth, ConstT(ae_matrix, b), newheight, newwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildbilinearv(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), m, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), d, const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildbilinearv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), d, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildbicubicv(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), m, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), d, const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildbicubicv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), d, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_int_t &d, real_2d_array &tbl, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dunpackv(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &m, &n, &d, const_cast < alglib_impl::ae_matrix * >(tbl.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dunpackv(ConstT(spline2dinterpolant, c), &m, &n, &d, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildbilinear(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(f.c_ptr()), m, n, const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildbilinear(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_matrix, f), m, n, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildbicubic(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_matrix * >(f.c_ptr()), m, n, const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildbicubic(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_matrix, f), m, n, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real_2d_array &tbl, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dunpack(const_cast < alglib_impl::spline2dinterpolant * >(c.c_ptr()), &m, &n, const_cast < alglib_impl::ae_matrix * >(tbl.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dunpack(ConstT(spline2dinterpolant, c), &m, &n, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildercreate(d, const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildercreate(d, ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetuserterm(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), v, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetuserterm(ConstT(spline2dbuilder, state), v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetlinterm(const spline2dbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetlinterm(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildersetlinterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetconstterm(const spline2dbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetconstterm(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildersetconstterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetzeroterm(const spline2dbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetzeroterm(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildersetzeroterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array &xy, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetpoints(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetpoints(ConstT(spline2dbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetareaauto(const spline2dbuilder &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetareaauto(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dbuildersetareaauto(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const double xb, const double ya, const double yb, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetarea(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), xa, xb, ya, yb, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetarea(ConstT(spline2dbuilder, state), xa, xb, ya, yb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, const ae_int_t ky, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetgrid(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), kx, ky, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetgrid(ConstT(spline2dbuilder, state), kx, ky, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetalgofastddm(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), nlayers, lambdav, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetalgofastddm(ConstT(spline2dbuilder, state), nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double lambdans, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetalgoblocklls(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), lambdans, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetalgoblocklls(ConstT(spline2dbuilder, state), lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double lambdans, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dbuildersetalgonaivells(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), lambdans, &_alglib_env_state);
+   alglib_impl::spline2dbuildersetalgonaivells(ConstT(spline2dbuilder, state), lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline2dfit(const_cast < alglib_impl::spline2dbuilder * >(state.c_ptr()), const_cast < alglib_impl::spline2dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline2dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline2dfit(ConstT(spline2dbuilder, state), ConstT(spline2dinterpolant, s), ConstT(spline2dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -30829,163 +28768,76 @@ namespace alglib {
 DefClass(spline3dinterpolant, )
 
 double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::spline3dcalc(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), x, y, z, &_alglib_env_state);
+   double D = alglib_impl::spline3dcalc(ConstT(spline3dinterpolant, c), x, y, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dlintransxyz(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), ax, bx, ay, by, az, bz, &_alglib_env_state);
+   alglib_impl::spline3dlintransxyz(ConstT(spline3dinterpolant, c), ax, bx, ay, by, az, bz, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dlintransf(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), a, b, &_alglib_env_state);
+   alglib_impl::spline3dlintransf(ConstT(spline3dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dresampletrilinear(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), oldzcount, oldycount, oldxcount, newzcount, newycount, newxcount, const_cast < alglib_impl::ae_vector * >(b.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline3dresampletrilinear(ConstT(ae_vector, a), oldzcount, oldycount, oldxcount, newzcount, newycount, newxcount, ConstT(ae_vector, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dbuildtrilinearv(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), m, const_cast < alglib_impl::ae_vector * >(z.c_ptr()), l, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), d, const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline3dbuildtrilinearv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, z), l, ConstT(ae_vector, f), d, ConstT(spline3dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dcalcvbuf(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), x, y, z, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline3dcalcvbuf(ConstT(spline3dinterpolant, c), x, y, z, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dcalcv(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), x, y, z, const_cast < alglib_impl::ae_vector * >(f.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline3dcalcv(ConstT(spline3dinterpolant, c), x, y, z, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline3dunpackv(const_cast < alglib_impl::spline3dinterpolant * >(c.c_ptr()), &n, &m, &l, &d, &stype, const_cast < alglib_impl::ae_matrix * >(tbl.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline3dunpackv(ConstT(spline3dinterpolant, c), &n, &m, &l, &d, &stype, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib
 
@@ -31387,162 +29239,80 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
 
 namespace alglib {
 void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::nsfitspheremcc(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rhi, &_alglib_env_state);
+   alglib_impl::nsfitspheremcc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::nsfitspheremic(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &_alglib_env_state);
+   alglib_impl::nsfitspheremic(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::nsfitspheremzc(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &rhi, &_alglib_env_state);
+   alglib_impl::nsfitspheremzc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::nsfitspherex(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nx, problemtype, epsx, aulits, penalty, const_cast < alglib_impl::ae_vector * >(cx.c_ptr()), &rlo, &rhi, &_alglib_env_state);
+   alglib_impl::nsfitspherex(ConstT(ae_matrix, xy), npoints, nx, problemtype, epsx, aulits, penalty, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitpenalized(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, rho, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfitpenalized': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitpenalized': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitpenalized(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, m, rho, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitpenalizedw(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, m, rho, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   if ((x.length() != y.length()) || (x.length() != w.length()))
-      _ALGLIB_CPP_EXCEPTION("Error while calling 'spline1dfitpenalizedw': looks like one of arguments has wrong size");
-   n = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfitpenalizedw': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::spline1dfitpenalizedw(const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), n, m, rho, &info, const_cast < alglib_impl::spline1dinterpolant * >(s.c_ptr()), const_cast < alglib_impl::spline1dfitreport * >(rep.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 } // end of namespace alglib
@@ -33757,21 +31527,11 @@ DefClass(rbfmodel, )
 DefClass(rbfreport, DecVal(rmserror) DecVal(maxerror) DecVal(arows) DecVal(acols) DecVal(annz) DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
@@ -33785,20 +31545,10 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
@@ -33810,20 +31560,10 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
 }
 
 void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
@@ -33831,20 +31571,10 @@ void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state state;
    alglib_impl::ae_serializer serializer;
 
-   alglib_impl::ae_state_init(&state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&state, &_break_jump);
+   alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
+   TryCatch(state, )
    alglib_impl::ae_serializer_init(&serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
@@ -33853,660 +31583,313 @@ void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
 }
 
 void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfcreate(nx, ny, const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfcreate(nx, ny, ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfcreatecalcbuffer(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::rbfcalcbuffer * >(buf.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfcreatecalcbuffer(ConstT(rbfmodel, s), ConstT(rbfcalcbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetpoints(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, &_alglib_env_state);
+   alglib_impl::rbfsetpoints(ConstT(rbfmodel, s), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = xy.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = xy.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetpoints(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, &_alglib_env_state);
-
+   alglib_impl::rbfsetpoints(ConstT(rbfmodel, s), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetpointsandscales(const_cast < alglib_impl::rbfmodel * >(r.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfsetpointsandscales(ConstT(rbfmodel, r), ConstT(ae_matrix, xy), n, ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const real_1d_array &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-
-   n = xy.rows();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = xy.rows();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetpointsandscales(const_cast < alglib_impl::rbfmodel * >(r.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(s.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::rbfsetpointsandscales(ConstT(rbfmodel, r), ConstT(ae_matrix, xy), n, ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetalgoqnn(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), q, z, &_alglib_env_state);
+   alglib_impl::rbfsetalgoqnn(ConstT(rbfmodel, s), q, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void rbfsetalgoqnn(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   double q;
-   double z;
-
-   q = 1.0;
-   z = 5.0;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   double q = 1.0;
+   double z = 5.0;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetalgoqnn(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), q, z, &_alglib_env_state);
-
+   alglib_impl::rbfsetalgoqnn(ConstT(rbfmodel, s), q, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetalgomultilayer(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), rbase, nlayers, lambdav, &_alglib_env_state);
+   alglib_impl::rbfsetalgomultilayer(ConstT(rbfmodel, s), rbase, nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   double lambdav;
-
-   lambdav = 0.01;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   double lambdav = 0.01;
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetalgomultilayer(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), rbase, nlayers, lambdav, &_alglib_env_state);
-
+   alglib_impl::rbfsetalgomultilayer(ConstT(rbfmodel, s), rbase, nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetalgohierarchical(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), rbase, nlayers, lambdans, &_alglib_env_state);
+   alglib_impl::rbfsetalgohierarchical(ConstT(rbfmodel, s), rbase, nlayers, lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetlinterm(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetlinterm(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfsetlinterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetconstterm(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetconstterm(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfsetconstterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetzeroterm(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetzeroterm(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfsetzeroterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetv2bf(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), bf, &_alglib_env_state);
+   alglib_impl::rbfsetv2bf(ConstT(rbfmodel, s), bf, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetv2its(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), maxits, &_alglib_env_state);
+   alglib_impl::rbfsetv2its(ConstT(rbfmodel, s), maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfsetv2supportr(const rbfmodel &s, const double r, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfsetv2supportr(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), r, &_alglib_env_state);
+   alglib_impl::rbfsetv2supportr(ConstT(rbfmodel, s), r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfbuildmodel(const rbfmodel &s, rbfreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfbuildmodel(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::rbfreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfbuildmodel(ConstT(rbfmodel, s), ConstT(rbfreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 double rbfcalc1(const rbfmodel &s, const double x0, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rbfcalc1(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), x0, &_alglib_env_state);
+   double D = alglib_impl::rbfcalc1(ConstT(rbfmodel, s), x0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double rbfcalc2(const rbfmodel &s, const double x0, const double x1, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rbfcalc2(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), x0, x1, &_alglib_env_state);
+   double D = alglib_impl::rbfcalc2(ConstT(rbfmodel, s), x0, x1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rbfcalc3(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), x0, x1, x2, &_alglib_env_state);
+   double D = alglib_impl::rbfcalc3(ConstT(rbfmodel, s), x0, x1, x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfcalc(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfcalc(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfcalcbuf(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfcalcbuf(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbftscalcbuf(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::rbfcalcbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbftscalcbuf(ConstT(rbfmodel, s), ConstT(rbfcalcbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfgridcalc2(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x0.c_ptr()), n0, const_cast < alglib_impl::ae_vector * >(x1.c_ptr()), n1, const_cast < alglib_impl::ae_matrix * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfgridcalc2(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_matrix, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfgridcalc2v(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x0.c_ptr()), n0, const_cast < alglib_impl::ae_vector * >(x1.c_ptr()), n1, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfgridcalc2v(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfgridcalc2vsubset(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x0.c_ptr()), n0, const_cast < alglib_impl::ae_vector * >(x1.c_ptr()), n1, const_cast < alglib_impl::ae_vector * >(flagy.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfgridcalc2vsubset(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, flagy), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfgridcalc3v(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x0.c_ptr()), n0, const_cast < alglib_impl::ae_vector * >(x1.c_ptr()), n1, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfgridcalc3v(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfgridcalc3vsubset(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(x0.c_ptr()), n0, const_cast < alglib_impl::ae_vector * >(x1.c_ptr()), n1, const_cast < alglib_impl::ae_vector * >(x2.c_ptr()), n2, const_cast < alglib_impl::ae_vector * >(flagy.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfgridcalc3vsubset(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, x2), n2, ConstT(ae_vector, flagy), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfunpack(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &nx, &ny, const_cast < alglib_impl::ae_matrix * >(xwr.c_ptr()), &nc, const_cast < alglib_impl::ae_matrix * >(v.c_ptr()), &modelversion, &_alglib_env_state);
+   alglib_impl::rbfunpack(ConstT(rbfmodel, s), &nx, &ny, ConstT(ae_matrix, xwr), &nc, ConstT(ae_matrix, v), &modelversion, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 
 ae_int_t rbfgetmodelversion(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_int_t result = alglib_impl::rbfgetmodelversion(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::ae_int_t Z = alglib_impl::rbfgetmodelversion(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < ae_int_t * >(&result));
+   return Z;
 }
 
 double rbfpeekprogress(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::rbfpeekprogress(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   double D = alglib_impl::rbfpeekprogress(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < double *>(&result));
+   return D;
 }
 
 void rbfrequesttermination(const rbfmodel &s, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rbfrequesttermination(const_cast < alglib_impl::rbfmodel * >(s.c_ptr()), &_alglib_env_state);
+   alglib_impl::rbfrequesttermination(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib

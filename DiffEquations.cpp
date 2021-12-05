@@ -579,64 +579,34 @@ DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
 DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::odesolverrkck(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), m, eps, h, const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &_alglib_env_state);
+   alglib_impl::odesolverrkck(ConstT(ae_vector, y), n, ConstT(ae_vector, x), m, eps, h, ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #if !defined AE_NO_EXCEPTIONS
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   ae_int_t n;
-   ae_int_t m;
-
-   n = y.length();
-   m = x.length();
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump))
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   ae_int_t n = y.length();
+   ae_int_t m = x.length();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::odesolverrkck(const_cast < alglib_impl::ae_vector * >(y.c_ptr()), n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), m, eps, h, const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &_alglib_env_state);
-
+   alglib_impl::odesolverrkck(ConstT(ae_vector, y), n, ConstT(ae_vector, x), m, eps, h, ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 #endif
 
 bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return 0;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, false)
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   bool result = alglib_impl::odesolveriteration(const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &_alglib_env_state);
+   bool Ok = alglib_impl::odesolveriteration(ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return *(reinterpret_cast < bool *>(&result));
+   return Ok;
 }
 
 // This function is used to launcn iterations of ODE solver
@@ -646,49 +616,25 @@ bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
 //     ptr     -   optional pointer which is passed to diff; can be NULL
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::ae_assert(diff != NULL, "ALGLIB: error in 'odesolversolve()' (diff is NULL)", &_alglib_env_state);
-   while (alglib_impl::odesolveriteration(state.c_ptr(), &_alglib_env_state)) {
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN if (state.needdy) {
-         diff(state.y, state.x, state.dy, ptr);
-         continue;
-      }
-      goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'odesolversolve'", &_alglib_env_state);
-   }
+   while (alglib_impl::odesolveriteration(state.c_ptr(), &_alglib_env_state))
+   BegPoll
+      if (state.needdy) diff(state.y, state.x, state.dy, ptr);
+      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'odesolversolve'", &_alglib_env_state);
+   EndPoll
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_alglib_env_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_alglib_env_state.error_msg);
-      return;
-#endif
-   }
-   ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::odesolverresults(const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &m, const_cast < alglib_impl::ae_vector * >(xtbl.c_ptr()), const_cast < alglib_impl::ae_matrix * >(ytbl.c_ptr()), const_cast < alglib_impl::odesolverreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::odesolverresults(ConstT(odesolverstate, state), &m, ConstT(ae_vector, xtbl), ConstT(ae_matrix, ytbl), ConstT(odesolverreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
-   return;
 }
 } // end of namespace alglib

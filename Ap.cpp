@@ -9225,31 +9225,31 @@ const xparams &parallel = *((const xparams *)(&_i64_xparallel));
 ap_error::ap_error() {
 }
 
-ap_error::ap_error(const char *s) {
-   msg = s;
+ap_error::ap_error(const char *Msg) {
+   msg = Msg;
 }
 
-void ap_error::make_assertion(bool bClause) {
-   if (!bClause)
-      _ALGLIB_CPP_EXCEPTION("");
+void ap_error::make_assertion(bool Cond) {
+   if (!Cond)
+      ThrowError("");
 }
 
-void ap_error::make_assertion(bool bClause, const char *p_msg) {
-   if (!bClause)
-      _ALGLIB_CPP_EXCEPTION(p_msg);
+void ap_error::make_assertion(bool Cond, const char *Msg) {
+   if (!Cond)
+      ThrowError(Msg);
 }
 #else
-void set_error_flag(const char *s) {
-   if (s == NULL)
-      s = "ALGLIB: unknown error";
-   _alglib_last_error = s;
+void set_error_flag(const char *Msg) {
+   if (Msg == NULL)
+      Msg = "ALGLIB: unknown error";
+   _alglib_last_error = Msg;
 }
 
-bool get_error_flag(const char **p_msg) {
+bool get_error_flag(const char **MsgP) {
    if (_alglib_last_error == NULL)
       return false;
-   if (p_msg != NULL)
-      *p_msg = _alglib_last_error;
+   if (MsgP != NULL)
+      *MsgP = _alglib_last_error;
    return true;
 }
 
@@ -9359,7 +9359,7 @@ std::string complex::tostring(int _dps) const {
    char buf_zero[32];
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
-      _ALGLIB_CPP_EXCEPTION("complex::tostring(): incorrect dps");
+      ThrowError("complex::tostring(): incorrect dps");
 
 // handle IEEE special quantities
    if (fp_isnan(x) || fp_isnan(y))
@@ -9369,15 +9369,15 @@ std::string complex::tostring(int _dps) const {
 
 // generate mask
    if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
-      _ALGLIB_CPP_EXCEPTION("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring(): buffer overflow");
 
 // print |x|, |y| and zero with same mask and compare
    if (sprintf(buf_x, mask, (double)(fabs(x))) >= (int)sizeof(buf_x))
-      _ALGLIB_CPP_EXCEPTION("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring(): buffer overflow");
    if (sprintf(buf_y, mask, (double)(fabs(y))) >= (int)sizeof(buf_y))
-      _ALGLIB_CPP_EXCEPTION("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring(): buffer overflow");
    if (sprintf(buf_zero, mask, (double)0) >= (int)sizeof(buf_zero))
-      _ALGLIB_CPP_EXCEPTION("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring(): buffer overflow");
 
 // different zero/nonzero patterns
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
@@ -10235,11 +10235,11 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
    if (e_ptr == NULL || e_ptr->datatype != datatype) {
       const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(msg);
+      ThrowError(msg);
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(msg);
+      set_error_flag(msg);
       return;
 #endif
    }
@@ -10248,21 +10248,17 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
 }
 
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    ptr = &inner_vec;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
@@ -10271,21 +10267,17 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
 }
 
 ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    alglib_impl::ae_assert(rhs.ptr != NULL, "ALGLIB: ae_vector_wrapper source is not initialized", &_state);
    alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_vector_wrapper datatype check failed", &_state);
    ptr = &inner_vec;
@@ -10301,18 +10293,8 @@ ae_vector_wrapper::~ae_vector_wrapper() {
 }
 
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
-      return;
-#endif
-   }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, )
    alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, ptr == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, ptr is frozen proxy array", &_state);
    alglib_impl::ae_vector_set_length(ptr, iLen, &_state);
@@ -10335,20 +10317,10 @@ void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::a
 }
 
 const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
    if (this == &rhs)
       return *this;
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
-      return *this;
-#endif
-   }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, *this)
    ae_assert(ptr != NULL, "ALGLIB: incorrect assignment (uninitialized destination)", &_state);
    ae_assert(rhs.ptr != NULL, "ALGLIB: incorrect assignment (uninitialized source)", &_state);
    ae_assert(rhs.ptr->datatype == ptr->datatype, "ALGLIB: incorrect assignment to array (types do not match)", &_state);
@@ -10375,16 +10347,12 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
    size_t i;
    char *p = filter_spaces(s);
    if (p == NULL)
-      _ALGLIB_CPP_EXCEPTION("ALGLIB: allocation error");
+      ThrowError("ALGLIB: allocation error");
    try {
       str_vector_create(p, true, &svec);
       {
-         jmp_buf _break_jump;
-         alglib_impl::ae_state _state;
-         alglib_impl::ae_state_init(&_state);
-         if (setjmp(_break_jump))
-            _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-         alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+         TryCatch(_state, )
          ptr = &inner_vec;
          is_frozen_proxy = false;
          memset(ptr, 0, sizeof(*ptr));
@@ -10582,21 +10550,17 @@ void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
 // TODO: convert to constructor!!!!!!!
 void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::x_vector x;
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: unable to attach proxy object to something else", &_state);
    alglib_impl::ae_assert(iLen > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
    x.cnt = iLen;
@@ -10695,11 +10659,11 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
    if (e_ptr->datatype != datatype) {
       const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(msg);
+      ThrowError(msg);
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(msg);
+      set_error_flag(msg);
       return;
 #endif
    }
@@ -10708,21 +10672,17 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
 }
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    ptr = &inner_mat;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
@@ -10732,21 +10692,17 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
 }
 
 ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    is_frozen_proxy = false;
    ptr = NULL;
    alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_matrix_wrapper datatype check failed", &_state);
@@ -10769,16 +10725,12 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
    size_t i, j;
    char *p = filter_spaces(s);
    if (p == NULL)
-      _ALGLIB_CPP_EXCEPTION("ALGLIB: allocation error");
+      ThrowError("ALGLIB: allocation error");
    try {
       str_matrix_create(p, &smat);
       {
-         jmp_buf _break_jump;
-         alglib_impl::ae_state _state;
-         alglib_impl::ae_state_init(&_state);
-         if (setjmp(_break_jump))
-            _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-         alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+         TryCatch(_state, )
          ptr = &inner_mat;
          is_frozen_proxy = false;
          memset(ptr, 0, sizeof(*ptr));
@@ -10812,18 +10764,8 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
 
 // TODO: automatic allocation of NULL ptr!!!!!
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
-      return;
-#endif
-   }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, )
    alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, attempt to resize proxy array", &_state);
    alglib_impl::ae_matrix_set_length(ptr, rows, cols, &_state);
@@ -10863,20 +10805,10 @@ void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::a
 
 const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
    ae_int_t i;
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
    if (this == &rhs)
       return *this;
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
-#if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
-#else
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
-      return *this;
-#endif
-   }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, *this)
    ae_assert(ptr != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)", &_state);
    ae_assert(rhs.ptr != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)", &_state);
    ae_assert(rhs.ptr->datatype == ptr->datatype, "ALGLIB: incorrect assignment to array (types dont match)", &_state);
@@ -11073,21 +11005,18 @@ void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pCo
 }
 
 void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
-   jmp_buf _break_jump;
-   alglib_impl::ae_state _state;
    alglib_impl::x_matrix x;
-   alglib_impl::ae_state_init(&_state);
-   if (setjmp(_break_jump)) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
-      _ALGLIB_CPP_EXCEPTION(_state.error_msg);
+      ThrowErrorMsg(_state, );
 #else
       ptr = NULL;
       is_frozen_proxy = false;
-      _ALGLIB_SET_ERROR_FLAG(_state.error_msg);
+      set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   alglib_impl::ae_state_set_break_jump(&_state, &_break_jump);
    alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: unable to attach proxy object to something else", &_state);
    alglib_impl::ae_assert(irows > 0 && icols > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
    x.rows = irows;
@@ -11278,18 +11207,18 @@ void str_vector_create(const char *src, bool match_head_only, std::vector < cons
 //
    p_vec->clear();
    if (*src != '[')
-      _ALGLIB_CPP_EXCEPTION("Incorrect initializer for vector");
+      ThrowError("Incorrect initializer for vector");
    src++;
    if (*src == ']')
       return;
    p_vec->push_back(src);
    for (;;) {
       if (*src == 0)
-         _ALGLIB_CPP_EXCEPTION("Incorrect initializer for vector");
+         ThrowError("Incorrect initializer for vector");
       if (*src == ']') {
          if (src[1] == 0 || !match_head_only)
             return;
-         _ALGLIB_CPP_EXCEPTION("Incorrect initializer for vector");
+         ThrowError("Incorrect initializer for vector");
       }
       if (*src == ',') {
          p_vec->push_back(src + 1);
@@ -11313,16 +11242,16 @@ void str_matrix_create(const char *src, std::vector < std::vector < const char *
 // Parse non-empty string
 //
    if (*src != '[')
-      _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
+      ThrowError("Incorrect initializer for matrix");
    src++;
    for (;;) {
       p_mat->push_back(std::vector < const char *>());
       str_vector_create(src, false, &p_mat->back());
       if (p_mat->back().size() == 0 || p_mat->back().size() != (*p_mat)[0].size())
-         _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
+         ThrowError("Incorrect initializer for matrix");
       src = strchr(src, ']');
       if (src == NULL)
-         _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
+         ThrowError("Incorrect initializer for matrix");
       src++;
       if (*src == ',') {
          src++;
@@ -11330,11 +11259,11 @@ void str_matrix_create(const char *src, std::vector < std::vector < const char *
       }
       if (*src == ']')
          break;
-      _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
+      ThrowError("Incorrect initializer for matrix");
    }
    src++;
    if (*src != 0)
-      _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
+      ThrowError("Incorrect initializer for matrix");
 }
 
 bool parse_bool_delim(const char *s, const char *delim) {
@@ -11347,7 +11276,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
    strncpy(buf, s, strlen(p));
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
-         _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+         ThrowError("Cannot parse value");
       return false;
    }
 // try to parse true
@@ -11356,11 +11285,11 @@ bool parse_bool_delim(const char *s, const char *delim) {
    strncpy(buf, s, strlen(p));
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
-         _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+         ThrowError("Cannot parse value");
       return true;
    }
 // error
-   _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+   ThrowError("Cannot parse value");
 }
 
 ae_int_t parse_int_delim(const char *s, const char *delim) {
@@ -11379,18 +11308,18 @@ ae_int_t parse_int_delim(const char *s, const char *delim) {
    if (*s == '-' || *s == '+')
       s++;
    if (*s == 0 || strchr("1234567890", *s) == NULL)
-      _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+      ThrowError("Cannot parse value");
    while (*s != 0 && strchr("1234567890", *s) != NULL)
       s++;
    if (*s == 0 || strchr(delim, *s) == NULL)
-      _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+      ThrowError("Cannot parse value");
 
 // convert and ensure that value fits into ae_int_t
    s = p;
    long_val = atol(s);
    ae_val = long_val;
    if (ae_val != long_val)
-      _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+      ThrowError("Cannot parse value");
    return ae_val;
 }
 
@@ -11483,7 +11412,7 @@ double parse_real_delim(const char *s, const char *delim) {
    double result;
    const char *new_s;
    if (!_parse_real_delim(s, delim, &result, &new_s))
-      _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+      ThrowError("Cannot parse value");
    return result;
 }
 
@@ -11500,30 +11429,30 @@ complex parse_complex_delim(const char *s, const char *delim) {
    if (_parse_real_delim(s, "+-", &c_result.x, &new_s)) {
       s = new_s;
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
-         _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+         ThrowError("Cannot parse value");
       s = new_s + 1;
       if (*s == 0 || strchr(delim, *s) == NULL)
-         _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+         ThrowError("Cannot parse value");
       return c_result;
    }
 // parse as complex value "bi+a" or "bi-a"
    if (_parse_real_delim(s, "i", &c_result.y, &new_s)) {
       s = new_s + 1;
       if (*s == 0)
-         _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+         ThrowError("Cannot parse value");
       if (strchr(delim, *s) != NULL) {
          c_result.x = 0;
          return c_result;
       }
       if (strchr("+-", *s) != NULL) {
          if (!_parse_real_delim(s, delim, &c_result.x, &new_s))
-            _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+            ThrowError("Cannot parse value");
          return c_result;
       }
-      _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+      ThrowError("Cannot parse value");
    }
 // error
-   _ALGLIB_CPP_EXCEPTION("Cannot parse value");
+   ThrowError("Cannot parse value");
 }
 
 std::string arraytostring(const bool *ptr, ae_int_t n) {
@@ -11546,7 +11475,7 @@ std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
    result = "[";
    for (i = 0; i < n; i++) {
       if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf))
-         _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+         ThrowError("arraytostring(): buffer overflow");
       result += buf;
    }
    result += "]";
@@ -11563,14 +11492,14 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    dps = dps <= 50 ? dps : 50;
    result = "[";
    if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask1))
-      _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+      ThrowError("arraytostring(): buffer overflow");
    if (sprintf(mask2, ",%s", mask1) >= (int)sizeof(mask2))
-      _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+      ThrowError("arraytostring(): buffer overflow");
    for (i = 0; i < n; i++) {
       buf[0] = 0;
       if (fp_isfinite(ptr[i])) {
          if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof(buf))
-            _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+            ThrowError("arraytostring(): buffer overflow");
       } else if (fp_isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
       else if (fp_isposinf(ptr[i]))
@@ -11737,7 +11666,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
 //
    FILE *f_in = fopen(filename, "rb");
    if (f_in == NULL)
-      _ALGLIB_CPP_EXCEPTION("read_csv: unable to open input file");
+      ThrowError("read_csv: unable to open input file");
    flag = fseek(f_in, 0, SEEK_END);
    AE_CRITICAL_ASSERT(flag == 0);
    long int _filesize = ftell(f_in);
@@ -11797,7 +11726,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
          if (p_buf[row_start + idx] == separator)
             cur_cols_cnt++;
       if (cols_count > 0 && cols_count != cur_cols_cnt)
-         _ALGLIB_CPP_EXCEPTION("read_csv: non-rectangular contents, rows have different sizes");
+         ThrowError("read_csv: non-rectangular contents, rows have different sizes");
       cols_count = cur_cols_cnt;
 
    // store offsets and lengths of the fields
