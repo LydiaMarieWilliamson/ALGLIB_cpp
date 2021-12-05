@@ -30,15 +30,15 @@ bool issue824_passed = true;
 typedef struct {
    alglib_impl::ae_complex cval;
    double rval;
-    alglib_impl::ae_int_t ival;
+   alglib_impl::ae_int_t ival;
    bool bval;
-    alglib_impl::ae_vector i1val;
+   alglib_impl::ae_vector i1val;
 } innerrec;
 
 typedef struct {
    bool bval;
    innerrec recval;
-    alglib_impl::ae_shared_pool pool;
+   alglib_impl::ae_shared_pool pool;
 } seedrec;
 
 void innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
