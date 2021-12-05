@@ -19,7 +19,7 @@
 // === ODESOLVER Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-typedef struct {
+struct odesolverstate {
    ae_int_t n;
    ae_int_t m;
    double xscale;
@@ -45,21 +45,22 @@ typedef struct {
    ae_matrix rkb;
    ae_matrix rkk;
    rcommstate rstate;
-} odesolverstate;
-typedef struct {
+};
+void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
+void odesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void odesolverstate_free(void *_p, bool make_automatic);
+
+struct odesolverreport {
    ae_int_t nfev;
    ae_int_t terminationtype;
-} odesolverreport;
+};
+void odesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void odesolverreport_free(void *_p, bool make_automatic);
 
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
 bool odesolveriteration(odesolverstate *state, ae_state *_state);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state);
-void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
-void odesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void odesolverstate_free(void *_p, bool make_automatic);
-void odesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
-void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void odesolverreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

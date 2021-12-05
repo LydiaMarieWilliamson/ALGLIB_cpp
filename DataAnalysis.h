@@ -35,13 +35,16 @@ void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, c
 // === BDSS Package ===
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
-typedef struct {
+struct cvreport {
    double relclserror;
    double avgce;
    double rmserror;
    double avgerror;
    double avgrelerror;
-} cvreport;
+};
+void cvreport_init(void *_p, ae_state *_state, bool make_automatic);
+void cvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void cvreport_free(void *_p, bool make_automatic);
 
 void dserrallocate(ae_int_t nclasses, RVector *buf, ae_state *_state);
 void dserraccumulate(RVector *buf, RVector *y, RVector *desiredy, ae_state *_state);
@@ -55,9 +58,6 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntbuf, RVector *bufr, ZVector *bufi, ae_int_t n, ae_int_t nc, double alpha, ae_int_t *info, double *threshold, double *rms, double *cvrms, ae_state *_state);
 void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve, ae_state *_state);
 void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_int_t *info, RVector *thresholds, ae_int_t *ni, double *cve, ae_state *_state);
-void cvreport_init(void *_p, ae_state *_state, bool make_automatic);
-void cvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void cvreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -70,18 +70,26 @@ void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array
 // Depends on: (LinAlg) SPARSE
 // Depends on: BDSS
 namespace alglib_impl {
-typedef struct {
+struct modelerrors {
    double relclserror;
    double avgce;
    double rmserror;
    double avgerror;
    double avgrelerror;
-} modelerrors;
-typedef struct {
+};
+void modelerrors_init(void *_p, ae_state *_state, bool make_automatic);
+void modelerrors_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void modelerrors_free(void *_p, bool make_automatic);
+
+struct smlpgrad {
    double f;
    ae_vector g;
-} smlpgrad;
-typedef struct {
+};
+void smlpgrad_init(void *_p, ae_state *_state, bool make_automatic);
+void smlpgrad_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void smlpgrad_free(void *_p, bool make_automatic);
+
+struct multilayerperceptron {
    ae_int_t hlnetworktype;
    ae_int_t hlnormtype;
    ae_vector hllayersizes;
@@ -108,7 +116,13 @@ typedef struct {
    sparsematrix dummysxy;
    ae_vector dummyidx;
    ae_shared_pool dummypool;
-} multilayerperceptron;
+};
+void multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic);
+void multilayerperceptron_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void multilayerperceptron_free(void *_p, bool make_automatic);
+void mlpalloc(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
+void mlpserialize(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
+void mlpunserialize(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
 
 ae_int_t mlpgradsplitcost(ae_state *_state);
 ae_int_t mlpgradsplitsize(ae_state *_state);
@@ -183,34 +197,22 @@ void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, d
 void mlphessiannbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h, ae_state *_state);
 void mlphessianbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h, ae_state *_state);
 void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *columnmeans, RVector *columnsigmas, RVector *neurons, RVector *dfdnet, RVector *x, RVector *y, ae_state *_state);
-void mlpalloc(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
-void mlpserialize(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
-void mlpunserialize(ae_serializer *s, multilayerperceptron *network, ae_state *_state);
 void mlpallerrorssubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, modelerrors *rep, ae_state *_state);
 void mlpallerrorssparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, modelerrors *rep, ae_state *_state);
 double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, ae_state *_state);
 double mlperrorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, ae_state *_state);
 void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep, ae_state *_state);
 bool _trypexec_mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep, ae_state *_state);
-void modelerrors_init(void *_p, ae_state *_state, bool make_automatic);
-void modelerrors_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void modelerrors_free(void *_p, bool make_automatic);
-void smlpgrad_init(void *_p, ae_state *_state, bool make_automatic);
-void smlpgrad_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void smlpgrad_free(void *_p, bool make_automatic);
-void multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic);
-void multilayerperceptron_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void multilayerperceptron_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(modelerrors, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 DecClass(multilayerperceptron, );
-
 void mlpserialize(multilayerperceptron &obj, std::string &s_out);
-void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
 void mlpserialize(multilayerperceptron &obj, std::ostream &s_out);
+void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
 void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj);
+
 void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = xdefault);
 void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = xdefault);
 void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = xdefault);
@@ -278,14 +280,20 @@ double mlperrorsparsesubset(const multilayerperceptron &network, const sparsemat
 // === MLPE Package ===
 // Depends on: MLPBASE
 namespace alglib_impl {
-typedef struct {
+struct mlpensemble {
    ae_int_t ensemblesize;
    ae_vector weights;
    ae_vector columnmeans;
    ae_vector columnsigmas;
    multilayerperceptron network;
    ae_vector y;
-} mlpensemble;
+};
+void mlpensemble_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpensemble_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpensemble_free(void *_p, bool make_automatic);
+void mlpealloc(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
+void mlpeserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
+void mlpeunserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
 
 void mlpecreate0(ae_int_t nin, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble, ae_state *_state);
 void mlpecreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble, ae_state *_state);
@@ -313,21 +321,15 @@ double mlpeavgce(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, ae_state 
 double mlpermserror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double mlpeavgerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double mlpeavgrelerror(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, ae_state *_state);
-void mlpealloc(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
-void mlpeserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
-void mlpeunserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state);
-void mlpensemble_init(void *_p, ae_state *_state, bool make_automatic);
-void mlpensemble_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlpensemble_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(mlpensemble, );
-
 void mlpeserialize(mlpensemble &obj, std::string &s_out);
-void mlpeunserialize(const std::string &s_in, mlpensemble &obj);
 void mlpeserialize(mlpensemble &obj, std::ostream &s_out);
+void mlpeunserialize(const std::string &s_in, mlpensemble &obj);
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj);
+
 void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = xdefault);
 void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = xdefault);
 void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = xdefault);
@@ -358,7 +360,7 @@ double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, con
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
-typedef struct {
+struct kmeansbuffers {
    ae_matrix ct;
    ae_matrix ctbest;
    ae_vector xycbest;
@@ -367,8 +369,12 @@ typedef struct {
    ae_vector csizes;
    apbuffers initbuf;
    ae_shared_pool updatepool;
-} kmeansbuffers;
-typedef struct {
+};
+void kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void kmeansbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kmeansbuffers_free(void *_p, bool make_automatic);
+
+struct clusterizerstate {
    ae_int_t npoints;
    ae_int_t nfeatures;
    ae_int_t disttype;
@@ -383,8 +389,12 @@ typedef struct {
    ae_matrix tmpd;
    apbuffers distbuf;
    kmeansbuffers kmeanstmp;
-} clusterizerstate;
-typedef struct {
+};
+void clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic);
+void clusterizerstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void clusterizerstate_free(void *_p, bool make_automatic);
+
+struct ahcreport {
    ae_int_t terminationtype;
    ae_int_t npoints;
    ae_vector p;
@@ -392,8 +402,12 @@ typedef struct {
    ae_matrix pz;
    ae_matrix pm;
    ae_vector mergedist;
-} ahcreport;
-typedef struct {
+};
+void ahcreport_init(void *_p, ae_state *_state, bool make_automatic);
+void ahcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void ahcreport_free(void *_p, bool make_automatic);
+
+struct kmeansreport {
    ae_int_t npoints;
    ae_int_t nfeatures;
    ae_int_t terminationtype;
@@ -402,7 +416,10 @@ typedef struct {
    ae_int_t k;
    ae_matrix c;
    ae_vector cidx;
-} kmeansreport;
+};
+void kmeansreport_init(void *_p, ae_state *_state, bool make_automatic);
+void kmeansreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kmeansreport_free(void *_p, bool make_automatic);
 
 void clusterizercreate(clusterizerstate *s, ae_state *_state);
 void clusterizersetpoints(clusterizerstate *s, RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, ae_state *_state);
@@ -422,18 +439,6 @@ void kmeansinitbuf(kmeansbuffers *buf, ae_state *_state);
 void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t initalgo, ae_int_t seed, ae_int_t maxits, ae_int_t restarts, bool kmeansdbgnoits, ae_int_t *info, ae_int_t *iterationscount, RMatrix *ccol, bool needccol, RMatrix *crow, bool needcrow, ZVector *xyc, double *energy, kmeansbuffers *buf, ae_state *_state);
 void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool, ae_state *_state);
 bool _trypexec_kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool, ae_state *_state);
-void kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void kmeansbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void kmeansbuffers_free(void *_p, bool make_automatic);
-void clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic);
-void clusterizerstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void clusterizerstate_free(void *_p, bool make_automatic);
-void ahcreport_init(void *_p, ae_state *_state, bool make_automatic);
-void ahcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void ahcreport_free(void *_p, bool make_automatic);
-void kmeansreport_init(void *_p, ae_state *_state, bool make_automatic);
-void kmeansreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void kmeansreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -463,7 +468,7 @@ void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: BDSS
 namespace alglib_impl {
-typedef struct {
+struct decisionforestbuilder {
    ae_int_t dstype;
    ae_int_t npoints;
    ae_int_t nvars;
@@ -491,8 +496,12 @@ typedef struct {
    bool neediobmatrix;
    ae_matrix iobmatrix;
    ae_vector varimpshuffle2;
-} decisionforestbuilder;
-typedef struct {
+};
+void decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforestbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforestbuilder_free(void *_p, bool make_automatic);
+
+struct dfworkbuf {
    ae_vector classpriors;
    ae_vector varpool;
    ae_int_t varpoolsize;
@@ -517,15 +526,23 @@ typedef struct {
    ae_vector classtotals0;
    ae_vector classtotals1;
    ae_vector classtotals01;
-} dfworkbuf;
-typedef struct {
+};
+void dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfworkbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfworkbuf_free(void *_p, bool make_automatic);
+
+struct dfvotebuf {
    ae_vector trntotals;
    ae_vector oobtotals;
    ae_vector trncounts;
    ae_vector oobcounts;
    ae_vector giniimportances;
-} dfvotebuf;
-typedef struct {
+};
+void dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfvotebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfvotebuf_free(void *_p, bool make_automatic);
+
+struct dfpermimpbuf {
    ae_vector losses;
    ae_vector xraw;
    ae_vector xdist;
@@ -534,16 +551,28 @@ typedef struct {
    ae_vector yv;
    ae_vector targety;
    ae_vector startnodes;
-} dfpermimpbuf;
-typedef struct {
+};
+void dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dfpermimpbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfpermimpbuf_free(void *_p, bool make_automatic);
+
+struct dftreebuf {
    ae_vector treebuf;
    ae_int_t treeidx;
-} dftreebuf;
-typedef struct {
+};
+void dftreebuf_init(void *_p, ae_state *_state, bool make_automatic);
+void dftreebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dftreebuf_free(void *_p, bool make_automatic);
+
+struct decisionforestbuffer {
    ae_vector x;
    ae_vector y;
-} decisionforestbuffer;
-typedef struct {
+};
+void decisionforestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforestbuffer_free(void *_p, bool make_automatic);
+
+struct decisionforest {
    ae_int_t forestformat;
    bool usemantissa8;
    ae_int_t nvars;
@@ -553,8 +582,15 @@ typedef struct {
    ae_vector trees;
    decisionforestbuffer buffer;
    ae_vector trees8;
-} decisionforest;
-typedef struct {
+};
+void decisionforest_init(void *_p, ae_state *_state, bool make_automatic);
+void decisionforest_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void decisionforest_free(void *_p, bool make_automatic);
+void dfalloc(ae_serializer *s, decisionforest *forest, ae_state *_state);
+void dfserialize(ae_serializer *s, decisionforest *forest, ae_state *_state);
+void dfunserialize(ae_serializer *s, decisionforest *forest, ae_state *_state);
+
+struct dfreport {
    double relclserror;
    double avgce;
    double rmserror;
@@ -567,8 +603,12 @@ typedef struct {
    double oobavgrelerror;
    ae_vector topvars;
    ae_vector varimportances;
-} dfreport;
-typedef struct {
+};
+void dfreport_init(void *_p, ae_state *_state, bool make_automatic);
+void dfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfreport_free(void *_p, bool make_automatic);
+
+struct dfinternalbuffers {
    ae_vector treebuf;
    ae_vector idxbuf;
    ae_vector tmpbufr;
@@ -581,7 +621,10 @@ typedef struct {
    ae_vector varpool;
    ae_vector evsbin;
    ae_vector evssplits;
-} dfinternalbuffers;
+};
+void dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic);
+void dfinternalbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void dfinternalbuffers_free(void *_p, bool make_automatic);
 
 void dfcreatebuffer(decisionforest *model, decisionforestbuffer *buf, ae_state *_state);
 void dfbuildercreate(decisionforestbuilder *s, ae_state *_state);
@@ -613,39 +656,9 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_
 double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 void dfcopy(decisionforest *df1, decisionforest *df2, ae_state *_state);
-void dfalloc(ae_serializer *s, decisionforest *forest, ae_state *_state);
-void dfserialize(ae_serializer *s, decisionforest *forest, ae_state *_state);
-void dfunserialize(ae_serializer *s, decisionforest *forest, ae_state *_state);
 void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, double r, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
 void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t nrndvars, double r, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
 void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t samplesize, ae_int_t nfeatures, ae_int_t flags, ae_int_t *info, decisionforest *df, dfreport *rep, ae_state *_state);
-void decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void decisionforestbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void decisionforestbuilder_free(void *_p, bool make_automatic);
-void dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void dfworkbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dfworkbuf_free(void *_p, bool make_automatic);
-void dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic);
-void dfvotebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dfvotebuf_free(void *_p, bool make_automatic);
-void dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void dfpermimpbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dfpermimpbuf_free(void *_p, bool make_automatic);
-void dftreebuf_init(void *_p, ae_state *_state, bool make_automatic);
-void dftreebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dftreebuf_free(void *_p, bool make_automatic);
-void decisionforestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void decisionforestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void decisionforestbuffer_free(void *_p, bool make_automatic);
-void decisionforest_init(void *_p, ae_state *_state, bool make_automatic);
-void decisionforest_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void decisionforest_free(void *_p, bool make_automatic);
-void dfreport_init(void *_p, ae_state *_state, bool make_automatic);
-void dfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dfreport_free(void *_p, bool make_automatic);
-void dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic);
-void dfinternalbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void dfinternalbuffers_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -653,11 +666,11 @@ DecClass(decisionforestbuilder, );
 DecClass(decisionforestbuffer, );
 DecClass(decisionforest, );
 DecClass(dfreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; double &oobrelclserror; double &oobavgce; double &oobrmserror; double &oobavgerror; double &oobavgrelerror; integer_1d_array topvars; real_1d_array varimportances;);
-
 void dfserialize(decisionforest &obj, std::string &s_out);
-void dfunserialize(const std::string &s_in, decisionforest &obj);
 void dfserialize(decisionforest &obj, std::ostream &s_out);
+void dfunserialize(const std::string &s_in, decisionforest &obj);
 void dfunserialize(const std::istream &s_in, decisionforest &obj);
+
 void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf, const xparams _xparams = xdefault);
 void dfbuildercreate(decisionforestbuilder &s, const xparams _xparams = xdefault);
 void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const xparams _xparams = xdefault);
@@ -695,10 +708,14 @@ void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoin
 // Depends on: (LinAlg) SVD
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
-typedef struct {
+struct linearmodel {
    ae_vector w;
-} linearmodel;
-typedef struct {
+};
+void linearmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void linearmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void linearmodel_free(void *_p, bool make_automatic);
+
+struct lrreport {
    ae_matrix c;
    double rmserror;
    double avgerror;
@@ -708,7 +725,10 @@ typedef struct {
    double cvavgrelerror;
    ae_int_t ncvdefects;
    ae_vector cvdefects;
-} lrreport;
+};
+void lrreport_init(void *_p, ae_state *_state, bool make_automatic);
+void lrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lrreport_free(void *_p, bool make_automatic);
 
 void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar, ae_state *_state);
 void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar, ae_state *_state);
@@ -723,12 +743,6 @@ double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_
 void lrcopy(linearmodel *lm1, linearmodel *lm2, ae_state *_state);
 void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, double *b, double *vara, double *varb, double *covab, double *corrab, double *p, ae_state *_state);
 void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b, ae_state *_state);
-void linearmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void linearmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void linearmodel_free(void *_p, bool make_automatic);
-void lrreport_init(void *_p, ae_state *_state, bool make_automatic);
-void lrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void lrreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -767,7 +781,7 @@ void filterlrma(real_1d_array &x, const ae_int_t k, const xparams _xparams = xde
 // === SSA Package ===
 // Depends on: (LinAlg) EVD, SVD
 namespace alglib_impl {
-typedef struct {
+struct ssamodel {
    ae_int_t nsequences;
    ae_vector sequenceidx;
    ae_vector sequencedata;
@@ -809,7 +823,10 @@ typedef struct {
    ae_int_t uxbatchwidth;
    ae_int_t uxbatchsize;
    ae_int_t uxbatchlimit;
-} ssamodel;
+};
+void ssamodel_init(void *_p, ae_state *_state, bool make_automatic);
+void ssamodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void ssamodel_free(void *_p, bool make_automatic);
 
 void ssacreate(ssamodel *s, ae_state *_state);
 void ssasetwindow(ssamodel *s, ae_int_t windowwidth, ae_state *_state);
@@ -832,9 +849,6 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend, ae_state *_st
 void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t forecastlen, bool applysmoothing, RVector *trend, ae_state *_state);
 void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend, ae_state *_state);
 void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t m, ae_int_t forecastlen, bool applysmoothing, RVector *trend, ae_state *_state);
-void ssamodel_init(void *_p, ae_state *_state, bool make_automatic);
-void ssamodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void ssamodel_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -884,7 +898,7 @@ void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
 // === MCPD Package ===
 // Depends on: (Optimization) MINBLEIC
 namespace alglib_impl {
-typedef struct {
+struct mcpdstate {
    ae_int_t n;
    ae_vector states;
    ae_int_t npairs;
@@ -912,13 +926,20 @@ typedef struct {
    ae_vector effectivect;
    ae_vector h;
    ae_matrix p;
-} mcpdstate;
-typedef struct {
+};
+void mcpdstate_init(void *_p, ae_state *_state, bool make_automatic);
+void mcpdstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mcpdstate_free(void *_p, bool make_automatic);
+
+struct mcpdreport {
    ae_int_t inneriterationscount;
    ae_int_t outeriterationscount;
    ae_int_t nfev;
    ae_int_t terminationtype;
-} mcpdreport;
+};
+void mcpdreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mcpdreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mcpdreport_free(void *_p, bool make_automatic);
 
 void mcpdcreate(ae_int_t n, mcpdstate *s, ae_state *_state);
 void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s, ae_state *_state);
@@ -935,12 +956,6 @@ void mcpdsetprior(mcpdstate *s, RMatrix *pp, ae_state *_state);
 void mcpdsetpredictionweights(mcpdstate *s, RVector *pw, ae_state *_state);
 void mcpdsolve(mcpdstate *s, ae_state *_state);
 void mcpdresults(mcpdstate *s, RMatrix *p, mcpdreport *rep, ae_state *_state);
-void mcpdstate_init(void *_p, ae_state *_state, bool make_automatic);
-void mcpdstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mcpdstate_free(void *_p, bool make_automatic);
-void mcpdreport_init(void *_p, ae_state *_state, bool make_automatic);
-void mcpdreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mcpdreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -970,10 +985,14 @@ void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep, const xp
 // Depends on: (Solvers) DIRECTDENSESOLVERS
 // Depends on: MLPBASE
 namespace alglib_impl {
-typedef struct {
+struct logitmodel {
    ae_vector w;
-} logitmodel;
-typedef struct {
+};
+void logitmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void logitmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void logitmodel_free(void *_p, bool make_automatic);
+
+struct logitmcstate {
    bool brackt;
    bool stage1;
    ae_int_t infoc;
@@ -999,11 +1018,18 @@ typedef struct {
    double width;
    double width1;
    double xtrapf;
-} logitmcstate;
-typedef struct {
+};
+void logitmcstate_init(void *_p, ae_state *_state, bool make_automatic);
+void logitmcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void logitmcstate_free(void *_p, bool make_automatic);
+
+struct mnlreport {
    ae_int_t ngrad;
    ae_int_t nhess;
-} mnlreport;
+};
+void mnlreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mnlreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mnlreport_free(void *_p, bool make_automatic);
 
 void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep, ae_state *_state);
 void mnlprocess(logitmodel *lm, RVector *x, RVector *y, ae_state *_state);
@@ -1017,15 +1043,6 @@ double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_sta
 double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize, ae_state *_state);
 ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state);
-void logitmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void logitmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void logitmodel_free(void *_p, bool make_automatic);
-void logitmcstate_init(void *_p, ae_state *_state, bool make_automatic);
-void logitmcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void logitmcstate_free(void *_p, bool make_automatic);
-void mnlreport_init(void *_p, ae_state *_state, bool make_automatic);
-void mnlreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mnlreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1049,14 +1066,18 @@ ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int
 // Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
 // Depends on: BDSS
 namespace alglib_impl {
-typedef struct {
+struct knnbuffer {
    kdtreerequestbuffer treebuf;
    ae_vector x;
    ae_vector y;
    ae_vector tags;
    ae_matrix xy;
-} knnbuffer;
-typedef struct {
+};
+void knnbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void knnbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnbuffer_free(void *_p, bool make_automatic);
+
+struct knnbuilder {
    ae_int_t dstype;
    ae_int_t npoints;
    ae_int_t nvars;
@@ -1066,8 +1087,12 @@ typedef struct {
    ae_vector dsrval;
    ae_vector dsival;
    ae_int_t knnnrm;
-} knnbuilder;
-typedef struct {
+};
+void knnbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void knnbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnbuilder_free(void *_p, bool make_automatic);
+
+struct knnmodel {
    ae_int_t nvars;
    ae_int_t nout;
    ae_int_t k;
@@ -1076,14 +1101,24 @@ typedef struct {
    bool isdummy;
    kdtree tree;
    knnbuffer buffer;
-} knnmodel;
-typedef struct {
+};
+void knnmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void knnmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnmodel_free(void *_p, bool make_automatic);
+void knnalloc(ae_serializer *s, knnmodel *model, ae_state *_state);
+void knnserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
+void knnunserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
+
+struct knnreport {
    double relclserror;
    double avgce;
    double rmserror;
    double avgerror;
    double avgrelerror;
-} knnreport;
+};
+void knnreport_init(void *_p, ae_state *_state, bool make_automatic);
+void knnreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void knnreport_free(void *_p, bool make_automatic);
 
 void knncreatebuffer(knnmodel *model, knnbuffer *buf, ae_state *_state);
 void knnbuildercreate(knnbuilder *s, ae_state *_state);
@@ -1103,21 +1138,6 @@ double knnrmserror(knnmodel *model, RMatrix *xy, ae_int_t npoints, ae_state *_st
 double knnavgerror(knnmodel *model, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 double knnavgrelerror(knnmodel *model, RMatrix *xy, ae_int_t npoints, ae_state *_state);
 void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep, ae_state *_state);
-void knnalloc(ae_serializer *s, knnmodel *model, ae_state *_state);
-void knnserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
-void knnunserialize(ae_serializer *s, knnmodel *model, ae_state *_state);
-void knnbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void knnbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void knnbuffer_free(void *_p, bool make_automatic);
-void knnbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void knnbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void knnbuilder_free(void *_p, bool make_automatic);
-void knnmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void knnmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void knnmodel_free(void *_p, bool make_automatic);
-void knnreport_init(void *_p, ae_state *_state, bool make_automatic);
-void knnreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void knnreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1125,11 +1145,11 @@ DecClass(knnbuffer, );
 DecClass(knnbuilder, );
 DecClass(knnmodel, );
 DecClass(knnreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
-
 void knnserialize(knnmodel &obj, std::string &s_out);
-void knnunserialize(const std::string &s_in, knnmodel &obj);
 void knnserialize(knnmodel &obj, std::ostream &s_out);
+void knnunserialize(const std::string &s_in, knnmodel &obj);
 void knnunserialize(const std::istream &s_in, knnmodel &obj);
+
 void knncreatebuffer(const knnmodel &model, knnbuffer &buf, const xparams _xparams = xdefault);
 void knnbuildercreate(knnbuilder &s, const xparams _xparams = xdefault);
 void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout, const xparams _xparams = xdefault);
@@ -1155,7 +1175,7 @@ void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t
 // Depends on: (Optimization) MINLBFGS
 // Depends on: MLPE
 namespace alglib_impl {
-typedef struct {
+struct mlpreport {
    double relclserror;
    double avgce;
    double rmserror;
@@ -1164,15 +1184,23 @@ typedef struct {
    ae_int_t ngrad;
    ae_int_t nhess;
    ae_int_t ncholesky;
-} mlpreport;
-typedef struct {
+};
+void mlpreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpreport_free(void *_p, bool make_automatic);
+
+struct mlpcvreport {
    double relclserror;
    double avgce;
    double rmserror;
    double avgerror;
    double avgrelerror;
-} mlpcvreport;
-typedef struct {
+};
+void mlpcvreport_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpcvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpcvreport_free(void *_p, bool make_automatic);
+
+struct smlptrnsession {
    ae_vector bestparameters;
    double bestrmserror;
    bool randomizenetwork;
@@ -1187,15 +1215,23 @@ typedef struct {
    ae_int_t algoused;
    ae_int_t minibatchsize;
    hqrndstate generator;
-} smlptrnsession;
-typedef struct {
+};
+void smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic);
+void smlptrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void smlptrnsession_free(void *_p, bool make_automatic);
+
+struct mlpetrnsession {
    ae_vector trnsubset;
    ae_vector valsubset;
    ae_shared_pool mlpsessions;
    mlpreport mlprep;
    multilayerperceptron network;
-} mlpetrnsession;
-typedef struct {
+};
+void mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpetrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpetrnsession_free(void *_p, bool make_automatic);
+
+struct mlptrainer {
    ae_int_t nin;
    ae_int_t nout;
    bool rcpar;
@@ -1215,8 +1251,12 @@ typedef struct {
    ae_int_t valsubsetsize;
    ae_int_t algokind;
    ae_int_t minibatchsize;
-} mlptrainer;
-typedef struct {
+};
+void mlptrainer_init(void *_p, ae_state *_state, bool make_automatic);
+void mlptrainer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlptrainer_free(void *_p, bool make_automatic);
+
+struct mlpparallelizationcv {
    multilayerperceptron network;
    mlpreport rep;
    ae_vector subset;
@@ -1225,7 +1265,10 @@ typedef struct {
    ae_vector y;
    ae_int_t ngrad;
    ae_shared_pool trnpool;
-} mlpparallelizationcv;
+};
+void mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic);
+void mlpparallelizationcv_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void mlpparallelizationcv_free(void *_p, bool make_automatic);
 
 void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep, ae_state *_state);
 void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, ae_state *_state);
@@ -1247,24 +1290,6 @@ void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double 
 void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors, ae_state *_state);
 void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep, ae_state *_state);
 void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts, mlpreport *rep, ae_state *_state);
-void mlpreport_init(void *_p, ae_state *_state, bool make_automatic);
-void mlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlpreport_free(void *_p, bool make_automatic);
-void mlpcvreport_init(void *_p, ae_state *_state, bool make_automatic);
-void mlpcvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlpcvreport_free(void *_p, bool make_automatic);
-void smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic);
-void smlptrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void smlptrnsession_free(void *_p, bool make_automatic);
-void mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic);
-void mlpetrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlpetrnsession_free(void *_p, bool make_automatic);
-void mlptrainer_init(void *_p, ae_state *_state, bool make_automatic);
-void mlptrainer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlptrainer_free(void *_p, bool make_automatic);
-void mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic);
-void mlpparallelizationcv_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void mlpparallelizationcv_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {

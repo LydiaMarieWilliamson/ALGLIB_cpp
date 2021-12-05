@@ -232,9 +232,9 @@ typedef ptrdiff_t ae_int_t;
 
 typedef double Real; // Used in the Kernel*.{cpp,h} files.
 
-typedef struct {
+struct ae_complex {
    double x, y;
-} ae_complex;
+};
 
 typedef enum {
    ERR_OK = 0,
@@ -265,11 +265,11 @@ enum { CPU_SSE2 = 0x1, CPU_AVX2 = 0x2, CPU_FMA = 0x4 };
 //     ptr         pointer to the actual data
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_string {
    ALIGNED ae_int64_t owner;
    ALIGNED ae_int64_t last_action;
    ALIGNED char *ptr;
-} x_string;
+};
 
 // x-vector:
 //     cnt         number of elements
@@ -292,7 +292,7 @@ typedef struct {
 //     ptr         pointer to the actual data
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_vector {
    ae_int64_t cnt;
    ae_int64_t datatype;
    ae_int64_t owner;
@@ -301,7 +301,7 @@ typedef struct {
       void *p_ptr;
       ae_int64_t portable_alignment_enforcer;
    } x_ptr;
-} x_vector;
+};
 
 // x-matrix:
 //     rows        number of rows. may be zero only when cols is zero too.
@@ -328,7 +328,7 @@ typedef struct {
 //     ptr         pointer to the actual data, stored rowwise
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_matrix {
    ae_int64_t rows;
    ae_int64_t cols;
    ae_int64_t stride;
@@ -339,7 +339,7 @@ typedef struct {
       void *p_ptr;
       ae_int64_t portable_alignment_enforcer;
    } x_ptr;
-} x_matrix;
+};
 
 // dynamic block which may be automatically deallocated during stack unwinding
 //
@@ -464,7 +464,7 @@ typedef struct ae_state {
 typedef char (*ae_stream_writer)(const char *p_string, ae_int_t aux);
 typedef char (*ae_stream_reader)(ae_int_t aux, ae_int_t cnt, char *p_buf);
 
-typedef struct {
+struct ae_serializer {
    ae_int_t mode;
    ae_int_t entries_needed;
    ae_int_t entries_saved;
@@ -480,7 +480,7 @@ typedef struct {
    ae_int_t stream_aux;
    ae_stream_writer stream_writer;
    ae_stream_reader stream_reader;
-} ae_serializer;
+};
 
 typedef struct ae_vector {
 // Number of elements in array, cnt >= 0
@@ -564,7 +564,7 @@ typedef struct ae_smart_ptr {
 //   c) when thread acquires free lock, it immediately returns
 //   d) when thread acquires busy lock, program is terminated
 //      (because lock is already acquired and no one else can free it)
-typedef struct {
+struct ae_lock {
 // Pointer to _lock structure. This pointer has type void* in order to
 // make header file OS-independent (lock declaration depends on OS).
    void *lock_ptr;
@@ -579,7 +579,7 @@ typedef struct {
 // transient lock. Eternal locks are allocated without using ae_dyn_block
 // structure and do not allow deallocation.
    bool eternal;
-} ae_lock;
+};
 
 // Shared pool: data structure used to provide thread-safe access to pool  of
 // temporary variables.

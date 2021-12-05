@@ -19,11 +19,14 @@
 // === HQRND Package ===
 // Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
-typedef struct {
+struct hqrndstate {
    ae_int_t s1;
    ae_int_t s2;
    ae_int_t magicv;
-} hqrndstate;
+};
+void hqrndstate_init(void *_p, ae_state *_state, bool make_automatic);
+void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void hqrndstate_free(void *_p, bool make_automatic);
 
 void hqrndrandomize(hqrndstate *state, ae_state *_state);
 void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state, ae_state *_state);
@@ -37,9 +40,6 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state);
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state);
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state);
 double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state);
-void hqrndstate_init(void *_p, ae_state *_state, bool make_automatic);
-void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void hqrndstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -61,11 +61,14 @@ double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae
 
 // === XDEBUG Package ===
 namespace alglib_impl {
-typedef struct {
+struct xdebugrecord1 {
    ae_int_t i;
    ae_complex c;
    ae_vector a;
-} xdebugrecord1;
+};
+void xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic);
+void xdebugrecord1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void xdebugrecord1_free(void *_p, bool make_automatic);
 
 void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state);
 ae_int_t xdebugb1count(BVector *a, ae_state *_state);
@@ -101,9 +104,6 @@ void xdebugc2neg(CMatrix *a, ae_state *_state);
 void xdebugc2transpose(CMatrix *a, ae_state *_state);
 void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state);
 double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c, ae_state *_state);
-void xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic);
-void xdebugrecord1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void xdebugrecord1_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -148,7 +148,7 @@ double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const re
 // === NEARESTNEIGHBOR Package ===
 // Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
-typedef struct {
+struct kdtreerequestbuffer {
    ae_vector x;
    ae_vector boxmin;
    ae_vector boxmax;
@@ -163,8 +163,12 @@ typedef struct {
    ae_vector curboxmin;
    ae_vector curboxmax;
    double curdist;
-} kdtreerequestbuffer;
-typedef struct {
+};
+void kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void kdtreerequestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kdtreerequestbuffer_free(void *_p, bool make_automatic);
+
+struct kdtree {
    ae_int_t n;
    ae_int_t nx;
    ae_int_t ny;
@@ -177,7 +181,13 @@ typedef struct {
    ae_vector splits;
    kdtreerequestbuffer innerbuf;
    ae_int_t debugcounter;
-} kdtree;
+};
+void kdtree_init(void *_p, ae_state *_state, bool make_automatic);
+void kdtree_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void kdtree_free(void *_p, bool make_automatic);
+void kdtreealloc(ae_serializer *s, kdtree *tree, ae_state *_state);
+void kdtreeserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
+void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
 
 void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt, ae_state *_state);
 void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt, ae_state *_state);
@@ -208,15 +218,6 @@ void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state *_
 void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype, ae_state *_state);
 void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k, ae_state *_state);
 void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_int_t *nodele, ae_int_t *nodege, ae_state *_state);
-void kdtreealloc(ae_serializer *s, kdtree *tree, ae_state *_state);
-void kdtreeserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
-void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state);
-void kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void kdtreerequestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void kdtreerequestbuffer_free(void *_p, bool make_automatic);
-void kdtree_init(void *_p, ae_state *_state, bool make_automatic);
-void kdtree_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void kdtree_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -224,11 +225,11 @@ DecClass(kdtreerequestbuffer, );
 
 // KD-tree object.
 DecClass(kdtree, );
-
 void kdtreeserialize(kdtree &obj, std::string &s_out);
-void kdtreeunserialize(const std::string &s_in, kdtree &obj);
 void kdtreeserialize(kdtree &obj, std::ostream &s_out);
+void kdtreeunserialize(const std::string &s_in, kdtree &obj);
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj);
+
 void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
 void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = xdefault);

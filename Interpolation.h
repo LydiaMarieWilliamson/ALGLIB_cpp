@@ -20,13 +20,16 @@
 // === RATINT Package ===
 // Depends on: (AlgLibInternal) TSORT
 namespace alglib_impl {
-typedef struct {
+struct barycentricinterpolant {
    ae_int_t n;
    double sy;
    ae_vector x;
    ae_vector y;
    ae_vector w;
-} barycentricinterpolant;
+};
+void barycentricinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void barycentricinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void barycentricinterpolant_free(void *_p, bool make_automatic);
 
 double barycentriccalc(barycentricinterpolant *b, double t, ae_state *_state);
 void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df, ae_state *_state);
@@ -37,9 +40,6 @@ void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVect
 void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b, ae_state *_state);
 void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b, ae_state *_state);
 void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_state *_state);
-void barycentricinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void barycentricinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void barycentricinterpolant_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -59,7 +59,7 @@ void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array 
 // Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
 // Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
-typedef struct {
+struct idwcalcbuffer {
    ae_vector x;
    ae_vector y;
    ae_vector tsyw;
@@ -67,8 +67,12 @@ typedef struct {
    ae_matrix tsxy;
    ae_vector tsdist;
    kdtreerequestbuffer requestbuffer;
-} idwcalcbuffer;
-typedef struct {
+};
+void idwcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void idwcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void idwcalcbuffer_free(void *_p, bool make_automatic);
+
+struct idwmodel {
    ae_int_t nx;
    ae_int_t ny;
    ae_vector globalprior;
@@ -84,8 +88,15 @@ typedef struct {
    ae_int_t npoints;
    ae_vector shepardxy;
    idwcalcbuffer buffer;
-} idwmodel;
-typedef struct {
+};
+void idwmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void idwmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void idwmodel_free(void *_p, bool make_automatic);
+void idwalloc(ae_serializer *s, idwmodel *model, ae_state *_state);
+void idwserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
+void idwunserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
+
+struct idwbuilder {
    ae_int_t priortermtype;
    ae_vector priortermval;
    ae_int_t algotype;
@@ -109,13 +120,20 @@ typedef struct {
    ae_vector tmpw;
    kdtree tmptree;
    ae_vector tmpmean;
-} idwbuilder;
-typedef struct {
+};
+void idwbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void idwbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void idwbuilder_free(void *_p, bool make_automatic);
+
+struct idwreport {
    double rmserror;
    double avgerror;
    double maxerror;
    double r2;
-} idwreport;
+};
+void idwreport_init(void *_p, ae_state *_state, bool make_automatic);
+void idwreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void idwreport_free(void *_p, bool make_automatic);
 
 void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state);
 void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_state);
@@ -134,21 +152,6 @@ void idwcalc(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
 void idwcalcbuf(idwmodel *s, RVector *x, RVector *y, ae_state *_state);
 void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y, ae_state *_state);
 void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep, ae_state *_state);
-void idwalloc(ae_serializer *s, idwmodel *model, ae_state *_state);
-void idwserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
-void idwunserialize(ae_serializer *s, idwmodel *model, ae_state *_state);
-void idwcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void idwcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void idwcalcbuffer_free(void *_p, bool make_automatic);
-void idwmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void idwmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void idwmodel_free(void *_p, bool make_automatic);
-void idwbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void idwbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void idwbuilder_free(void *_p, bool make_automatic);
-void idwreport_init(void *_p, ae_state *_state, bool make_automatic);
-void idwreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void idwreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -156,11 +159,11 @@ DecClass(idwcalcbuffer, );
 DecClass(idwmodel, );
 DecClass(idwbuilder, );
 DecClass(idwreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
-
 void idwserialize(idwmodel &obj, std::string &s_out);
-void idwunserialize(const std::string &s_in, idwmodel &obj);
 void idwserialize(idwmodel &obj, std::ostream &s_out);
+void idwunserialize(const std::string &s_in, idwmodel &obj);
 void idwunserialize(const std::istream &s_in, idwmodel &obj);
+
 void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _xparams = xdefault);
 void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams = xdefault);
 void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers, const xparams _xparams = xdefault);
@@ -234,21 +237,28 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
 // Depends on: (Solvers) LINLSQR
 // Depends on: INTFITSERV
 namespace alglib_impl {
-typedef struct {
+struct spline1dinterpolant {
    bool periodic;
    ae_int_t n;
    ae_int_t k;
    ae_int_t continuity;
    ae_vector x;
    ae_vector c;
-} spline1dinterpolant;
-typedef struct {
+};
+void spline1dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void spline1dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline1dinterpolant_free(void *_p, bool make_automatic);
+
+struct spline1dfitreport {
    double taskrcond;
    double rmserror;
    double avgerror;
    double avgrelerror;
    double maxerror;
-} spline1dfitreport;
+};
+void spline1dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void spline1dfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline1dfitreport_free(void *_p, bool make_automatic);
 
 void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
 void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, spline1dinterpolant *c, ae_state *_state);
@@ -275,12 +285,6 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
 void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata, ae_state *_state);
 ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, double b, double *x, ae_state *_state);
 void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state);
-void spline1dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void spline1dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline1dinterpolant_free(void *_p, bool make_automatic);
-void spline1dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void spline1dfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline1dfitreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -323,22 +327,30 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, splin
 // Depends on: (Optimization) MINLM
 // Depends on: POLINT, SPLINE1D
 namespace alglib_impl {
-typedef struct {
+struct polynomialfitreport {
    double taskrcond;
    double rmserror;
    double avgerror;
    double avgrelerror;
    double maxerror;
-} polynomialfitreport;
-typedef struct {
+};
+void polynomialfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void polynomialfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void polynomialfitreport_free(void *_p, bool make_automatic);
+
+struct barycentricfitreport {
    double taskrcond;
    ae_int_t dbest;
    double rmserror;
    double avgerror;
    double avgrelerror;
    double maxerror;
-} barycentricfitreport;
-typedef struct {
+};
+void barycentricfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void barycentricfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void barycentricfitreport_free(void *_p, bool make_automatic);
+
+struct lsfitreport {
    double taskrcond;
    ae_int_t iterationscount;
    ae_int_t varidx;
@@ -352,8 +364,12 @@ typedef struct {
    ae_vector errcurve;
    ae_vector noise;
    double r2;
-} lsfitreport;
-typedef struct {
+};
+void lsfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void lsfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lsfitreport_free(void *_p, bool make_automatic);
+
+struct lsfitstate {
    ae_int_t optalgo;
    ae_int_t m;
    ae_int_t k;
@@ -410,7 +426,10 @@ typedef struct {
    ae_int_t prevnpt;
    ae_int_t prevalgo;
    rcommstate rstate;
-} lsfitstate;
+};
+void lsfitstate_init(void *_p, ae_state *_state, bool make_automatic);
+void lsfitstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void lsfitstate_free(void *_p, bool make_automatic);
 
 void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t m, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
 void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state);
@@ -448,18 +467,6 @@ void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 bool lsfititeration(lsfitstate *state, ae_state *_state);
 void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state);
 void lsfitsetgradientcheck(lsfitstate *state, double teststep, ae_state *_state);
-void polynomialfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void polynomialfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void polynomialfitreport_free(void *_p, bool make_automatic);
-void barycentricfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void barycentricfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void barycentricfitreport_free(void *_p, bool make_automatic);
-void lsfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void lsfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void lsfitreport_free(void *_p, bool make_automatic);
-void lsfitstate_init(void *_p, ae_state *_state, bool make_automatic);
-void lsfitstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void lsfitstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -529,10 +536,13 @@ void lsfitsetgradientcheck(const lsfitstate &state, const double teststep, const
 // === FITSPHERE Package ===
 // Depends on: (Optimization) MINLM, MINNLC
 namespace alglib_impl {
-typedef struct {
+struct fitsphereinternalreport {
    ae_int_t nfev;
    ae_int_t iterationscount;
-} fitsphereinternalreport;
+};
+void fitsphereinternalreport_init(void *_p, ae_state *_state, bool make_automatic);
+void fitsphereinternalreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void fitsphereinternalreport_free(void *_p, bool make_automatic);
 
 void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r, ae_state *_state);
 void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state);
@@ -540,9 +550,6 @@ void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state);
 void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state);
 void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep, ae_state *_state);
-void fitsphereinternalreport_init(void *_p, ae_state *_state, bool make_automatic);
-void fitsphereinternalreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void fitsphereinternalreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -557,21 +564,28 @@ void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t 
 // Depends on: (Integration) AUTOGK
 // Depends on: SPLINE1D
 namespace alglib_impl {
-typedef struct {
+struct pspline2interpolant {
    ae_int_t n;
    bool periodic;
    ae_vector p;
    spline1dinterpolant x;
    spline1dinterpolant y;
-} pspline2interpolant;
-typedef struct {
+};
+void pspline2interpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void pspline2interpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void pspline2interpolant_free(void *_p, bool make_automatic);
+
+struct pspline3interpolant {
    ae_int_t n;
    bool periodic;
    ae_vector p;
    spline1dinterpolant x;
    spline1dinterpolant y;
    spline1dinterpolant z;
-} pspline3interpolant;
+};
+void pspline3interpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void pspline3interpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void pspline3interpolant_free(void *_p, bool make_automatic);
 
 void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state);
 void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state);
@@ -590,12 +604,6 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
 double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_state);
 double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_state);
 void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, double stopeps, RMatrix *x2, ZVector *idx2, ae_int_t *nsections, ae_state *_state);
-void pspline2interpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void pspline2interpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void pspline2interpolant_free(void *_p, bool make_automatic);
-void pspline3interpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void pspline3interpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void pspline3interpolant_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -625,13 +633,17 @@ void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: LSFIT
 namespace alglib_impl {
-typedef struct {
+struct rbfv1calcbuffer {
    ae_vector calcbufxcx;
    ae_matrix calcbufx;
    ae_vector calcbuftags;
    kdtreerequestbuffer requestbuffer;
-} rbfv1calcbuffer;
-typedef struct {
+};
+void rbfv1calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv1calcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv1calcbuffer_free(void *_p, bool make_automatic);
+
+struct rbfv1model {
    ae_int_t ny;
    ae_int_t nx;
    ae_int_t nc;
@@ -644,8 +656,12 @@ typedef struct {
    ae_vector calcbufxcx;
    ae_matrix calcbufx;
    ae_vector calcbuftags;
-} rbfv1model;
-typedef struct {
+};
+void rbfv1model_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv1model_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv1model_free(void *_p, bool make_automatic);
+
+struct gridcalc3v1buf {
    ae_vector tx;
    ae_vector cx;
    ae_vector ty;
@@ -659,22 +675,29 @@ typedef struct {
    kdtreerequestbuffer requestbuf;
    ae_matrix calcbufx;
    ae_vector calcbuftags;
-} gridcalc3v1buf;
-typedef struct {
+};
+void gridcalc3v1buf_init(void *_p, ae_state *_state, bool make_automatic);
+void gridcalc3v1buf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void gridcalc3v1buf_free(void *_p, bool make_automatic);
+
+struct rbfv1report {
    ae_int_t arows;
    ae_int_t acols;
    ae_int_t annz;
    ae_int_t iterationscount;
    ae_int_t nmv;
    ae_int_t terminationtype;
-} rbfv1report;
+};
+void rbfv1report_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv1report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv1report_free(void *_p, bool make_automatic);
+void rbfv1alloc(ae_serializer *s, rbfv1model *model, ae_state *_state);
+void rbfv1serialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
+void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
 
 void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state);
 void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state);
 void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep, ae_state *_state);
-void rbfv1alloc(ae_serializer *s, rbfv1model *model, ae_state *_state);
-void rbfv1serialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
-void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state);
 double rbfv1calc2(rbfv1model *s, double x0, double x1, ae_state *_state);
 double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2, ae_state *_state);
 void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y, ae_state *_state);
@@ -683,24 +706,12 @@ void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int
 void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
 bool _trypexec_rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
 void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v, ae_state *_state);
-void rbfv1calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv1calcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv1calcbuffer_free(void *_p, bool make_automatic);
-void rbfv1model_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv1model_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv1model_free(void *_p, bool make_automatic);
-void gridcalc3v1buf_init(void *_p, ae_state *_state, bool make_automatic);
-void gridcalc3v1buf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void gridcalc3v1buf_free(void *_p, bool make_automatic);
-void rbfv1report_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv1report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv1report_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
 // Depends on: SPLINE1D
 namespace alglib_impl {
-typedef struct {
+struct spline2dinterpolant {
    ae_int_t stype;
    ae_int_t n;
    ae_int_t m;
@@ -708,8 +719,15 @@ typedef struct {
    ae_vector x;
    ae_vector y;
    ae_vector f;
-} spline2dinterpolant;
-typedef struct {
+};
+void spline2dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dinterpolant_free(void *_p, bool make_automatic);
+void spline2dalloc(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
+void spline2dserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
+void spline2dunserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
+
+struct spline2dbuilder {
    ae_int_t priorterm;
    double priortermval;
    ae_int_t areatype;
@@ -733,14 +751,22 @@ typedef struct {
    ae_int_t interfacesize;
    ae_int_t lsqrcnt;
    ae_int_t maxcoresize;
-} spline2dbuilder;
-typedef struct {
+};
+void spline2dbuilder_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dbuilder_free(void *_p, bool make_automatic);
+
+struct spline2dfitreport {
    double rmserror;
    double avgerror;
    double maxerror;
    double r2;
-} spline2dfitreport;
-typedef struct {
+};
+void spline2dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dfitreport_free(void *_p, bool make_automatic);
+
+struct spline2dxdesignmatrix {
    ae_int_t blockwidth;
    ae_int_t kx;
    ae_int_t ky;
@@ -757,8 +783,12 @@ typedef struct {
    ae_vector tmp0;
    ae_vector tmp1;
    ae_matrix tmp2;
-} spline2dxdesignmatrix;
-typedef struct {
+};
+void spline2dxdesignmatrix_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dxdesignmatrix_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dxdesignmatrix_free(void *_p, bool make_automatic);
+
+struct spline2dblockllsbuf {
    linlsqrstate solver;
    linlsqrreport solverrep;
    ae_matrix blockata;
@@ -767,15 +797,22 @@ typedef struct {
    ae_vector cholbuf1;
    ae_vector tmp0;
    ae_vector tmp1;
-} spline2dblockllsbuf;
-typedef struct {
+};
+void spline2dblockllsbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dblockllsbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dblockllsbuf_free(void *_p, bool make_automatic);
+
+struct spline2dfastddmbuf {
    spline2dxdesignmatrix xdesignmatrix;
    ae_vector tmp0;
    ae_vector tmpz;
    spline2dfitreport dummyrep;
    spline2dinterpolant localmodel;
    spline2dblockllsbuf blockllsbuf;
-} spline2dfastddmbuf;
+};
+void spline2dfastddmbuf_init(void *_p, ae_state *_state, bool make_automatic);
+void spline2dfastddmbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline2dfastddmbuf_free(void *_p, bool make_automatic);
 
 double spline2dcalc(spline2dinterpolant *c, double x, double y, ae_state *_state);
 void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double *fx, double *fy, double *fxy, ae_state *_state);
@@ -807,38 +844,17 @@ void spline2dbuildersetalgofastddm(spline2dbuilder *state, ae_int_t nlayers, dou
 void spline2dbuildersetalgoblocklls(spline2dbuilder *state, double lambdans, ae_state *_state);
 void spline2dbuildersetalgonaivells(spline2dbuilder *state, double lambdans, ae_state *_state);
 void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitreport *rep, ae_state *_state);
-void spline2dalloc(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
-void spline2dserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
-void spline2dunserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state);
-void spline2dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dinterpolant_free(void *_p, bool make_automatic);
-void spline2dbuilder_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dbuilder_free(void *_p, bool make_automatic);
-void spline2dfitreport_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dfitreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dfitreport_free(void *_p, bool make_automatic);
-void spline2dxdesignmatrix_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dxdesignmatrix_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dxdesignmatrix_free(void *_p, bool make_automatic);
-void spline2dblockllsbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dblockllsbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dblockllsbuf_free(void *_p, bool make_automatic);
-void spline2dfastddmbuf_init(void *_p, ae_state *_state, bool make_automatic);
-void spline2dfastddmbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline2dfastddmbuf_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(spline2dinterpolant, );
 DecClass(spline2dbuilder, );
 DecClass(spline2dfitreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
-
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out);
-void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj);
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out);
+void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj);
 void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj);
+
 double spline2dcalc(const spline2dinterpolant &c, const double x, const double y, const xparams _xparams = xdefault);
 void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy, const xparams _xparams = xdefault);
 void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
@@ -875,15 +891,19 @@ void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2df
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: LSFIT
 namespace alglib_impl {
-typedef struct {
+struct rbfv2calcbuffer {
    ae_vector x;
    ae_vector curboxmin;
    ae_vector curboxmax;
    double curdist2;
    ae_vector x123;
    ae_vector y123;
-} rbfv2calcbuffer;
-typedef struct {
+};
+void rbfv2calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv2calcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv2calcbuffer_free(void *_p, bool make_automatic);
+
+struct rbfv2model {
    ae_int_t ny;
    ae_int_t nx;
    ae_int_t bf;
@@ -902,8 +922,12 @@ typedef struct {
    double supportr;
    ae_int_t basisfunction;
    rbfv2calcbuffer calcbuf;
-} rbfv2model;
-typedef struct {
+};
+void rbfv2model_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv2model_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv2model_free(void *_p, bool make_automatic);
+
+struct rbfv2gridcalcbuffer {
    rbfv2calcbuffer calcbuf;
    ae_vector cx;
    ae_vector rx;
@@ -911,19 +935,26 @@ typedef struct {
    ae_vector tx;
    ae_vector ty;
    ae_vector rf;
-} rbfv2gridcalcbuffer;
-typedef struct {
+};
+void rbfv2gridcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic);
+
+struct rbfv2report {
    ae_int_t terminationtype;
    double maxerror;
    double rmserror;
-} rbfv2report;
+};
+void rbfv2report_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfv2report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfv2report_free(void *_p, bool make_automatic);
+void rbfv2alloc(ae_serializer *s, rbfv2model *model, ae_state *_state);
+void rbfv2serialize(ae_serializer *s, rbfv2model *model, ae_state *_state);
+void rbfv2unserialize(ae_serializer *s, rbfv2model *model, ae_state *_state);
 
 void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state);
 void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf, ae_state *_state);
 void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scalevec, ae_int_t aterm, ae_int_t nh, double rbase, double lambdans, rbfv2model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv2report *rep, ae_state *_state);
-void rbfv2alloc(ae_serializer *s, rbfv2model *model, ae_state *_state);
-void rbfv2serialize(ae_serializer *s, rbfv2model *model, ae_state *_state);
-void rbfv2unserialize(ae_serializer *s, rbfv2model *model, ae_state *_state);
 double rbfv2farradius(ae_int_t bf, ae_state *_state);
 double rbfv2nearradius(ae_int_t bf, ae_state *_state);
 double rbfv2basisfunc(ae_int_t bf, double d2, ae_state *_state);
@@ -938,24 +969,12 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
 void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
 bool _trypexec_rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y, ae_state *_state);
 void rbfv2unpack(rbfv2model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v, ae_state *_state);
-void rbfv2calcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv2calcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv2calcbuffer_free(void *_p, bool make_automatic);
-void rbfv2model_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv2model_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv2model_free(void *_p, bool make_automatic);
-void rbfv2gridcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic);
-void rbfv2report_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfv2report_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfv2report_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 // === SPLINE3D Package ===
 // Depends on: SPLINE1D
 namespace alglib_impl {
-typedef struct {
+struct spline3dinterpolant {
    ae_int_t k;
    ae_int_t stype;
    ae_int_t n;
@@ -966,7 +985,10 @@ typedef struct {
    ae_vector y;
    ae_vector z;
    ae_vector f;
-} spline3dinterpolant;
+};
+void spline3dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
+void spline3dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void spline3dinterpolant_free(void *_p, bool make_automatic);
 
 double spline3dcalc(spline3dinterpolant *c, double x, double y, double z, ae_state *_state);
 void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz, ae_state *_state);
@@ -977,9 +999,6 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
 void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVector *f, ae_state *_state);
 void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f, ae_state *_state);
 void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t *l, ae_int_t *d, ae_int_t *stype, RMatrix *tbl, ae_state *_state);
-void spline3dinterpolant_init(void *_p, ae_state *_state, bool make_automatic);
-void spline3dinterpolant_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void spline3dinterpolant_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1020,12 +1039,16 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
 // === RBF Package ===
 // Depends on: RBFV1, RBFV2
 namespace alglib_impl {
-typedef struct {
+struct rbfcalcbuffer {
    ae_int_t modelversion;
    rbfv1calcbuffer bufv1;
    rbfv2calcbuffer bufv2;
-} rbfcalcbuffer;
-typedef struct {
+};
+void rbfcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfcalcbuffer_free(void *_p, bool make_automatic);
+
+struct rbfmodel {
    ae_int_t nx;
    ae_int_t ny;
    ae_int_t modelversion;
@@ -1048,8 +1071,12 @@ typedef struct {
    ae_vector s;
    ae_int_t progress10000;
    bool terminationrequest;
-} rbfmodel;
-typedef struct {
+};
+void rbfmodel_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfmodel_free(void *_p, bool make_automatic);
+
+struct rbfreport {
    double rmserror;
    double maxerror;
    ae_int_t arows;
@@ -1058,7 +1085,13 @@ typedef struct {
    ae_int_t iterationscount;
    ae_int_t nmv;
    ae_int_t terminationtype;
-} rbfreport;
+};
+void rbfreport_init(void *_p, ae_state *_state, bool make_automatic);
+void rbfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void rbfreport_free(void *_p, bool make_automatic);
+void rbfalloc(ae_serializer *s, rbfmodel *model, ae_state *_state);
+void rbfserialize(ae_serializer *s, rbfmodel *model, ae_state *_state);
+void rbfunserialize(ae_serializer *s, rbfmodel *model, ae_state *_state);
 
 void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s, ae_state *_state);
 void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf, ae_state *_state);
@@ -1092,29 +1125,17 @@ void rbfunpack(rbfmodel *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *
 ae_int_t rbfgetmodelversion(rbfmodel *s, ae_state *_state);
 double rbfpeekprogress(rbfmodel *s, ae_state *_state);
 void rbfrequesttermination(rbfmodel *s, ae_state *_state);
-void rbfalloc(ae_serializer *s, rbfmodel *model, ae_state *_state);
-void rbfserialize(ae_serializer *s, rbfmodel *model, ae_state *_state);
-void rbfunserialize(ae_serializer *s, rbfmodel *model, ae_state *_state);
-void rbfcalcbuffer_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfcalcbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfcalcbuffer_free(void *_p, bool make_automatic);
-void rbfmodel_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfmodel_free(void *_p, bool make_automatic);
-void rbfreport_init(void *_p, ae_state *_state, bool make_automatic);
-void rbfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void rbfreport_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(rbfcalcbuffer, );
 DecClass(rbfmodel, );
 DecClass(rbfreport, double &rmserror; double &maxerror; ae_int_t &arows; ae_int_t &acols; ae_int_t &annz; ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
-
 void rbfserialize(rbfmodel &obj, std::string &s_out);
-void rbfunserialize(const std::string &s_in, rbfmodel &obj);
 void rbfserialize(rbfmodel &obj, std::ostream &s_out);
+void rbfunserialize(const std::string &s_in, rbfmodel &obj);
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj);
+
 void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams _xparams = xdefault);
 void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _xparams = xdefault);
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n, const xparams _xparams = xdefault);

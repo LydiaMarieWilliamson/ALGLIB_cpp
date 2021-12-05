@@ -61,12 +61,16 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
-typedef struct {
+struct autogkreport {
    ae_int_t terminationtype;
    ae_int_t nfev;
    ae_int_t nintervals;
-} autogkreport;
-typedef struct {
+};
+void autogkreport_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkreport_free(void *_p, bool make_automatic);
+
+struct autogkinternalstate {
    double a;
    double b;
    double eps;
@@ -87,8 +91,12 @@ typedef struct {
    ae_vector wr;
    ae_int_t n;
    rcommstate rstate;
-} autogkinternalstate;
-typedef struct {
+};
+void autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkinternalstate_free(void *_p, bool make_automatic);
+
+struct autogkstate {
    double a;
    double b;
    double alpha;
@@ -106,22 +114,16 @@ typedef struct {
    ae_int_t terminationtype;
    ae_int_t nfev;
    ae_int_t nintervals;
-} autogkstate;
+};
+void autogkstate_init(void *_p, ae_state *_state, bool make_automatic);
+void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void autogkstate_free(void *_p, bool make_automatic);
 
 void autogksmooth(double a, double b, autogkstate *state, ae_state *_state);
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state);
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state);
 bool autogkiteration(autogkstate *state, ae_state *_state);
 void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state);
-void autogkreport_init(void *_p, ae_state *_state, bool make_automatic);
-void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void autogkreport_free(void *_p, bool make_automatic);
-void autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic);
-void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void autogkinternalstate_free(void *_p, bool make_automatic);
-void autogkstate_init(void *_p, ae_state *_state, bool make_automatic);
-void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void autogkstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
 namespace alglib {
