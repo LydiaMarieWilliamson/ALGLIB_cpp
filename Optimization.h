@@ -2155,9 +2155,6 @@ void minslpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 void minslpstate_free(void *_p, bool make_automatic);
 } // end of namespace alglib_impl
 
-namespace alglib {
-} // end of namespace alglib
-
 // === MINNLC Package ===
 // Depends on: MINBLEIC, NLCSQP, NLCSLP
 namespace alglib_impl {
