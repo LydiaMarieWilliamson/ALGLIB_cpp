@@ -3219,19 +3219,15 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    double phi;
    double t;
    double twon;
-   ae_vector a;
-   ae_vector c;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a, 0, sizeof(a));
-   memset(&c, 0, sizeof(c));
    *sn = 0;
    *cn = 0;
    *dn = 0;
    *ph = 0;
-   ae_vector_init(&a, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_REAL, _state, true);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_REAL, _state);
 
    ae_assert(ae_fp_greater_eq(m, (double)(0)) && ae_fp_less_eq(m, (double)(1)), "Domain error in JacobianEllipticFunctions: m<0 or m>1", _state);
    ae_vector_set_length(&a, 8 + 1, _state);
@@ -3834,7 +3830,7 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(c, true);
+   SetVector(c);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -3868,7 +3864,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
    double e;
    double d;
 
-   ae_vector_free(b, true);
+   SetVector(b);
 
    ae_vector_set_length(b, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -4998,7 +4994,7 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(c, true);
+   SetVector(c);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -5118,7 +5114,7 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(c, true);
+   SetVector(c);
 
    ae_vector_set_length(c, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -6410,7 +6406,7 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(c, true);
+   SetVector(c);
 
    ae_vector_set_length(c, n + 1, _state);
    c->ptr.p_double[0] = (double)(1);

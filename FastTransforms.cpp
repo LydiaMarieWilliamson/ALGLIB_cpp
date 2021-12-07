@@ -45,15 +45,11 @@ namespace alglib_impl {
 // API: void fftc1d(complex_1d_array &a, const xparams _xparams = xdefault);
 void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   fasttransformplan plan;
    ae_int_t i;
-   ae_vector buf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&plan, 0, sizeof(plan));
-   memset(&buf, 0, sizeof(buf));
-   fasttransformplan_init(&plan, _state, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   NewObj(fasttransformplan, plan, _state);
+   NewVector(buf, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "FFTC1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTC1D: Length(A)<N!", _state);
@@ -155,15 +151,11 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    ae_complex hn;
    ae_complex hmnc;
    ae_complex v;
-   ae_vector buf;
-   fasttransformplan plan;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&plan, 0, sizeof(plan));
-   ae_vector_free(f, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   fasttransformplan_init(&plan, _state, true);
+   SetVector(f);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewObj(fasttransformplan, plan, _state);
 
    ae_assert(n > 0, "FFTR1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTR1D: Length(A)<N!", _state);
@@ -262,15 +254,11 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
 void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector h;
-   ae_vector fh;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&h, 0, sizeof(h));
-   memset(&fh, 0, sizeof(fh));
-   ae_vector_free(a, true);
-   ae_vector_init(&h, 0, DT_REAL, _state, true);
-   ae_vector_init(&fh, 0, DT_COMPLEX, _state, true);
+   SetVector(a);
+   NewVector(h, 0, DT_REAL, _state);
+   NewVector(fh, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
    ae_assert(f->cnt >= ae_ifloor((double)n / (double)2, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
@@ -511,11 +499,9 @@ namespace alglib_impl {
 void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector fa;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&fa, 0, sizeof(fa));
-   ae_vector_init(&fa, 0, DT_COMPLEX, _state, true);
+   NewVector(fa, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0, "FHTR1D: incorrect N!", _state);
 
@@ -616,7 +602,7 @@ namespace alglib_impl {
 // API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = xdefault);
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state) {
 
-   ae_vector_free(r, true);
+   SetVector(r);
 
    ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!", _state);
 
@@ -656,22 +642,16 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_vector buf;
-   ae_vector buf2;
-   fasttransformplan plan;
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
    double t;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   memset(&plan, 0, sizeof(plan));
-   ae_vector_free(r, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
-   fasttransformplan_init(&plan, _state, true);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
+   NewObj(fasttransformplan, plan, _state);
 
    ae_assert((n > 0 && m > 0) && n <= m, "ConvC1DInv: incorrect N or M!", _state);
    p = ftbasefindsmooth(m, _state);
@@ -742,15 +722,13 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
 // API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams = xdefault);
 void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector buf;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   ae_vector_free(c, true);
-   ae_vector_init(&buf, 0, DT_COMPLEX, _state, true);
+   SetVector(c);
+   NewVector(buf, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -805,25 +783,17 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_vector buf;
-   ae_vector buf2;
-   ae_vector cbuf;
-   fasttransformplan plan;
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
    double t;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   memset(&cbuf, 0, sizeof(cbuf));
-   memset(&plan, 0, sizeof(plan));
-   ae_vector_free(r, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
-   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, true);
-   fasttransformplan_init(&plan, _state, true);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
+   NewVector(cbuf, 0, DT_COMPLEX, _state);
+   NewObj(fasttransformplan, plan, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!", _state);
 
@@ -903,7 +873,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 // API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = xdefault);
 void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state) {
 
-   ae_vector_free(r, true);
+   SetVector(r);
 
    ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!", _state);
 
@@ -943,24 +913,16 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_vector buf;
-   ae_vector buf2;
-   ae_vector buf3;
-   fasttransformplan plan;
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   memset(&buf3, 0, sizeof(buf3));
-   memset(&plan, 0, sizeof(plan));
-   ae_vector_free(r, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
-   fasttransformplan_init(&plan, _state, true);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
+   NewVector(buf3, 0, DT_REAL, _state);
+   NewObj(fasttransformplan, plan, _state);
 
    ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!", _state);
    p = ftbasefindsmootheven(m, _state);
@@ -1016,15 +978,13 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
 // API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector buf;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   ae_vector_free(c, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   SetVector(c);
+   NewVector(buf, 0, DT_REAL, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -1080,30 +1040,18 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_vector buf;
-   ae_vector buf2;
-   ae_vector buf3;
-   ae_vector cbuf;
-   ae_vector cbuf2;
-   fasttransformplan plan;
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   memset(&buf3, 0, sizeof(buf3));
-   memset(&cbuf, 0, sizeof(cbuf));
-   memset(&cbuf2, 0, sizeof(cbuf2));
-   memset(&plan, 0, sizeof(plan));
-   ae_vector_free(r, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
-   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cbuf2, 0, DT_COMPLEX, _state, true);
-   fasttransformplan_init(&plan, _state, true);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
+   NewVector(buf3, 0, DT_REAL, _state);
+   NewVector(cbuf, 0, DT_COMPLEX, _state);
+   NewVector(cbuf2, 0, DT_COMPLEX, _state);
+   NewObj(fasttransformplan, plan, _state);
 
    ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!", _state);
 
@@ -1203,7 +1151,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    ae_int_t i2;
    ae_int_t j1;
    ae_int_t j2;
-   ae_vector bbuf;
    ae_complex v;
    double ax;
    double ay;
@@ -1215,20 +1162,13 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-   fasttransformplan plan;
-   ae_vector buf;
-   ae_vector buf2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bbuf, 0, sizeof(bbuf));
-   memset(&plan, 0, sizeof(plan));
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   ae_vector_free(r, true);
-   ae_vector_init(&bbuf, 0, DT_COMPLEX, _state, true);
-   fasttransformplan_init(&plan, _state, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   SetVector(r);
+   NewVector(bbuf, 0, DT_COMPLEX, _state);
+   NewObj(fasttransformplan, plan, _state);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
@@ -1576,21 +1516,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-   fasttransformplan plan;
-   ae_vector buf;
-   ae_vector buf2;
-   ae_vector buf3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&plan, 0, sizeof(plan));
-   memset(&buf, 0, sizeof(buf));
-   memset(&buf2, 0, sizeof(buf2));
-   memset(&buf3, 0, sizeof(buf3));
-   ae_vector_free(r, true);
-   fasttransformplan_init(&plan, _state, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
+   SetVector(r);
+   NewObj(fasttransformplan, plan, _state);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(buf2, 0, DT_REAL, _state);
+   NewVector(buf3, 0, DT_REAL, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
@@ -1982,16 +1914,12 @@ namespace alglib_impl {
 // API: void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams = xdefault);
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector p;
-   ae_vector b;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p, 0, sizeof(p));
-   memset(&b, 0, sizeof(b));
-   ae_vector_free(r, true);
-   ae_vector_init(&p, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&b, 0, DT_COMPLEX, _state, true);
+   SetVector(r);
+   NewVector(p, 0, DT_COMPLEX, _state);
+   NewVector(b, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
@@ -2032,19 +1960,15 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 // API: void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams = xdefault);
 void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, CVector *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector p;
-   ae_vector b;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p, 0, sizeof(p));
-   memset(&b, 0, sizeof(b));
-   ae_vector_free(c, true);
-   ae_vector_init(&p, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&b, 0, DT_COMPLEX, _state, true);
+   SetVector(c);
+   NewVector(p, 0, DT_COMPLEX, _state);
+   NewVector(b, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -2115,16 +2039,12 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 // API: void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams = xdefault);
 void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector p;
-   ae_vector b;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p, 0, sizeof(p));
-   memset(&b, 0, sizeof(b));
-   ae_vector_free(r, true);
-   ae_vector_init(&p, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(r);
+   NewVector(p, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    ae_assert(n > 0 && m > 0, "CorrR1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
@@ -2165,19 +2085,15 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 // API: void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
 void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, RVector *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector p;
-   ae_vector b;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p, 0, sizeof(p));
-   memset(&b, 0, sizeof(b));
-   ae_vector_free(c, true);
-   ae_vector_init(&p, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(c);
+   NewVector(p, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 

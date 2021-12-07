@@ -674,6 +674,7 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, bool make_a
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
+#define NewBlock(B, N, Q)		ae_dyn_block B; memset(&B, 0, sizeof B); ae_db_init(&B, N, Q, true)
 
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic);
 void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic);
@@ -683,6 +684,9 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state);
 void ae_vector_free(ae_vector *dst, bool make_automatic);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
+#define NewVector(V, N, Type, Q)	ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, Q, true)
+#define DupVector(V, Q)			ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, Q, true); V = &_##V
+#define SetVector(P)			ae_vector_free(P, true)
 
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic);
 void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic);
@@ -691,11 +695,17 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state *state);
 void ae_matrix_free(ae_matrix *dst, bool make_automatic);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
+#define NewMatrix(M, Ys, Xs, Type, Q)	ae_matrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, Type, Q, true)
+#define DupMatrix(M, Q)			ae_matrix _##M; memset(&_##M, 0, sizeof _##M), ae_matrix_copy(&_##M, M, Q, true), M = &_##M
+#define SetMatrix(P)			ae_matrix_free(P, true)
 
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bool make_automatic);
 void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
 void ae_smart_ptr_release(ae_smart_ptr *dst);
+#define NewObj(Type, P, Q)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, Q, true)
+#define RefObj(Type, P, Q)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, Q, true)
+#define SetObj(Type, P)		Type##_free(P, true)
 
 void ae_yield();
 void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic);
@@ -733,6 +743,8 @@ bool ae_force_symmetric(ae_matrix *a);
 bool ae_force_hermitian(ae_matrix *a);
 
 void ae_serializer_init(ae_serializer *serializer);
+#define NewSerializer(Ser)	alglib_impl::ae_serializer Ser; alglib_impl::ae_serializer_init(&Ser)
+
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
 void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes);

@@ -54,20 +54,14 @@ namespace alglib_impl {
 void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector d;
-   ae_vector e;
-   ae_matrix z;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&d, 0, sizeof(d));
-   memset(&e, 0, sizeof(e));
-   memset(&z, 0, sizeof(z));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewMatrix(z, 0, 0, DT_REAL, _state);
 
    if (n < 1) {
       *info = -1;
@@ -144,12 +138,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 // API: void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _alpha;
-   ae_vector _beta;
    ae_int_t i;
-   ae_vector d;
-   ae_vector e;
-   ae_matrix z;
    double pim1a;
    double pia;
    double pim1b;
@@ -165,21 +154,14 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    double bet;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_alpha, 0, sizeof(_alpha));
-   memset(&_beta, 0, sizeof(_beta));
-   memset(&d, 0, sizeof(d));
-   memset(&e, 0, sizeof(e));
-   memset(&z, 0, sizeof(z));
-   ae_vector_copy(&_alpha, alpha, _state, true);
-   alpha = &_alpha;
-   ae_vector_copy(&_beta, beta, _state, true);
-   beta = &_beta;
+   DupVector(alpha, _state);
+   DupVector(beta, _state);
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewMatrix(z, 0, 0, DT_REAL, _state);
 
    if (n <= 2) {
       *info = -1;
@@ -302,32 +284,20 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
 // API: void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _alpha;
-   ae_vector _beta;
    ae_int_t i;
-   ae_vector d;
-   ae_vector e;
-   ae_matrix z;
    double polim1;
    double poli;
    double t;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_alpha, 0, sizeof(_alpha));
-   memset(&_beta, 0, sizeof(_beta));
-   memset(&d, 0, sizeof(d));
-   memset(&e, 0, sizeof(e));
-   memset(&z, 0, sizeof(z));
-   ae_vector_copy(&_alpha, alpha, _state, true);
-   alpha = &_alpha;
-   ae_vector_copy(&_beta, beta, _state, true);
-   beta = &_beta;
+   DupVector(alpha, _state);
+   DupVector(beta, _state);
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewMatrix(z, 0, 0, DT_REAL, _state);
 
    if (n < 2) {
       *info = -1;
@@ -399,18 +369,14 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
 // API: void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector alpha;
-   ae_vector beta;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&alpha, 0, sizeof(alpha));
-   memset(&beta, 0, sizeof(beta));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&alpha, 0, DT_REAL, _state, true);
-   ae_vector_init(&beta, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(alpha, 0, DT_REAL, _state);
+   NewVector(beta, 0, DT_REAL, _state);
 
    if (n < 1) {
       *info = -1;
@@ -467,8 +433,6 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
 // API: void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector a;
-   ae_vector b;
    double alpha2;
    double beta2;
    double apb;
@@ -477,13 +441,11 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    double s;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a, 0, sizeof(a));
-   memset(&b, 0, sizeof(b));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&a, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    if ((n < 1 || ae_fp_less_eq(alpha, (double)(-1))) || ae_fp_less_eq(beta, (double)(-1))) {
       *info = -1;
@@ -551,20 +513,16 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 // API: void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector a;
-   ae_vector b;
    double t;
    ae_int_t i;
    double s;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a, 0, sizeof(a));
-   memset(&b, 0, sizeof(b));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&a, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    if (n < 1 || ae_fp_less_eq(alpha, (double)(-1))) {
       *info = -1;
@@ -624,18 +582,14 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 // API: void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = xdefault);
 void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector a;
-   ae_vector b;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a, 0, sizeof(a));
-   memset(&b, 0, sizeof(b));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(w, true);
-   ae_vector_init(&a, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(w);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    if (n < 1) {
       *info = -1;
@@ -780,43 +734,27 @@ namespace alglib_impl {
 // API: void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
 void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _alpha;
-   ae_vector _beta;
-   ae_vector ta;
    ae_int_t i;
    ae_int_t j;
-   ae_vector t;
-   ae_vector s;
    ae_int_t wlen;
    ae_int_t woffs;
    double u;
    ae_int_t m;
    ae_int_t l;
    ae_int_t k;
-   ae_vector xgtmp;
-   ae_vector wgtmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_alpha, 0, sizeof(_alpha));
-   memset(&_beta, 0, sizeof(_beta));
-   memset(&ta, 0, sizeof(ta));
-   memset(&t, 0, sizeof(t));
-   memset(&s, 0, sizeof(s));
-   memset(&xgtmp, 0, sizeof(xgtmp));
-   memset(&wgtmp, 0, sizeof(wgtmp));
-   ae_vector_copy(&_alpha, alpha, _state, true);
-   alpha = &_alpha;
-   ae_vector_copy(&_beta, beta, _state, true);
-   beta = &_beta;
+   DupVector(alpha, _state);
+   DupVector(beta, _state);
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(wkronrod, true);
-   ae_vector_free(wgauss, true);
-   ae_vector_init(&ta, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&s, 0, DT_REAL, _state, true);
-   ae_vector_init(&xgtmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&wgtmp, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   NewVector(ta, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(s, 0, DT_REAL, _state);
+   NewVector(xgtmp, 0, DT_REAL, _state);
+   NewVector(wgtmp, 0, DT_REAL, _state);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -965,9 +903,9 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
    double eps;
 
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(wkronrod, true);
-   ae_vector_free(wgauss, true);
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
 
    if (ae_fp_greater(ae_machineepsilon, 1.0E-32) && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
       *info = 1;
@@ -1012,8 +950,6 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
 void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t clen;
-   ae_vector a;
-   ae_vector b;
    double alpha2;
    double beta2;
    double apb;
@@ -1022,14 +958,12 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    double s;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a, 0, sizeof(a));
-   memset(&b, 0, sizeof(b));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(wkronrod, true);
-   ae_vector_free(wgauss, true);
-   ae_vector_init(&a, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -1107,8 +1041,6 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
 // API: void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
 void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector alpha;
-   ae_vector beta;
    ae_int_t alen;
    ae_int_t blen;
    double mu0;
@@ -1116,14 +1048,12 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&alpha, 0, sizeof(alpha));
-   memset(&beta, 0, sizeof(beta));
    *info = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(wkronrod, true);
-   ae_vector_free(wgauss, true);
-   ae_vector_init(&alpha, 0, DT_REAL, _state, true);
-   ae_vector_init(&beta, 0, DT_REAL, _state, true);
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   NewVector(alpha, 0, DT_REAL, _state);
+   NewVector(beta, 0, DT_REAL, _state);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -1180,19 +1110,15 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ng;
-   ae_vector p1;
-   ae_vector p2;
    double tmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p1, 0, sizeof(p1));
-   memset(&p2, 0, sizeof(p2));
-   ae_vector_free(x, true);
-   ae_vector_free(wkronrod, true);
-   ae_vector_free(wgauss, true);
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
    *eps = 0;
-   ae_vector_init(&p1, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   NewVector(p1, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
@@ -1622,7 +1548,7 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
 // API: void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams = xdefault);
 void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
 
-   autogkstate_free(state, true);
+   SetObj(autogkstate, state);
 
    ae_assert(ae_isfinite(a, _state), "AutoGKSmooth: A is not finite!", _state);
    ae_assert(ae_isfinite(b, _state), "AutoGKSmooth: B is not finite!", _state);
@@ -1650,7 +1576,7 @@ void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
 // API: void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state, const xparams _xparams = xdefault);
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state) {
 
-   autogkstate_free(state, true);
+   SetObj(autogkstate, state);
 
    ae_assert(ae_isfinite(a, _state), "AutoGKSmoothW: A is not finite!", _state);
    ae_assert(ae_isfinite(b, _state), "AutoGKSmoothW: B is not finite!", _state);
@@ -1694,7 +1620,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
 // API: void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state, const xparams _xparams = xdefault);
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state) {
 
-   autogkstate_free(state, true);
+   SetObj(autogkstate, state);
 
    ae_assert(ae_isfinite(a, _state), "AutoGKSingular: A is not finite!", _state);
    ae_assert(ae_isfinite(b, _state), "AutoGKSingular: B is not finite!", _state);
@@ -1965,7 +1891,7 @@ lbl_rcomm:
 void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state) {
 
    *v = 0;
-   autogkreport_free(rep, true);
+   SetObj(autogkreport, rep);
 
    *v = state->v;
    rep->terminationtype = state->terminationtype;
@@ -2377,12 +2303,10 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
 
 static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix tmp;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_init(&tmp, 0, 0, DT_REAL, _state, true);
+   NewMatrix(tmp, 0, 0, DT_REAL, _state);
 
    ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
    for (i = 0; i <= *heapsize - 1; i++) {

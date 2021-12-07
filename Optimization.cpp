@@ -1220,19 +1220,10 @@ ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, B
 // ALGLIB: Copyright 20.01.2012 by Sergey Bochkanov
 bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, RMatrix *ce, ae_int_t k, double epsi, ae_int_t *qpits, ae_int_t *gpaits, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _ce;
    ae_int_t i;
    ae_int_t j;
    ae_int_t idx0;
    ae_int_t idx1;
-   ae_vector permx;
-   ae_vector xn;
-   ae_vector xa;
-   ae_vector newtonstep;
-   ae_vector g;
-   ae_vector pg;
-   ae_vector tau;
-   ae_vector s;
    double armijostep;
    double armijobeststep;
    double armijobestfeas;
@@ -1254,14 +1245,8 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    bool werechangesinconstraints;
    bool stage1isover;
    bool converged;
-   ae_vector activeconstraints;
-   ae_vector tmpk;
-   ae_vector colnorms;
    ae_int_t nactive;
    ae_int_t nfree;
-   ae_vector p1;
-   ae_vector p2;
-   apbuffers buf;
    ae_int_t itscount;
    ae_int_t itswithintolerance;
    ae_int_t maxitswithintolerance;
@@ -1270,48 +1255,28 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    ae_int_t gparuns;
    ae_int_t maxarmijoruns;
    double infeasibilityincreasetolerance;
-   ae_matrix permce;
-   ae_matrix q;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_ce, 0, sizeof(_ce));
-   memset(&permx, 0, sizeof(permx));
-   memset(&xn, 0, sizeof(xn));
-   memset(&xa, 0, sizeof(xa));
-   memset(&newtonstep, 0, sizeof(newtonstep));
-   memset(&g, 0, sizeof(g));
-   memset(&pg, 0, sizeof(pg));
-   memset(&tau, 0, sizeof(tau));
-   memset(&s, 0, sizeof(s));
-   memset(&activeconstraints, 0, sizeof(activeconstraints));
-   memset(&tmpk, 0, sizeof(tmpk));
-   memset(&colnorms, 0, sizeof(colnorms));
-   memset(&p1, 0, sizeof(p1));
-   memset(&p2, 0, sizeof(p2));
-   memset(&buf, 0, sizeof(buf));
-   memset(&permce, 0, sizeof(permce));
-   memset(&q, 0, sizeof(q));
-   ae_matrix_copy(&_ce, ce, _state, true);
-   ce = &_ce;
+   DupMatrix(ce, _state);
    *qpits = 0;
    *gpaits = 0;
-   ae_vector_init(&permx, 0, DT_REAL, _state, true);
-   ae_vector_init(&xn, 0, DT_REAL, _state, true);
-   ae_vector_init(&xa, 0, DT_REAL, _state, true);
-   ae_vector_init(&newtonstep, 0, DT_REAL, _state, true);
-   ae_vector_init(&g, 0, DT_REAL, _state, true);
-   ae_vector_init(&pg, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&s, 0, DT_REAL, _state, true);
-   ae_vector_init(&activeconstraints, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpk, 0, DT_REAL, _state, true);
-   ae_vector_init(&colnorms, 0, DT_REAL, _state, true);
-   ae_vector_init(&p1, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
-   apbuffers_init(&buf, _state, true);
-   ae_matrix_init(&permce, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&q, 0, 0, DT_REAL, _state, true);
+   NewVector(permx, 0, DT_REAL, _state);
+   NewVector(xn, 0, DT_REAL, _state);
+   NewVector(xa, 0, DT_REAL, _state);
+   NewVector(newtonstep, 0, DT_REAL, _state);
+   NewVector(g, 0, DT_REAL, _state);
+   NewVector(pg, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(s, 0, DT_REAL, _state);
+   NewVector(activeconstraints, 0, DT_REAL, _state);
+   NewVector(tmpk, 0, DT_REAL, _state);
+   NewVector(colnorms, 0, DT_REAL, _state);
+   NewVector(p1, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
+   NewObj(apbuffers, buf, _state);
+   NewMatrix(permce, 0, 0, DT_REAL, _state);
+   NewMatrix(q, 0, 0, DT_REAL, _state);
 
    maxitswithintolerance = 3;
    maxbadits = 3;
@@ -4009,7 +3974,7 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
 // API: void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams);
 void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae_state *_state) {
 
-   minlbfgsstate_free(state, true);
+   SetObj(minlbfgsstate, state);
 
    ae_assert(n >= 1, "MinLBFGSCreate: N<1!", _state);
    ae_assert(m >= 1, "MinLBFGSCreate: M<1", _state);
@@ -4066,7 +4031,7 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae
 // API: void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams);
 void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state, ae_state *_state) {
 
-   minlbfgsstate_free(state, true);
+   SetObj(minlbfgsstate, state);
 
    ae_assert(n >= 1, "MinLBFGSCreateF: N too small!", _state);
    ae_assert(m >= 1, "MinLBFGSCreateF: M<1", _state);
@@ -5161,7 +5126,7 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 // API: void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams);
 void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -5208,8 +5173,8 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state
 // API: void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   optguardnonc1test0report_free(strrep, true);
-   optguardnonc1test0report_free(lngrep, true);
+   SetObj(optguardnonc1test0report, strrep);
+   SetObj(optguardnonc1test0report, lngrep);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -5264,8 +5229,8 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 // API: void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   optguardnonc1test1report_free(strrep, true);
-   optguardnonc1test1report_free(lngrep, true);
+   SetObj(optguardnonc1test1report, strrep);
+   SetObj(optguardnonc1test1report, lngrep);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -5302,8 +5267,8 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 // API: void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams);
 void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minlbfgsreport_free(rep, true);
+   SetVector(x);
+   SetObj(minlbfgsreport, rep);
 
    minlbfgsresultsbuf(state, x, rep, _state);
 }
@@ -13691,15 +13656,11 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, 
 // API: void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams);
 void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   minbleicstate_free(state, true);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   SetObj(minbleicstate, state);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "MinBLEICCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinBLEICCreate: Length(X)<N", _state);
@@ -13750,15 +13711,11 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_sta
 // API: void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams);
 void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   minbleicstate_free(state, true);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   SetObj(minbleicstate, state);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "MinBLEICCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinBLEICCreateF: Length(X)<N", _state);
@@ -15235,7 +15192,7 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 // API: void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams);
 void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -15282,8 +15239,8 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state
 // API: void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   optguardnonc1test0report_free(strrep, true);
-   optguardnonc1test0report_free(lngrep, true);
+   SetObj(optguardnonc1test0report, strrep);
+   SetObj(optguardnonc1test0report, lngrep);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -15338,8 +15295,8 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 // API: void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   optguardnonc1test1report_free(strrep, true);
-   optguardnonc1test1report_free(lngrep, true);
+   SetObj(optguardnonc1test1report, strrep);
+   SetObj(optguardnonc1test1report, lngrep);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -15374,8 +15331,8 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 // API: void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams);
 void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minbleicreport_free(rep, true);
+   SetVector(x);
+   SetObj(minbleicreport, rep);
 
    minbleicresultsbuf(state, x, rep, _state);
 }
@@ -15497,14 +15454,10 @@ static void minbleic_clearrequestfields(minbleicstate *state, ae_state *_state) 
 static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
 // Initialize
    state->teststep = (double)(0);
@@ -20307,7 +20260,7 @@ namespace alglib_impl {
 void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    ae_int_t i;
 
-   minqpstate_free(state, true);
+   SetObj(minqpstate, state);
 
    ae_assert(n >= 1, "MinQPCreate: N<1", _state);
 
@@ -21265,14 +21218,10 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 // API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
 void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
-   sparsematrix dummyc;
-   ae_vector dummyct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&dummyc, 0, sizeof(dummyc));
-   memset(&dummyct, 0, sizeof(dummyct));
-   sparsematrix_init(&dummyc, _state, true);
-   ae_vector_init(&dummyct, 0, DT_INT, _state, true);
+   NewObj(sparsematrix, dummyc, _state);
+   NewVector(dummyct, 0, DT_INT, _state);
 
    minqpsetlcmixed(state, &dummyc, &dummyct, 0, c, ct, k, _state);
    ae_frame_leave(_state);
@@ -21312,14 +21261,10 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
 void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix dummyc;
-   ae_vector dummyct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&dummyc, 0, sizeof(dummyc));
-   memset(&dummyct, 0, sizeof(dummyct));
-   ae_matrix_init(&dummyc, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyct, 0, DT_INT, _state, true);
+   NewMatrix(dummyc, 0, 0, DT_REAL, _state);
+   NewVector(dummyct, 0, DT_INT, _state);
 
    minqpsetlcmixed(state, c, ct, k, &dummyc, &dummyct, 0, _state);
    ae_frame_leave(_state);
@@ -21381,38 +21326,20 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    ae_int_t j;
    ae_int_t j0;
    double v;
-   ae_vector srcidx;
-   ae_vector dstidx;
-   ae_vector s;
-   ae_vector rs;
-   ae_vector eoffs;
-   ae_vector roffs;
-   ae_vector v2;
-   ae_vector eidx;
-   ae_vector eval;
    ae_int_t t0;
    ae_int_t t1;
    ae_int_t nnz;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&srcidx, 0, sizeof(srcidx));
-   memset(&dstidx, 0, sizeof(dstidx));
-   memset(&s, 0, sizeof(s));
-   memset(&rs, 0, sizeof(rs));
-   memset(&eoffs, 0, sizeof(eoffs));
-   memset(&roffs, 0, sizeof(roffs));
-   memset(&v2, 0, sizeof(v2));
-   memset(&eidx, 0, sizeof(eidx));
-   memset(&eval, 0, sizeof(eval));
-   ae_vector_init(&srcidx, 0, DT_INT, _state, true);
-   ae_vector_init(&dstidx, 0, DT_INT, _state, true);
-   ae_vector_init(&s, 0, DT_REAL, _state, true);
-   ae_vector_init(&rs, 0, DT_INT, _state, true);
-   ae_vector_init(&eoffs, 0, DT_INT, _state, true);
-   ae_vector_init(&roffs, 0, DT_INT, _state, true);
-   ae_vector_init(&v2, 0, DT_REAL, _state, true);
-   ae_vector_init(&eidx, 0, DT_INT, _state, true);
-   ae_vector_init(&eval, 0, DT_REAL, _state, true);
+   NewVector(srcidx, 0, DT_INT, _state);
+   NewVector(dstidx, 0, DT_INT, _state);
+   NewVector(s, 0, DT_REAL, _state);
+   NewVector(rs, 0, DT_INT, _state);
+   NewVector(eoffs, 0, DT_INT, _state);
+   NewVector(roffs, 0, DT_INT, _state);
+   NewVector(v2, 0, DT_REAL, _state);
+   NewVector(eidx, 0, DT_INT, _state);
+   NewVector(eval, 0, DT_REAL, _state);
 
    n = state->n;
 
@@ -22354,8 +22281,8 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
 // API: void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams);
 void minqpresults(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minqpreport_free(rep, true);
+   SetVector(x);
+   SetObj(minqpreport, rep);
 
    minqpresultsbuf(state, x, rep, _state);
 }
@@ -23118,7 +23045,7 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
 // API: void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    ae_assert(n >= 1, "MinLMCreateVJ: N<1!", _state);
    ae_assert(m >= 1, "MinLMCreateVJ: M<1!", _state);
@@ -23204,7 +23131,7 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
 // API: void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams);
 void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    ae_assert(ae_isfinite(diffstep, _state), "MinLMCreateV: DiffStep is not finite!", _state);
    ae_assert(ae_fp_greater(diffstep, (double)(0)), "MinLMCreateV: DiffStep <= 0!", _state);
@@ -23294,7 +23221,7 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 // API: void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    ae_assert(n >= 1, "MinLMCreateFGH: N<1!", _state);
    ae_assert(x->cnt >= n, "MinLMCreateFGH: Length(X)<N!", _state);
@@ -24942,7 +24869,7 @@ void minlmoptguardgradient(minlmstate *state, double teststep, ae_state *_state)
 // API: void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams);
 void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -24976,8 +24903,8 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_sta
 // API: void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams);
 void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minlmreport_free(rep, true);
+   SetVector(x);
+   SetObj(minlmreport, rep);
 
    minlmresultsbuf(state, x, rep, _state);
 }
@@ -25063,7 +24990,7 @@ void minlmrequesttermination(minlmstate *state, ae_state *_state) {
 // API: void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    minlmcreatevj(n, m, x, state, _state);
 }
@@ -25076,7 +25003,7 @@ void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_st
 // API: void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    minlmcreatefj(n, m, x, state, _state);
 }
@@ -25089,7 +25016,7 @@ void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_st
 // API: void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
 void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
 
-   minlmstate_free(state, true);
+   SetObj(minlmstate, state);
 
    ae_assert(n >= 1, "MinLMCreateFJ: N<1!", _state);
    ae_assert(m >= 1, "MinLMCreateFJ: M<1!", _state);
@@ -26373,7 +26300,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 // API: void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams);
 void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
 
-   mincgstate_free(state, true);
+   SetObj(mincgstate, state);
 
    ae_assert(n >= 1, "MinCGCreate: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!", _state);
@@ -26424,7 +26351,7 @@ void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
 // API: void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams);
 void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae_state *_state) {
 
-   mincgstate_free(state, true);
+   SetObj(mincgstate, state);
 
    ae_assert(n >= 1, "MinCGCreateF: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreateF: Length(X)<N!", _state);
@@ -27481,7 +27408,7 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 // API: void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams);
 void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -27528,8 +27455,8 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_sta
 // API: void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   optguardnonc1test0report_free(strrep, true);
-   optguardnonc1test0report_free(lngrep, true);
+   SetObj(optguardnonc1test0report, strrep);
+   SetObj(optguardnonc1test0report, lngrep);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -27584,8 +27511,8 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 // API: void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   optguardnonc1test1report_free(strrep, true);
-   optguardnonc1test1report_free(lngrep, true);
+   SetObj(optguardnonc1test1report, strrep);
+   SetObj(optguardnonc1test1report, lngrep);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -27620,8 +27547,8 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 // API: void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams);
 void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   mincgreport_free(rep, true);
+   SetVector(x);
+   SetObj(mincgreport, rep);
 
    mincgresultsbuf(state, x, rep, _state);
 }
@@ -27745,11 +27672,9 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
    ae_int_t k;
    ae_int_t n;
    double t;
-   ae_matrix b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_REAL, _state, true);
+   NewMatrix(b, 0, 0, DT_REAL, _state);
 
    if (vcnt == 0) {
       mincgsetprecdiagfast(state, d1, _state);
@@ -31869,7 +31794,6 @@ static void reviseddualsimplex_subproblemhandlexnupdate(dualsimplexstate *state,
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector dummy;
    ae_int_t nn;
    ae_int_t m;
    ae_int_t ii;
@@ -31883,8 +31807,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&dummy, 0, sizeof(dummy));
-   ae_vector_init(&dummy, 0, DT_REAL, _state, true);
+   NewVector(dummy, 0, DT_REAL, _state);
 
    nn = s->ns;
    m = s->m;
@@ -33381,12 +33304,10 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    ae_int_t i;
    ae_int_t j;
    double v;
-   hqrndstate rs;
    ae_int_t t0;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   hqrndstate_init(&rs, _state, true);
+   NewObj(hqrndstate, rs, _state);
 
    nx = state->primary.ns + state->primary.m;
    m = state->primary.m;
@@ -35656,7 +35577,7 @@ static void minlp_clearreportfields(minlpstate *state, ae_state *_state);
 void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
    ae_int_t i;
 
-   minlpstate_free(state, true);
+   SetObj(minlpstate, state);
 
    ae_assert(n >= 1, "MinLPCreate: N<1", _state);
 
@@ -36014,16 +35935,12 @@ void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 // API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams);
 void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector al;
-   ae_vector au;
    ae_int_t n;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&al, 0, sizeof(al));
-   memset(&au, 0, sizeof(au));
-   ae_vector_init(&al, 0, DT_REAL, _state, true);
-   ae_vector_init(&au, 0, DT_REAL, _state, true);
+   NewVector(al, 0, DT_REAL, _state);
+   NewVector(au, 0, DT_REAL, _state);
 
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC: K<0", _state);
@@ -36099,11 +36016,9 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
    ae_int_t j;
    ae_int_t n;
    ae_int_t nz;
-   ae_vector nrs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&nrs, 0, sizeof(nrs));
-   ae_vector_init(&nrs, 0, DT_INT, _state, true);
+   NewVector(nrs, 0, DT_INT, _state);
 
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC2Dense: K<0", _state);
@@ -36396,18 +36311,12 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
    ae_int_t m;
    ae_int_t i;
    double v;
-   dualsimplexsettings settings;
-   ae_matrix dummy;
-   dualsimplexbasis dummybasis;
    bool badconstr;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&settings, 0, sizeof(settings));
-   memset(&dummy, 0, sizeof(dummy));
-   memset(&dummybasis, 0, sizeof(dummybasis));
-   dualsimplexsettings_init(&settings, _state, true);
-   ae_matrix_init(&dummy, 0, 0, DT_REAL, _state, true);
-   dualsimplexbasis_init(&dummybasis, _state, true);
+   NewObj(dualsimplexsettings, settings, _state);
+   NewMatrix(dummy, 0, 0, DT_REAL, _state);
+   NewObj(dualsimplexbasis, dummybasis, _state);
 
    n = state->n;
    m = state->m;
@@ -36584,8 +36493,8 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
 // API: void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams);
 void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minlpreport_free(rep, true);
+   SetVector(x);
+   SetObj(minlpreport, rep);
 
    minlpresultsbuf(state, x, rep, _state);
 }
@@ -40079,7 +39988,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
 // API: void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams);
 void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) {
 
-   minnlcstate_free(state, true);
+   SetObj(minnlcstate, state);
 
    ae_assert(n >= 1, "MinNLCCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinNLCCreate: Length(X)<N", _state);
@@ -40132,7 +40041,7 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) 
 // API: void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams);
 void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state) {
 
-   minnlcstate_free(state, true);
+   SetObj(minnlcstate, state);
 
    ae_assert(n >= 1, "MinNLCCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinNLCCreateF: Length(X)<N", _state);
@@ -41819,7 +41728,7 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 // API: void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams);
 void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -41868,8 +41777,8 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_s
 // API: void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   optguardnonc1test0report_free(strrep, true);
-   optguardnonc1test0report_free(lngrep, true);
+   SetObj(optguardnonc1test0report, strrep);
+   SetObj(optguardnonc1test0report, lngrep);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -41926,8 +41835,8 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 // API: void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   optguardnonc1test1report_free(strrep, true);
-   optguardnonc1test1report_free(lngrep, true);
+   SetObj(optguardnonc1test1report, strrep);
+   SetObj(optguardnonc1test1report, lngrep);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -41979,8 +41888,8 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 // API: void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams);
 void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minnlcreport_free(rep, true);
+   SetVector(x);
+   SetObj(minnlcreport, rep);
 
    minnlcresultsbuf(state, x, rep, _state);
 }
@@ -42213,14 +42122,10 @@ static void minnlc_clearrequestfields(minnlcstate *state, ae_state *_state) {
 static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
 // Default params
    state->stabilizingpoint = -2.0;
@@ -43805,7 +43710,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state
 // API: void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams);
 void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
 
-   minnsstate_free(state, true);
+   SetObj(minnsstate, state);
 
    ae_assert(n >= 1, "MinNSCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinNSCreate: Length(X)<N", _state);
@@ -43843,7 +43748,7 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
 // API: void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams);
 void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state) {
 
-   minnsstate_free(state, true);
+   SetObj(minnsstate, state);
 
    ae_assert(n >= 1, "MinNSCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinNSCreateF: Length(X)<N", _state);
@@ -44534,8 +44439,8 @@ lbl_rcomm:
 // API: void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams);
 void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minnsreport_free(rep, true);
+   SetVector(x);
+   SetObj(minnsreport, rep);
 
    minnsresultsbuf(state, x, rep, _state);
 }
@@ -44613,14 +44518,10 @@ static void minns_clearrequestfields(minnsstate *state, ae_state *_state) {
 static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
    state->agsinitstp = 0.2;
    state->agsstattold = ae_sqrt(ae_machineepsilon, _state);
@@ -46545,7 +46446,7 @@ void minbleicsetbarrierdecay(minbleicstate *state, double mudecay, ae_state *_st
 void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasastate *state, ae_state *_state) {
    ae_int_t i;
 
-   minasastate_free(state, true);
+   SetObj(minasastate, state);
 
    ae_assert(n >= 1, "MinASA: N too small!", _state);
    ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!", _state);
@@ -47299,8 +47200,8 @@ lbl_rcomm:
 // API: void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams);
 void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minasareport_free(rep, true);
+   SetVector(x);
+   SetObj(minasareport, rep);
 
    minasaresultsbuf(state, x, rep, _state);
 }
@@ -47806,15 +47707,11 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
 // API: void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams);
 void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   minbcstate_free(state, true);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   SetObj(minbcstate, state);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "MinBCCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinBCCreate: Length(X)<N", _state);
@@ -47865,15 +47762,11 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
 // API: void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams);
 void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   minbcstate_free(state, true);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   SetObj(minbcstate, state);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "MinBCCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinBCCreateF: Length(X)<N", _state);
@@ -49375,7 +49268,7 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 // API: void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams);
 void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_state) {
 
-   optguardreport_free(rep, true);
+   SetObj(optguardreport, rep);
 
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
 }
@@ -49422,8 +49315,8 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_sta
 // API: void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
 void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
 
-   optguardnonc1test0report_free(strrep, true);
-   optguardnonc1test0report_free(lngrep, true);
+   SetObj(optguardnonc1test0report, strrep);
+   SetObj(optguardnonc1test0report, lngrep);
 
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test0report(&state->smonitor.nonc1test0lngrep, &state->lastscaleused, lngrep, _state);
@@ -49478,8 +49371,8 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 // API: void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
 void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
 
-   optguardnonc1test1report_free(strrep, true);
-   optguardnonc1test1report_free(lngrep, true);
+   SetObj(optguardnonc1test1report, strrep);
+   SetObj(optguardnonc1test1report, lngrep);
 
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1strrep, &state->lastscaleused, strrep, _state);
    smoothnessmonitorexportc1test1report(&state->smonitor.nonc1test1lngrep, &state->lastscaleused, lngrep, _state);
@@ -49512,8 +49405,8 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 // API: void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams);
 void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   minbcreport_free(rep, true);
+   SetVector(x);
+   SetObj(minbcreport, rep);
 
    minbcresultsbuf(state, x, rep, _state);
 }
@@ -49614,14 +49507,10 @@ static void minbc_clearrequestfields(minbcstate *state, ae_state *_state) {
 static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_matrix c;
-   ae_vector ct;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&c, 0, sizeof(c));
-   memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
 
 // Initialize
    state->teststep = (double)(0);
@@ -50182,7 +50071,7 @@ namespace alglib_impl {
 // API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams);
 void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p, ae_state *_state) {
 
-   lptestproblem_free(p, true);
+   SetObj(lptestproblem, p);
 
    ae_assert(n >= 1, "LPTestProblemCreate: N<1", _state);
    p->n = n;
@@ -50326,7 +50215,7 @@ void lptestproblemserialize(ae_serializer *s, lptestproblem *p, ae_state *_state
 void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_state) {
    ae_int_t k;
 
-   lptestproblem_free(p, true);
+   SetObj(lptestproblem, p);
 
    ae_serializer_unserialize_int(s, &k, _state);
    ae_assert(k == getlptestserializationcode(_state), "LPTestProblemUnserialize: stream header corrupted", _state);
@@ -50356,7 +50245,7 @@ void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_sta
 // API: void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams);
 void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_state *_state) {
 
-   minlpstate_free(state, true);
+   SetObj(minlpstate, state);
 
    minlpcreate(p->n, state, _state);
    minlpsetscale(state, &p->s, _state);
@@ -50412,12 +50301,11 @@ namespace alglib {
 DefClass(lptestproblem, )
 
 void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -50430,11 +50318,9 @@ void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -50445,22 +50331,18 @@ void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
 }
 
 void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);

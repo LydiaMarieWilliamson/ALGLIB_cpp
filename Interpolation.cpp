@@ -410,9 +410,9 @@ void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVect
    double v;
 
    *n = 0;
-   ae_vector_free(x, true);
-   ae_vector_free(y, true);
-   ae_vector_free(w, true);
+   SetVector(x);
+   SetVector(y);
+   SetVector(w);
 
    *n = b->n;
    ae_vector_set_length(x, *n, _state);
@@ -440,7 +440,7 @@ void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVect
 // API: void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b, const xparams _xparams = xdefault);
 void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b, ae_state *_state) {
 
-   barycentricinterpolant_free(b, true);
+   SetObj(barycentricinterpolant, b);
 
    ae_assert(n > 0, "BarycentricBuildXYW: incorrect N!", _state);
 
@@ -489,21 +489,13 @@ void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_vector perm;
-   ae_vector wtemp;
-   ae_vector sortrbuf;
-   ae_vector sortrbuf2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&perm, 0, sizeof(perm));
-   memset(&wtemp, 0, sizeof(wtemp));
-   memset(&sortrbuf, 0, sizeof(sortrbuf));
-   memset(&sortrbuf2, 0, sizeof(sortrbuf2));
-   barycentricinterpolant_free(b, true);
-   ae_vector_init(&perm, 0, DT_INT, _state, true);
-   ae_vector_init(&wtemp, 0, DT_REAL, _state, true);
-   ae_vector_init(&sortrbuf, 0, DT_REAL, _state, true);
-   ae_vector_init(&sortrbuf2, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, b);
+   NewVector(perm, 0, DT_INT, _state);
+   NewVector(wtemp, 0, DT_REAL, _state);
+   NewVector(sortrbuf, 0, DT_REAL, _state);
+   NewVector(sortrbuf2, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "BarycentricFloaterHormann: N <= 0!", _state);
    ae_assert(d >= 0, "BarycentricFloaterHormann: incorrect D!", _state);
@@ -573,7 +565,7 @@ void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_state *_state) {
 
-   barycentricinterpolant_free(b2, true);
+   SetObj(barycentricinterpolant, b2);
 
    b2->n = b->n;
    b2->sy = b->sy;
@@ -595,18 +587,14 @@ void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2, ae_s
 // Internal subroutine.
 static void ratint_barycentricnormalize(barycentricinterpolant *b, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector p1;
-   ae_vector p2;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j2;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&p1, 0, sizeof(p1));
-   memset(&p2, 0, sizeof(p2));
-   ae_vector_init(&p1, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   NewVector(p1, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
 // Normalize task: |Y| <= 1, |W| <= 1, sort X[]
    b->sy = (double)(0);
@@ -797,7 +785,7 @@ static void idw_errormetricsviacalc(idwbuilder *state, idwmodel *model, idwrepor
 // API: void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _xparams = xdefault);
 void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state) {
 
-   idwcalcbuffer_free(buf, true);
+   SetObj(idwcalcbuffer, buf);
 
    ae_assert(s->nx >= 1, "IDWCreateCalcBuffer: integrity check failed", _state);
    ae_assert(s->ny >= 1, "IDWCreateCalcBuffer: integrity check failed", _state);
@@ -838,7 +826,7 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state) {
 // API: void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state, const xparams _xparams = xdefault);
 void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state, ae_state *_state) {
 
-   idwbuilder_free(state, true);
+   SetObj(idwbuilder, state);
 
    ae_assert(nx >= 1, "IDWBuilderCreate: NX <= 0", _state);
    ae_assert(ny >= 1, "IDWBuilderCreate: NY <= 0", _state);
@@ -1227,7 +1215,7 @@ double idwcalc3(idwmodel *s, double x0, double x1, double x2, ae_state *_state) 
 // API: void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
 void idwcalc(idwmodel *s, RVector *x, RVector *y, ae_state *_state) {
 
-   ae_vector_free(y, true);
+   SetVector(y);
 
    idwtscalcbuf(s, &s->buffer, x, y, _state);
 }
@@ -1534,8 +1522,8 @@ void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep, ae_state *_state
    double rss;
    double tss;
 
-   idwmodel_free(model, true);
-   idwreport_free(rep, true);
+   SetObj(idwmodel, model);
+   SetObj(idwreport, rep);
 
    nx = state->nx;
    ny = state->ny;
@@ -1876,7 +1864,7 @@ void idwunserialize(ae_serializer *s, idwmodel *model, ae_state *_state) {
    bool processed;
    ae_int_t scode;
 
-   idwmodel_free(model, true);
+   SetObj(idwmodel, model);
 
 // Header
    ae_serializer_unserialize_int(s, &scode, _state);
@@ -2146,12 +2134,11 @@ DefClass(idwbuilder, )
 DefClass(idwreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void idwserialize(idwmodel &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -2164,11 +2151,9 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void idwserialize(idwmodel &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -2179,22 +2164,18 @@ void idwserialize(idwmodel &obj, std::ostream &s_out) {
 }
 
 void idwunserialize(const std::string &s_in, idwmodel &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void idwunserialize(const std::istream &s_in, idwmodel &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
@@ -2397,8 +2378,8 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
    *xb = 0;
    *sa = 0;
    *sb = 0;
-   ae_vector_free(xoriginal, true);
-   ae_vector_free(yoriginal, true);
+   SetVector(xoriginal);
+   SetVector(yoriginal);
 
    ae_assert(n >= 1, "LSFitScaleXY: incorrect N", _state);
    ae_assert(k >= 0, "LSFitScaleXY: incorrect K", _state);
@@ -2482,23 +2463,15 @@ void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t 
    ae_int_t j0;
    ae_int_t j1;
    double rj;
-   ae_matrix araw;
-   ae_matrix amod;
-   ae_matrix braw;
-   ae_vector tmp0;
    double lambdareg;
    ae_int_t rfsits;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&araw, 0, sizeof(araw));
-   memset(&amod, 0, sizeof(amod));
-   memset(&braw, 0, sizeof(braw));
-   memset(&tmp0, 0, sizeof(tmp0));
-   ae_matrix_free(v, true);
-   ae_matrix_init(&araw, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&amod, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&braw, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
+   SetMatrix(v);
+   NewMatrix(araw, 0, 0, DT_REAL, _state);
+   NewMatrix(amod, 0, 0, DT_REAL, _state);
+   NewMatrix(braw, 0, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "BuildPriorTerm: N<0", _state);
    ae_assert(nx > 0, "BuildPriorTerm: NX <= 0", _state);
@@ -2651,23 +2624,15 @@ void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_
    ae_int_t j1;
    ae_int_t ew;
    double rj;
-   ae_matrix araw;
-   ae_matrix amod;
-   ae_matrix braw;
-   ae_vector tmp0;
    double lambdareg;
    ae_int_t rfsits;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&araw, 0, sizeof(araw));
-   memset(&amod, 0, sizeof(amod));
-   memset(&braw, 0, sizeof(braw));
-   memset(&tmp0, 0, sizeof(tmp0));
-   ae_matrix_free(v, true);
-   ae_matrix_init(&araw, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&amod, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&braw, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
+   SetMatrix(v);
+   NewMatrix(araw, 0, 0, DT_REAL, _state);
+   NewMatrix(amod, 0, 0, DT_REAL, _state);
+   NewMatrix(braw, 0, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "BuildPriorTerm: N<0", _state);
    ae_assert(nx > 0, "BuildPriorTerm: NX <= 0", _state);
@@ -2842,22 +2807,14 @@ void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
-   ae_vector vp;
-   ae_vector vx;
-   ae_vector tk;
-   ae_vector tk1;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&vp, 0, sizeof(vp));
-   memset(&vx, 0, sizeof(vx));
-   memset(&tk, 0, sizeof(tk));
-   memset(&tk1, 0, sizeof(tk1));
-   ae_vector_free(t, true);
-   ae_vector_init(&vp, 0, DT_REAL, _state, true);
-   ae_vector_init(&vx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tk, 0, DT_REAL, _state, true);
-   ae_vector_init(&tk1, 0, DT_REAL, _state, true);
+   SetVector(t);
+   NewVector(vp, 0, DT_REAL, _state);
+   NewVector(vx, 0, DT_REAL, _state);
+   NewVector(tk, 0, DT_REAL, _state);
+   NewVector(tk1, 0, DT_REAL, _state);
 
    ae_assert(ae_isfinite(a, _state), "PolynomialBar2Cheb: A is not finite!", _state);
    ae_assert(ae_isfinite(b, _state), "PolynomialBar2Cheb: B is not finite!", _state);
@@ -2934,7 +2891,6 @@ void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentrici
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
-   ae_vector y;
    double tk;
    double tk1;
    double vx;
@@ -2942,9 +2898,8 @@ void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentrici
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&y, 0, sizeof(y));
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, p);
+   NewVector(y, 0, DT_REAL, _state);
 
    ae_assert(ae_isfinite(a, _state), "PolynomialBar2Cheb: A is not finite!", _state);
    ae_assert(ae_isfinite(b, _state), "PolynomialBar2Cheb: B is not finite!", _state);
@@ -3020,37 +2975,23 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
    ae_int_t k;
    double e;
    double d;
-   ae_vector vp;
-   ae_vector vx;
-   ae_vector tk;
-   ae_vector tk1;
-   ae_vector t;
    double v;
    double c0;
    double s0;
    double va;
    double vb;
-   ae_vector vai;
-   ae_vector vbi;
    double minx;
    double maxx;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&vp, 0, sizeof(vp));
-   memset(&vx, 0, sizeof(vx));
-   memset(&tk, 0, sizeof(tk));
-   memset(&tk1, 0, sizeof(tk1));
-   memset(&t, 0, sizeof(t));
-   memset(&vai, 0, sizeof(vai));
-   memset(&vbi, 0, sizeof(vbi));
-   ae_vector_free(a, true);
-   ae_vector_init(&vp, 0, DT_REAL, _state, true);
-   ae_vector_init(&vx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tk, 0, DT_REAL, _state, true);
-   ae_vector_init(&tk1, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&vai, 0, DT_REAL, _state, true);
-   ae_vector_init(&vbi, 0, DT_REAL, _state, true);
+   SetVector(a);
+   NewVector(vp, 0, DT_REAL, _state);
+   NewVector(vx, 0, DT_REAL, _state);
+   NewVector(tk, 0, DT_REAL, _state);
+   NewVector(tk1, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(vai, 0, DT_REAL, _state);
+   NewVector(vbi, 0, DT_REAL, _state);
 
 // We have barycentric model built using set of points X[], and we
 // want to convert it to power basis centered about point  C  with
@@ -3256,15 +3197,13 @@ void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricin
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t k;
-   ae_vector y;
    double vx;
    double vy;
    double px;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&y, 0, sizeof(y));
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, p);
+   NewVector(y, 0, DT_REAL, _state);
 
    ae_assert(ae_isfinite(c, _state), "PolynomialPow2Bar: C is not finite!", _state);
    ae_assert(ae_isfinite(s, _state), "PolynomialPow2Bar: S is not finite!", _state);
@@ -3310,32 +3249,20 @@ void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricin
 // API: void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p, const xparams _xparams = xdefault);
 void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t j;
    ae_int_t k;
-   ae_vector w;
    double b;
    double a;
    double v;
    double mx;
-   ae_vector sortrbuf;
-   ae_vector sortrbuf2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&w, 0, sizeof(w));
-   memset(&sortrbuf, 0, sizeof(sortrbuf));
-   memset(&sortrbuf2, 0, sizeof(sortrbuf2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&sortrbuf, 0, DT_REAL, _state, true);
-   ae_vector_init(&sortrbuf2, 0, DT_REAL, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(barycentricinterpolant, p);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(sortrbuf, 0, DT_REAL, _state);
+   NewVector(sortrbuf2, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "PolynomialBuild: N <= 0!", _state);
    ae_assert(x->cnt >= n, "PolynomialBuild: Length(X)<N!", _state);
@@ -3399,16 +3326,12 @@ void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant 
 void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector x;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&x, 0, sizeof(x));
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, p);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(x, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "PolynomialBuildEqDist: N <= 0!", _state);
    ae_assert(y->cnt >= n, "PolynomialBuildEqDist: Length(Y)<N!", _state);
@@ -3463,17 +3386,13 @@ void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentr
 void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector x;
    double v;
    double t;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&x, 0, sizeof(x));
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, p);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(x, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "PolynomialBuildCheb1: N <= 0!", _state);
    ae_assert(y->cnt >= n, "PolynomialBuildCheb1: Length(Y)<N!", _state);
@@ -3527,16 +3446,12 @@ void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentri
 void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector x;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&x, 0, sizeof(x));
-   barycentricinterpolant_free(p, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
+   SetObj(barycentricinterpolant, p);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(x, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "PolynomialBuildCheb2: N <= 0!", _state);
    ae_assert(y->cnt >= n, "PolynomialBuildCheb2: Length(Y)<N!", _state);
@@ -4238,18 +4153,12 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 // API: void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(c, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, c);
 
    ae_assert(n > 1, "Spline1DBuildLinear: N<2!", _state);
    ae_assert(x->cnt >= n, "Spline1DBuildLinear: Length(X)<N!", _state);
@@ -4335,39 +4244,19 @@ void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant
 // API: void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector dt;
-   ae_vector d;
-   ae_vector p;
    ae_int_t ylen;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&dt, 0, sizeof(dt));
-   memset(&d, 0, sizeof(d));
-   memset(&p, 0, sizeof(p));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(c, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, c);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DBuildCubic: incorrect BoundLType!", _state);
@@ -4468,37 +4357,19 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 // API: void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d, const xparams _xparams = xdefault);
 void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector dt;
-   ae_vector p;
    ae_int_t i;
    ae_int_t ylen;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&dt, 0, sizeof(dt));
-   memset(&p, 0, sizeof(p));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_free(d, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetVector(d);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DGridDiffCubic: incorrect BoundLType!", _state);
@@ -4603,14 +4474,6 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // API: void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2, const xparams _xparams = xdefault);
 void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d1, RVector *d2, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector dt;
-   ae_vector p;
    ae_int_t i;
    ae_int_t ylen;
    double delta;
@@ -4620,26 +4483,16 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
    double s3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&dt, 0, sizeof(dt));
-   memset(&p, 0, sizeof(p));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_free(d1, true);
-   ae_vector_free(d2, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetVector(d1);
+   SetVector(d2);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DGridDiff2Cubic: incorrect BoundLType!", _state);
@@ -4777,55 +4630,26 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 // API: void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, const xparams _xparams = xdefault);
 void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _x2;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector d;
-   ae_vector dt;
-   ae_vector d1;
-   ae_vector d2;
-   ae_vector p;
-   ae_vector p2;
    ae_int_t i;
    ae_int_t ylen;
    double t;
    double t2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_x2, 0, sizeof(_x2));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&d, 0, sizeof(d));
-   memset(&dt, 0, sizeof(dt));
-   memset(&d1, 0, sizeof(d1));
-   memset(&d2, 0, sizeof(d2));
-   memset(&p, 0, sizeof(p));
-   memset(&p2, 0, sizeof(p2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_x2, x2, _state, true);
-   x2 = &_x2;
-   ae_vector_free(y2, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&d1, 0, DT_REAL, _state, true);
-   ae_vector_init(&d2, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(x2, _state);
+   SetVector(y2);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(d1, 0, DT_REAL, _state);
+   NewVector(d2, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvCubic: incorrect BoundLType!", _state);
@@ -4952,53 +4776,26 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 // API: void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, const xparams _xparams = xdefault);
 void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _x2;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector d;
-   ae_vector dt;
-   ae_vector rt1;
-   ae_vector p;
-   ae_vector p2;
    ae_int_t i;
    ae_int_t ylen;
    double t;
    double t2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_x2, 0, sizeof(_x2));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&d, 0, sizeof(d));
-   memset(&dt, 0, sizeof(dt));
-   memset(&rt1, 0, sizeof(rt1));
-   memset(&p, 0, sizeof(p));
-   memset(&p2, 0, sizeof(p2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_x2, x2, _state, true);
-   x2 = &_x2;
-   ae_vector_free(y2, true);
-   ae_vector_free(d2, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&rt1, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(x2, _state);
+   SetVector(y2);
+   SetVector(d2);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(rt1, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvDiffCubic: incorrect BoundLType!", _state);
@@ -5131,51 +4928,26 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // API: void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2, const xparams _xparams = xdefault);
 void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *x2, ae_int_t n2, RVector *y2, RVector *d2, RVector *dd2, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _x2;
-   ae_vector a1;
-   ae_vector a2;
-   ae_vector a3;
-   ae_vector b;
-   ae_vector d;
-   ae_vector dt;
-   ae_vector p;
-   ae_vector p2;
    ae_int_t i;
    ae_int_t ylen;
    double t;
    double t2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_x2, 0, sizeof(_x2));
-   memset(&a1, 0, sizeof(a1));
-   memset(&a2, 0, sizeof(a2));
-   memset(&a3, 0, sizeof(a3));
-   memset(&b, 0, sizeof(b));
-   memset(&d, 0, sizeof(d));
-   memset(&dt, 0, sizeof(dt));
-   memset(&p, 0, sizeof(p));
-   memset(&p2, 0, sizeof(p2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_x2, x2, _state, true);
-   x2 = &_x2;
-   ae_vector_free(y2, true);
-   ae_vector_free(d2, true);
-   ae_vector_free(dd2, true);
-   ae_vector_init(&a1, 0, DT_REAL, _state, true);
-   ae_vector_init(&a2, 0, DT_REAL, _state, true);
-   ae_vector_init(&a3, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&dt, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(x2, _state);
+   SetVector(y2);
+   SetVector(d2);
+   SetVector(dd2);
+   NewVector(a1, 0, DT_REAL, _state);
+   NewVector(a2, 0, DT_REAL, _state);
+   NewVector(a3, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(dt, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
 // check correctness of boundary conditions
    ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvDiff2Cubic: incorrect BoundLType!", _state);
@@ -5283,21 +5055,13 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 // API: void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundtype, double tension, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector d;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&d, 0, sizeof(d));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(c, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, c);
+   NewVector(d, 0, DT_REAL, _state);
 
    ae_assert(n >= 2, "Spline1DBuildCatmullRom: N<2!", _state);
    ae_assert(boundtype == -1 || boundtype == 0, "Spline1DBuildCatmullRom: incorrect BoundType!", _state);
@@ -5384,25 +5148,16 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 // API: void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _d;
    ae_int_t i;
    double delta;
    double delta2;
    double delta3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_d, 0, sizeof(_d));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_d, d, _state, true);
-   d = &_d;
-   spline1dinterpolant_free(c, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(d, _state);
+   SetObj(spline1dinterpolant, c);
 
    ae_assert(n >= 2, "Spline1DBuildHermite: N<2!", _state);
    ae_assert(x->cnt >= n, "Spline1DBuildHermite: Length(X)<N!", _state);
@@ -5463,27 +5218,15 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 // API: void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t i;
-   ae_vector d;
-   ae_vector w;
-   ae_vector diff;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&d, 0, sizeof(d));
-   memset(&w, 0, sizeof(w));
-   memset(&diff, 0, sizeof(diff));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(c, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&diff, 0, DT_REAL, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, c);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(diff, 0, DT_REAL, _state);
 
    ae_assert(n >= 2, "Spline1DBuildAkima: N<2!", _state);
    ae_assert(x->cnt >= n, "Spline1DBuildAkima: Length(X)<N!", _state);
@@ -5645,7 +5388,7 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
 void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc, ae_state *_state) {
    ae_int_t s;
 
-   spline1dinterpolant_free(cc, true);
+   SetObj(spline1dinterpolant, cc);
 
    cc->periodic = c->periodic;
    cc->n = c->n;
@@ -5688,7 +5431,7 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl, ae_state 
    ae_int_t j;
 
    *n = 0;
-   ae_matrix_free(tbl, true);
+   SetMatrix(tbl);
 
    ae_matrix_set_length(tbl, c->n - 2 + 1, 2 + c->k + 1, _state);
    *n = c->n;
@@ -5719,19 +5462,13 @@ void spline1dlintransx(spline1dinterpolant *c, double a, double b, ae_state *_st
    double v;
    double dv;
    double d2v;
-   ae_vector x;
-   ae_vector y;
-   ae_vector d;
    bool isperiodic;
    ae_int_t contval;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&d, 0, sizeof(d));
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL, _state);
 
    ae_assert(c->k == 3, "Spline1DLinTransX: internal error", _state);
    n = c->n;
@@ -5938,8 +5675,6 @@ double spline1dintegrate(spline1dinterpolant *c, double x, ae_state *_state) {
 // API: void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
 void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t bfrad;
    double xa;
    double xb;
@@ -5952,82 +5687,42 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    double dv;
    double d2v;
    ae_int_t gridexpansion;
-   ae_vector xywork;
-   ae_matrix vterm;
-   ae_vector sx;
-   ae_vector sy;
-   ae_vector sdy;
-   ae_vector tmpx;
-   ae_vector tmpy;
-   spline1dinterpolant basis1;
-   sparsematrix av;
-   sparsematrix ah;
-   sparsematrix ata;
-   ae_vector targets;
    double meany;
    ae_int_t lsqrcnt;
    ae_int_t nrel;
    double rss;
    double tss;
    ae_int_t arows;
-   ae_vector tmp0;
-   ae_vector tmp1;
-   linlsqrstate solver;
-   linlsqrreport srep;
    double creg;
    double mxata;
    ae_int_t bw;
-   ae_vector nzidx;
-   ae_vector nzval;
    ae_int_t nzcnt;
    double scaletargetsby;
    double scalepenaltyby;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&xywork, 0, sizeof(xywork));
-   memset(&vterm, 0, sizeof(vterm));
-   memset(&sx, 0, sizeof(sx));
-   memset(&sy, 0, sizeof(sy));
-   memset(&sdy, 0, sizeof(sdy));
-   memset(&tmpx, 0, sizeof(tmpx));
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&basis1, 0, sizeof(basis1));
-   memset(&av, 0, sizeof(av));
-   memset(&ah, 0, sizeof(ah));
-   memset(&ata, 0, sizeof(ata));
-   memset(&targets, 0, sizeof(targets));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&tmp1, 0, sizeof(tmp1));
-   memset(&solver, 0, sizeof(solver));
-   memset(&srep, 0, sizeof(srep));
-   memset(&nzidx, 0, sizeof(nzidx));
-   memset(&nzval, 0, sizeof(nzval));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_vector_init(&xywork, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vterm, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&sx, 0, DT_REAL, _state, true);
-   ae_vector_init(&sy, 0, DT_REAL, _state, true);
-   ae_vector_init(&sdy, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   spline1dinterpolant_init(&basis1, _state, true);
-   sparsematrix_init(&av, _state, true);
-   sparsematrix_init(&ah, _state, true);
-   sparsematrix_init(&ata, _state, true);
-   ae_vector_init(&targets, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp1, 0, DT_REAL, _state, true);
-   linlsqrstate_init(&solver, _state, true);
-   linlsqrreport_init(&srep, _state, true);
-   ae_vector_init(&nzidx, 0, DT_INT, _state, true);
-   ae_vector_init(&nzval, 0, DT_REAL, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(xywork, 0, DT_REAL, _state);
+   NewMatrix(vterm, 0, 0, DT_REAL, _state);
+   NewVector(sx, 0, DT_REAL, _state);
+   NewVector(sy, 0, DT_REAL, _state);
+   NewVector(sdy, 0, DT_REAL, _state);
+   NewVector(tmpx, 0, DT_REAL, _state);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewObj(spline1dinterpolant, basis1, _state);
+   NewObj(sparsematrix, av, _state);
+   NewObj(sparsematrix, ah, _state);
+   NewObj(sparsematrix, ata, _state);
+   NewVector(targets, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(tmp1, 0, DT_REAL, _state);
+   NewObj(linlsqrstate, solver, _state);
+   NewObj(linlsqrreport, srep, _state);
+   NewVector(nzidx, 0, DT_INT, _state);
+   NewVector(nzval, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "Spline1DFit: N<1!", _state);
    ae_assert(m >= 1, "Spline1DFit: M<1!", _state);
@@ -6442,11 +6137,6 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
    double pll;
    double pr;
    double mr;
-   ae_vector tr;
-   ae_vector tmpr;
-   ae_vector tmpe;
-   ae_vector tmpet;
-   ae_vector tmpc;
    double x0;
    double x1;
    double x2;
@@ -6459,23 +6149,18 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
    bool nstep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tr, 0, sizeof(tr));
-   memset(&tmpr, 0, sizeof(tmpr));
-   memset(&tmpe, 0, sizeof(tmpe));
-   memset(&tmpet, 0, sizeof(tmpet));
-   memset(&tmpc, 0, sizeof(tmpc));
-   ae_vector_free(r, true);
+   SetVector(r);
    *nr = 0;
    *dr = false;
-   ae_vector_free(e, true);
-   ae_vector_free(et, true);
+   SetVector(e);
+   SetVector(et);
    *ne = 0;
    *de = false;
-   ae_vector_init(&tr, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpr, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpe, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpet, 0, DT_INT, _state, true);
-   ae_vector_init(&tmpc, 0, DT_REAL, _state, true);
+   NewVector(tr, 0, DT_REAL, _state);
+   NewVector(tmpr, 0, DT_REAL, _state);
+   NewVector(tmpe, 0, DT_REAL, _state);
+   NewVector(tmpet, 0, DT_INT, _state);
+   NewVector(tmpc, 0, DT_REAL, _state);
 
 // exception handling
    ae_assert(c->k == 3, "Spline1DRootsAndExtrema : incorrect parameter C.K!", _state);
@@ -6834,21 +6519,13 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
 // Internal subroutine. Heap sort.
 void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector rbuf;
-   ae_vector ibuf;
-   ae_vector rbuf2;
-   ae_vector ibuf2;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rbuf, 0, sizeof(rbuf));
-   memset(&ibuf, 0, sizeof(ibuf));
-   memset(&rbuf2, 0, sizeof(rbuf2));
-   memset(&ibuf2, 0, sizeof(ibuf2));
-   ae_vector_init(&rbuf, 0, DT_REAL, _state, true);
-   ae_vector_init(&ibuf, 0, DT_INT, _state, true);
-   ae_vector_init(&rbuf2, 0, DT_REAL, _state, true);
-   ae_vector_init(&ibuf2, 0, DT_INT, _state, true);
+   NewVector(rbuf, 0, DT_REAL, _state);
+   NewVector(ibuf, 0, DT_INT, _state);
+   NewVector(rbuf2, 0, DT_REAL, _state);
+   NewVector(ibuf2, 0, DT_INT, _state);
 
    ae_vector_set_length(&ibuf, n, _state);
    ae_vector_set_length(&rbuf, n, _state);
@@ -7448,12 +7125,6 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
 // API: void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c, const xparams _xparams = xdefault);
 void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector d;
-   ae_vector ex;
-   ae_vector ey;
-   ae_vector p;
    double delta;
    double alpha;
    double beta;
@@ -7466,21 +7137,13 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&d, 0, sizeof(d));
-   memset(&ex, 0, sizeof(ex));
-   memset(&ey, 0, sizeof(ey));
-   memset(&p, 0, sizeof(p));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   spline1dinterpolant_free(c, true);
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&ex, 0, DT_REAL, _state, true);
-   ae_vector_init(&ey, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetObj(spline1dinterpolant, c);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(ex, 0, DT_REAL, _state);
+   NewVector(ey, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // Check lengths of arguments
    ae_assert(n >= 2, "Spline1DBuildMonotone: N<2", _state);
@@ -7700,14 +7363,10 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
 // Internal subroutine. Heap sort.
 static void spline1d_heapsortpoints(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector bufx;
-   ae_vector bufy;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bufx, 0, sizeof(bufx));
-   memset(&bufy, 0, sizeof(bufy));
-   ae_vector_init(&bufx, 0, DT_REAL, _state, true);
-   ae_vector_init(&bufy, 0, DT_REAL, _state, true);
+   NewVector(bufx, 0, DT_REAL, _state);
+   NewVector(bufy, 0, DT_REAL, _state);
 
    tagsortfastr(x, y, &bufx, &bufy, n, _state);
    ae_frame_leave(_state);
@@ -7725,15 +7384,11 @@ static void spline1d_heapsortpoints(RVector *x, RVector *y, ae_int_t n, ae_state
 //                 arrays X/Y contains (X[P[I]],Y[P[I]])
 static void spline1d_heapsortppoints(RVector *x, RVector *y, ZVector *p, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector rbuf;
-   ae_vector ibuf;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rbuf, 0, sizeof(rbuf));
-   memset(&ibuf, 0, sizeof(ibuf));
-   ae_vector_init(&rbuf, 0, DT_REAL, _state, true);
-   ae_vector_init(&ibuf, 0, DT_INT, _state, true);
+   NewVector(rbuf, 0, DT_REAL, _state);
+   NewVector(ibuf, 0, DT_INT, _state);
 
    if (p->cnt < n) {
       ae_vector_set_length(p, n, _state);
@@ -7762,18 +7417,12 @@ static void spline1d_heapsortppoints(RVector *x, RVector *y, ZVector *p, ae_int_
 //
 static void spline1d_solvetridiagonal(RVector *a, RVector *b, RVector *c, RVector *d, ae_int_t n, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _b;
-   ae_vector _d;
    ae_int_t k;
    double t;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_b, 0, sizeof(_b));
-   memset(&_d, 0, sizeof(_d));
-   ae_vector_copy(&_b, b, _state, true);
-   b = &_b;
-   ae_vector_copy(&_d, d, _state, true);
-   d = &_d;
+   DupVector(b, _state);
+   DupVector(d, _state);
 
    if (x->cnt < n) {
       ae_vector_set_length(x, n, _state);
@@ -7801,25 +7450,16 @@ static void spline1d_solvetridiagonal(RVector *a, RVector *b, RVector *c, RVecto
 // ( C[N-1]           A[N-1] B[N-1] )
 static void spline1d_solvecyclictridiagonal(RVector *a, RVector *b, RVector *c, RVector *d, ae_int_t n, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _b;
    ae_int_t k;
    double alpha;
    double beta;
    double gamma;
-   ae_vector y;
-   ae_vector z;
-   ae_vector u;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_b, 0, sizeof(_b));
-   memset(&y, 0, sizeof(y));
-   memset(&z, 0, sizeof(z));
-   memset(&u, 0, sizeof(u));
-   ae_vector_copy(&_b, b, _state, true);
-   b = &_b;
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&z, 0, DT_REAL, _state, true);
-   ae_vector_init(&u, 0, DT_REAL, _state, true);
+   DupVector(b, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(z, 0, DT_REAL, _state);
+   NewVector(u, 0, DT_REAL, _state);
 
    if (x->cnt < n) {
       ae_vector_set_length(x, n, _state);
@@ -8388,18 +8028,12 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
 // API: void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
 void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t m, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t k0;
    ae_int_t k1;
    ae_int_t k2;
-   ae_vector buf0;
-   ae_vector buf1;
-   ae_matrix sections;
-   ae_vector points;
    double v;
    ae_int_t worstidx;
    double worsterror;
@@ -8407,31 +8041,19 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
    ae_int_t idx1;
    double e0;
    double e1;
-   ae_vector heaperrors;
-   ae_vector heaptags;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&buf0, 0, sizeof(buf0));
-   memset(&buf1, 0, sizeof(buf1));
-   memset(&sections, 0, sizeof(sections));
-   memset(&points, 0, sizeof(points));
-   memset(&heaperrors, 0, sizeof(heaperrors));
-   memset(&heaptags, 0, sizeof(heaptags));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_free(x2, true);
-   ae_vector_free(y2, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetVector(x2);
+   SetVector(y2);
    *nsections = 0;
-   ae_vector_init(&buf0, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf1, 0, DT_REAL, _state, true);
-   ae_matrix_init(&sections, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&points, 0, DT_REAL, _state, true);
-   ae_vector_init(&heaperrors, 0, DT_REAL, _state, true);
-   ae_vector_init(&heaptags, 0, DT_INT, _state, true);
+   NewVector(buf0, 0, DT_REAL, _state);
+   NewVector(buf1, 0, DT_REAL, _state);
+   NewMatrix(sections, 0, 0, DT_REAL, _state);
+   NewVector(points, 0, DT_REAL, _state);
+   NewVector(heaperrors, 0, DT_REAL, _state);
+   NewVector(heaptags, 0, DT_INT, _state);
 
    ae_assert(n >= 0, "LSTFitPiecewiseLinearRDPFixed: N<0", _state);
    ae_assert(m >= 1, "LSTFitPiecewiseLinearRDPFixed: M<1", _state);
@@ -8582,36 +8204,22 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
 // API: void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections, const xparams _xparams = xdefault);
 void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RVector *x2, RVector *y2, ae_int_t *nsections, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_vector buf0;
-   ae_vector buf1;
-   ae_vector xtmp;
-   ae_vector ytmp;
    double v;
    ae_int_t npts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&buf0, 0, sizeof(buf0));
-   memset(&buf1, 0, sizeof(buf1));
-   memset(&xtmp, 0, sizeof(xtmp));
-   memset(&ytmp, 0, sizeof(ytmp));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_free(x2, true);
-   ae_vector_free(y2, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   SetVector(x2);
+   SetVector(y2);
    *nsections = 0;
-   ae_vector_init(&buf0, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf1, 0, DT_REAL, _state, true);
-   ae_vector_init(&xtmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&ytmp, 0, DT_REAL, _state, true);
+   NewVector(buf0, 0, DT_REAL, _state);
+   NewVector(buf1, 0, DT_REAL, _state);
+   NewVector(xtmp, 0, DT_REAL, _state);
+   NewVector(ytmp, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "LSTFitPiecewiseLinearRDP: N<0", _state);
    ae_assert(ae_fp_greater(eps, (double)(0)), "LSTFitPiecewiseLinearRDP: Eps <= 0", _state);
@@ -8714,23 +8322,15 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
 void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector xc;
-   ae_vector yc;
-   ae_vector dc;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&dc, 0, sizeof(dc));
    *info = 0;
-   barycentricinterpolant_free(p, true);
-   polynomialfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&yc, 0, DT_REAL, _state, true);
-   ae_vector_init(&dc, 0, DT_INT, _state, true);
+   SetObj(barycentricinterpolant, p);
+   SetObj(polynomialfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(yc, 0, DT_REAL, _state);
+   NewVector(dc, 0, DT_INT, _state);
 
    ae_assert(n > 0, "PolynomialFit: N <= 0!", _state);
    ae_assert(m > 0, "PolynomialFit: M <= 0!", _state);
@@ -8825,71 +8425,36 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 // API: void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams = xdefault);
 void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _w;
-   ae_vector _xc;
-   ae_vector _yc;
    double xa;
    double xb;
    double sa;
    double sb;
-   ae_vector xoriginal;
-   ae_vector yoriginal;
-   ae_vector y2;
-   ae_vector w2;
-   ae_vector tmp;
-   ae_vector tmp2;
-   ae_vector bx;
-   ae_vector by;
-   ae_vector bw;
    ae_int_t i;
    ae_int_t j;
    double u;
    double v;
    double s;
    ae_int_t relcnt;
-   lsfitreport lrep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_w, 0, sizeof(_w));
-   memset(&_xc, 0, sizeof(_xc));
-   memset(&_yc, 0, sizeof(_yc));
-   memset(&xoriginal, 0, sizeof(xoriginal));
-   memset(&yoriginal, 0, sizeof(yoriginal));
-   memset(&y2, 0, sizeof(y2));
-   memset(&w2, 0, sizeof(w2));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&tmp2, 0, sizeof(tmp2));
-   memset(&bx, 0, sizeof(bx));
-   memset(&by, 0, sizeof(by));
-   memset(&bw, 0, sizeof(bw));
-   memset(&lrep, 0, sizeof(lrep));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_w, w, _state, true);
-   w = &_w;
-   ae_vector_copy(&_xc, xc, _state, true);
-   xc = &_xc;
-   ae_vector_copy(&_yc, yc, _state, true);
-   yc = &_yc;
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(w, _state);
+   DupVector(xc, _state);
+   DupVector(yc, _state);
    *info = 0;
-   barycentricinterpolant_free(p, true);
-   polynomialfitreport_free(rep, true);
-   ae_vector_init(&xoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&yoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&y2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp2, 0, DT_REAL, _state, true);
-   ae_vector_init(&bx, 0, DT_REAL, _state, true);
-   ae_vector_init(&by, 0, DT_REAL, _state, true);
-   ae_vector_init(&bw, 0, DT_REAL, _state, true);
-   lsfitreport_init(&lrep, _state, true);
+   SetObj(barycentricinterpolant, p);
+   SetObj(polynomialfitreport, rep);
+   NewVector(xoriginal, 0, DT_REAL, _state);
+   NewVector(yoriginal, 0, DT_REAL, _state);
+   NewVector(y2, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(tmp2, 0, DT_REAL, _state);
+   NewVector(bx, 0, DT_REAL, _state);
+   NewVector(by, 0, DT_REAL, _state);
+   NewVector(bw, 0, DT_REAL, _state);
+   NewObj(lsfitreport, lrep, _state);
 
    ae_assert(n > 0, "PolynomialFitWC: N <= 0!", _state);
    ae_assert(m > 0, "PolynomialFitWC: M <= 0!", _state);
@@ -9181,22 +8746,16 @@ double logisticcalc5(double x, double a, double b, double c, double d, double g,
 // API: void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    double g;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *a = 0;
    *b = 0;
    *c = 0;
    *d = 0;
-   lsfitreport_free(rep, true);
+   SetObj(lsfitreport, rep);
 
    logisticfit45x(x, y, n, _state->v_nan, _state->v_nan, true, 0.0, 0.0, 0, a, b, c, d, &g, rep, _state);
    ae_frame_leave(_state);
@@ -9304,22 +8863,16 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // API: void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    double g;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *a = 0;
    *b = 0;
    *c = 0;
    *d = 0;
-   lsfitreport_free(rep, true);
+   SetObj(lsfitreport, rep);
 
    logisticfit45x(x, y, n, cnstrleft, cnstrright, true, 0.0, 0.0, 0, a, b, c, d, &g, rep, _state);
    ae_frame_leave(_state);
@@ -9404,22 +8957,16 @@ void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // API: void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *a = 0;
    *b = 0;
    *c = 0;
    *d = 0;
    *g = 0;
-   lsfitreport_free(rep, true);
+   SetObj(lsfitreport, rep);
 
    logisticfit45x(x, y, n, _state->v_nan, _state->v_nan, false, 0.0, 0.0, 0, a, b, c, d, g, rep, _state);
    ae_frame_leave(_state);
@@ -9537,22 +9084,16 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // API: void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *a = 0;
    *b = 0;
    *c = 0;
    *d = 0;
    *g = 0;
-   lsfitreport_free(rep, true);
+   SetObj(lsfitreport, rep);
 
    logisticfit45x(x, y, n, cnstrleft, cnstrright, false, 0.0, 0.0, 0, a, b, c, d, g, rep, _state);
    ae_frame_leave(_state);
@@ -9663,81 +9204,43 @@ void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // API: void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep, const xparams _xparams = xdefault);
 void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, bool is4pl, double lambdav, double epsx, ae_int_t rscnt, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
    ae_int_t i;
    ae_int_t outerit;
    ae_int_t nz;
    double v;
-   ae_vector p0;
-   ae_vector p1;
-   ae_vector p2;
-   ae_vector bndl;
-   ae_vector bndu;
-   ae_vector s;
-   ae_vector bndl1;
-   ae_vector bndu1;
-   ae_vector bndl2;
-   ae_vector bndu2;
-   ae_matrix z;
-   hqrndstate rs;
-   minlmstate state;
-   minlmreport replm;
    ae_int_t maxits;
    double fbest;
    double flast;
    double scalex;
    double scaley;
-   ae_vector bufx;
-   ae_vector bufy;
    double fposb;
    double fnegb;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&p0, 0, sizeof(p0));
-   memset(&p1, 0, sizeof(p1));
-   memset(&p2, 0, sizeof(p2));
-   memset(&bndl, 0, sizeof(bndl));
-   memset(&bndu, 0, sizeof(bndu));
-   memset(&s, 0, sizeof(s));
-   memset(&bndl1, 0, sizeof(bndl1));
-   memset(&bndu1, 0, sizeof(bndu1));
-   memset(&bndl2, 0, sizeof(bndl2));
-   memset(&bndu2, 0, sizeof(bndu2));
-   memset(&z, 0, sizeof(z));
-   memset(&rs, 0, sizeof(rs));
-   memset(&state, 0, sizeof(state));
-   memset(&replm, 0, sizeof(replm));
-   memset(&bufx, 0, sizeof(bufx));
-   memset(&bufy, 0, sizeof(bufy));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *a = 0;
    *b = 0;
    *c = 0;
    *d = 0;
    *g = 0;
-   lsfitreport_free(rep, true);
-   ae_vector_init(&p0, 0, DT_REAL, _state, true);
-   ae_vector_init(&p1, 0, DT_REAL, _state, true);
-   ae_vector_init(&p2, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndl, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndu, 0, DT_REAL, _state, true);
-   ae_vector_init(&s, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndl1, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndu1, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndl2, 0, DT_REAL, _state, true);
-   ae_vector_init(&bndu2, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
-   hqrndstate_init(&rs, _state, true);
-   minlmstate_init(&state, _state, true);
-   minlmreport_init(&replm, _state, true);
-   ae_vector_init(&bufx, 0, DT_REAL, _state, true);
-   ae_vector_init(&bufy, 0, DT_REAL, _state, true);
+   SetObj(lsfitreport, rep);
+   NewVector(p0, 0, DT_REAL, _state);
+   NewVector(p1, 0, DT_REAL, _state);
+   NewVector(p2, 0, DT_REAL, _state);
+   NewVector(bndl, 0, DT_REAL, _state);
+   NewVector(bndu, 0, DT_REAL, _state);
+   NewVector(s, 0, DT_REAL, _state);
+   NewVector(bndl1, 0, DT_REAL, _state);
+   NewVector(bndu1, 0, DT_REAL, _state);
+   NewVector(bndl2, 0, DT_REAL, _state);
+   NewVector(bndu2, 0, DT_REAL, _state);
+   NewMatrix(z, 0, 0, DT_REAL, _state);
+   NewObj(hqrndstate, rs, _state);
+   NewObj(minlmstate, state, _state);
+   NewObj(minlmreport, replm, _state);
+   NewVector(bufx, 0, DT_REAL, _state);
+   NewVector(bufy, 0, DT_REAL, _state);
 
    ae_assert(ae_isfinite(epsx, _state), "LogisticFitX: EpsX is infinite/NAN", _state);
    ae_assert(ae_isfinite(lambdav, _state), "LogisticFitX: LambdaV is infinite/NAN", _state);
@@ -10172,18 +9675,14 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
    ae_int_t i;
    double wrmscur;
    double wrmsbest;
-   barycentricinterpolant locb;
-   barycentricfitreport locrep;
    ae_int_t locinfo;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&locb, 0, sizeof(locb));
-   memset(&locrep, 0, sizeof(locrep));
    *info = 0;
-   barycentricinterpolant_free(b, true);
-   barycentricfitreport_free(rep, true);
-   barycentricinterpolant_init(&locb, _state, true);
-   barycentricfitreport_init(&locrep, _state, true);
+   SetObj(barycentricinterpolant, b);
+   SetObj(barycentricfitreport, rep);
+   NewObj(barycentricinterpolant, locb, _state);
+   NewObj(barycentricfitreport, locrep, _state);
 
    ae_assert(n > 0, "BarycentricFitFloaterHormannWC: N <= 0!", _state);
    ae_assert(m > 0, "BarycentricFitFloaterHormannWC: M <= 0!", _state);
@@ -10277,24 +9776,16 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
 // API: void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams = xdefault);
 void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector w;
-   ae_vector xc;
-   ae_vector yc;
-   ae_vector dc;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&dc, 0, sizeof(dc));
    *info = 0;
-   barycentricinterpolant_free(b, true);
-   barycentricfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&yc, 0, DT_REAL, _state, true);
-   ae_vector_init(&dc, 0, DT_INT, _state, true);
+   SetObj(barycentricinterpolant, b);
+   SetObj(barycentricfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(yc, 0, DT_REAL, _state);
+   NewVector(dc, 0, DT_INT, _state);
 
    ae_assert(n > 0, "BarycentricFitFloaterHormann: N <= 0!", _state);
    ae_assert(m > 0, "BarycentricFitFloaterHormann: M <= 0!", _state);
@@ -10410,8 +9901,8 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
    ae_int_t i;
 
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
 
    ae_assert(n >= 1, "Spline1DFitCubicWC: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitCubicWC: M<4!", _state);
@@ -10540,8 +10031,8 @@ void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVecto
    ae_int_t i;
 
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
 
    ae_assert(n >= 1, "Spline1DFitHermiteWC: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitHermiteWC: M<4!", _state);
@@ -10576,23 +10067,15 @@ void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVecto
 void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector xc;
-   ae_vector yc;
-   ae_vector dc;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&dc, 0, sizeof(dc));
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&yc, 0, DT_REAL, _state, true);
-   ae_vector_init(&dc, 0, DT_INT, _state, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(yc, 0, DT_REAL, _state);
+   NewVector(dc, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "Spline1DFitCubic: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitCubic: M<4!", _state);
@@ -10620,23 +10103,15 @@ void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *
 void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector w;
-   ae_vector xc;
-   ae_vector yc;
-   ae_vector dc;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&dc, 0, sizeof(dc));
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&yc, 0, DT_REAL, _state, true);
-   ae_vector_init(&dc, 0, DT_INT, _state, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(yc, 0, DT_REAL, _state);
+   NewVector(dc, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "Spline1DFitHermite: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitHermite: M<4!", _state);
@@ -10734,8 +10209,8 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
 
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
 
    ae_assert(n >= 1, "LSFitLinearW: N<1!", _state);
    ae_assert(m >= 1, "LSFitLinearW: M<1!", _state);
@@ -10845,37 +10320,21 @@ void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t
 // API: void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
 void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _y;
-   ae_matrix _cmatrix;
    ae_int_t i;
    ae_int_t j;
-   ae_vector tau;
-   ae_matrix q;
-   ae_matrix f2;
-   ae_vector tmp;
-   ae_vector c0;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_y, 0, sizeof(_y));
-   memset(&_cmatrix, 0, sizeof(_cmatrix));
-   memset(&tau, 0, sizeof(tau));
-   memset(&q, 0, sizeof(q));
-   memset(&f2, 0, sizeof(f2));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&c0, 0, sizeof(c0));
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_matrix_copy(&_cmatrix, cmatrix, _state, true);
-   cmatrix = &_cmatrix;
+   DupVector(y, _state);
+   DupMatrix(cmatrix, _state);
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_matrix_init(&q, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&f2, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&c0, 0, DT_REAL, _state, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewMatrix(q, 0, 0, DT_REAL, _state);
+   NewMatrix(f2, 0, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(c0, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "LSFitLinearWC: N<1!", _state);
    ae_assert(m >= 1, "LSFitLinearWC: M<1!", _state);
@@ -11032,15 +10491,13 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
 // API: void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
 void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector w;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "LSFitLinear: N<1!", _state);
    ae_assert(m >= 1, "LSFitLinear: M<1!", _state);
@@ -11149,19 +10606,14 @@ void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t 
 // API: void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams = xdefault);
 void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae_int_t m, ae_int_t k, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _y;
-   ae_vector w;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_y, 0, sizeof(_y));
-   memset(&w, 0, sizeof(w));
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(y, _state);
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "LSFitLinearC: N<1!", _state);
    ae_assert(m >= 1, "LSFitLinearC: M<1!", _state);
@@ -11221,7 +10673,7 @@ void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae
 void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateWF: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateWF: M<1!", _state);
@@ -11319,7 +10771,7 @@ void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, a
 void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, double diffstep, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateF: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateF: M<1!", _state);
@@ -11423,7 +10875,7 @@ void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae
 void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateWFG: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateWFG: M<1!", _state);
@@ -11525,7 +10977,7 @@ void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, 
 void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, bool cheapfg, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateFG: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateFG: M<1!", _state);
@@ -11618,7 +11070,7 @@ void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, a
 void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateWFGH: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateWFGH: M<1!", _state);
@@ -11709,7 +11161,7 @@ void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n,
 void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae_int_t k, lsfitstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lsfitstate_free(state, true);
+   SetObj(lsfitstate, state);
 
    ae_assert(n >= 1, "LSFitCreateFGH: N<1!", _state);
    ae_assert(m >= 1, "LSFitCreateFGH: M<1!", _state);
@@ -12634,8 +12086,8 @@ void lsfitresults(lsfitstate *state, ae_int_t *info, RVector *c, lsfitreport *re
    ae_int_t j;
 
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
 
    lsfit_clearreport(rep, _state);
    *info = state->repterminationtype;
@@ -13008,27 +12460,10 @@ static void lsfit_logisticfit45errors(RVector *x, RVector *y, ae_int_t n, double
 // ALGLIB Project: Copyright 08.09.2009 by Sergey Bochkanov
 static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _w;
-   ae_vector _xc;
-   ae_vector _yc;
-   ae_matrix fmatrix;
-   ae_matrix cmatrix;
-   ae_vector y2;
-   ae_vector w2;
-   ae_vector sx;
-   ae_vector sy;
-   ae_vector sd;
-   ae_vector tmp;
-   ae_vector xoriginal;
-   ae_vector yoriginal;
-   lsfitreport lrep;
    double v0;
    double v1;
    double v2;
    double mx;
-   spline1dinterpolant s2;
    ae_int_t i;
    ae_int_t j;
    ae_int_t relcnt;
@@ -13041,48 +12476,26 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
    double decay;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_w, 0, sizeof(_w));
-   memset(&_xc, 0, sizeof(_xc));
-   memset(&_yc, 0, sizeof(_yc));
-   memset(&fmatrix, 0, sizeof(fmatrix));
-   memset(&cmatrix, 0, sizeof(cmatrix));
-   memset(&y2, 0, sizeof(y2));
-   memset(&w2, 0, sizeof(w2));
-   memset(&sx, 0, sizeof(sx));
-   memset(&sy, 0, sizeof(sy));
-   memset(&sd, 0, sizeof(sd));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&xoriginal, 0, sizeof(xoriginal));
-   memset(&yoriginal, 0, sizeof(yoriginal));
-   memset(&lrep, 0, sizeof(lrep));
-   memset(&s2, 0, sizeof(s2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_w, w, _state, true);
-   w = &_w;
-   ae_vector_copy(&_xc, xc, _state, true);
-   xc = &_xc;
-   ae_vector_copy(&_yc, yc, _state, true);
-   yc = &_yc;
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(w, _state);
+   DupVector(xc, _state);
+   DupVector(yc, _state);
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_matrix_init(&fmatrix, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&cmatrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&y2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&sx, 0, DT_REAL, _state, true);
-   ae_vector_init(&sy, 0, DT_REAL, _state, true);
-   ae_vector_init(&sd, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&xoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&yoriginal, 0, DT_REAL, _state, true);
-   lsfitreport_init(&lrep, _state, true);
-   spline1dinterpolant_init(&s2, _state, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewMatrix(fmatrix, 0, 0, DT_REAL, _state);
+   NewMatrix(cmatrix, 0, 0, DT_REAL, _state);
+   NewVector(y2, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(sx, 0, DT_REAL, _state);
+   NewVector(sy, 0, DT_REAL, _state);
+   NewVector(sd, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(xoriginal, 0, DT_REAL, _state);
+   NewVector(yoriginal, 0, DT_REAL, _state);
+   NewObj(lsfitreport, lrep, _state);
+   NewObj(spline1dinterpolant, s2, _state);
 
    ae_assert(st == 0 || st == 1, "Spline1DFit: internal error!", _state);
    if (st == 0 && m < 4) {
@@ -13301,60 +12714,30 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
 static void lsfit_lsfitlinearinternal(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    double threshold;
-   ae_matrix ft;
-   ae_matrix q;
-   ae_matrix l;
-   ae_matrix r;
-   ae_vector b;
-   ae_vector wmod;
-   ae_vector tau;
-   ae_vector nzeros;
-   ae_vector s;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_vector sv;
-   ae_matrix u;
-   ae_matrix vt;
-   ae_vector tmp;
-   ae_vector utb;
-   ae_vector sutb;
    ae_int_t relcnt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ft, 0, sizeof(ft));
-   memset(&q, 0, sizeof(q));
-   memset(&l, 0, sizeof(l));
-   memset(&r, 0, sizeof(r));
-   memset(&b, 0, sizeof(b));
-   memset(&wmod, 0, sizeof(wmod));
-   memset(&tau, 0, sizeof(tau));
-   memset(&nzeros, 0, sizeof(nzeros));
-   memset(&s, 0, sizeof(s));
-   memset(&sv, 0, sizeof(sv));
-   memset(&u, 0, sizeof(u));
-   memset(&vt, 0, sizeof(vt));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&utb, 0, sizeof(utb));
-   memset(&sutb, 0, sizeof(sutb));
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
-   ae_matrix_init(&ft, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&q, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&l, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&r, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
-   ae_vector_init(&wmod, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&nzeros, 0, DT_REAL, _state, true);
-   ae_vector_init(&s, 0, DT_REAL, _state, true);
-   ae_vector_init(&sv, 0, DT_REAL, _state, true);
-   ae_matrix_init(&u, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vt, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&utb, 0, DT_REAL, _state, true);
-   ae_vector_init(&sutb, 0, DT_REAL, _state, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
+   NewMatrix(ft, 0, 0, DT_REAL, _state);
+   NewMatrix(q, 0, 0, DT_REAL, _state);
+   NewMatrix(l, 0, 0, DT_REAL, _state);
+   NewMatrix(r, 0, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   NewVector(wmod, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(nzeros, 0, DT_REAL, _state);
+   NewVector(s, 0, DT_REAL, _state);
+   NewVector(sv, 0, DT_REAL, _state);
+   NewMatrix(u, 0, 0, DT_REAL, _state);
+   NewMatrix(vt, 0, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(utb, 0, DT_REAL, _state);
+   NewVector(sutb, 0, DT_REAL, _state);
 
    lsfit_clearreport(rep, _state);
    if (n < 1 || m < 1) {
@@ -13629,53 +13012,27 @@ static void lsfit_barycentriccalcbasis(barycentricinterpolant *b, double t, RVec
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _xc;
-   ae_vector _yc;
-   ae_vector y2;
-   ae_vector w2;
-   ae_vector tmp;
-   ae_vector tmp2;
-   ae_vector tmpdiff;
-   ae_vector bx;
-   ae_vector by;
-   ae_vector bw;
-   ae_matrix fmatrix;
-   ae_matrix cmatrix;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double decay;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_xc, 0, sizeof(_xc));
-   memset(&_yc, 0, sizeof(_yc));
-   memset(&y2, 0, sizeof(y2));
-   memset(&w2, 0, sizeof(w2));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&tmp2, 0, sizeof(tmp2));
-   memset(&tmpdiff, 0, sizeof(tmpdiff));
-   memset(&bx, 0, sizeof(bx));
-   memset(&by, 0, sizeof(by));
-   memset(&bw, 0, sizeof(bw));
-   memset(&fmatrix, 0, sizeof(fmatrix));
-   memset(&cmatrix, 0, sizeof(cmatrix));
-   ae_vector_copy(&_xc, xc, _state, true);
-   xc = &_xc;
-   ae_vector_copy(&_yc, yc, _state, true);
-   yc = &_yc;
+   DupVector(xc, _state);
+   DupVector(yc, _state);
    *info = 0;
-   ae_vector_free(c, true);
-   lsfitreport_free(rep, true);
-   ae_vector_init(&y2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp2, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpdiff, 0, DT_REAL, _state, true);
-   ae_vector_init(&bx, 0, DT_REAL, _state, true);
-   ae_vector_init(&by, 0, DT_REAL, _state, true);
-   ae_vector_init(&bw, 0, DT_REAL, _state, true);
-   ae_matrix_init(&fmatrix, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&cmatrix, 0, 0, DT_REAL, _state, true);
+   SetVector(c);
+   SetObj(lsfitreport, rep);
+   NewVector(y2, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(tmp2, 0, DT_REAL, _state);
+   NewVector(tmpdiff, 0, DT_REAL, _state);
+   NewVector(bx, 0, DT_REAL, _state);
+   NewVector(by, 0, DT_REAL, _state);
+   NewVector(bw, 0, DT_REAL, _state);
+   NewMatrix(fmatrix, 0, 0, DT_REAL, _state);
+   NewMatrix(cmatrix, 0, 0, DT_REAL, _state);
 
    lsfit_clearreport(rep, _state);
 
@@ -13789,26 +13146,9 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
 // Internal Floater-Hormann fitting subroutine for fixed D
 static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t d, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _w;
-   ae_vector _xc;
-   ae_vector _yc;
-   ae_matrix fmatrix;
-   ae_matrix cmatrix;
-   ae_vector y2;
-   ae_vector w2;
-   ae_vector sx;
-   ae_vector sy;
-   ae_vector sbf;
-   ae_vector xoriginal;
-   ae_vector yoriginal;
-   ae_vector tmp;
-   lsfitreport lrep;
    double v0;
    double v1;
    double mx;
-   barycentricinterpolant b2;
    ae_int_t i;
    ae_int_t j;
    ae_int_t relcnt;
@@ -13819,48 +13159,26 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    double decay;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_w, 0, sizeof(_w));
-   memset(&_xc, 0, sizeof(_xc));
-   memset(&_yc, 0, sizeof(_yc));
-   memset(&fmatrix, 0, sizeof(fmatrix));
-   memset(&cmatrix, 0, sizeof(cmatrix));
-   memset(&y2, 0, sizeof(y2));
-   memset(&w2, 0, sizeof(w2));
-   memset(&sx, 0, sizeof(sx));
-   memset(&sy, 0, sizeof(sy));
-   memset(&sbf, 0, sizeof(sbf));
-   memset(&xoriginal, 0, sizeof(xoriginal));
-   memset(&yoriginal, 0, sizeof(yoriginal));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&lrep, 0, sizeof(lrep));
-   memset(&b2, 0, sizeof(b2));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_w, w, _state, true);
-   w = &_w;
-   ae_vector_copy(&_xc, xc, _state, true);
-   xc = &_xc;
-   ae_vector_copy(&_yc, yc, _state, true);
-   yc = &_yc;
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(w, _state);
+   DupVector(xc, _state);
+   DupVector(yc, _state);
    *info = 0;
-   barycentricinterpolant_free(b, true);
-   barycentricfitreport_free(rep, true);
-   ae_matrix_init(&fmatrix, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&cmatrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&y2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&sx, 0, DT_REAL, _state, true);
-   ae_vector_init(&sy, 0, DT_REAL, _state, true);
-   ae_vector_init(&sbf, 0, DT_REAL, _state, true);
-   ae_vector_init(&xoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&yoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   lsfitreport_init(&lrep, _state, true);
-   barycentricinterpolant_init(&b2, _state, true);
+   SetObj(barycentricinterpolant, b);
+   SetObj(barycentricfitreport, rep);
+   NewMatrix(fmatrix, 0, 0, DT_REAL, _state);
+   NewMatrix(cmatrix, 0, 0, DT_REAL, _state);
+   NewVector(y2, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(sx, 0, DT_REAL, _state);
+   NewVector(sy, 0, DT_REAL, _state);
+   NewVector(sbf, 0, DT_REAL, _state);
+   NewVector(xoriginal, 0, DT_REAL, _state);
+   NewVector(yoriginal, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewObj(lsfitreport, lrep, _state);
+   NewObj(barycentricinterpolant, b2, _state);
 
    if (((n < 1 || m < 2) || k < 0) || k >= m) {
       *info = -1;
@@ -14101,14 +13419,12 @@ static void lsfit_clearreport(lsfitreport *rep, ae_state *_state) {
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *w, RVector *x, RVector *s, ae_int_t n, ae_int_t k, lsfitreport *rep, RMatrix *z, ae_int_t zkind, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _s;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    double v;
    double noisec;
    ae_int_t info;
-   matinvreport invrep;
    ae_int_t nzcnt;
    double avg;
    double rss;
@@ -14117,11 +13433,8 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
    double ss;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_s, 0, sizeof(_s));
-   memset(&invrep, 0, sizeof(invrep));
-   ae_vector_copy(&_s, s, _state, true);
-   s = &_s;
-   matinvreport_init(&invrep, _state, true);
+   DupVector(s, _state);
+   NewObj(matinvreport, invrep, _state);
 
 // Compute NZCnt - count of non-zero weights
    nzcnt = 0;
@@ -15260,7 +14573,7 @@ namespace alglib_impl {
 void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r, ae_state *_state) {
    double dummy;
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *r = 0;
 
    fitspherex(xy, npoints, nx, 0, 0.0, 0, 0.0, cx, &dummy, r, _state);
@@ -15294,7 +14607,7 @@ void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state) {
    double dummy;
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rhi = 0;
 
    fitspherex(xy, npoints, nx, 1, 0.0, 0, 0.0, cx, &dummy, rhi, _state);
@@ -15328,7 +14641,7 @@ void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state) {
    double dummy;
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
 
    fitspherex(xy, npoints, nx, 2, 0.0, 0, 0.0, cx, rlo, &dummy, _state);
@@ -15362,7 +14675,7 @@ void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // API: void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
 void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state) {
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
    *rhi = 0;
 
@@ -15518,14 +14831,12 @@ void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double
 // API: void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
 void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state) {
    ae_frame _frame_block;
-   fitsphereinternalreport rep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rep, 0, sizeof(rep));
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
    *rhi = 0;
-   fitsphereinternalreport_init(&rep, _state, true);
+   NewObj(fitsphereinternalreport, rep, _state);
 
    ae_assert(ae_isfinite(penalty, _state) && ae_fp_greater_eq(penalty, (double)(0)), "FitSphereX: Penalty<0 or is not finite", _state);
    ae_assert(ae_isfinite(epsx, _state) && ae_fp_greater_eq(epsx, (double)(0)), "FitSphereX: EpsX<0 or is not finite", _state);
@@ -15611,65 +14922,35 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
    bool userhi;
    double vlo;
    double vhi;
-   ae_vector vmin;
-   ae_vector vmax;
    double spread;
-   ae_vector pcr;
-   ae_vector scr;
-   ae_vector bl;
-   ae_vector bu;
    ae_int_t suboffset;
    ae_int_t dstrow;
-   minnlcstate nlcstate;
-   minnlcreport nlcrep;
-   ae_matrix cmatrix;
-   ae_vector ct;
    ae_int_t outeridx;
    ae_int_t maxouterits;
    ae_int_t maxits;
    double safeguard;
    double bi;
-   minbleicstate blcstate;
-   minbleicreport blcrep;
-   ae_vector prevc;
-   minlmstate lmstate;
-   minlmreport lmrep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&vmin, 0, sizeof(vmin));
-   memset(&vmax, 0, sizeof(vmax));
-   memset(&pcr, 0, sizeof(pcr));
-   memset(&scr, 0, sizeof(scr));
-   memset(&bl, 0, sizeof(bl));
-   memset(&bu, 0, sizeof(bu));
-   memset(&nlcstate, 0, sizeof(nlcstate));
-   memset(&nlcrep, 0, sizeof(nlcrep));
-   memset(&cmatrix, 0, sizeof(cmatrix));
-   memset(&ct, 0, sizeof(ct));
-   memset(&blcstate, 0, sizeof(blcstate));
-   memset(&blcrep, 0, sizeof(blcrep));
-   memset(&prevc, 0, sizeof(prevc));
-   memset(&lmstate, 0, sizeof(lmstate));
-   memset(&lmrep, 0, sizeof(lmrep));
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
    *rhi = 0;
-   fitsphereinternalreport_free(rep, true);
-   ae_vector_init(&vmin, 0, DT_REAL, _state, true);
-   ae_vector_init(&vmax, 0, DT_REAL, _state, true);
-   ae_vector_init(&pcr, 0, DT_REAL, _state, true);
-   ae_vector_init(&scr, 0, DT_REAL, _state, true);
-   ae_vector_init(&bl, 0, DT_REAL, _state, true);
-   ae_vector_init(&bu, 0, DT_REAL, _state, true);
-   minnlcstate_init(&nlcstate, _state, true);
-   minnlcreport_init(&nlcrep, _state, true);
-   ae_matrix_init(&cmatrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&ct, 0, DT_INT, _state, true);
-   minbleicstate_init(&blcstate, _state, true);
-   minbleicreport_init(&blcrep, _state, true);
-   ae_vector_init(&prevc, 0, DT_REAL, _state, true);
-   minlmstate_init(&lmstate, _state, true);
-   minlmreport_init(&lmrep, _state, true);
+   SetObj(fitsphereinternalreport, rep);
+   NewVector(vmin, 0, DT_REAL, _state);
+   NewVector(vmax, 0, DT_REAL, _state);
+   NewVector(pcr, 0, DT_REAL, _state);
+   NewVector(scr, 0, DT_REAL, _state);
+   NewVector(bl, 0, DT_REAL, _state);
+   NewVector(bu, 0, DT_REAL, _state);
+   NewObj(minnlcstate, nlcstate, _state);
+   NewObj(minnlcreport, nlcrep, _state);
+   NewMatrix(cmatrix, 0, 0, DT_REAL, _state);
+   NewVector(ct, 0, DT_INT, _state);
+   NewObj(minbleicstate, blcstate, _state);
+   NewObj(minbleicreport, blcrep, _state);
+   NewVector(prevc, 0, DT_REAL, _state);
+   NewObj(minlmstate, lmstate, _state);
+   NewObj(minlmreport, lmrep, _state);
 
 // Check input parameters
    ae_assert(npoints > 0, "FitSphereX: NPoints <= 0", _state);
@@ -16158,16 +15439,11 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
 // API: void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
 void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _xy;
-   ae_vector tmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_xy, 0, sizeof(_xy));
-   memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_copy(&_xy, xy, _state, true);
-   xy = &_xy;
-   pspline2interpolant_free(p, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   DupMatrix(xy, _state);
+   SetObj(pspline2interpolant, p);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_assert(st >= 0 && st <= 2, "PSpline2Build: incorrect spline type!", _state);
    ae_assert(pt >= 0 && pt <= 2, "PSpline2Build: incorrect parameterization type!", _state);
@@ -16217,16 +15493,11 @@ void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2in
 // API: void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
 void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _xy;
-   ae_vector tmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_xy, 0, sizeof(_xy));
-   memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_copy(&_xy, xy, _state, true);
-   xy = &_xy;
-   pspline3interpolant_free(p, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   DupMatrix(xy, _state);
+   SetObj(pspline3interpolant, p);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_assert(st >= 0 && st <= 2, "PSpline3Build: incorrect spline type!", _state);
    ae_assert(pt >= 0 && pt <= 2, "PSpline3Build: incorrect parameterization type!", _state);
@@ -16306,19 +15577,12 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 // API: void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p, const xparams _xparams = xdefault);
 void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _xy;
-   ae_matrix xyp;
-   ae_vector tmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_xy, 0, sizeof(_xy));
-   memset(&xyp, 0, sizeof(xyp));
-   memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_copy(&_xy, xy, _state, true);
-   xy = &_xy;
-   pspline2interpolant_free(p, true);
-   ae_matrix_init(&xyp, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   DupMatrix(xy, _state);
+   SetObj(pspline2interpolant, p);
+   NewMatrix(xyp, 0, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_assert(st >= 1 && st <= 2, "PSpline2BuildPeriodic: incorrect spline type!", _state);
    ae_assert(pt >= 0 && pt <= 2, "PSpline2BuildPeriodic: incorrect parameterization type!", _state);
@@ -16363,19 +15627,12 @@ void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, ps
 // API: void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p, const xparams _xparams = xdefault);
 void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _xy;
-   ae_matrix xyp;
-   ae_vector tmp;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_xy, 0, sizeof(_xy));
-   memset(&xyp, 0, sizeof(xyp));
-   memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_copy(&_xy, xy, _state, true);
-   xy = &_xy;
-   pspline3interpolant_free(p, true);
-   ae_matrix_init(&xyp, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   DupMatrix(xy, _state);
+   SetObj(pspline3interpolant, p);
+   NewMatrix(xyp, 0, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_assert(st >= 1 && st <= 2, "PSpline3BuildPeriodic: incorrect spline type!", _state);
    ae_assert(pt >= 0 && pt <= 2, "PSpline3BuildPeriodic: incorrect parameterization type!", _state);
@@ -16440,7 +15697,7 @@ void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, ps
 void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t, ae_state *_state) {
 
    *n = 0;
-   ae_vector_free(t, true);
+   SetVector(t);
 
    ae_assert(p->n >= 2, "PSpline2ParameterValues: internal error!", _state);
    *n = p->n;
@@ -16460,7 +15717,7 @@ void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t, ae
 void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t, ae_state *_state) {
 
    *n = 0;
-   ae_vector_free(t, true);
+   SetVector(t);
 
    ae_assert(p->n >= 2, "PSpline3ParameterValues: internal error!", _state);
    *n = p->n;
@@ -16781,8 +16038,6 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
 // API: double pspline2arclength(const pspline2interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
 double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_state) {
    ae_frame _frame_block;
-   autogkstate state;
-   autogkreport rep;
    double sx;
    double dsx;
    double d2sx;
@@ -16792,10 +16047,8 @@ double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&state, 0, sizeof(state));
-   memset(&rep, 0, sizeof(rep));
-   autogkstate_init(&state, _state, true);
-   autogkreport_init(&rep, _state, true);
+   NewObj(autogkstate, state, _state);
+   NewObj(autogkreport, rep, _state);
 
    autogksmooth(a, b, &state, _state);
    while (autogkiteration(&state, _state)) {
@@ -16824,8 +16077,6 @@ double pspline2arclength(pspline2interpolant *p, double a, double b, ae_state *_
 // API: double pspline3arclength(const pspline3interpolant &p, const double a, const double b, const xparams _xparams = xdefault);
 double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_state) {
    ae_frame _frame_block;
-   autogkstate state;
-   autogkreport rep;
    double sx;
    double dsx;
    double d2sx;
@@ -16838,10 +16089,8 @@ double pspline3arclength(pspline3interpolant *p, double a, double b, ae_state *_
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&state, 0, sizeof(state));
-   memset(&rep, 0, sizeof(rep));
-   autogkstate_init(&state, _state, true);
-   autogkreport_init(&rep, _state, true);
+   NewObj(autogkstate, state, _state);
+   NewObj(autogkreport, rep, _state);
 
    autogksmooth(a, b, &state, _state);
    while (autogkiteration(&state, _state)) {
@@ -16928,26 +16177,16 @@ void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, doub
    ae_int_t idx1;
    ae_int_t worstidx;
    double worsterror;
-   ae_matrix sections;
-   ae_vector heaperrors;
-   ae_vector heaptags;
-   ae_vector buf0;
-   ae_vector buf1;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&sections, 0, sizeof(sections));
-   memset(&heaperrors, 0, sizeof(heaperrors));
-   memset(&heaptags, 0, sizeof(heaptags));
-   memset(&buf0, 0, sizeof(buf0));
-   memset(&buf1, 0, sizeof(buf1));
-   ae_matrix_free(x2, true);
-   ae_vector_free(idx2, true);
+   SetMatrix(x2);
+   SetVector(idx2);
    *nsections = 0;
-   ae_matrix_init(&sections, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&heaperrors, 0, DT_REAL, _state, true);
-   ae_vector_init(&heaptags, 0, DT_INT, _state, true);
-   ae_vector_init(&buf0, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf1, 0, DT_REAL, _state, true);
+   NewMatrix(sections, 0, 0, DT_REAL, _state);
+   NewVector(heaperrors, 0, DT_REAL, _state);
+   NewVector(heaptags, 0, DT_INT, _state);
+   NewVector(buf0, 0, DT_REAL, _state);
+   NewVector(buf1, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "LSTFitPiecewiseLinearParametricRDP: N<0", _state);
    ae_assert(d >= 1, "LSTFitPiecewiseLinearParametricRDP: D <= 0", _state);
@@ -17061,7 +16300,7 @@ static void parametric_pspline2par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector
    double v;
    ae_int_t i;
 
-   ae_vector_free(p, true);
+   SetVector(p);
 
    ae_assert(pt >= 0 && pt <= 2, "PSpline2Par: internal error!", _state);
 
@@ -17095,7 +16334,7 @@ static void parametric_pspline3par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector
    double v;
    ae_int_t i;
 
-   ae_vector_free(p, true);
+   SetVector(p);
 
    ae_assert(pt >= 0 && pt <= 2, "PSpline3Par: internal error!", _state);
 
@@ -17464,7 +16703,7 @@ void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   rbfv1model_free(s, true);
+   SetObj(rbfv1model, s);
 
    ae_assert(nx == 2 || nx == 3, "RBFCreate: NX<>2 and NX<>3", _state);
    ae_assert(ny >= 1, "RBFCreate: NY<1", _state);
@@ -17522,7 +16761,7 @@ void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state) {
 // ALGLIB: Copyright 02.04.2016 by Sergey Bochkanov
 void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state) {
 
-   rbfv1calcbuffer_free(buf, true);
+   SetObj(rbfv1calcbuffer, buf);
 
    kdtreecreaterequestbuffer(&s->tree, &buf->requestbuffer, _state);
 }
@@ -17559,59 +16798,31 @@ void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf, ae_state *_state
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep, ae_state *_state) {
    ae_frame _frame_block;
-   kdtree tree;
-   kdtree ctree;
-   ae_vector dist;
-   ae_vector xcx;
-   ae_matrix a;
-   ae_matrix v;
-   ae_matrix omega;
-   ae_matrix residualy;
-   ae_vector radius;
-   ae_matrix xc;
    ae_int_t nc;
    double rmax;
-   ae_vector tags;
-   ae_vector ctags;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t snnz;
-   ae_vector tmp0;
-   ae_vector tmp1;
    ae_int_t layerscnt;
    bool modelstatus;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tree, 0, sizeof(tree));
-   memset(&ctree, 0, sizeof(ctree));
-   memset(&dist, 0, sizeof(dist));
-   memset(&xcx, 0, sizeof(xcx));
-   memset(&a, 0, sizeof(a));
-   memset(&v, 0, sizeof(v));
-   memset(&omega, 0, sizeof(omega));
-   memset(&residualy, 0, sizeof(residualy));
-   memset(&radius, 0, sizeof(radius));
-   memset(&xc, 0, sizeof(xc));
-   memset(&tags, 0, sizeof(tags));
-   memset(&ctags, 0, sizeof(ctags));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&tmp1, 0, sizeof(tmp1));
-   rbfv1report_free(rep, true);
-   kdtree_init(&tree, _state, true);
-   kdtree_init(&ctree, _state, true);
-   ae_vector_init(&dist, 0, DT_REAL, _state, true);
-   ae_vector_init(&xcx, 0, DT_REAL, _state, true);
-   ae_matrix_init(&a, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&v, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&omega, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&residualy, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&radius, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xc, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tags, 0, DT_INT, _state, true);
-   ae_vector_init(&ctags, 0, DT_INT, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp1, 0, DT_REAL, _state, true);
+   SetObj(rbfv1report, rep);
+   NewObj(kdtree, tree, _state);
+   NewObj(kdtree, ctree, _state);
+   NewVector(dist, 0, DT_REAL, _state);
+   NewVector(xcx, 0, DT_REAL, _state);
+   NewMatrix(a, 0, 0, DT_REAL, _state);
+   NewMatrix(v, 0, 0, DT_REAL, _state);
+   NewMatrix(omega, 0, 0, DT_REAL, _state);
+   NewMatrix(residualy, 0, 0, DT_REAL, _state);
+   NewVector(radius, 0, DT_REAL, _state);
+   NewMatrix(xc, 0, 0, DT_REAL, _state);
+   NewVector(tags, 0, DT_INT, _state);
+   NewVector(ctags, 0, DT_INT, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(tmp1, 0, DT_REAL, _state);
 
    ae_assert(s->nx == 2 || s->nx == 3, "RBFBuildModel: S.NX<>2 or S.NX<>3!", _state);
 
@@ -17845,7 +17056,7 @@ void rbfv1unserialize(ae_serializer *s, rbfv1model *model, ae_state *_state) {
    ae_int_t nx;
    ae_int_t ny;
 
-   rbfv1model_free(model, true);
+   SetObj(rbfv1model, model);
 
 // Unserialize primary model parameters, initialize model.
 //
@@ -18157,11 +17368,6 @@ void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y,
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector cpx0;
-   ae_vector cpx1;
-   ae_vector p01;
-   ae_vector p11;
-   ae_vector p2;
    double rlimit;
    double xcnorm2;
    ae_int_t hp01;
@@ -18180,17 +17386,12 @@ void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int
    ae_int_t i11;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&cpx0, 0, sizeof(cpx0));
-   memset(&cpx1, 0, sizeof(cpx1));
-   memset(&p01, 0, sizeof(p01));
-   memset(&p11, 0, sizeof(p11));
-   memset(&p2, 0, sizeof(p2));
-   ae_matrix_free(y, true);
-   ae_vector_init(&cpx0, 0, DT_REAL, _state, true);
-   ae_vector_init(&cpx1, 0, DT_REAL, _state, true);
-   ae_vector_init(&p01, 0, DT_INT, _state, true);
-   ae_vector_init(&p11, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   SetMatrix(y);
+   NewVector(cpx0, 0, DT_REAL, _state);
+   NewVector(cpx1, 0, DT_REAL, _state);
+   NewVector(p01, 0, DT_INT, _state);
+   NewVector(p11, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc2: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2: invalid value for N1 (N1 <= 0)!", _state);
@@ -18268,8 +17469,6 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t ic;
-   gridcalc3v1buf *pbuf;
-   ae_smart_ptr _pbuf;
    ae_int_t flag12dim1;
    ae_int_t flag12dim2;
    double problemcost;
@@ -18292,8 +17491,7 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
    bool somenodes;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_pbuf, 0, sizeof(_pbuf));
-   ae_smart_ptr_init(&_pbuf, (void **)&pbuf, _state, true);
+   RefObj(gridcalc3v1buf, pbuf, _state);
 
    nx = s->nx;
    ny = s->ny;
@@ -18579,9 +17777,9 @@ void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 
    *nx = 0;
    *ny = 0;
-   ae_matrix_free(xwr, true);
+   SetMatrix(xwr);
    *nc = 0;
-   ae_matrix_free(v, true);
+   SetMatrix(v);
 
    *nx = s->nx;
    *ny = s->ny;
@@ -18611,14 +17809,9 @@ void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 
 static bool rbfv1_rbfv1buildlinearmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t ny, ae_int_t modeltype, RMatrix *v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmpy;
-   ae_matrix a;
    double scaling;
-   ae_vector shifting;
    double mn;
    double mx;
-   ae_vector c;
-   lsfitreport rep;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -18626,17 +17819,12 @@ static bool rbfv1_rbfv1buildlinearmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_i
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&a, 0, sizeof(a));
-   memset(&shifting, 0, sizeof(shifting));
-   memset(&c, 0, sizeof(c));
-   memset(&rep, 0, sizeof(rep));
-   ae_matrix_free(v, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   ae_matrix_init(&a, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&shifting, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_REAL, _state, true);
-   lsfitreport_init(&rep, _state, true);
+   SetMatrix(v);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewMatrix(a, 0, 0, DT_REAL, _state);
+   NewVector(shifting, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_REAL, _state);
+   NewObj(lsfitreport, rep, _state);
 
    ae_assert(n >= 0, "BuildLinearModel: N<0", _state);
    ae_assert(ny > 0, "BuildLinearModel: NY <= 0", _state);
@@ -18751,14 +17939,6 @@ static bool rbfv1_rbfv1buildlinearmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_i
 
 static void rbfv1_buildrbfmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, RVector *r, ae_int_t n, ae_int_t nc, ae_int_t ny, kdtree *pointstree, kdtree *centerstree, double epsort, double epserr, ae_int_t maxits, ae_int_t *gnnz, ae_int_t *snnz, RMatrix *w, ae_int_t *info, ae_int_t *iterationscount, ae_int_t *nmv, ae_state *_state) {
    ae_frame _frame_block;
-   linlsqrstate state;
-   linlsqrreport lsqrrep;
-   sparsematrix spg;
-   sparsematrix sps;
-   ae_vector nearcenterscnt;
-   ae_vector nearpointscnt;
-   ae_vector skipnearpointscnt;
-   ae_vector farpointscnt;
    ae_int_t maxnearcenterscnt;
    ae_int_t maxnearpointscnt;
    ae_int_t maxfarpointscnt;
@@ -18766,93 +17946,53 @@ static void rbfv1_buildrbfmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, RVector
    ae_int_t sumnearpointscnt;
    ae_int_t sumfarpointscnt;
    double maxrad;
-   ae_vector pointstags;
-   ae_vector centerstags;
-   ae_matrix nearpoints;
-   ae_matrix nearcenters;
-   ae_matrix farpoints;
    ae_int_t tmpi;
    ae_int_t pointscnt;
    ae_int_t centerscnt;
-   ae_vector xcx;
-   ae_vector tmpy;
-   ae_vector tc;
-   ae_vector g;
-   ae_vector c;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t sind;
-   ae_matrix a;
    double vv;
    double vx;
    double vy;
    double vz;
    double vr;
    double gnorm2;
-   ae_vector tmp0;
-   ae_vector tmp1;
-   ae_vector tmp2;
    double fx;
-   ae_matrix xx;
-   ae_matrix cx;
    double mrad;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&state, 0, sizeof(state));
-   memset(&lsqrrep, 0, sizeof(lsqrrep));
-   memset(&spg, 0, sizeof(spg));
-   memset(&sps, 0, sizeof(sps));
-   memset(&nearcenterscnt, 0, sizeof(nearcenterscnt));
-   memset(&nearpointscnt, 0, sizeof(nearpointscnt));
-   memset(&skipnearpointscnt, 0, sizeof(skipnearpointscnt));
-   memset(&farpointscnt, 0, sizeof(farpointscnt));
-   memset(&pointstags, 0, sizeof(pointstags));
-   memset(&centerstags, 0, sizeof(centerstags));
-   memset(&nearpoints, 0, sizeof(nearpoints));
-   memset(&nearcenters, 0, sizeof(nearcenters));
-   memset(&farpoints, 0, sizeof(farpoints));
-   memset(&xcx, 0, sizeof(xcx));
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&tc, 0, sizeof(tc));
-   memset(&g, 0, sizeof(g));
-   memset(&c, 0, sizeof(c));
-   memset(&a, 0, sizeof(a));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&tmp1, 0, sizeof(tmp1));
-   memset(&tmp2, 0, sizeof(tmp2));
-   memset(&xx, 0, sizeof(xx));
-   memset(&cx, 0, sizeof(cx));
    *gnnz = 0;
    *snnz = 0;
-   ae_matrix_free(w, true);
+   SetMatrix(w);
    *info = 0;
    *iterationscount = 0;
    *nmv = 0;
-   linlsqrstate_init(&state, _state, true);
-   linlsqrreport_init(&lsqrrep, _state, true);
-   sparsematrix_init(&spg, _state, true);
-   sparsematrix_init(&sps, _state, true);
-   ae_vector_init(&nearcenterscnt, 0, DT_INT, _state, true);
-   ae_vector_init(&nearpointscnt, 0, DT_INT, _state, true);
-   ae_vector_init(&skipnearpointscnt, 0, DT_INT, _state, true);
-   ae_vector_init(&farpointscnt, 0, DT_INT, _state, true);
-   ae_vector_init(&pointstags, 0, DT_INT, _state, true);
-   ae_vector_init(&centerstags, 0, DT_INT, _state, true);
-   ae_matrix_init(&nearpoints, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&nearcenters, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&farpoints, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&xcx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   ae_vector_init(&tc, 0, DT_REAL, _state, true);
-   ae_vector_init(&g, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_REAL, _state, true);
-   ae_matrix_init(&a, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp1, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp2, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xx, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&cx, 0, 0, DT_REAL, _state, true);
+   NewObj(linlsqrstate, state, _state);
+   NewObj(linlsqrreport, lsqrrep, _state);
+   NewObj(sparsematrix, spg, _state);
+   NewObj(sparsematrix, sps, _state);
+   NewVector(nearcenterscnt, 0, DT_INT, _state);
+   NewVector(nearpointscnt, 0, DT_INT, _state);
+   NewVector(skipnearpointscnt, 0, DT_INT, _state);
+   NewVector(farpointscnt, 0, DT_INT, _state);
+   NewVector(pointstags, 0, DT_INT, _state);
+   NewVector(centerstags, 0, DT_INT, _state);
+   NewMatrix(nearpoints, 0, 0, DT_REAL, _state);
+   NewMatrix(nearcenters, 0, 0, DT_REAL, _state);
+   NewMatrix(farpoints, 0, 0, DT_REAL, _state);
+   NewVector(xcx, 0, DT_REAL, _state);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewVector(tc, 0, DT_REAL, _state);
+   NewVector(g, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_REAL, _state);
+   NewMatrix(a, 0, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(tmp1, 0, DT_REAL, _state);
+   NewVector(tmp2, 0, DT_REAL, _state);
+   NewMatrix(xx, 0, 0, DT_REAL, _state);
+   NewMatrix(cx, 0, 0, DT_REAL, _state);
 
 // Handle special cases: NC=0
    if (nc == 0) {
@@ -19083,17 +18223,9 @@ static void rbfv1_buildrbfmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, RVector
 
 static void rbfv1_buildrbfmlayersmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, double rval, RVector *r, ae_int_t n, ae_int_t *nc, ae_int_t ny, ae_int_t nlayers, kdtree *centerstree, double epsort, double epserr, ae_int_t maxits, double lambdav, ae_int_t *annz, RMatrix *w, ae_int_t *info, ae_int_t *iterationscount, ae_int_t *nmv, ae_state *_state) {
    ae_frame _frame_block;
-   linlsqrstate state;
-   linlsqrreport lsqrrep;
-   sparsematrix spa;
    double anorm;
-   ae_vector omega;
-   ae_vector xx;
-   ae_vector tmpy;
-   ae_matrix cx;
    double yval;
    ae_int_t nec;
-   ae_vector centerstags;
    ae_int_t layer;
    ae_int_t i;
    ae_int_t j;
@@ -19103,30 +18235,22 @@ static void rbfv1_buildrbfmlayersmodellsqr(RMatrix *x, RMatrix *y, RMatrix *xc, 
    double rmaxafter;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&state, 0, sizeof(state));
-   memset(&lsqrrep, 0, sizeof(lsqrrep));
-   memset(&spa, 0, sizeof(spa));
-   memset(&omega, 0, sizeof(omega));
-   memset(&xx, 0, sizeof(xx));
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&cx, 0, sizeof(cx));
-   memset(&centerstags, 0, sizeof(centerstags));
-   ae_matrix_free(xc, true);
-   ae_vector_free(r, true);
+   SetMatrix(xc);
+   SetVector(r);
    *nc = 0;
    *annz = 0;
-   ae_matrix_free(w, true);
+   SetMatrix(w);
    *info = 0;
    *iterationscount = 0;
    *nmv = 0;
-   linlsqrstate_init(&state, _state, true);
-   linlsqrreport_init(&lsqrrep, _state, true);
-   sparsematrix_init(&spa, _state, true);
-   ae_vector_init(&omega, 0, DT_REAL, _state, true);
-   ae_vector_init(&xx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   ae_matrix_init(&cx, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&centerstags, 0, DT_INT, _state, true);
+   NewObj(linlsqrstate, state, _state);
+   NewObj(linlsqrreport, lsqrrep, _state);
+   NewObj(sparsematrix, spa, _state);
+   NewVector(omega, 0, DT_REAL, _state);
+   NewVector(xx, 0, DT_REAL, _state);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewMatrix(cx, 0, 0, DT_REAL, _state);
+   NewVector(centerstags, 0, DT_INT, _state);
 
    ae_assert(nlayers >= 0, "BuildRBFMLayersModelLSQR: invalid argument(NLayers<0)", _state);
    ae_assert(n >= 0, "BuildRBFMLayersModelLSQR: invalid argument(N<0)", _state);
@@ -20054,7 +19178,7 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i, ae
 // API: void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f, const xparams _xparams = xdefault);
 void spline2dcalcv(spline2dinterpolant *c, double x, double y, RVector *f, ae_state *_state) {
 
-   ae_vector_free(f, true);
+   SetVector(f);
 
    ae_assert(c->stype == -1 || c->stype == -3, "Spline2DCalcV: incorrect C (incorrect parameter C.SType)", _state);
    ae_assert(ae_isfinite(x, _state) && ae_isfinite(y, _state), "Spline2DCalcV: either X=NaN/Infinite or Y=NaN/Infinite", _state);
@@ -20270,23 +19394,15 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
 // API: void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by, const xparams _xparams = xdefault);
 void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay, double by, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector x;
-   ae_vector y;
-   ae_vector f;
-   ae_vector v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&f, 0, sizeof(f));
-   memset(&v, 0, sizeof(v));
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&f, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(f, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DLinTransXY: incorrect C (incorrect parameter C.SType)", _state);
    ae_assert(ae_isfinite(ax, _state), "Spline2DLinTransXY: AX is infinite or NaN", _state);
@@ -20373,19 +19489,13 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
 // API: void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
 void spline2dlintransf(spline2dinterpolant *c, double a, double b, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector x;
-   ae_vector y;
-   ae_vector f;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&f, 0, sizeof(f));
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&f, 0, DT_REAL, _state, true);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(f, 0, DT_REAL, _state);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DLinTransF: incorrect C (incorrect parameter C.SType)", _state);
    ae_vector_set_length(&x, c->n, _state);
@@ -20421,7 +19531,7 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b, ae_state *_st
 void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc, ae_state *_state) {
    ae_int_t tblsize;
 
-   spline2dinterpolant_free(cc, true);
+   SetObj(spline2dinterpolant, cc);
 
    ae_assert(c->stype == -1 || c->stype == -3, "Spline2DCopy: incorrect C (incorrect parameter C.SType)", _state);
    cc->n = c->n;
@@ -20461,25 +19571,17 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc, ae_state *_st
 // API: void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth, const xparams _xparams = xdefault);
 void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, RMatrix *b, ae_int_t newheight, ae_int_t newwidth, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix buf;
-   ae_vector x;
-   ae_vector y;
-   spline1dinterpolant c;
    ae_int_t mw;
    ae_int_t mh;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&c, 0, sizeof(c));
-   ae_matrix_free(b, true);
-   ae_matrix_init(&buf, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   spline1dinterpolant_init(&c, _state, true);
+   SetMatrix(b);
+   NewMatrix(buf, 0, 0, DT_REAL, _state);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewObj(spline1dinterpolant, c, _state);
 
    ae_assert(oldwidth > 1 && oldheight > 1, "Spline2DResampleBicubic: width/height less than 1", _state);
    ae_assert(newwidth > 1 && newheight > 1, "Spline2DResampleBicubic: width/height less than 1", _state);
@@ -20549,7 +19651,7 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(b, true);
+   SetMatrix(b);
 
    ae_assert(oldwidth > 1 && oldheight > 1, "Spline2DResampleBilinear: width/height less than 1", _state);
    ae_assert(newwidth > 1 && newheight > 1, "Spline2DResampleBilinear: width/height less than 1", _state);
@@ -20595,7 +19697,7 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
    ae_int_t k;
    ae_int_t i0;
 
-   spline2dinterpolant_free(c, true);
+   SetObj(spline2dinterpolant, c);
 
    ae_assert(n >= 2, "Spline2DBuildBilinearV: N is less then 2", _state);
    ae_assert(m >= 2, "Spline2DBuildBilinearV: M is less then 2", _state);
@@ -20686,11 +19788,6 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
 // API: void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c, const xparams _xparams = xdefault);
 void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _f;
-   ae_matrix tf;
-   ae_matrix dx;
-   ae_matrix dy;
-   ae_matrix dxy;
    double t;
    ae_int_t i;
    ae_int_t j;
@@ -20698,18 +19795,12 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
    ae_int_t di;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_f, 0, sizeof(_f));
-   memset(&tf, 0, sizeof(tf));
-   memset(&dx, 0, sizeof(dx));
-   memset(&dy, 0, sizeof(dy));
-   memset(&dxy, 0, sizeof(dxy));
-   ae_vector_copy(&_f, f, _state, true);
-   f = &_f;
-   spline2dinterpolant_free(c, true);
-   ae_matrix_init(&tf, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dx, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dy, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dxy, 0, 0, DT_REAL, _state, true);
+   DupVector(f, _state);
+   SetObj(spline2dinterpolant, c);
+   NewMatrix(tf, 0, 0, DT_REAL, _state);
+   NewMatrix(dx, 0, 0, DT_REAL, _state);
+   NewMatrix(dy, 0, 0, DT_REAL, _state);
+   NewMatrix(dxy, 0, 0, DT_REAL, _state);
 
    ae_assert(n >= 2, "Spline2DBuildBicubicV: N is less than 2", _state);
    ae_assert(m >= 2, "Spline2DBuildBicubicV: M is less than 2", _state);
@@ -20866,7 +19957,7 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
    *m = 0;
    *n = 0;
    *d = 0;
-   ae_matrix_free(tbl, true);
+   SetMatrix(tbl);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DUnpackV: incorrect C (incorrect parameter C.SType)", _state);
    *n = c->n;
@@ -20947,7 +20038,7 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
    ae_int_t j;
    ae_int_t k;
 
-   spline2dinterpolant_free(c, true);
+   SetObj(spline2dinterpolant, c);
 
    ae_assert(n >= 2, "Spline2DBuildBilinear: N<2", _state);
    ae_assert(m >= 2, "Spline2DBuildBilinear: M<2", _state);
@@ -21023,29 +20114,20 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
 // API: void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c, const xparams _xparams = xdefault);
 void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _f;
    ae_int_t sfx;
    ae_int_t sfy;
    ae_int_t sfxy;
-   ae_matrix dx;
-   ae_matrix dy;
-   ae_matrix dxy;
    double t;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_f, 0, sizeof(_f));
-   memset(&dx, 0, sizeof(dx));
-   memset(&dy, 0, sizeof(dy));
-   memset(&dxy, 0, sizeof(dxy));
-   ae_matrix_copy(&_f, f, _state, true);
-   f = &_f;
-   spline2dinterpolant_free(c, true);
-   ae_matrix_init(&dx, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dy, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dxy, 0, 0, DT_REAL, _state, true);
+   DupMatrix(f, _state);
+   SetObj(spline2dinterpolant, c);
+   NewMatrix(dx, 0, 0, DT_REAL, _state);
+   NewMatrix(dy, 0, 0, DT_REAL, _state);
+   NewMatrix(dxy, 0, 0, DT_REAL, _state);
 
    ae_assert(n >= 2, "Spline2DBuildBicubicSpline: N<2", _state);
    ae_assert(m >= 2, "Spline2DBuildBicubicSpline: M<2", _state);
@@ -21159,7 +20241,7 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
 
    *m = 0;
    *n = 0;
-   ae_matrix_free(tbl, true);
+   SetMatrix(tbl);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline2DUnpack: incorrect C (incorrect parameter C.SType)", _state);
    if (c->d != 1) {
@@ -21269,7 +20351,7 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
 // API: void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state, const xparams _xparams = xdefault);
 void spline2dbuildercreate(ae_int_t d, spline2dbuilder *state, ae_state *_state) {
 
-   spline2dbuilder_free(state, true);
+   SetObj(spline2dbuilder, state);
 
    ae_assert(d >= 1, "Spline2DBuilderCreate: D <= 0", _state);
 
@@ -21655,21 +20737,6 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    ae_int_t basecasex;
    ae_int_t basecasey;
    double eps;
-   ae_vector xywork;
-   ae_matrix vterm;
-   ae_vector tmpx;
-   ae_vector tmpy;
-   ae_vector tmp0;
-   ae_vector tmp1;
-   ae_vector meany;
-   ae_vector xyindex;
-   ae_vector tmpi;
-   spline1dinterpolant basis1;
-   sparsematrix av;
-   sparsematrix ah;
-   spline2dxdesignmatrix xdesignmatrix;
-   ae_vector z;
-   spline2dblockllsbuf blockllsbuf;
    ae_int_t sfx;
    ae_int_t sfy;
    ae_int_t sfxy;
@@ -21677,38 +20744,23 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    ae_int_t dstidx;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xywork, 0, sizeof(xywork));
-   memset(&vterm, 0, sizeof(vterm));
-   memset(&tmpx, 0, sizeof(tmpx));
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&tmp1, 0, sizeof(tmp1));
-   memset(&meany, 0, sizeof(meany));
-   memset(&xyindex, 0, sizeof(xyindex));
-   memset(&tmpi, 0, sizeof(tmpi));
-   memset(&basis1, 0, sizeof(basis1));
-   memset(&av, 0, sizeof(av));
-   memset(&ah, 0, sizeof(ah));
-   memset(&xdesignmatrix, 0, sizeof(xdesignmatrix));
-   memset(&z, 0, sizeof(z));
-   memset(&blockllsbuf, 0, sizeof(blockllsbuf));
-   spline2dinterpolant_free(s, true);
-   spline2dfitreport_free(rep, true);
-   ae_vector_init(&xywork, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vterm, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpx, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp1, 0, DT_REAL, _state, true);
-   ae_vector_init(&meany, 0, DT_REAL, _state, true);
-   ae_vector_init(&xyindex, 0, DT_INT, _state, true);
-   ae_vector_init(&tmpi, 0, DT_INT, _state, true);
-   spline1dinterpolant_init(&basis1, _state, true);
-   sparsematrix_init(&av, _state, true);
-   sparsematrix_init(&ah, _state, true);
-   spline2dxdesignmatrix_init(&xdesignmatrix, _state, true);
-   ae_vector_init(&z, 0, DT_REAL, _state, true);
-   spline2dblockllsbuf_init(&blockllsbuf, _state, true);
+   SetObj(spline2dinterpolant, s);
+   SetObj(spline2dfitreport, rep);
+   NewVector(xywork, 0, DT_REAL, _state);
+   NewMatrix(vterm, 0, 0, DT_REAL, _state);
+   NewVector(tmpx, 0, DT_REAL, _state);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(tmp1, 0, DT_REAL, _state);
+   NewVector(meany, 0, DT_REAL, _state);
+   NewVector(xyindex, 0, DT_INT, _state);
+   NewVector(tmpi, 0, DT_INT, _state);
+   NewObj(spline1dinterpolant, basis1, _state);
+   NewObj(sparsematrix, av, _state);
+   NewObj(sparsematrix, ah, _state);
+   NewObj(spline2dxdesignmatrix, xdesignmatrix, _state);
+   NewVector(z, 0, DT_REAL, _state);
+   NewObj(spline2dblockllsbuf, blockllsbuf, _state);
 
    nzwidth = 4;
    bfrad = 2;
@@ -22107,7 +21159,7 @@ void spline2dserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *
 void spline2dunserialize(ae_serializer *s, spline2dinterpolant *spline, ae_state *_state) {
    ae_int_t scode;
 
-   spline2dinterpolant_free(spline, true);
+   SetObj(spline2dinterpolant, spline);
 
 // Header
    ae_serializer_unserialize_int(s, &scode, _state);
@@ -22129,23 +21181,17 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector xt;
-   ae_vector ft;
    double s;
    double ds;
    double d2s;
-   spline1dinterpolant c;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xt, 0, sizeof(xt));
-   memset(&ft, 0, sizeof(ft));
-   memset(&c, 0, sizeof(c));
-   ae_matrix_free(dx, true);
-   ae_matrix_free(dy, true);
-   ae_matrix_free(dxy, true);
-   ae_vector_init(&xt, 0, DT_REAL, _state, true);
-   ae_vector_init(&ft, 0, DT_REAL, _state, true);
-   spline1dinterpolant_init(&c, _state, true);
+   SetMatrix(dx);
+   SetMatrix(dy);
+   SetMatrix(dxy);
+   NewVector(xt, 0, DT_REAL, _state);
+   NewVector(ft, 0, DT_REAL, _state);
+   NewObj(spline1dinterpolant, c, _state);
 
    ae_matrix_set_length(dx, m, n, _state);
    ae_matrix_set_length(dy, m, n, _state);
@@ -22234,27 +21280,15 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
    double w0;
    double w1;
    double w2;
-   ae_vector crx;
-   ae_vector cry;
-   ae_vector nrs;
-   ae_matrix d2x;
-   ae_matrix d2y;
-   ae_matrix dxy;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&crx, 0, sizeof(crx));
-   memset(&cry, 0, sizeof(cry));
-   memset(&nrs, 0, sizeof(nrs));
-   memset(&d2x, 0, sizeof(d2x));
-   memset(&d2y, 0, sizeof(d2y));
-   memset(&dxy, 0, sizeof(dxy));
    *arows = 0;
-   ae_vector_init(&crx, 0, DT_INT, _state, true);
-   ae_vector_init(&cry, 0, DT_INT, _state, true);
-   ae_vector_init(&nrs, 0, DT_INT, _state, true);
-   ae_matrix_init(&d2x, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&d2y, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dxy, 0, 0, DT_REAL, _state, true);
+   NewVector(crx, 0, DT_INT, _state);
+   NewVector(cry, 0, DT_INT, _state);
+   NewVector(nrs, 0, DT_INT, _state);
+   NewMatrix(d2x, 0, 0, DT_REAL, _state);
+   NewMatrix(d2y, 0, 0, DT_REAL, _state);
+   NewMatrix(dxy, 0, 0, DT_REAL, _state);
 
    nzwidth = 4;
    nzshift = 1;
@@ -22489,35 +21523,17 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
    ae_int_t tilescount1;
    double v;
    double rss;
-   ae_vector yraw;
-   ae_vector xyindex;
-   ae_vector tmp0;
-   ae_vector bufi;
-   spline2dfastddmbuf seed;
-   ae_shared_pool pool;
-   spline2dxdesignmatrix xdesignmatrix;
-   spline2dblockllsbuf blockllsbuf;
-   spline2dfitreport dummyrep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&yraw, 0, sizeof(yraw));
-   memset(&xyindex, 0, sizeof(xyindex));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&bufi, 0, sizeof(bufi));
-   memset(&seed, 0, sizeof(seed));
-   memset(&pool, 0, sizeof(pool));
-   memset(&xdesignmatrix, 0, sizeof(xdesignmatrix));
-   memset(&blockllsbuf, 0, sizeof(blockllsbuf));
-   memset(&dummyrep, 0, sizeof(dummyrep));
-   ae_vector_init(&yraw, 0, DT_REAL, _state, true);
-   ae_vector_init(&xyindex, 0, DT_INT, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&bufi, 0, DT_INT, _state, true);
-   spline2dfastddmbuf_init(&seed, _state, true);
-   ae_shared_pool_init(&pool, _state, true);
-   spline2dxdesignmatrix_init(&xdesignmatrix, _state, true);
-   spline2dblockllsbuf_init(&blockllsbuf, _state, true);
-   spline2dfitreport_init(&dummyrep, _state, true);
+   NewVector(yraw, 0, DT_REAL, _state);
+   NewVector(xyindex, 0, DT_INT, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(bufi, 0, DT_INT, _state);
+   NewObj(spline2dfastddmbuf, seed, _state);
+   NewObj(ae_shared_pool, pool, _state);
+   NewObj(spline2dxdesignmatrix, xdesignmatrix, _state);
+   NewObj(spline2dblockllsbuf, blockllsbuf, _state);
+   NewObj(spline2dfitreport, dummyrep, _state);
 
 // Dataset metrics and integrity checks
    nzwidth = 4;
@@ -22662,12 +21678,9 @@ static void spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalexy, 
    double vsx;
    double vsy;
    double vsxy;
-   spline2dfastddmbuf *buf;
-   ae_smart_ptr _buf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_buf, 0, sizeof(_buf));
-   ae_smart_ptr_init(&_buf, (void **)&buf, _state, true);
+   RefObj(spline2dfastddmbuf, buf, _state);
 
 // Dataset metrics and fast integrity checks;
 // no code with side effects is allowed before parallel split.
@@ -22859,7 +21872,6 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
    ae_int_t i;
    ae_int_t j;
    double lambdachol;
-   sreal mxata;
    double v;
    ae_int_t celloffset;
    ae_int_t i0;
@@ -22871,8 +21883,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
    ae_int_t ky;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&mxata, 0, sizeof(mxata));
-   sreal_init(&mxata, _state, true);
+   NewObj(sreal, mxata, _state);
 
    ae_assert(xdesign->blockwidth == 4, "Spline2DFit: integrity check failed", _state);
    blockbandwidth = 3;
@@ -23064,25 +22075,15 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
    ae_int_t endi;
    ae_int_t endj;
    ae_int_t rfsidx;
-   ae_matrix ata;
-   ae_vector tmp0;
-   ae_vector tmp1;
    double mxata;
-   linlsqrstate solver;
-   linlsqrreport solverrep;
    double rss;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ata, 0, sizeof(ata));
-   memset(&tmp0, 0, sizeof(tmp0));
-   memset(&tmp1, 0, sizeof(tmp1));
-   memset(&solver, 0, sizeof(solver));
-   memset(&solverrep, 0, sizeof(solverrep));
-   ae_matrix_init(&ata, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp1, 0, DT_REAL, _state, true);
-   linlsqrstate_init(&solver, _state, true);
-   linlsqrreport_init(&solverrep, _state, true);
+   NewMatrix(ata, 0, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
+   NewVector(tmp1, 0, DT_REAL, _state);
+   NewObj(linlsqrstate, solver, _state);
+   NewObj(linlsqrreport, solverrep, _state);
 
    blockbandwidth = 3;
    ew = 2 + d;
@@ -23368,7 +22369,6 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
    double avgrowlen;
    double cellcost;
    double totalcost;
-   sreal tmpmxata;
    ae_int_t i;
    ae_int_t j;
    ae_int_t i0;
@@ -23385,8 +22385,7 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
    ae_int_t endj;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmpmxata, 0, sizeof(tmpmxata));
-   sreal_init(&tmpmxata, _state, true);
+   NewObj(sreal, tmpmxata, _state);
 
    ae_assert(ae_fp_greater_eq(mxata->val, (double)(0)), "BlockLLSGenerateATA: integrity check failed", _state);
    blockbandwidth = 3;
@@ -23597,16 +22596,12 @@ static void spline2d_blockllstrsv(RMatrix *blockata, ae_int_t kx, ae_int_t ky, b
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_computeresidualsfromscratch(RVector *xy, RVector *yraw, ae_int_t npoints, ae_int_t d, ae_int_t scalexy, spline2dinterpolant *spline, ae_state *_state) {
    ae_frame _frame_block;
-   srealarray seed;
-   ae_shared_pool pool;
    ae_int_t chunksize;
    double pointcost;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&seed, 0, sizeof(seed));
-   memset(&pool, 0, sizeof(pool));
-   srealarray_init(&seed, _state, true);
-   ae_shared_pool_init(&pool, _state, true);
+   NewObj(srealarray, seed, _state);
+   NewObj(ae_shared_pool, pool, _state);
 
 // Setting up
    chunksize = 1000;
@@ -23635,13 +22630,10 @@ static void spline2d_computeresidualsfromscratchrec(RVector *xy, RVector *yraw, 
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   srealarray *pbuf;
-   ae_smart_ptr _pbuf;
    ae_int_t xew;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_pbuf, 0, sizeof(_pbuf));
-   ae_smart_ptr_init(&_pbuf, (void **)&pbuf, _state, true);
+   RefObj(srealarray, pbuf, _state);
 
    xew = 2 + d;
 
@@ -23734,11 +22726,9 @@ static void spline2d_reorderdatasetandbuildindex(RVector *xy, ae_int_t npoints, 
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_rescaledatasetandrefineindex(RVector *xy, ae_int_t npoints, ae_int_t d, RVector *shadow, ae_int_t ns, ae_int_t kx, ae_int_t ky, ZVector *xyindex, ZVector *bufi, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector xyindexprev;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xyindexprev, 0, sizeof(xyindexprev));
-   ae_vector_init(&xyindexprev, 0, DT_INT, _state, true);
+   NewVector(xyindexprev, 0, DT_INT, _state);
 
 // Set up
    ae_assert(kx >= 2, "Spline2DFit.RescaleDataset2AndRefineIndex: integrity check failed", _state);
@@ -23916,9 +22906,6 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
    ae_int_t baseidx;
    ae_int_t nzshift;
    ae_int_t nzwidth;
-   ae_matrix d2x;
-   ae_matrix d2y;
-   ae_matrix dxy;
    double v;
    double v0;
    double v1;
@@ -23928,12 +22915,9 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
    double w2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&d2x, 0, sizeof(d2x));
-   memset(&d2y, 0, sizeof(d2y));
-   memset(&dxy, 0, sizeof(dxy));
-   ae_matrix_init(&d2x, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&d2y, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dxy, 0, 0, DT_REAL, _state, true);
+   NewMatrix(d2x, 0, 0, DT_REAL, _state);
+   NewMatrix(d2y, 0, 0, DT_REAL, _state);
+   NewMatrix(dxy, 0, 0, DT_REAL, _state);
 
    nzshift = 1;
    nzwidth = 4;
@@ -24562,12 +23546,11 @@ DefClass(spline2dbuilder, )
 DefClass(spline2dfitreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -24580,11 +23563,9 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -24595,22 +23576,18 @@ void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
 }
 
 void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
@@ -24928,7 +23905,7 @@ void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   rbfv2model_free(s, true);
+   SetObj(rbfv2model, s);
 
    ae_assert(nx >= 1, "RBFCreate: NX<1", _state);
    ae_assert(ny >= 1, "RBFCreate: NY<1", _state);
@@ -24993,7 +23970,7 @@ void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state) {
 // ALGLIB: Copyright 02.04.2016 by Sergey Bochkanov
 void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf, ae_state *_state) {
 
-   rbfv2calcbuffer_free(buf, true);
+   SetObj(rbfv2calcbuffer, buf);
 
    rbfv2_allocatecalcbuffer(s, buf, _state);
 }
@@ -25054,34 +24031,9 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
    ae_int_t nx;
    ae_int_t ny;
    ae_int_t bf;
-   ae_matrix rhs;
-   ae_matrix residualy;
-   ae_matrix v;
    ae_int_t rowsperpoint;
-   ae_vector hidx;
-   ae_vector xr;
-   ae_vector ri;
-   ae_vector kdroots;
-   ae_vector kdnodes;
-   ae_vector kdsplits;
-   ae_vector kdboxmin;
-   ae_vector kdboxmax;
-   ae_vector cw;
-   ae_vector cwrange;
-   ae_matrix curxy;
    ae_int_t curn;
    ae_int_t nbasis;
-   kdtree curtree;
-   kdtree globaltree;
-   ae_vector x0;
-   ae_vector x1;
-   ae_vector tags;
-   ae_vector dist;
-   ae_vector nncnt;
-   ae_vector rowsizes;
-   ae_vector diagata;
-   ae_vector prec;
-   ae_vector tmpx;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -25093,96 +24045,49 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
    double criticalr;
    ae_int_t cnt;
    double avgdiagata;
-   ae_vector avgrowsize;
    double sumrowsize;
    double rprogress;
    ae_int_t maxits;
-   linlsqrstate linstate;
-   linlsqrreport lsqrrep;
-   sparsematrix sparseacrs;
-   ae_vector densew1;
-   ae_vector denseb1;
-   rbfv2calcbuffer calcbuf;
-   ae_vector vr2;
-   ae_vector voffs;
-   ae_vector rowindexes;
-   ae_vector rowvals;
    double penalty;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rhs, 0, sizeof(rhs));
-   memset(&residualy, 0, sizeof(residualy));
-   memset(&v, 0, sizeof(v));
-   memset(&hidx, 0, sizeof(hidx));
-   memset(&xr, 0, sizeof(xr));
-   memset(&ri, 0, sizeof(ri));
-   memset(&kdroots, 0, sizeof(kdroots));
-   memset(&kdnodes, 0, sizeof(kdnodes));
-   memset(&kdsplits, 0, sizeof(kdsplits));
-   memset(&kdboxmin, 0, sizeof(kdboxmin));
-   memset(&kdboxmax, 0, sizeof(kdboxmax));
-   memset(&cw, 0, sizeof(cw));
-   memset(&cwrange, 0, sizeof(cwrange));
-   memset(&curxy, 0, sizeof(curxy));
-   memset(&curtree, 0, sizeof(curtree));
-   memset(&globaltree, 0, sizeof(globaltree));
-   memset(&x0, 0, sizeof(x0));
-   memset(&x1, 0, sizeof(x1));
-   memset(&tags, 0, sizeof(tags));
-   memset(&dist, 0, sizeof(dist));
-   memset(&nncnt, 0, sizeof(nncnt));
-   memset(&rowsizes, 0, sizeof(rowsizes));
-   memset(&diagata, 0, sizeof(diagata));
-   memset(&prec, 0, sizeof(prec));
-   memset(&tmpx, 0, sizeof(tmpx));
-   memset(&avgrowsize, 0, sizeof(avgrowsize));
-   memset(&linstate, 0, sizeof(linstate));
-   memset(&lsqrrep, 0, sizeof(lsqrrep));
-   memset(&sparseacrs, 0, sizeof(sparseacrs));
-   memset(&densew1, 0, sizeof(densew1));
-   memset(&denseb1, 0, sizeof(denseb1));
-   memset(&calcbuf, 0, sizeof(calcbuf));
-   memset(&vr2, 0, sizeof(vr2));
-   memset(&voffs, 0, sizeof(voffs));
-   memset(&rowindexes, 0, sizeof(rowindexes));
-   memset(&rowvals, 0, sizeof(rowvals));
-   rbfv2report_free(rep, true);
-   ae_matrix_init(&rhs, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&residualy, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&v, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&hidx, 0, DT_INT, _state, true);
-   ae_vector_init(&xr, 0, DT_REAL, _state, true);
-   ae_vector_init(&ri, 0, DT_REAL, _state, true);
-   ae_vector_init(&kdroots, 0, DT_INT, _state, true);
-   ae_vector_init(&kdnodes, 0, DT_INT, _state, true);
-   ae_vector_init(&kdsplits, 0, DT_REAL, _state, true);
-   ae_vector_init(&kdboxmin, 0, DT_REAL, _state, true);
-   ae_vector_init(&kdboxmax, 0, DT_REAL, _state, true);
-   ae_vector_init(&cw, 0, DT_REAL, _state, true);
-   ae_vector_init(&cwrange, 0, DT_INT, _state, true);
-   ae_matrix_init(&curxy, 0, 0, DT_REAL, _state, true);
-   kdtree_init(&curtree, _state, true);
-   kdtree_init(&globaltree, _state, true);
-   ae_vector_init(&x0, 0, DT_REAL, _state, true);
-   ae_vector_init(&x1, 0, DT_REAL, _state, true);
-   ae_vector_init(&tags, 0, DT_INT, _state, true);
-   ae_vector_init(&dist, 0, DT_REAL, _state, true);
-   ae_vector_init(&nncnt, 0, DT_INT, _state, true);
-   ae_vector_init(&rowsizes, 0, DT_INT, _state, true);
-   ae_vector_init(&diagata, 0, DT_REAL, _state, true);
-   ae_vector_init(&prec, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpx, 0, DT_REAL, _state, true);
-   ae_vector_init(&avgrowsize, 0, DT_REAL, _state, true);
-   linlsqrstate_init(&linstate, _state, true);
-   linlsqrreport_init(&lsqrrep, _state, true);
-   sparsematrix_init(&sparseacrs, _state, true);
-   ae_vector_init(&densew1, 0, DT_REAL, _state, true);
-   ae_vector_init(&denseb1, 0, DT_REAL, _state, true);
-   rbfv2calcbuffer_init(&calcbuf, _state, true);
-   ae_vector_init(&vr2, 0, DT_REAL, _state, true);
-   ae_vector_init(&voffs, 0, DT_INT, _state, true);
-   ae_vector_init(&rowindexes, 0, DT_INT, _state, true);
-   ae_vector_init(&rowvals, 0, DT_REAL, _state, true);
+   SetObj(rbfv2report, rep);
+   NewMatrix(rhs, 0, 0, DT_REAL, _state);
+   NewMatrix(residualy, 0, 0, DT_REAL, _state);
+   NewMatrix(v, 0, 0, DT_REAL, _state);
+   NewVector(hidx, 0, DT_INT, _state);
+   NewVector(xr, 0, DT_REAL, _state);
+   NewVector(ri, 0, DT_REAL, _state);
+   NewVector(kdroots, 0, DT_INT, _state);
+   NewVector(kdnodes, 0, DT_INT, _state);
+   NewVector(kdsplits, 0, DT_REAL, _state);
+   NewVector(kdboxmin, 0, DT_REAL, _state);
+   NewVector(kdboxmax, 0, DT_REAL, _state);
+   NewVector(cw, 0, DT_REAL, _state);
+   NewVector(cwrange, 0, DT_INT, _state);
+   NewMatrix(curxy, 0, 0, DT_REAL, _state);
+   NewObj(kdtree, curtree, _state);
+   NewObj(kdtree, globaltree, _state);
+   NewVector(x0, 0, DT_REAL, _state);
+   NewVector(x1, 0, DT_REAL, _state);
+   NewVector(tags, 0, DT_INT, _state);
+   NewVector(dist, 0, DT_REAL, _state);
+   NewVector(nncnt, 0, DT_INT, _state);
+   NewVector(rowsizes, 0, DT_INT, _state);
+   NewVector(diagata, 0, DT_REAL, _state);
+   NewVector(prec, 0, DT_REAL, _state);
+   NewVector(tmpx, 0, DT_REAL, _state);
+   NewVector(avgrowsize, 0, DT_REAL, _state);
+   NewObj(linlsqrstate, linstate, _state);
+   NewObj(linlsqrreport, lsqrrep, _state);
+   NewObj(sparsematrix, sparseacrs, _state);
+   NewVector(densew1, 0, DT_REAL, _state);
+   NewVector(denseb1, 0, DT_REAL, _state);
+   NewObj(rbfv2calcbuffer, calcbuf, _state);
+   NewVector(vr2, 0, DT_REAL, _state);
+   NewVector(voffs, 0, DT_INT, _state);
+   NewVector(rowindexes, 0, DT_INT, _state);
+   NewVector(rowvals, 0, DT_REAL, _state);
 
    ae_assert(s->nx > 0, "RBFV2BuildHierarchical: incorrect NX", _state);
    ae_assert(s->ny > 0, "RBFV2BuildHierarchical: incorrect NY", _state);
@@ -25628,7 +24533,7 @@ void rbfv2unserialize(ae_serializer *s, rbfv2model *model, ae_state *_state) {
    ae_int_t nx;
    ae_int_t ny;
 
-   rbfv2model_free(model, true);
+   SetObj(rbfv2model, model);
 
 // Unserialize primary model parameters, initialize model.
 //
@@ -25995,38 +24900,20 @@ void rbfv2tscalcbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y,
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv2gridcalc2(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector cpx0;
-   ae_vector cpx1;
-   ae_vector dummyx2;
-   ae_vector dummyx3;
-   ae_vector dummyflag;
-   ae_vector p01;
-   ae_vector p11;
-   ae_vector p2;
-   ae_vector vy;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&cpx0, 0, sizeof(cpx0));
-   memset(&cpx1, 0, sizeof(cpx1));
-   memset(&dummyx2, 0, sizeof(dummyx2));
-   memset(&dummyx3, 0, sizeof(dummyx3));
-   memset(&dummyflag, 0, sizeof(dummyflag));
-   memset(&p01, 0, sizeof(p01));
-   memset(&p11, 0, sizeof(p11));
-   memset(&p2, 0, sizeof(p2));
-   memset(&vy, 0, sizeof(vy));
-   ae_matrix_free(y, true);
-   ae_vector_init(&cpx0, 0, DT_REAL, _state, true);
-   ae_vector_init(&cpx1, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyx2, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyx3, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyflag, 0, DT_BOOL, _state, true);
-   ae_vector_init(&p01, 0, DT_INT, _state, true);
-   ae_vector_init(&p11, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
-   ae_vector_init(&vy, 0, DT_REAL, _state, true);
+   SetMatrix(y);
+   NewVector(cpx0, 0, DT_REAL, _state);
+   NewVector(cpx1, 0, DT_REAL, _state);
+   NewVector(dummyx2, 0, DT_REAL, _state);
+   NewVector(dummyx3, 0, DT_REAL, _state);
+   NewVector(dummyflag, 0, DT_BOOL, _state);
+   NewVector(p01, 0, DT_INT, _state);
+   NewVector(p11, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
+   NewVector(vy, 0, DT_REAL, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc2: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2: invalid value for N1 (N1 <= 0)!", _state);
@@ -26083,13 +24970,8 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_vector tx;
-   ae_vector ty;
-   ae_vector z;
    ae_int_t dstoffs;
    ae_int_t dummy;
-   rbfv2gridcalcbuffer bufseedv2;
-   ae_shared_pool bufpool;
    ae_int_t rowidx;
    ae_int_t rowcnt;
    double v;
@@ -26098,11 +24980,6 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
    double searchradius2;
    ae_int_t ntrials;
    double avgfuncpernode;
-   hqrndstate rs;
-   ae_vector blocks0;
-   ae_vector blocks1;
-   ae_vector blocks2;
-   ae_vector blocks3;
    ae_int_t blockscnt0;
    ae_int_t blockscnt1;
    ae_int_t blockscnt2;
@@ -26114,26 +24991,16 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
    ae_int_t maxblocksize;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tx, 0, sizeof(tx));
-   memset(&ty, 0, sizeof(ty));
-   memset(&z, 0, sizeof(z));
-   memset(&bufseedv2, 0, sizeof(bufseedv2));
-   memset(&bufpool, 0, sizeof(bufpool));
-   memset(&rs, 0, sizeof(rs));
-   memset(&blocks0, 0, sizeof(blocks0));
-   memset(&blocks1, 0, sizeof(blocks1));
-   memset(&blocks2, 0, sizeof(blocks2));
-   memset(&blocks3, 0, sizeof(blocks3));
-   ae_vector_init(&tx, 0, DT_REAL, _state, true);
-   ae_vector_init(&ty, 0, DT_REAL, _state, true);
-   ae_vector_init(&z, 0, DT_REAL, _state, true);
-   rbfv2gridcalcbuffer_init(&bufseedv2, _state, true);
-   ae_shared_pool_init(&bufpool, _state, true);
-   hqrndstate_init(&rs, _state, true);
-   ae_vector_init(&blocks0, 0, DT_INT, _state, true);
-   ae_vector_init(&blocks1, 0, DT_INT, _state, true);
-   ae_vector_init(&blocks2, 0, DT_INT, _state, true);
-   ae_vector_init(&blocks3, 0, DT_INT, _state, true);
+   NewVector(tx, 0, DT_REAL, _state);
+   NewVector(ty, 0, DT_REAL, _state);
+   NewVector(z, 0, DT_REAL, _state);
+   NewObj(rbfv2gridcalcbuffer, bufseedv2, _state);
+   NewObj(ae_shared_pool, bufpool, _state);
+   NewObj(hqrndstate, rs, _state);
+   NewVector(blocks0, 0, DT_INT, _state);
+   NewVector(blocks1, 0, DT_INT, _state);
+   NewVector(blocks2, 0, DT_INT, _state);
+   NewVector(blocks3, 0, DT_INT, _state);
 
    nx = s->nx;
    ny = s->ny;
@@ -26313,12 +25180,9 @@ void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x
    ae_int_t maxbs;
    ae_int_t midpoint;
    bool emptyrow;
-   rbfv2gridcalcbuffer *buf;
-   ae_smart_ptr _buf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_buf, 0, sizeof(_buf));
-   ae_smart_ptr_init(&_buf, (void **)&buf, _state, true);
+   RefObj(rbfv2gridcalcbuffer, buf, _state);
 
    nx = s->nx;
    ny = s->ny;
@@ -26558,9 +25422,9 @@ void rbfv2unpack(rbfv2model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 
    *nx = 0;
    *ny = 0;
-   ae_matrix_free(xwr, true);
+   SetMatrix(xwr);
    *nc = 0;
-   ae_matrix_free(v, true);
+   SetMatrix(v);
 
    *nx = s->nx;
    *ny = s->ny;
@@ -26587,14 +25451,9 @@ void rbfv2unpack(rbfv2model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int
 
 static bool rbfv2_rbfv2buildlinearmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, RMatrix *v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmpy;
-   ae_matrix a;
    double scaling;
-   ae_vector shifting;
    double mn;
    double mx;
-   ae_vector c;
-   lsfitreport rep;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -26602,17 +25461,12 @@ static bool rbfv2_rbfv2buildlinearmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_i
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmpy, 0, sizeof(tmpy));
-   memset(&a, 0, sizeof(a));
-   memset(&shifting, 0, sizeof(shifting));
-   memset(&c, 0, sizeof(c));
-   memset(&rep, 0, sizeof(rep));
-   ae_matrix_free(v, true);
-   ae_vector_init(&tmpy, 0, DT_REAL, _state, true);
-   ae_matrix_init(&a, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&shifting, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_REAL, _state, true);
-   lsfitreport_init(&rep, _state, true);
+   SetMatrix(v);
+   NewVector(tmpy, 0, DT_REAL, _state);
+   NewMatrix(a, 0, 0, DT_REAL, _state);
+   NewVector(shifting, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_REAL, _state);
+   NewObj(lsfitreport, rep, _state);
 
    ae_assert(n >= 0, "BuildLinearModel: N<0", _state);
    ae_assert(nx > 0, "BuildLinearModel: NX <= 0", _state);
@@ -26756,24 +25610,16 @@ static void rbfv2_convertandappendtree(kdtree *curtree, ae_int_t n, ae_int_t nx,
    ae_int_t nodesbase;
    ae_int_t splitsbase;
    ae_int_t cwbase;
-   ae_vector localnodes;
-   ae_vector localsplits;
-   ae_vector localcw;
-   ae_matrix xybuf;
    ae_int_t localnodessize;
    ae_int_t localsplitssize;
    ae_int_t localcwsize;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&localnodes, 0, sizeof(localnodes));
-   memset(&localsplits, 0, sizeof(localsplits));
-   memset(&localcw, 0, sizeof(localcw));
-   memset(&xybuf, 0, sizeof(xybuf));
-   ae_vector_init(&localnodes, 0, DT_INT, _state, true);
-   ae_vector_init(&localsplits, 0, DT_REAL, _state, true);
-   ae_vector_init(&localcw, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xybuf, 0, 0, DT_REAL, _state, true);
+   NewVector(localnodes, 0, DT_INT, _state);
+   NewVector(localsplits, 0, DT_REAL, _state);
+   NewVector(localcw, 0, DT_REAL, _state);
+   NewMatrix(xybuf, 0, 0, DT_REAL, _state);
 
 // Calculate base offsets
    nodesbase = kdnodes->cnt;
@@ -27917,27 +26763,17 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z, ae_sta
 // API: void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz, const xparams _xparams = xdefault);
 void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector x;
-   ae_vector y;
-   ae_vector z;
-   ae_vector f;
-   ae_vector v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t di;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&z, 0, sizeof(z));
-   memset(&f, 0, sizeof(f));
-   memset(&v, 0, sizeof(v));
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&z, 0, DT_REAL, _state, true);
-   ae_vector_init(&f, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(z, 0, DT_REAL, _state);
+   NewVector(f, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline3DLinTransXYZ: incorrect C (incorrect parameter C.SType)", _state);
    ae_vector_set_length(&x, c->n, _state);
@@ -28095,22 +26931,14 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
 // API: void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b, const xparams _xparams = xdefault);
 void spline3dlintransf(spline3dinterpolant *c, double a, double b, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector x;
-   ae_vector y;
-   ae_vector z;
-   ae_vector f;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&x, 0, sizeof(x));
-   memset(&y, 0, sizeof(y));
-   memset(&z, 0, sizeof(z));
-   memset(&f, 0, sizeof(f));
-   ae_vector_init(&x, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&z, 0, DT_REAL, _state, true);
-   ae_vector_init(&f, 0, DT_REAL, _state, true);
+   NewVector(x, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(z, 0, DT_REAL, _state);
+   NewVector(f, 0, DT_REAL, _state);
 
    ae_assert(c->stype == -3 || c->stype == -1, "Spline3DLinTransF: incorrect C (incorrect parameter C.SType)", _state);
    ae_vector_set_length(&x, c->n, _state);
@@ -28146,7 +26974,7 @@ void spline3dlintransf(spline3dinterpolant *c, double a, double b, ae_state *_st
 void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc, ae_state *_state) {
    ae_int_t tblsize;
 
-   spline3dinterpolant_free(cc, true);
+   SetObj(spline3dinterpolant, cc);
 
    ae_assert(c->k == 1 || c->k == 3, "Spline3DCopy: incorrect C (incorrect parameter C.K)", _state);
    cc->k = c->k;
@@ -28212,7 +27040,7 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
    ae_int_t j;
    ae_int_t k;
 
-   ae_vector_free(b, true);
+   SetVector(b);
 
    ae_assert((oldycount > 1 && oldzcount > 1) && oldxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1", _state);
    ae_assert((newycount > 1 && newzcount > 1) && newxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1", _state);
@@ -28286,7 +27114,7 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
    ae_int_t i0;
    ae_int_t j0;
 
-   spline3dinterpolant_free(c, true);
+   SetObj(spline3dinterpolant, c);
 
    ae_assert(m >= 2, "Spline3DBuildTrilinearV: M<2", _state);
    ae_assert(n >= 2, "Spline3DBuildTrilinearV: N<2", _state);
@@ -28503,7 +27331,7 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
 // API: void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f, const xparams _xparams = xdefault);
 void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f, ae_state *_state) {
 
-   ae_vector_free(f, true);
+   SetVector(f);
 
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalcV: incorrect C (incorrect parameter C.SType)", _state);
    ae_assert((ae_isfinite(x, _state) && ae_isfinite(y, _state)) && ae_isfinite(z, _state), "Spline3DCalcV: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite", _state);
@@ -28576,7 +27404,7 @@ void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t 
    *l = 0;
    *d = 0;
    *stype = 0;
-   ae_matrix_free(tbl, true);
+   SetMatrix(tbl);
 
    ae_assert(c->stype == -1, "Spline3DUnpackV: incorrect C (incorrect parameter C.SType)", _state);
    *n = c->n;
@@ -28851,7 +27679,7 @@ namespace alglib_impl {
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi, ae_state *_state) {
    double dummy;
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rhi = 0;
 
    nsfitspherex(xy, npoints, nx, 1, 0.0, 0, 0.0, cx, &dummy, rhi, _state);
@@ -28864,7 +27692,7 @@ void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
 void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, ae_state *_state) {
    double dummy;
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
 
    nsfitspherex(xy, npoints, nx, 2, 0.0, 0, 0.0, cx, rlo, &dummy, _state);
@@ -28876,7 +27704,7 @@ void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
 // API: void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
 void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi, ae_state *_state) {
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
    *rhi = 0;
 
@@ -28889,7 +27717,7 @@ void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
 // API: void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi, const xparams _xparams = xdefault);
 void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, ae_state *_state) {
 
-   ae_vector_free(cx, true);
+   SetVector(cx);
    *rlo = 0;
    *rhi = 0;
 
@@ -28908,23 +27736,15 @@ void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemty
 // API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
 void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector w;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&w, 0, sizeof(w));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
+   DupVector(x, _state);
+   DupVector(y, _state);
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(w, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "Spline1DFitPenalized: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitPenalized: M<4!", _state);
@@ -28953,9 +27773,6 @@ void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double
 // API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams = xdefault);
 void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   ae_vector _w;
    ae_int_t i;
    ae_int_t j;
    ae_int_t b;
@@ -28965,101 +27782,47 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    double xb;
    double sa;
    double sb;
-   ae_vector xoriginal;
-   ae_vector yoriginal;
    double pdecay;
    double tdecay;
-   ae_matrix fmatrix;
-   ae_vector fcolumn;
-   ae_vector y2;
-   ae_vector w2;
-   ae_vector xc;
-   ae_vector yc;
-   ae_vector dc;
    double fdmax;
    double admax;
-   ae_matrix amatrix;
-   ae_matrix d2matrix;
    double fa;
    double ga;
    double fb;
    double gb;
    double lambdav;
-   ae_vector bx;
-   ae_vector by;
-   ae_vector bd1;
-   ae_vector bd2;
-   ae_vector tx;
-   ae_vector ty;
-   ae_vector td;
-   spline1dinterpolant bs;
-   ae_matrix nmatrix;
-   ae_vector rightpart;
-   fblslincgstate cgstate;
-   ae_vector c;
-   ae_vector tmp0;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&_w, 0, sizeof(_w));
-   memset(&xoriginal, 0, sizeof(xoriginal));
-   memset(&yoriginal, 0, sizeof(yoriginal));
-   memset(&fmatrix, 0, sizeof(fmatrix));
-   memset(&fcolumn, 0, sizeof(fcolumn));
-   memset(&y2, 0, sizeof(y2));
-   memset(&w2, 0, sizeof(w2));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&dc, 0, sizeof(dc));
-   memset(&amatrix, 0, sizeof(amatrix));
-   memset(&d2matrix, 0, sizeof(d2matrix));
-   memset(&bx, 0, sizeof(bx));
-   memset(&by, 0, sizeof(by));
-   memset(&bd1, 0, sizeof(bd1));
-   memset(&bd2, 0, sizeof(bd2));
-   memset(&tx, 0, sizeof(tx));
-   memset(&ty, 0, sizeof(ty));
-   memset(&td, 0, sizeof(td));
-   memset(&bs, 0, sizeof(bs));
-   memset(&nmatrix, 0, sizeof(nmatrix));
-   memset(&rightpart, 0, sizeof(rightpart));
-   memset(&cgstate, 0, sizeof(cgstate));
-   memset(&c, 0, sizeof(c));
-   memset(&tmp0, 0, sizeof(tmp0));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_vector_copy(&_w, w, _state, true);
-   w = &_w;
+   DupVector(x, _state);
+   DupVector(y, _state);
+   DupVector(w, _state);
    *info = 0;
-   spline1dinterpolant_free(s, true);
-   spline1dfitreport_free(rep, true);
-   ae_vector_init(&xoriginal, 0, DT_REAL, _state, true);
-   ae_vector_init(&yoriginal, 0, DT_REAL, _state, true);
-   ae_matrix_init(&fmatrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&fcolumn, 0, DT_REAL, _state, true);
-   ae_vector_init(&y2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&yc, 0, DT_REAL, _state, true);
-   ae_vector_init(&dc, 0, DT_INT, _state, true);
-   ae_matrix_init(&amatrix, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&d2matrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&bx, 0, DT_REAL, _state, true);
-   ae_vector_init(&by, 0, DT_REAL, _state, true);
-   ae_vector_init(&bd1, 0, DT_REAL, _state, true);
-   ae_vector_init(&bd2, 0, DT_REAL, _state, true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, true);
-   ae_vector_init(&ty, 0, DT_REAL, _state, true);
-   ae_vector_init(&td, 0, DT_REAL, _state, true);
-   spline1dinterpolant_init(&bs, _state, true);
-   ae_matrix_init(&nmatrix, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&rightpart, 0, DT_REAL, _state, true);
-   fblslincgstate_init(&cgstate, _state, true);
-   ae_vector_init(&c, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp0, 0, DT_REAL, _state, true);
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(xoriginal, 0, DT_REAL, _state);
+   NewVector(yoriginal, 0, DT_REAL, _state);
+   NewMatrix(fmatrix, 0, 0, DT_REAL, _state);
+   NewVector(fcolumn, 0, DT_REAL, _state);
+   NewVector(y2, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(yc, 0, DT_REAL, _state);
+   NewVector(dc, 0, DT_INT, _state);
+   NewMatrix(amatrix, 0, 0, DT_REAL, _state);
+   NewMatrix(d2matrix, 0, 0, DT_REAL, _state);
+   NewVector(bx, 0, DT_REAL, _state);
+   NewVector(by, 0, DT_REAL, _state);
+   NewVector(bd1, 0, DT_REAL, _state);
+   NewVector(bd2, 0, DT_REAL, _state);
+   NewVector(tx, 0, DT_REAL, _state);
+   NewVector(ty, 0, DT_REAL, _state);
+   NewVector(td, 0, DT_REAL, _state);
+   NewObj(spline1dinterpolant, bs, _state);
+   NewMatrix(nmatrix, 0, 0, DT_REAL, _state);
+   NewVector(rightpart, 0, DT_REAL, _state);
+   NewObj(fblslincgstate, cgstate, _state);
+   NewVector(c, 0, DT_REAL, _state);
+   NewVector(tmp0, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "Spline1DFitPenalizedW: N<1!", _state);
    ae_assert(m >= 4, "Spline1DFitPenalizedW: M<4!", _state);
@@ -29398,7 +28161,7 @@ static void rbf_clearreportfields(rbfreport *rep, ae_state *_state);
 // API: void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s, const xparams _xparams = xdefault);
 void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s, ae_state *_state) {
 
-   rbfmodel_free(s, true);
+   SetObj(rbfmodel, s);
 
    ae_assert(nx >= 1, "RBFCreate: NX<1", _state);
    ae_assert(ny >= 1, "RBFCreate: NY<1", _state);
@@ -29466,7 +28229,7 @@ void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s, ae_state *_state) {
 // API: void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf, const xparams _xparams = xdefault);
 void rbfcreatecalcbuffer(rbfmodel *s, rbfcalcbuffer *buf, ae_state *_state) {
 
-   rbfcalcbuffer_free(buf, true);
+   SetObj(rbfcalcbuffer, buf);
 
    if (s->modelversion == 1) {
       buf->modelversion = 1;
@@ -30102,23 +28865,15 @@ void rbfsetcond(rbfmodel *s, double epsort, double epserr, ae_int_t maxits, ae_s
 // API: void rbfbuildmodel(const rbfmodel &s, rbfreport &rep, const xparams _xparams = xdefault);
 void rbfbuildmodel(rbfmodel *s, rbfreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   rbfv1report rep1;
-   rbfv2report rep2;
-   ae_matrix x3;
-   ae_vector scalevec;
    ae_int_t i;
    ae_int_t curalgorithmtype;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rep1, 0, sizeof(rep1));
-   memset(&rep2, 0, sizeof(rep2));
-   memset(&x3, 0, sizeof(x3));
-   memset(&scalevec, 0, sizeof(scalevec));
-   rbfreport_free(rep, true);
-   rbfv1report_init(&rep1, _state, true);
-   rbfv2report_init(&rep2, _state, true);
-   ae_matrix_init(&x3, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&scalevec, 0, DT_REAL, _state, true);
+   SetObj(rbfreport, rep);
+   NewObj(rbfv1report, rep1, _state);
+   NewObj(rbfv2report, rep2, _state);
+   NewMatrix(x3, 0, 0, DT_REAL, _state);
+   NewVector(scalevec, 0, DT_REAL, _state);
 
 // Clean fields prior to processing
    rbf_clearreportfields(rep, _state);
@@ -30385,7 +29140,7 @@ double rbfcalc3(rbfmodel *s, double x0, double x1, double x2, ae_state *_state) 
 // API: void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = xdefault);
 void rbfcalc(rbfmodel *s, RVector *x, RVector *y, ae_state *_state) {
 
-   ae_vector_free(y, true);
+   SetVector(y);
 
    ae_assert(x->cnt >= s->nx, "RBFCalc: Length(X)<NX", _state);
    ae_assert(isfinitevector(x, s->nx, _state), "RBFCalc: X contains infinite or NaN values", _state);
@@ -30486,24 +29241,14 @@ void rbftscalcbuf(rbfmodel *s, rbfcalcbuffer *buf, RVector *x, RVector *y, ae_st
 // API: void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y, const xparams _xparams = xdefault);
 void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector cpx0;
-   ae_vector cpx1;
-   ae_vector p01;
-   ae_vector p11;
-   ae_vector p2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&cpx0, 0, sizeof(cpx0));
-   memset(&cpx1, 0, sizeof(cpx1));
-   memset(&p01, 0, sizeof(p01));
-   memset(&p11, 0, sizeof(p11));
-   memset(&p2, 0, sizeof(p2));
-   ae_matrix_free(y, true);
-   ae_vector_init(&cpx0, 0, DT_REAL, _state, true);
-   ae_vector_init(&cpx1, 0, DT_REAL, _state, true);
-   ae_vector_init(&p01, 0, DT_INT, _state, true);
-   ae_vector_init(&p11, 0, DT_INT, _state, true);
-   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   SetMatrix(y);
+   NewVector(cpx0, 0, DT_REAL, _state);
+   NewVector(cpx1, 0, DT_REAL, _state);
+   NewVector(p01, 0, DT_INT, _state);
+   NewVector(p11, 0, DT_INT, _state);
+   NewVector(p2, 0, DT_INT, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc2: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2: invalid value for N1 (N1 <= 0)!", _state);
@@ -30579,12 +29324,10 @@ void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n
 void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *y, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector dummy;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&dummy, 0, sizeof(dummy));
-   ae_vector_free(y, true);
-   ae_vector_init(&dummy, 0, DT_BOOL, _state, true);
+   SetVector(y);
+   NewVector(dummy, 0, DT_BOOL, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc2V: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2V: invalid value for N1 (N1 <= 0)!", _state);
@@ -30666,7 +29409,7 @@ void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, BVector *flagy, RVector *y, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(y, true);
+   SetVector(y);
 
    ae_assert(n0 > 0, "RBFGridCalc2VSubset: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2VSubset: invalid value for N1 (N1 <= 0)!", _state);
@@ -30744,12 +29487,10 @@ void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_
 void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *y, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector dummy;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&dummy, 0, sizeof(dummy));
-   ae_vector_free(y, true);
-   ae_vector_init(&dummy, 0, DT_BOOL, _state, true);
+   SetVector(y);
+   NewVector(dummy, 0, DT_BOOL, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc3V: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc3V: invalid value for N1 (N1 <= 0)!", _state);
@@ -30842,7 +29583,7 @@ void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 void rbfgridcalc3vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, BVector *flagy, RVector *y, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(y, true);
+   SetVector(y);
 
    ae_assert(n0 > 0, "RBFGridCalc3VSubset: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc3VSubset: invalid value for N1 (N1 <= 0)!", _state);
@@ -30875,31 +29616,19 @@ void rbfgridcalc2vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
    ae_int_t nx;
    ae_int_t ny;
    ae_int_t ylen;
-   hqrndstate rs;
-   ae_vector dummyx2;
-   ae_vector dummyx3;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t l;
-   ae_vector tx;
-   ae_vector ty;
    ae_int_t dstoffs;
-   rbfcalcbuffer calcbuf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   memset(&dummyx2, 0, sizeof(dummyx2));
-   memset(&dummyx3, 0, sizeof(dummyx3));
-   memset(&tx, 0, sizeof(tx));
-   memset(&ty, 0, sizeof(ty));
-   memset(&calcbuf, 0, sizeof(calcbuf));
-   hqrndstate_init(&rs, _state, true);
-   ae_vector_init(&dummyx2, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyx3, 0, DT_REAL, _state, true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, true);
-   ae_vector_init(&ty, 0, DT_REAL, _state, true);
-   rbfcalcbuffer_init(&calcbuf, _state, true);
+   NewObj(hqrndstate, rs, _state);
+   NewVector(dummyx2, 0, DT_REAL, _state);
+   NewVector(dummyx3, 0, DT_REAL, _state);
+   NewVector(tx, 0, DT_REAL, _state);
+   NewVector(ty, 0, DT_REAL, _state);
+   NewObj(rbfcalcbuffer, calcbuf, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc2VX: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc2VX: invalid value for N1 (N1 <= 0)!", _state);
@@ -30980,9 +29709,6 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
    ae_int_t nx;
    ae_int_t ny;
    double rmax;
-   ae_vector blocks0;
-   ae_vector blocks1;
-   ae_vector blocks2;
    ae_int_t blockscnt0;
    ae_int_t blockscnt1;
    ae_int_t blockscnt2;
@@ -30991,26 +29717,15 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
    double avgfuncpernode;
    ae_int_t ntrials;
    ae_int_t maxblocksize;
-   gridcalc3v1buf bufseedv1;
-   ae_shared_pool bufpool;
-   hqrndstate rs;
-   ae_vector dummyx3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&blocks0, 0, sizeof(blocks0));
-   memset(&blocks1, 0, sizeof(blocks1));
-   memset(&blocks2, 0, sizeof(blocks2));
-   memset(&bufseedv1, 0, sizeof(bufseedv1));
-   memset(&bufpool, 0, sizeof(bufpool));
-   memset(&rs, 0, sizeof(rs));
-   memset(&dummyx3, 0, sizeof(dummyx3));
-   ae_vector_init(&blocks0, 0, DT_INT, _state, true);
-   ae_vector_init(&blocks1, 0, DT_INT, _state, true);
-   ae_vector_init(&blocks2, 0, DT_INT, _state, true);
-   gridcalc3v1buf_init(&bufseedv1, _state, true);
-   ae_shared_pool_init(&bufpool, _state, true);
-   hqrndstate_init(&rs, _state, true);
-   ae_vector_init(&dummyx3, 0, DT_REAL, _state, true);
+   NewVector(blocks0, 0, DT_INT, _state);
+   NewVector(blocks1, 0, DT_INT, _state);
+   NewVector(blocks2, 0, DT_INT, _state);
+   NewObj(gridcalc3v1buf, bufseedv1, _state);
+   NewObj(ae_shared_pool, bufpool, _state);
+   NewObj(hqrndstate, rs, _state);
+   NewVector(dummyx3, 0, DT_REAL, _state);
 
    ae_assert(n0 > 0, "RBFGridCalc3V: invalid value for N0 (N0 <= 0)!", _state);
    ae_assert(n1 > 0, "RBFGridCalc3V: invalid value for N1 (N1 <= 0)!", _state);
@@ -31167,9 +29882,9 @@ void rbfunpack(rbfmodel *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *
 
    *nx = 0;
    *ny = 0;
-   ae_matrix_free(xwr, true);
+   SetMatrix(xwr);
    *nc = 0;
-   ae_matrix_free(v, true);
+   SetMatrix(v);
    *modelversion = 0;
 
    if (s->modelversion == 1) {
@@ -31328,7 +30043,7 @@ void rbfunserialize(ae_serializer *s, rbfmodel *model, ae_state *_state) {
    ae_int_t i0;
    ae_int_t i1;
 
-   rbfmodel_free(model, true);
+   SetObj(rbfmodel, model);
 
    rbf_rbfpreparenonserializablefields(model, _state);
 
@@ -31381,7 +30096,7 @@ static void rbf_rbfpreparenonserializablefields(rbfmodel *s, ae_state *_state) {
 // ALGLIB: Copyright 12.05.2016 by Sergey Bochkanov
 static void rbf_initializev1(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *_state) {
 
-   rbfv1model_free(s, true);
+   SetObj(rbfv1model, s);
 
    if (nx == 2 || nx == 3) {
       rbfv1create(nx, ny, s, _state);
@@ -31392,7 +30107,7 @@ static void rbf_initializev1(ae_int_t nx, ae_int_t ny, rbfv1model *s, ae_state *
 // ALGLIB: Copyright 12.05.2016 by Sergey Bochkanov
 static void rbf_initializev2(ae_int_t nx, ae_int_t ny, rbfv2model *s, ae_state *_state) {
 
-   rbfv2model_free(s, true);
+   SetObj(rbfv2model, s);
 
    rbfv2create(nx, ny, s, _state);
 }
@@ -31527,12 +30242,11 @@ DefClass(rbfmodel, )
 DefClass(rbfreport, DecVal(rmserror) DecVal(maxerror) DecVal(arows) DecVal(acols) DecVal(annz) DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -31545,11 +30259,9 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -31560,22 +30272,18 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
 }
 
 void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);

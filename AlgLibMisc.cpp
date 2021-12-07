@@ -31,7 +31,7 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
    ae_int_t s0;
    ae_int_t s1;
 
-   hqrndstate_free(state, true);
+   SetObj(hqrndstate, state);
 
    s0 = ae_randominteger(hqrnd_hqrndm1, _state);
    s1 = ae_randominteger(hqrnd_hqrndm2, _state);
@@ -43,7 +43,7 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
 // API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = xdefault);
 void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state, ae_state *_state) {
 
-   hqrndstate_free(state, true);
+   SetObj(hqrndstate, state);
 
 // Protection against negative seeds:
 //
@@ -201,7 +201,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x, ae_state *_state) {
    double v1;
    double v2;
 
-   ae_vector_free(x, true);
+   SetVector(x);
 
    n2 = n / 2;
    rallocv(n, x, _state);
@@ -230,7 +230,7 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x, ae_stat
    double v1;
    double v2;
 
-   ae_matrix_free(x, true);
+   SetMatrix(x);
 
    n2 = n / 2;
    ae_matrix_set_length(x, m, n, _state);
@@ -562,7 +562,7 @@ namespace alglib_impl {
 // API: void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams = xdefault);
 void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state) {
 
-   xdebugrecord1_free(rec1, true);
+   SetObj(xdebugrecord1, rec1);
 
    rec1->i = 1;
    rec1->c.x = (double)(1);
@@ -616,11 +616,9 @@ void xdebugb1not(BVector *a, ae_state *_state) {
 void xdebugb1appendcopy(BVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_vector_init(&b, 0, DT_BOOL, _state, true);
+   NewVector(b, 0, DT_BOOL, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
    for (i = 0; i <= b.cnt - 1; i++) {
@@ -643,7 +641,7 @@ void xdebugb1appendcopy(BVector *a, ae_state *_state) {
 void xdebugb1outeven(ae_int_t n, BVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -693,11 +691,9 @@ void xdebugi1neg(ZVector *a, ae_state *_state) {
 void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_vector_init(&b, 0, DT_INT, _state, true);
+   NewVector(b, 0, DT_INT, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
    for (i = 0; i <= b.cnt - 1; i++) {
@@ -722,7 +718,7 @@ void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
 void xdebugi1outeven(ae_int_t n, ZVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -776,11 +772,9 @@ void xdebugr1neg(RVector *a, ae_state *_state) {
 void xdebugr1appendcopy(RVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_vector_init(&b, 0, DT_REAL, _state, true);
+   NewVector(b, 0, DT_REAL, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
    for (i = 0; i <= b.cnt - 1; i++) {
@@ -805,7 +799,7 @@ void xdebugr1appendcopy(RVector *a, ae_state *_state) {
 void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -859,11 +853,9 @@ void xdebugc1neg(CVector *a, ae_state *_state) {
 void xdebugc1appendcopy(CVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_vector_init(&b, 0, DT_COMPLEX, _state, true);
+   NewVector(b, 0, DT_COMPLEX, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
    for (i = 0; i <= b.cnt - 1; i++) {
@@ -888,7 +880,7 @@ void xdebugc1appendcopy(CVector *a, ae_state *_state) {
 void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
    ae_vector_set_length(a, n, _state);
    for (i = 0; i <= a->cnt - 1; i++) {
@@ -952,11 +944,9 @@ void xdebugb2transpose(BMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_BOOL, _state, true);
+   NewMatrix(b, 0, 0, DT_BOOL, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
    for (i = 0; i <= b.rows - 1; i++) {
@@ -984,7 +974,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1043,11 +1033,9 @@ void xdebugi2transpose(ZMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_INT, _state, true);
+   NewMatrix(b, 0, 0, DT_INT, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
    for (i = 0; i <= b.rows - 1; i++) {
@@ -1075,7 +1063,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1134,11 +1122,9 @@ void xdebugr2transpose(RMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_REAL, _state, true);
+   NewMatrix(b, 0, 0, DT_REAL, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
    for (i = 0; i <= b.rows - 1; i++) {
@@ -1166,7 +1152,7 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1225,11 +1211,9 @@ void xdebugc2transpose(CMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_COMPLEX, _state, true);
+   NewMatrix(b, 0, 0, DT_COMPLEX, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
    for (i = 0; i <= b.rows - 1; i++) {
@@ -1257,7 +1241,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
@@ -1690,13 +1674,11 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
 void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt, ae_state *_state) {
 
    ae_frame _frame_block;
-   ae_vector tags;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tags, 0, sizeof(tags));
-   kdtree_free(kdt, true);
-   ae_vector_init(&tags, 0, DT_INT, _state, true);
+   SetObj(kdtree, kdt);
+   NewVector(tags, 0, DT_INT, _state);
 
    ae_assert(n >= 0, "KDTreeBuild: N<0", _state);
    ae_assert(nx >= 1, "KDTreeBuild: NX<1", _state);
@@ -1756,7 +1738,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    ae_int_t nodesoffs;
    ae_int_t splitsoffs;
 
-   kdtree_free(kdt, true);
+   SetObj(kdtree, kdt);
 
    ae_assert(n >= 0, "KDTreeBuildTagged: N<0", _state);
    ae_assert(nx >= 1, "KDTreeBuildTagged: NX<1", _state);
@@ -1835,7 +1817,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 // API: void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams = xdefault);
 void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *_state) {
 
-   kdtreerequestbuffer_free(buf, true);
+   SetObj(kdtreerequestbuffer, buf);
 
    ae_vector_set_length(&buf->x, kdt->nx, _state);
    ae_vector_set_length(&buf->boxmin, kdt->nx, _state);
@@ -2754,7 +2736,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // API: void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams = xdefault);
 void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
 
-   ae_matrix_free(x, true);
+   SetMatrix(x);
 
    kdtreequeryresultsx(kdt, x, _state);
 }
@@ -2770,7 +2752,7 @@ void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
 // API: void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = xdefault);
 void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 
-   ae_matrix_free(xy, true);
+   SetMatrix(xy);
 
    kdtreequeryresultsxy(kdt, xy, _state);
 }
@@ -2786,7 +2768,7 @@ void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 // API: void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = xdefault);
 void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
 
-   ae_vector_free(tags, true);
+   SetVector(tags);
 
    kdtreequeryresultstags(kdt, tags, _state);
 }
@@ -2802,7 +2784,7 @@ void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
 // API: void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams = xdefault);
 void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r, ae_state *_state) {
 
-   ae_vector_free(r, true);
+   SetVector(r);
 
    kdtreequeryresultsdistances(kdt, r, _state);
 }
@@ -3005,7 +2987,7 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
    ae_int_t i0;
    ae_int_t i1;
 
-   kdtree_free(tree, true);
+   SetObj(kdtree, tree);
 
 // check correctness of header
    ae_serializer_unserialize_int(s, &i0, _state);
@@ -3819,12 +3801,11 @@ DefClass(kdtreerequestbuffer, )
 DefClass(kdtree, )
 
 void kdtreeserialize(kdtree &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -3837,11 +3818,9 @@ void kdtreeserialize(kdtree &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -3852,22 +3831,18 @@ void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
 }
 
 void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);

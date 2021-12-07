@@ -133,8 +133,8 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_sta
    ae_int_t i;
    double h;
 
-   ae_vector_free(x, true);
-   ae_vector_free(y, true);
+   SetVector(x);
+   SetVector(y);
 
    ae_assert(n >= 1, "TaskGenInterpolationEqdist1D: N<1!", _state);
    ae_vector_set_length(x, n, _state);
@@ -166,8 +166,8 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y
    ae_int_t i;
    double h;
 
-   ae_vector_free(x, true);
-   ae_vector_free(y, true);
+   SetVector(x);
+   SetVector(y);
 
    ae_assert(n >= 1, "TaskGenInterpolationEqdist1D: N<1!", _state);
    ae_vector_set_length(x, n, _state);
@@ -194,8 +194,8 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y
 void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(x, true);
-   ae_vector_free(y, true);
+   SetVector(x);
+   SetVector(y);
 
    ae_assert(n >= 1, "TaskGenInterpolation1DCheb1: N<1!", _state);
    ae_vector_set_length(x, n, _state);
@@ -223,8 +223,8 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y, a
 void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(x, true);
-   ae_vector_free(y, true);
+   SetVector(x);
+   SetVector(y);
 
    ae_assert(n >= 1, "TaskGenInterpolation1DCheb2: N<1!", _state);
    ae_vector_set_length(x, n, _state);
@@ -369,13 +369,11 @@ void bmatrixsetlengthatleast(BMatrix *x, ae_int_t m, ae_int_t n, ae_state *_stat
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void bvectorgrowto(BVector *x, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_BOOL, _state, true);
+   NewVector(oldx, 0, DT_BOOL, _state);
 
 // Enough place
    if (x->cnt >= n) {
@@ -407,13 +405,11 @@ void bvectorgrowto(BVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorgrowto(ZVector *x, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_INT, _state, true);
+   NewVector(oldx, 0, DT_INT, _state);
 
 // Enough place
    if (x->cnt >= n) {
@@ -448,15 +444,13 @@ void ivectorgrowto(ZVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix olda;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n2;
    ae_int_t m;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&olda, 0, sizeof(olda));
-   ae_matrix_init(&olda, 0, 0, DT_REAL, _state, true);
+   NewMatrix(olda, 0, 0, DT_REAL, _state);
 
 // Enough place?
    if (a->rows >= n && a->cols >= mincols) {
@@ -492,15 +486,13 @@ void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols, ae_state *_stat
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix olda;
    ae_int_t i;
    ae_int_t j;
    ae_int_t n2;
    ae_int_t m;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&olda, 0, sizeof(olda));
-   ae_matrix_init(&olda, 0, 0, DT_REAL, _state, true);
+   NewMatrix(olda, 0, 0, DT_REAL, _state);
 
 // Enough place?
    if (a->cols >= n && a->rows >= minrows) {
@@ -533,13 +525,11 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows, ae_state *_stat
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_REAL, _state, true);
+   NewVector(oldx, 0, DT_REAL, _state);
 
 // Enough place
    if (x->cnt >= n) {
@@ -569,13 +559,11 @@ void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorresize(ZVector *x, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_INT, _state, true);
+   NewVector(oldx, 0, DT_INT, _state);
 
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -596,13 +584,11 @@ void ivectorresize(ZVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorresize(RVector *x, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_REAL, _state, true);
+   NewVector(oldx, 0, DT_REAL, _state);
 
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -623,15 +609,13 @@ void rvectorresize(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix oldx;
    ae_int_t i;
    ae_int_t j;
    ae_int_t m2;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_matrix_init(&oldx, 0, 0, DT_REAL, _state, true);
+   NewMatrix(oldx, 0, 0, DT_REAL, _state);
 
    m2 = x->rows;
    n2 = x->cols;
@@ -655,15 +639,13 @@ void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix oldx;
    ae_int_t i;
    ae_int_t j;
    ae_int_t m2;
    ae_int_t n2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_matrix_init(&oldx, 0, 0, DT_INT, _state, true);
+   NewMatrix(oldx, 0, 0, DT_INT, _state);
 
    m2 = x->rows;
    n2 = x->cols;
@@ -685,13 +667,11 @@ void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorappend(ZVector *x, ae_int_t v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t i;
    ae_int_t n;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_INT, _state, true);
+   NewVector(oldx, 0, DT_INT, _state);
 
    n = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -1522,7 +1502,7 @@ void unserializerealarray(ae_serializer *s, RVector *v, ae_state *_state) {
    ae_int_t i;
    double t;
 
-   ae_vector_free(v, true);
+   SetVector(v);
 
    ae_serializer_unserialize_int(s, &n, _state);
    if (n == 0) {
@@ -1567,7 +1547,7 @@ void unserializeintegerarray(ae_serializer *s, ZVector *v, ae_state *_state) {
    ae_int_t i;
    ae_int_t t;
 
-   ae_vector_free(v, true);
+   SetVector(v);
 
    ae_serializer_unserialize_int(s, &n, _state);
    if (n == 0) {
@@ -1628,7 +1608,7 @@ void unserializerealmatrix(ae_serializer *s, RMatrix *v, ae_state *_state) {
    ae_int_t n1;
    double t;
 
-   ae_matrix_free(v, true);
+   SetMatrix(v);
 
    ae_serializer_unserialize_int(s, &n0, _state);
    ae_serializer_unserialize_int(s, &n1, _state);
@@ -1648,7 +1628,7 @@ void unserializerealmatrix(ae_serializer *s, RMatrix *v, ae_state *_state) {
 void copybooleanarray(BVector *src, BVector *dst, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(dst, true);
+   SetVector(dst);
 
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt, _state);
@@ -1662,7 +1642,7 @@ void copybooleanarray(BVector *src, BVector *dst, ae_state *_state) {
 void copyintegerarray(ZVector *src, ZVector *dst, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(dst, true);
+   SetVector(dst);
 
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt, _state);
@@ -1676,7 +1656,7 @@ void copyintegerarray(ZVector *src, ZVector *dst, ae_state *_state) {
 void copyrealarray(RVector *src, RVector *dst, ae_state *_state) {
    ae_int_t i;
 
-   ae_vector_free(dst, true);
+   SetVector(dst);
 
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt, _state);
@@ -1691,7 +1671,7 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(dst, true);
+   SetMatrix(dst);
 
    if (src->rows > 0 && src->cols > 0) {
       ae_matrix_set_length(dst, src->rows, src->cols, _state);
@@ -1706,21 +1686,21 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst, ae_state *_state) {
 // Clears integer array
 void unsetintegerarray(ZVector *a, ae_state *_state) {
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
 }
 
 // Clears real array
 void unsetrealarray(RVector *a, ae_state *_state) {
 
-   ae_vector_free(a, true);
+   SetVector(a);
 
 }
 
 // Clears real matrix
 void unsetrealmatrix(RMatrix *a, ae_state *_state) {
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
 }
 
@@ -3392,12 +3372,10 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void igrowv(ae_int_t newn, ZVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t oldn;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_INT, _state, true);
+   NewVector(oldx, 0, DT_INT, _state);
 
    if (x->cnt >= newn) {
       ae_frame_leave(_state);
@@ -3419,12 +3397,10 @@ void igrowv(ae_int_t newn, ZVector *x, ae_state *_state) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rgrowv(ae_int_t newn, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldx;
    ae_int_t oldn;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldx, 0, sizeof(oldx));
-   ae_vector_init(&oldx, 0, DT_REAL, _state, true);
+   NewVector(oldx, 0, DT_REAL, _state);
 
    if (x->cnt >= newn) {
       ae_frame_leave(_state);
@@ -6238,13 +6214,11 @@ static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state) {
    ae_frame _frame_block;
-   apbuffers buf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   ae_vector_free(p1, true);
-   ae_vector_free(p2, true);
-   apbuffers_init(&buf, _state, true);
+   SetVector(p1);
+   SetVector(p2);
+   NewObj(apbuffers, buf, _state);
 
    tagsortbuf(a, n, p1, p2, &buf, _state);
    ae_frame_leave(_state);
@@ -8084,19 +8058,13 @@ namespace alglib_impl {
 void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state) {
    ae_frame _frame_block;
    bool normin;
-   ae_vector cnorm;
-   ae_matrix a1;
-   ae_vector x1;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&cnorm, 0, sizeof(cnorm));
-   memset(&a1, 0, sizeof(a1));
-   memset(&x1, 0, sizeof(x1));
    *s = 0;
-   ae_vector_init(&cnorm, 0, DT_REAL, _state, true);
-   ae_matrix_init(&a1, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&x1, 0, DT_REAL, _state, true);
+   NewVector(cnorm, 0, DT_REAL, _state);
+   NewMatrix(a1, 0, 0, DT_REAL, _state);
+   NewVector(x1, 0, DT_REAL, _state);
 
 // From 0-based to 1-based
    normin = false;
@@ -8696,12 +8664,10 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
    ae_complex beta;
    double vr;
    ae_complex cx;
-   ae_vector tmp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "RMatrixTRSafeSolve: incorrect N!", _state);
    ae_assert(trans == 0 || trans == 1, "RMatrixTRSafeSolve: incorrect Trans!", _state);
@@ -8872,12 +8838,10 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
    ae_complex alpha;
    ae_complex beta;
    ae_complex vc;
-   ae_vector tmp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0, "CMatrixTRSafeSolve: incorrect N!", _state);
    ae_assert((trans == 0 || trans == 1) || trans == 2, "CMatrixTRSafeSolve: incorrect Trans!", _state);
@@ -10625,7 +10589,6 @@ static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t least
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state) {
    ae_frame _frame_block;
-   srealarray bluesteinbuf;
    ae_int_t rowptr;
    ae_int_t bluesteinsize;
    ae_int_t precrptr;
@@ -10634,9 +10597,8 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state 
    ae_int_t precisize;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bluesteinbuf, 0, sizeof(bluesteinbuf));
-   fasttransformplan_free(plan, true);
-   srealarray_init(&bluesteinbuf, _state, true);
+   SetObj(fasttransformplan, plan);
+   NewObj(srealarray, bluesteinbuf, _state);
 
 // Initial check for parameters
    ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
@@ -10908,7 +10870,6 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state) {
    ae_frame _frame_block;
-   srealarray localbuf;
    ae_int_t m;
    ae_int_t n1;
    ae_int_t n2;
@@ -10920,8 +10881,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
    ae_int_t row3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&localbuf, 0, sizeof(localbuf));
-   srealarray_init(&localbuf, _state, true);
+   NewObj(srealarray, localbuf, _state);
 
    ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
    ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
@@ -11239,24 +11199,12 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
    ae_int_t childsize;
    ae_int_t chunksize;
    ae_int_t lastchunksize;
-   srealarray *bufa;
-   ae_smart_ptr _bufa;
-   srealarray *bufb;
-   ae_smart_ptr _bufb;
-   srealarray *bufc;
-   ae_smart_ptr _bufc;
-   srealarray *bufd;
-   ae_smart_ptr _bufd;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_bufa, 0, sizeof(_bufa));
-   memset(&_bufb, 0, sizeof(_bufb));
-   memset(&_bufc, 0, sizeof(_bufc));
-   memset(&_bufd, 0, sizeof(_bufd));
-   ae_smart_ptr_init(&_bufa, (void **)&bufa, _state, true);
-   ae_smart_ptr_init(&_bufb, (void **)&bufb, _state, true);
-   ae_smart_ptr_init(&_bufc, (void **)&bufc, _state, true);
-   ae_smart_ptr_init(&_bufd, (void **)&bufd, _state, true);
+   RefObj(srealarray, bufa, _state);
+   RefObj(srealarray, bufb, _state);
+   RefObj(srealarray, bufc, _state);
+   RefObj(srealarray, bufd, _state);
 
    ae_assert(plan->entries.ptr.pp_int[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header", _state);
    rowidx = subplan + 1;
@@ -12247,11 +12195,9 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *pr
    ae_int_t i;
    double bx;
    double by;
-   fasttransformplan plan;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&plan, 0, sizeof(plan));
-   fasttransformplan_init(&plan, _state, true);
+   NewObj(fasttransformplan, plan, _state);
 
 // Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
    for (i = 0; i <= 2 * m - 1; i++) {
@@ -12395,13 +12341,11 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t
 static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t q;
-   fasttransformplan plan;
    ae_int_t kiq;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&plan, 0, sizeof(plan));
-   fasttransformplan_init(&plan, _state, true);
+   NewObj(fasttransformplan, plan, _state);
 
 // Fill PrecR with Rader factors, perform FFT
    kiq = 1;

@@ -68,7 +68,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
 
-   odesolverstate_free(state, true);
+   SetObj(odesolverstate, state);
 
    ae_assert(n >= 1, "ODESolverRKCK: N<1!", _state);
    ae_assert(m >= 1, "ODESolverRKCK: M<1!", _state);
@@ -388,9 +388,9 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
    ae_int_t i;
 
    *m = 0;
-   ae_vector_free(xtbl, true);
-   ae_matrix_free(ytbl, true);
-   odesolverreport_free(rep, true);
+   SetVector(xtbl);
+   SetMatrix(ytbl);
+   SetObj(odesolverreport, rep);
 
    rep->terminationtype = state->repterminationtype;
    if (rep->terminationtype > 0) {
@@ -413,7 +413,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    ae_int_t i;
    double v;
 
-   odesolverstate_free(state, true);
+   SetObj(odesolverstate, state);
 
 // Prepare RComm
    ae_vector_set_length(&state->rstate.ia, 5 + 1, _state);

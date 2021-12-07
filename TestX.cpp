@@ -2059,20 +2059,14 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       try {
          int alloc_cnt;
          alglib_impl::ae_frame _frame_block;
-         alglib_impl::ae_shared_pool pool;
-         alglib_impl::ae_smart_ptr ptr0, ptr1;
-         void *p0, *p1;
-         seedrec seed;
 
       // case #0: just seeding the pool
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
-         memset(&pool, 0, sizeof(pool));
-         memset(&seed, 0, sizeof(seed));
-         alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
+         NewObj(alglib_impl::ae_shared_pool, pool, &_alglib_env_state);
+         NewObj(seedrec, seed, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
 
@@ -2080,14 +2074,12 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
-         memset(&seed, 0, sizeof(seed));
-         memset(&pool, 0, sizeof(pool));
-         memset(&ptr0, 0, sizeof(ptr0));
-         alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
+         RefObj(void, p0, &_alglib_env_state);
+      // NewObj(alglib_impl::ae_shared_pool, pool, &_alglib_env_state); NewObj(seedrec, seed, &_alglib_env_state); // ... but without the declarations
+         memset(&pool, 0, sizeof pool), alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
+         memset(&seed, 0, sizeof seed), seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
 
@@ -2095,19 +2087,17 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
-         memset(&ptr0, 0, sizeof(ptr0));
-         memset(&ptr1, 0, sizeof(ptr1));
-         memset(&pool, 0, sizeof(pool));
-         memset(&seed, 0, sizeof(seed));
-         alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
-         alglib_impl::ae_smart_ptr_init(&ptr1, (void **)&p1, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &ptr1, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_recycle(&pool, &ptr0, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_recycle(&pool, &ptr1, &_alglib_env_state);
+      // RefObj(void, p0, &_alglib_env_state); // ... but without the declaration.
+         memset(&_p0, 0, sizeof _p0), alglib_impl::ae_smart_ptr_init(&_p0, (void **)&p0, &_alglib_env_state, true);
+         RefObj(void, p1, &_alglib_env_state);
+      // NewObj(alglib_impl::ae_shared_pool, pool, &_alglib_env_state); NewObj(seedrec, seed, &_alglib_env_state); // ... but without the declarations
+         memset(&pool, 0, sizeof pool), alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
+         memset(&seed, 0, sizeof seed), seedrec_init(&seed, &_alglib_env_state, true);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_retrieve(&pool, &_p1, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_recycle(&pool, &_p0, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_recycle(&pool, &_p1, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
       } catch(...) {
@@ -2200,24 +2190,18 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       try {
          int alloc_cnt;
          alglib_impl::ae_frame _frame_block;
-         alglib_impl::ae_shared_pool pool;
-         alglib_impl::ae_smart_ptr ptr0;
-         void *p0, *p1;
-         seedrec seed;
+         void *p1;
 
       // seeding shared pool and retrieving twice to same pointer, no recycling
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
          alglib_impl::ae_frame_make(&_alglib_env_state, &_frame_block);
-         memset(&ptr0, 0, sizeof(ptr0));
-         memset(&pool, 0, sizeof(pool));
-         memset(&seed, 0, sizeof(seed));
-         alglib_impl::ae_smart_ptr_init(&ptr0, (void **)&p0, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         seedrec_init(&seed, &_alglib_env_state, true);
-         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
-         alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
+         RefObj(void, p0, &_alglib_env_state);
+         NewObj(alglib_impl::ae_shared_pool, pool, &_alglib_env_state);
+         NewObj(seedrec, seed, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0, &_alglib_env_state);
+         alglib_impl::ae_shared_pool_retrieve(&pool, &_p0, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue764_passed = issue764_passed && (alloc_cnt == alglib_impl::_alloc_counter);
       } catch(...) {

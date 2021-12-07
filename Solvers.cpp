@@ -56,12 +56,6 @@ namespace alglib_impl {
 // API: void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep, const xparams _xparams = xdefault);
 void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _a;
-   ae_matrix c;
-   ae_matrix vl;
-   ae_matrix vr;
-   ae_vector wr;
-   ae_vector wi;
    ae_int_t i;
    ae_int_t j;
    bool status;
@@ -71,21 +65,14 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_complex vv;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&c, 0, sizeof(c));
-   memset(&vl, 0, sizeof(vl));
-   memset(&vr, 0, sizeof(vr));
-   memset(&wr, 0, sizeof(wr));
-   memset(&wi, 0, sizeof(wi));
-   ae_vector_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(x, true);
-   polynomialsolverreport_free(rep, true);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vl, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vr, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&wr, 0, DT_REAL, _state, true);
-   ae_vector_init(&wi, 0, DT_REAL, _state, true);
+   DupVector(a, _state);
+   SetVector(x);
+   SetObj(polynomialsolverreport, rep);
+   NewMatrix(c, 0, 0, DT_REAL, _state);
+   NewMatrix(vl, 0, 0, DT_REAL, _state);
+   NewMatrix(vr, 0, 0, DT_REAL, _state);
+   NewVector(wr, 0, DT_REAL, _state);
+   NewVector(wi, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "PolynomialSolve: N <= 0", _state);
    ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1", _state);
@@ -241,17 +228,13 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
 // API: void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL, _state);
+   NewMatrix(xm, 0, 0, DT_REAL, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -298,18 +281,13 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
 // API: void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
 void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
-   ae_vector p;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&p, 0, sizeof(p));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   NewVector(p, 0, DT_INT, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -389,21 +367,15 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
 // API: void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
 void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix da;
-   ae_matrix emptya;
-   ae_vector p;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&da, 0, sizeof(da));
-   memset(&emptya, 0, sizeof(emptya));
-   memset(&p, 0, sizeof(p));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(da, 0, 0, DT_REAL, _state);
+   NewMatrix(emptya, 0, 0, DT_REAL, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -466,20 +438,15 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 // API: void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    double v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_vector p;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&p, 0, sizeof(p));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   NewVector(p, 0, DT_INT, _state);
 
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
@@ -569,17 +536,13 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 // API: void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL, _state);
+   NewMatrix(xm, 0, 0, DT_REAL, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -701,14 +664,12 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
 // API: void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
 void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix emptya;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(emptya, 0, 0, DT_REAL, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -826,17 +787,13 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 // API: void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL, _state);
+   NewMatrix(xm, 0, 0, DT_REAL, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -887,8 +844,8 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
 void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
 
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -954,21 +911,15 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 // API: void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
 void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix da;
-   ae_matrix emptya;
-   ae_vector p;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&da, 0, sizeof(da));
-   memset(&emptya, 0, sizeof(emptya));
-   memset(&p, 0, sizeof(p));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(da, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(emptya, 0, 0, DT_COMPLEX, _state);
+   NewVector(p, 0, DT_INT, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -1019,20 +970,15 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 // API: void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_complex v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_vector p;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&p, 0, sizeof(p));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   NewVector(p, 0, DT_INT, _state);
 
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
@@ -1116,17 +1062,13 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
 // API: void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
 void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(xm, 0, 0, DT_COMPLEX, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -1166,18 +1108,13 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
 // API: void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
 void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
-   ae_vector p;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&p, 0, sizeof(p));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   NewVector(p, 0, DT_INT, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -1250,14 +1187,12 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
 // API: void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
 void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix emptya;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(emptya, 0, 0, DT_COMPLEX, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -1387,17 +1322,13 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
 // API: void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
 void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(xm, 0, 0, DT_COMPLEX, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -1499,8 +1430,8 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
 void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
 
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -1542,17 +1473,13 @@ void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatri
 // API: void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
 void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(xm, 0, 0, DT_COMPLEX, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -1619,18 +1546,16 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
 // API: void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
 void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix da;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&da, 0, sizeof(da));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(da, 0, 0, DT_REAL, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -1697,14 +1622,11 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
 // API: void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
 
    *info = 1;
@@ -1785,17 +1707,13 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
 // API: void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL, _state);
+   NewMatrix(xm, 0, 0, DT_REAL, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -1837,13 +1755,10 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
 // API: void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
 void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
 
    *info = 1;
@@ -1920,14 +1835,12 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
 // API: void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
 void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix emptya;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(emptya, 0, 0, DT_REAL, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -2054,17 +1967,13 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
 // API: void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL, _state);
+   NewMatrix(xm, 0, 0, DT_REAL, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -2174,18 +2083,16 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
 // API: void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
 void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix da;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&da, 0, sizeof(da));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(da, 0, 0, DT_COMPLEX, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -2252,14 +2159,11 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
 // API: void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
 
    *info = 1;
@@ -2333,17 +2237,13 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
 // API: void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
 void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(xm, 0, 0, DT_COMPLEX, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -2387,13 +2287,10 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
 // API: void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
 void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *info = 0;
 
    *info = 1;
@@ -2471,14 +2368,12 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 // API: void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
 void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix emptya;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&emptya, 0, sizeof(emptya));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewMatrix(emptya, 0, 0, DT_COMPLEX, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -2606,17 +2501,13 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
 // API: void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
 void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix bm;
-   ae_matrix xm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bm, 0, sizeof(bm));
-   memset(&xm, 0, sizeof(xm));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(xm, 0, 0, DT_COMPLEX, _state);
 
    if (n <= 0) {
       *info = -1;
@@ -2725,17 +2616,6 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 // API: void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
 void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, double threshold, ae_int_t *info, densesolverlsreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector sv;
-   ae_matrix u;
-   ae_matrix vt;
-   ae_vector rp;
-   ae_vector utb;
-   ae_vector sutb;
-   ae_vector tmp;
-   ae_vector ta;
-   ae_vector tx;
-   ae_vector buf;
-   ae_vector w;
    ae_int_t i;
    ae_int_t j;
    ae_int_t nsv;
@@ -2750,31 +2630,20 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    bool smallerr;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&sv, 0, sizeof(sv));
-   memset(&u, 0, sizeof(u));
-   memset(&vt, 0, sizeof(vt));
-   memset(&rp, 0, sizeof(rp));
-   memset(&utb, 0, sizeof(utb));
-   memset(&sutb, 0, sizeof(sutb));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&ta, 0, sizeof(ta));
-   memset(&tx, 0, sizeof(tx));
-   memset(&buf, 0, sizeof(buf));
-   memset(&w, 0, sizeof(w));
    *info = 0;
-   densesolverlsreport_free(rep, true);
-   ae_vector_free(x, true);
-   ae_vector_init(&sv, 0, DT_REAL, _state, true);
-   ae_matrix_init(&u, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vt, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&rp, 0, DT_REAL, _state, true);
-   ae_vector_init(&utb, 0, DT_REAL, _state, true);
-   ae_vector_init(&sutb, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&ta, 0, DT_REAL, _state, true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
+   SetObj(densesolverlsreport, rep);
+   SetVector(x);
+   NewVector(sv, 0, DT_REAL, _state);
+   NewMatrix(u, 0, 0, DT_REAL, _state);
+   NewMatrix(vt, 0, 0, DT_REAL, _state);
+   NewVector(rp, 0, DT_REAL, _state);
+   NewVector(utb, 0, DT_REAL, _state);
+   NewVector(sutb, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(ta, 0, DT_REAL, _state);
+   NewVector(tx, 0, DT_REAL, _state);
+   NewVector(buf, 0, DT_REAL, _state);
+   NewVector(w, 0, DT_REAL, _state);
 
    if ((nrows <= 0 || ncols <= 0) || ae_fp_less(threshold, (double)(0))) {
       *info = -1;
@@ -2922,12 +2791,6 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    ae_int_t k;
    ae_int_t rfs;
    ae_int_t nrfs;
-   ae_vector xc;
-   ae_vector y;
-   ae_vector bc;
-   ae_vector xa;
-   ae_vector xb;
-   ae_vector tx;
    double v;
    double verr;
    double mxb;
@@ -2935,21 +2798,15 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    bool terminatenexttime;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xc, 0, sizeof(xc));
-   memset(&y, 0, sizeof(y));
-   memset(&bc, 0, sizeof(bc));
-   memset(&xa, 0, sizeof(xa));
-   memset(&xb, 0, sizeof(xb));
-   memset(&tx, 0, sizeof(tx));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_vector_init(&xc, 0, DT_REAL, _state, true);
-   ae_vector_init(&y, 0, DT_REAL, _state, true);
-   ae_vector_init(&bc, 0, DT_REAL, _state, true);
-   ae_vector_init(&xa, 0, DT_REAL, _state, true);
-   ae_vector_init(&xb, 0, DT_REAL, _state, true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewVector(xc, 0, DT_REAL, _state);
+   NewVector(y, 0, DT_REAL, _state);
+   NewVector(bc, 0, DT_REAL, _state);
+   NewVector(xa, 0, DT_REAL, _state);
+   NewVector(xb, 0, DT_REAL, _state);
+   NewVector(tx, 0, DT_REAL, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -3049,8 +2906,8 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
    ae_int_t j;
 
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -3099,36 +2956,22 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    ae_int_t k;
    ae_int_t rfs;
    ae_int_t nrfs;
-   ae_vector xc;
-   ae_vector y;
-   ae_vector bc;
-   ae_vector xa;
-   ae_vector xb;
-   ae_vector tx;
-   ae_vector tmpbuf;
    ae_complex v;
    double verr;
    bool smallerr;
    bool terminatenexttime;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xc, 0, sizeof(xc));
-   memset(&y, 0, sizeof(y));
-   memset(&bc, 0, sizeof(bc));
-   memset(&xa, 0, sizeof(xa));
-   memset(&xb, 0, sizeof(xb));
-   memset(&tx, 0, sizeof(tx));
-   memset(&tmpbuf, 0, sizeof(tmpbuf));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&xa, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&xb, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&tx, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&tmpbuf, 0, DT_REAL, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewVector(xc, 0, DT_COMPLEX, _state);
+   NewVector(y, 0, DT_COMPLEX, _state);
+   NewVector(bc, 0, DT_COMPLEX, _state);
+   NewVector(xa, 0, DT_COMPLEX, _state);
+   NewVector(xb, 0, DT_COMPLEX, _state);
+   NewVector(tx, 0, DT_COMPLEX, _state);
+   NewVector(tmpbuf, 0, DT_REAL, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -3239,29 +3082,17 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector xc;
-   ae_vector y;
-   ae_vector bc;
-   ae_vector xa;
-   ae_vector xb;
-   ae_vector tx;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&xc, 0, sizeof(xc));
-   memset(&y, 0, sizeof(y));
-   memset(&bc, 0, sizeof(bc));
-   memset(&xa, 0, sizeof(xa));
-   memset(&xb, 0, sizeof(xb));
-   memset(&tx, 0, sizeof(tx));
    *info = 0;
-   densesolverreport_free(rep, true);
-   ae_matrix_free(x, true);
-   ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&xa, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&xb, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&tx, 0, DT_COMPLEX, _state, true);
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewVector(xc, 0, DT_COMPLEX, _state);
+   NewVector(y, 0, DT_COMPLEX, _state);
+   NewVector(bc, 0, DT_COMPLEX, _state);
+   NewVector(xa, 0, DT_COMPLEX, _state);
+   NewVector(xb, 0, DT_COMPLEX, _state);
+   NewVector(tx, 0, DT_COMPLEX, _state);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -3903,14 +3734,12 @@ namespace alglib_impl {
 void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   sparsematrix a2;
    ae_int_t n;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a2, 0, sizeof(a2));
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
-   sparsematrix_init(&a2, _state, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, a2, _state);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDSolveSKS: N <= 0", _state);
@@ -3969,18 +3798,14 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   sparsematrix a2;
    ae_int_t n;
    double v;
-   ae_vector p;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a2, 0, sizeof(a2));
-   memset(&p, 0, sizeof(p));
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
-   sparsematrix_init(&a2, _state, true);
-   ae_vector_init(&p, 0, DT_INT, _state, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, a2, _state);
+   NewVector(p, 0, DT_INT, _state);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDSolve: N <= 0", _state);
@@ -4046,8 +3871,8 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
    ae_int_t i;
    ae_int_t n;
 
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDCholeskySolve: N <= 0", _state);
@@ -4106,19 +3931,13 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    ae_int_t j;
    ae_int_t n;
    double v;
-   sparsematrix a2;
-   ae_vector pivp;
-   ae_vector pivq;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&a2, 0, sizeof(a2));
-   memset(&pivp, 0, sizeof(pivp));
-   memset(&pivq, 0, sizeof(pivq));
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
-   sparsematrix_init(&a2, _state, true);
-   ae_vector_init(&pivp, 0, DT_INT, _state, true);
-   ae_vector_init(&pivq, 0, DT_INT, _state, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, a2, _state);
+   NewVector(pivp, 0, DT_INT, _state);
+   NewVector(pivq, 0, DT_INT, _state);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSolve: N <= 0", _state);
@@ -4187,8 +4006,8 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
    double v;
    ae_int_t n;
 
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseLUSolve: N <= 0", _state);
@@ -4388,16 +4207,12 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
 void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
-   sparsematrix convbuf;
-   sparsesolverstate solver;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&convbuf, 0, sizeof(convbuf));
-   memset(&solver, 0, sizeof(solver));
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
-   sparsematrix_init(&convbuf, _state, true);
-   sparsesolverstate_init(&solver, _state, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, convbuf, _state);
+   NewObj(sparsesolverstate, solver, _state);
 
    n = sparsegetnrows(a, _state);
 
@@ -4477,16 +4292,12 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
 void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
-   sparsematrix convbuf;
-   sparsesolverstate solver;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&convbuf, 0, sizeof(convbuf));
-   memset(&solver, 0, sizeof(solver));
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
-   sparsematrix_init(&convbuf, _state, true);
-   sparsesolverstate_init(&solver, _state, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, convbuf, _state);
+   NewObj(sparsesolverstate, solver, _state);
 
    n = sparsegetnrows(a, _state);
 
@@ -4578,7 +4389,7 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
 // API: void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state, const xparams _xparams = xdefault);
 void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) {
 
-   sparsesolverstate_free(state, true);
+   SetObj(sparsesolverstate, state);
 
    ae_assert(n >= 1, "SparseSolverCreate: N <= 0", _state);
    state->n = n;
@@ -4820,8 +4631,8 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b, ae
 // API: void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
 void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
 
    sparsesolveroocstop(state, x, rep, _state);
 }
@@ -5064,8 +4875,8 @@ void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax, ae_state *
 // API: void sparsesolveroocstop(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
 void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   sparsesolverreport_free(rep, true);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
 
    ae_assert(!state->running, "SparseSolverOOCStop: the solver is still running", _state);
    ae_vector_set_length(x, state->n, _state);
@@ -5575,7 +5386,7 @@ static void lincg_updateitersdata(lincgstate *state, ae_state *_state);
 void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
    ae_int_t i;
 
-   lincgstate_free(state, true);
+   SetObj(lincgstate, state);
 
    ae_assert(n > 0, "LinCGCreate: N <= 0", _state);
    state->n = n;
@@ -6162,8 +5973,8 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 // API: void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep, const xparams _xparams = xdefault);
 void lincgresults(lincgstate *state, RVector *x, lincgreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   lincgreport_free(rep, true);
+   SetVector(x);
+   SetObj(lincgreport, rep);
 
    ae_assert(!state->running, "LinCGResult: you can not get result, because function LinCGIteration has been launched!", _state);
    if (x->cnt < state->n) {
@@ -6487,7 +6298,7 @@ static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state);
 // API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams = xdefault);
 void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_state) {
 
-   linlsqrstate_free(state, true);
+   SetObj(linlsqrstate, state);
 
    ae_assert(m > 0, "LinLSQRCreate: M <= 0", _state);
    ae_assert(n > 0, "LinLSQRCreate: N <= 0", _state);
@@ -7134,8 +6945,8 @@ void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxi
 // API: void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep, const xparams _xparams = xdefault);
 void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   linlsqrreport_free(rep, true);
+   SetVector(x);
+   SetObj(linlsqrreport, rep);
 
    ae_assert(!state->running, "LinLSQRResult: you can not call this function when LinLSQRIteration is running", _state);
    if (x->cnt < state->n) {
@@ -7536,7 +7347,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
 // API: void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = xdefault);
 void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state *_state) {
 
-   nleqstate_free(state, true);
+   SetObj(nleqstate, state);
 
    ae_assert(n >= 1, "NLEQCreateLM: N<1!", _state);
    ae_assert(m >= 1, "NLEQCreateLM: M<1!", _state);
@@ -7904,8 +7715,8 @@ lbl_rcomm:
 // API: void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = xdefault);
 void nleqresults(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_state) {
 
-   ae_vector_free(x, true);
-   nleqreport_free(rep, true);
+   SetVector(x);
+   SetObj(nleqreport, rep);
 
    nleqresultsbuf(state, x, rep, _state);
 }

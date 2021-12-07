@@ -580,13 +580,13 @@ void set_memory_pool(void *ptr, size_t size) {
    sm_page_size = 256;
 // we expect to have memory for at least one page + table entry + alignment
    AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);
-   sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof(ae_int_t));
+   sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    sm_page_tbl = (ae_int_t *) ptr;
    sm_mem = (unsigned char *)ae_align(sm_page_tbl + sm_page_cnt, sm_page_size);
 
 // Mark all pages as free
-   memset(sm_page_tbl, 0, sm_page_cnt * sizeof(ae_int_t));
+   memset(sm_page_tbl, 0, sm_page_cnt * sizeof *sm_page_tbl);
 }
 
 void *ae_static_malloc(size_t size, size_t alignment) {
@@ -1276,11 +1276,9 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state) {
 // * vector must be initialized
 // * new size may be zero.
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
-   ae_vector tmp;
    ae_int_t bytes_total;
 
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, newsize, dst->datatype, state, false);
+   ae_vector tmp; memset(&tmp, 0, sizeof tmp), ae_vector_init(&tmp, newsize, dst->datatype, state, false);
    bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
    if (bytes_total > 0)
       memmove(tmp.ptr.p_ptr, dst->ptr.p_ptr, bytes_total);
@@ -3672,8 +3670,7 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 // copy seed object
    if (src->seed_object != NULL) {
       dst->seed_object = ae_malloc(dst->size_of_object, state);
-      memset(dst->seed_object, 0, dst->size_of_object);
-      dst->copy(dst->seed_object, src->seed_object, state, false);
+      memset(dst->seed_object, 0, dst->size_of_object), dst->copy(dst->seed_object, src->seed_object, state, false);
    }
 // copy recycled objects
    dst->recycled_objects = NULL;
@@ -3682,15 +3679,14 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 
    // allocate entry, immediately add to the recycled list
    // (we do not want to lose it in case of future malloc failures)
-      tmp = (ae_shared_pool_entry *) ae_malloc(sizeof(ae_shared_pool_entry), state);
-      memset(tmp, 0, sizeof(*tmp));
+      tmp = (ae_shared_pool_entry *) ae_malloc(sizeof *tmp, state);
+      memset(tmp, 0, sizeof *tmp);
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
 
    // prepare place for object, copy() it
       tmp->obj = ae_malloc(dst->size_of_object, state);
-      memset(tmp->obj, 0, dst->size_of_object);
-      dst->copy(tmp->obj, ptr->obj, state, false);
+      memset(tmp->obj, 0, dst->size_of_object), dst->copy(tmp->obj, ptr->obj, state, false);
    }
 
 // recycled entries are not copied because they do not store any information
@@ -3761,8 +3757,7 @@ void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t si
    dst->free = free;
 // set seed object
    dst->seed_object = ae_malloc(size_of_object, state);
-   memset(dst->seed_object, 0, size_of_object);
-   copy(dst->seed_object, seed_object, state, false);
+   memset(dst->seed_object, 0, size_of_object), copy(dst->seed_object, seed_object, state, false);
 }
 
 // This  function  retrieves  a  copy  of  the seed object from the pool and
@@ -4282,7 +4277,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
       ae_int_t elen;
       elen = bytes->cnt - eidx * chunk_size;
       elen = elen > chunk_size ? chunk_size : elen;
-      memset(&tmpi, 0, sizeof(tmpi));
+      memset(&tmpi, 0, sizeof tmpi);
       memmove(&tmpi, bytes->ptr.p_ubyte + eidx * chunk_size, elen);
       ae_serializer_serialize_int64(serializer, tmpi, state);
    }
@@ -5101,31 +5096,19 @@ ae_int_t ae_v_len(ae_int_t a, ae_int_t b) {
 
 // RComm functions
 void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
-// initial zero-filling
-   memset(&p->ba, 0, sizeof(p->ba));
-   memset(&p->ia, 0, sizeof(p->ia));
-   memset(&p->ra, 0, sizeof(p->ra));
-   memset(&p->ca, 0, sizeof(p->ca));
-
-// initialization
-   ae_vector_init(&p->ba, 0, DT_BOOL, _state, make_automatic);
-   ae_vector_init(&p->ia, 0, DT_INT, _state, make_automatic);
-   ae_vector_init(&p->ra, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->ca, 0, DT_COMPLEX, _state, make_automatic);
+// zero-filled initialization
+   memset(&p->ba, 0, sizeof p->ba), ae_vector_init(&p->ba, 0, DT_BOOL, _state, make_automatic);
+   memset(&p->ia, 0, sizeof p->ia), ae_vector_init(&p->ia, 0, DT_INT, _state, make_automatic);
+   memset(&p->ra, 0, sizeof p->ra), ae_vector_init(&p->ra, 0, DT_REAL, _state, make_automatic);
+   memset(&p->ca, 0, sizeof p->ca), ae_vector_init(&p->ca, 0, DT_COMPLEX, _state, make_automatic);
 }
 
 void rcommstate_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic) {
-// initial zero-filling
-   memset(&dst->ba, 0, sizeof(dst->ba));
-   memset(&dst->ia, 0, sizeof(dst->ia));
-   memset(&dst->ra, 0, sizeof(dst->ra));
-   memset(&dst->ca, 0, sizeof(dst->ca));
-
-// initialization
-   ae_vector_copy(&dst->ba, &src->ba, _state, make_automatic);
-   ae_vector_copy(&dst->ia, &src->ia, _state, make_automatic);
-   ae_vector_copy(&dst->ra, &src->ra, _state, make_automatic);
-   ae_vector_copy(&dst->ca, &src->ca, _state, make_automatic);
+// zero-filled initialization
+   memset(&dst->ba, 0, sizeof dst->ba), ae_vector_copy(&dst->ba, &src->ba, _state, make_automatic);
+   memset(&dst->ia, 0, sizeof dst->ia), ae_vector_copy(&dst->ia, &src->ia, _state, make_automatic);
+   memset(&dst->ra, 0, sizeof dst->ra), ae_vector_copy(&dst->ra, &src->ra, _state, make_automatic);
+   memset(&dst->ca, 0, sizeof dst->ca), ae_vector_copy(&dst->ca, &src->ca, _state, make_automatic);
    dst->stage = src->stage;
 }
 
@@ -10237,14 +10220,12 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(msg);
       return;
 #endif
    }
-   ptr = e_ptr;
-   is_frozen_proxy = true;
+   is_frozen_proxy = true, ptr = e_ptr;
 }
 
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
@@ -10253,16 +10234,12 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   ptr = &inner_vec;
-   is_frozen_proxy = false;
-   memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init(ptr, 0, datatype, &_state, false);
+   is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init(ptr, 0, datatype, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10272,18 +10249,14 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
    }
    alglib_impl::ae_assert(rhs.ptr != NULL, "ALGLIB: ae_vector_wrapper source is not initialized", &_state);
    alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_vector_wrapper datatype check failed", &_state);
-   ptr = &inner_vec;
-   is_frozen_proxy = false;
-   memset(ptr, 0, sizeof(*ptr));
-   ae_vector_copy(ptr, rhs.ptr, &_state, false);
+   is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_copy(ptr, rhs.ptr, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10310,10 +10283,7 @@ ae_int_t ae_vector_wrapper::length() const {
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state) {
    if (ptr == &inner_vec)
       ae_vector_free(ptr, true);
-   ptr = &inner_vec;
-   memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init_attach_to_x(ptr, new_ptr, _state, false);
-   is_frozen_proxy = true;
+   is_frozen_proxy = true, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init_attach_to_x(ptr, new_ptr, _state, false);
 }
 
 const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
@@ -10353,10 +10323,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
       {
          alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
          TryCatch(_state, )
-         ptr = &inner_vec;
-         is_frozen_proxy = false;
-         memset(ptr, 0, sizeof(*ptr));
-         ae_vector_init(ptr, (ae_int_t) (svec.size()), datatype, &_state, false);
+         is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init(ptr, (ae_int_t) (svec.size()), datatype, &_state, false);
          ae_state_clear(&_state);
       }
       for (i = 0; i < svec.size(); i++) {
@@ -10555,8 +10522,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
@@ -10661,14 +10627,12 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(msg);
       return;
 #endif
    }
-   ptr = e_ptr;
-   is_frozen_proxy = true;
+   is_frozen_proxy = true, ptr = e_ptr;
 }
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
@@ -10677,16 +10641,12 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   ptr = &inner_mat;
-   is_frozen_proxy = false;
-   memset(ptr, 0, sizeof(*ptr));
-   ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
+   is_frozen_proxy = false, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
    ae_state_clear(&_state);
 
 }
@@ -10697,19 +10657,15 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
    }
-   is_frozen_proxy = false;
-   ptr = NULL;
+   is_frozen_proxy = false, ptr = NULL;
    alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_matrix_wrapper datatype check failed", &_state);
    if (rhs.ptr != NULL) {
-      ptr = &inner_mat;
-      memset(ptr, 0, sizeof(*ptr));
-      ae_matrix_copy(ptr, rhs.ptr, &_state, false);
+      ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_copy(ptr, rhs.ptr, &_state, false);
    }
    ae_state_clear(&_state);
 }
@@ -10731,9 +10687,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
       {
          alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
          TryCatch(_state, )
-         ptr = &inner_mat;
-         is_frozen_proxy = false;
-         memset(ptr, 0, sizeof(*ptr));
+         is_frozen_proxy = false, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr);
          if (smat.size() != 0)
             ae_matrix_init(ptr, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, false);
          else
@@ -10797,10 +10751,7 @@ ae_int_t ae_matrix_wrapper::getstride() const {
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state) {
    if (ptr == &inner_mat)
       ae_matrix_free(ptr, true);
-   ptr = &inner_mat;
-   memset(ptr, 0, sizeof(*ptr));
-   ae_matrix_init_attach_to_x(ptr, new_ptr, _state, false);
-   is_frozen_proxy = true;
+   is_frozen_proxy = true, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_init_attach_to_x(ptr, new_ptr, _state, false);
 }
 
 const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
@@ -11011,8 +10962,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg(_state, );
 #else
-      ptr = NULL;
-      is_frozen_proxy = false;
+      is_frozen_proxy = false, ptr = NULL;
       set_error_flag(_state.error_msg);
       return;
 #endif
@@ -11272,7 +11222,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
 
 // try to parse false
    p = "false";
-   memset(buf, 0, sizeof(buf));
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
@@ -11281,7 +11231,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
    }
 // try to parse true
    p = "true";
-   memset(buf, 0, sizeof(buf));
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
@@ -11341,7 +11291,7 @@ bool _parse_real_delim(const char *s, const char *delim, double *result, const c
       isign = *s == '-' ? -1 : +1;
       s++;
    }
-   memset(buf, 0, sizeof(buf));
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, 3);
    if (my_stricmp(buf, "nan") != 0 && my_stricmp(buf, "inf") != 0) {
    //

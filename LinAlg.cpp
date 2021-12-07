@@ -3010,13 +3010,7 @@ static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwi
 // API: void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams = xdefault);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
@@ -3024,19 +3018,13 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_vector_free(tau, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&taubuf, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_REAL, _state, true);
+   SetVector(tau);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(taubuf, 0, DT_REAL, _state);
+   NewMatrix(tmpa, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpt, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpr, 0, 0, DT_REAL, _state);
 
    if (m <= 0 || n <= 0) {
       ae_frame_leave(_state);
@@ -3139,13 +3127,7 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
 // API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams = xdefault);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
@@ -3153,19 +3135,13 @@ void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_vector_free(tau, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&taubuf, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_REAL, _state, true);
+   SetVector(tau);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(taubuf, 0, DT_REAL, _state);
+   NewMatrix(tmpa, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpt, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpr, 0, 0, DT_REAL, _state);
 
    if (m <= 0 || n <= 0) {
       ae_frame_leave(_state);
@@ -3256,13 +3232,7 @@ void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
 // API: void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams = xdefault);
 void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
@@ -3270,19 +3240,13 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_vector_free(tau, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&taubuf, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_COMPLEX, _state, true);
+   SetVector(tau);
+   NewVector(work, 0, DT_COMPLEX, _state);
+   NewVector(t, 0, DT_COMPLEX, _state);
+   NewVector(taubuf, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpa, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpt, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpr, 0, 0, DT_COMPLEX, _state);
 
    if (m <= 0 || n <= 0) {
       ae_frame_leave(_state);
@@ -3374,13 +3338,7 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
 // API: void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams = xdefault);
 void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
@@ -3388,19 +3346,13 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_vector_free(tau, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&taubuf, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_COMPLEX, _state, true);
+   SetVector(tau);
+   NewVector(work, 0, DT_COMPLEX, _state);
+   NewVector(t, 0, DT_COMPLEX, _state);
+   NewVector(taubuf, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpa, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpt, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpr, 0, 0, DT_COMPLEX, _state);
 
    if (m <= 0 || n <= 0) {
       ae_frame_leave(_state);
@@ -3488,14 +3440,8 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
 // API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams = xdefault);
 void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qcolumns, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
    ae_int_t refcnt;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
@@ -3504,19 +3450,13 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_matrix_free(q, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&taubuf, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_REAL, _state, true);
+   SetMatrix(q);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(taubuf, 0, DT_REAL, _state);
+   NewMatrix(tmpa, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpt, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpr, 0, 0, DT_REAL, _state);
 
    ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns>M!", _state);
    if ((m <= 0 || n <= 0) || qcolumns <= 0) {
@@ -3604,7 +3544,7 @@ void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r, ae_state *
    ae_int_t i;
    ae_int_t k;
 
-   ae_matrix_free(r, true);
+   SetMatrix(r);
 
    if (m <= 0 || n <= 0) {
       return;
@@ -3641,14 +3581,8 @@ void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r, ae_state *
 // API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q, const xparams _xparams = xdefault);
 void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qrows, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
    ae_int_t refcnt;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
@@ -3657,19 +3591,13 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_matrix_free(q, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&taubuf, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_REAL, _state, true);
+   SetMatrix(q);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(taubuf, 0, DT_REAL, _state);
+   NewMatrix(tmpa, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpt, 0, 0, DT_REAL, _state);
+   NewMatrix(tmpr, 0, 0, DT_REAL, _state);
 
    ae_assert(qrows <= n, "RMatrixLQUnpackQ: QRows>N!", _state);
    if ((m <= 0 || n <= 0) || qrows <= 0) {
@@ -3757,7 +3685,7 @@ void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l, ae_state *
    ae_int_t i;
    ae_int_t k;
 
-   ae_matrix_free(l, true);
+   SetMatrix(l);
 
    if (m <= 0 || n <= 0) {
       return;
@@ -3794,14 +3722,8 @@ void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l, ae_state *
 // API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q, const xparams _xparams = xdefault);
 void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qcolumns, CMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
    ae_int_t refcnt;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t rowscount;
@@ -3810,19 +3732,13 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_matrix_free(q, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&taubuf, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_COMPLEX, _state, true);
+   SetMatrix(q);
+   NewVector(work, 0, DT_COMPLEX, _state);
+   NewVector(t, 0, DT_COMPLEX, _state);
+   NewVector(taubuf, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpa, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpt, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpr, 0, 0, DT_COMPLEX, _state);
 
    ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns>M!", _state);
    if (m <= 0 || n <= 0) {
@@ -3913,7 +3829,7 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r, ae_state *
    ae_int_t i;
    ae_int_t k;
 
-   ae_matrix_free(r, true);
+   SetMatrix(r);
 
    if (m <= 0 || n <= 0) {
       return;
@@ -3950,14 +3866,8 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r, ae_state *
 // API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q, const xparams _xparams = xdefault);
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
-   ae_vector taubuf;
    ae_int_t minmn;
    ae_int_t refcnt;
-   ae_matrix tmpa;
-   ae_matrix tmpt;
-   ae_matrix tmpr;
    ae_int_t blockstart;
    ae_int_t blocksize;
    ae_int_t columnscount;
@@ -3966,19 +3876,13 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    ae_int_t ts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   memset(&taubuf, 0, sizeof(taubuf));
-   memset(&tmpa, 0, sizeof(tmpa));
-   memset(&tmpt, 0, sizeof(tmpt));
-   memset(&tmpr, 0, sizeof(tmpr));
-   ae_matrix_free(q, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&taubuf, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpa, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpt, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&tmpr, 0, 0, DT_COMPLEX, _state, true);
+   SetMatrix(q);
+   NewVector(work, 0, DT_COMPLEX, _state);
+   NewVector(t, 0, DT_COMPLEX, _state);
+   NewVector(taubuf, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpa, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpt, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(tmpr, 0, 0, DT_COMPLEX, _state);
 
    if (m <= 0 || n <= 0) {
       ae_frame_leave(_state);
@@ -4068,7 +3972,7 @@ void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l, ae_state *
    ae_int_t i;
    ae_int_t k;
 
-   ae_matrix_free(l, true);
+   SetMatrix(l);
 
    if (m <= 0 || n <= 0) {
       return;
@@ -4208,19 +4112,15 @@ void rmatrixlqbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVecto
 // API: void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup, const xparams _xparams = xdefault);
 void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
-   ae_vector t;
    ae_int_t maxmn;
    ae_int_t i;
    double ltau;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&t, 0, sizeof(t));
-   ae_vector_free(tauq, true);
-   ae_vector_free(taup, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   SetVector(tauq);
+   SetVector(taup);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
 // Prepare
    if (n <= 0 || m <= 0) {
@@ -4341,7 +4241,7 @@ void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(q, true);
+   SetMatrix(q);
 
    ae_assert(qcolumns <= m, "RMatrixBDUnpackQ: QColumns>M!", _state);
    ae_assert(qcolumns >= 0, "RMatrixBDUnpackQ: QColumns<0!", _state);
@@ -4396,18 +4296,12 @@ void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RM
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t istep;
-   ae_vector v;
-   ae_vector work;
-   ae_vector dummy;
    ae_int_t mx;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   memset(&dummy, 0, sizeof(dummy));
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummy, 0, DT_REAL, _state, true);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(dummy, 0, DT_REAL, _state);
 
    if (((m <= 0 || n <= 0) || zrows <= 0) || zcolumns <= 0) {
       ae_frame_leave(_state);
@@ -4516,7 +4410,7 @@ void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_in
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(pt, true);
+   SetMatrix(pt);
 
    ae_assert(ptrows <= n, "RMatrixBDUnpackPT: PTRows>N!", _state);
    ae_assert(ptrows >= 0, "RMatrixBDUnpackPT: PTRows<0!", _state);
@@ -4568,21 +4462,15 @@ void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_in
 void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_vector v;
-   ae_vector work;
-   ae_vector dummy;
    ae_int_t mx;
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t istep;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   memset(&dummy, 0, sizeof(dummy));
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummy, 0, DT_REAL, _state, true);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(dummy, 0, DT_REAL, _state);
 
    if (((m <= 0 || n <= 0) || zrows <= 0) || zcolumns <= 0) {
       ae_frame_leave(_state);
@@ -4687,8 +4575,8 @@ void rmatrixbdunpackdiagonals(RMatrix *b, ae_int_t m, ae_int_t n, bool *isupper,
    ae_int_t i;
 
    *isupper = false;
-   ae_vector_free(d, true);
-   ae_vector_free(e, true);
+   SetVector(d);
+   SetVector(e);
 
    *isupper = m >= n;
    if (m <= 0 || n <= 0) {
@@ -4750,15 +4638,11 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    double v;
-   ae_vector t;
-   ae_vector work;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   memset(&work, 0, sizeof(work));
-   ae_vector_free(tau, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   SetVector(tau);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "RMatrixHessenberg: incorrect N!", _state);
 
@@ -4813,15 +4697,11 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q, 
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector v;
-   ae_vector work;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_free(q, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   SetMatrix(q);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    if (n == 0) {
       ae_frame_leave(_state);
@@ -4871,15 +4751,11 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h, ae_state *_sta
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector v;
-   ae_vector work;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_free(h, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   SetMatrix(h);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    if (n == 0) {
       ae_frame_leave(_state);
@@ -4970,20 +4846,14 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
    double alpha;
    double taui;
    double v;
-   ae_vector t;
-   ae_vector t2;
-   ae_vector t3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   memset(&t2, 0, sizeof(t2));
-   memset(&t3, 0, sizeof(t3));
-   ae_vector_free(tau, true);
-   ae_vector_free(d, true);
-   ae_vector_free(e, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&t2, 0, DT_REAL, _state, true);
-   ae_vector_init(&t3, 0, DT_REAL, _state, true);
+   SetVector(tau);
+   SetVector(d);
+   SetVector(e);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(t2, 0, DT_REAL, _state);
+   NewVector(t3, 0, DT_REAL, _state);
 
    if (n <= 0) {
       ae_frame_leave(_state);
@@ -5106,15 +4976,11 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector v;
-   ae_vector work;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_free(q, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   SetMatrix(q);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    if (n == 0) {
       ae_frame_leave(_state);
@@ -5234,20 +5100,14 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
    ae_complex alpha;
    ae_complex taui;
    ae_complex v;
-   ae_vector t;
-   ae_vector t2;
-   ae_vector t3;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   memset(&t2, 0, sizeof(t2));
-   memset(&t3, 0, sizeof(t3));
-   ae_vector_free(tau, true);
-   ae_vector_free(d, true);
-   ae_vector_free(e, true);
-   ae_vector_init(&t, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t2, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&t3, 0, DT_COMPLEX, _state, true);
+   SetVector(tau);
+   SetVector(d);
+   SetVector(e);
+   NewVector(t, 0, DT_COMPLEX, _state);
+   NewVector(t2, 0, DT_COMPLEX, _state);
+   NewVector(t3, 0, DT_COMPLEX, _state);
 
 // Init and test
    if (n <= 0) {
@@ -5379,15 +5239,11 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector v;
-   ae_vector work;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&v, 0, sizeof(v));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_free(q, true);
-   ae_vector_init(&v, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
+   SetMatrix(q);
+   NewVector(v, 0, DT_COMPLEX, _state);
+   NewVector(work, 0, DT_COMPLEX, _state);
 
    if (n == 0) {
       ae_frame_leave(_state);
@@ -5894,7 +5750,7 @@ void rmatrixrndorthogonal(ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_assert(n >= 1, "RMatrixRndOrthogonal: N<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -5926,12 +5782,10 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&rs, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, rs, _state);
 
    ae_assert(n >= 1 && ae_fp_greater_eq(c, (double)(1)), "RMatrixRndCond: N<1 or C<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -5984,7 +5838,7 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   ae_matrix_free(a, true);
+   SetMatrix(a);
 
    ae_assert(n >= 1, "CMatrixRndOrthogonal: N<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -6017,13 +5871,11 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate state;
    ae_complex v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&state, 0, sizeof(state));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&state, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, state, _state);
 
    ae_assert(n >= 1 && ae_fp_greater_eq(c, (double)(1)), "CMatrixRndCond: N<1 or C<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -6071,12 +5923,10 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&rs, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, rs, _state);
 
    ae_assert(n >= 1 && ae_fp_greater_eq(c, (double)(1)), "SMatrixRndCond: N<1 or C<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -6124,12 +5974,10 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&rs, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, rs, _state);
 
 // Special cases
    if (n <= 0 || ae_fp_less(c, (double)(1))) {
@@ -6179,12 +6027,10 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&rs, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, rs, _state);
 
    ae_assert(n >= 1 && ae_fp_greater_eq(c, (double)(1)), "HMatrixRndCond: N<1 or C<1!", _state);
    ae_matrix_set_length(a, n, n, _state);
@@ -6237,12 +6083,10 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_int_t j;
    double l1;
    double l2;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rs, 0, sizeof(rs));
-   ae_matrix_free(a, true);
-   hqrndstate_init(&rs, _state, true);
+   SetMatrix(a);
+   NewObj(hqrndstate, rs, _state);
 
 // Special cases
    if (n <= 0 || ae_fp_less(c, (double)(1))) {
@@ -6298,17 +6142,11 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n, ae_sta
    ae_int_t i;
    double u1;
    double u2;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
+   NewObj(hqrndstate, state, _state);
 
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (n == 1) {
@@ -6376,17 +6214,11 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n, ae_stat
    ae_int_t j;
    double u1;
    double u2;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
+   NewObj(hqrndstate, state, _state);
 
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (m == 1) {
@@ -6452,17 +6284,11 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n, ae_sta
    ae_complex tau;
    ae_int_t s;
    ae_int_t i;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&v, 0, DT_COMPLEX, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_COMPLEX, _state);
+   NewVector(v, 0, DT_COMPLEX, _state);
+   NewObj(hqrndstate, state, _state);
 
    ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (n == 1) {
@@ -6525,17 +6351,11 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n, ae_stat
    ae_int_t s;
    ae_int_t i;
    ae_int_t j;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&v, 0, DT_COMPLEX, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_COMPLEX, _state);
+   NewVector(v, 0, DT_COMPLEX, _state);
+   NewObj(hqrndstate, state, _state);
 
    ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (m == 1) {
@@ -6599,17 +6419,11 @@ void smatrixrndmultiply(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    double u1;
    double u2;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
+   NewObj(hqrndstate, state, _state);
 
 // General case.
    ae_vector_set_length(&w, n, _state);
@@ -6670,17 +6484,11 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_complex lambdav;
    ae_int_t s;
    ae_int_t i;
-   ae_vector w;
-   ae_vector v;
-   hqrndstate state;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&w, 0, sizeof(w));
-   memset(&v, 0, sizeof(v));
-   memset(&state, 0, sizeof(state));
-   ae_vector_init(&w, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&v, 0, DT_COMPLEX, _state, true);
-   hqrndstate_init(&state, _state, true);
+   NewVector(w, 0, DT_COMPLEX, _state);
+   NewVector(v, 0, DT_COMPLEX, _state);
+   NewObj(hqrndstate, state, _state);
 
 // General case.
    ae_vector_set_length(&w, n, _state);
@@ -6924,7 +6732,7 @@ static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize, ae_state *
 // API: void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s, const xparams _xparams = xdefault);
 void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state *_state) {
 
-   sparsematrix_free(s, true);
+   SetObj(sparsematrix, s);
 
    sparsecreatebuf(m, n, k, s, _state);
 }
@@ -7018,7 +6826,7 @@ void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_sta
 void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
 
-   sparsematrix_free(s, true);
+   SetObj(sparsematrix, s);
 
    ae_assert(m > 0, "SparseCreateCRS: M <= 0", _state);
    ae_assert(n > 0, "SparseCreateCRS: N <= 0", _state);
@@ -7114,7 +6922,7 @@ void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, a
 void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
 
-   sparsematrix_free(s, true);
+   SetObj(sparsematrix, s);
 
    ae_assert(m > 0, "SparseCreateSKS: M <= 0", _state);
    ae_assert(n > 0, "SparseCreateSKS: N <= 0", _state);
@@ -7236,7 +7044,7 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
 // API: void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s, const xparams _xparams = xdefault);
 void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s, ae_state *_state) {
 
-   sparsematrix_free(s, true);
+   SetObj(sparsematrix, s);
 
    ae_assert(m > 0, "SparseCreateSKSBand: M <= 0", _state);
    ae_assert(n > 0, "SparseCreateSKSBand: N <= 0", _state);
@@ -7322,7 +7130,7 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
 // API: void sparsecopy(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopy(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
-   sparsematrix_free(s1, true);
+   SetObj(sparsematrix, s1);
 
    sparsecopybuf(s0, s1, _state);
 }
@@ -9648,7 +9456,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 // API: void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b, const xparams _xparams = xdefault);
 void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b, ae_state *_state) {
 
-   sparsematrix_free(b, true);
+   SetObj(sparsematrix, b);
 
    sparsesymmpermtblbuf(a, isupper, p, b, _state);
 }
@@ -9816,14 +9624,10 @@ void sparseresizematrix(sparsematrix *s, ae_state *_state) {
    ae_int_t k;
    ae_int_t k1;
    ae_int_t i;
-   ae_vector tvals;
-   ae_vector tidx;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tvals, 0, sizeof(tvals));
-   memset(&tidx, 0, sizeof(tidx));
-   ae_vector_init(&tvals, 0, DT_REAL, _state, true);
-   ae_vector_init(&tidx, 0, DT_INT, _state, true);
+   NewVector(tvals, 0, DT_REAL, _state);
+   NewVector(tidx, 0, DT_INT, _state);
 
    ae_assert(s->matrixtype == 0, "SparseResizeMatrix: incorrect matrix type", _state);
 
@@ -10496,9 +10300,6 @@ void sparsetransposesks(sparsematrix *s, ae_state *_state) {
 // API: void sparsetransposecrs(const sparsematrix &s, const xparams _xparams = xdefault);
 void sparsetransposecrs(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector oldvals;
-   ae_vector oldidx;
-   ae_vector oldridx;
    ae_int_t oldn;
    ae_int_t oldm;
    ae_int_t newn;
@@ -10507,17 +10308,12 @@ void sparsetransposecrs(sparsematrix *s, ae_state *_state) {
    ae_int_t j;
    ae_int_t k;
    ae_int_t nonne;
-   ae_vector counts;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&oldvals, 0, sizeof(oldvals));
-   memset(&oldidx, 0, sizeof(oldidx));
-   memset(&oldridx, 0, sizeof(oldridx));
-   memset(&counts, 0, sizeof(counts));
-   ae_vector_init(&oldvals, 0, DT_REAL, _state, true);
-   ae_vector_init(&oldidx, 0, DT_INT, _state, true);
-   ae_vector_init(&oldridx, 0, DT_INT, _state, true);
-   ae_vector_init(&counts, 0, DT_INT, _state, true);
+   NewVector(oldvals, 0, DT_REAL, _state);
+   NewVector(oldidx, 0, DT_INT, _state);
+   NewVector(oldridx, 0, DT_INT, _state);
+   NewVector(counts, 0, DT_INT, _state);
 
    ae_assert(s->matrixtype == 1, "SparseTransposeCRS: only CRS matrices are supported", _state);
    ae_swap_vectors(&s->vals, &oldvals);
@@ -10588,7 +10384,7 @@ void sparsetransposecrs(sparsematrix *s, ae_state *_state) {
 // API: void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
-   sparsematrix_free(s1, true);
+   SetObj(sparsematrix, s1);
 
    sparsecopytransposecrsbuf(s0, s1, _state);
 }
@@ -10761,11 +10557,6 @@ void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1, ae_state 
 // API: void sparseconverttohash(const sparsematrix &s, const xparams _xparams = xdefault);
 void sparseconverttohash(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tidx;
-   ae_vector tridx;
-   ae_vector tdidx;
-   ae_vector tuidx;
-   ae_vector tvals;
    ae_int_t n;
    ae_int_t m;
    ae_int_t offs0;
@@ -10774,16 +10565,11 @@ void sparseconverttohash(sparsematrix *s, ae_state *_state) {
    ae_int_t k;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tidx, 0, sizeof(tidx));
-   memset(&tridx, 0, sizeof(tridx));
-   memset(&tdidx, 0, sizeof(tdidx));
-   memset(&tuidx, 0, sizeof(tuidx));
-   memset(&tvals, 0, sizeof(tvals));
-   ae_vector_init(&tidx, 0, DT_INT, _state, true);
-   ae_vector_init(&tridx, 0, DT_INT, _state, true);
-   ae_vector_init(&tdidx, 0, DT_INT, _state, true);
-   ae_vector_init(&tuidx, 0, DT_INT, _state, true);
-   ae_vector_init(&tvals, 0, DT_REAL, _state, true);
+   NewVector(tidx, 0, DT_INT, _state);
+   NewVector(tridx, 0, DT_INT, _state);
+   NewVector(tdidx, 0, DT_INT, _state);
+   NewVector(tuidx, 0, DT_INT, _state);
+   NewVector(tvals, 0, DT_REAL, _state);
 
    ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseConvertToHash: invalid matrix type", _state);
    if (s->matrixtype == 0) {
@@ -10864,7 +10650,7 @@ void sparseconverttohash(sparsematrix *s, ae_state *_state) {
 // API: void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopytohash(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
-   sparsematrix_free(s1, true);
+   SetObj(sparsematrix, s1);
 
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToHash: invalid matrix type", _state);
    sparsecopytohashbuf(s0, s1, _state);
@@ -10947,24 +10733,16 @@ void sparseconverttocrs(sparsematrix *s, ae_state *_state) {
    ae_int_t m;
    ae_int_t i;
    ae_int_t j;
-   ae_vector tvals;
-   ae_vector tidx;
-   ae_vector temp;
-   ae_vector tridx;
    ae_int_t nonne;
    ae_int_t k;
    ae_int_t offs0;
    ae_int_t offs1;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tvals, 0, sizeof(tvals));
-   memset(&tidx, 0, sizeof(tidx));
-   memset(&temp, 0, sizeof(temp));
-   memset(&tridx, 0, sizeof(tridx));
-   ae_vector_init(&tvals, 0, DT_REAL, _state, true);
-   ae_vector_init(&tidx, 0, DT_INT, _state, true);
-   ae_vector_init(&temp, 0, DT_INT, _state, true);
-   ae_vector_init(&tridx, 0, DT_INT, _state, true);
+   NewVector(tvals, 0, DT_REAL, _state);
+   NewVector(tidx, 0, DT_INT, _state);
+   NewVector(temp, 0, DT_INT, _state);
+   NewVector(tridx, 0, DT_INT, _state);
 
    m = s->m;
    if (s->matrixtype == 0) {
@@ -11125,7 +10903,7 @@ void sparseconverttocrs(sparsematrix *s, ae_state *_state) {
 // API: void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
-   sparsematrix_free(s1, true);
+   SetObj(sparsematrix, s1);
 
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToCRS: invalid matrix type", _state);
    sparsecopytocrsbuf(s0, s1, _state);
@@ -11148,7 +10926,6 @@ void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 // API: void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector temp;
    ae_int_t nonne;
    ae_int_t i;
    ae_int_t j;
@@ -11158,8 +10935,7 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    ae_int_t m;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&temp, 0, sizeof(temp));
-   ae_vector_init(&temp, 0, DT_INT, _state, true);
+   NewVector(temp, 0, DT_INT, _state);
 
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToCRSBuf: invalid matrix type", _state);
    m = s0->m;
@@ -11317,10 +11093,6 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 // API: void sparseconverttosks(const sparsematrix &s, const xparams _xparams = xdefault);
 void sparseconverttosks(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tridx;
-   ae_vector tdidx;
-   ae_vector tuidx;
-   ae_vector tvals;
    ae_int_t n;
    ae_int_t t0;
    ae_int_t t1;
@@ -11330,14 +11102,10 @@ void sparseconverttosks(sparsematrix *s, ae_state *_state) {
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tridx, 0, sizeof(tridx));
-   memset(&tdidx, 0, sizeof(tdidx));
-   memset(&tuidx, 0, sizeof(tuidx));
-   memset(&tvals, 0, sizeof(tvals));
-   ae_vector_init(&tridx, 0, DT_INT, _state, true);
-   ae_vector_init(&tdidx, 0, DT_INT, _state, true);
-   ae_vector_init(&tuidx, 0, DT_INT, _state, true);
-   ae_vector_init(&tvals, 0, DT_REAL, _state, true);
+   NewVector(tridx, 0, DT_INT, _state);
+   NewVector(tdidx, 0, DT_INT, _state);
+   NewVector(tuidx, 0, DT_INT, _state);
+   NewVector(tvals, 0, DT_REAL, _state);
 
    ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseConvertToSKS: invalid matrix type", _state);
    ae_assert(s->m == s->n, "SparseConvertToSKS: rectangular matrices are not supported", _state);
@@ -11419,7 +11187,7 @@ void sparseconverttosks(sparsematrix *s, ae_state *_state) {
 // API: void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = xdefault);
 void sparsecopytosks(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
-   sparsematrix_free(s1, true);
+   SetObj(sparsematrix, s1);
 
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToSKS: invalid matrix type", _state);
    sparsecopytosksbuf(s0, s1, _state);
@@ -11667,7 +11435,7 @@ bool sparseissks(sparsematrix *s, ae_state *_state) {
 // API: void sparsefree(sparsematrix &s, const xparams _xparams = xdefault);
 void sparsefree(sparsematrix *s, ae_state *_state) {
 
-   sparsematrix_free(s, true);
+   SetObj(sparsematrix, s);
 
    s->matrixtype = -1;
    s->m = 0;
@@ -11973,7 +11741,7 @@ void sparseunserialize(ae_serializer *s, sparsematrix *a, ae_state *_state) {
    ae_int_t k;
    double v;
 
-   sparsematrix_free(a, true);
+   SetObj(sparsematrix, a);
 
 // Check stream header: scode, matrix type, version type
    ae_serializer_unserialize_int(s, &k, _state);
@@ -12029,12 +11797,10 @@ void sparseunserialize(ae_serializer *s, sparsematrix *a, ae_state *_state) {
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize, ae_state *_state) {
    ae_frame _frame_block;
-   hqrndstate r;
    ae_int_t result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&r, 0, sizeof(r));
-   hqrndstate_init(&r, _state, true);
+   NewObj(hqrndstate, r, _state);
 
    hqrndseed(i, j, &r, _state);
    result = hqrnduniformi(&r, tabsize, _state);
@@ -12150,12 +11916,11 @@ DefClass(sparsematrix, )
 DefClass(sparsebuffers, )
 
 void sparseserialize(sparsematrix &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_int_t ssize;
 
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
    ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
@@ -12168,11 +11933,9 @@ void sparseserialize(sparsematrix &obj, std::string &s_out) {
    alglib_impl::ae_state_clear(&state);
 }
 void sparseserialize(sparsematrix &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::sparsealloc(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -12183,22 +11946,18 @@ void sparseserialize(sparsematrix &obj, std::ostream &s_out) {
 }
 
 void sparseunserialize(const std::string &s_in, sparsematrix &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
    alglib_impl::ae_state_clear(&state);
 }
 void sparseunserialize(const std::istream &s_in, sparsematrix &obj) {
-   alglib_impl::ae_serializer serializer;
-
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
    TryCatch(state, )
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::sparseunserialize(&serializer, obj.c_ptr(), &state);
    alglib_impl::ae_serializer_stop(&serializer, &state);
@@ -12786,23 +12545,15 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix h1;
-   ae_matrix z1;
-   ae_vector wr1;
-   ae_vector wi1;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&h1, 0, sizeof(h1));
-   memset(&z1, 0, sizeof(z1));
-   memset(&wr1, 0, sizeof(wr1));
-   memset(&wi1, 0, sizeof(wi1));
-   ae_vector_free(wr, true);
-   ae_vector_free(wi, true);
+   SetVector(wr);
+   SetVector(wi);
    *info = 0;
-   ae_matrix_init(&h1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z1, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&wr1, 0, DT_REAL, _state, true);
-   ae_vector_init(&wi1, 0, DT_REAL, _state, true);
+   NewMatrix(h1, 0, 0, DT_REAL, _state);
+   NewMatrix(z1, 0, 0, DT_REAL, _state);
+   NewVector(wr1, 0, DT_REAL, _state);
+   NewVector(wi1, 0, DT_REAL, _state);
 
 // Allocate space
    ae_vector_set_length(wr, n, _state);
@@ -12896,17 +12647,13 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
 // Algorithm implemented on the basis of subroutine DHSEQR (LAPACK 3.0 library).
 bool upperhessenbergschurdecomposition(RMatrix *h, ae_int_t n, RMatrix *s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector wi;
-   ae_vector wr;
    ae_int_t info;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&wi, 0, sizeof(wi));
-   memset(&wr, 0, sizeof(wr));
-   ae_matrix_free(s, true);
-   ae_vector_init(&wi, 0, DT_REAL, _state, true);
-   ae_vector_init(&wr, 0, DT_REAL, _state, true);
+   SetMatrix(s);
+   NewVector(wi, 0, DT_REAL, _state);
+   NewVector(wr, 0, DT_REAL, _state);
 
    internalschurdecomposition(h, n, 1, 2, &wr, &wi, s, &info, _state);
    result = info == 0;
@@ -12916,7 +12663,6 @@ bool upperhessenbergschurdecomposition(RMatrix *h, ae_int_t n, RMatrix *s, ae_st
 
 void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
    ae_int_t i;
    ae_int_t i1;
    ae_int_t i2;
@@ -12939,14 +12685,6 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
    double tst1;
    double ulp;
    double unfl;
-   ae_matrix s;
-   ae_vector v;
-   ae_vector vv;
-   ae_vector workc1;
-   ae_vector works1;
-   ae_vector workv3;
-   ae_vector tmpwr;
-   ae_vector tmpwi;
    bool initz;
    bool wantt;
    bool wantz;
@@ -12957,27 +12695,18 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
    double vt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&s, 0, sizeof(s));
-   memset(&v, 0, sizeof(v));
-   memset(&vv, 0, sizeof(vv));
-   memset(&workc1, 0, sizeof(workc1));
-   memset(&works1, 0, sizeof(works1));
-   memset(&workv3, 0, sizeof(workv3));
-   memset(&tmpwr, 0, sizeof(tmpwr));
-   memset(&tmpwi, 0, sizeof(tmpwi));
-   ae_vector_free(wr, true);
-   ae_vector_free(wi, true);
+   SetVector(wr);
+   SetVector(wi);
    *info = 0;
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_matrix_init(&s, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&v, 0, DT_REAL, _state, true);
-   ae_vector_init(&vv, 0, DT_REAL, _state, true);
-   ae_vector_init(&workc1, 0, DT_REAL, _state, true);
-   ae_vector_init(&works1, 0, DT_REAL, _state, true);
-   ae_vector_init(&workv3, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpwr, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpwi, 0, DT_REAL, _state, true);
+   NewVector(work, 0, DT_REAL, _state);
+   NewMatrix(s, 0, 0, DT_REAL, _state);
+   NewVector(v, 0, DT_REAL, _state);
+   NewVector(vv, 0, DT_REAL, _state);
+   NewVector(workc1, 0, DT_REAL, _state);
+   NewVector(works1, 0, DT_REAL, _state);
+   NewVector(workv3, 0, DT_REAL, _state);
+   NewVector(tmpwr, 0, DT_REAL, _state);
+   NewVector(tmpwi, 0, DT_REAL, _state);
 
 // Set the order of the multi-shift QR algorithm to be used.
 // If you want to tune algorithm, change this values
@@ -13941,7 +13670,7 @@ static void evd_internalhsevdladiv(double a, double b, double c, double d, doubl
 // API: void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams = xdefault);
 void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state *_state) {
 
-   eigsubspacestate_free(state, true);
+   SetObj(eigsubspacestate, state);
 
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0", _state);
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0", _state);
@@ -14246,9 +13975,9 @@ void eigsubspaceoocstop(eigsubspacestate *state, RVector *w, RMatrix *z, eigsubs
    ae_int_t i;
    ae_int_t j;
 
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   eigsubspacereport_free(rep, true);
+   SetVector(w);
+   SetMatrix(z);
+   SetObj(eigsubspacereport, rep);
 
    ae_assert(!state->running, "EigSubspaceStop: solver is still running", _state);
    n = state->n;
@@ -14297,14 +14026,12 @@ void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, R
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_matrix acopy;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&acopy, 0, sizeof(acopy));
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   eigsubspacereport_free(rep, true);
-   ae_matrix_init(&acopy, 0, 0, DT_REAL, _state, true);
+   SetVector(w);
+   SetMatrix(z);
+   SetObj(eigsubspacereport, rep);
+   NewMatrix(acopy, 0, 0, DT_REAL, _state);
 
    ae_assert(!state->running, "EigSubspaceSolveDenseS: solver is still running", _state);
    n = state->n;
@@ -14376,9 +14103,9 @@ void eigsubspacesolvesparses(eigsubspacestate *state, sparsematrix *a, bool isup
    ae_int_t j;
    ae_int_t k;
 
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   eigsubspacereport_free(rep, true);
+   SetVector(w);
+   SetMatrix(z);
+   SetObj(eigsubspacereport, rep);
 
    ae_assert(!state->running, "EigSubspaceSolveSparseS: solver is still running", _state);
    n = state->n;
@@ -14648,21 +14375,14 @@ lbl_rcomm:
 // API: bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z, const xparams _xparams = xdefault);
 bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector tau;
-   ae_vector e;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(d, true);
-   ae_matrix_free(z, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(d);
+   SetMatrix(z);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixEVD: incorrect ZNeeded", _state);
    smatrixtd(a, n, isupper, &tau, d, &e, _state);
@@ -14713,22 +14433,15 @@ bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 // API: bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z, const xparams _xparams = xdefault);
 bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector tau;
-   ae_vector e;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *m = 0;
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   SetVector(w);
+   SetMatrix(z);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixTDEVDR: incorrect ZNeeded", _state);
    smatrixtd(a, n, isupper, &tau, w, &e, _state);
@@ -14776,21 +14489,14 @@ bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 // API: bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z, const xparams _xparams = xdefault);
 bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector tau;
-   ae_vector e;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(w);
+   SetMatrix(z);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "SMatrixEVDI: incorrect ZNeeded", _state);
    smatrixtd(a, n, isupper, &tau, w, &e, _state);
@@ -14838,32 +14544,19 @@ bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // API: bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z, const xparams _xparams = xdefault);
 bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector tau;
-   ae_vector e;
-   ae_matrix t;
-   ae_matrix qz;
-   ae_matrix q;
    ae_int_t i;
    ae_int_t j;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   memset(&t, 0, sizeof(t));
-   memset(&qz, 0, sizeof(qz));
-   memset(&q, 0, sizeof(q));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(d, true);
-   ae_matrix_free(z, true);
-   ae_vector_init(&tau, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_matrix_init(&t, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&qz, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&q, 0, 0, DT_COMPLEX, _state, true);
+   DupMatrix(a, _state);
+   SetVector(d);
+   SetMatrix(z);
+   NewVector(tau, 0, DT_COMPLEX, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewMatrix(t, 0, 0, DT_REAL, _state);
+   NewMatrix(qz, 0, 0, DT_REAL, _state);
+   NewMatrix(q, 0, 0, DT_COMPLEX, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEVD: incorrect ZNeeded", _state);
 
@@ -14956,34 +14649,21 @@ bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 // API: bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z, const xparams _xparams = xdefault);
 bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_matrix q;
-   ae_matrix t;
-   ae_vector tau;
-   ae_vector e;
-   ae_vector work;
    ae_int_t i;
    ae_int_t k;
    double v;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&q, 0, sizeof(q));
-   memset(&t, 0, sizeof(t));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
    *m = 0;
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   ae_matrix_init(&q, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&t, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   SetVector(w);
+   SetMatrix(z);
+   NewMatrix(q, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(t, 0, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_COMPLEX, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEigenValuesAndVectorsInInterval: incorrect ZNeeded", _state);
 
@@ -15074,12 +14754,6 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 // API: bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z, const xparams _xparams = xdefault);
 bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_matrix q;
-   ae_matrix t;
-   ae_vector tau;
-   ae_vector e;
-   ae_vector work;
    ae_int_t i;
    ae_int_t k;
    double v;
@@ -15087,21 +14761,14 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&q, 0, sizeof(q));
-   memset(&t, 0, sizeof(t));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   memset(&work, 0, sizeof(work));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(w, true);
-   ae_matrix_free(z, true);
-   ae_matrix_init(&q, 0, 0, DT_COMPLEX, _state, true);
-   ae_matrix_init(&t, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(w);
+   SetMatrix(z);
+   NewMatrix(q, 0, 0, DT_COMPLEX, _state);
+   NewMatrix(t, 0, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_COMPLEX, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
 
    ae_assert(zneeded == 0 || zneeded == 1, "HermitianEigenValuesAndVectorsByIndexes: incorrect ZNeeded", _state);
 
@@ -15201,27 +14868,16 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // API: bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z, const xparams _xparams = xdefault);
 bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
-   ae_vector d1;
-   ae_vector e1;
-   ae_vector ex;
-   ae_matrix z1;
    ae_int_t i;
    ae_int_t j;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   memset(&d1, 0, sizeof(d1));
-   memset(&e1, 0, sizeof(e1));
-   memset(&ex, 0, sizeof(ex));
-   memset(&z1, 0, sizeof(z1));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_init(&d1, 0, DT_REAL, _state, true);
-   ae_vector_init(&e1, 0, DT_REAL, _state, true);
-   ae_vector_init(&ex, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z1, 0, 0, DT_REAL, _state, true);
+   DupVector(e, _state);
+   NewVector(d1, 0, DT_REAL, _state);
+   NewVector(e1, 0, DT_REAL, _state);
+   NewVector(ex, 0, DT_REAL, _state);
+   NewMatrix(z1, 0, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "SMatrixTDEVD: N <= 0", _state);
    ae_assert(zneeded >= 0 && zneeded <= 3, "SMatrixTDEVD: incorrect ZNeeded", _state);
@@ -15362,35 +15018,19 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
    ae_int_t j;
    ae_int_t k;
    ae_int_t cr;
-   ae_vector iblock;
-   ae_vector isplit;
-   ae_vector ifail;
-   ae_vector d1;
-   ae_vector e1;
-   ae_vector w;
-   ae_matrix z2;
-   ae_matrix z3;
    double v;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&iblock, 0, sizeof(iblock));
-   memset(&isplit, 0, sizeof(isplit));
-   memset(&ifail, 0, sizeof(ifail));
-   memset(&d1, 0, sizeof(d1));
-   memset(&e1, 0, sizeof(e1));
-   memset(&w, 0, sizeof(w));
-   memset(&z2, 0, sizeof(z2));
-   memset(&z3, 0, sizeof(z3));
    *m = 0;
-   ae_vector_init(&iblock, 0, DT_INT, _state, true);
-   ae_vector_init(&isplit, 0, DT_INT, _state, true);
-   ae_vector_init(&ifail, 0, DT_INT, _state, true);
-   ae_vector_init(&d1, 0, DT_REAL, _state, true);
-   ae_vector_init(&e1, 0, DT_REAL, _state, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z2, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z3, 0, 0, DT_REAL, _state, true);
+   NewVector(iblock, 0, DT_INT, _state);
+   NewVector(isplit, 0, DT_INT, _state);
+   NewVector(ifail, 0, DT_INT, _state);
+   NewVector(d1, 0, DT_REAL, _state);
+   NewVector(e1, 0, DT_REAL, _state);
+   NewVector(w, 0, DT_REAL, _state);
+   NewMatrix(z2, 0, 0, DT_REAL, _state);
+   NewMatrix(z3, 0, 0, DT_REAL, _state);
 
    ae_assert(zneeded >= 0 && zneeded <= 2, "SMatrixTDEVDR: incorrect ZNeeded!", _state);
 
@@ -15597,34 +15237,18 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
    ae_int_t k;
    ae_int_t m;
    ae_int_t cr;
-   ae_vector iblock;
-   ae_vector isplit;
-   ae_vector ifail;
-   ae_vector w;
-   ae_vector d1;
-   ae_vector e1;
-   ae_matrix z2;
-   ae_matrix z3;
    double v;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&iblock, 0, sizeof(iblock));
-   memset(&isplit, 0, sizeof(isplit));
-   memset(&ifail, 0, sizeof(ifail));
-   memset(&w, 0, sizeof(w));
-   memset(&d1, 0, sizeof(d1));
-   memset(&e1, 0, sizeof(e1));
-   memset(&z2, 0, sizeof(z2));
-   memset(&z3, 0, sizeof(z3));
-   ae_vector_init(&iblock, 0, DT_INT, _state, true);
-   ae_vector_init(&isplit, 0, DT_INT, _state, true);
-   ae_vector_init(&ifail, 0, DT_INT, _state, true);
-   ae_vector_init(&w, 0, DT_REAL, _state, true);
-   ae_vector_init(&d1, 0, DT_REAL, _state, true);
-   ae_vector_init(&e1, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z2, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&z3, 0, 0, DT_REAL, _state, true);
+   NewVector(iblock, 0, DT_INT, _state);
+   NewVector(isplit, 0, DT_INT, _state);
+   NewVector(ifail, 0, DT_INT, _state);
+   NewVector(w, 0, DT_REAL, _state);
+   NewVector(d1, 0, DT_REAL, _state);
+   NewVector(e1, 0, DT_REAL, _state);
+   NewMatrix(z2, 0, 0, DT_REAL, _state);
+   NewMatrix(z3, 0, 0, DT_REAL, _state);
 
    ae_assert((0 <= i1 && i1 <= i2) && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!", _state);
 
@@ -15841,50 +15465,27 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
 // API: bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr, const xparams _xparams = xdefault);
 bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_matrix a1;
-   ae_matrix vl1;
-   ae_matrix vr1;
-   ae_matrix s1;
-   ae_matrix s;
-   ae_matrix dummy;
-   ae_vector wr1;
-   ae_vector wi1;
-   ae_vector tau;
    ae_int_t i;
    ae_int_t info;
-   ae_vector sel1;
    ae_int_t m1;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&a1, 0, sizeof(a1));
-   memset(&vl1, 0, sizeof(vl1));
-   memset(&vr1, 0, sizeof(vr1));
-   memset(&s1, 0, sizeof(s1));
-   memset(&s, 0, sizeof(s));
-   memset(&dummy, 0, sizeof(dummy));
-   memset(&wr1, 0, sizeof(wr1));
-   memset(&wi1, 0, sizeof(wi1));
-   memset(&tau, 0, sizeof(tau));
-   memset(&sel1, 0, sizeof(sel1));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(wr, true);
-   ae_vector_free(wi, true);
-   ae_matrix_free(vl, true);
-   ae_matrix_free(vr, true);
-   ae_matrix_init(&a1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vl1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vr1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&s1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&s, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&dummy, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&wr1, 0, DT_REAL, _state, true);
-   ae_vector_init(&wi1, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&sel1, 0, DT_BOOL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(wr);
+   SetVector(wi);
+   SetMatrix(vl);
+   SetMatrix(vr);
+   NewMatrix(a1, 0, 0, DT_REAL, _state);
+   NewMatrix(vl1, 0, 0, DT_REAL, _state);
+   NewMatrix(vr1, 0, 0, DT_REAL, _state);
+   NewMatrix(s1, 0, 0, DT_REAL, _state);
+   NewMatrix(s, 0, 0, DT_REAL, _state);
+   NewMatrix(dummy, 0, 0, DT_REAL, _state);
+   NewVector(wr1, 0, DT_REAL, _state);
+   NewVector(wi1, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(sel1, 0, DT_BOOL, _state);
 
    ae_assert(vneeded >= 0 && vneeded <= 3, "RMatrixEVD: incorrect VNeeded!", _state);
    if (vneeded == 0) {
@@ -15932,7 +15533,6 @@ static void evd_clearrfields(eigsubspacestate *state, ae_state *_state) {
 
 static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
    ae_int_t maxit;
    ae_int_t i;
    ae_int_t ii;
@@ -15972,30 +15572,18 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
    double ssfmin;
    double tst;
    double tmp;
-   ae_vector work1;
-   ae_vector work2;
-   ae_vector workc;
-   ae_vector works;
-   ae_vector wtemp;
    bool gotoflag;
    ae_int_t zrows;
    bool wastranspose;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   memset(&work1, 0, sizeof(work1));
-   memset(&work2, 0, sizeof(work2));
-   memset(&workc, 0, sizeof(workc));
-   memset(&works, 0, sizeof(works));
-   memset(&wtemp, 0, sizeof(wtemp));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_init(&work1, 0, DT_REAL, _state, true);
-   ae_vector_init(&work2, 0, DT_REAL, _state, true);
-   ae_vector_init(&workc, 0, DT_REAL, _state, true);
-   ae_vector_init(&works, 0, DT_REAL, _state, true);
-   ae_vector_init(&wtemp, 0, DT_REAL, _state, true);
+   DupVector(e, _state);
+   NewVector(work1, 0, DT_REAL, _state);
+   NewVector(work2, 0, DT_REAL, _state);
+   NewVector(workc, 0, DT_REAL, _state);
+   NewVector(works, 0, DT_REAL, _state);
+   NewVector(wtemp, 0, DT_REAL, _state);
 
    ae_assert(zneeded >= 0 && zneeded <= 3, "TridiagonalEVD: Incorrent ZNeeded", _state);
 
@@ -16717,8 +16305,6 @@ static double evd_tdevdextsign(double a, double b, ae_state *_state) {
 
 static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n, ae_int_t irange, ae_int_t iorder, double vl, double vu, ae_int_t il, ae_int_t iu, double abstol, RVector *w, ae_int_t *m, ae_int_t *nsplit, ZVector *iblock, ZVector *isplit, ae_int_t *errorcode, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _d;
-   ae_vector _e;
    double fudge;
    double relfac;
    bool ncnvrg;
@@ -16762,67 +16348,33 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    double wul;
    double scalefactor;
    double t;
-   ae_vector idumma;
-   ae_vector work;
-   ae_vector iwork;
-   ae_vector ia1s2;
-   ae_vector ra1s2;
-   ae_matrix ra1s2x2;
-   ae_matrix ia1s2x2;
-   ae_vector ra1siin;
-   ae_vector ra2siin;
-   ae_vector ra3siin;
-   ae_vector ra4siin;
-   ae_matrix ra1siinx2;
-   ae_matrix ia1siinx2;
-   ae_vector iworkspace;
-   ae_vector rworkspace;
    ae_int_t tmpi;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_d, 0, sizeof(_d));
-   memset(&_e, 0, sizeof(_e));
-   memset(&idumma, 0, sizeof(idumma));
-   memset(&work, 0, sizeof(work));
-   memset(&iwork, 0, sizeof(iwork));
-   memset(&ia1s2, 0, sizeof(ia1s2));
-   memset(&ra1s2, 0, sizeof(ra1s2));
-   memset(&ra1s2x2, 0, sizeof(ra1s2x2));
-   memset(&ia1s2x2, 0, sizeof(ia1s2x2));
-   memset(&ra1siin, 0, sizeof(ra1siin));
-   memset(&ra2siin, 0, sizeof(ra2siin));
-   memset(&ra3siin, 0, sizeof(ra3siin));
-   memset(&ra4siin, 0, sizeof(ra4siin));
-   memset(&ra1siinx2, 0, sizeof(ra1siinx2));
-   memset(&ia1siinx2, 0, sizeof(ia1siinx2));
-   memset(&iworkspace, 0, sizeof(iworkspace));
-   memset(&rworkspace, 0, sizeof(rworkspace));
-   ae_vector_copy(&_d, d, _state, true);
-   d = &_d;
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_free(w, true);
+   DupVector(d, _state);
+   DupVector(e, _state);
+   SetVector(w);
    *m = 0;
    *nsplit = 0;
-   ae_vector_free(iblock, true);
-   ae_vector_free(isplit, true);
+   SetVector(iblock);
+   SetVector(isplit);
    *errorcode = 0;
-   ae_vector_init(&idumma, 0, DT_INT, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&iwork, 0, DT_INT, _state, true);
-   ae_vector_init(&ia1s2, 0, DT_INT, _state, true);
-   ae_vector_init(&ra1s2, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ra1s2x2, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ia1s2x2, 0, 0, DT_INT, _state, true);
-   ae_vector_init(&ra1siin, 0, DT_REAL, _state, true);
-   ae_vector_init(&ra2siin, 0, DT_REAL, _state, true);
-   ae_vector_init(&ra3siin, 0, DT_REAL, _state, true);
-   ae_vector_init(&ra4siin, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ra1siinx2, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ia1siinx2, 0, 0, DT_INT, _state, true);
-   ae_vector_init(&iworkspace, 0, DT_INT, _state, true);
-   ae_vector_init(&rworkspace, 0, DT_REAL, _state, true);
+   NewVector(idumma, 0, DT_INT, _state);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(iwork, 0, DT_INT, _state);
+   NewVector(ia1s2, 0, DT_INT, _state);
+   NewVector(ra1s2, 0, DT_REAL, _state);
+   NewMatrix(ra1s2x2, 0, 0, DT_REAL, _state);
+   NewMatrix(ia1s2x2, 0, 0, DT_INT, _state);
+   NewVector(ra1siin, 0, DT_REAL, _state);
+   NewVector(ra2siin, 0, DT_REAL, _state);
+   NewVector(ra3siin, 0, DT_REAL, _state);
+   NewVector(ra4siin, 0, DT_REAL, _state);
+   NewMatrix(ra1siinx2, 0, 0, DT_REAL, _state);
+   NewMatrix(ia1siinx2, 0, 0, DT_INT, _state);
+   NewVector(iworkspace, 0, DT_INT, _state);
+   NewVector(rworkspace, 0, DT_REAL, _state);
 
 // Quick return if possible
    *m = 0;
@@ -17335,8 +16887,6 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
 
 static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, RVector *w, ZVector *iblock, ZVector *isplit, RMatrix *z, ZVector *ifail, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
-   ae_vector _w;
    ae_int_t maxits;
    ae_int_t extra;
    ae_int_t b1;
@@ -17365,43 +16915,25 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
    double xj;
    double xjm;
    double ztr;
-   ae_vector work1;
-   ae_vector work2;
-   ae_vector work3;
-   ae_vector work4;
-   ae_vector work5;
-   ae_vector iwork;
    bool tmpcriterion;
    ae_int_t ti;
    ae_int_t i1;
    ae_int_t i2;
    double v;
-   hqrndstate rs;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   memset(&_w, 0, sizeof(_w));
-   memset(&work1, 0, sizeof(work1));
-   memset(&work2, 0, sizeof(work2));
-   memset(&work3, 0, sizeof(work3));
-   memset(&work4, 0, sizeof(work4));
-   memset(&work5, 0, sizeof(work5));
-   memset(&iwork, 0, sizeof(iwork));
-   memset(&rs, 0, sizeof(rs));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_copy(&_w, w, _state, true);
-   w = &_w;
-   ae_matrix_free(z, true);
-   ae_vector_free(ifail, true);
+   DupVector(e, _state);
+   DupVector(w, _state);
+   SetMatrix(z);
+   SetVector(ifail);
    *info = 0;
-   ae_vector_init(&work1, 0, DT_REAL, _state, true);
-   ae_vector_init(&work2, 0, DT_REAL, _state, true);
-   ae_vector_init(&work3, 0, DT_REAL, _state, true);
-   ae_vector_init(&work4, 0, DT_REAL, _state, true);
-   ae_vector_init(&work5, 0, DT_REAL, _state, true);
-   ae_vector_init(&iwork, 0, DT_INT, _state, true);
-   hqrndstate_init(&rs, _state, true);
+   NewVector(work1, 0, DT_REAL, _state);
+   NewVector(work2, 0, DT_REAL, _state);
+   NewVector(work3, 0, DT_REAL, _state);
+   NewVector(work4, 0, DT_REAL, _state);
+   NewVector(work5, 0, DT_REAL, _state);
+   NewVector(iwork, 0, DT_INT, _state);
+   NewObj(hqrndstate, rs, _state);
 
    hqrndseed(346436, 2434, &rs, _state);
    maxits = 5;
@@ -18008,28 +17540,17 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
 //      June 30, 1999
 static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _vselect;
    ae_int_t i;
    ae_int_t j;
-   ae_matrix t1;
-   ae_matrix vl1;
-   ae_matrix vr1;
-   ae_vector vselect1;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_vselect, 0, sizeof(_vselect));
-   memset(&t1, 0, sizeof(t1));
-   memset(&vl1, 0, sizeof(vl1));
-   memset(&vr1, 0, sizeof(vr1));
-   memset(&vselect1, 0, sizeof(vselect1));
-   ae_vector_copy(&_vselect, vselect, _state, true);
-   vselect = &_vselect;
+   DupVector(vselect, _state);
    *m = 0;
    *info = 0;
-   ae_matrix_init(&t1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vl1, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&vr1, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&vselect1, 0, DT_BOOL, _state, true);
+   NewMatrix(t1, 0, 0, DT_REAL, _state);
+   NewMatrix(vl1, 0, 0, DT_REAL, _state);
+   NewMatrix(vr1, 0, 0, DT_REAL, _state);
+   NewVector(vselect1, 0, DT_BOOL, _state);
 
 // Allocate VL/VR, if needed
    if (howmny == 2 || howmny == 3) {
@@ -18102,7 +17623,6 @@ static void evd_rmatrixinternaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_i
 //      June 30, 1999
 static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, BVector *vselect, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _vselect;
    bool allv;
    bool bothv;
    bool leftv;
@@ -18137,61 +17657,31 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
    double wi;
    double wr;
    double xnorm;
-   ae_matrix x;
-   ae_vector work;
-   ae_vector temp;
-   ae_matrix temp11;
-   ae_matrix temp22;
-   ae_matrix temp11b;
-   ae_matrix temp21b;
-   ae_matrix temp12b;
-   ae_matrix temp22b;
    bool skipflag;
    ae_int_t k1;
    ae_int_t k2;
    ae_int_t k3;
    ae_int_t k4;
    double vt;
-   ae_vector rswap4;
-   ae_vector zswap4;
-   ae_matrix ipivot44;
-   ae_vector civ4;
-   ae_vector crv4;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_vselect, 0, sizeof(_vselect));
-   memset(&x, 0, sizeof(x));
-   memset(&work, 0, sizeof(work));
-   memset(&temp, 0, sizeof(temp));
-   memset(&temp11, 0, sizeof(temp11));
-   memset(&temp22, 0, sizeof(temp22));
-   memset(&temp11b, 0, sizeof(temp11b));
-   memset(&temp21b, 0, sizeof(temp21b));
-   memset(&temp12b, 0, sizeof(temp12b));
-   memset(&temp22b, 0, sizeof(temp22b));
-   memset(&rswap4, 0, sizeof(rswap4));
-   memset(&zswap4, 0, sizeof(zswap4));
-   memset(&ipivot44, 0, sizeof(ipivot44));
-   memset(&civ4, 0, sizeof(civ4));
-   memset(&crv4, 0, sizeof(crv4));
-   ae_vector_copy(&_vselect, vselect, _state, true);
-   vselect = &_vselect;
+   DupVector(vselect, _state);
    *m = 0;
    *info = 0;
-   ae_matrix_init(&x, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_vector_init(&temp, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp11, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp22, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp11b, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp21b, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp12b, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&temp22b, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&rswap4, 0, DT_BOOL, _state, true);
-   ae_vector_init(&zswap4, 0, DT_BOOL, _state, true);
-   ae_matrix_init(&ipivot44, 0, 0, DT_INT, _state, true);
-   ae_vector_init(&civ4, 0, DT_REAL, _state, true);
-   ae_vector_init(&crv4, 0, DT_REAL, _state, true);
+   NewMatrix(x, 0, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
+   NewVector(temp, 0, DT_REAL, _state);
+   NewMatrix(temp11, 0, 0, DT_REAL, _state);
+   NewMatrix(temp22, 0, 0, DT_REAL, _state);
+   NewMatrix(temp11b, 0, 0, DT_REAL, _state);
+   NewMatrix(temp21b, 0, 0, DT_REAL, _state);
+   NewMatrix(temp12b, 0, 0, DT_REAL, _state);
+   NewMatrix(temp22b, 0, 0, DT_REAL, _state);
+   NewVector(rswap4, 0, DT_BOOL, _state);
+   NewVector(zswap4, 0, DT_BOOL, _state);
+   NewMatrix(ipivot44, 0, 0, DT_INT, _state);
+   NewVector(civ4, 0, DT_REAL, _state);
+   NewVector(crv4, 0, DT_REAL, _state);
 
    ae_matrix_set_length(&x, 2 + 1, 2 + 1, _state);
    ae_matrix_set_length(&temp11, 1 + 1, 1 + 1, _state);
@@ -22787,7 +22277,7 @@ static void amdordering_vtxinit(sparsematrix *a, ae_int_t n, bool checkexactdegr
    ae_int_t j0;
    ae_int_t j1;
 
-   amdvertexset_free(s, true);
+   SetObj(amdvertexset, s);
 
    s->n = n;
    s->checkexactdegrees = checkexactdegrees;
@@ -24323,17 +23813,11 @@ static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *
    ae_int_t j0;
    ae_int_t j1;
    ae_int_t jj;
-   ae_vector d;
-   ae_vector tmpr;
-   ae_vector tmpperm;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&d, 0, sizeof(d));
-   memset(&tmpr, 0, sizeof(tmpr));
-   memset(&tmpperm, 0, sizeof(tmpperm));
-   ae_vector_init(&d, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpr, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmpperm, 0, DT_INT, _state, true);
+   NewVector(d, 0, DT_REAL, _state);
+   NewVector(tmpr, 0, DT_REAL, _state);
+   NewVector(tmpperm, 0, DT_INT, _state);
 
 // Initialize D by vertex degrees
    rsetallocv(n, (double)(0), &d, _state);
@@ -26606,14 +26090,10 @@ static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   sparsematrix perma;
-   ae_matrix densea;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&perma, 0, sizeof(perma));
-   memset(&densea, 0, sizeof(densea));
-   sparsematrix_init(&perma, _state, true);
-   ae_matrix_init(&densea, 0, 0, DT_REAL, _state, true);
+   NewObj(sparsematrix, perma, _state);
+   NewMatrix(densea, 0, 0, DT_REAL, _state);
 
    sparsesymmpermtblbuf(a, false, fillinperm, &perma, _state);
    ae_matrix_set_length(&densea, n, n, _state);
@@ -26651,12 +26131,10 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
    double ajj;
    double v;
    double r;
-   ae_vector tmp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    ae_vector_set_length(&tmp, 2 * n, _state);
    result = true;
@@ -26922,7 +26400,7 @@ static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bo
 // API: void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = xdefault);
 void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
 
-   ae_vector_free(pivots, true);
+   SetVector(pivots);
 
    ae_assert(m > 0, "RMatrixLU: incorrect M!", _state);
    ae_assert(n > 0, "RMatrixLU: incorrect N!", _state);
@@ -26953,7 +26431,7 @@ void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_s
 // API: void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = xdefault);
 void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
 
-   ae_vector_free(pivots, true);
+   SetVector(pivots);
 
    ae_assert(m > 0, "CMatrixLU: incorrect M!", _state);
    ae_assert(n > 0, "CMatrixLU: incorrect N!", _state);
@@ -26987,12 +26465,10 @@ void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_s
 // API: bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = xdefault);
 bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
    if (n < 1) {
       result = false;
@@ -27031,12 +26507,10 @@ bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 // API: bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = xdefault);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   NewVector(tmp, 0, DT_REAL, _state);
 
    if (n < 1) {
       result = false;
@@ -27083,11 +26557,9 @@ bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 // API: void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, const xparams _xparams = xdefault);
 void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *u, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector bufr;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bufr, 0, sizeof(bufr));
-   ae_vector_init(&bufr, 0, DT_REAL, _state, true);
+   NewVector(bufr, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1: Rows(A)<N", _state);
@@ -27153,11 +26625,9 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
 // API: void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, const xparams _xparams = xdefault);
 void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *fix, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector bufr;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&bufr, 0, sizeof(bufr));
-   ae_vector_init(&bufr, 0, DT_REAL, _state, true);
+   NewVector(bufr, 0, DT_REAL, _state);
 
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateFix: N <= 0", _state);
    ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFix: Rows(A)<N", _state);
@@ -27509,14 +26979,12 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 // API: bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q, const xparams _xparams = xdefault);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q, ae_state *_state) {
    ae_frame _frame_block;
-   sluv2buffer buf2;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf2, 0, sizeof(buf2));
-   ae_vector_free(p, true);
-   ae_vector_free(q, true);
-   sluv2buffer_init(&buf2, _state, true);
+   SetVector(p);
+   SetVector(q);
+   NewObj(sluv2buffer, buf2, _state);
 
    ae_assert((pivottype == 0 || pivottype == 1) || pivottype == 2, "SparseLU: unexpected pivot type", _state);
    ae_assert(sparseiscrs(a, _state), "SparseLU: A is not stored in CRS format", _state);
@@ -27748,20 +27216,14 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper, ae_state *
 // API: bool sparsecholesky(const sparsematrix &a, const bool isupper, const xparams _xparams = xdefault);
 bool sparsecholesky(sparsematrix *a, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   sparsedecompositionanalysis analysis;
    ae_int_t facttype;
    ae_int_t permtype;
-   ae_vector dummyd;
-   ae_vector dummyp;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&analysis, 0, sizeof(analysis));
-   memset(&dummyd, 0, sizeof(dummyd));
-   memset(&dummyp, 0, sizeof(dummyp));
-   sparsedecompositionanalysis_init(&analysis, _state, true);
-   ae_vector_init(&dummyd, 0, DT_REAL, _state, true);
-   ae_vector_init(&dummyp, 0, DT_INT, _state, true);
+   NewObj(sparsedecompositionanalysis, analysis, _state);
+   NewVector(dummyd, 0, DT_REAL, _state);
+   NewVector(dummyp, 0, DT_INT, _state);
 
    ae_assert(sparsegetnrows(a, _state) == sparsegetncols(a, _state), "SparseCholesky: A is not square", _state);
 
@@ -27866,18 +27328,14 @@ bool sparsecholesky(sparsematrix *a, bool isupper, ae_state *_state) {
 // API: bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p, const xparams _xparams = xdefault);
 bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p, ae_state *_state) {
    ae_frame _frame_block;
-   sparsedecompositionanalysis analysis;
-   ae_vector dummyd;
    ae_int_t facttype;
    ae_int_t permtype;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&analysis, 0, sizeof(analysis));
-   memset(&dummyd, 0, sizeof(dummyd));
-   ae_vector_free(p, true);
-   sparsedecompositionanalysis_init(&analysis, _state, true);
-   ae_vector_init(&dummyd, 0, DT_REAL, _state, true);
+   SetVector(p);
+   NewObj(sparsedecompositionanalysis, analysis, _state);
+   NewVector(dummyd, 0, DT_REAL, _state);
 
    ae_assert(sparsegetnrows(a, _state) == sparsegetncols(a, _state), "SparseCholeskyP: A is not square", _state);
 
@@ -27999,7 +27457,7 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p, ae_state *_state
 bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis *analysis, ae_state *_state) {
    bool result;
 
-   sparsedecompositionanalysis_free(analysis, true);
+   SetObj(sparsedecompositionanalysis, analysis);
 
    ae_assert(sparsegetnrows(a, _state) == sparsegetncols(a, _state), "SparseCholeskyAnalyze: A is not square", _state);
    ae_assert(facttype == 0 || facttype == 1, "SparseCholeskyAnalyze: unexpected FactType", _state);
@@ -28139,9 +27597,9 @@ void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t mo
 bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupper, sparsematrix *a, RVector *d, ZVector *p, ae_state *_state) {
    bool result;
 
-   sparsematrix_free(a, true);
-   ae_vector_free(d, true);
-   ae_vector_free(p, true);
+   SetObj(sparsematrix, a);
+   SetVector(d);
+   SetVector(p);
 
    if (needupper) {
       result = spsymmfactorize(&analysis->analysis, _state);
@@ -28237,16 +27695,14 @@ void sparsecholeskyreload(sparsedecompositionanalysis *analysis, sparsematrix *a
 
 void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_free(pivots, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   SetVector(pivots);
+   NewVector(tmp, 0, DT_REAL, _state);
 
 // Internal LU decomposition subroutine.
 // Never call it directly.
@@ -28281,16 +27737,14 @@ void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
 
 void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_free(pivots, true);
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   SetVector(pivots);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
 // Internal LU decomposition subroutine.
 // Never call it directly.
@@ -28325,16 +27779,14 @@ void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
 
 void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    ae_int_t i;
    ae_int_t j;
    double mx;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_free(pivots, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   SetVector(pivots);
+   NewVector(tmp, 0, DT_REAL, _state);
 
 // Internal LU decomposition subroutine.
 // Never call it directly.
@@ -28369,16 +27821,14 @@ void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
 
 void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tmp;
    ae_int_t i;
    ae_int_t j;
    double mx;
    ae_complex v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   ae_vector_free(pivots, true);
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   SetVector(pivots);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
 // Internal LU decomposition subroutine.
 // Never call it directly.
@@ -29016,23 +28466,14 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
 // API: bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt, const xparams _xparams = xdefault);
 bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
    ae_int_t i;
-   ae_vector en;
-   ae_vector d1;
-   ae_vector e1;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   memset(&en, 0, sizeof(en));
-   memset(&d1, 0, sizeof(d1));
-   memset(&e1, 0, sizeof(e1));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_init(&en, 0, DT_REAL, _state, true);
-   ae_vector_init(&d1, 0, DT_REAL, _state, true);
-   ae_vector_init(&e1, 0, DT_REAL, _state, true);
+   DupVector(e, _state);
+   NewVector(en, 0, DT_REAL, _state);
+   NewVector(d1, 0, DT_REAL, _state);
+   NewVector(e1, 0, DT_REAL, _state);
 
    result = false;
 
@@ -29061,13 +28502,10 @@ bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfract
 
 bool bidiagonalsvddecomposition(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
+   DupVector(e, _state);
 
    result = bdsvd_bidiagonalsvddecompositioninternal(d, e, n, isupper, isfractionalaccuracyrequired, u, 1, nru, c, 1, ncc, vt, 1, ncvt, _state);
    ae_frame_leave(_state);
@@ -29077,7 +28515,6 @@ bool bidiagonalsvddecomposition(RVector *d, RVector *e, ae_int_t n, bool isupper
 // Internal working subroutine for bidiagonal decomposition
 static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *uu, ae_int_t ustart, ae_int_t nru, RMatrix *c, ae_int_t cstart, ae_int_t ncc, RMatrix *vt, ae_int_t vstart, ae_int_t ncvt, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _e;
    ae_int_t i;
    ae_int_t idir;
    ae_int_t isub;
@@ -29117,18 +28554,9 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    double tol;
    double tolmul;
    double unfl;
-   ae_vector work0;
-   ae_vector work1;
-   ae_vector work2;
-   ae_vector work3;
    ae_int_t maxitr;
    bool matrixsplitflag;
    bool iterflag;
-   ae_vector utemp;
-   ae_vector vttemp;
-   ae_vector ctemp;
-   ae_vector etemp;
-   ae_matrix ut;
    bool fwddir;
    double tmp;
    ae_int_t mm1;
@@ -29140,27 +28568,16 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_e, 0, sizeof(_e));
-   memset(&work0, 0, sizeof(work0));
-   memset(&work1, 0, sizeof(work1));
-   memset(&work2, 0, sizeof(work2));
-   memset(&work3, 0, sizeof(work3));
-   memset(&utemp, 0, sizeof(utemp));
-   memset(&vttemp, 0, sizeof(vttemp));
-   memset(&ctemp, 0, sizeof(ctemp));
-   memset(&etemp, 0, sizeof(etemp));
-   memset(&ut, 0, sizeof(ut));
-   ae_vector_copy(&_e, e, _state, true);
-   e = &_e;
-   ae_vector_init(&work0, 0, DT_REAL, _state, true);
-   ae_vector_init(&work1, 0, DT_REAL, _state, true);
-   ae_vector_init(&work2, 0, DT_REAL, _state, true);
-   ae_vector_init(&work3, 0, DT_REAL, _state, true);
-   ae_vector_init(&utemp, 0, DT_REAL, _state, true);
-   ae_vector_init(&vttemp, 0, DT_REAL, _state, true);
-   ae_vector_init(&ctemp, 0, DT_REAL, _state, true);
-   ae_vector_init(&etemp, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ut, 0, 0, DT_REAL, _state, true);
+   DupVector(e, _state);
+   NewVector(work0, 0, DT_REAL, _state);
+   NewVector(work1, 0, DT_REAL, _state);
+   NewVector(work2, 0, DT_REAL, _state);
+   NewVector(work3, 0, DT_REAL, _state);
+   NewVector(utemp, 0, DT_REAL, _state);
+   NewVector(vttemp, 0, DT_REAL, _state);
+   NewVector(ctemp, 0, DT_REAL, _state);
+   NewVector(etemp, 0, DT_REAL, _state);
+   NewMatrix(ut, 0, 0, DT_REAL, _state);
 
    result = true;
    if (n == 0) {
@@ -30015,13 +29432,6 @@ namespace alglib_impl {
 // API: bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt, const xparams _xparams = xdefault);
 bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t vtneeded, ae_int_t additionalmemory, RVector *w, RMatrix *u, RMatrix *vt, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector tauq;
-   ae_vector taup;
-   ae_vector tau;
-   ae_vector e;
-   ae_vector work;
-   ae_matrix t2;
    bool isupper;
    ae_int_t minmn;
    ae_int_t ncu;
@@ -30033,24 +29443,16 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&tauq, 0, sizeof(tauq));
-   memset(&taup, 0, sizeof(taup));
-   memset(&tau, 0, sizeof(tau));
-   memset(&e, 0, sizeof(e));
-   memset(&work, 0, sizeof(work));
-   memset(&t2, 0, sizeof(t2));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(w, true);
-   ae_matrix_free(u, true);
-   ae_matrix_free(vt, true);
-   ae_vector_init(&tauq, 0, DT_REAL, _state, true);
-   ae_vector_init(&taup, 0, DT_REAL, _state, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&e, 0, DT_REAL, _state, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   ae_matrix_init(&t2, 0, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(w);
+   SetMatrix(u);
+   SetMatrix(vt);
+   NewVector(tauq, 0, DT_REAL, _state);
+   NewVector(taup, 0, DT_REAL, _state);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(e, 0, DT_REAL, _state);
+   NewVector(work, 0, DT_REAL, _state);
+   NewMatrix(t2, 0, 0, DT_REAL, _state);
 
    result = true;
    if (m == 0 || n == 0) {
@@ -30275,23 +29677,16 @@ static void rcond_internalcomplexrcondloadall(ZVector *isave, RVector *rsave, ae
 // API: double rmatrixrcond1(const real_2d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
 double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
-   ae_vector t;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "RMatrixRCond1: N<1!", _state);
    ae_vector_set_length(&t, n, _state);
@@ -30332,20 +29727,15 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state) {
 // API: double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
 double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "RMatrixRCondInf: N<1!", _state);
    nrm = (double)(0);
@@ -30391,22 +29781,17 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state) {
 // API: double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = xdefault);
 double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
    double v;
    double nrm;
-   ae_vector t;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_vector_set_length(&t, n, _state);
    for (i = 0; i <= n - 1; i++) {
@@ -30467,17 +29852,13 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_sta
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
-   ae_vector t;
    ae_int_t j1;
    ae_int_t j2;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
-   memset(&t, 0, sizeof(t));
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   NewVector(pivots, 0, DT_INT, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "RMatrixTRRCond1: N<1!", _state);
    ae_vector_set_length(&t, n, _state);
@@ -30535,14 +29916,12 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
    ae_int_t j1;
    ae_int_t j2;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "RMatrixTRRCondInf: N<1!", _state);
    nrm = (double)(0);
@@ -30599,22 +29978,17 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
 // API: double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = xdefault);
 double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    ae_int_t j1;
    ae_int_t j2;
    double v;
    double nrm;
-   ae_vector t;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_vector_set_length(&t, n, _state);
    for (i = 0; i <= n - 1; i++) {
@@ -30669,23 +30043,16 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 // API: double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
 double cmatrixrcond1(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
-   ae_vector t;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "CMatrixRCond1: N<1!", _state);
    ae_vector_set_length(&t, n, _state);
@@ -30726,20 +30093,15 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n, ae_state *_state) {
 // API: double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
 double cmatrixrcondinf(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    ae_int_t i;
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "CMatrixRCondInf: N<1!", _state);
    nrm = (double)(0);
@@ -30951,17 +30313,13 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_sta
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
-   ae_vector t;
    ae_int_t j1;
    ae_int_t j2;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
-   memset(&t, 0, sizeof(t));
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   NewVector(pivots, 0, DT_INT, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 1, "RMatrixTRRCond1: N<1!", _state);
    ae_vector_set_length(&t, n, _state);
@@ -31019,14 +30377,12 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
    ae_int_t j;
    double v;
    double nrm;
-   ae_vector pivots;
    ae_int_t j1;
    ae_int_t j2;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "RMatrixTRRCondInf: N<1!", _state);
    nrm = (double)(0);
@@ -31075,10 +30431,6 @@ double rcondthreshold(ae_state *_state) {
 //      February 29, 1992
 static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector ex;
-   ae_vector ev;
-   ae_vector iwork;
-   ae_vector tmp;
    ae_int_t i;
    ae_int_t j;
    ae_int_t kase;
@@ -31090,15 +30442,11 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
    double s;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ex, 0, sizeof(ex));
-   memset(&ev, 0, sizeof(ev));
-   memset(&iwork, 0, sizeof(iwork));
-   memset(&tmp, 0, sizeof(tmp));
    *rc = 0;
-   ae_vector_init(&ex, 0, DT_REAL, _state, true);
-   ae_vector_init(&ev, 0, DT_REAL, _state, true);
-   ae_vector_init(&iwork, 0, DT_INT, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   NewVector(ex, 0, DT_REAL, _state);
+   NewVector(ev, 0, DT_REAL, _state);
+   NewVector(iwork, 0, DT_INT, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
 
 // RC=0 if something happens
    *rc = (double)(0);
@@ -31206,12 +30554,6 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
 //      March 31, 1993
 static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, bool isunit, bool onenorm, double anorm, double *rc, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector ex;
-   ae_vector cwork2;
-   ae_vector cwork3;
-   ae_vector cwork4;
-   ae_vector isave;
-   ae_vector rsave;
    ae_int_t kase;
    ae_int_t kase1;
    double ainvnm;
@@ -31223,19 +30565,13 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    double maxgrowth;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ex, 0, sizeof(ex));
-   memset(&cwork2, 0, sizeof(cwork2));
-   memset(&cwork3, 0, sizeof(cwork3));
-   memset(&cwork4, 0, sizeof(cwork4));
-   memset(&isave, 0, sizeof(isave));
-   memset(&rsave, 0, sizeof(rsave));
    *rc = 0;
-   ae_vector_init(&ex, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork2, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork3, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork4, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&isave, 0, DT_INT, _state, true);
-   ae_vector_init(&rsave, 0, DT_REAL, _state, true);
+   NewVector(ex, 0, DT_COMPLEX, _state);
+   NewVector(cwork2, 0, DT_COMPLEX, _state);
+   NewVector(cwork3, 0, DT_COMPLEX, _state);
+   NewVector(cwork4, 0, DT_COMPLEX, _state);
+   NewVector(isave, 0, DT_INT, _state);
+   NewVector(rsave, 0, DT_REAL, _state);
 
 // RC=0 if something happens
    *rc = (double)(0);
@@ -31349,24 +30685,16 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    ae_int_t j;
    ae_int_t kase;
    double ainvnm;
-   ae_vector ex;
-   ae_vector ev;
-   ae_vector tmp;
-   ae_vector iwork;
    double sa;
    double v;
    double maxgrowth;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ex, 0, sizeof(ex));
-   memset(&ev, 0, sizeof(ev));
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&iwork, 0, sizeof(iwork));
    *rc = 0;
-   ae_vector_init(&ex, 0, DT_REAL, _state, true);
-   ae_vector_init(&ev, 0, DT_REAL, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   ae_vector_init(&iwork, 0, DT_INT, _state, true);
+   NewVector(ex, 0, DT_REAL, _state);
+   NewVector(ev, 0, DT_REAL, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewVector(iwork, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "Assertion failed", _state);
    ae_vector_set_length(&tmp, n, _state);
@@ -31514,11 +30842,6 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
 //      February 29, 1992
 static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool isupper, bool isnormprovided, double anorm, double *rc, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector isave;
-   ae_vector rsave;
-   ae_vector ex;
-   ae_vector ev;
-   ae_vector tmp;
    ae_int_t kase;
    double ainvnm;
    ae_complex v;
@@ -31528,17 +30851,12 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    double maxgrowth;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&isave, 0, sizeof(isave));
-   memset(&rsave, 0, sizeof(rsave));
-   memset(&ex, 0, sizeof(ex));
-   memset(&ev, 0, sizeof(ev));
-   memset(&tmp, 0, sizeof(tmp));
    *rc = 0;
-   ae_vector_init(&isave, 0, DT_INT, _state, true);
-   ae_vector_init(&rsave, 0, DT_REAL, _state, true);
-   ae_vector_init(&ex, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&ev, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   NewVector(isave, 0, DT_INT, _state);
+   NewVector(rsave, 0, DT_REAL, _state);
+   NewVector(ex, 0, DT_COMPLEX, _state);
+   NewVector(ev, 0, DT_COMPLEX, _state);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
    ae_assert(n >= 1, "Assertion failed", _state);
    ae_vector_set_length(&tmp, n, _state);
@@ -31688,10 +31006,6 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
 //      February 29, 1992
 static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector ex;
-   ae_vector ev;
-   ae_vector iwork;
-   ae_vector tmp;
    double v;
    ae_int_t i;
    ae_int_t j;
@@ -31705,15 +31019,11 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    bool munit;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ex, 0, sizeof(ex));
-   memset(&ev, 0, sizeof(ev));
-   memset(&iwork, 0, sizeof(iwork));
-   memset(&tmp, 0, sizeof(tmp));
    *rc = 0;
-   ae_vector_init(&ex, 0, DT_REAL, _state, true);
-   ae_vector_init(&ev, 0, DT_REAL, _state, true);
-   ae_vector_init(&iwork, 0, DT_INT, _state, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   NewVector(ex, 0, DT_REAL, _state);
+   NewVector(ev, 0, DT_REAL, _state);
+   NewVector(iwork, 0, DT_INT, _state);
+   NewVector(tmp, 0, DT_REAL, _state);
 
 // RC=0 if something happens
    *rc = (double)(0);
@@ -31879,12 +31189,6 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
 //      March 31, 1993
 static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm, bool isanormprovided, double anorm, double *rc, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector ex;
-   ae_vector cwork2;
-   ae_vector cwork3;
-   ae_vector cwork4;
-   ae_vector isave;
-   ae_vector rsave;
    ae_int_t kase;
    ae_int_t kase1;
    double ainvnm;
@@ -31896,19 +31200,13 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    double maxgrowth;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&ex, 0, sizeof(ex));
-   memset(&cwork2, 0, sizeof(cwork2));
-   memset(&cwork3, 0, sizeof(cwork3));
-   memset(&cwork4, 0, sizeof(cwork4));
-   memset(&isave, 0, sizeof(isave));
-   memset(&rsave, 0, sizeof(rsave));
    *rc = 0;
-   ae_vector_init(&ex, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork2, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork3, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&cwork4, 0, DT_COMPLEX, _state, true);
-   ae_vector_init(&isave, 0, DT_INT, _state, true);
-   ae_vector_init(&rsave, 0, DT_REAL, _state, true);
+   NewVector(ex, 0, DT_COMPLEX, _state);
+   NewVector(cwork2, 0, DT_COMPLEX, _state);
+   NewVector(cwork3, 0, DT_COMPLEX, _state);
+   NewVector(cwork4, 0, DT_COMPLEX, _state);
+   NewVector(isave, 0, DT_INT, _state);
+   NewVector(rsave, 0, DT_REAL, _state);
 
    if (n <= 0) {
       ae_frame_leave(_state);
@@ -33527,7 +32825,7 @@ namespace alglib_impl {
 // API: void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams = xdefault);
 void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits, normestimatorstate *state, ae_state *_state) {
 
-   normestimatorstate_free(state, true);
+   SetObj(normestimatorstate, state);
 
    ae_assert(m > 0, "NormEstimatorCreate: M <= 0", _state);
    ae_assert(n > 0, "NormEstimatorCreate: N <= 0", _state);
@@ -33914,20 +33212,16 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
 // API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams = xdefault);
 void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double v;
-   sinteger sinfo;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&sinfo, 0, sizeof(sinfo));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&work, 0, DT_REAL, _state, true);
-   sinteger_init(&sinfo, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(work, 0, DT_REAL, _state);
+   NewObj(sinteger, sinfo, _state);
 
    ae_assert(n > 0, "RMatrixLUInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixLUInverse: cols(A)<N!", _state);
@@ -33998,13 +33292,11 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // API: void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = xdefault);
 void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector pivots;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n > 0, "RMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixInverse: cols(A)<N!", _state);
@@ -34037,20 +33329,16 @@ void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, a
 // API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams = xdefault);
 void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector work;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_complex v;
-   sinteger sinfo;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&work, 0, sizeof(work));
-   memset(&sinfo, 0, sizeof(sinfo));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&work, 0, DT_COMPLEX, _state, true);
-   sinteger_init(&sinfo, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(work, 0, DT_COMPLEX, _state);
+   NewObj(sinteger, sinfo, _state);
 
    ae_assert(n > 0, "CMatrixLUInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CMatrixLUInverse: cols(A)<N!", _state);
@@ -34117,13 +33405,11 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // API: void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = xdefault);
 void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector pivots;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&pivots, 0, sizeof(pivots));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n > 0, "CRMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CRMatrixInverse: cols(A)<N!", _state);
@@ -34166,17 +33452,13 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector tmp;
-   matinvreport rep2;
    bool f;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&rep2, 0, sizeof(rep2));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   matinvreport_init(&rep2, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewObj(matinvreport, rep2, _state);
 
    ae_assert(n > 0, "SPDMatrixCholeskyInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "SPDMatrixCholeskyInverse: cols(A)<N!", _state);
@@ -34251,7 +33533,7 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
 
    *info = 0;
-   matinvreport_free(rep, true);
+   SetObj(matinvreport, rep);
 
    ae_assert(n > 0, "SPDMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "SPDMatrixInverse: cols(A)<N!", _state);
@@ -34297,17 +33579,13 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   matinvreport rep2;
-   ae_vector tmp;
    bool f;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&rep2, 0, sizeof(rep2));
-   memset(&tmp, 0, sizeof(tmp));
    *info = 0;
-   matinvreport_free(rep, true);
-   matinvreport_init(&rep2, _state, true);
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
+   SetObj(matinvreport, rep);
+   NewObj(matinvreport, rep2, _state);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
 
    ae_assert(n > 0, "HPDMatrixCholeskyInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "HPDMatrixCholeskyInverse: cols(A)<N!", _state);
@@ -34382,7 +33660,7 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
 
    *info = 0;
-   matinvreport_free(rep, true);
+   SetObj(matinvreport, rep);
 
    ae_assert(n > 0, "HPDMatrixInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "HPDMatrixInverse: cols(A)<N!", _state);
@@ -34436,16 +33714,12 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector tmp;
-   sinteger sinfo;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&sinfo, 0, sizeof(sinfo));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
-   sinteger_init(&sinfo, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(tmp, 0, DT_REAL, _state);
+   NewObj(sinteger, sinfo, _state);
 
    ae_assert(n > 0, "RMatrixTRInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "RMatrixTRInverse: cols(A)<N!", _state);
@@ -34515,16 +33789,12 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_vector tmp;
-   sinteger sinfo;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tmp, 0, sizeof(tmp));
-   memset(&sinfo, 0, sizeof(sinfo));
    *info = 0;
-   matinvreport_free(rep, true);
-   ae_vector_init(&tmp, 0, DT_COMPLEX, _state, true);
-   sinteger_init(&sinfo, _state, true);
+   SetObj(matinvreport, rep);
+   NewVector(tmp, 0, DT_COMPLEX, _state);
+   NewObj(sinteger, sinfo, _state);
 
    ae_assert(n > 0, "CMatrixTRInverse: N <= 0!", _state);
    ae_assert(a->cols >= n, "CMatrixTRInverse: cols(A)<N!", _state);
@@ -34565,14 +33835,12 @@ void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isu
    double v;
    ae_int_t n1;
    ae_int_t n2;
-   sinteger sinfo2;
    ae_int_t tsa;
    ae_int_t tsb;
    ae_int_t tscur;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&sinfo2, 0, sizeof(sinfo2));
-   sinteger_init(&sinfo2, _state, true);
+   NewObj(sinteger, sinfo2, _state);
 
    if (n < 1) {
       ae_frame_leave(_state);
@@ -35230,14 +34498,12 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    ae_complex v;
    ae_int_t n1;
    ae_int_t n2;
-   sinteger sinfo;
    ae_int_t tsa;
    ae_int_t tsb;
    ae_int_t tscur;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&sinfo, 0, sizeof(sinfo));
-   sinteger_init(&sinfo, _state, true);
+   NewObj(sinteger, sinfo, _state);
 
    if (n < 1) {
       ae_frame_leave(_state);
@@ -35618,17 +34884,13 @@ namespace alglib_impl {
 // API: void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval, const xparams _xparams = xdefault);
 void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t updcolumn, double updval, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector t1;
-   ae_vector t2;
    ae_int_t i;
    double lambdav;
    double vt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t1, 0, sizeof(t1));
-   memset(&t2, 0, sizeof(t2));
-   ae_vector_init(&t1, 0, DT_REAL, _state, true);
-   ae_vector_init(&t2, 0, DT_REAL, _state, true);
+   NewVector(t1, 0, DT_REAL, _state);
+   NewVector(t2, 0, DT_REAL, _state);
 
    ae_assert(updrow >= 0 && updrow < n, "RMatrixInvUpdateSimple: incorrect UpdRow!", _state);
    ae_assert(updcolumn >= 0 && updcolumn < n, "RMatrixInvUpdateSimple: incorrect UpdColumn!", _state);
@@ -35673,18 +34935,14 @@ void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t
 // API: void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v, const xparams _xparams = xdefault);
 void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector t1;
-   ae_vector t2;
    ae_int_t i;
    ae_int_t j;
    double lambdav;
    double vt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t1, 0, sizeof(t1));
-   memset(&t2, 0, sizeof(t2));
-   ae_vector_init(&t1, 0, DT_REAL, _state, true);
-   ae_vector_init(&t2, 0, DT_REAL, _state, true);
+   NewVector(t1, 0, DT_REAL, _state);
+   NewVector(t2, 0, DT_REAL, _state);
 
    ae_vector_set_length(&t1, n - 1 + 1, _state);
    ae_vector_set_length(&t2, n - 1 + 1, _state);
@@ -35728,17 +34986,13 @@ void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v,
 // API: void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u, const xparams _xparams = xdefault);
 void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVector *u, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector t1;
-   ae_vector t2;
    ae_int_t i;
    double lambdav;
    double vt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t1, 0, sizeof(t1));
-   memset(&t2, 0, sizeof(t2));
-   ae_vector_init(&t1, 0, DT_REAL, _state, true);
-   ae_vector_init(&t2, 0, DT_REAL, _state, true);
+   NewVector(t1, 0, DT_REAL, _state);
+   NewVector(t2, 0, DT_REAL, _state);
 
    ae_vector_set_length(&t1, n - 1 + 1, _state);
    ae_vector_set_length(&t2, n - 1 + 1, _state);
@@ -35782,18 +35036,14 @@ void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVect
 // API: void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v, const xparams _xparams = xdefault);
 void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector t1;
-   ae_vector t2;
    ae_int_t i;
    ae_int_t j;
    double lambdav;
    double vt;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t1, 0, sizeof(t1));
-   memset(&t2, 0, sizeof(t2));
-   ae_vector_init(&t1, 0, DT_REAL, _state, true);
-   ae_vector_init(&t2, 0, DT_REAL, _state, true);
+   NewVector(t1, 0, DT_REAL, _state);
+   NewVector(t2, 0, DT_REAL, _state);
 
    ae_vector_set_length(&t1, n - 1 + 1, _state);
    ae_vector_set_length(&t2, n - 1 + 1, _state);
@@ -35903,20 +35153,14 @@ namespace alglib_impl {
 // API: bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xparams _xparams = xdefault);
 bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector tau;
-   ae_vector wi;
-   ae_vector wr;
    ae_int_t info;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&tau, 0, sizeof(tau));
-   memset(&wi, 0, sizeof(wi));
-   memset(&wr, 0, sizeof(wr));
-   ae_matrix_free(s, true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, true);
-   ae_vector_init(&wi, 0, DT_REAL, _state, true);
-   ae_vector_init(&wr, 0, DT_REAL, _state, true);
+   SetMatrix(s);
+   NewVector(tau, 0, DT_REAL, _state);
+   NewVector(wi, 0, DT_REAL, _state);
+   NewVector(wr, 0, DT_REAL, _state);
 
 // Upper Hessenberg form of the 0-based matrix
    rmatrixhessenberg(a, n, &tau, _state);
@@ -35994,9 +35238,6 @@ namespace alglib_impl {
 // API: bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z, const xparams _xparams = xdefault);
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_matrix r;
-   ae_matrix t;
    bool isupperr;
    ae_int_t j1;
    ae_int_t j2;
@@ -36008,15 +35249,11 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&r, 0, sizeof(r));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_free(d, true);
-   ae_matrix_free(z, true);
-   ae_matrix_init(&r, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&t, 0, 0, DT_REAL, _state, true);
+   DupMatrix(a, _state);
+   SetVector(d);
+   SetMatrix(z);
+   NewMatrix(r, 0, 0, DT_REAL, _state);
+   NewMatrix(t, 0, 0, DT_REAL, _state);
 
 // Reduce and solve
    result = smatrixgevdreduce(a, n, isuppera, b, isupperb, problemtype, &r, &isupperr, _state);
@@ -36119,30 +35356,20 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
 // API: bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr, const xparams _xparams = xdefault);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix t;
-   ae_vector w1;
-   ae_vector w2;
-   ae_vector w3;
    ae_int_t i;
    ae_int_t j;
    double v;
-   matinvreport rep;
    ae_int_t info;
    bool result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   memset(&w1, 0, sizeof(w1));
-   memset(&w2, 0, sizeof(w2));
-   memset(&w3, 0, sizeof(w3));
-   memset(&rep, 0, sizeof(rep));
-   ae_matrix_free(r, true);
+   SetMatrix(r);
    *isupperr = false;
-   ae_matrix_init(&t, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&w1, 0, DT_REAL, _state, true);
-   ae_vector_init(&w2, 0, DT_REAL, _state, true);
-   ae_vector_init(&w3, 0, DT_REAL, _state, true);
-   matinvreport_init(&rep, _state, true);
+   NewMatrix(t, 0, 0, DT_REAL, _state);
+   NewVector(w1, 0, DT_REAL, _state);
+   NewVector(w2, 0, DT_REAL, _state);
+   NewVector(w3, 0, DT_REAL, _state);
+   NewObj(matinvreport, rep, _state);
 
    ae_assert(n > 0, "SMatrixGEVDReduce: N <= 0!", _state);
    ae_assert((problemtype == 1 || problemtype == 2) || problemtype == 3, "SMatrixGEVDReduce: incorrect ProblemType!", _state);
@@ -36393,16 +35620,11 @@ double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state) {
 // API: double rmatrixdet(const real_2d_array &a, const xparams _xparams = xdefault);
 double rmatrixdet(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector pivots;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "RMatrixDet: N<1!", _state);
    ae_assert(a->rows >= n, "RMatrixDet: rows(A)<N!", _state);
@@ -36470,16 +35692,11 @@ ae_complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_stat
 // API: complex cmatrixdet(const complex_2d_array &a, const xparams _xparams = xdefault);
 ae_complex cmatrixdet(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
-   ae_vector pivots;
    ae_complex result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   memset(&pivots, 0, sizeof(pivots));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
-   ae_vector_init(&pivots, 0, DT_INT, _state, true);
+   DupMatrix(a, _state);
+   NewVector(pivots, 0, DT_INT, _state);
 
    ae_assert(n >= 1, "CMatrixDet: N<1!", _state);
    ae_assert(a->rows >= n, "CMatrixDet: rows(A)<N!", _state);
@@ -36558,14 +35775,11 @@ double spdmatrixcholeskydet(RMatrix *a, ae_int_t n, ae_state *_state) {
 // API: double spdmatrixdet(const real_2d_array &a, const xparams _xparams = xdefault);
 double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _a;
    bool b;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_a, 0, sizeof(_a));
-   ae_matrix_copy(&_a, a, _state, true);
-   a = &_a;
+   DupMatrix(a, _state);
 
    ae_assert(n >= 1, "SPDMatrixDet: N<1!", _state);
    ae_assert(a->rows >= n, "SPDMatrixDet: rows(A)<N!", _state);

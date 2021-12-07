@@ -267,7 +267,6 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
 // API: void samplemedian(const real_1d_array &x, double &median, const xparams _xparams = xdefault);
 void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
    ae_int_t i;
    ae_int_t ir;
    ae_int_t j;
@@ -278,9 +277,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
    double tval;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
+   DupVector(x, _state);
    *median = 0;
 
    ae_assert(n >= 0, "SampleMedian: N<0", _state);
@@ -400,18 +397,13 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 // API: void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams = xdefault);
 void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
    ae_int_t i1;
    double t;
-   ae_vector rbuf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&rbuf, 0, sizeof(rbuf));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
+   DupVector(x, _state);
    *v = 0;
-   ae_vector_init(&rbuf, 0, DT_REAL, _state, true);
+   NewVector(rbuf, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "SamplePercentile: N<0", _state);
    ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!", _state);
@@ -618,20 +610,12 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
 double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
-   ae_vector _y;
-   apbuffers buf;
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&buf, 0, sizeof(buf));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_vector_copy(&_y, y, _state, true);
-   y = &_y;
-   apbuffers_init(&buf, _state, true);
+   DupVector(x, _state);
+   DupVector(y, _state);
+   NewObj(apbuffers, buf, _state);
 
    ae_assert(n >= 0, "SpearmanCorr2: N<0", _state);
    ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X)<N!", _state);
@@ -672,25 +656,16 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // API: void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
 void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _x;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_vector t;
-   ae_vector x0;
-   ae_vector same;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&t, 0, sizeof(t));
-   memset(&x0, 0, sizeof(x0));
-   memset(&same, 0, sizeof(same));
-   ae_matrix_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_matrix_free(c, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&x0, 0, DT_REAL, _state, true);
-   ae_vector_init(&same, 0, DT_BOOL, _state, true);
+   DupMatrix(x, _state);
+   SetMatrix(c);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(x0, 0, DT_REAL, _state);
+   NewVector(same, 0, DT_BOOL, _state);
 
    ae_assert(n >= 0, "CovM: N<0", _state);
    ae_assert(m >= 1, "CovM: M<1", _state);
@@ -766,15 +741,13 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 // API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
 void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector t;
    ae_int_t i;
    ae_int_t j;
    double v;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   ae_matrix_free(c, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   SetMatrix(c);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "PearsonCorrM: N<0", _state);
    ae_assert(m >= 1, "PearsonCorrM: M<1", _state);
@@ -821,22 +794,16 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   apbuffers buf;
-   ae_matrix xc;
-   ae_vector t;
    double v;
    double vv;
    double x0;
    bool b;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf, 0, sizeof(buf));
-   memset(&xc, 0, sizeof(xc));
-   memset(&t, 0, sizeof(t));
-   ae_matrix_free(c, true);
-   apbuffers_init(&buf, _state, true);
-   ae_matrix_init(&xc, 0, 0, DT_REAL, _state, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   SetMatrix(c);
+   NewObj(apbuffers, buf, _state);
+   NewMatrix(xc, 0, 0, DT_REAL, _state);
+   NewVector(t, 0, DT_REAL, _state);
 
    ae_assert(n >= 0, "SpearmanCorrM: N<0", _state);
    ae_assert(m >= 1, "SpearmanCorrM: M<1", _state);
@@ -948,35 +915,19 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
 void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _x;
-   ae_matrix _y;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_vector t;
-   ae_vector x0;
-   ae_vector y0;
-   ae_vector samex;
-   ae_vector samey;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&t, 0, sizeof(t));
-   memset(&x0, 0, sizeof(x0));
-   memset(&y0, 0, sizeof(y0));
-   memset(&samex, 0, sizeof(samex));
-   memset(&samey, 0, sizeof(samey));
-   ae_matrix_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_matrix_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_matrix_free(c, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&x0, 0, DT_REAL, _state, true);
-   ae_vector_init(&y0, 0, DT_REAL, _state, true);
-   ae_vector_init(&samex, 0, DT_BOOL, _state, true);
-   ae_vector_init(&samey, 0, DT_BOOL, _state, true);
+   DupMatrix(x, _state);
+   DupMatrix(y, _state);
+   SetMatrix(c);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(x0, 0, DT_REAL, _state);
+   NewVector(y0, 0, DT_REAL, _state);
+   NewVector(samex, 0, DT_BOOL, _state);
+   NewVector(samey, 0, DT_BOOL, _state);
 
    ae_assert(n >= 0, "CovM2: N<0", _state);
    ae_assert(m1 >= 1, "CovM2: M1<1", _state);
@@ -1086,41 +1037,21 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
    ae_frame _frame_block;
-   ae_matrix _x;
-   ae_matrix _y;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_vector t;
-   ae_vector x0;
-   ae_vector y0;
-   ae_vector sx;
-   ae_vector sy;
-   ae_vector samex;
-   ae_vector samey;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&_y, 0, sizeof(_y));
-   memset(&t, 0, sizeof(t));
-   memset(&x0, 0, sizeof(x0));
-   memset(&y0, 0, sizeof(y0));
-   memset(&sx, 0, sizeof(sx));
-   memset(&sy, 0, sizeof(sy));
-   memset(&samex, 0, sizeof(samex));
-   memset(&samey, 0, sizeof(samey));
-   ae_matrix_copy(&_x, x, _state, true);
-   x = &_x;
-   ae_matrix_copy(&_y, y, _state, true);
-   y = &_y;
-   ae_matrix_free(c, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&x0, 0, DT_REAL, _state, true);
-   ae_vector_init(&y0, 0, DT_REAL, _state, true);
-   ae_vector_init(&sx, 0, DT_REAL, _state, true);
-   ae_vector_init(&sy, 0, DT_REAL, _state, true);
-   ae_vector_init(&samex, 0, DT_BOOL, _state, true);
-   ae_vector_init(&samey, 0, DT_BOOL, _state, true);
+   DupMatrix(x, _state);
+   DupMatrix(y, _state);
+   SetMatrix(c);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(x0, 0, DT_REAL, _state);
+   NewVector(y0, 0, DT_REAL, _state);
+   NewVector(sx, 0, DT_REAL, _state);
+   NewVector(sy, 0, DT_REAL, _state);
+   NewVector(samex, 0, DT_BOOL, _state);
+   NewVector(samey, 0, DT_BOOL, _state);
 
    ae_assert(n >= 0, "PearsonCorrM2: N<0", _state);
    ae_assert(m1 >= 1, "PearsonCorrM2: M1<1", _state);
@@ -1271,29 +1202,17 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    double v2;
    double vv;
    bool b;
-   ae_vector t;
    double x0;
    double y0;
-   ae_vector sx;
-   ae_vector sy;
-   ae_matrix xc;
-   ae_matrix yc;
-   apbuffers buf;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&t, 0, sizeof(t));
-   memset(&sx, 0, sizeof(sx));
-   memset(&sy, 0, sizeof(sy));
-   memset(&xc, 0, sizeof(xc));
-   memset(&yc, 0, sizeof(yc));
-   memset(&buf, 0, sizeof(buf));
-   ae_matrix_free(c, true);
-   ae_vector_init(&t, 0, DT_REAL, _state, true);
-   ae_vector_init(&sx, 0, DT_REAL, _state, true);
-   ae_vector_init(&sy, 0, DT_REAL, _state, true);
-   ae_matrix_init(&xc, 0, 0, DT_REAL, _state, true);
-   ae_matrix_init(&yc, 0, 0, DT_REAL, _state, true);
-   apbuffers_init(&buf, _state, true);
+   SetMatrix(c);
+   NewVector(t, 0, DT_REAL, _state);
+   NewVector(sx, 0, DT_REAL, _state);
+   NewVector(sy, 0, DT_REAL, _state);
+   NewMatrix(xc, 0, 0, DT_REAL, _state);
+   NewMatrix(yc, 0, 0, DT_REAL, _state);
+   NewObj(apbuffers, buf, _state);
 
    ae_assert(n >= 0, "SpearmanCorrM2: N<0", _state);
    ae_assert(m1 >= 1, "SpearmanCorrM2: M1<1", _state);
@@ -1436,18 +1355,12 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 // API: void rankdata(real_2d_array &xy, const xparams _xparams = xdefault);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
    ae_frame _frame_block;
-   apbuffers buf0;
-   apbuffers buf1;
    ae_int_t basecasecost;
-   ae_shared_pool pool;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf0, 0, sizeof(buf0));
-   memset(&buf1, 0, sizeof(buf1));
-   memset(&pool, 0, sizeof(pool));
-   apbuffers_init(&buf0, _state, true);
-   apbuffers_init(&buf1, _state, true);
-   ae_shared_pool_init(&pool, _state, true);
+   NewObj(apbuffers, buf0, _state);
+   NewObj(apbuffers, buf1, _state);
+   NewObj(ae_shared_pool, pool, _state);
 
    ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
@@ -1502,18 +1415,12 @@ bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_st
 // API: void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
    ae_frame _frame_block;
-   apbuffers buf0;
-   apbuffers buf1;
    ae_int_t basecasecost;
-   ae_shared_pool pool;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&buf0, 0, sizeof(buf0));
-   memset(&buf1, 0, sizeof(buf1));
-   memset(&pool, 0, sizeof(pool));
-   apbuffers_init(&buf0, _state, true);
-   apbuffers_init(&buf1, _state, true);
-   ae_shared_pool_init(&pool, _state, true);
+   NewObj(apbuffers, buf0, _state);
+   NewObj(apbuffers, buf1, _state);
+   NewObj(ae_shared_pool, pool, _state);
 
    ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
@@ -1589,18 +1496,12 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_st
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
    ae_frame _frame_block;
-   apbuffers *buf0;
-   ae_smart_ptr _buf0;
-   apbuffers *buf1;
-   ae_smart_ptr _buf1;
    double problemcost;
    ae_int_t im;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_buf0, 0, sizeof(_buf0));
-   memset(&_buf1, 0, sizeof(_buf1));
-   ae_smart_ptr_init(&_buf0, (void **)&buf0, _state, true);
-   ae_smart_ptr_init(&_buf1, (void **)&buf1, _state, true);
+   RefObj(apbuffers, buf0, _state);
+   RefObj(apbuffers, buf1, _state);
 
    ae_assert(i1 >= i0, "RankDataRec: internal error", _state);
 
@@ -2812,9 +2713,6 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
 
 static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector vx;
-   ae_vector vy;
-   ae_matrix ctbl;
    double t1;
    double t2;
    double t3;
@@ -2828,12 +2726,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
    double result;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&vx, 0, sizeof(vx));
-   memset(&vy, 0, sizeof(vy));
-   memset(&ctbl, 0, sizeof(ctbl));
-   ae_vector_init(&vx, 0, DT_REAL, _state, true);
-   ae_vector_init(&vy, 0, DT_REAL, _state, true);
-   ae_matrix_init(&ctbl, 0, 0, DT_REAL, _state, true);
+   NewVector(vx, 0, DT_REAL, _state);
+   NewVector(vy, 0, DT_REAL, _state);
+   NewMatrix(ctbl, 0, 0, DT_REAL, _state);
 
    result = (double)(1);
    x = s;
@@ -4922,7 +4817,6 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state);
 // API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
 void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_frame _frame_block;
-   ae_vector _x;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -4930,8 +4824,6 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    double tmp;
    ae_int_t tmpi;
    ae_int_t ns;
-   ae_vector r;
-   ae_vector c;
    double w;
    double p;
    double mp;
@@ -4940,16 +4832,12 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    double mu;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&_x, 0, sizeof(_x));
-   memset(&r, 0, sizeof(r));
-   memset(&c, 0, sizeof(c));
-   ae_vector_copy(&_x, x, _state, true);
-   x = &_x;
+   DupVector(x, _state);
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-   ae_vector_init(&r, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_INT, _state, true);
+   NewVector(r, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_INT, _state);
 
 // Prepare
    if (n < 5) {
@@ -9816,8 +9704,6 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    double tmp;
    ae_int_t tmpi;
    ae_int_t ns;
-   ae_vector r;
-   ae_vector c;
    double u;
    double p;
    double mp;
@@ -9825,18 +9711,14 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    double sigma;
    double mu;
    ae_int_t tiecount;
-   ae_vector tiesize;
 
    ae_frame_make(_state, &_frame_block);
-   memset(&r, 0, sizeof(r));
-   memset(&c, 0, sizeof(c));
-   memset(&tiesize, 0, sizeof(tiesize));
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-   ae_vector_init(&r, 0, DT_REAL, _state, true);
-   ae_vector_init(&c, 0, DT_INT, _state, true);
-   ae_vector_init(&tiesize, 0, DT_INT, _state, true);
+   NewVector(r, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_INT, _state);
+   NewVector(tiesize, 0, DT_INT, _state);
 
 // Prepare
    if (n <= 4 || m <= 4) {
