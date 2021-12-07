@@ -960,10 +960,10 @@ void ae_state_set_flags(ae_state *state, ae_uint64_t flags) {
 // deallocated/reused till ae_leave_frame called. It may be global or  local
 // variable (local is even better).
 void ae_frame_make(ae_state *state, ae_frame *tmp) {
-   tmp->db_marker.p_next = state->p_top_block;
-   tmp->db_marker.deallocator = NULL;
-   tmp->db_marker.ptr = DYN_FRAME;
-   state->p_top_block = &tmp->db_marker;
+   tmp->p_next = state->p_top_block;
+   tmp->deallocator = NULL;
+   tmp->ptr = DYN_FRAME;
+   state->p_top_block = tmp;
 }
 
 // This function leaves current stack frame and deallocates all automatic

@@ -376,9 +376,7 @@ typedef struct ae_dyn_block {
 typedef void (*ae_deallocator)(void *);
 
 // frame marker
-typedef struct ae_frame {
-   ae_dyn_block db_marker;
-} ae_frame;
+typedef struct ae_dyn_block ae_frame;
 
 // ALGLIB environment state
 typedef struct ae_state {
@@ -564,7 +562,7 @@ struct ae_lock {
 //
 // ae_dyn_block structure is responsible for automatic deletion of
 // the memory allocated for the pointer when its frame is destroyed.
-   ae_dyn_block db;
+   ae_frame db;
 
 // Whether we have eternal lock object (used by thread pool) or
 // transient lock. Eternal locks are allocated without using ae_dyn_block
@@ -606,7 +604,7 @@ typedef struct ae_shared_pool {
 // destructor function;
    void (*free)(void *ptr, bool make_automatic);
 // frame entry; contains pointer to the pool object itself
-   ae_dyn_block frame_entry;
+   ae_frame frame_entry;
 } ae_shared_pool;
 
 void ae_never_call_it();
