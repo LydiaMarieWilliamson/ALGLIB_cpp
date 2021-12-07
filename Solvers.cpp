@@ -77,7 +77,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_assert(n > 0, "PolynomialSolve: N <= 0", _state);
    ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1", _state);
    ae_assert(isfinitevector(a, n + 1, _state), "PolynomialSolve: A contains infitite numbers", _state);
-   ae_assert(ae_fp_neq(a->ptr.p_double[n], (double)(0)), "PolynomialSolve: A[N]=0", _state);
+   ae_assert(ae_fp_neq(a->xR[n], (double)(0)), "PolynomialSolve: A[N]=0", _state);
 
 // Prepare
    ae_vector_set_length(x, n, _state);
@@ -88,12 +88,12 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 // * make residual NE-th degree polynomial monic
 //   (here NE=N-NZ)
    nz = 0;
-   while (nz < n && ae_fp_eq(a->ptr.p_double[nz], (double)(0))) {
+   while (nz < n && ae_fp_eq(a->xR[nz], (double)(0))) {
       nz = nz + 1;
    }
    ne = n - nz;
    for (i = nz; i <= n; i++) {
-      a->ptr.p_double[i - nz] = a->ptr.p_double[i] / a->ptr.p_double[n];
+      a->xR[i - nz] = a->xR[i] / a->xR[n];
    }
 
 // For NZ<N, build companion matrix and find NE non-zero roots
@@ -101,24 +101,24 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
       ae_matrix_set_length(&c, ne, ne, _state);
       for (i = 0; i <= ne - 1; i++) {
          for (j = 0; j <= ne - 1; j++) {
-            c.ptr.pp_double[i][j] = (double)(0);
+            c.xyR[i][j] = (double)(0);
          }
       }
-      c.ptr.pp_double[0][ne - 1] = -a->ptr.p_double[0];
+      c.xyR[0][ne - 1] = -a->xR[0];
       for (i = 1; i <= ne - 1; i++) {
-         c.ptr.pp_double[i][i - 1] = (double)(1);
-         c.ptr.pp_double[i][ne - 1] = -a->ptr.p_double[i];
+         c.xyR[i][i - 1] = (double)(1);
+         c.xyR[i][ne - 1] = -a->xR[i];
       }
       status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr, _state);
       ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed", _state);
       for (i = 0; i <= ne - 1; i++) {
-         x->ptr.p_complex[i].x = wr.ptr.p_double[i];
-         x->ptr.p_complex[i].y = wi.ptr.p_double[i];
+         x->xC[i].x = wr.xR[i];
+         x->xC[i].y = wi.xR[i];
       }
    }
 // Remaining NZ zero roots
    for (i = ne; i <= n - 1; i++) {
-      x->ptr.p_complex[i] = ae_complex_from_i(0);
+      x->xC[i] = ae_complex_from_i(0);
    }
 
 // Rep
@@ -127,8 +127,8 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
       v = ae_complex_from_i(0);
       vv = ae_complex_from_i(1);
       for (j = 0; j <= ne; j++) {
-         v = ae_c_add(v, ae_c_mul_d(vv, a->ptr.p_double[j]));
-         vv = ae_c_mul(vv, x->ptr.p_complex[i]);
+         v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
+         vv = ae_c_mul(vv, x->xC[i]);
       }
       rep->maxerr = ae_maxreal(rep->maxerr, ae_c_abs(v, _state), _state);
    }
@@ -242,10 +242,10 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
    rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -296,9 +296,9 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
    }
    rmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(a->ptr.pp_double[i][i], (double)(0))) {
+      if (ae_fp_eq(a->xyR[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
-            b->ptr.p_double[j] = 0.0;
+            b->xR[j] = 0.0;
          }
          *info = -3;
          ae_frame_leave(_state);
@@ -388,7 +388,7 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 // 1. factorize matrix
 // 3. solve
    for (i = 0; i <= n - 1; i++) {
-      ae_v_move(&da.ptr.pp_double[i][0], 1, &a->ptr.pp_double[i][0], 1, ae_v_len(0, n - 1));
+      ae_v_move(&da.xyR[i][0], 1, &a->xyR[i][0], 1, ae_v_len(0, n - 1));
    }
    rmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
@@ -456,10 +456,10 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    }
    rmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(a->ptr.pp_double[i][i], (double)(0))) {
+      if (ae_fp_eq(a->xyR[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
-               b->ptr.pp_double[j][k] = 0.0;
+               b->xyR[j][k] = 0.0;
             }
          }
          *info = -3;
@@ -470,11 +470,11 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 
 // Solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
-      if (p.ptr.p_int[i] != i) {
+      if (p.xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = b->ptr.pp_double[i][j];
-            b->ptr.pp_double[i][j] = b->ptr.pp_double[p.ptr.p_int[i]][j];
-            b->ptr.pp_double[p.ptr.p_int[i]][j] = v;
+            v = b->xyR[i][j];
+            b->xyR[i][j] = b->xyR[p.xZ[i]][j];
+            b->xyR[p.xZ[i]][j] = v;
          }
       }
    }
@@ -550,10 +550,10 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
    rmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -597,9 +597,9 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(lua->ptr.pp_double[i][i], (double)(0))) {
+      if (ae_fp_eq(lua->xyR[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
-            b->ptr.p_double[j] = 0.0;
+            b->xR[j] = 0.0;
          }
          *info = -3;
          return;
@@ -726,10 +726,10 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(lua->ptr.pp_double[i][i], (double)(0))) {
+      if (ae_fp_eq(lua->xyR[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
-               b->ptr.pp_double[j][k] = 0.0;
+               b->xyR[j][k] = 0.0;
             }
          }
          *info = -3;
@@ -739,11 +739,11 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 
 // Solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
+      if (p->xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = b->ptr.pp_double[i][j];
-            b->ptr.pp_double[i][j] = b->ptr.pp_double[p->ptr.p_int[i]][j];
-            b->ptr.pp_double[p->ptr.p_int[i]][j] = v;
+            v = b->xyR[i][j];
+            b->xyR[i][j] = b->xyR[p->xZ[i]][j];
+            b->xyR[p->xZ[i]][j] = v;
          }
       }
    }
@@ -801,10 +801,10 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
    rmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -931,7 +931,7 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 
 // factorize, solve
    for (i = 0; i <= n - 1; i++) {
-      ae_v_cmove(&da.ptr.pp_complex[i][0], 1, &a->ptr.pp_complex[i][0], 1, "N", ae_v_len(0, n - 1));
+      ae_v_cmove(&da.xyC[i][0], 1, &a->xyC[i][0], 1, "N", ae_v_len(0, n - 1));
    }
    cmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
@@ -988,10 +988,10 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    }
    cmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_c_eq_d(a->ptr.pp_complex[i][i], (double)(0))) {
+      if (ae_c_eq_d(a->xyC[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
-               b->ptr.pp_complex[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = ae_complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1002,11 +1002,11 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
 
 // Solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
-      if (p.ptr.p_int[i] != i) {
+      if (p.xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = b->ptr.pp_complex[i][j];
-            b->ptr.pp_complex[i][j] = b->ptr.pp_complex[p.ptr.p_int[i]][j];
-            b->ptr.pp_complex[p.ptr.p_int[i]][j] = v;
+            v = b->xyC[i][j];
+            b->xyC[i][j] = b->xyC[p.xZ[i]][j];
+            b->xyC[p.xZ[i]][j] = v;
          }
       }
    }
@@ -1076,10 +1076,10 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
    cmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -1123,9 +1123,9 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
    }
    cmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_c_eq_d(a->ptr.pp_complex[i][i], (double)(0))) {
+      if (ae_c_eq_d(a->xyC[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
-            b->ptr.p_complex[j] = ae_complex_from_d(0.0);
+            b->xC[j] = ae_complex_from_d(0.0);
          }
          *info = -3;
          ae_frame_leave(_state);
@@ -1245,10 +1245,10 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_c_eq_d(lua->ptr.pp_complex[i][i], (double)(0))) {
+      if (ae_c_eq_d(lua->xyC[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
-               b->ptr.pp_complex[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = ae_complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1258,11 +1258,11 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
 
 // Solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
+      if (p->xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = b->ptr.pp_complex[i][j];
-            b->ptr.pp_complex[i][j] = b->ptr.pp_complex[p->ptr.p_int[i]][j];
-            b->ptr.pp_complex[p->ptr.p_int[i]][j] = v;
+            v = b->xyC[i][j];
+            b->xyC[i][j] = b->xyC[p->xZ[i]][j];
+            b->xyC[p->xZ[i]][j] = v;
          }
       }
    }
@@ -1336,10 +1336,10 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
    cmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -1385,9 +1385,9 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_c_eq_d(lua->ptr.pp_complex[i][i], (double)(0))) {
+      if (ae_c_eq_d(lua->xyC[i][i], (double)(0))) {
          for (j = 0; j <= n - 1; j++) {
-            b->ptr.p_complex[j] = ae_complex_from_d(0.0);
+            b->xC[j] = ae_complex_from_d(0.0);
          }
          *info = -3;
          return;
@@ -1487,10 +1487,10 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
    cmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -1575,13 +1575,13 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
          j1 = 0;
          j2 = i;
       }
-      ae_v_move(&da.ptr.pp_double[i][j1], 1, &a->ptr.pp_double[i][j1], 1, ae_v_len(j1, j2));
+      ae_v_move(&da.xyR[i][j1], 1, &a->xyR[i][j1], 1, ae_v_len(j1, j2));
    }
    if (!spdmatrixcholesky(&da, n, isupper, _state)) {
       ae_matrix_set_length(x, n, m, _state);
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_double[i][j] = (double)(0);
+            x->xyR[i][j] = (double)(0);
          }
       }
       rep->r1 = (double)(0);
@@ -1638,7 +1638,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
    if (!spdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            b->ptr.pp_double[i][j] = 0.0;
+            b->xyR[i][j] = 0.0;
          }
       }
       *info = -3;
@@ -1721,10 +1721,10 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
    spdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -1769,7 +1769,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
    }
    if (!spdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i <= n - 1; i++) {
-         b->ptr.p_double[i] = 0.0;
+         b->xR[i] = 0.0;
       }
       *info = -3;
       ae_frame_leave(_state);
@@ -1895,10 +1895,10 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->ptr.pp_double[k][k], 0.0)) {
+      if (ae_fp_eq(cha->xyR[k][k], 0.0)) {
          for (i = 0; i <= n - 1; i++) {
             for (j = 0; j <= m - 1; j++) {
-               b->ptr.pp_double[i][j] = 0.0;
+               b->xyR[i][j] = 0.0;
             }
          }
          *info = -3;
@@ -1981,10 +1981,10 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, 
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
    spdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -2027,9 +2027,9 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->ptr.pp_double[k][k], 0.0)) {
+      if (ae_fp_eq(cha->xyR[k][k], 0.0)) {
          for (i = 0; i <= n - 1; i++) {
-            b->ptr.p_double[i] = 0.0;
+            b->xR[i] = 0.0;
          }
          *info = -3;
          return;
@@ -2111,13 +2111,13 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
          j1 = 0;
          j2 = i;
       }
-      ae_v_cmove(&da.ptr.pp_complex[i][j1], 1, &a->ptr.pp_complex[i][j1], 1, "N", ae_v_len(j1, j2));
+      ae_v_cmove(&da.xyC[i][j1], 1, &a->xyC[i][j1], 1, "N", ae_v_len(j1, j2));
    }
    if (!hpdmatrixcholesky(&da, n, isupper, _state)) {
       ae_matrix_set_length(x, n, m, _state);
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_complex[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
       rep->r1 = (double)(0);
@@ -2175,7 +2175,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            b->ptr.pp_complex[i][j] = ae_complex_from_d(0.0);
+            b->xyC[i][j] = ae_complex_from_d(0.0);
          }
       }
       *info = -3;
@@ -2251,10 +2251,10 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
    hpdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -2301,7 +2301,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
    }
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i <= n - 1; i++) {
-         b->ptr.p_complex[i] = ae_complex_from_d(0.0);
+         b->xC[i] = ae_complex_from_d(0.0);
       }
       *info = -3;
       ae_frame_leave(_state);
@@ -2429,10 +2429,10 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->ptr.pp_complex[k][k].x, 0.0) && ae_fp_eq(cha->ptr.pp_complex[k][k].y, 0.0)) {
+      if (ae_fp_eq(cha->xyC[k][k].x, 0.0) && ae_fp_eq(cha->xyC[k][k].y, 0.0)) {
          for (i = 0; i <= n - 1; i++) {
             for (j = 0; j <= m - 1; j++) {
-               b->ptr.pp_complex[i][j] = ae_complex_from_d(0.0);
+               b->xyC[i][j] = ae_complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -2515,10 +2515,10 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, 
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
    hpdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
 }
 
@@ -2561,9 +2561,9 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->ptr.pp_complex[k][k].x, 0.0) && ae_fp_eq(cha->ptr.pp_complex[k][k].y, 0.0)) {
+      if (ae_fp_eq(cha->xyC[k][k].x, 0.0) && ae_fp_eq(cha->xyC[k][k].y, 0.0)) {
          for (i = 0; i <= n - 1; i++) {
-            b->ptr.p_complex[i] = ae_complex_from_d(0.0);
+            b->xC[i] = ae_complex_from_d(0.0);
          }
          *info = -3;
          return;
@@ -2655,7 +2655,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt, _state);
-   zeroa = ae_fp_eq(sv.ptr.p_double[0], (double)(0));
+   zeroa = ae_fp_eq(sv.xR[0], (double)(0));
    if (svdfailed || zeroa) {
       if (svdfailed) {
          *info = -4;
@@ -2664,7 +2664,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       }
       ae_vector_set_length(x, ncols, _state);
       for (i = 0; i <= ncols - 1; i++) {
-         x->ptr.p_double[i] = (double)(0);
+         x->xR[i] = (double)(0);
       }
       rep->n = ncols;
       rep->k = ncols;
@@ -2672,9 +2672,9 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       for (i = 0; i <= ncols - 1; i++) {
          for (j = 0; j <= ncols - 1; j++) {
             if (i == j) {
-               rep->cx.ptr.pp_double[i][j] = (double)(1);
+               rep->cx.xyR[i][j] = (double)(1);
             } else {
-               rep->cx.ptr.pp_double[i][j] = (double)(0);
+               rep->cx.xyR[i][j] = (double)(0);
             }
          }
       }
@@ -2684,7 +2684,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    }
    nsv = ae_minint(ncols, nrows, _state);
    if (nsv == ncols) {
-      rep->r2 = sv.ptr.p_double[nsv - 1] / sv.ptr.p_double[0];
+      rep->r2 = sv.xR[nsv - 1] / sv.xR[0];
    } else {
       rep->r2 = (double)(0);
    }
@@ -2709,11 +2709,11 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    ae_vector_set_length(&tx, ncols + 1, _state);
    ae_vector_set_length(&buf, ncols + 1, _state);
    for (i = 0; i <= ncols - 1; i++) {
-      x->ptr.p_double[i] = (double)(0);
+      x->xR[i] = (double)(0);
    }
    kernelidx = nsv;
    for (i = 0; i <= nsv - 1; i++) {
-      if (ae_fp_less_eq(sv.ptr.p_double[i], threshold * sv.ptr.p_double[0])) {
+      if (ae_fp_less_eq(sv.xR[i], threshold * sv.xR[0])) {
          kernelidx = i;
          break;
       }
@@ -2728,16 +2728,16 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       }
    // calculate right part
       if (rfs == 0) {
-         ae_v_move(&rp.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0, nrows - 1));
+         ae_v_move(&rp.xR[0], 1, &b->xR[0], 1, ae_v_len(0, nrows - 1));
       } else {
          smallerr = true;
          for (i = 0; i <= nrows - 1; i++) {
-            ae_v_move(&ta.ptr.p_double[0], 1, &a->ptr.pp_double[i][0], 1, ae_v_len(0, ncols - 1));
-            ta.ptr.p_double[ncols] = (double)(-1);
-            ae_v_move(&tx.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, ncols - 1));
-            tx.ptr.p_double[ncols] = b->ptr.p_double[i];
+            ae_v_move(&ta.xR[0], 1, &a->xyR[i][0], 1, ae_v_len(0, ncols - 1));
+            ta.xR[ncols] = (double)(-1);
+            ae_v_move(&tx.xR[0], 1, &x->xR[0], 1, ae_v_len(0, ncols - 1));
+            tx.xR[ncols] = b->xR[i];
             xdot(&ta, &tx, ncols + 1, &buf, &v, &verr, _state);
-            rp.ptr.p_double[i] = -v;
+            rp.xR[i] = -v;
             smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
          }
          if (smallerr) {
@@ -2747,36 +2747,36 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
 
    // solve A*dx = rp
       for (i = 0; i <= ncols - 1; i++) {
-         tmp.ptr.p_double[i] = (double)(0);
+         tmp.xR[i] = (double)(0);
       }
       for (i = 0; i <= nsv - 1; i++) {
-         utb.ptr.p_double[i] = (double)(0);
+         utb.xR[i] = (double)(0);
       }
       for (i = 0; i <= nrows - 1; i++) {
-         v = rp.ptr.p_double[i];
-         ae_v_addd(&utb.ptr.p_double[0], 1, &u.ptr.pp_double[i][0], 1, ae_v_len(0, nsv - 1), v);
+         v = rp.xR[i];
+         ae_v_addd(&utb.xR[0], 1, &u.xyR[i][0], 1, ae_v_len(0, nsv - 1), v);
       }
       for (i = 0; i <= nsv - 1; i++) {
          if (i < kernelidx) {
-            sutb.ptr.p_double[i] = utb.ptr.p_double[i] / sv.ptr.p_double[i];
+            sutb.xR[i] = utb.xR[i] / sv.xR[i];
          } else {
-            sutb.ptr.p_double[i] = (double)(0);
+            sutb.xR[i] = (double)(0);
          }
       }
       for (i = 0; i <= nsv - 1; i++) {
-         v = sutb.ptr.p_double[i];
-         ae_v_addd(&tmp.ptr.p_double[0], 1, &vt.ptr.pp_double[i][0], 1, ae_v_len(0, ncols - 1), v);
+         v = sutb.xR[i];
+         ae_v_addd(&tmp.xR[0], 1, &vt.xyR[i][0], 1, ae_v_len(0, ncols - 1), v);
       }
 
    // update x:  x:=x+dx
-      ae_v_add(&x->ptr.p_double[0], 1, &tmp.ptr.p_double[0], 1, ae_v_len(0, ncols - 1));
+      ae_v_add(&x->xR[0], 1, &tmp.xR[0], 1, ae_v_len(0, ncols - 1));
    }
 
 // fill CX
    if (rep->k > 0) {
       ae_matrix_set_length(&rep->cx, ncols, rep->k, _state);
       for (i = 0; i <= rep->k - 1; i++) {
-         ae_v_move(&rep->cx.ptr.pp_double[0][i], rep->cx.stride, &vt.ptr.pp_double[kernelidx + i][0], 1, ae_v_len(0, ncols - 1));
+         ae_v_move(&rep->cx.xyR[0][i], rep->cx.stride, &vt.xyR[kernelidx + i][0], 1, ae_v_len(0, ncols - 1));
       }
    }
    ae_frame_leave(_state);
@@ -2815,7 +2815,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] > n - 1 || p->ptr.p_int[i] < i) {
+      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave(_state);
          return;
@@ -2835,7 +2835,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    if (ae_fp_less(rep->r1, rcondthreshold(_state)) || ae_fp_less(rep->rinf, rcondthreshold(_state))) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_double[i][j] = (double)(0);
+            x->xyR[i][j] = (double)(0);
          }
       }
       rep->r1 = (double)(0);
@@ -2850,17 +2850,17 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    mxb = 0.0;
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= m - 1; j++) {
-         v = b->ptr.pp_double[i][j];
+         v = b->xyR[i][j];
          mxb = ae_maxreal(mxb, ae_fabs(v, _state), _state);
-         x->ptr.pp_double[i][j] = v;
+         x->xyR[i][j] = v;
       }
    }
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
+      if (p->xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = x->ptr.pp_double[i][j];
-            x->ptr.pp_double[i][j] = x->ptr.pp_double[p->ptr.p_int[i]][j];
-            x->ptr.pp_double[p->ptr.p_int[i]][j] = v;
+            v = x->xyR[i][j];
+            x->xyR[i][j] = x->xyR[p->xZ[i]][j];
+            x->xyR[p->xZ[i]][j] = v;
          }
       }
    }
@@ -2878,13 +2878,13 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
             }
          // generate right part
             smallerr = true;
-            ae_v_move(&xb.ptr.p_double[0], 1, &x->ptr.pp_double[0][k], x->stride, ae_v_len(0, n - 1));
+            ae_v_move(&xb.xR[0], 1, &x->xyR[0][k], x->stride, ae_v_len(0, n - 1));
             for (i = 0; i <= n - 1; i++) {
-               ae_v_move(&xa.ptr.p_double[0], 1, &a->ptr.pp_double[i][0], 1, ae_v_len(0, n - 1));
-               xa.ptr.p_double[n] = (double)(-1);
-               xb.ptr.p_double[n] = b->ptr.pp_double[i][k];
+               ae_v_move(&xa.xR[0], 1, &a->xyR[i][0], 1, ae_v_len(0, n - 1));
+               xa.xR[n] = (double)(-1);
+               xb.xR[n] = b->xyR[i][k];
                xdot(&xa, &xb, n + 1, &tx, &v, &verr, _state);
-               y.ptr.p_double[i] = -v;
+               y.xR[i] = -v;
                smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
             }
             if (smallerr) {
@@ -2892,7 +2892,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
             }
          // solve and update
             directdensesolvers_rbasiclusolve(lua, p, n, &y, _state);
-            ae_v_add(&x->ptr.pp_double[0][k], x->stride, &y.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+            ae_v_add(&x->xyR[0][k], x->stride, &y.xR[0], 1, ae_v_len(0, n - 1));
          }
       }
    }
@@ -2922,7 +2922,7 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
    if (ae_fp_less(rep->r1, rcondthreshold(_state))) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_double[i][j] = (double)(0);
+            x->xyR[i][j] = (double)(0);
          }
       }
       rep->r1 = (double)(0);
@@ -2935,7 +2935,7 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
 // Solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= m - 1; j++) {
-         x->ptr.pp_double[i][j] = b->ptr.pp_double[i][j];
+         x->xyR[i][j] = b->xyR[i][j];
       }
    }
    if (isupper) {
@@ -2980,7 +2980,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] > n - 1 || p->ptr.p_int[i] < i) {
+      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave(_state);
          return;
@@ -3001,7 +3001,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    if (ae_fp_less(rep->r1, rcondthreshold(_state)) || ae_fp_less(rep->rinf, rcondthreshold(_state))) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_complex[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
       rep->r1 = (double)(0);
@@ -3015,15 +3015,15 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
 // First phase: solve with TRSM()
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= m - 1; j++) {
-         x->ptr.pp_complex[i][j] = b->ptr.pp_complex[i][j];
+         x->xyC[i][j] = b->xyC[i][j];
       }
    }
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
+      if (p->xZ[i] != i) {
          for (j = 0; j <= m - 1; j++) {
-            v = x->ptr.pp_complex[i][j];
-            x->ptr.pp_complex[i][j] = x->ptr.pp_complex[p->ptr.p_int[i]][j];
-            x->ptr.pp_complex[p->ptr.p_int[i]][j] = v;
+            v = x->xyC[i][j];
+            x->xyC[i][j] = x->xyC[p->xZ[i]][j];
+            x->xyC[p->xZ[i]][j] = v;
          }
       }
    }
@@ -3032,8 +3032,8 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
 
 // solve
    for (k = 0; k <= m - 1; k++) {
-      ae_v_cmove(&bc.ptr.p_complex[0], 1, &b->ptr.pp_complex[0][k], b->stride, "N", ae_v_len(0, n - 1));
-      ae_v_cmove(&xc.ptr.p_complex[0], 1, &x->ptr.pp_complex[0][k], x->stride, "N", ae_v_len(0, n - 1));
+      ae_v_cmove(&bc.xC[0], 1, &b->xyC[0][k], b->stride, "N", ae_v_len(0, n - 1));
+      ae_v_cmove(&xc.xC[0], 1, &x->xyC[0][k], x->stride, "N", ae_v_len(0, n - 1));
 
    // Iterative refinement of xc:
    // * calculate r = bc-A*xc using extra-precise dot product
@@ -3052,13 +3052,13 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
             }
          // generate right part
             smallerr = true;
-            ae_v_cmove(&xb.ptr.p_complex[0], 1, &xc.ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+            ae_v_cmove(&xb.xC[0], 1, &xc.xC[0], 1, "N", ae_v_len(0, n - 1));
             for (i = 0; i <= n - 1; i++) {
-               ae_v_cmove(&xa.ptr.p_complex[0], 1, &a->ptr.pp_complex[i][0], 1, "N", ae_v_len(0, n - 1));
-               xa.ptr.p_complex[n] = ae_complex_from_i(-1);
-               xb.ptr.p_complex[n] = bc.ptr.p_complex[i];
+               ae_v_cmove(&xa.xC[0], 1, &a->xyC[i][0], 1, "N", ae_v_len(0, n - 1));
+               xa.xC[n] = ae_complex_from_i(-1);
+               xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr, _state);
-               y.ptr.p_complex[i] = ae_c_neg(v);
+               y.xC[i] = ae_c_neg(v);
                smallerr = smallerr && ae_fp_less(ae_c_abs(v, _state), 4 * verr);
             }
             if (smallerr) {
@@ -3066,12 +3066,12 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
             }
          // solve and update
             directdensesolvers_cbasiclusolve(lua, p, n, &y, _state);
-            ae_v_cadd(&xc.ptr.p_complex[0], 1, &y.ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+            ae_v_cadd(&xc.xC[0], 1, &y.xC[0], 1, "N", ae_v_len(0, n - 1));
          }
       }
    // Store xc.
    // Post-scale result.
-      ae_v_cmove(&x->ptr.pp_complex[0][k], x->stride, &xc.ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
+      ae_v_cmove(&x->xyC[0][k], x->stride, &xc.xC[0], 1, "N", ae_v_len(0, n - 1));
    }
    ae_frame_leave(_state);
 }
@@ -3114,7 +3114,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    if (ae_fp_less(rep->r1, rcondthreshold(_state))) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
-            x->ptr.pp_complex[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
       rep->r1 = (double)(0);
@@ -3128,7 +3128,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
 // solve
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= m - 1; j++) {
-         x->ptr.pp_complex[i][j] = b->ptr.pp_complex[i][j];
+         x->xyC[i][j] = b->xyC[i][j];
       }
    }
    if (isupper) {
@@ -3177,20 +3177,20 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
    double v;
 
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
-         v = xb->ptr.p_double[i];
-         xb->ptr.p_double[i] = xb->ptr.p_double[p->ptr.p_int[i]];
-         xb->ptr.p_double[p->ptr.p_int[i]] = v;
+      if (p->xZ[i] != i) {
+         v = xb->xR[i];
+         xb->xR[i] = xb->xR[p->xZ[i]];
+         xb->xR[p->xZ[i]] = v;
       }
    }
    for (i = 1; i <= n - 1; i++) {
-      v = ae_v_dotproduct(&lua->ptr.pp_double[i][0], 1, &xb->ptr.p_double[0], 1, ae_v_len(0, i - 1));
-      xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+      v = ae_v_dotproduct(&lua->xyR[i][0], 1, &xb->xR[0], 1, ae_v_len(0, i - 1));
+      xb->xR[i] = xb->xR[i] - v;
    }
-   xb->ptr.p_double[n - 1] = xb->ptr.p_double[n - 1] / lua->ptr.pp_double[n - 1][n - 1];
+   xb->xR[n - 1] = xb->xR[n - 1] / lua->xyR[n - 1][n - 1];
    for (i = n - 2; i >= 0; i--) {
-      v = ae_v_dotproduct(&lua->ptr.pp_double[i][i + 1], 1, &xb->ptr.p_double[i + 1], 1, ae_v_len(i + 1, n - 1));
-      xb->ptr.p_double[i] = (xb->ptr.p_double[i] - v) / lua->ptr.pp_double[i][i];
+      v = ae_v_dotproduct(&lua->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, ae_v_len(i + 1, n - 1));
+      xb->xR[i] = (xb->xR[i] - v) / lua->xyR[i][i];
    }
 }
 
@@ -3209,38 +3209,38 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
 
    // Solve U'*y=b first.
       for (i = 0; i <= n - 1; i++) {
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
          if (i < n - 1) {
-            v = xb->ptr.p_double[i];
-            ae_v_subd(&xb->ptr.p_double[i + 1], 1, &cha->ptr.pp_double[i][i + 1], 1, ae_v_len(i + 1, n - 1), v);
+            v = xb->xR[i];
+            ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, ae_v_len(i + 1, n - 1), v);
          }
       }
 
    // Solve U*x=y then.
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
-            v = ae_v_dotproduct(&cha->ptr.pp_double[i][i + 1], 1, &xb->ptr.p_double[i + 1], 1, ae_v_len(i + 1, n - 1));
-            xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+            v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, ae_v_len(i + 1, n - 1));
+            xb->xR[i] = xb->xR[i] - v;
          }
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
       }
    } else {
 
    // Solve L*y=b first
       for (i = 0; i <= n - 1; i++) {
          if (i > 0) {
-            v = ae_v_dotproduct(&cha->ptr.pp_double[i][0], 1, &xb->ptr.p_double[0], 1, ae_v_len(0, i - 1));
-            xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+            v = ae_v_dotproduct(&cha->xyR[i][0], 1, &xb->xR[0], 1, ae_v_len(0, i - 1));
+            xb->xR[i] = xb->xR[i] - v;
          }
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
       }
 
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
          if (i > 0) {
-            v = xb->ptr.p_double[i];
-            ae_v_subd(&xb->ptr.p_double[0], 1, &cha->ptr.pp_double[i][0], 1, ae_v_len(0, i - 1), v);
+            v = xb->xR[i];
+            ae_v_subd(&xb->xR[0], 1, &cha->xyR[i][0], 1, ae_v_len(0, i - 1), v);
          }
       }
    }
@@ -3257,20 +3257,20 @@ static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t 
    ae_complex v;
 
    for (i = 0; i <= n - 1; i++) {
-      if (p->ptr.p_int[i] != i) {
-         v = xb->ptr.p_complex[i];
-         xb->ptr.p_complex[i] = xb->ptr.p_complex[p->ptr.p_int[i]];
-         xb->ptr.p_complex[p->ptr.p_int[i]] = v;
+      if (p->xZ[i] != i) {
+         v = xb->xC[i];
+         xb->xC[i] = xb->xC[p->xZ[i]];
+         xb->xC[p->xZ[i]] = v;
       }
    }
    for (i = 1; i <= n - 1; i++) {
-      v = ae_v_cdotproduct(&lua->ptr.pp_complex[i][0], 1, "N", &xb->ptr.p_complex[0], 1, "N", ae_v_len(0, i - 1));
-      xb->ptr.p_complex[i] = ae_c_sub(xb->ptr.p_complex[i], v);
+      v = ae_v_cdotproduct(&lua->xyC[i][0], 1, "N", &xb->xC[0], 1, "N", ae_v_len(0, i - 1));
+      xb->xC[i] = ae_c_sub(xb->xC[i], v);
    }
-   xb->ptr.p_complex[n - 1] = ae_c_div(xb->ptr.p_complex[n - 1], lua->ptr.pp_complex[n - 1][n - 1]);
+   xb->xC[n - 1] = ae_c_div(xb->xC[n - 1], lua->xyC[n - 1][n - 1]);
    for (i = n - 2; i >= 0; i--) {
-      v = ae_v_cdotproduct(&lua->ptr.pp_complex[i][i + 1], 1, "N", &xb->ptr.p_complex[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
-      xb->ptr.p_complex[i] = ae_c_div(ae_c_sub(xb->ptr.p_complex[i], v), lua->ptr.pp_complex[i][i]);
+      v = ae_v_cdotproduct(&lua->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
+      xb->xC[i] = ae_c_div(ae_c_sub(xb->xC[i], v), lua->xyC[i][i]);
    }
 }
 
@@ -3289,38 +3289,38 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
 
    // Solve U'*y=b first.
       for (i = 0; i <= n - 1; i++) {
-         xb->ptr.p_complex[i] = ae_c_div(xb->ptr.p_complex[i], ae_c_conj(cha->ptr.pp_complex[i][i], _state));
+         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
          if (i < n - 1) {
-            v = xb->ptr.p_complex[i];
-            ae_v_csubc(&xb->ptr.p_complex[i + 1], 1, &cha->ptr.pp_complex[i][i + 1], 1, "Conj", ae_v_len(i + 1, n - 1), v);
+            v = xb->xC[i];
+            ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", ae_v_len(i + 1, n - 1), v);
          }
       }
 
    // Solve U*x=y then.
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
-            v = ae_v_cdotproduct(&cha->ptr.pp_complex[i][i + 1], 1, "N", &xb->ptr.p_complex[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
-            xb->ptr.p_complex[i] = ae_c_sub(xb->ptr.p_complex[i], v);
+            v = ae_v_cdotproduct(&cha->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
+            xb->xC[i] = ae_c_sub(xb->xC[i], v);
          }
-         xb->ptr.p_complex[i] = ae_c_div(xb->ptr.p_complex[i], cha->ptr.pp_complex[i][i]);
+         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
       }
    } else {
 
    // Solve L*y=b first
       for (i = 0; i <= n - 1; i++) {
          if (i > 0) {
-            v = ae_v_cdotproduct(&cha->ptr.pp_complex[i][0], 1, "N", &xb->ptr.p_complex[0], 1, "N", ae_v_len(0, i - 1));
-            xb->ptr.p_complex[i] = ae_c_sub(xb->ptr.p_complex[i], v);
+            v = ae_v_cdotproduct(&cha->xyC[i][0], 1, "N", &xb->xC[0], 1, "N", ae_v_len(0, i - 1));
+            xb->xC[i] = ae_c_sub(xb->xC[i], v);
          }
-         xb->ptr.p_complex[i] = ae_c_div(xb->ptr.p_complex[i], cha->ptr.pp_complex[i][i]);
+         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
       }
 
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->ptr.p_complex[i] = ae_c_div(xb->ptr.p_complex[i], ae_c_conj(cha->ptr.pp_complex[i][i], _state));
+         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
          if (i > 0) {
-            v = xb->ptr.p_complex[i];
-            ae_v_csubc(&xb->ptr.p_complex[0], 1, &cha->ptr.pp_complex[i][0], 1, "Conj", ae_v_len(0, i - 1), v);
+            v = xb->xC[i];
+            ae_v_csubc(&xb->xC[0], 1, &cha->xyC[i][0], 1, "Conj", ae_v_len(0, i - 1), v);
          }
       }
    }
@@ -3753,13 +3753,13 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
    if (!sparsecholeskyskyline(&a2, n, isupper, _state)) {
       rep->terminationtype = -3;
       for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = (double)(0);
+         x->xR[i] = (double)(0);
       }
       ae_frame_leave(_state);
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = b->ptr.p_double[i];
+      x->xR[i] = b->xR[i];
    }
    if (isupper) {
       sparsetrsv(&a2, isupper, false, 1, x, _state);
@@ -3823,10 +3823,10 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
    }
    rcopyallocv(n, b, x, _state);
    for (i = 0; i <= n - 1; i++) {
-      j = p.ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = p.xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    if (isupper) {
       sparsetrsv(&a2, isupper, false, 1, x, _state);
@@ -3836,10 +3836,10 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
       sparsetrsv(&a2, isupper, false, 1, x, _state);
    }
    for (i = n - 1; i >= 0; i--) {
-      j = p.ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = p.xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    rep->terminationtype = 1;
    ae_frame_leave(_state);
@@ -3887,13 +3887,13 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
       if (ae_fp_eq(sparseget(a, i, i, _state), 0.0)) {
          rep->terminationtype = -3;
          for (i = 0; i <= n - 1; i++) {
-            x->ptr.p_double[i] = (double)(0);
+            x->xR[i] = (double)(0);
          }
          return;
       }
    }
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = b->ptr.p_double[i];
+      x->xR[i] = b->xR[i];
    }
    if (isupper) {
       sparsetrsv(a, isupper, false, 1, x, _state);
@@ -3951,27 +3951,27 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    if (!sparselu(&a2, 0, &pivp, &pivq, _state)) {
       rep->terminationtype = -3;
       for (i = 0; i <= n - 1; i++) {
-         x->ptr.p_double[i] = (double)(0);
+         x->xR[i] = (double)(0);
       }
       ae_frame_leave(_state);
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = b->ptr.p_double[i];
+      x->xR[i] = b->xR[i];
    }
    for (i = 0; i <= n - 1; i++) {
-      j = pivp.ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = pivp.xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    sparsetrsv(&a2, false, true, 0, x, _state);
    sparsetrsv(&a2, true, false, 0, x, _state);
    for (i = n - 1; i >= 0; i--) {
-      j = pivq.ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = pivq.xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    rep->terminationtype = 1;
    ae_frame_leave(_state);
@@ -4019,36 +4019,36 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
    ae_assert(p->cnt >= n, "SparseLUSolve: length(P)<N", _state);
    ae_assert(q->cnt >= n, "SparseLUSolve: length(Q)<N", _state);
    for (i = 0; i <= n - 1; i++) {
-      ae_assert(p->ptr.p_int[i] >= i && p->ptr.p_int[i] < n, "SparseLUSolve: P is corrupted", _state);
-      ae_assert(q->ptr.p_int[i] >= i && q->ptr.p_int[i] < n, "SparseLUSolve: Q is corrupted", _state);
+      ae_assert(p->xZ[i] >= i && p->xZ[i] < n, "SparseLUSolve: P is corrupted", _state);
+      ae_assert(q->xZ[i] >= i && q->xZ[i] < n, "SparseLUSolve: Q is corrupted", _state);
    }
    initsparsesolverreport(rep, _state);
    ae_vector_set_length(x, n, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (a->didx.ptr.p_int[i] == a->uidx.ptr.p_int[i] || a->vals.ptr.p_double[a->didx.ptr.p_int[i]] == 0.0) {
+      if (a->didx.xZ[i] == a->uidx.xZ[i] || a->vals.xR[a->didx.xZ[i]] == 0.0) {
          rep->terminationtype = -3;
          for (i = 0; i <= n - 1; i++) {
-            x->ptr.p_double[i] = (double)(0);
+            x->xR[i] = (double)(0);
          }
          return;
       }
    }
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = b->ptr.p_double[i];
+      x->xR[i] = b->xR[i];
    }
    for (i = 0; i <= n - 1; i++) {
-      j = p->ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = p->xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    sparsetrsv(a, false, true, 0, x, _state);
    sparsetrsv(a, true, false, 0, x, _state);
    for (i = n - 1; i >= 0; i--) {
-      j = q->ptr.p_int[i];
-      v = x->ptr.p_double[i];
-      x->ptr.p_double[i] = x->ptr.p_double[j];
-      x->ptr.p_double[j] = v;
+      j = q->xZ[i];
+      v = x->xR[i];
+      x->xR[i] = x->xR[j];
+      x->xR[j] = v;
    }
    rep->terminationtype = 1;
 }
@@ -4934,10 +4934,10 @@ static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_s
 //   generation - on first subroutine call
 // * values from previous call - on subsequent calls
    if (state->rstate.stage >= 0) {
-      outeridx = state->rstate.ia.ptr.p_int[0];
-      res = state->rstate.ra.ptr.p_double[0];
-      prevres = state->rstate.ra.ptr.p_double[1];
-      res0 = state->rstate.ra.ptr.p_double[2];
+      outeridx = state->rstate.ia.xZ[0];
+      res = state->rstate.ra.xR[0];
+      prevres = state->rstate.ra.xR[1];
+      res0 = state->rstate.ra.xR[2];
    } else {
       outeridx = 359;
       res = -58;
@@ -5103,10 +5103,10 @@ lbl_5:
 // Saving state
 lbl_rcomm:
    result = true;
-   state->rstate.ia.ptr.p_int[0] = outeridx;
-   state->rstate.ra.ptr.p_double[0] = res;
-   state->rstate.ra.ptr.p_double[1] = prevres;
-   state->rstate.ra.ptr.p_double[2] = res0;
+   state->rstate.ia.xZ[0] = outeridx;
+   state->rstate.ra.xR[0] = res;
+   state->rstate.ra.xR[1] = prevres;
+   state->rstate.ra.xR[2] = res0;
    return result;
 }
 
@@ -5409,9 +5409,9 @@ void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
    ae_vector_set_length(&state->startx, state->n, _state);
    ae_vector_set_length(&state->b, state->n, _state);
    for (i = 0; i <= state->n - 1; i++) {
-      state->rx.ptr.p_double[i] = _state->v_nan;
-      state->startx.ptr.p_double[i] = 0.0;
-      state->b.ptr.p_double[i] = (double)(0);
+      state->rx.xR[i] = _state->v_nan;
+      state->startx.xR[i] = 0.0;
+      state->b.xR[i] = (double)(0);
    }
    ae_vector_set_length(&state->cx, state->n, _state);
    ae_vector_set_length(&state->p, state->n, _state);
@@ -5443,7 +5443,7 @@ void lincgsetstartingpoint(lincgstate *state, RVector *x, ae_state *_state) {
    ae_assert(!state->running, "LinCGSetStartingPoint: you can not change starting point because LinCGIteration() function is running", _state);
    ae_assert(state->n <= x->cnt, "LinCGSetStartingPoint: Length(X)<N", _state);
    ae_assert(isfinitevector(x, state->n, _state), "LinCGSetStartingPoint: X contains infinite or NaN values!", _state);
-   ae_v_move(&state->startx.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->startx.xR[0], 1, &x->xR[0], 1, ae_v_len(0, state->n - 1));
 }
 
 // This function sets right part. By default, right part is zero.
@@ -5459,7 +5459,7 @@ void lincgsetb(lincgstate *state, RVector *b, ae_state *_state) {
    ae_assert(!state->running, "LinCGSetB: you can not set B, because function LinCGIteration is running!", _state);
    ae_assert(b->cnt >= state->n, "LinCGSetB: Length(B)<N", _state);
    ae_assert(isfinitevector(b, state->n, _state), "LinCGSetB: B contains infinite or NaN values!", _state);
-   ae_v_move(&state->b.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->b.xR[0], 1, &b->xR[0], 1, ae_v_len(0, state->n - 1));
 }
 
 // This  function  changes  preconditioning  settings  of  LinCGSolveSparse()
@@ -5539,10 +5539,10 @@ bool lincgiteration(lincgstate *state, ae_state *_state) {
 //   generation - on first subroutine call
 // * values from previous call - on subsequent calls
    if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.ptr.p_int[0];
-      uvar = state->rstate.ra.ptr.p_double[0];
-      bnorm = state->rstate.ra.ptr.p_double[1];
-      v = state->rstate.ra.ptr.p_double[2];
+      i = state->rstate.ia.xZ[0];
+      uvar = state->rstate.ra.xR[0];
+      bnorm = state->rstate.ra.xR[1];
+      v = state->rstate.ra.xR[2];
    } else {
       i = 359;
       uvar = -58;
@@ -5581,8 +5581,8 @@ bool lincgiteration(lincgstate *state, ae_state *_state) {
    lincg_updateitersdata(state, _state);
 
 // Start 0-th iteration
-   ae_v_move(&state->rx.ptr.p_double[0], 1, &state->startx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->rx.xR[0], 1, &state->startx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
@@ -5594,10 +5594,10 @@ lbl_0:
    state->r2 = (double)(0);
    state->meritfunction = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      state->r.ptr.p_double[i] = state->b.ptr.p_double[i] - state->mv.ptr.p_double[i];
-      state->r2 = state->r2 + state->r.ptr.p_double[i] * state->r.ptr.p_double[i];
-      state->meritfunction = state->meritfunction + state->mv.ptr.p_double[i] * state->rx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->rx.ptr.p_double[i];
-      bnorm = bnorm + state->b.ptr.p_double[i] * state->b.ptr.p_double[i];
+      state->r.xR[i] = state->b.xR[i] - state->mv.xR[i];
+      state->r2 = state->r2 + state->r.xR[i] * state->r.xR[i];
+      state->meritfunction = state->meritfunction + state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
+      bnorm = bnorm + state->b.xR[i] * state->b.xR[i];
    }
    bnorm = ae_sqrt(bnorm, _state);
 
@@ -5605,7 +5605,7 @@ lbl_0:
    if (!state->xrep) {
       goto lbl_8;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 1;
@@ -5626,7 +5626,7 @@ lbl_8:
       return result;
    }
 // Calculate Z and P
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->r.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->r.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needprec = true;
@@ -5635,8 +5635,8 @@ lbl_8:
 lbl_2:
    state->needprec = false;
    for (i = 0; i <= state->n - 1; i++) {
-      state->z.ptr.p_double[i] = state->pv.ptr.p_double[i];
-      state->p.ptr.p_double[i] = state->z.ptr.p_double[i];
+      state->z.xR[i] = state->pv.xR[i];
+      state->p.xR[i] = state->z.xR[i];
    }
 
 // Other iterations(1..N)
@@ -5648,7 +5648,7 @@ lbl_10:
    state->repiterationscount = state->repiterationscount + 1;
 
 // Calculate Alpha
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->p.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->p.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
@@ -5671,7 +5671,7 @@ lbl_3:
    }
    state->alpha = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      state->alpha = state->alpha + state->r.ptr.p_double[i] * state->z.ptr.p_double[i];
+      state->alpha = state->alpha + state->r.xR[i] * state->z.xR[i];
    }
    state->alpha = state->alpha / state->vmv;
    if (!ae_isfinite(state->alpha, _state)) {
@@ -5684,7 +5684,7 @@ lbl_3:
    }
 // Next step toward solution
    for (i = 0; i <= state->n - 1; i++) {
-      state->cx.ptr.p_double[i] = state->rx.ptr.p_double[i] + state->alpha * state->p.ptr.p_double[i];
+      state->cx.xR[i] = state->rx.xR[i] + state->alpha * state->p.xR[i];
    }
 
 // Calculate R:
@@ -5696,14 +5696,14 @@ lbl_3:
    }
 // Calculate R using recurrent formula
    for (i = 0; i <= state->n - 1; i++) {
-      state->cr.ptr.p_double[i] = state->r.ptr.p_double[i] - state->alpha * state->mv.ptr.p_double[i];
-      state->x.ptr.p_double[i] = state->cr.ptr.p_double[i];
+      state->cr.xR[i] = state->r.xR[i] - state->alpha * state->mv.xR[i];
+      state->x.xR[i] = state->cr.xR[i];
    }
    goto lbl_13;
 lbl_12:
 
 // Calculate R using matrix-vector multiplication
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->cx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->cx.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needmv = true;
@@ -5712,21 +5712,21 @@ lbl_12:
 lbl_4:
    state->needmv = false;
    for (i = 0; i <= state->n - 1; i++) {
-      state->cr.ptr.p_double[i] = state->b.ptr.p_double[i] - state->mv.ptr.p_double[i];
-      state->x.ptr.p_double[i] = state->cr.ptr.p_double[i];
+      state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
+      state->x.xR[i] = state->cr.xR[i];
    }
 
 // Calculating merit function
 // Check emergency stopping criterion
    v = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      v = v + state->mv.ptr.p_double[i] * state->cx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->cx.ptr.p_double[i];
+      v = v + state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
    }
    if (ae_fp_less(v, state->meritfunction)) {
       goto lbl_14;
    }
    for (i = 0; i <= state->n - 1; i++) {
-      if (!ae_isfinite(state->rx.ptr.p_double[i], _state)) {
+      if (!ae_isfinite(state->rx.xR[i], _state)) {
          state->running = false;
          state->repterminationtype = -4;
          result = false;
@@ -5738,7 +5738,7 @@ lbl_4:
    if (!state->xrep) {
       goto lbl_16;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 5;
@@ -5753,21 +5753,21 @@ lbl_16:
 lbl_14:
    state->meritfunction = v;
 lbl_13:
-   ae_v_move(&state->rx.ptr.p_double[0], 1, &state->cx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->rx.xR[0], 1, &state->cx.xR[0], 1, ae_v_len(0, state->n - 1));
 
 // calculating RNorm
 //
 // NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
    state->r2 = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      state->r2 = state->r2 + state->cr.ptr.p_double[i] * state->cr.ptr.p_double[i];
+      state->r2 = state->r2 + state->cr.xR[i] * state->cr.xR[i];
    }
 
 // output report
    if (!state->xrep) {
       goto lbl_18;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 6;
@@ -5790,7 +5790,7 @@ lbl_18:
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
       for (i = 0; i <= state->n - 1; i++) {
-         if (!ae_isfinite(state->rx.ptr.p_double[i], _state)) {
+         if (!ae_isfinite(state->rx.xR[i], _state)) {
             state->running = false;
             state->repterminationtype = -4;
             result = false;
@@ -5804,7 +5804,7 @@ lbl_18:
       result = false;
       return result;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->cr.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->cr.xR[0], 1, ae_v_len(0, state->n - 1));
 
 // prepere of parameters for next iteration
    state->repnmv = state->repnmv + 1;
@@ -5814,13 +5814,13 @@ lbl_18:
    goto lbl_rcomm;
 lbl_7:
    state->needprec = false;
-   ae_v_move(&state->cz.ptr.p_double[0], 1, &state->pv.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->cz.xR[0], 1, &state->pv.xR[0], 1, ae_v_len(0, state->n - 1));
    if (state->repiterationscount % state->itsbeforerestart != 0) {
       state->beta = (double)(0);
       uvar = (double)(0);
       for (i = 0; i <= state->n - 1; i++) {
-         state->beta = state->beta + state->cz.ptr.p_double[i] * state->cr.ptr.p_double[i];
-         uvar = uvar + state->z.ptr.p_double[i] * state->r.ptr.p_double[i];
+         state->beta = state->beta + state->cz.xR[i] * state->cr.xR[i];
+         uvar = uvar + state->z.xR[i] * state->r.xR[i];
       }
 
    // check that UVar is't INF or is't zero
@@ -5841,18 +5841,18 @@ lbl_7:
          return result;
       }
       for (i = 0; i <= state->n - 1; i++) {
-         state->p.ptr.p_double[i] = state->cz.ptr.p_double[i] + state->beta * state->p.ptr.p_double[i];
+         state->p.xR[i] = state->cz.xR[i] + state->beta * state->p.xR[i];
       }
    } else {
-      ae_v_move(&state->p.ptr.p_double[0], 1, &state->cz.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+      ae_v_move(&state->p.xR[0], 1, &state->cz.xR[0], 1, ae_v_len(0, state->n - 1));
    }
 
 // prepere data for next iteration
    for (i = 0; i <= state->n - 1; i++) {
 
    // write (k+1)th iteration to (k )th iteration
-      state->r.ptr.p_double[i] = state->cr.ptr.p_double[i];
-      state->z.ptr.p_double[i] = state->cz.ptr.p_double[i];
+      state->r.xR[i] = state->cr.xR[i];
+      state->z.xR[i] = state->cz.xR[i];
    }
    goto lbl_10;
 lbl_11:
@@ -5862,10 +5862,10 @@ lbl_11:
 // Saving state
 lbl_rcomm:
    result = true;
-   state->rstate.ia.ptr.p_int[0] = i;
-   state->rstate.ra.ptr.p_double[0] = uvar;
-   state->rstate.ra.ptr.p_double[1] = bnorm;
-   state->rstate.ra.ptr.p_double[2] = v;
+   state->rstate.ia.xZ[0] = i;
+   state->rstate.ra.xR[0] = uvar;
+   state->rstate.ra.xR[1] = bnorm;
+   state->rstate.ra.xR[2] = v;
    return result;
 }
 
@@ -5913,16 +5913,16 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       for (i = 0; i <= n - 1; i++) {
          v = sparsegetdiagonal(a, i, _state);
          if (ae_fp_greater(v, (double)(0))) {
-            state->tmpd.ptr.p_double[i] = 1 / ae_sqrt(v, _state);
+            state->tmpd.xR[i] = 1 / ae_sqrt(v, _state);
          } else {
-            state->tmpd.ptr.p_double[i] = (double)(1);
+            state->tmpd.xR[i] = (double)(1);
          }
       }
    } else {
 
    // No diagonal scaling
       for (i = 0; i <= n - 1; i++) {
-         state->tmpd.ptr.p_double[i] = (double)(1);
+         state->tmpd.xR[i] = (double)(1);
       }
    }
 
@@ -5937,12 +5937,12 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       }
       if (state->needvmv) {
          sparsesmv(a, isupper, &state->x, &state->mv, _state);
-         vmv = ae_v_dotproduct(&state->x.ptr.p_double[0], 1, &state->mv.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+         vmv = ae_v_dotproduct(&state->x.xR[0], 1, &state->mv.xR[0], 1, ae_v_len(0, state->n - 1));
          state->vmv = vmv;
       }
       if (state->needprec) {
          for (i = 0; i <= n - 1; i++) {
-            state->pv.ptr.p_double[i] = state->x.ptr.p_double[i] * ae_sqr(state->tmpd.ptr.p_double[i], _state);
+            state->pv.xR[i] = state->x.xR[i] * ae_sqr(state->tmpd.xR[i], _state);
          }
       }
    }
@@ -5980,7 +5980,7 @@ void lincgresults(lincgstate *state, RVector *x, lincgreport *rep, ae_state *_st
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&x->xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
    rep->terminationtype = state->repterminationtype;
@@ -6352,10 +6352,10 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
    ae_vector_set_length(&state->mtv, state->n, _state);
    ae_vector_set_length(&state->b, state->m, _state);
    for (i = 0; i <= n - 1; i++) {
-      state->rx.ptr.p_double[i] = _state->v_nan;
+      state->rx.xR[i] = _state->v_nan;
    }
    for (i = 0; i <= m - 1; i++) {
-      state->b.ptr.p_double[i] = (double)(0);
+      state->b.xR[i] = (double)(0);
    }
    ae_vector_set_length(&state->rstate.ia, 1 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 0 + 1, _state);
@@ -6378,8 +6378,8 @@ void linlsqrsetb(linlsqrstate *state, RVector *b, ae_state *_state) {
    ae_assert(isfinitevector(b, state->m, _state), "LinLSQRSetB: B contains infinite or NaN values", _state);
    state->bnorm2 = (double)(0);
    for (i = 0; i <= state->m - 1; i++) {
-      state->b.ptr.p_double[i] = b->ptr.p_double[i];
-      state->bnorm2 = state->bnorm2 + b->ptr.p_double[i] * b->ptr.p_double[i];
+      state->b.xR[i] = b->xR[i];
+      state->bnorm2 = state->bnorm2 + b->xR[i] * b->xR[i];
    }
 }
 
@@ -6445,9 +6445,9 @@ bool linlsqriteration(linlsqrstate *state, ae_state *_state) {
 //   generation - on first subroutine call
 // * values from previous call - on subsequent calls
    if (state->rstate.stage >= 0) {
-      summn = state->rstate.ia.ptr.p_int[0];
-      i = state->rstate.ia.ptr.p_int[1];
-      bnorm = state->rstate.ra.ptr.p_double[0];
+      summn = state->rstate.ia.xZ[0];
+      i = state->rstate.ia.xZ[1];
+      bnorm = state->rstate.ra.xR[0];
    } else {
       summn = 359;
       i = -58;
@@ -6494,7 +6494,7 @@ lbl_7:
    if (!state->nes.needmv) {
       goto lbl_9;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->nes.x.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->nes.x.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
@@ -6502,13 +6502,13 @@ lbl_7:
    goto lbl_rcomm;
 lbl_0:
    state->needmv = false;
-   ae_v_move(&state->nes.mv.ptr.p_double[0], 1, &state->mv.ptr.p_double[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(&state->nes.mv.xR[0], 1, &state->mv.xR[0], 1, ae_v_len(0, state->m - 1));
    goto lbl_7;
 lbl_9:
    if (!state->nes.needmtv) {
       goto lbl_11;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->nes.x.ptr.p_double[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->nes.x.xR[0], 1, ae_v_len(0, state->m - 1));
 
 // matrix-vector multiplication
    state->repnmv = state->repnmv + 1;
@@ -6518,7 +6518,7 @@ lbl_9:
    goto lbl_rcomm;
 lbl_1:
    state->needmtv = false;
-   ae_v_move(&state->nes.mtv.ptr.p_double[0], 1, &state->mtv.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->nes.mtv.xR[0], 1, &state->mtv.xR[0], 1, ae_v_len(0, state->n - 1));
    goto lbl_7;
 lbl_11:
    goto lbl_7;
@@ -6527,14 +6527,14 @@ lbl_8:
 
 // initialize .RX by zeros
    for (i = 0; i <= state->n - 1; i++) {
-      state->rx.ptr.p_double[i] = (double)(0);
+      state->rx.xR[i] = (double)(0);
    }
 
 // output first report
    if (!state->xrep) {
       goto lbl_13;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    linlsqr_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 2;
@@ -6581,11 +6581,11 @@ lbl_13:
    }
    for (i = 0; i <= summn - 1; i++) {
       if (i < state->m) {
-         state->ui.ptr.p_double[i] = state->b.ptr.p_double[i] / state->betai;
+         state->ui.xR[i] = state->b.xR[i] / state->betai;
       } else {
-         state->ui.ptr.p_double[i] = (double)(0);
+         state->ui.xR[i] = (double)(0);
       }
-      state->x.ptr.p_double[i] = state->ui.ptr.p_double[i];
+      state->x.xR[i] = state->ui.xR[i];
    }
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
@@ -6595,11 +6595,11 @@ lbl_13:
 lbl_3:
    state->needmtv = false;
    for (i = 0; i <= state->n - 1; i++) {
-      state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->ui.ptr.p_double[state->m + i];
+      state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->ui.xR[state->m + i];
    }
    state->alphai = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      state->alphai = state->alphai + state->mtv.ptr.p_double[i] * state->mtv.ptr.p_double[i];
+      state->alphai = state->alphai + state->mtv.xR[i] * state->mtv.xR[i];
    }
    state->alphai = ae_sqrt(state->alphai, _state);
    if (ae_fp_eq(state->alphai, (double)(0))) {
@@ -6611,13 +6611,13 @@ lbl_3:
       return result;
    }
    for (i = 0; i <= state->n - 1; i++) {
-      state->vi.ptr.p_double[i] = state->mtv.ptr.p_double[i] / state->alphai;
-      state->omegai.ptr.p_double[i] = state->vi.ptr.p_double[i];
+      state->vi.xR[i] = state->mtv.xR[i] / state->alphai;
+      state->omegai.xR[i] = state->vi.xR[i];
    }
    state->phibari = state->betai;
    state->rhobari = state->alphai;
    for (i = 0; i <= state->n - 1; i++) {
-      state->d.ptr.p_double[i] = (double)(0);
+      state->d.xR[i] = (double)(0);
    }
    state->dnorm = (double)(0);
 
@@ -6640,7 +6640,7 @@ lbl_15:
 //        occurs). However, near-zero alpha and beta won't stop algorithm
 //        and, although no division by zero will happen, orthogonality
 //        in U and V will be lost.
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->vi.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->vi.xR[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
@@ -6649,20 +6649,20 @@ lbl_15:
 lbl_4:
    state->needmv = false;
    for (i = 0; i <= state->n - 1; i++) {
-      state->mv.ptr.p_double[state->m + i] = state->lambdai * state->vi.ptr.p_double[i];
+      state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
    }
    state->betaip1 = (double)(0);
    for (i = 0; i <= summn - 1; i++) {
-      state->uip1.ptr.p_double[i] = state->mv.ptr.p_double[i] - state->alphai * state->ui.ptr.p_double[i];
-      state->betaip1 = state->betaip1 + state->uip1.ptr.p_double[i] * state->uip1.ptr.p_double[i];
+      state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
+      state->betaip1 = state->betaip1 + state->uip1.xR[i] * state->uip1.xR[i];
    }
    if (ae_fp_neq(state->betaip1, (double)(0))) {
       state->betaip1 = ae_sqrt(state->betaip1, _state);
       for (i = 0; i <= summn - 1; i++) {
-         state->uip1.ptr.p_double[i] = state->uip1.ptr.p_double[i] / state->betaip1;
+         state->uip1.xR[i] = state->uip1.xR[i] / state->betaip1;
       }
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->uip1.ptr.p_double[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->uip1.xR[0], 1, ae_v_len(0, state->m - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmtv = true;
@@ -6671,17 +6671,17 @@ lbl_4:
 lbl_5:
    state->needmtv = false;
    for (i = 0; i <= state->n - 1; i++) {
-      state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->uip1.ptr.p_double[state->m + i];
+      state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->uip1.xR[state->m + i];
    }
    state->alphaip1 = (double)(0);
    for (i = 0; i <= state->n - 1; i++) {
-      state->vip1.ptr.p_double[i] = state->mtv.ptr.p_double[i] - state->betaip1 * state->vi.ptr.p_double[i];
-      state->alphaip1 = state->alphaip1 + state->vip1.ptr.p_double[i] * state->vip1.ptr.p_double[i];
+      state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
+      state->alphaip1 = state->alphaip1 + state->vip1.xR[i] * state->vip1.xR[i];
    }
    if (ae_fp_neq(state->alphaip1, (double)(0))) {
       state->alphaip1 = ae_sqrt(state->alphaip1, _state);
       for (i = 0; i <= state->n - 1; i++) {
-         state->vip1.ptr.p_double[i] = state->vip1.ptr.p_double[i] / state->alphaip1;
+         state->vip1.xR[i] = state->vip1.xR[i] / state->alphaip1;
       }
    }
 // Build next orthogonal transformation
@@ -6705,8 +6705,8 @@ lbl_5:
 
 // Update d and DNorm, check condition-related stopping criteria
    for (i = 0; i <= state->n - 1; i++) {
-      state->d.ptr.p_double[i] = 1 / state->rhoi * (state->vi.ptr.p_double[i] - state->theta * state->d.ptr.p_double[i]);
-      state->dnorm = state->dnorm + state->d.ptr.p_double[i] * state->d.ptr.p_double[i];
+      state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
+      state->dnorm = state->dnorm + state->d.xR[i] * state->d.xR[i];
    }
    if (ae_fp_greater_eq(ae_sqrt(state->dnorm, _state) * state->anorm, state->epsc)) {
       state->running = false;
@@ -6716,12 +6716,12 @@ lbl_5:
    }
 // Update x, output report
    for (i = 0; i <= state->n - 1; i++) {
-      state->rx.ptr.p_double[i] = state->rx.ptr.p_double[i] + state->phii / state->rhoi * state->omegai.ptr.p_double[i];
+      state->rx.xR[i] = state->rx.xR[i] + state->phii / state->rhoi * state->omegai.xR[i];
    }
    if (!state->xrep) {
       goto lbl_17;
    }
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    linlsqr_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 6;
@@ -6768,7 +6768,7 @@ lbl_17:
    }
 // Update omega
    for (i = 0; i <= state->n - 1; i++) {
-      state->omegaip1.ptr.p_double[i] = state->vip1.ptr.p_double[i] - state->theta / state->rhoi * state->omegai.ptr.p_double[i];
+      state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
    }
 
 // Prepare for the next iteration - rename variables:
@@ -6776,9 +6776,9 @@ lbl_17:
 // v[i]   := v[i+1]
 // rho[i] := rho[i+1]
 // ...
-   ae_v_move(&state->ui.ptr.p_double[0], 1, &state->uip1.ptr.p_double[0], 1, ae_v_len(0, summn - 1));
-   ae_v_move(&state->vi.ptr.p_double[0], 1, &state->vip1.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
-   ae_v_move(&state->omegai.ptr.p_double[0], 1, &state->omegaip1.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->ui.xR[0], 1, &state->uip1.xR[0], 1, ae_v_len(0, summn - 1));
+   ae_v_move(&state->vi.xR[0], 1, &state->vip1.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->omegai.xR[0], 1, &state->omegaip1.xR[0], 1, ae_v_len(0, state->n - 1));
    state->alphai = state->alphaip1;
    state->betai = state->betaip1;
    state->phibari = state->phibarip1;
@@ -6791,9 +6791,9 @@ lbl_16:
 // Saving state
 lbl_rcomm:
    result = true;
-   state->rstate.ia.ptr.p_int[0] = summn;
-   state->rstate.ia.ptr.p_int[1] = i;
-   state->rstate.ra.ptr.p_double[0] = bnorm;
+   state->rstate.ia.xZ[0] = summn;
+   state->rstate.ia.xZ[1] = i;
+   state->rstate.ra.xR[0] = bnorm;
    return result;
 }
 
@@ -6839,25 +6839,25 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
 
    // Default preconditioner - inverse of column norms
       for (i = 0; i <= n - 1; i++) {
-         state->tmpd.ptr.p_double[i] = (double)(0);
+         state->tmpd.xR[i] = (double)(0);
       }
       t0 = 0;
       t1 = 0;
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v, _state)) {
-         state->tmpd.ptr.p_double[j] = state->tmpd.ptr.p_double[j] + ae_sqr(v, _state);
+         state->tmpd.xR[j] = state->tmpd.xR[j] + ae_sqr(v, _state);
       }
       for (i = 0; i <= n - 1; i++) {
-         if (ae_fp_greater(state->tmpd.ptr.p_double[i], (double)(0))) {
-            state->tmpd.ptr.p_double[i] = 1 / ae_sqrt(state->tmpd.ptr.p_double[i], _state);
+         if (ae_fp_greater(state->tmpd.xR[i], (double)(0))) {
+            state->tmpd.xR[i] = 1 / ae_sqrt(state->tmpd.xR[i], _state);
          } else {
-            state->tmpd.ptr.p_double[i] = (double)(1);
+            state->tmpd.xR[i] = (double)(1);
          }
       }
    } else {
 
    // No diagonal scaling
       for (i = 0; i <= n - 1; i++) {
-         state->tmpd.ptr.p_double[i] = (double)(1);
+         state->tmpd.xR[i] = (double)(1);
       }
    }
 
@@ -6872,19 +6872,19 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
    while (linlsqriteration(state, _state)) {
       if (state->needmv) {
          for (i = 0; i <= n - 1; i++) {
-            state->tmpx.ptr.p_double[i] = state->tmpd.ptr.p_double[i] * state->x.ptr.p_double[i];
+            state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
          }
          sparsemv(a, &state->tmpx, &state->mv, _state);
       }
       if (state->needmtv) {
          sparsemtv(a, &state->x, &state->mtv, _state);
          for (i = 0; i <= n - 1; i++) {
-            state->mtv.ptr.p_double[i] = state->tmpd.ptr.p_double[i] * state->mtv.ptr.p_double[i];
+            state->mtv.xR[i] = state->tmpd.xR[i] * state->mtv.xR[i];
          }
       }
    }
    for (i = 0; i <= n - 1; i++) {
-      state->rx.ptr.p_double[i] = state->tmpd.ptr.p_double[i] * state->rx.ptr.p_double[i];
+      state->rx.xR[i] = state->tmpd.xR[i] * state->rx.xR[i];
    }
 }
 
@@ -6952,7 +6952,7 @@ void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_stat
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&x->xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
    rep->terminationtype = state->repterminationtype;
@@ -7460,16 +7460,16 @@ bool nleqiteration(nleqstate *state, ae_state *_state) {
 //   generation - on first subroutine call
 // * values from previous call - on subsequent calls
    if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.ptr.p_int[0];
-      m = state->rstate.ia.ptr.p_int[1];
-      i = state->rstate.ia.ptr.p_int[2];
-      b = state->rstate.ba.ptr.p_bool[0];
-      lambdaup = state->rstate.ra.ptr.p_double[0];
-      lambdadown = state->rstate.ra.ptr.p_double[1];
-      lambdav = state->rstate.ra.ptr.p_double[2];
-      rho = state->rstate.ra.ptr.p_double[3];
-      mu = state->rstate.ra.ptr.p_double[4];
-      stepnorm = state->rstate.ra.ptr.p_double[5];
+      n = state->rstate.ia.xZ[0];
+      m = state->rstate.ia.xZ[1];
+      i = state->rstate.ia.xZ[2];
+      b = state->rstate.ba.xB[0];
+      lambdaup = state->rstate.ra.xR[0];
+      lambdadown = state->rstate.ra.xR[1];
+      lambdav = state->rstate.ra.xR[2];
+      rho = state->rstate.ra.xR[3];
+      mu = state->rstate.ra.xR[4];
+      stepnorm = state->rstate.ra.xR[5];
    } else {
       n = 359;
       m = -58;
@@ -7515,7 +7515,7 @@ bool nleqiteration(nleqstate *state, ae_state *_state) {
 lbl_0:
    state->needf = false;
    state->repnfunc = state->repnfunc + 1;
-   ae_v_move(&state->xbase.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->xbase.xR[0], 1, &state->x.xR[0], 1, ae_v_len(0, n - 1));
    state->fbase = state->f;
    state->fprev = ae_maxrealnumber;
    if (!state->xrep) {
@@ -7549,7 +7549,7 @@ lbl_7:
 // at XBase
    nleq_clearrequestfields(state, _state);
    state->needfij = true;
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
@@ -7557,7 +7557,7 @@ lbl_2:
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
    rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0, _state);
-   ae_v_muld(&state->rightpart.ptr.p_double[0], 1, ae_v_len(0, n - 1), -1);
+   ae_v_muld(&state->rightpart.xR[0], 1, ae_v_len(0, n - 1), -1);
 
 // Inner cycle: find good lambda
 lbl_9:
@@ -7570,14 +7570,14 @@ lbl_9:
 // * Lambda   - is additional Levenberg-Marquardt parameter
 //              for better convergence when far away from minimum
    for (i = 0; i <= n - 1; i++) {
-      state->candstep.ptr.p_double[i] = (double)(0);
+      state->candstep.xR[i] = (double)(0);
    }
    fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf, _state);
 
 // Normalize step (it must be no more than StpMax)
    stepnorm = (double)(0);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_neq(state->candstep.ptr.p_double[i], (double)(0))) {
+      if (ae_fp_neq(state->candstep.xR[i], (double)(0))) {
          stepnorm = (double)(1);
          break;
       }
@@ -7593,11 +7593,11 @@ lbl_9:
 // We can break this cycle on two occasions:
 // * step is so small that x+step == x (in floating point arithmetics)
 // * lambda is so large
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   ae_v_addd(&state->x.ptr.p_double[0], 1, &state->candstep.ptr.p_double[0], 1, ae_v_len(0, n - 1), stepnorm);
+   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_addd(&state->x.xR[0], 1, &state->candstep.xR[0], 1, ae_v_len(0, n - 1), stepnorm);
    b = true;
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_neq(state->x.ptr.p_double[i], state->xbase.ptr.p_double[i])) {
+      if (ae_fp_neq(state->x.xR[i], state->xbase.xR[i])) {
          b = false;
          break;
       }
@@ -7606,7 +7606,7 @@ lbl_9:
 
    // Step is too small, force zero step and break
       stepnorm = (double)(0);
-      ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
       state->f = state->fbase;
       goto lbl_10;
    }
@@ -7627,7 +7627,7 @@ lbl_3:
 
    // Lambda is too large (near overflow), force zero step and break
       stepnorm = (double)(0);
-      ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
       state->f = state->fbase;
       goto lbl_10;
    }
@@ -7638,7 +7638,7 @@ lbl_10:
 // * new position
 // * new function value
    state->fbase = state->f;
-   ae_v_addd(&state->xbase.ptr.p_double[0], 1, &state->candstep.ptr.p_double[0], 1, ae_v_len(0, n - 1), stepnorm);
+   ae_v_addd(&state->xbase.xR[0], 1, &state->candstep.xR[0], 1, ae_v_len(0, n - 1), stepnorm);
    state->repiterationscount = state->repiterationscount + 1;
 
 // Report new iteration
@@ -7648,7 +7648,7 @@ lbl_10:
    nleq_clearrequestfields(state, _state);
    state->xupdated = true;
    state->f = state->fbase;
-   ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
@@ -7678,16 +7678,16 @@ lbl_8:
 // Saving state
 lbl_rcomm:
    result = true;
-   state->rstate.ia.ptr.p_int[0] = n;
-   state->rstate.ia.ptr.p_int[1] = m;
-   state->rstate.ia.ptr.p_int[2] = i;
-   state->rstate.ba.ptr.p_bool[0] = b;
-   state->rstate.ra.ptr.p_double[0] = lambdaup;
-   state->rstate.ra.ptr.p_double[1] = lambdadown;
-   state->rstate.ra.ptr.p_double[2] = lambdav;
-   state->rstate.ra.ptr.p_double[3] = rho;
-   state->rstate.ra.ptr.p_double[4] = mu;
-   state->rstate.ra.ptr.p_double[5] = stepnorm;
+   state->rstate.ia.xZ[0] = n;
+   state->rstate.ia.xZ[1] = m;
+   state->rstate.ia.xZ[2] = i;
+   state->rstate.ba.xB[0] = b;
+   state->rstate.ra.xR[0] = lambdaup;
+   state->rstate.ra.xR[1] = lambdadown;
+   state->rstate.ra.xR[2] = lambdav;
+   state->rstate.ra.xR[3] = rho;
+   state->rstate.ra.xR[4] = mu;
+   state->rstate.ra.xR[5] = stepnorm;
    return result;
 }
 
@@ -7734,7 +7734,7 @@ void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_st
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&x->xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, state->n - 1));
    rep->iterationscount = state->repiterationscount;
    rep->nfunc = state->repnfunc;
    rep->njac = state->repnjac;
@@ -7759,7 +7759,7 @@ void nleqrestartfrom(nleqstate *state, RVector *x, ae_state *_state) {
 
    ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "NLEQRestartFrom: X contains infinite or NaN values!", _state);
-   ae_v_move(&state->x.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(&state->x.xR[0], 1, &x->xR[0], 1, ae_v_len(0, state->n - 1));
    ae_vector_set_length(&state->rstate.ia, 2 + 1, _state);
    ae_vector_set_length(&state->rstate.ba, 0 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 5 + 1, _state);

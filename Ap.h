@@ -298,9 +298,9 @@ struct x_vector {
    ae_int64_t owner;
    ae_int64_t last_action;
    union {
-      void *p_ptr;
+      void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
-   } x_ptr;
+   };
 };
 
 // x-matrix:
@@ -336,9 +336,9 @@ struct x_matrix {
    ae_int64_t owner;
    ae_int64_t last_action;
    union {
-      void *p_ptr;
+      void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
-   } x_ptr;
+   };
 };
 
 // dynamic block which may be automatically deallocated during stack unwinding
@@ -485,30 +485,24 @@ struct ae_serializer {
 typedef struct ae_vector {
 // Number of elements in array, cnt >= 0
    ae_int_t cnt;
-
 // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
    ae_datatype datatype;
-
-// If ptr points to memory owned and managed by ae_vector itself,
-// this field is false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is true.
+// If the x{X,B,U,Z,R,C} points to memory owned and managed by ae_vector itself, this field is false.
+// If vector was attached to x_vector structure with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
-
-// ae_dyn_block structure which manages data in ptr. This structure
-// is responsible for automatic deletion of object when its frame
-// is destroyed.
+// ae_dyn_block structure which manages data in ptr.
+// This structure is responsible for automatic deletion of object when its frame is destroyed.
    ae_dyn_block data;
-
 // Pointer to data.
 // User usually works with this field.
    union {
-      void *p_ptr;
-      bool *p_bool;
-      unsigned char *p_ubyte;
-      ae_int_t *p_int;
-      double *p_double;
-      ae_complex *p_complex;
-   } ptr;
+      void *xX;
+      bool *xB;
+      unsigned char *xU;
+      ae_int_t *xZ;
+      double *xR;
+      ae_complex *xC;
+   };
 } ae_vector;
 
 typedef struct ae_matrix {
@@ -516,21 +510,18 @@ typedef struct ae_matrix {
    ae_int_t cols;
    ae_int_t stride;
    ae_datatype datatype;
-
-// If ptr points to memory owned and managed by ae_vector itself,
-// this field is false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is true.
+// If the xB/xy{X,B,Z,R,C} points to memory owned and managed by ae_vector itself, this field is false.
+// If vector was attached to x_vector structure with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
-
    ae_dyn_block data;
    union {
-      void *p_ptr;
-      void **pp_void;
-      bool **pp_bool;
-      ae_int_t **pp_int;
-      double **pp_double;
-      ae_complex **pp_complex;
-   } ptr;
+      void *xX;
+      void **xyX;
+      bool **xyB;
+      ae_int_t **xyZ;
+      double **xyR;
+      ae_complex **xyC;
+   };
 } ae_matrix;
 
 // Used for better documenting function parameters.

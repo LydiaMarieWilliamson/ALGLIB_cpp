@@ -397,7 +397,7 @@ const char *ae_get_last_error_xdesc() {
 }
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
-   union _u {
+   union {
       const void *ptr;
       ae_int_t iptr;
    } u;
@@ -464,7 +464,7 @@ void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    for (;;) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
-      union _u {
+      union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
@@ -503,7 +503,7 @@ void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    for (;;) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
-      union _u {
+      union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
@@ -810,11 +810,11 @@ void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
    if (dst->rows > 0 && dst->cols > 0) {
       p_base = (char *)storage;
       pp_ptr = (void **)dst->data.ptr;
-      dst->ptr.pp_void = pp_ptr;
+      dst->xyX = pp_ptr;
       for (i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
          pp_ptr[i] = p_base;
    } else
-      dst->ptr.pp_void = NULL;
+      dst->xyX = NULL;
 }
 
 // Returns size of datatype.
@@ -1131,13 +1131,13 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_stat
 
 // prepare for possible errors during allocation
    dst->cnt = 0;
-   dst->ptr.p_ptr = NULL;
+   dst->xX = NULL;
 
 // init
    ae_db_init(&dst->data, size * ae_sizeof(datatype), state, make_automatic);
    dst->cnt = size;
    dst->datatype = datatype;
-   dst->ptr.p_ptr = dst->data.ptr;
+   dst->xX = dst->data.ptr;
    dst->is_attached = false;
 }
 
@@ -1161,7 +1161,7 @@ void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_a
 
    ae_vector_init(dst, src->cnt, src->datatype, state, make_automatic);
    if (src->cnt != 0)
-      memmove(dst->ptr.p_ptr, src->ptr.p_ptr, (size_t)(src->cnt * ae_sizeof(src->datatype)));
+      memmove(dst->xX, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
 
 // This function initializes ae_vector using X-structure as source. New copy
@@ -1186,7 +1186,7 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool 
 
    ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, state, make_automatic);
    if (src->cnt > 0)
-      memmove(dst->ptr.p_ptr, src->x_ptr.p_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
+      memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
 }
 
 // This function initializes ae_vector using X-structure as source.
@@ -1225,7 +1225,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 
 // prepare for possible errors during allocation
    dst->cnt = 0;
-   dst->ptr.p_ptr = NULL;
+   dst->xX = NULL;
    dst->datatype = (ae_datatype) src->datatype;
 
 // zero-size init in order to correctly register in the frame
@@ -1233,7 +1233,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 
 // init
    dst->cnt = cnt;
-   dst->ptr.p_ptr = src->x_ptr.p_ptr;
+   dst->xX = src->x_ptr;
    dst->is_attached = true;
 }
 
@@ -1257,10 +1257,10 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state) {
 
 // realloc, being ready for exception during reallocation (cnt=ptr=0 on entry)
    dst->cnt = 0;
-   dst->ptr.p_ptr = NULL;
+   dst->xX = NULL;
    ae_db_realloc(&dst->data, newsize * ae_sizeof(dst->datatype), state);
    dst->cnt = newsize;
-   dst->ptr.p_ptr = dst->data.ptr;
+   dst->xX = dst->data.ptr;
 }
 
 // This function resized ae_vector, preserving previously existing elements.
@@ -1281,7 +1281,7 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
    ae_vector tmp; memset(&tmp, 0, sizeof tmp), ae_vector_init(&tmp, newsize, dst->datatype, state, false);
    bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
    if (bytes_total > 0)
-      memmove(tmp.ptr.p_ptr, dst->ptr.p_ptr, bytes_total);
+      memmove(tmp.xX, dst->xX, bytes_total);
    ae_swap_vectors(dst, &tmp);
    ae_vector_free(&tmp, true);
 }
@@ -1300,7 +1300,7 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
 void ae_vector_free(ae_vector *dst, bool/* make_automatic*/) {
    dst->cnt = 0;
    ae_db_free(&dst->data);
-   dst->ptr.p_ptr = 0;
+   dst->xX = 0;
    dst->is_attached = false;
 }
 
@@ -1318,13 +1318,13 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
 
    cnt = vec1->cnt;
    datatype = vec1->datatype;
-   p_ptr = vec1->ptr.p_ptr;
+   p_ptr = vec1->xX;
    vec1->cnt = vec2->cnt;
    vec1->datatype = vec2->datatype;
-   vec1->ptr.p_ptr = vec2->ptr.p_ptr;
+   vec1->xX = vec2->xX;
    vec2->cnt = cnt;
    vec2->datatype = datatype;
-   vec2->ptr.p_ptr = p_ptr;
+   vec2->xX = p_ptr;
 }
 
 // This function creates ae_matrix.
@@ -1356,7 +1356,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
       dst->rows = 0;
       dst->cols = 0;
       dst->is_attached = false;
-      dst->ptr.pp_void = NULL;
+      dst->xyX = NULL;
       dst->stride = 0;
       dst->datatype = datatype;
       ae_db_init(&dst->data, 0, state, make_automatic);
@@ -1366,7 +1366,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
    dst->is_attached = false;
    dst->rows = 0;
    dst->cols = 0;
-   dst->ptr.pp_void = NULL;
+   dst->xyX = NULL;
    dst->stride = cols;
    while (dst->stride * ae_sizeof(datatype) % AE_DATA_ALIGN != 0)
       dst->stride++;
@@ -1393,10 +1393,10 @@ void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_a
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, state, make_automatic);
    if (src->rows != 0 && src->cols != 0) {
       if (dst->stride == src->stride)
-         memmove(dst->ptr.pp_void[0], src->ptr.pp_void[0], (size_t)(src->rows * src->stride * ae_sizeof(src->datatype)));
+         memmove(dst->xyX[0], src->xyX[0], (size_t)(src->rows * src->stride * ae_sizeof(src->datatype)));
       else
          for (i = 0; i < dst->rows; i++)
-            memmove(dst->ptr.pp_void[i], src->ptr.pp_void[i], (size_t)(dst->cols * ae_sizeof(dst->datatype)));
+            memmove(dst->xyX[i], src->xyX[i], (size_t)(dst->cols * ae_sizeof(dst->datatype)));
    }
 }
 
@@ -1422,8 +1422,8 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool 
    AE_CRITICAL_ASSERT(state != NULL);
    ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, state, make_automatic);
    if (src->rows != 0 && src->cols != 0) {
-      p_src_row = (char *)src->x_ptr.p_ptr;
-      p_dst_row = (char *)(dst->ptr.pp_void[0]);
+      p_src_row = (char *)src->x_ptr;
+      p_dst_row = (char *)(dst->xyX[0]);
       row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
       for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
          memmove(p_dst_row, p_src_row, (size_t)(row_size));
@@ -1477,7 +1477,7 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
    dst->cols = 0;
    dst->stride = cols;
    dst->datatype = (ae_datatype) src->datatype;
-   dst->ptr.pp_void = NULL;
+   dst->xyX = NULL;
    ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), state, make_automatic);
    dst->rows = rows;
    dst->cols = cols;
@@ -1486,10 +1486,10 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
       char *p_row;
       void **pp_ptr;
 
-      p_row = (char *)src->x_ptr.p_ptr;
+      p_row = (char *)src->x_ptr;
       rowsize = dst->stride * ae_sizeof(dst->datatype);
       pp_ptr = (void **)dst->data.ptr;
-      dst->ptr.pp_void = pp_ptr;
+      dst->xyX = pp_ptr;
       for (i = 0; i < dst->rows; i++, p_row += rowsize)
          pp_ptr[i] = p_row;
    }
@@ -1525,7 +1525,7 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
 // realloc, being ready for an exception during reallocation (rows=cols=0 on entry)
    dst->rows = 0;
    dst->cols = 0;
-   dst->ptr.pp_void = NULL;
+   dst->xyX = NULL;
    ae_db_realloc(&dst->data, rows * ((ae_int_t) sizeof(void *) + dst->stride * ae_sizeof(dst->datatype)) + AE_DATA_ALIGN - 1, state);
    dst->rows = rows;
    dst->cols = cols;
@@ -1550,7 +1550,7 @@ void ae_matrix_free(ae_matrix *dst, bool/* make_automatic*/) {
    dst->cols = 0;
    dst->stride = 0;
    ae_db_free(&dst->data);
-   dst->ptr.p_ptr = 0;
+   dst->xX = 0;
    dst->is_attached = false;
 }
 
@@ -1572,19 +1572,19 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
    cols = mat1->cols;
    stride = mat1->stride;
    datatype = mat1->datatype;
-   p_ptr = mat1->ptr.p_ptr;
+   p_ptr = mat1->xX;
 
    mat1->rows = mat2->rows;
    mat1->cols = mat2->cols;
    mat1->stride = mat2->stride;
    mat1->datatype = mat2->datatype;
-   mat1->ptr.p_ptr = mat2->ptr.p_ptr;
+   mat1->xX = mat2->xX;
 
    mat2->rows = rows;
    mat2->cols = cols;
    mat2->stride = stride;
    mat2->datatype = datatype;
-   mat2->ptr.p_ptr = p_ptr;
+   mat2->xX = p_ptr;
 }
 
 // This function creates smart pointer structure.
@@ -1716,15 +1716,15 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
 //   data  from src  (if  size / type  are  different)  or  overwritten  (if
 //   possible given destination size).
 void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
-   if (src->ptr.p_ptr == dst->x_ptr.p_ptr) {
+   if (src->xX == dst->x_ptr) {
    // src->ptr points to the beginning of dst, attached matrices, no need to copy
       return;
    }
    if (dst->cnt != src->cnt || dst->datatype != src->datatype) {
       if (dst->owner == OWN_AE)
-         ae_free(dst->x_ptr.p_ptr);
-      dst->x_ptr.p_ptr = ae_malloc((size_t)(src->cnt * ae_sizeof(src->datatype)), state);
-      if (src->cnt != 0 && dst->x_ptr.p_ptr == NULL)
+         ae_free(dst->x_ptr);
+      dst->x_ptr = ae_malloc((size_t)(src->cnt * ae_sizeof(src->datatype)), state);
+      if (src->cnt != 0 && dst->x_ptr == NULL)
          ae_break(state, ERR_OUT_OF_MEMORY, "ae_malloc(): out of memory");
       dst->last_action = ACT_NEW_LOCATION;
       dst->cnt = src->cnt;
@@ -1741,7 +1741,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
          ae_assert(false, "ALGLIB: internal error in ae_x_set_vector()", state);
    }
    if (src->cnt)
-      memmove(dst->x_ptr.p_ptr, src->ptr.p_ptr, (size_t)(src->cnt * ae_sizeof(src->datatype)));
+      memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
 
 // This function copies contents of ae_matrix to x_matrix.
@@ -1773,19 +1773,19 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
    char *p_dst_row;
    ae_int_t i;
    ae_int_t row_size;
-   if (src->ptr.pp_void != NULL && src->ptr.pp_void[0] == dst->x_ptr.p_ptr) {
+   if (src->xyX != NULL && src->xyX[0] == dst->x_ptr) {
    // src->ptr points to the beginning of dst, attached matrices, no need to copy
       return;
    }
    if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
       if (dst->owner == OWN_AE)
-         ae_free(dst->x_ptr.p_ptr);
+         ae_free(dst->x_ptr);
       dst->rows = src->rows;
       dst->cols = src->cols;
       dst->stride = src->cols;
       dst->datatype = src->datatype;
-      dst->x_ptr.p_ptr = ae_malloc((size_t)(dst->rows * ((ae_int_t) dst->stride) * ae_sizeof(src->datatype)), state);
-      if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr.p_ptr == NULL)
+      dst->x_ptr = ae_malloc((size_t)(dst->rows * ((ae_int_t) dst->stride) * ae_sizeof(src->datatype)), state);
+      if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr == NULL)
          ae_break(state, ERR_OUT_OF_MEMORY, "ae_malloc(): out of memory");
       dst->last_action = ACT_NEW_LOCATION;
       dst->owner = OWN_AE;
@@ -1800,8 +1800,8 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
          ae_assert(false, "ALGLIB: internal error in ae_x_set_vector()", state);
    }
    if (src->rows != 0 && src->cols != 0) {
-      p_src_row = (char *)(src->ptr.pp_void[0]);
-      p_dst_row = (char *)dst->x_ptr.p_ptr;
+      p_src_row = (char *)(src->xyX[0]);
+      p_dst_row = (char *)dst->x_ptr;
       row_size = ae_sizeof(src->datatype) * src->cols;
       for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof(src->datatype), p_dst_row += dst->stride * ae_sizeof(src->datatype))
          memmove(p_dst_row, p_src_row, (size_t)(row_size));
@@ -1823,8 +1823,8 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
 //   (assuming correctly initialized src)
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
    if (dst->owner == OWN_AE)
-      ae_free(dst->x_ptr.p_ptr);
-   dst->x_ptr.p_ptr = src->ptr.p_ptr;
+      ae_free(dst->x_ptr);
+   dst->x_ptr = src->xX;
    dst->last_action = ACT_NEW_LOCATION;
    dst->cnt = src->cnt;
    dst->datatype = src->datatype;
@@ -1846,12 +1846,12 @@ void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
 //   (assuming correctly initialized src)
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    if (dst->owner == OWN_AE)
-      ae_free(dst->x_ptr.p_ptr);
+      ae_free(dst->x_ptr);
    dst->rows = src->rows;
    dst->cols = src->cols;
    dst->stride = src->stride;
    dst->datatype = src->datatype;
-   dst->x_ptr.p_ptr = &(src->ptr.pp_double[0][0]);
+   dst->x_ptr = &(src->xyR[0][0]);
    dst->last_action = ACT_NEW_LOCATION;
    dst->owner = OWN_CALLER;
 }
@@ -1862,8 +1862,8 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
 // dst                 vector
 void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
    if (dst->owner == OWN_AE)
-      aligned_free(dst->x_ptr.p_ptr);
-   dst->x_ptr.p_ptr = NULL;
+      aligned_free(dst->x_ptr);
+   dst->x_ptr = NULL;
    dst->cnt = 0;
 }
 
@@ -2176,7 +2176,7 @@ bool ae_fp_greater_eq(double v1, double v2) {
 }
 
 bool ae_isfinite_stateless(double x, ae_int_t endianness) {
-   union _u {
+   union {
       double a;
       ae_int32_t p[2];
    } u;
@@ -2190,7 +2190,7 @@ bool ae_isfinite_stateless(double x, ae_int_t endianness) {
 }
 
 bool ae_isnan_stateless(double x, ae_int_t endianness) {
-   union _u {
+   union {
       double a;
       ae_int32_t p[2];
    } u;
@@ -2207,7 +2207,7 @@ bool ae_isnan_stateless(double x, ae_int_t endianness) {
 }
 
 bool ae_isinf_stateless(double x, ae_int_t endianness) {
-   union _u {
+   union {
       double a;
       ae_int32_t p[2];
    } u;
@@ -2226,7 +2226,7 @@ bool ae_isinf_stateless(double x, ae_int_t endianness) {
 }
 
 bool ae_isposinf_stateless(double x, ae_int_t endianness) {
-   union _u {
+   union {
       double a;
       ae_int32_t p[2];
    } u;
@@ -2245,7 +2245,7 @@ bool ae_isposinf_stateless(double x, ae_int_t endianness) {
 }
 
 bool ae_isneginf_stateless(double x, ae_int_t endianness) {
-   union _u {
+   union {
       double a;
       ae_int32_t p[2];
    } u;
@@ -2496,8 +2496,8 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       double v;
       ae_int_t i, j;
 
-      p1 = (double *)(a->x_ptr.p_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr.p_ptr) + offset1 * a->stride + offset0;
+      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2546,7 +2546,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       return;
    }
 // base case
-   p = (double *)(a->x_ptr.p_ptr) + offset * a->stride + offset;
+   p = (double *)(a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2600,8 +2600,8 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       double v;
       ae_int_t i, j;
 
-      p1 = (ae_complex *) (a->x_ptr.p_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *) (a->x_ptr.p_ptr) + offset1 * a->stride + offset0;
+      p1 = (ae_complex *) (a->x_ptr) + offset0 * a->stride + offset1;
+      p2 = (ae_complex *) (a->x_ptr) + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2650,7 +2650,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       return;
    }
 // base case
-   p = (ae_complex *) (a->x_ptr.p_ptr) + offset * a->stride + offset;
+   p = (ae_complex *) (a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2705,8 +2705,8 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       double *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
 
-      p1 = (double *)(a->x_ptr.p_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr.p_ptr) + offset1 * a->stride + offset0;
+      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2741,7 +2741,7 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       return;
    }
 // base case
-   p = (double *)(a->x_ptr.p_ptr) + offset * a->stride + offset;
+   p = (double *)(a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2777,8 +2777,8 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       ae_complex *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
 
-      p1 = (ae_complex *) (a->x_ptr.p_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *) (a->x_ptr.p_ptr) + offset1 * a->stride + offset0;
+      p1 = (ae_complex *) (a->x_ptr) + offset0 * a->stride + offset1;
+      p2 = (ae_complex *) (a->x_ptr) + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2813,7 +2813,7 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       return;
    }
 // base case
-   p = (ae_complex *) (a->x_ptr.p_ptr) + offset * a->stride + offset;
+   p = (ae_complex *) (a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -3055,7 +3055,7 @@ bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
 //             (11 chars for value, one for trailing zero)
 // state       ALGLIB environment state
 void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
-   union _u {
+   union {
       ae_int_t ival;
       unsigned char bytes[9];
    } u;
@@ -3154,7 +3154,7 @@ ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend) {
    const char *emsg = "ALGLIB: unable to read integer value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
-   union _u {
+   union {
       ae_int_t ival;
       unsigned char bytes[9];
    } u;
@@ -3253,7 +3253,7 @@ ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheen
 //             (11 chars for value, one for trailing zero)
 // state       ALGLIB environment state
 void ae_double2str(double v, char *buf, ae_state *state) {
-   union _u {
+   union {
       double dval;
       unsigned char bytes[9];
    } u;
@@ -3313,7 +3313,7 @@ double ae_str2double(const char *buf, ae_state *state, const char **pasttheend) 
    const char *emsg = "ALGLIB: unable to read double value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
-   union _u {
+   union {
       double dval;
       unsigned char bytes[9];
    } u;
@@ -4278,7 +4278,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
       elen = bytes->cnt - eidx * chunk_size;
       elen = elen > chunk_size ? chunk_size : elen;
       memset(&tmpi, 0, sizeof tmpi);
-      memmove(&tmpi, bytes->ptr.p_ubyte + eidx * chunk_size, elen);
+      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
       ae_serializer_serialize_int64(serializer, tmpi, state);
    }
 }
@@ -4361,7 +4361,7 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
       elen = n - eidx * chunk_size;
       elen = elen > chunk_size ? chunk_size : elen;
       ae_serializer_unserialize_int64(serializer, &tmp64, state);
-      memmove(bytes->ptr.p_ubyte + eidx * chunk_size, &tmp64, elen);
+      memmove(bytes->xU + eidx * chunk_size, &tmp64, elen);
    }
 }
 
@@ -6840,7 +6840,7 @@ bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, a
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixgemm(m, n, k, alpha, _a->ptr.pp_double[ia] + ja, _a->stride, optypea, _b->ptr.pp_double[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_double[ic] + jc, _c->stride);
+   return _ialglib_rmatrixgemm(m, n, k, alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, beta, _c->xyR[ic] + jc, _c->stride);
 }
 
 bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
@@ -6849,7 +6849,7 @@ bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alph
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixgemm(m, n, k, alpha, _a->ptr.pp_complex[ia] + ja, _a->stride, optypea, _b->ptr.pp_complex[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_complex[ic] + jc, _c->stride);
+   return _ialglib_cmatrixgemm(m, n, k, alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, beta, _c->xyC[ic] + jc, _c->stride);
 }
 
 bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6858,7 +6858,7 @@ bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixrighttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
+   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6867,7 +6867,7 @@ bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixrighttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
+   return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
 bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6876,7 +6876,7 @@ bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t 
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixlefttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
+   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6885,7 +6885,7 @@ bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t 
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixlefttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
+   return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
 bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -6894,7 +6894,7 @@ bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a,
       return false;
 
 // ALGLIB kernel
-   return _ialglib_cmatrixherk(n, k, alpha, &a->ptr.pp_complex[ia][ja], a->stride, optypea, beta, &c->ptr.pp_complex[ic][jc], c->stride, isupper);
+   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -6903,19 +6903,19 @@ bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a,
       return false;
 
 // ALGLIB kernel
-   return _ialglib_rmatrixsyrk(n, k, alpha, &a->ptr.pp_double[ia][ja], a->stride, optypea, beta, &c->ptr.pp_double[ic][jc], c->stride, isupper);
+   return _ialglib_rmatrixsyrk(n, k, alpha, &a->xyR[ia][ja], a->stride, optypea, beta, &c->xyR[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_cmatrixrank1(m, n, &a->ptr.pp_complex[ia][ja], a->stride, &u->ptr.p_complex[uoffs], &v->ptr.p_complex[voffs]);
+   return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
 }
 
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_rmatrixrank1(m, n, &a->ptr.pp_double[ia][ja], a->stride, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
+   return _ialglib_rmatrixrank1(m, n, &a->xyR[ia][ja], a->stride, &u->xR[uoffs], &v->xR[voffs]);
 }
 
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_rmatrixger(m, n, &a->ptr.pp_double[ia][ja], a->stride, alpha, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
+   return _ialglib_rmatrixger(m, n, &a->xyR[ia][ja], a->stride, alpha, &u->xR[uoffs], &v->xR[voffs]);
 }
 
 // This function reads rectangular matrix A given by two column pointers
@@ -7392,11 +7392,11 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
    // use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, y->ptr.p_double, _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, y->xR, _state))
 // Original generic C implementation
    result = (double)(0);
    for (i = 0; i <= n - 1; i++) {
-      result = result + x->ptr.p_double[i] * y->ptr.p_double[i];
+      result = result + x->xR[i] * y->xR[i];
    }
    return result;
 }
@@ -7419,10 +7419,10 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, a->xyR[i], _state))
    result = (double)(0);
    for (j = 0; j <= n - 1; j++) {
-      result = result + x->ptr.p_double[j] * a->ptr.pp_double[i][j];
+      result = result + x->xR[j] * a->xyR[i][j];
    }
    return result;
 }
@@ -7445,10 +7445,10 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->ptr.pp_double[ia], b->ptr.pp_double[ib], _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->xyR[ia], b->xyR[ib], _state))
    result = (double)(0);
    for (j = 0; j <= n - 1; j++) {
-      result = result + a->ptr.pp_double[ia][j] * b->ptr.pp_double[ib][j];
+      result = result + a->xyR[ia][j] * b->xyR[ib][j];
    }
    return result;
 }
@@ -7470,10 +7470,10 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->xR, _state))
    result = (double)(0);
    for (i = 0; i <= n - 1; i++) {
-      v = x->ptr.p_double[i];
+      v = x->xR[i];
       result = result + v * v;
    }
    return result;
@@ -7498,9 +7498,9 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, y->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->xR, y->xR, _state))
    for (j = 0; j <= n - 1; j++) {
-      y->ptr.p_double[j] = x->ptr.p_double[j];
+      y->xR[j] = x->xR[j];
    }
 }
 
@@ -7521,9 +7521,9 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->xR, a->xyR[i], _state))
    for (j = 0; j <= n - 1; j++) {
-      a->ptr.pp_double[i][j] = x->ptr.p_double[j];
+      a->xyR[i][j] = x->xR[j];
    }
 }
 
@@ -7544,9 +7544,9 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->xyR[i], x->xR, _state))
    for (j = 0; j <= n - 1; j++) {
-      x->ptr.p_double[j] = a->ptr.pp_double[i][j];
+      x->xR[j] = a->xyR[i][j];
    }
 }
 
@@ -7570,9 +7570,9 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->ptr.pp_double[i], b->ptr.pp_double[k], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->xyR[i], b->xyR[k], _state))
    for (j = 0; j <= n - 1; j++) {
-      b->ptr.pp_double[k][j] = a->ptr.pp_double[i][j];
+      b->xyR[k][j] = a->xyR[i][j];
    }
 }
 
@@ -7593,9 +7593,9 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->xR, y->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      y->ptr.p_double[i] = v * x->ptr.p_double[i];
+      y->xR[i] = v * x->xR[i];
    }
 }
 
@@ -7617,9 +7617,9 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->ptr.p_double, y->ptr.pp_double[ridx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->xR, y->xyR[ridx], _state))
    for (i = 0; i <= n - 1; i++) {
-      y->ptr.pp_double[ridx][i] = v * x->ptr.p_double[i];
+      y->xyR[ridx][i] = v * x->xR[i];
    }
 }
 
@@ -7639,9 +7639,9 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv, (n, x->ptr.p_int, y->ptr.p_int, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv, (n, x->xZ, y->xZ, _state))
    for (j = 0; j <= n - 1; j++) {
-      y->ptr.p_int[j] = x->ptr.p_int[j];
+      y->xZ[j] = x->xZ[j];
    }
 }
 
@@ -7664,9 +7664,9 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1 * 8)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv, (n, x->ptr.p_bool, y->ptr.p_bool, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv, (n, x->xB, y->xB, _state))
    for (j = 0; j <= n - 1; j++) {
-      y->ptr.p_bool[j] = x->ptr.p_bool[j];
+      y->xB[j] = x->xB[j];
    }
 }
 
@@ -7686,9 +7686,9 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, x->xR, _state))
    for (j = 0; j <= n - 1; j++) {
-      x->ptr.p_double[j] = v;
+      x->xR[j] = v;
    }
 }
 
@@ -7709,9 +7709,9 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, a->ptr.pp_double[i], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, a->xyR[i], _state))
    for (j = 0; j <= n - 1; j++) {
-      a->ptr.pp_double[i][j] = v;
+      a->xyR[i][j] = v;
    }
 }
 
@@ -7731,9 +7731,9 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx, (n, v, x->ptr.p_double + offsx, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx, (n, v, x->xR + offsx, _state))
    for (j = 0; j <= n - 1; j++) {
-      x->ptr.p_double[offsx + j] = v;
+      x->xR[offsx + j] = v;
    }
 }
 
@@ -7764,14 +7764,14 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1) {
       for (i = 0; i < m; i++) {
-         rsetm_simd(n, v, a->ptr.pp_double[i], _state);
+         rsetm_simd(n, v, a->xyR[i], _state);
       }
       return;
    }
 
    for (i = 0; i <= m - 1; i++) {
       for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = v;
+         a->xyR[i][j] = v;
       }
    }
 }
@@ -7792,9 +7792,9 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv, (n, v, x->ptr.p_int, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv, (n, v, x->xZ, _state))
    for (j = 0; j <= n - 1; j++) {
-      x->ptr.p_int[j] = v;
+      x->xZ[j] = v;
    }
 }
 
@@ -7814,9 +7814,9 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1 * 8)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv, (n, v, x->ptr.p_bool, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv, (n, v, x->xB, _state))
    for (j = 0; j <= n - 1; j++) {
-      x->ptr.p_bool[j] = v;
+      x->xB[j] = v;
    }
 }
 
@@ -7836,9 +7836,9 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] * v;
+      x->xR[i] = x->xR[i] * v;
    }
 }
 
@@ -7858,9 +7858,9 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xyR[rowidx], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * v;
+      x->xyR[rowidx][i] = x->xyR[rowidx][i] * v;
    }
 }
 
@@ -7880,9 +7880,9 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->ptr.p_double + offsx, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->xR + offsx, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] * v;
+      x->xR[offsx + i] = x->xR[offsx + i] * v;
    }
 }
 
@@ -7903,9 +7903,9 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.p_double[i];
+      x->xR[i] = x->xR[i] + alpha * y->xR[i];
    }
 }
 
@@ -7926,9 +7926,9 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] + alpha * y->ptr.p_double[i];
+      x->xyR[rowidx][i] = x->xyR[rowidx][i] + alpha * y->xR[i];
    }
 }
 
@@ -7950,9 +7950,9 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridx], x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridx], x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] + alpha * y->ptr.pp_double[ridx][i];
+      x->xR[i] = x->xR[i] + alpha * y->xyR[ridx][i];
    }
 }
 
@@ -7975,9 +7975,9 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->ptr.pp_double[ridxsrc], x->ptr.pp_double[ridxdst], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridxsrc], x->xyR[ridxdst], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[ridxdst][i] = x->ptr.pp_double[ridxdst][i] + alpha * y->ptr.pp_double[ridxsrc][i];
+      x->xyR[ridxdst][i] = x->xyR[ridxdst][i] + alpha * y->xyR[ridxsrc][i];
    }
 }
 
@@ -8000,9 +8000,9 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->ptr.p_double + offsy, x->ptr.p_double + offsx, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->xR + offsy, x->xR + offsx, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[offsx + i] = x->ptr.p_double[offsx + i] + alpha * y->ptr.p_double[offsy + i];
+      x->xR[offsx + i] = x->xR[offsx + i] + alpha * y->xR[offsy + i];
    }
 }
 
@@ -8022,9 +8022,9 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.p_double[i];
+      x->xR[i] = x->xR[i] * y->xR[i];
    }
 }
 
@@ -8044,9 +8044,9 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[rowidx][i] = x->ptr.pp_double[rowidx][i] * y->ptr.p_double[i];
+      x->xyR[rowidx][i] = x->xyR[rowidx][i] * y->xR[i];
    }
 }
 
@@ -8066,9 +8066,9 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->ptr.pp_double[rowidx], x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xyR[rowidx], x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] * y->ptr.pp_double[rowidx][i];
+      x->xR[i] = x->xR[i] * y->xyR[rowidx][i];
    }
 }
 
@@ -8088,9 +8088,9 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = ae_maxreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
+      x->xR[i] = ae_maxreal(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -8110,9 +8110,9 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[rowidx][i] = ae_maxreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
+      x->xyR[rowidx][i] = ae_maxreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -8132,9 +8132,9 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      y->ptr.p_double[i] = ae_maxreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
+      y->xR[i] = ae_maxreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -8154,9 +8154,9 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.p_double[i] = ae_minreal(x->ptr.p_double[i], y->ptr.p_double[i], _state);
+      x->xR[i] = ae_minreal(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -8176,9 +8176,9 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->ptr.p_double, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i <= n - 1; i++) {
-      x->ptr.pp_double[rowidx][i] = ae_minreal(x->ptr.pp_double[rowidx][i], y->ptr.p_double[i], _state);
+      x->xyR[rowidx][i] = ae_minreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -8198,9 +8198,9 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->ptr.pp_double[rowidx], y->ptr.p_double, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i <= n - 1; i++) {
-      y->ptr.p_double[i] = ae_minreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
+      y->xR[i] = ae_minreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -8222,13 +8222,13 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.p_double, _state));
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->xR, _state));
 
    if (n == 0)
       return 0.0;
-   result = x->ptr.p_double[0];
+   result = x->xR[0];
    for (i = 1; i <= n - 1; i++) {
-      v = x->ptr.p_double[i];
+      v = x->xR[i];
       if (v > result) {
          result = v;
       }
@@ -8254,12 +8254,12 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->xyR[rowidx], _state))
          if (n == 0)
    return 0.0;
-   result = x->ptr.pp_double[rowidx][0];
+   result = x->xyR[rowidx][0];
    for (i = 1; i <= n - 1; i++) {
-      v = x->ptr.pp_double[rowidx][i];
+      v = x->xyR[rowidx][i];
       if (v > result) {
          result = v;
       }
@@ -8285,10 +8285,10 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.p_double, _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xR, _state))
       result = (double)(0);
    for (i = 0; i <= n - 1; i++) {
-      v = ae_fabs(x->ptr.p_double[i], _state);
+      v = ae_fabs(x->xR[i], _state);
       if (v > result) {
          result = v;
       }
@@ -8314,10 +8314,10 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.pp_double[rowidx], _state))
+      _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xyR[rowidx], _state))
       result = (double)(0);
    for (i = 0; i <= n - 1; i++) {
-      v = ae_fabs(x->ptr.pp_double[rowidx][i], _state);
+      v = ae_fabs(x->xyR[rowidx][i], _state);
       if (v > result) {
          result = v;
       }
@@ -8345,9 +8345,9 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx, (n, x->ptr.p_double + offsx, y->ptr.p_double + offsy, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx, (n, x->xR + offsx, y->xR + offsy, _state))
    for (j = 0; j <= n - 1; j++) {
-      y->ptr.p_double[offsy + j] = x->ptr.p_double[offsx + j];
+      y->xR[offsy + j] = x->xR[offsx + j];
    }
 }
 
@@ -8371,9 +8371,9 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx, (n, x->ptr.p_int + offsx, y->ptr.p_int + offsy, _state))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx, (n, x->xZ + offsx, y->xZ + offsy, _state))
    for (j = 0; j <= n - 1; j++) {
-      y->ptr.p_int[offsy + j] = x->ptr.p_int[offsx + j];
+      y->xZ[offsy + j] = x->xZ[offsx + j];
    }
 }
 
@@ -8433,26 +8433,26 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
    if (opa == 0) {
    // Try SIMD code
       if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->xR, y->xR, _state))
    // Generic C version: y += A*x
       for (i = 0; i <= m - 1; i++) {
          v = (double)(0);
          for (j = 0; j <= n - 1; j++) {
-            v = v + a->ptr.pp_double[i][j] * x->ptr.p_double[j];
+            v = v + a->xyR[i][j] * x->xR[j];
          }
-         y->ptr.p_double[i] = alpha * v + y->ptr.p_double[i];
+         y->xR[i] = alpha * v + y->xR[i];
       }
       return;
    }
    if (opa == 1) {
    // Try SIMD code
       if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->ptr.p_double, y->ptr.p_double, _state))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->xR, y->xR, _state))
    // Generic C version: y += A^T*x
       for (i = 0; i <= n - 1; i++) {
-         v = alpha * x->ptr.p_double[i];
+         v = alpha * x->xR[i];
          for (j = 0; j <= m - 1; j++) {
-            y->ptr.p_double[j] = y->ptr.p_double[j] + v * a->ptr.pp_double[i][j];
+            y->xR[j] = y->xR[j] + v * a->xyR[i][j];
          }
       }
       return;
@@ -8521,26 +8521,26 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
    if (opa == 0) {
    // Try SIMD code
       if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy, _state))
    // Generic C code: y += A*x
       for (i = 0; i <= m - 1; i++) {
          v = (double)(0);
          for (j = 0; j <= n - 1; j++) {
-            v = v + a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+            v = v + a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
-         y->ptr.p_double[iy + i] = alpha * v + y->ptr.p_double[iy + i];
+         y->xR[iy + i] = alpha * v + y->xR[iy + i];
       }
       return;
    }
    if (opa == 1) {
    // Try SIMD code
       if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy, _state))
    // Generic C code: y += A^T*x
       for (i = 0; i <= n - 1; i++) {
-         v = alpha * x->ptr.p_double[ix + i];
+         v = alpha * x->xR[ix + i];
          for (j = 0; j <= m - 1; j++) {
-            y->ptr.p_double[iy + j] = y->ptr.p_double[iy + j] + v * a->ptr.pp_double[ia + i][ja + j];
+            y->xR[iy + j] = y->xR[iy + j] + v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -8570,9 +8570,9 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
       return;
    }
    for (i = 0; i <= m - 1; i++) {
-      s = alpha * u->ptr.p_double[i];
+      s = alpha * u->xR[i];
       for (j = 0; j <= n - 1; j++) {
-         a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] + s * v->ptr.p_double[j];
+         a->xyR[i][j] = a->xyR[i][j] + s * v->xR[j];
       }
    }
 }
@@ -8614,58 +8614,58 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
    }
    if (optype == 0 && isupper) {
       for (i = n - 1; i >= 0; i--) {
-         v = x->ptr.p_double[ix + i];
+         v = x->xR[ix + i];
          for (j = i + 1; j <= n - 1; j++) {
-            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
+            v = v / a->xyR[ia + i][ja + i];
          }
-         x->ptr.p_double[ix + i] = v;
+         x->xR[ix + i] = v;
       }
       return;
    }
    if (optype == 0 && !isupper) {
       for (i = 0; i <= n - 1; i++) {
-         v = x->ptr.p_double[ix + i];
+         v = x->xR[ix + i];
          for (j = 0; j <= i - 1; j++) {
-            v = v - a->ptr.pp_double[ia + i][ja + j] * x->ptr.p_double[ix + j];
+            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
+            v = v / a->xyR[ia + i][ja + i];
          }
-         x->ptr.p_double[ix + i] = v;
+         x->xR[ix + i] = v;
       }
       return;
    }
    if (optype == 1 && isupper) {
       for (i = 0; i <= n - 1; i++) {
-         v = x->ptr.p_double[ix + i];
+         v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
+            v = v / a->xyR[ia + i][ja + i];
          }
-         x->ptr.p_double[ix + i] = v;
+         x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = i + 1; j <= n - 1; j++) {
-            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
+            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
          }
       }
       return;
    }
    if (optype == 1 && !isupper) {
       for (i = n - 1; i >= 0; i--) {
-         v = x->ptr.p_double[ix + i];
+         v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->ptr.pp_double[ia + i][ja + i];
+            v = v / a->xyR[ia + i][ja + i];
          }
-         x->ptr.p_double[ix + i] = v;
+         x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = 0; j <= i - 1; j++) {
-            x->ptr.p_double[ix + j] = x->ptr.p_double[ix + j] - v * a->ptr.pp_double[ia + i][ja + j];
+            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -8698,15 +8698,15 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 #      endif
 
 // Prepare C
-   c = _c->ptr.pp_double[ic] + jc;
+   c = _c->xyR[ic] + jc;
    stride_c = _c->stride;
 
 // Do we have alpha*A*B ?
    if (alpha != 0 && k > 0) {
    // Prepare structures
       ae_int_t base0, base1, offs0;
-      double *a = _a->ptr.pp_double[ia] + ja;
-      double *b = _b->ptr.pp_double[ib] + jb;
+      double *a = _a->xyR[ia] + ja;
+      double *b = _b->xyR[ib] + jb;
       ae_int_t stride_a = _a->stride;
       ae_int_t stride_b = _b->stride;
       double _blka[_ABLASF_BLOCK_SIZE * _ABLASF_MICRO_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
@@ -8790,10 +8790,10 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 // Propagate rank-1 node (can not be accelerated with SIMD)
    if (blocksize == 1 && sstride == 1) {
    // blocksize is 1, stride is 1
-      double vx = x->ptr.p_double[cols0];
-      double *p_mat_row = rowstorage->ptr.p_double + offss + 1 * 1;
-      double *p_simd_buf = simdbuf->ptr.p_double;
-      ae_int_t *p_rowidx = superrowidx->ptr.p_int + rbase;
+      double vx = x->xR[cols0];
+      double *p_mat_row = rowstorage->xR + offss + 1 * 1;
+      double *p_simd_buf = simdbuf->xR;
+      ae_int_t *p_rowidx = superrowidx->xZ + rbase;
       if (simdwidth == 4) {
          for (k = 0; k < offdiagsize; k++)
             p_simd_buf[p_rowidx[k] * 4] -= p_mat_row[k] * vx;
@@ -8805,13 +8805,13 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
    }
 // Generic C code for generic propagate
    for (k = 0; k <= offdiagsize - 1; k++) {
-      i = superrowidx->ptr.p_int[rbase + k];
+      i = superrowidx->xZ[rbase + k];
       baseoffs = offss + (k + blocksize) * sstride;
-      v = simdbuf->ptr.p_double[i * simdwidth];
+      v = simdbuf->xR[i * simdwidth];
       for (j = 0; j <= blocksize - 1; j++) {
-         v = v - rowstorage->ptr.p_double[baseoffs + j] * x->ptr.p_double[cols0 + j];
+         v = v - rowstorage->xR[baseoffs + j] * x->xR[cols0 + j];
       }
-      simdbuf->ptr.p_double[i * simdwidth] = v;
+      simdbuf->xR[i * simdwidth] = v;
    }
 }
 
@@ -8839,7 +8839,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4, (rowstorage->ptr.p_double, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
+   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4, (rowstorage->xR, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase, _state))
 // Generic code
    ae_int_t k;
    ae_int_t targetrow;
@@ -8893,7 +8893,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    srccol2 = -1;
    srccol3 = -1;
    for (k = 0; k <= uwidth - 1; k++) {
-      targetcol = raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]];
+      targetcol = raw2smap->xZ[superrowidx->xZ[urbase + k]];
       if (targetcol == 0) {
          srccol0 = k;
       }
@@ -8930,122 +8930,122 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    u32 = (double)(0);
    u33 = (double)(0);
    if (urank >= 1) {
-      d0 = diagd->ptr.p_double[offsd + 0];
+      d0 = diagd->xR[offsd + 0];
    }
    if (urank >= 2) {
-      d1 = diagd->ptr.p_double[offsd + 1];
+      d1 = diagd->xR[offsd + 1];
    }
    if (urank >= 3) {
-      d2 = diagd->ptr.p_double[offsd + 2];
+      d2 = diagd->xR[offsd + 2];
    }
    if (urank >= 4) {
-      d3 = diagd->ptr.p_double[offsd + 3];
+      d3 = diagd->xR[offsd + 3];
    }
    if (srccol0 >= 0) {
       if (urank >= 1) {
-         u00 = d0 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 0];
+         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride + 0];
       }
       if (urank >= 2) {
-         u01 = d1 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 1];
+         u01 = d1 * rowstorage->xR[offsu + srccol0 * urowstride + 1];
       }
       if (urank >= 3) {
-         u02 = d2 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 2];
+         u02 = d2 * rowstorage->xR[offsu + srccol0 * urowstride + 2];
       }
       if (urank >= 4) {
-         u03 = d3 * rowstorage->ptr.p_double[offsu + srccol0 * urowstride + 3];
+         u03 = d3 * rowstorage->xR[offsu + srccol0 * urowstride + 3];
       }
    }
    if (srccol1 >= 0) {
       if (urank >= 1) {
-         u10 = d0 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 0];
+         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride + 0];
       }
       if (urank >= 2) {
-         u11 = d1 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 1];
+         u11 = d1 * rowstorage->xR[offsu + srccol1 * urowstride + 1];
       }
       if (urank >= 3) {
-         u12 = d2 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 2];
+         u12 = d2 * rowstorage->xR[offsu + srccol1 * urowstride + 2];
       }
       if (urank >= 4) {
-         u13 = d3 * rowstorage->ptr.p_double[offsu + srccol1 * urowstride + 3];
+         u13 = d3 * rowstorage->xR[offsu + srccol1 * urowstride + 3];
       }
    }
    if (srccol2 >= 0) {
       if (urank >= 1) {
-         u20 = d0 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 0];
+         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride + 0];
       }
       if (urank >= 2) {
-         u21 = d1 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 1];
+         u21 = d1 * rowstorage->xR[offsu + srccol2 * urowstride + 1];
       }
       if (urank >= 3) {
-         u22 = d2 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 2];
+         u22 = d2 * rowstorage->xR[offsu + srccol2 * urowstride + 2];
       }
       if (urank >= 4) {
-         u23 = d3 * rowstorage->ptr.p_double[offsu + srccol2 * urowstride + 3];
+         u23 = d3 * rowstorage->xR[offsu + srccol2 * urowstride + 3];
       }
    }
    if (srccol3 >= 0) {
       if (urank >= 1) {
-         u30 = d0 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 0];
+         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride + 0];
       }
       if (urank >= 2) {
-         u31 = d1 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 1];
+         u31 = d1 * rowstorage->xR[offsu + srccol3 * urowstride + 1];
       }
       if (urank >= 3) {
-         u32 = d2 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 2];
+         u32 = d2 * rowstorage->xR[offsu + srccol3 * urowstride + 2];
       }
       if (urank >= 4) {
-         u33 = d3 * rowstorage->ptr.p_double[offsu + srccol3 * urowstride + 3];
+         u33 = d3 * rowstorage->xR[offsu + srccol3 * urowstride + 3];
       }
    }
 // Run update
    if (urank == 1) {
       for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0;
+         uk0 = rowstorage->xR[offsk + 0];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0;
       }
    }
    if (urank == 2) {
       for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1;
+         uk0 = rowstorage->xR[offsk + 0];
+         uk1 = rowstorage->xR[offsk + 1];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1;
       }
    }
    if (urank == 3) {
       for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2;
+         uk0 = rowstorage->xR[offsk + 0];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2;
       }
    }
    if (urank == 4) {
       for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         uk0 = rowstorage->xR[offsk + 0];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
       }
    }
    result = true;
@@ -9104,55 +9104,55 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernel4444, (rowstorage->ptr.p_double, offss, sheight, offsu, uheight, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
+   _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernel4444, (rowstorage->xR, offss, sheight, offsu, uheight, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase, _state))
 // Generic C fallback code
-   d0 = diagd->ptr.p_double[offsd + 0];
-   d1 = diagd->ptr.p_double[offsd + 1];
-   d2 = diagd->ptr.p_double[offsd + 2];
-   d3 = diagd->ptr.p_double[offsd + 3];
-   u00 = d0 * rowstorage->ptr.p_double[offsu + 0 * 4 + 0];
-   u01 = d1 * rowstorage->ptr.p_double[offsu + 0 * 4 + 1];
-   u02 = d2 * rowstorage->ptr.p_double[offsu + 0 * 4 + 2];
-   u03 = d3 * rowstorage->ptr.p_double[offsu + 0 * 4 + 3];
-   u10 = d0 * rowstorage->ptr.p_double[offsu + 1 * 4 + 0];
-   u11 = d1 * rowstorage->ptr.p_double[offsu + 1 * 4 + 1];
-   u12 = d2 * rowstorage->ptr.p_double[offsu + 1 * 4 + 2];
-   u13 = d3 * rowstorage->ptr.p_double[offsu + 1 * 4 + 3];
-   u20 = d0 * rowstorage->ptr.p_double[offsu + 2 * 4 + 0];
-   u21 = d1 * rowstorage->ptr.p_double[offsu + 2 * 4 + 1];
-   u22 = d2 * rowstorage->ptr.p_double[offsu + 2 * 4 + 2];
-   u23 = d3 * rowstorage->ptr.p_double[offsu + 2 * 4 + 3];
-   u30 = d0 * rowstorage->ptr.p_double[offsu + 3 * 4 + 0];
-   u31 = d1 * rowstorage->ptr.p_double[offsu + 3 * 4 + 1];
-   u32 = d2 * rowstorage->ptr.p_double[offsu + 3 * 4 + 2];
-   u33 = d3 * rowstorage->ptr.p_double[offsu + 3 * 4 + 3];
+   d0 = diagd->xR[offsd + 0];
+   d1 = diagd->xR[offsd + 1];
+   d2 = diagd->xR[offsd + 2];
+   d3 = diagd->xR[offsd + 3];
+   u00 = d0 * rowstorage->xR[offsu + 0 * 4 + 0];
+   u01 = d1 * rowstorage->xR[offsu + 0 * 4 + 1];
+   u02 = d2 * rowstorage->xR[offsu + 0 * 4 + 2];
+   u03 = d3 * rowstorage->xR[offsu + 0 * 4 + 3];
+   u10 = d0 * rowstorage->xR[offsu + 1 * 4 + 0];
+   u11 = d1 * rowstorage->xR[offsu + 1 * 4 + 1];
+   u12 = d2 * rowstorage->xR[offsu + 1 * 4 + 2];
+   u13 = d3 * rowstorage->xR[offsu + 1 * 4 + 3];
+   u20 = d0 * rowstorage->xR[offsu + 2 * 4 + 0];
+   u21 = d1 * rowstorage->xR[offsu + 2 * 4 + 1];
+   u22 = d2 * rowstorage->xR[offsu + 2 * 4 + 2];
+   u23 = d3 * rowstorage->xR[offsu + 2 * 4 + 3];
+   u30 = d0 * rowstorage->xR[offsu + 3 * 4 + 0];
+   u31 = d1 * rowstorage->xR[offsu + 3 * 4 + 1];
+   u32 = d2 * rowstorage->xR[offsu + 3 * 4 + 2];
+   u33 = d3 * rowstorage->xR[offsu + 3 * 4 + 3];
    if (sheight == uheight) {
    // No row scatter, the most efficient code
       for (k = 0; k <= uheight - 1; k++) {
          targetrow = offss + k * 4;
          offsk = offsu + k * 4;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         uk0 = rowstorage->xR[offsk + 0];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
       }
    } else {
    // Row scatter is performed, less efficient code using double mapping to determine target row index
       for (k = 0; k <= uheight - 1; k++) {
-         targetrow = offss + raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase + k]] * 4;
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * 4;
-         uk0 = rowstorage->ptr.p_double[offsk + 0];
-         uk1 = rowstorage->ptr.p_double[offsk + 1];
-         uk2 = rowstorage->ptr.p_double[offsk + 2];
-         uk3 = rowstorage->ptr.p_double[offsk + 3];
-         rowstorage->ptr.p_double[targetrow + 0] = rowstorage->ptr.p_double[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->ptr.p_double[targetrow + 1] = rowstorage->ptr.p_double[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->ptr.p_double[targetrow + 2] = rowstorage->ptr.p_double[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         uk0 = rowstorage->xR[offsk + 0];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
+         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
+         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
+         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
       }
    }
    result = true;
@@ -10298,7 +10298,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
       ae_assert(rhs.ptr->cnt == ptr->cnt, "ALGLIB: incorrect assignment to proxy array (sizes do not match)", &_state);
    if (rhs.ptr->cnt != ptr->cnt)
       ae_vector_set_length(ptr, rhs.ptr->cnt, &_state);
-   memcpy(ptr->ptr.p_ptr, rhs.ptr->ptr.p_ptr, ptr->cnt * alglib_impl::ae_sizeof(ptr->datatype));
+   memcpy(ptr->xX, rhs.ptr->xX, ptr->cnt * alglib_impl::ae_sizeof(ptr->datatype));
    alglib_impl::ae_state_clear(&_state);
    return *this;
 }
@@ -10328,15 +10328,15 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
       }
       for (i = 0; i < svec.size(); i++) {
          if (datatype == alglib_impl::DT_BOOL)
-            ptr->ptr.p_bool[i] = parse_bool_delim(svec[i], ",]");
+            ptr->xB[i] = parse_bool_delim(svec[i], ",]");
          if (datatype == alglib_impl::DT_INT)
-            ptr->ptr.p_int[i] = parse_int_delim(svec[i], ",]");
+            ptr->xZ[i] = parse_int_delim(svec[i], ",]");
          if (datatype == alglib_impl::DT_REAL)
-            ptr->ptr.p_double[i] = parse_real_delim(svec[i], ",]");
+            ptr->xR[i] = parse_real_delim(svec[i], ",]");
          if (datatype == alglib_impl::DT_COMPLEX) {
             complex t = parse_complex_delim(svec[i], ",]");
-            ptr->ptr.p_complex[i].x = t.x;
-            ptr->ptr.p_complex[i].y = t.y;
+            ptr->xC[i].x = t.x;
+            ptr->xC[i].y = t.y;
          }
       }
       alglib_impl::ae_free(p);
@@ -10364,17 +10364,17 @@ boolean_1d_array::~boolean_1d_array() {
 }
 
 const bool &boolean_1d_array::operator() (ae_int_t i) const {
-   return ptr->ptr.p_bool[i];
+   return ptr->xB[i];
 }
 bool &boolean_1d_array::operator() (ae_int_t i) {
-   return ptr->ptr.p_bool[i];
+   return ptr->xB[i];
 }
 
 const bool &boolean_1d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.p_bool[i];
+   return ptr->xB[i];
 }
 bool &boolean_1d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.p_bool[i];
+   return ptr->xB[i];
 }
 
 void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
@@ -10387,15 +10387,15 @@ void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
 
 // copy
    for (i = 0; i < iLen; i++)
-      ptr->ptr.p_bool[i] = pContent[i];
+      ptr->xB[i] = pContent[i];
 }
 
 bool *boolean_1d_array::getcontent() {
-   return ptr->ptr.p_bool;
+   return ptr->xB;
 }
 
 const bool *boolean_1d_array::getcontent() const {
-   return ptr->ptr.p_bool;
+   return ptr->xB;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10426,17 +10426,17 @@ integer_1d_array::~integer_1d_array() {
 }
 
 const ae_int_t &integer_1d_array::operator() (ae_int_t i) const {
-   return ptr->ptr.p_int[i];
+   return ptr->xZ[i];
 }
 ae_int_t &integer_1d_array::operator() (ae_int_t i) {
-   return ptr->ptr.p_int[i];
+   return ptr->xZ[i];
 }
 
 const ae_int_t &integer_1d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.p_int[i];
+   return ptr->xZ[i];
 }
 ae_int_t &integer_1d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.p_int[i];
+   return ptr->xZ[i];
 }
 
 void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
@@ -10449,15 +10449,15 @@ void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
 
 // copy
    for (i = 0; i < iLen; i++)
-      ptr->ptr.p_int[i] = pContent[i];
+      ptr->xZ[i] = pContent[i];
 }
 
 ae_int_t *integer_1d_array::getcontent() {
-   return ptr->ptr.p_int;
+   return ptr->xZ;
 }
 
 const ae_int_t *integer_1d_array::getcontent() const {
-   return ptr->ptr.p_int;
+   return ptr->xZ;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10488,17 +10488,17 @@ real_1d_array::~real_1d_array() {
 }
 
 const double &real_1d_array::operator() (ae_int_t i) const {
-   return ptr->ptr.p_double[i];
+   return ptr->xR[i];
 }
 double &real_1d_array::operator() (ae_int_t i) {
-   return ptr->ptr.p_double[i];
+   return ptr->xR[i];
 }
 
 const double &real_1d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.p_double[i];
+   return ptr->xR[i];
 }
 double &real_1d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.p_double[i];
+   return ptr->xR[i];
 }
 
 void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
@@ -10511,7 +10511,7 @@ void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
 
 // copy
    for (i = 0; i < iLen; i++)
-      ptr->ptr.p_double[i] = pContent[i];
+      ptr->xR[i] = pContent[i];
 }
 
 // TODO: convert to constructor!!!!!!!
@@ -10533,17 +10533,17 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    x.datatype = alglib_impl::DT_REAL;
    x.owner = alglib_impl::OWN_CALLER;
    x.last_action = alglib_impl::ACT_UNCHANGED;
-   x.x_ptr.p_ptr = pContent;
+   x.x_ptr = pContent;
    attach_to(&x, &_state);
    ae_state_clear(&_state);
 }
 
 double *real_1d_array::getcontent() {
-   return ptr->ptr.p_double;
+   return ptr->xR;
 }
 
 const double *real_1d_array::getcontent() const {
-   return ptr->ptr.p_double;
+   return ptr->xR;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10574,17 +10574,17 @@ complex_1d_array::~complex_1d_array() {
 }
 
 const complex &complex_1d_array::operator() (ae_int_t i) const {
-   return *((const complex *)(ptr->ptr.p_complex + i));
+   return *((const complex *)(ptr->xC + i));
 }
 complex &complex_1d_array::operator() (ae_int_t i) {
-   return *((complex *)(ptr->ptr.p_complex + i));
+   return *((complex *)(ptr->xC + i));
 }
 
 const complex &complex_1d_array::operator[] (ae_int_t i) const {
-   return *((const complex *)(ptr->ptr.p_complex + i));
+   return *((const complex *)(ptr->xC + i));
 }
 complex &complex_1d_array::operator[] (ae_int_t i) {
-   return *((complex *)(ptr->ptr.p_complex + i));
+   return *((complex *)(ptr->xC + i));
 }
 
 void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
@@ -10597,17 +10597,17 @@ void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
 
 // copy
    for (i = 0; i < iLen; i++) {
-      ptr->ptr.p_complex[i].x = pContent[i].x;
-      ptr->ptr.p_complex[i].y = pContent[i].y;
+      ptr->xC[i].x = pContent[i].x;
+      ptr->xC[i].y = pContent[i].y;
    }
 }
 
 complex *complex_1d_array::getcontent() {
-   return (complex *)ptr->ptr.p_complex;
+   return (complex *)ptr->xC;
 }
 
 const complex *complex_1d_array::getcontent() const {
-   return (const complex *)ptr->ptr.p_complex;
+   return (const complex *)ptr->xC;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10697,15 +10697,15 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
       for (i = 0; i < smat.size(); i++)
          for (j = 0; j < smat[0].size(); j++) {
             if (datatype == alglib_impl::DT_BOOL)
-               ptr->ptr.pp_bool[i][j] = parse_bool_delim(smat[i][j], ",]");
+               ptr->xyB[i][j] = parse_bool_delim(smat[i][j], ",]");
             if (datatype == alglib_impl::DT_INT)
-               ptr->ptr.pp_int[i][j] = parse_int_delim(smat[i][j], ",]");
+               ptr->xyZ[i][j] = parse_int_delim(smat[i][j], ",]");
             if (datatype == alglib_impl::DT_REAL)
-               ptr->ptr.pp_double[i][j] = parse_real_delim(smat[i][j], ",]");
+               ptr->xyR[i][j] = parse_real_delim(smat[i][j], ",]");
             if (datatype == alglib_impl::DT_COMPLEX) {
                complex t = parse_complex_delim(smat[i][j], ",]");
-               ptr->ptr.pp_complex[i][j].x = t.x;
-               ptr->ptr.pp_complex[i][j].y = t.y;
+               ptr->xyC[i][j].x = t.x;
+               ptr->xyC[i][j].y = t.y;
             }
          }
       alglib_impl::ae_free(p);
@@ -10770,7 +10770,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
    if ((rhs.ptr->rows != ptr->rows) || (rhs.ptr->cols != ptr->cols))
       ae_matrix_set_length(ptr, rhs.ptr->rows, rhs.ptr->cols, &_state);
    for (i = 0; i < ptr->rows; i++)
-      memcpy(ptr->ptr.pp_void[i], rhs.ptr->ptr.pp_void[i], ptr->cols * alglib_impl::ae_sizeof(ptr->datatype));
+      memcpy(ptr->xyX[i], rhs.ptr->xyX[i], ptr->cols * alglib_impl::ae_sizeof(ptr->datatype));
    alglib_impl::ae_state_clear(&_state);
    return *this;
 }
@@ -10800,17 +10800,17 @@ const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs)
 }
 
 const bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->ptr.pp_bool[i][j];
+   return ptr->xyB[i][j];
 }
 bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->ptr.pp_bool[i][j];
+   return ptr->xyB[i][j];
 }
 
 const bool *boolean_2d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.pp_bool[i];
+   return ptr->xyB[i];
 }
 bool *boolean_2d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.pp_bool[i];
+   return ptr->xyB[i];
 }
 
 void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
@@ -10824,7 +10824,7 @@ void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pC
 // copy
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
-         ptr->ptr.pp_bool[i][j] = pContent[i * icols + j];
+         ptr->xyB[i][j] = pContent[i * icols + j];
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10864,17 +10864,17 @@ const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs)
 }
 
 const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->ptr.pp_int[i][j];
+   return ptr->xyZ[i][j];
 }
 ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->ptr.pp_int[i][j];
+   return ptr->xyZ[i][j];
 }
 
 const ae_int_t *integer_2d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.pp_int[i];
+   return ptr->xyZ[i];
 }
 ae_int_t *integer_2d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.pp_int[i];
+   return ptr->xyZ[i];
 }
 
 void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
@@ -10888,7 +10888,7 @@ void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t
 // copy
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
-         ptr->ptr.pp_int[i][j] = pContent[i * icols + j];
+         ptr->xyZ[i][j] = pContent[i * icols + j];
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -10928,17 +10928,17 @@ const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
 }
 
 const double &real_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->ptr.pp_double[i][j];
+   return ptr->xyR[i][j];
 }
 double &real_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->ptr.pp_double[i][j];
+   return ptr->xyR[i][j];
 }
 
 const double *real_2d_array::operator[] (ae_int_t i) const {
-   return ptr->ptr.pp_double[i];
+   return ptr->xyR[i];
 }
 double *real_2d_array::operator[] (ae_int_t i) {
-   return ptr->ptr.pp_double[i];
+   return ptr->xyR[i];
 }
 
 void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
@@ -10952,7 +10952,7 @@ void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pCo
 // copy
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
-         ptr->ptr.pp_double[i][j] = pContent[i * icols + j];
+         ptr->xyR[i][j] = pContent[i * icols + j];
 }
 
 void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
@@ -10975,7 +10975,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    x.datatype = alglib_impl::DT_REAL;
    x.owner = alglib_impl::OWN_CALLER;
    x.last_action = alglib_impl::ACT_UNCHANGED;
-   x.x_ptr.p_ptr = pContent;
+   x.x_ptr = pContent;
    attach_to(&x, &_state);
    ae_state_clear(&_state);
 }
@@ -11017,17 +11017,17 @@ const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs)
 }
 
 const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return *((const complex *)(ptr->ptr.pp_complex[i] + j));
+   return *((const complex *)(ptr->xyC[i] + j));
 }
 complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return *((complex *)(ptr->ptr.pp_complex[i] + j));
+   return *((complex *)(ptr->xyC[i] + j));
 }
 
 const complex *complex_2d_array::operator[] (ae_int_t i) const {
-   return (const complex *)(ptr->ptr.pp_complex[i]);
+   return (const complex *)(ptr->xyC[i]);
 }
 complex *complex_2d_array::operator[] (ae_int_t i) {
-   return (complex *)(ptr->ptr.pp_complex[i]);
+   return (complex *)(ptr->xyC[i]);
 }
 
 void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
@@ -11041,8 +11041,8 @@ void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex 
 // copy
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++) {
-         ptr->ptr.pp_complex[i][j].x = pContent[i * icols + j].x;
-         ptr->ptr.pp_complex[i][j].y = pContent[i * icols + j].y;
+         ptr->xyC[i][j].x = pContent[i * icols + j].x;
+         ptr->xyC[i][j].y = pContent[i * icols + j].y;
       }
 }
 

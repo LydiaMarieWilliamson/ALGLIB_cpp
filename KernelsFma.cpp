@@ -223,7 +223,7 @@ void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, 
    const ae_int_t nVec = n >> 2;
    const ae_int_t nUnroll = nVec >> 3;
    for (i = 0; i < m; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)a->ptr.pp_double[i];
+      const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       __m256d sum;
       if (nUnroll >= 1) {
          __m256d u0 = _mm256_mul_pd(pRow[0], pX[0]);
@@ -297,7 +297,7 @@ void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, 
       double ans = pComps[0] + pComps[1];
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < n; j++) {
-         ans += a->ptr.pp_double[i][j] * x[j];
+         ans += a->xyR[i][j] * x[j];
       }
       y[i] += alpha * ans;
    }
@@ -310,7 +310,7 @@ void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)a->ptr.pp_double[i];
+      const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
       for (j = 0; j < nVec; j++) {
@@ -318,7 +318,7 @@ void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha
       }
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < m; j++) {
-         y[j] += v * a->ptr.pp_double[i][j];
+         y[j] += v * a->xyR[i][j];
       }
    }
 }
@@ -330,7 +330,7 @@ void rgemvx_straight_fma_xaligned(const ae_int_t m, const ae_int_t n, const doub
    const ae_int_t nVec = n >> 2;
    const ae_int_t nUnroll = nVec >> 3;
    for (i = 0; i < m; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)(a->ptr.pp_double[i + ia] + ja);
+      const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       __m256d sum;
       if (nUnroll >= 1) {
          __m256d u0 = _mm256_mul_pd(ULOAD256PD(pRow[0]), pX[0]);
@@ -405,7 +405,7 @@ void rgemvx_straight_fma_xaligned(const ae_int_t m, const ae_int_t n, const doub
       double ans = pComps[0] + pComps[1];
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < n; j++) {
-         ans += a->ptr.pp_double[i + ia][j + ja] * x[j];
+         ans += a->xyR[i + ia][j + ja] * x[j];
       }
       y[i] += alpha * ans;
    }
@@ -416,7 +416,7 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
    ae_int_t j;
    if (n <= 3) {
       for (i = 0; i < m; i++) {
-         const double *p_a = a->ptr.pp_double[ia + i] + ja;
+         const double *p_a = a->xyR[ia + i] + ja;
          double v = 0.0;
          for (j = 0; j < n; j++) {
             v += p_a[j] * x[j];
@@ -433,7 +433,7 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
    for (i = 0; i < m; i++) {
-      const double *p_a = a->ptr.pp_double[ia + i] + ja;
+      const double *p_a = a->xyR[ia + i] + ja;
       double v = 0.0;
       for (j = 0; j < shift; j++) {
          v += p_a[j] * x[j];
@@ -450,7 +450,7 @@ void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const do
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)(a->ptr.pp_double[i + ia] + ja);
+      const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
       for (j = 0; j < nVec; j++) {
@@ -458,7 +458,7 @@ void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const do
       }
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < m; j++) {
-         y[j] += v * a->ptr.pp_double[i + ia][j + ja];
+         y[j] += v * a->xyR[i + ia][j + ja];
       }
    }
 }
@@ -468,7 +468,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
    ae_int_t j;
    if (m <= 3) {
       for (i = 0; i < n; i++) {
-         const double *p_a = a->ptr.pp_double[ia + i] + ja;
+         const double *p_a = a->xyR[ia + i] + ja;
          const double v = alpha * x[i];
          for (j = 0; j < m; j++) {
             y[j] += v * p_a[j];
@@ -484,7 +484,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
    for (i = 0; i < n; i++) {
-      const double *p_a = a->ptr.pp_double[ia + i] + ja;
+      const double *p_a = a->xyR[ia + i] + ja;
       const double v = alpha * x[i];
       for (j = 0; j < shift; j++) {
          y[j] += v * p_a[j];
@@ -561,18 +561,18 @@ void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVe
       ae_int_t supported = ae_cpuid();
       if (supported & CPU_FMA) {
          __m256d x_simd;
-         double *p_mat_row = rowstorage->ptr.p_double + offss + blocksize * 4;
-         double *p_simd_buf = simdbuf->ptr.p_double;
-         ae_int_t *p_rowidx = superrowidx->ptr.p_int + rbase;
+         double *p_mat_row = rowstorage->xR + offss + blocksize * 4;
+         double *p_simd_buf = simdbuf->xR;
+         ae_int_t *p_rowidx = superrowidx->xZ + rbase;
          if (blocksize == 3) {
             double xx[4];
-            xx[0] = x->ptr.p_double[cols0];
-            xx[1] = x->ptr.p_double[cols0 + 1];
-            xx[2] = x->ptr.p_double[cols0 + 2];
+            xx[0] = x->xR[cols0];
+            xx[1] = x->xR[cols0 + 1];
+            xx[2] = x->xR[cols0 + 2];
             xx[3] = 0;
             x_simd = _mm256_loadu_pd(xx);
          } else
-            x_simd = _mm256_loadu_pd(x->ptr.p_double + cols0);
+            x_simd = _mm256_loadu_pd(x->xR + cols0);
          for (k = 0; k < offdiagsize; k++) {
             double *p_buf_row = p_simd_buf + p_rowidx[k] * 4;
             _mm256_store_pd(p_buf_row, _mm256_fnmadd_pd(_mm256_load_pd(p_mat_row), x_simd, _mm256_load_pd(p_buf_row)));
@@ -585,10 +585,10 @@ void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVe
    // blocksize is 2, stride is 2
       ae_int_t supported = ae_cpuid();
       if (supported & CPU_FMA) {
-         __m128d x_simd = _mm_loadu_pd(x->ptr.p_double + cols0);
-         double *p_mat_row = rowstorage->ptr.p_double + offss + 2 * 2;
-         double *p_simd_buf = simdbuf->ptr.p_double;
-         ae_int_t *p_rowidx = superrowidx->ptr.p_int + rbase;
+         __m128d x_simd = _mm_loadu_pd(x->xR + cols0);
+         double *p_mat_row = rowstorage->xR + offss + 2 * 2;
+         double *p_simd_buf = simdbuf->xR;
+         ae_int_t *p_rowidx = superrowidx->xZ + rbase;
          for (k = 0; k < offdiagsize; k++) {
             double *p_buf_row = p_simd_buf + p_rowidx[k] * 4;
             _mm_store_pd(p_buf_row, _mm_fnmadd_pd(_mm_load_pd(p_mat_row), x_simd, _mm_load_pd(p_buf_row)));

@@ -112,19 +112,19 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
 //   generation - on first subroutine call
 // * values from previous call - on subsequent calls
    if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.ptr.p_int[0];
-      m = state->rstate.ia.ptr.p_int[1];
-      i = state->rstate.ia.ptr.p_int[2];
-      j = state->rstate.ia.ptr.p_int[3];
-      k = state->rstate.ia.ptr.p_int[4];
-      klimit = state->rstate.ia.ptr.p_int[5];
-      gridpoint = state->rstate.ba.ptr.p_bool[0];
-      xc = state->rstate.ra.ptr.p_double[0];
-      v = state->rstate.ra.ptr.p_double[1];
-      h = state->rstate.ra.ptr.p_double[2];
-      h2 = state->rstate.ra.ptr.p_double[3];
-      err = state->rstate.ra.ptr.p_double[4];
-      maxgrowpow = state->rstate.ra.ptr.p_double[5];
+      n = state->rstate.ia.xZ[0];
+      m = state->rstate.ia.xZ[1];
+      i = state->rstate.ia.xZ[2];
+      j = state->rstate.ia.xZ[3];
+      k = state->rstate.ia.xZ[4];
+      klimit = state->rstate.ia.xZ[5];
+      gridpoint = state->rstate.ba.xB[0];
+      xc = state->rstate.ra.xR[0];
+      v = state->rstate.ra.xR[1];
+      h = state->rstate.ra.xR[2];
+      h2 = state->rstate.ra.xR[3];
+      err = state->rstate.ra.xR[4];
+      maxgrowpow = state->rstate.ra.xR[5];
    } else {
       n = 359;
       m = -58;
@@ -169,42 +169,42 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
 // Prepare coefficients table.
 // Check it for errors
    ae_vector_set_length(&state->rka, 6, _state);
-   state->rka.ptr.p_double[0] = (double)(0);
-   state->rka.ptr.p_double[1] = (double)1 / (double)5;
-   state->rka.ptr.p_double[2] = (double)3 / (double)10;
-   state->rka.ptr.p_double[3] = (double)3 / (double)5;
-   state->rka.ptr.p_double[4] = (double)(1);
-   state->rka.ptr.p_double[5] = (double)7 / (double)8;
+   state->rka.xR[0] = (double)(0);
+   state->rka.xR[1] = (double)1 / (double)5;
+   state->rka.xR[2] = (double)3 / (double)10;
+   state->rka.xR[3] = (double)3 / (double)5;
+   state->rka.xR[4] = (double)(1);
+   state->rka.xR[5] = (double)7 / (double)8;
    ae_matrix_set_length(&state->rkb, 6, 5, _state);
-   state->rkb.ptr.pp_double[1][0] = (double)1 / (double)5;
-   state->rkb.ptr.pp_double[2][0] = (double)3 / (double)40;
-   state->rkb.ptr.pp_double[2][1] = (double)9 / (double)40;
-   state->rkb.ptr.pp_double[3][0] = (double)3 / (double)10;
-   state->rkb.ptr.pp_double[3][1] = -(double)9 / (double)10;
-   state->rkb.ptr.pp_double[3][2] = (double)6 / (double)5;
-   state->rkb.ptr.pp_double[4][0] = -(double)11 / (double)54;
-   state->rkb.ptr.pp_double[4][1] = (double)5 / (double)2;
-   state->rkb.ptr.pp_double[4][2] = -(double)70 / (double)27;
-   state->rkb.ptr.pp_double[4][3] = (double)35 / (double)27;
-   state->rkb.ptr.pp_double[5][0] = (double)1631 / (double)55296;
-   state->rkb.ptr.pp_double[5][1] = (double)175 / (double)512;
-   state->rkb.ptr.pp_double[5][2] = (double)575 / (double)13824;
-   state->rkb.ptr.pp_double[5][3] = (double)44275 / (double)110592;
-   state->rkb.ptr.pp_double[5][4] = (double)253 / (double)4096;
+   state->rkb.xyR[1][0] = (double)1 / (double)5;
+   state->rkb.xyR[2][0] = (double)3 / (double)40;
+   state->rkb.xyR[2][1] = (double)9 / (double)40;
+   state->rkb.xyR[3][0] = (double)3 / (double)10;
+   state->rkb.xyR[3][1] = -(double)9 / (double)10;
+   state->rkb.xyR[3][2] = (double)6 / (double)5;
+   state->rkb.xyR[4][0] = -(double)11 / (double)54;
+   state->rkb.xyR[4][1] = (double)5 / (double)2;
+   state->rkb.xyR[4][2] = -(double)70 / (double)27;
+   state->rkb.xyR[4][3] = (double)35 / (double)27;
+   state->rkb.xyR[5][0] = (double)1631 / (double)55296;
+   state->rkb.xyR[5][1] = (double)175 / (double)512;
+   state->rkb.xyR[5][2] = (double)575 / (double)13824;
+   state->rkb.xyR[5][3] = (double)44275 / (double)110592;
+   state->rkb.xyR[5][4] = (double)253 / (double)4096;
    ae_vector_set_length(&state->rkc, 6, _state);
-   state->rkc.ptr.p_double[0] = (double)37 / (double)378;
-   state->rkc.ptr.p_double[1] = (double)(0);
-   state->rkc.ptr.p_double[2] = (double)250 / (double)621;
-   state->rkc.ptr.p_double[3] = (double)125 / (double)594;
-   state->rkc.ptr.p_double[4] = (double)(0);
-   state->rkc.ptr.p_double[5] = (double)512 / (double)1771;
+   state->rkc.xR[0] = (double)37 / (double)378;
+   state->rkc.xR[1] = (double)(0);
+   state->rkc.xR[2] = (double)250 / (double)621;
+   state->rkc.xR[3] = (double)125 / (double)594;
+   state->rkc.xR[4] = (double)(0);
+   state->rkc.xR[5] = (double)512 / (double)1771;
    ae_vector_set_length(&state->rkcs, 6, _state);
-   state->rkcs.ptr.p_double[0] = (double)2825 / (double)27648;
-   state->rkcs.ptr.p_double[1] = (double)(0);
-   state->rkcs.ptr.p_double[2] = (double)18575 / (double)48384;
-   state->rkcs.ptr.p_double[3] = (double)13525 / (double)55296;
-   state->rkcs.ptr.p_double[4] = (double)277 / (double)14336;
-   state->rkcs.ptr.p_double[5] = (double)1 / (double)4;
+   state->rkcs.xR[0] = (double)2825 / (double)27648;
+   state->rkcs.xR[1] = (double)(0);
+   state->rkcs.xR[2] = (double)18575 / (double)48384;
+   state->rkcs.xR[3] = (double)13525 / (double)55296;
+   state->rkcs.xR[4] = (double)277 / (double)14336;
+   state->rkcs.xR[5] = (double)1 / (double)4;
    ae_matrix_set_length(&state->rkk, 6, n, _state);
 
 // Main cycle consists of two iterations:
@@ -214,10 +214,10 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    ae_vector_set_length(&state->escale, n, _state);
    ae_vector_set_length(&state->yn, n, _state);
    ae_vector_set_length(&state->yns, n, _state);
-   xc = state->xg.ptr.p_double[0];
-   ae_v_move(&state->ytbl.ptr.pp_double[0][0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   xc = state->xg.xR[0];
+   ae_v_move(&state->ytbl.xyR[0][0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
    for (j = 0; j <= n - 1; j++) {
-      state->escale.ptr.p_double[j] = (double)(0);
+      state->escale.xR[j] = (double)(0);
    }
    i = 1;
 lbl_3:
@@ -231,8 +231,8 @@ lbl_6:
    }
 // truncate step if needed (beyond right boundary).
 // determine should we store X or not
-   if (ae_fp_greater_eq(xc + h, state->xg.ptr.p_double[i])) {
-      h = state->xg.ptr.p_double[i] - xc;
+   if (ae_fp_greater_eq(xc + h, state->xg.xR[i])) {
+      h = state->xg.xR[i] - xc;
       gridpoint = true;
    } else {
       gridpoint = false;
@@ -243,7 +243,7 @@ lbl_6:
 // These maximums are initialized by zeros,
 // then updated every iterations.
    for (j = 0; j <= n - 1; j++) {
-      state->escale.ptr.p_double[j] = ae_maxreal(state->escale.ptr.p_double[j], ae_fabs(state->yc.ptr.p_double[j], _state), _state);
+      state->escale.xR[j] = ae_maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
    }
 
 // make one step:
@@ -255,19 +255,19 @@ lbl_6:
 // to the form where x[0] < x[1] < ... < x[n-1]. So X is
 // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
 // by dy/dt=xscale*f(y,xscale*t).
-   ae_v_move(&state->yn.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   ae_v_move(&state->yns.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->yn.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->yns.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
    k = 0;
 lbl_8:
    if (k > 5) {
       goto lbl_10;
    }
 // prepare data for the next update of YN/YNS
-   state->x = state->xscale * (xc + state->rka.ptr.p_double[k] * h);
-   ae_v_move(&state->y.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   state->x = state->xscale * (xc + state->rka.xR[k] * h);
+   ae_v_move(&state->y.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
    for (j = 0; j <= k - 1; j++) {
-      v = state->rkb.ptr.pp_double[k][j];
-      ae_v_addd(&state->y.ptr.p_double[0], 1, &state->rkk.ptr.pp_double[j][0], 1, ae_v_len(0, n - 1), v);
+      v = state->rkb.xyR[k][j];
+      ae_v_addd(&state->y.xR[0], 1, &state->rkk.xyR[j][0], 1, ae_v_len(0, n - 1), v);
    }
    state->needdy = true;
    state->rstate.stage = 0;
@@ -276,13 +276,13 @@ lbl_0:
    state->needdy = false;
    state->repnfev = state->repnfev + 1;
    v = h * state->xscale;
-   ae_v_moved(&state->rkk.ptr.pp_double[k][0], 1, &state->dy.ptr.p_double[0], 1, ae_v_len(0, n - 1), v);
+   ae_v_moved(&state->rkk.xyR[k][0], 1, &state->dy.xR[0], 1, ae_v_len(0, n - 1), v);
 
 // update YN/YNS
-   v = state->rkc.ptr.p_double[k];
-   ae_v_addd(&state->yn.ptr.p_double[0], 1, &state->rkk.ptr.pp_double[k][0], 1, ae_v_len(0, n - 1), v);
-   v = state->rkcs.ptr.p_double[k];
-   ae_v_addd(&state->yns.ptr.p_double[0], 1, &state->rkk.ptr.pp_double[k][0], 1, ae_v_len(0, n - 1), v);
+   v = state->rkc.xR[k];
+   ae_v_addd(&state->yn.xR[0], 1, &state->rkk.xyR[k][0], 1, ae_v_len(0, n - 1), v);
+   v = state->rkcs.xR[k];
+   ae_v_addd(&state->yns.xR[0], 1, &state->rkk.xyR[k][0], 1, ae_v_len(0, n - 1), v);
    k = k + 1;
    goto lbl_8;
 lbl_10:
@@ -293,15 +293,15 @@ lbl_10:
       if (!state->fraceps) {
 
       // absolute error is estimated
-         err = ae_maxreal(err, ae_fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j], _state), _state);
+         err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state), _state);
       } else {
 
       // Relative error is estimated
-         v = state->escale.ptr.p_double[j];
+         v = state->escale.xR[j];
          if (ae_fp_eq(v, (double)(0))) {
             v = (double)(1);
          }
-         err = ae_maxreal(err, ae_fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j], _state) / v, _state);
+         err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
       }
    }
 
@@ -320,7 +320,7 @@ lbl_10:
    }
 // advance position
    xc = xc + h;
-   ae_v_move(&state->yc.ptr.p_double[0], 1, &state->yn.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->yc.xR[0], 1, &state->yn.xR[0], 1, ae_v_len(0, n - 1));
 
 // update H
    h = h2;
@@ -333,7 +333,7 @@ lbl_10:
 lbl_7:
 
 // save result
-   ae_v_move(&state->ytbl.ptr.pp_double[i][0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->ytbl.xyR[i][0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
    i = i + 1;
    goto lbl_3;
 lbl_5:
@@ -347,19 +347,19 @@ lbl_1:
 // Saving state
 lbl_rcomm:
    result = true;
-   state->rstate.ia.ptr.p_int[0] = n;
-   state->rstate.ia.ptr.p_int[1] = m;
-   state->rstate.ia.ptr.p_int[2] = i;
-   state->rstate.ia.ptr.p_int[3] = j;
-   state->rstate.ia.ptr.p_int[4] = k;
-   state->rstate.ia.ptr.p_int[5] = klimit;
-   state->rstate.ba.ptr.p_bool[0] = gridpoint;
-   state->rstate.ra.ptr.p_double[0] = xc;
-   state->rstate.ra.ptr.p_double[1] = v;
-   state->rstate.ra.ptr.p_double[2] = h;
-   state->rstate.ra.ptr.p_double[3] = h2;
-   state->rstate.ra.ptr.p_double[4] = err;
-   state->rstate.ra.ptr.p_double[5] = maxgrowpow;
+   state->rstate.ia.xZ[0] = n;
+   state->rstate.ia.xZ[1] = m;
+   state->rstate.ia.xZ[2] = i;
+   state->rstate.ia.xZ[3] = j;
+   state->rstate.ia.xZ[4] = k;
+   state->rstate.ia.xZ[5] = klimit;
+   state->rstate.ba.xB[0] = gridpoint;
+   state->rstate.ra.xR[0] = xc;
+   state->rstate.ra.xR[1] = v;
+   state->rstate.ra.xR[2] = h;
+   state->rstate.ra.xR[3] = h2;
+   state->rstate.ra.xR[4] = err;
+   state->rstate.ra.xR[5] = maxgrowpow;
    return result;
 }
 
@@ -398,10 +398,10 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
       rep->nfev = state->repnfev;
       ae_vector_set_length(xtbl, state->m, _state);
       v = state->xscale;
-      ae_v_moved(&xtbl->ptr.p_double[0], 1, &state->xg.ptr.p_double[0], 1, ae_v_len(0, state->m - 1), v);
+      ae_v_moved(&xtbl->xR[0], 1, &state->xg.xR[0], 1, ae_v_len(0, state->m - 1), v);
       ae_matrix_set_length(ytbl, state->m, state->n, _state);
       for (i = 0; i <= state->m - 1; i++) {
-         ae_v_move(&ytbl->ptr.pp_double[i][0], 1, &state->ytbl.ptr.pp_double[i][0], 1, ae_v_len(0, state->n - 1));
+         ae_v_move(&ytbl->xyR[i][0], 1, &state->ytbl.xyR[i][0], 1, ae_v_len(0, state->n - 1));
       }
    } else {
       rep->nfev = 0;
@@ -436,18 +436,18 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       state->repnfev = 0;
       state->repterminationtype = 1;
       ae_matrix_set_length(&state->ytbl, 1, n, _state);
-      ae_v_move(&state->ytbl.ptr.pp_double[0][0], 1, &y->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(&state->ytbl.xyR[0][0], 1, &y->xR[0], 1, ae_v_len(0, n - 1));
       ae_vector_set_length(&state->xg, m, _state);
-      ae_v_move(&state->xg.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, m - 1));
+      ae_v_move(&state->xg.xR[0], 1, &x->xR[0], 1, ae_v_len(0, m - 1));
       return;
    }
 // check again: correct order of X[]
-   if (ae_fp_eq(x->ptr.p_double[1], x->ptr.p_double[0])) {
+   if (ae_fp_eq(x->xR[1], x->xR[0])) {
       state->repterminationtype = -2;
       return;
    }
    for (i = 1; i <= m - 1; i++) {
-      if ((ae_fp_greater(x->ptr.p_double[1], x->ptr.p_double[0]) && ae_fp_less_eq(x->ptr.p_double[i], x->ptr.p_double[i - 1])) || (ae_fp_less(x->ptr.p_double[1], x->ptr.p_double[0]) && ae_fp_greater_eq(x->ptr.p_double[i], x->ptr.p_double[i - 1]))) {
+      if ((ae_fp_greater(x->xR[1], x->xR[0]) && ae_fp_less_eq(x->xR[i], x->xR[i - 1])) || (ae_fp_less(x->xR[1], x->xR[0]) && ae_fp_greater_eq(x->xR[i], x->xR[i - 1]))) {
          state->repterminationtype = -2;
          return;
       }
@@ -455,9 +455,9 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 
 // auto-select H if necessary
    if (ae_fp_eq(h, (double)(0))) {
-      v = ae_fabs(x->ptr.p_double[1] - x->ptr.p_double[0], _state);
+      v = ae_fabs(x->xR[1] - x->xR[0], _state);
       for (i = 2; i <= m - 1; i++) {
-         v = ae_minreal(v, ae_fabs(x->ptr.p_double[i] - x->ptr.p_double[i - 1], _state), _state);
+         v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
       }
       h = 0.001 * v;
    }
@@ -468,15 +468,15 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    state->eps = ae_fabs(eps, _state);
    state->fraceps = ae_fp_less(eps, (double)(0));
    ae_vector_set_length(&state->xg, m, _state);
-   ae_v_move(&state->xg.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, m - 1));
-   if (ae_fp_greater(x->ptr.p_double[1], x->ptr.p_double[0])) {
+   ae_v_move(&state->xg.xR[0], 1, &x->xR[0], 1, ae_v_len(0, m - 1));
+   if (ae_fp_greater(x->xR[1], x->xR[0])) {
       state->xscale = (double)(1);
    } else {
       state->xscale = (double)(-1);
-      ae_v_muld(&state->xg.ptr.p_double[0], 1, ae_v_len(0, m - 1), -1);
+      ae_v_muld(&state->xg.xR[0], 1, ae_v_len(0, m - 1), -1);
    }
    ae_vector_set_length(&state->yc, n, _state);
-   ae_v_move(&state->yc.ptr.p_double[0], 1, &y->ptr.p_double[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(&state->yc.xR[0], 1, &y->xR[0], 1, ae_v_len(0, n - 1));
    state->solvertype = solvertype;
    state->repterminationtype = 0;
 

@@ -734,7 +734,7 @@ void rgemv_straight_avx2(const ae_int_t m, const ae_int_t n, const double alpha,
    const ae_int_t nVec = n >> 2;
    const ae_int_t nUnroll = nVec >> 3;
    for (i = 0; i < m; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)a->ptr.pp_double[i];
+      const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       __m256d sum;
       if (nUnroll >= 1) {
          __m256d u0 = _mm256_mul_pd(pRow[0], pX[0]);
@@ -810,7 +810,7 @@ void rgemv_straight_avx2(const ae_int_t m, const ae_int_t n, const double alpha,
       double ans = pComps[0] + pComps[1];
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < n; j++) {
-         ans += a->ptr.pp_double[i][j] * x[j];
+         ans += a->xyR[i][j] * x[j];
       }
       y[i] += alpha * ans;
    }
@@ -823,7 +823,7 @@ void rgemv_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alph
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)a->ptr.pp_double[i];
+      const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
       for (j = 0; j < nVec; j++) {
@@ -831,7 +831,7 @@ void rgemv_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alph
       }
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < m; j++) {
-         y[j] += v * a->ptr.pp_double[i][j];
+         y[j] += v * a->xyR[i][j];
       }
    }
 }
@@ -843,7 +843,7 @@ void rgemvx_straight_avx2_xaligned(const ae_int_t m, const ae_int_t n, const dou
    const ae_int_t nVec = n >> 2;
    const ae_int_t nUnroll = nVec >> 3;
    for (i = 0; i < m; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)(a->ptr.pp_double[i + ia] + ja);
+      const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       __m256d sum;
       if (nUnroll >= 1) {
          __m256d u0 = _mm256_mul_pd(ULOAD256PD(pRow[0]), pX[0]);
@@ -922,7 +922,7 @@ void rgemvx_straight_avx2_xaligned(const ae_int_t m, const ae_int_t n, const dou
       double ans = pComps[0] + pComps[1];
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < n; j++) {
-         ans += a->ptr.pp_double[i + ia][j + ja] * x[j];
+         ans += a->xyR[i + ia][j + ja] * x[j];
       }
       y[i] += alpha * ans;
    }
@@ -933,7 +933,7 @@ void rgemvx_straight_avx2(const ae_int_t m, const ae_int_t n, const double alpha
    ae_int_t j;
    if (n <= 3) {
       for (i = 0; i < m; i++) {
-         const double *p_a = a->ptr.pp_double[ia + i] + ja;
+         const double *p_a = a->xyR[ia + i] + ja;
          double v = 0.0;
          for (j = 0; j < n; j++) {
             v += p_a[j] * x[j];
@@ -950,7 +950,7 @@ void rgemvx_straight_avx2(const ae_int_t m, const ae_int_t n, const double alpha
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
    for (i = 0; i < m; i++) {
-      const double *p_a = a->ptr.pp_double[ia + i] + ja;
+      const double *p_a = a->xyR[ia + i] + ja;
       double v = 0.0;
       for (j = 0; j < shift; j++) {
          v += p_a[j] * x[j];
@@ -967,7 +967,7 @@ void rgemvx_transposed_avx2_yaligned(const ae_int_t m, const ae_int_t n, const d
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {
-      const __m256d *__restrict pRow = (const __m256d *)(a->ptr.pp_double[i + ia] + ja);
+      const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
       for (j = 0; j < nVec; j++) {
@@ -975,7 +975,7 @@ void rgemvx_transposed_avx2_yaligned(const ae_int_t m, const ae_int_t n, const d
       }
       const ae_int_t tail = nVec << 2;
       for (j = tail; j < m; j++) {
-         y[j] += v * a->ptr.pp_double[i + ia][j + ja];
+         y[j] += v * a->xyR[i + ia][j + ja];
       }
    }
 }
@@ -985,7 +985,7 @@ void rgemvx_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alp
    ae_int_t j;
    if (m <= 3) {
       for (i = 0; i < n; i++) {
-         const double *p_a = a->ptr.pp_double[ia + i] + ja;
+         const double *p_a = a->xyR[ia + i] + ja;
          const double v = alpha * x[i];
          for (j = 0; j < m; j++) {
             y[j] += v * p_a[j];
@@ -1001,7 +1001,7 @@ void rgemvx_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alp
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
    for (i = 0; i < n; i++) {
-      const double *p_a = a->ptr.pp_double[ia + i] + ja;
+      const double *p_a = a->xyR[ia + i] + ja;
       const double v = alpha * x[i];
       for (j = 0; j < shift; j++) {
          y[j] += v * p_a[j];
