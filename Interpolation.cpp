@@ -14492,7 +14492,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
       if (state.needf) func(state.c, state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
       else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr, const xparams _xparams) {
@@ -14508,7 +14508,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
       else if (state.needfg) grad(state.c, state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
       else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr, const xparams _xparams) {
@@ -14526,7 +14526,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
       else if (state.needfgh) hess(state.c, state.x, state.f, state.g, state.h, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
       else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 

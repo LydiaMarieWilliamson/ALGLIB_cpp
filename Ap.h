@@ -39,16 +39,17 @@
 
 #define AE_USE_CPP
 // Definitions
-#define AE_UNKNOWN 0
+#define AE_OTHER_CPU 0
 #define AE_INTEL 1
 #define AE_SPARC 2
 
 // OS definitions
+#define AE_OTHER_OS 0
 #define AE_WINDOWS                    1
 #define AE_POSIX                      2
 #define AE_LINUX                    304
 #if !defined AE_OS
-#   define AE_OS AE_UNKNOWN
+#   define AE_OS AE_OTHER_OS
 #endif
 #if AE_OS == AE_LINUX
 #   undef AE_OS
@@ -151,7 +152,7 @@
 #      define _ALGLIB_HAS_SSE2_INTRINSICS
 #   endif
 #   if (AE_COMPILER == AE_GNUC && !defined AE_NO_AVX2 || AE_COMPILER == AE_OTHERC) && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
-#      include <immintrin.h> //(@) Oriignally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER.
+#      include <immintrin.h> //(@) Oriignally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER_OS.
 #   endif
 #   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 && !defined AE_NO_AVX2
 #      include <intrin.h>
@@ -191,7 +192,7 @@ typedef int32_t ae_int32_t;
 #   if AE_COMPILER == AE_MSVC
 typedef __int32 ae_int32_t;
 #   endif
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_OTHERC
 typedef int ae_int32_t;
 #   endif
 #endif
@@ -206,7 +207,7 @@ typedef int64_t ae_int64_t;
 #   if AE_COMPILER == AE_MSVC
 typedef __int64 ae_int64_t;
 #   endif
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_OTHERC
 typedef signed long long ae_int64_t;
 #   endif
 #endif
@@ -221,7 +222,7 @@ typedef uint64_t ae_uint64_t;
 #   if AE_COMPILER == AE_MSVC
 typedef unsigned __int64 ae_uint64_t;
 #   endif
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_OTHERC
 typedef unsigned long long ae_uint64_t;
 #   endif
 #endif
@@ -1166,19 +1167,19 @@ private:
 #   define ThrowError(Msg)	throw ap_error(Msg)
 #   define ThrowErrorMsg(Q, X)	throw ap_error((Q).error_msg)
 #   define BegPoll		{ try {
-#   define EndPoll		} catch(...) { ae_clean_up_before_breaking(&_alglib_env_state); throw; } }
+#   define EndPoll(Q)		} catch(...) { ae_clean_up_before_breaking(&Q); throw; } }
 #else
 // Exception-free code.
 #   define ThrowErrorMsg(Q, X)	set_error_flag((Q).error_msg); return X
 //(@) The following restriction is unnecessary.
-// #   if AE_OS != AE_UNKNOWN
+// #   if AE_OS != AE_OTHER_OS
 // #      error Exception-free mode can not be combined with AE_OS definition
 // #   endif
 #   if AE_THREADING != AE_SERIAL_UNSAFE
 #      error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
 #   endif
 #   define BegPoll	{
-#   define EndPoll	}
+#   define EndPoll(Q)	}
 // Set the error flag and (optionally) the error message.
 void set_error_flag(const char *Msg = NULL);
 // Get the error flag and optionally the error message (as *MsgP);
@@ -2037,5 +2038,4 @@ bool fp_isinf(double x);
 bool fp_isfinite(double x);
 } // end of namespace alglib
 
-// Declarations for optimized linear algebra codes, which is shared between the C++ and pure C libraries.
 #endif // OnceOnly

@@ -7976,7 +7976,7 @@ void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &fu
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
       else alglib_impl::ae_assert(false, "ALGLIB: error in 'nleqsolve' (some derivatives were not provided?)", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 

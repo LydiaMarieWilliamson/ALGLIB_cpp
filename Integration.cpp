@@ -2496,7 +2496,7 @@ void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, 
    BegPoll
       if (state.needf) func(state.x, state.xminusa, state.bminusx, state.f, ptr);
       else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'autogkintegrate()'", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 

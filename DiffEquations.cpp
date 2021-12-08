@@ -625,7 +625,7 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
    BegPoll
       if (state.needdy) diff(state.y, state.x, state.dy, ptr);
       else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'odesolversolve'", &_alglib_env_state);
-   EndPoll
+   EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 

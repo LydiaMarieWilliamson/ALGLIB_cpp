@@ -3394,7 +3394,7 @@ void ae_spin_wait(ae_int_t cnt) {
 // This function causes the calling thread to relinquish the CPU. The thread
 // is moved to the end of the queue and some other thread gets to run.
 //
-// NOTE: this function should NOT be called when AE_OS is AE_UNKNOWN  -  the
+// NOTE: this function should NOT be called when AE_OS is AE_OTHER_OS  -  the
 //       whole program will be abnormally terminated.
 void ae_yield() {
 #if AE_OS == AE_POSIX
