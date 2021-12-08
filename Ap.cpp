@@ -67,10 +67,10 @@ namespace alglib_impl {
 // These declarations are used to ensure, at compile-time, that
 //	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
 // They are implemented by the following general method to verify ConstA == ConstB:
-//	static char DummyArray[1 -  2*(ConstA - ConstB)*(ConstA - ConstB)];
+//	static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
 // that would lead to a syntax error if the constraint failed (by declaring a negative array size).
 // You can remove them, if you want, since they are not used anywhere else.
-#define EquateConst(Arr, A, B)	static char Arr[1 - 2*((A) - (B))*((A) - (B))];
+#define EquateConst(Arr, A, B)	static char Arr[1 - 2*((A) - (B)) * ((A) - (B))];
 EquateConst(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool), 1);
 EquateConst(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t), 4);
 EquateConst(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t), 8);
@@ -209,7 +209,7 @@ static ae_int_t _alglib_cores_to_use = 0;
 // Information about features the CPU and compiler support.
 // You must tell ALGLIB++ what CPU family is used by defining AE_CPU (without this hint zero will be returned).
 // NOTE:
-// *	The results of this function depend on both CPU and compiler;
+// *	The results of this function depend on both the CPU and compiler;
 //	if the compiler doesn't support SSE intrinsics, then the function won't set the corresponding flag.
 static ae_cpuid_t ae_cpuid() {
 // Determine the CPU characteristics and perform CPU-specific initializations.
@@ -353,9 +353,7 @@ int tickcount() {
    return r;
 #if 0
    struct timespec now;
-   if (clock_gettime(CLOCK_MONOTONIC, &now))
-      return 0;
-   return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+   return clock_gettime(CLOCK_MONOTONIC, &now) ? 0 : now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
 #endif
 }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
@@ -699,7 +697,7 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
 // The size of datatype or zero for dynamic types like strings or multiple precision types.
 ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
-   // case DT_BYTE: // The same as alglib_impl::DT_BOOL.
+   // case DT_BYTE: // The same as DT_BOOL.
       case DT_BOOL: return (ae_int_t) sizeof(bool);
       case DT_INT: return (ae_int_t) sizeof(ae_int_t);
       case DT_REAL: return (ae_int_t) sizeof(double);
@@ -1651,7 +1649,7 @@ static inline void _ae_release_lock_raw(_lock *p) { p->is_locked = false; }
 static inline void _ae_free_lock_raw(_lock *p) { }
 #endif
 
-// Initialize a free Lock lock.
+// Initialize a free lock.
 // NOTES:
 // *	make_automatic indicates whether or not the lock is to be added to automatic memory management list.
 // *	As a special exception, this function allows you to specify TopFr == NULL.
@@ -3258,8 +3256,8 @@ const double pi = 3.1415926535897932384626433832795;
 
 // Optimized shared C/C++ linear algebra code.
 static const ae_int_t alglib_simd_alignment = 0x10;
-static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block/2, alglib_twice_r_block = 2*alglib_r_block;
-static const ae_int_t alglib_c_block = 0x10, alglib_half_c_block = alglib_c_block/2, alglib_twice_c_block = 2*alglib_c_block;
+static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block / 2, alglib_twice_r_block = 2 * alglib_r_block;
+static const ae_int_t alglib_c_block = 0x10, alglib_half_c_block = alglib_c_block / 2, alglib_twice_c_block = 2 * alglib_c_block;
 
 // A fast 32 x 32 real matrix-vector product:
 //	y = beta y + alpha A x
@@ -4329,7 +4327,7 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
    return true;
 }
 
-// Real Left TRSM kernel
+// Real Left TRSM kernel.
 static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
    double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
@@ -5104,6 +5102,7 @@ void clear_error_flag() { _alglib_last_error = NULL; }
 // Global and local constants and variables.
 const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
 const double pi = 3.1415926535897932384626433832795;
+static const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
 
 // Standard functions.
@@ -5265,10 +5264,6 @@ complex csqr(const complex &A) {
    double x = A.x, y = A.y;
    return complex(x * x - y * y, 2.0 * x * y);
 }
-
-#if 0
-static const ae_int_t ByteOrder = alglib_impl::ByteOrder;
-#endif
 
 #ifdef AE_HPC
 ae_int_t getnworkers() { return alglib_impl::getnworkers(); }
@@ -6030,6 +6025,7 @@ static std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
 #endif
 
 // Matrices and Vectors: Wrappers.
+
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_init();
    TryX {
@@ -6139,7 +6135,6 @@ boolean_1d_array::boolean_1d_array(const char *s): ae_vector_wrapper(s, alglib_i
 std::string boolean_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&(operator()(0)), length()); }
 #endif
 boolean_1d_array::~boolean_1d_array() { }
-
 const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast < const boolean_1d_array &>(assign(rhs)); }
 const bool &boolean_1d_array::operator()(ae_int_t i) const { return This->xB[i]; }
 bool &boolean_1d_array::operator()(ae_int_t i) { return This->xB[i]; }
