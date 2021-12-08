@@ -504,7 +504,7 @@ int main() {
    bool _TotalResult = true;
    bool _TestResult;
    int _spoil_scenario;
-   printf("CPUID:%s%s%s\n", alglib_impl::ae_cpuid() & alglib_impl::CPU_SSE2 ? " sse2" : "", alglib_impl::ae_cpuid() & alglib_impl::CPU_AVX2 ? " avx2" : "", alglib_impl::ae_cpuid() & alglib_impl::CPU_FMA ? " fma" : "");
+   printf("CPUID:%s%s%s\n", alglib_impl::CurCPU & alglib_impl::CPU_SSE2 ? " sse2" : "", alglib_impl::CurCPU & alglib_impl::CPU_AVX2 ? " avx2" : "", alglib_impl::CurCPU & alglib_impl::CPU_FMA ? " fma" : "");
 #if AE_OS == AE_POSIX
    printf("OS: POSIX\n");
 #elif AE_OS == AE_WINDOWS

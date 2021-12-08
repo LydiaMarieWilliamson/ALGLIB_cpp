@@ -558,8 +558,7 @@ void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVe
    ae_assert(simdwidth == 4, "SPCHOL: unexpected stride in propagatefwd()", _state);
    if (sstride == 4) {
    // blocksize is either 3 or 4
-      ae_int_t supported = ae_cpuid();
-      if (supported & CPU_FMA) {
+      if (CurCPU & CPU_FMA) {
          __m256d x_simd;
          double *p_mat_row = rowstorage->xR + offss + blocksize * 4;
          double *p_simd_buf = simdbuf->xR;
@@ -583,8 +582,7 @@ void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVe
    }
    if (blocksize == 2 && sstride == 2) {
    // blocksize is 2, stride is 2
-      ae_int_t supported = ae_cpuid();
-      if (supported & CPU_FMA) {
+      if (CurCPU & CPU_FMA) {
          __m128d x_simd = _mm_loadu_pd(x->xR + cols0);
          double *p_mat_row = rowstorage->xR + offss + 2 * 2;
          double *p_simd_buf = simdbuf->xR;

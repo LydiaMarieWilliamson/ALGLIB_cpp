@@ -95620,7 +95620,7 @@ int main(int argc, char **argv) {
 #endif
 
 // CPUID results
-   printf("CPUID:%s%s%s\n", ae_cpuid() & CPU_SSE2 ? " sse2" : "", ae_cpuid() & CPU_AVX2 ? " avx2" : "", ae_cpuid() & CPU_FMA ? " fma" : "");
+   printf("CPUID:%s%s%s\n", CurCPU & CPU_SSE2 ? " sse2" : "", CurCPU & CPU_AVX2 ? " avx2" : "", CurCPU & CPU_FMA ? " fma" : "");
 
 // OS
 #if AE_OS == AE_POSIX

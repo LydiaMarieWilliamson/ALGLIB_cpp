@@ -3,8 +3,6 @@
 
 #include "Ap.h"
 
-#define AE_USE_CPP
-
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_SSE2_INTRINSICS
 

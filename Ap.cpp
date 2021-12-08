@@ -40,26 +40,19 @@
 #include <limits>
 #include <locale.h>
 #include <ctype.h>
-#if defined AE_CPU
-#   if (AE_CPU == AE_INTEL)
-#      if AE_COMPILER == AE_MSVC
-#         include <intrin.h>
-#      endif
+#if defined AE_CPU && AE_CPU == AE_INTEL
+#   if AE_COMPILER == AE_MSVC
+#      include <intrin.h>
 #   endif
 #endif
 
-namespace alglib_impl {
-// Core Code (Vectors, Matrices, Memory Management, etc.)
-// OS-specific includes
-#ifdef AE_USE_CPP
-} // end of namespace alglib_impl
-#endif
+// OS-specific includes.
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <time.h>
 #   include <unistd.h>
 #   include <pthread.h>
 #   include <sched.h>
-#   include <sys/time.h>
+#   include <sys/time.h> // For tickcount().
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   ifndef _WIN32_WINNT
 #      define _WIN32_WINNT 0x0501
@@ -70,87 +63,176 @@ namespace alglib_impl {
 // Debugging helpers for Windows
 #ifdef AE_DEBUG4WINDOWS
 #   include <windows.h>
-#   include <stdio.h>
 #endif
 
-#ifdef AE_USE_CPP
 namespace alglib_impl {
-#endif
-// local definitions
-#define x_nb 16
-#define AE_DATA_ALIGN 64
-#define AE_PTR_ALIGN sizeof(void*)
-#define DYN_BOTTOM ((void*)1)
-#define DYN_FRAME  ((void*)2)
-#define AE_LITTLE_ENDIAN 1
-#define AE_BIG_ENDIAN 2
-#define AE_MIXED_ENDIAN 3
-#define AE_SER_ENTRY_LENGTH 11
-#define AE_SER_ENTRIES_PER_ROW 5
+// Core Code (Vectors, Matrices, Memory Management, etc.)
+// Local definitions.
+#define AE_DATA_ALIGN	0x40
+#define AE_PTR_ALIGN	sizeof(void *)
 
-#define AE_SM_DEFAULT 0
-#define AE_SM_ALLOC 1
-#define AE_SM_READY2S 2
-#define AE_SM_TO_STRING    10
-#define AE_SM_TO_CPPSTRING 11
-#define AE_SM_TO_STREAM    12
-#define AE_SM_FROM_STRING  20
-#define AE_SM_FROM_STREAM  22
+#define AE_LITTLE_ENDIAN	1
+#define AE_BIG_ENDIAN		2
+#define AE_MIXED_ENDIAN		3
 
-#define AE_LOCK_CYCLES 512
-#define AE_LOCK_TESTS_BEFORE_YIELD 16
+#define AE_SER_ENTRY_LENGTH	11
+#define AE_SER_ENTRIES_PER_ROW	5
+
+// These declarations are used to ensure, at compile-time, that
+//      sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
+// They are implemented by the following general method to verify ConstA == ConstB:
+//      static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
+// that would lead to a syntax error if the constraint failed (by declaring a negative array size).
+// You can remove them, if you want, since they are not used anywhere else.
+#define EquateConst(Arr, A, B)  static char Arr[1 - 2*((A) - (B)) * ((A) - (B))];
+EquateConst(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool), 1);
+EquateConst(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t), 4);
+EquateConst(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t), 8);
+EquateConst(_ae_uint64_t_must_be_64_bits_wide, (int)sizeof(ae_uint64_t), 8);
+EquateConst(_ae_int_t_must_be_pointer_sized, (int)sizeof(ae_int_t), (int)sizeof(void *));
+#undef EquateConst
+
+// Allocation tracking, for debugging.
+ae_int_t _alloc_counter = 0;
+ae_int_t _alloc_counter_total = 0;
+bool _use_alloc_counter = false;
+
+// Allocation debugging.
+bool _force_malloc_failure = false;
+ae_int_t _malloc_failure_after = 0;
+
+// This function sets jump buffer for error handling.
+//
+// buf may be NULL.
+void ae_state_set_break_jump(ae_state *state, jmp_buf *buf) {
+   state->break_jump = buf;
+}
+
+// This function sets flags member of the ae_state structure
+//
+// buf may be NULL.
+void ae_state_set_flags(ae_state *state, ae_uint64_t flags) {
+   state->flags = flags;
+}
+
+// The stack and frame boundary special blocks.
+static unsigned char DynBottom = 1, DynFrame = 2;
+
+// This function makes new stack frame.
+//
+// This function takes two parameters: environment state and pointer to  the
+// dynamic block which will be used as indicator  of  the  frame  beginning.
+// This dynamic block must be initialized by caller and mustn't  be changed/
+// deallocated/reused till ae_leave_frame called. It may be global or  local
+// variable (local is even better).
+void ae_frame_make(ae_state *state, ae_frame *tmp) {
+   tmp->p_next = state->p_top_block;
+   tmp->deallocator = NULL;
+   tmp->ptr = &DynFrame;
+   state->p_top_block = tmp;
+}
+
+// This function leaves current stack frame and deallocates all automatic
+// dynamic blocks which were attached to this frame.
+void ae_frame_leave(ae_state *state) {
+   while (state->p_top_block->ptr != &DynFrame && state->p_top_block->ptr != &DynBottom) {
+      if (state->p_top_block->ptr != NULL && state->p_top_block->deallocator != NULL)
+         ((ae_deallocator) (state->p_top_block->deallocator)) (state->p_top_block->ptr);
+      state->p_top_block = state->p_top_block->p_next;
+   }
+   state->p_top_block = state->p_top_block->p_next;
+}
+
+// This function initializes ALGLIB environment state.
+//
+// NOTES:
+// * stacks contain no frames, so ae_make_frame() must be called before
+//   attaching dynamic blocks. Without it ae_leave_frame() will cycle
+//   forever (which is intended behavior).
+void ae_state_init(ae_state *state) {
+   ae_int32_t *vp;
+
+// Set flags
+   state->flags = 0x0;
+
+// p_next points to itself because:
+// * correct program should be able to detect end of the list
+//   by looking at the ptr field.
+// * NULL p_next may be used to distinguish automatic blocks
+//   (in the list) from non-automatic (not in the list)
+   state->last_block.p_next = &(state->last_block);
+   state->last_block.deallocator = NULL;
+   state->last_block.ptr = &DynBottom;
+   state->p_top_block = &(state->last_block);
+   state->break_jump = NULL;
+   state->error_msg = "";
+
+// determine endianness and initialize precomputed IEEE special quantities.
+   state->endianness = ae_get_endianness();
+   if (state->endianness == AE_LITTLE_ENDIAN) {
+      vp = (ae_int32_t *) (&state->v_nan);
+      vp[0] = 0;
+      vp[1] = (ae_int32_t) 0x7FF80000;
+      vp = (ae_int32_t *) (&state->v_posinf);
+      vp[0] = 0;
+      vp[1] = (ae_int32_t) 0x7FF00000;
+      vp = (ae_int32_t *) (&state->v_neginf);
+      vp[0] = 0;
+      vp[1] = (ae_int32_t) 0xFFF00000;
+   } else if (state->endianness == AE_BIG_ENDIAN) {
+      vp = (ae_int32_t *) (&state->v_nan);
+      vp[1] = 0;
+      vp[0] = (ae_int32_t) 0x7FF80000;
+      vp = (ae_int32_t *) (&state->v_posinf);
+      vp[1] = 0;
+      vp[0] = (ae_int32_t) 0x7FF00000;
+      vp = (ae_int32_t *) (&state->v_neginf);
+      vp[1] = 0;
+      vp[0] = (ae_int32_t) 0xFFF00000;
+   } else
+      abort();
+
+// set threading information
+   state->worker_thread = NULL;
+   state->parent_task = NULL;
+   state->thread_exception_handler = NULL;
+}
+
+// This function clears ALGLIB environment state.
+// All dynamic data controlled by state are freed.
+void ae_state_clear(ae_state *state) {
+   while (state->p_top_block->ptr != &DynBottom)
+      ae_frame_leave(state);
+}
+
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
-// IDs for set_dbg_value
-#define _ALGLIB_USE_ALLOC_COUNTER             0
-#define _ALGLIB_USE_DBG_COUNTERS              1
-#define _ALGLIB_USE_VENDOR_KERNELS          100
-#define _ALGLIB_VENDOR_MEMSTAT              101
-
-#define _ALGLIB_DEBUG_WORKSTEALING          200
-#define _ALGLIB_WSDBG_NCORES                201
-#define _ALGLIB_WSDBG_PUSHROOT_OK           202
-#define _ALGLIB_WSDBG_PUSHROOT_FAILED       203
-
-#define _ALGLIB_SET_GLOBAL_THREADING       1001
-#define _ALGLIB_SET_NWORKERS               1002
-
-// IDs for get_dbg_value
-#define _ALGLIB_GET_ALLOC_COUNTER             0
-#define _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE     1
-#define _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT    2
-
-#define _ALGLIB_GET_CORES_COUNT            1000
-#define _ALGLIB_GET_GLOBAL_THREADING       1001
-#define _ALGLIB_GET_NWORKERS               1002
-
-// Lock.
-//
-// This is internal structure which implements lock functionality.
-typedef struct {
-#if AE_OS == AE_POSIX
-   pthread_mutex_t mutex;
-#elif AE_OS == AE_WINDOWS
-   volatile ae_int_t *volatile p_lock;
-   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
-#else
-   bool is_locked;
-#endif
-} _lock;
-
-// Error tracking facilities; this fields are modified every time ae_set_error_flag()
-// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
-static const char *sef_file = "";
-static int sef_line = 0;
-static const char *sef_xdesc = "";
-
-// Global flags, split into several char-sized variables in order
-// to avoid problem with non-atomic reads/writes (single-byte ops
-// are atomic on all modern architectures);
+// Global flags, split into several char-sized variables in order to avoid problem with non-atomic reads/writes
+// (single-byte ops are atomic on all modern architectures);
+#define _ALGLIB_FLG_THREADING_MASK          0x7
+#define _ALGLIB_FLG_THREADING_SHIFT         0
 //
 // Following variables are included:
 // * threading-related settings
-unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
+static unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
+
+// This function gets default (global) threading model:
+// * serial execution
+// * multithreading, if cores_to_use allows it
+//
+ae_uint64_t ae_get_global_threading() {
+   return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
+}
+
+// This function sets default (global) threading model:
+// * serial execution
+// * multithreading, if cores_to_use allows it
+//
+void ae_set_global_threading(ae_uint64_t flg_value) {
+   flg_value = flg_value & _ALGLIB_FLG_THREADING_MASK;
+   AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
+   _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
+}
 
 // DESCRIPTION: recommended number of active workers:
 //              * positive value >= 1 is used to specify exact number of active workers
@@ -167,250 +249,99 @@ unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _
 #   error AE_NWORKERS must be positive number or not defined at all.
 #endif
 #if defined AE_NWORKERS
-ae_int_t _alglib_cores_to_use = 0;
+static ae_int_t _alglib_cores_to_use = 0;
 #else
-ae_int_t _alglib_cores_to_use = 0;
+static ae_int_t _alglib_cores_to_use = 0;
 #endif
 
-// Debug counters
-ae_int_t _alloc_counter = 0;
-ae_int_t _alloc_counter_total = 0;
-bool _use_alloc_counter = false;
-
-ae_int_t _dbg_alloc_total = 0;
-bool _use_dbg_counters = false;
-
-bool _use_vendor_kernels = true;
-
-bool debug_workstealing = false; // debug workstealing environment? False by default
-ae_int_t dbgws_pushroot_ok = 0;
-ae_int_t dbgws_pushroot_failed = 0;
-
-#ifdef AE_SMP_DEBUGCOUNTERS
-__declspec(align(AE_LOCK_ALIGNMENT))
-volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
-__declspec(align(AE_LOCK_ALIGNMENT))
-volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
-__declspec(align(AE_LOCK_ALIGNMENT))
-volatile ae_int64_t _ae_dbg_lock_yields = 0;
-#endif
-
-// Allocation debugging
-bool _force_malloc_failure = false;
-ae_int_t _malloc_failure_after = 0;
-
-// Trace-related declarations:
-// alglib_trace_type    -   trace output type
-// alglib_trace_file    -   file descriptor (to be used by ALGLIB code which
-//                          sends messages to trace log
-// alglib_fclose_trace  -   whether we have to call fclose() when disabling or
-//                          changing trace output
-// alglib_trace_tags    -   string buffer used to store tags + two additional
-//                          characters (leading and trailing commas) + null
-//                          terminator
-#define ALGLIB_TRACE_NONE 0
-#define ALGLIB_TRACE_FILE 1
-#define ALGLIB_TRACE_TAGS_LEN 2048
-#define ALGLIB_TRACE_BUFFER_LEN (ALGLIB_TRACE_TAGS_LEN+2+1)
-static ae_int_t alglib_trace_type = ALGLIB_TRACE_NONE;
-FILE *alglib_trace_file = NULL;
-static bool alglib_fclose_trace = false;
-static char alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
-
-// Fields for memory allocation over static array
-#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
+// CPUID
+// Information about features the CPU and compiler support.
+// You must tell ALGLIB++ what CPU family is used by defining AE_CPU symbol (without this hint zero will be returned).
+// NOTE:
+// *	The results of this function depend on both the CPU and compiler;
+//	if compiler doesn't support SSE intrinsics, then the function won't set the corresponding flag.
+static ae_cpuid_t ae_cpuid() {
+// Determine the CPU characteristics and perform CPU-specific initializations.
+// Previous calls are cached to speed things up.
+// There is no synchronization, but this can be safely done on a per-thread basis,
+// provided that simultaneous writes by different cores to the same location will be executed in serial manner,
+// which is true of contemporary architectures.
+   static volatile bool _ae_cpuid_initialized = false, _ae_cpuid_has_sse2 = false, _ae_cpuid_has_avx2 = false, _ae_cpuid_has_fma = false;
+// If not initialized, the determine the system properties.
+   if (!_ae_cpuid_initialized) {
+#if defined AE_CPU && AE_CPU == AE_INTEL
+   { // SSE2
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+      ae_int_t a, b, c, d;
+#   elif AE_COMPILER == AE_MSVC
+      int CPUInfo[4];
 #   endif
-static ae_int_t sm_page_size = 0;
-static ae_int_t sm_page_cnt = 0;
-static ae_int_t *sm_page_tbl = NULL;
-static unsigned char *sm_mem = NULL;
+   // SSE2 support
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || AE_COMPILER == AE_SUNC
+#      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+      if (d & 0x04000000) _ae_cpuid_has_sse2 = true;
+#      elif AE_COMPILER == AE_MSVC
+      __cpuid(CPUInfo, 1);
+      if (CPUInfo[3] & 0x04000000) _ae_cpuid_has_sse2 = true;
+#      endif
+#   endif
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
+   // Check OS support for XSAVE XGETBV
+#      if AE_COMPILER == AE_GNUC
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+      if (c & (0x1 << 27)) {
+         __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
+         if ((a & 0x6) == 0x6) {
+            if (_ae_cpuid_has_sse2) { // AVX2 support
+               __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
+               if (b & (0x1 << 5)) _ae_cpuid_has_avx2 = true;
+            }
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS
+            if (_ae_cpuid_has_avx2) { // FMA support
+               __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+               if (c & (0x1 << 12)) _ae_cpuid_has_fma = true;
+            }
+#         endif
+         }
+      }
+#      elif AE_COMPILER == AE_MSVC && _MSC_VER >= 1600
+      __cpuid(CPUInfo, 1);
+      if ((CPUInfo[2] & (0x1 << 27)) && (_xgetbv(0) & 0x6) == 0x6) {
+         if (_ae_cpuid_has_sse2) { // AVX2 support
+            __cpuidex(CPUInfo, 7, 0);
+            if ((CPUInfo[1] & (0x1 << 5)) != 0) _ae_cpuid_has_avx2 = true;
+         }
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS
+         if (_ae_cpuid_has_avx2) { // FMA support
+            __cpuid(CPUInfo, 1);
+            if ((CPUInfo[2] & (0x1 << 12)) != 0) _ae_cpuid_has_fma = true;
+         }
+#         endif
+      }
+#      endif
+#   endif
+   } { // Perform one more CPUID call to generate memory fence
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+      ae_int_t a, b, c, d;
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+#   elif AE_COMPILER == AE_MSVC
+      int CPUInfo[4];
+      __cpuid(CPUInfo, 1);
+#   endif
+   }
 #endif
-
-// These declarations are used to ensure that
-// sizeof(bool)=1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void*).
-// they will lead to syntax error otherwise (array size will be negative).
-//
-// you can remove them, if you want - they are not used anywhere.
-//
-static char _ae_bool_must_be_8_bits_wide[1 - 2 * ((int)(sizeof(bool)) - 1) *((int)(sizeof(bool)) - 1)];
-static char _ae_int32_t_must_be_32_bits_wide[1 - 2 * ((int)(sizeof(ae_int32_t)) - 4) *((int)(sizeof(ae_int32_t)) - 4)];
-static char _ae_int64_t_must_be_64_bits_wide[1 - 2 * ((int)(sizeof(ae_int64_t)) - 8) *((int)(sizeof(ae_int64_t)) - 8)];
-static char _ae_uint64_t_must_be_64_bits_wide[1 - 2 * ((int)(sizeof(ae_uint64_t)) - 8) *((int)(sizeof(ae_uint64_t)) - 8)];
-static char _ae_int_t_must_be_pointer_sized[1 - 2 * ((int)(sizeof(ae_int_t)) - (int)sizeof(void *)) *((int)(sizeof(ae_int_t)) - (int)(sizeof(void *)))];
-
-// This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
-// It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
-//
-static volatile ae_int_t ae_never_change_it = 1;
-
-// This function should never  be  called.  It is  here  to  prevent spurious
-// compiler warnings about unused variables (in fact: used).
-void ae_never_call_it() {
-   ae_touch_ptr((void *)_ae_bool_must_be_8_bits_wide);
-   ae_touch_ptr((void *)_ae_int32_t_must_be_32_bits_wide);
-   ae_touch_ptr((void *)_ae_int64_t_must_be_64_bits_wide);
-   ae_touch_ptr((void *)_ae_uint64_t_must_be_64_bits_wide);
-   ae_touch_ptr((void *)_ae_int_t_must_be_pointer_sized);
-}
-
-// Standard function wrappers for better GLIBC portability
-#if defined X_FOR_LINUX
-__asm__(".symver exp,exp@GLIBC_2.2.5");
-__asm__(".symver log,log@GLIBC_2.2.5");
-__asm__(".symver pow,pow@GLIBC_2.2.5");
-
-double __wrap_exp(double x) {
-   return exp(x);
-}
-
-double __wrap_log(double x) {
-   return log(x);
-}
-
-double __wrap_pow(double x, double y) {
-   return pow(x, y);
-}
-#endif
-
-void ae_set_dbg_flag(ae_int64_t flag_id, ae_int64_t flag_val) {
-   if (flag_id == _ALGLIB_USE_ALLOC_COUNTER) {
-      _use_alloc_counter = flag_val != 0;
-      return;
+   // Set the initialization flag.
+      _ae_cpuid_initialized = true;
    }
-   if (flag_id == _ALGLIB_USE_DBG_COUNTERS) {
-      _use_dbg_counters = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_USE_VENDOR_KERNELS) {
-      _use_vendor_kernels = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_DEBUG_WORKSTEALING) {
-      debug_workstealing = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_SET_GLOBAL_THREADING) {
-      ae_set_global_threading((ae_uint64_t) flag_val);
-      return;
-   }
-   if (flag_id == _ALGLIB_SET_NWORKERS) {
-      _alglib_cores_to_use = (ae_int_t) flag_val;
-      return;
-   }
+   return (ae_cpuid_t) (
+      (_ae_cpuid_has_sse2 ? (int)CPU_SSE2 : 0) |
+      (_ae_cpuid_has_avx2 ? (int)CPU_AVX2 : 0) |
+      (_ae_cpuid_has_fma ? (int)CPU_FMA : 0)
+   );
 }
 
-ae_int64_t ae_get_dbg_value(ae_int64_t id) {
-   if (id == _ALGLIB_GET_ALLOC_COUNTER)
-      return _alloc_counter;
-   if (id == _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE)
-      return _dbg_alloc_total;
-   if (id == _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT)
-      return _alloc_counter_total;
-
-   if (id == _ALGLIB_VENDOR_MEMSTAT) {
-#if defined AE_MKL
-      return ae_mkl_memstat();
-#else
-      return 0;
-#endif
-   }
-// workstealing counters
-   if (id == _ALGLIB_WSDBG_NCORES)
-#if defined AE_SMP
-      return ae_cores_count();
-#else
-      return 0;
-#endif
-   if (id == _ALGLIB_WSDBG_PUSHROOT_OK)
-      return dbgws_pushroot_ok;
-   if (id == _ALGLIB_WSDBG_PUSHROOT_FAILED)
-      return dbgws_pushroot_failed;
-
-   if (id == _ALGLIB_GET_CORES_COUNT)
-#if defined AE_SMP
-      return ae_cores_count();
-#else
-      return 0;
-#endif
-   if (id == _ALGLIB_GET_GLOBAL_THREADING)
-      return (ae_int64_t) ae_get_global_threading();
-   if (id == _ALGLIB_GET_NWORKERS)
-      return (ae_int64_t) _alglib_cores_to_use;
-
-// unknown value
-   return 0;
-}
-
-// This function sets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
-void ae_set_global_threading(ae_uint64_t flg_value) {
-   flg_value = flg_value & _ALGLIB_FLG_THREADING_MASK;
-   AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
-   _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
-}
-
-// This function gets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
-ae_uint64_t ae_get_global_threading() {
-   return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
-}
-
-void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
-   if (cond) {
-      *p_flag = true;
-      sef_file = filename;
-      sef_line = lineno;
-      sef_xdesc = xdesc;
-#ifdef ALGLIB_ABORT_ON_ERROR_FLAG
-      printf("[ALGLIB] aborting on ae_set_error_flag(cond=true)\n");
-      printf("[ALGLIB] %s:%d\n", filename, lineno);
-      printf("[ALGLIB] %s\n", xdesc);
-      fflush(stdout);
-      if (alglib_trace_file != NULL) fflush(alglib_trace_file);
-      abort();
-#endif
-   }
-}
-
-// This function returns file name for the last call of ae_set_error_flag()
-// with non-zero cond parameter.
-const char *ae_get_last_error_file() {
-   return sef_file;
-}
-
-// This function returns line number for the last call of ae_set_error_flag()
-// with non-zero cond parameter.
-int ae_get_last_error_line() {
-   return sef_line;
-}
-
-// This function returns extra description for the last call of ae_set_error_flag()
-// with non-zero cond parameter.
-const char *ae_get_last_error_xdesc() {
-   return sef_xdesc;
-}
-
-ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
-   union {
-      const void *ptr;
-      ae_int_t iptr;
-   } u;
-   u.ptr = ptr;
-   return (ae_int_t) (u.iptr % alignment);
-}
-
-void *ae_align(void *ptr, size_t alignment) {
-   char *result = (char *)ptr;
-   if ((result - (char *)0) % alignment != 0)
-      result += alignment - (result - (char *)0) % alignment;
-   return result;
-}
+const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
 
 // This function maps nworkers  number  (which  can  be  positive,  zero  or
 // negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
@@ -446,82 +377,96 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
    return ncores + nworkers >= 1 ? ncores + nworkers : 1;
 }
 
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
-//
-// This particular function performs atomic addition on pointer-sized  value,
-// which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
-void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
-   AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
-   for (;;) {
-   // perform conversion between ae_int_t* and void**
-   // without compiler warnings about indirection levels
-      union {
-         PVOID volatile *volatile ptr;
-         volatile ae_int_t *volatile iptr;
-      } u;
-      u.iptr = p;
+// Debug counters and flags.
+static ae_int_t _dbg_alloc_total = 0;
+static bool _use_dbg_counters = false;
+static bool _use_vendor_kernels = true;
+static bool debug_workstealing = false; // debug workstealing environment? False by default
+static ae_int_t dbgws_pushroot_ok = 0;
+static ae_int_t dbgws_pushroot_failed = 0;
 
-   // atomic read for initial value
-      PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-
-   // increment cached value and store
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) + v), v0) == v0)
-         break;
-   }
-#elif defined __clang__ && (AE_CPU == AE_INTEL)
-   __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
-   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
-#else
+#ifdef AE_SMP_DEBUGCOUNTERS
+__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
+__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
+__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
 #endif
+
+// Trace-related declarations:
+// alglib_trace_type    -   trace output type
+// alglib_trace_file    -   file descriptor (to be used by ALGLIB code which
+//                          sends messages to trace log
+// alglib_fclose_trace  -   whether we have to call fclose() when disabling or
+//                          changing trace output
+// alglib_trace_tags    -   string buffer used to store tags + two additional
+//                          characters (leading and trailing commas) + null
+//                          terminator
+#define ALGLIB_TRACE_NONE 0
+#define ALGLIB_TRACE_FILE 1
+#define ALGLIB_TRACE_TAGS_LEN 2048
+#define ALGLIB_TRACE_BUFFER_LEN (ALGLIB_TRACE_TAGS_LEN+2+1)
+static ae_int_t alglib_trace_type = ALGLIB_TRACE_NONE;
+FILE *alglib_trace_file = NULL;
+static bool alglib_fclose_trace = false;
+static char alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
+
+// Standard function wrappers for better GLIBC portability
+#if defined X_FOR_LINUX
+__asm__(".symver exp,exp@GLIBC_2.2.5");
+__asm__(".symver log,log@GLIBC_2.2.5");
+__asm__(".symver pow,pow@GLIBC_2.2.5");
+
+double __wrap_exp(double x) {
+   return exp(x);
 }
 
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
-//
-// This  particular  function  performs  atomic  subtraction on pointer-sized
-// value, which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
-void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
-   AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
-   for (;;) {
-   // perform conversion between ae_int_t* and void**
-   // without compiler warnings about indirection levels
-      union {
-         PVOID volatile *volatile ptr;
-         volatile ae_int_t *volatile iptr;
-      } u;
-      u.iptr = p;
+double __wrap_log(double x) {
+   return log(x);
+}
 
-   // atomic read for initial value, convert it to 1-byte pointer
-      PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-
-   // increment cached value and store
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) - v), v0) == v0)
-         break;
-   }
-#elif defined __clang__ && (AE_CPU == AE_INTEL)
-   __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
-   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
-#else
+double __wrap_pow(double x, double y) {
+   return pow(x, y);
+}
 #endif
+
+ae_int64_t ae_get_dbg_value(debug_flag_t id) {
+   switch (id) {
+      case _ALGLIB_ALLOC_COUNTER: return _alloc_counter;
+      case _ALGLIB_TOTAL_ALLOC_SIZE: return _dbg_alloc_total;
+      case _ALGLIB_TOTAL_ALLOC_COUNT: return _alloc_counter_total;
+#if defined AE_MKL
+      case _ALGLIB_VENDOR_MEMSTAT: return ae_mkl_memstat();
+#else
+      case _ALGLIB_VENDOR_MEMSTAT: return 0;
+#endif
+   // Work-stealing counters.
+#if defined AE_SMP
+      case _ALGLIB_WSDBG_NCORES: return ae_cores_count();
+#else
+      case _ALGLIB_WSDBG_NCORES: return 0;
+#endif
+      case _ALGLIB_WSDBG_PUSHROOT_OK: return dbgws_pushroot_ok;
+      case _ALGLIB_WSDBG_PUSHROOT_FAILED: return dbgws_pushroot_failed;
+#if defined AE_SMP
+      case _ALGLIB_CORES_COUNT: return ae_cores_count();
+#else
+      case _ALGLIB_CORES_COUNT: return 0;
+#endif
+      case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t) ae_get_global_threading();
+      case _ALGLIB_NWORKERS: return (ae_int64_t) _alglib_cores_to_use;
+   // Unknown value.
+      default: return 0;
+   }
+}
+
+void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
+   switch (flag_id) {
+      case _ALGLIB_ALLOC_COUNTER: _use_alloc_counter = flag_val != 0; break;
+      case _ALGLIB_TOTAL_ALLOC_SIZE: _use_dbg_counters = flag_val != 0; break;
+      case _ALGLIB_USE_VENDOR_KERNELS: _use_vendor_kernels = flag_val != 0; break;
+      case _ALGLIB_DEBUG_WORKSTEALING: debug_workstealing = flag_val != 0; break;
+      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t) flag_val); break;
+      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
+   }
 }
 
 // This function cleans up automatically managed memory before caller terminates
@@ -548,7 +493,7 @@ void ae_clean_up_before_breaking(ae_state *state) {
 //
 // If state is not NULL and state->thread_exception_handler  is  set,  it  is
 // called prior to handling error and clearing state.
-void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
+static void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
    if (state != NULL) {
       if (alglib_trace_type != ALGLIB_TRACE_NONE)
          ae_trace("---!!! CRITICAL ERROR !!!--- exception with message '%s' was generated\n", msg != NULL ? msg : "");
@@ -563,7 +508,153 @@ void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
       abort();
 }
 
+// Assertion
+//
+// For  non-NULL  state  it  allows  to  gracefully  leave  ALGLIB  session,
+// removing all frames and deallocating registered dynamic data structure.
+//
+// For NULL state it just abort()'s program.
+//
+// IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
+//            replaced by macro which does nothing. So, you may place actual
+//            function calls at cond, and these will always be performed.
+void ae_assert(bool cond, const char *msg, ae_state *state) {
+   if (!cond)
+      ae_break(state, ERR_ASSERTION_FAILED, msg);
+}
+
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
+int ae_tickcount() {
+   struct timeval now;
+   ae_int64_t r, v;
+   gettimeofday(&now, NULL);
+   v = now.tv_sec;
+   r = v * 1000;
+   v = now.tv_usec / 1000;
+   r = r + v;
+   return r;
+#   if 0
+   struct timespec now;
+   return clock_gettime(CLOCK_MONOTONIC, &now) ? 0 : now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+#   endif
+}
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+int ae_tickcount() {
+   return (int)GetTickCount();
+}
+#else
+int ae_tickcount() {
+   return 0;
+}
+#endif
+
+ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
+   union {
+      const void *ptr;
+      ae_int_t iptr;
+   } u;
+   u.ptr = ptr;
+   return (ae_int_t) (u.iptr % alignment);
+}
+
+void *ae_align(void *ptr, size_t alignment) {
+   char *result = (char *)ptr;
+   if ((result - (char *)0) % alignment != 0)
+      result += alignment - (result - (char *)0) % alignment;
+   return result;
+}
+
+// This function belongs to the family of  "optional  atomics",  i.e.  atomic
+// functions which either perform atomic changes - or do nothing at  all,  if
+// current compiler settings do not allow us to generate atomic code.
+//
+// All "optional atomics" are synchronized, i.e. either all of them work - or
+// no one of the works.
+//
+// This particular function performs atomic addition on pointer-sized  value,
+// which must be pointer-size aligned.
+//
+// NOTE: this function is not intended to be extremely high performance  one,
+//       so use it only when necessary.
+static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
+   AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
+#if AE_OS == AE_WINDOWS
+   for (;;) {
+   // perform conversion between ae_int_t* and void**
+   // without compiler warnings about indirection levels
+      union {
+         PVOID volatile *volatile ptr;
+         volatile ae_int_t *volatile iptr;
+      } u;
+      u.iptr = p;
+
+   // atomic read for initial value
+      PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
+
+   // increment cached value and store
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) + v), v0) == v0)
+         break;
+   }
+#elif defined __clang__ && (AE_CPU == AE_INTEL)
+   __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
+#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
+   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
+#else
+   *p += v; // At least do something for older compilers!
+#endif
+}
+
+// This function belongs to the family of  "optional  atomics",  i.e.  atomic
+// functions which either perform atomic changes - or do nothing at  all,  if
+// current compiler settings do not allow us to generate atomic code.
+//
+// All "optional atomics" are synchronized, i.e. either all of them work - or
+// no one of the works.
+//
+// This  particular  function  performs  atomic  subtraction on pointer-sized
+// value, which must be pointer-size aligned.
+//
+// NOTE: this function is not intended to be extremely high performance  one,
+//       so use it only when necessary.
+static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
+   AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
+#if AE_OS == AE_WINDOWS
+   for (;;) {
+   // perform conversion between ae_int_t* and void**
+   // without compiler warnings about indirection levels
+      union {
+         PVOID volatile *volatile ptr;
+         volatile ae_int_t *volatile iptr;
+      } u;
+      u.iptr = p;
+
+   // atomic read for initial value, convert it to 1-byte pointer
+      PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
+
+   // increment cached value and store
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) - v), v0) == v0)
+         break;
+   }
+#elif defined __clang__ && (AE_CPU == AE_INTEL)
+   __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
+#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
+   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
+#else
+   *p -= v; // At least do something for older compilers!
+#endif
+}
+
+// Fields for memory allocation over static array
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
+#   if AE_THREADING != AE_SERIAL_UNSAFE
+#      error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
+#   endif
+
+static ae_int_t sm_page_size = 0;
+static ae_int_t sm_page_cnt = 0;
+static ae_int_t *sm_page_tbl = NULL;
+static unsigned char *sm_mem = NULL;
+
 void set_memory_pool(void *ptr, size_t size) {
 // Integrity checks
    AE_CRITICAL_ASSERT(sm_page_size == 0);
@@ -589,7 +680,7 @@ void set_memory_pool(void *ptr, size_t size) {
    memset(sm_page_tbl, 0, sm_page_cnt * sizeof *sm_page_tbl);
 }
 
-void *ae_static_malloc(size_t size, size_t alignment) {
+static void *ae_static_malloc(size_t size, size_t alignment) {
    int rq_pages, i, j, cur_len;
 
    AE_CRITICAL_ASSERT(size >= 0);
@@ -645,7 +736,7 @@ void *ae_static_malloc(size_t size, size_t alignment) {
    return NULL;
 }
 
-void ae_static_free(void *block) {
+static void ae_static_free(void *block) {
    ae_int_t page_idx, page_cnt, i;
    if (block == NULL)
       return;
@@ -742,13 +833,11 @@ void *aligned_malloc(size_t size, size_t alignment) {
 #endif
 }
 
-void *aligned_extract_ptr(void *block) {
+static void *aligned_extract_ptr(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
 #else
-   if (block == NULL)
-      return NULL;
-   return *((void **)((char *)block - sizeof(void *)));
+   return block == NULL? NULL: *(void **)((char *)block - sizeof(void *));
 #endif
 }
 
@@ -764,14 +853,6 @@ void aligned_free(void *block) {
    if (_use_alloc_counter)
       ae_optional_atomic_sub_i(&_alloc_counter, 1);
 #endif
-}
-
-void *eternal_malloc(size_t size) {
-   if (size == 0)
-      return NULL;
-   if (_force_malloc_failure)
-      return NULL;
-   return malloc(size);
 }
 
 // Allocate memory with automatic alignment.
@@ -794,44 +875,6 @@ void *ae_malloc(size_t size, ae_state *state) {
 void ae_free(void *p) {
    if (p != NULL)
       aligned_free(p);
-}
-
-// Sets pointers to the matrix rows.
-//
-// * dst must be correctly initialized matrix
-// * dst->data.ptr points to the beginning of memory block  allocated  for
-//   row pointers.
-// * dst->ptr - undefined (initialized during algorithm processing)
-// * storage parameter points to the beginning of actual storage
-void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
-   char *p_base;
-   void **pp_ptr;
-   ae_int_t i;
-   if (dst->rows > 0 && dst->cols > 0) {
-      p_base = (char *)storage;
-      pp_ptr = (void **)dst->data.ptr;
-      dst->xyX = pp_ptr;
-      for (i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
-         pp_ptr[i] = p_base;
-   } else
-      dst->xyX = NULL;
-}
-
-// Returns size of datatype.
-// Zero for dynamic types like strings or multiple precision types.
-ae_int_t ae_sizeof(ae_datatype datatype) {
-   switch (datatype) {
-      case DT_BOOL:
-         return (ae_int_t) sizeof(bool);
-      case DT_INT:
-         return (ae_int_t) sizeof(ae_int_t);
-      case DT_REAL:
-         return (ae_int_t) sizeof(double);
-      case DT_COMPLEX:
-         return 2 * (ae_int_t) sizeof(double);
-      default:
-         return 0;
-   }
 }
 
 // Checks that n bytes pointed by ptr are zero.
@@ -876,107 +919,6 @@ void ae_touch_ptr(void *p) {
    fake_variable0 = fake_variable1;
 }
 
-// This function initializes ALGLIB environment state.
-//
-// NOTES:
-// * stacks contain no frames, so ae_make_frame() must be called before
-//   attaching dynamic blocks. Without it ae_leave_frame() will cycle
-//   forever (which is intended behavior).
-void ae_state_init(ae_state *state) {
-   ae_int32_t *vp;
-
-// Set flags
-   state->flags = 0x0;
-
-// p_next points to itself because:
-// * correct program should be able to detect end of the list
-//   by looking at the ptr field.
-// * NULL p_next may be used to distinguish automatic blocks
-//   (in the list) from non-automatic (not in the list)
-   state->last_block.p_next = &(state->last_block);
-   state->last_block.deallocator = NULL;
-   state->last_block.ptr = DYN_BOTTOM;
-   state->p_top_block = &(state->last_block);
-   state->break_jump = NULL;
-   state->error_msg = "";
-
-// determine endianness and initialize precomputed IEEE special quantities.
-   state->endianness = ae_get_endianness();
-   if (state->endianness == AE_LITTLE_ENDIAN) {
-      vp = (ae_int32_t *) (&state->v_nan);
-      vp[0] = 0;
-      vp[1] = (ae_int32_t) 0x7FF80000;
-      vp = (ae_int32_t *) (&state->v_posinf);
-      vp[0] = 0;
-      vp[1] = (ae_int32_t) 0x7FF00000;
-      vp = (ae_int32_t *) (&state->v_neginf);
-      vp[0] = 0;
-      vp[1] = (ae_int32_t) 0xFFF00000;
-   } else if (state->endianness == AE_BIG_ENDIAN) {
-      vp = (ae_int32_t *) (&state->v_nan);
-      vp[1] = 0;
-      vp[0] = (ae_int32_t) 0x7FF80000;
-      vp = (ae_int32_t *) (&state->v_posinf);
-      vp[1] = 0;
-      vp[0] = (ae_int32_t) 0x7FF00000;
-      vp = (ae_int32_t *) (&state->v_neginf);
-      vp[1] = 0;
-      vp[0] = (ae_int32_t) 0xFFF00000;
-   } else
-      abort();
-
-// set threading information
-   state->worker_thread = NULL;
-   state->parent_task = NULL;
-   state->thread_exception_handler = NULL;
-}
-
-// This function clears ALGLIB environment state.
-// All dynamic data controlled by state are freed.
-void ae_state_clear(ae_state *state) {
-   while (state->p_top_block->ptr != DYN_BOTTOM)
-      ae_frame_leave(state);
-}
-
-// This function sets jump buffer for error handling.
-//
-// buf may be NULL.
-void ae_state_set_break_jump(ae_state *state, jmp_buf *buf) {
-   state->break_jump = buf;
-}
-
-// This function sets flags member of the ae_state structure
-//
-// buf may be NULL.
-void ae_state_set_flags(ae_state *state, ae_uint64_t flags) {
-   state->flags = flags;
-}
-
-// This function makes new stack frame.
-//
-// This function takes two parameters: environment state and pointer to  the
-// dynamic block which will be used as indicator  of  the  frame  beginning.
-// This dynamic block must be initialized by caller and mustn't  be changed/
-// deallocated/reused till ae_leave_frame called. It may be global or  local
-// variable (local is even better).
-void ae_frame_make(ae_state *state, ae_frame *tmp) {
-   tmp->p_next = state->p_top_block;
-   tmp->deallocator = NULL;
-   tmp->ptr = DYN_FRAME;
-   state->p_top_block = tmp;
-}
-
-// This function leaves current stack frame and deallocates all automatic
-// dynamic blocks which were attached to this frame.
-void ae_frame_leave(ae_state *state) {
-   while (state->p_top_block->ptr != DYN_FRAME && state->p_top_block->ptr != DYN_BOTTOM) {
-      if (state->p_top_block->ptr != NULL && state->p_top_block->deallocator != NULL)
-         ((ae_deallocator) (state->p_top_block->deallocator)) (state->p_top_block->ptr);
-      state->p_top_block = state->p_top_block->p_next;
-   }
-   state->p_top_block = state->p_top_block->p_next;
-}
-
 // This function attaches block to the dynamic block list
 //
 // block               block
@@ -986,7 +928,7 @@ void ae_frame_leave(ae_state *state) {
 //
 // NOTES:
 // * never call it for special blocks which marks frame boundaries!
-void ae_db_attach(ae_dyn_block *block, ae_state *state) {
+static void ae_db_attach(ae_dyn_block *block, ae_state *state) {
    block->p_next = state->p_top_block;
    state->p_top_block = block;
 }
@@ -1107,6 +1049,19 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
    block2->deallocator = deallocator;
 }
 
+// Returns size of datatype.
+// Zero for dynamic types like strings or multiple precision types.
+ae_int_t ae_sizeof(ae_datatype datatype) {
+   switch (datatype) {
+   // case DT_BYTE: // The same as DT_BOOL.
+      case DT_BOOL: return (ae_int_t) sizeof(bool);
+      case DT_INT: return (ae_int_t) sizeof(ae_int_t);
+      case DT_REAL: return (ae_int_t) sizeof(double);
+      case DT_COMPLEX: return 2 * (ae_int_t) sizeof(double);
+      default: return 0;
+   }
+}
+
 // This function creates ae_vector.
 // Vector size may be zero. Vector contents is uninitialized.
 //
@@ -1162,79 +1117,6 @@ void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_a
    ae_vector_init(dst, src->cnt, src->datatype, state, make_automatic);
    if (src->cnt != 0)
       memmove(dst->xX, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
-}
-
-// This function initializes ae_vector using X-structure as source. New copy
-// of data is created, which is owned/managed by ae_vector  structure.  Both
-// structures (source and destination) remain completely  independent  after
-// this call.
-//
-// dst                 destination vector, MUST be zero-filled (we  check  it
-//                     and call abort() if *dst is non-zero; the rationale is
-//                     that we can not correctly handle errors in constructors
-//                     without zero-filling).
-// src                 well, it is source
-// state               pointer to current state structure. Can not be NULL.
-//                     used for exception handling (say, allocation error results
-//                     in longjmp call).
-// make_automatic      if true, vector will be registered in the current frame
-//                     of the state structure;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
-   AE_CRITICAL_ASSERT(state != NULL);
-
-   ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, state, make_automatic);
-   if (src->cnt > 0)
-      memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
-}
-
-// This function initializes ae_vector using X-structure as source.
-//
-// New vector is attached to source:
-// * DST shares memory with SRC
-// * both DST and SRC are writable - all writes to DST  change  elements  of
-//   SRC and vice versa.
-// * DST can be reallocated with ae_vector_set_length(), in  this  case  SRC
-//   remains untouched
-// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-//
-// NOTE: is_attached field is set  to  true  in  order  to  indicate  that
-//       vector does not own its memory.
-//
-// dst                 destination vector
-// src                 well, it is source
-// state               pointer to current state structure. Can not be NULL.
-//                     used for exception handling (say, allocation error results
-//                     in longjmp call).
-// make_automatic      if true, vector will be registered in the current frame
-//                     of the state structure;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
-   volatile ae_int_t cnt;
-
-   AE_CRITICAL_ASSERT(state != NULL);
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-
-   cnt = (ae_int_t) src->cnt;
-
-// ensure that size is correct
-   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x(): 32/64 overflow", state);
-   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x(): negative length", state);
-
-// prepare for possible errors during allocation
-   dst->cnt = 0;
-   dst->xX = NULL;
-   dst->datatype = (ae_datatype) src->datatype;
-
-// zero-size init in order to correctly register in the frame
-   ae_db_init(&dst->data, 0, state, make_automatic);
-
-// init
-   dst->cnt = cnt;
-   dst->xX = src->x_ptr;
-   dst->is_attached = true;
 }
 
 // This function changes length of ae_vector.
@@ -1327,6 +1209,27 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
    vec2->xX = p_ptr;
 }
 
+// Sets pointers to the matrix rows.
+//
+// * dst must be correctly initialized matrix
+// * dst->data.ptr points to the beginning of memory block  allocated  for
+//   row pointers.
+// * dst->ptr - undefined (initialized during algorithm processing)
+// * storage parameter points to the beginning of actual storage
+static void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
+   char *p_base;
+   void **pp_ptr;
+   ae_int_t i;
+   if (dst->rows > 0 && dst->cols > 0) {
+      p_base = (char *)storage;
+      pp_ptr = (void **)dst->data.ptr;
+      dst->xyX = pp_ptr;
+      for (i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
+         pp_ptr[i] = p_base;
+   } else
+      dst->xyX = NULL;
+}
+
 // This function creates ae_matrix.
 //
 // Matrix size may be zero, in such cases both rows and cols are zero.
@@ -1397,101 +1300,6 @@ void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_a
       else
          for (i = 0; i < dst->rows; i++)
             memmove(dst->xyX[i], src->xyX[i], (size_t)(dst->cols * ae_sizeof(dst->datatype)));
-   }
-}
-
-// This function initializes ae_matrix using X-structure as source. New copy
-// of data is created, which is owned/managed by ae_matrix  structure.  Both
-// structures (source and destination) remain completely  independent  after
-// this call.
-//
-// dst                 destination matrix, must be zero-filled
-// src                 well, it is source
-// state               pointer to current state structure. Can not be NULL.
-//                     used for exception handling (say, allocation error results
-//                     in longjmp call).
-// make_automatic      if true, matrix will be registered in the current frame
-//                     of the state structure;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
-   char *p_src_row;
-   char *p_dst_row;
-   ae_int_t row_size;
-   ae_int_t i;
-   AE_CRITICAL_ASSERT(state != NULL);
-   ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, state, make_automatic);
-   if (src->rows != 0 && src->cols != 0) {
-      p_src_row = (char *)src->x_ptr;
-      p_dst_row = (char *)(dst->xyX[0]);
-      row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
-      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
-         memmove(p_dst_row, p_src_row, (size_t)(row_size));
-   }
-}
-
-// This function initializes ae_matrix using X-structure as source.
-//
-// New matrix is attached to source:
-// * DST shares memory with SRC
-// * both DST and SRC are writable - all writes to DST  change  elements  of
-//   SRC and vice versa.
-// * DST can be reallocated with ae_matrix_set_length(), in  this  case  SRC
-//   remains untouched
-// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-//
-// dst                 destination matrix, must be zero-filled
-// src                 well, it is source
-// state               pointer to current state structure. Can not be NULL.
-//                     used for exception handling (say, allocation error results
-//                     in longjmp call).
-// make_automatic      if true, matrix will be registered in the current frame
-//                     of the state structure;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
-   ae_int_t rows, cols;
-
-   AE_CRITICAL_ASSERT(state != NULL);
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-
-   rows = (ae_int_t) src->rows;
-   cols = (ae_int_t) src->cols;
-
-// check that X-source is densely packed
-   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x(): unsupported stride", state);
-
-// ensure that size is correct
-   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
-   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
-   ae_assert(rows >= 0 && cols >= 0, "ae_matrix_init_attach_to_x(): negative length", state);
-
-// if one of rows/cols is zero, another MUST be too
-   if (rows == 0 || cols == 0) {
-      rows = 0;
-      cols = 0;
-   }
-// init, being ready for allocation error
-   dst->is_attached = true;
-   dst->rows = 0;
-   dst->cols = 0;
-   dst->stride = cols;
-   dst->datatype = (ae_datatype) src->datatype;
-   dst->xyX = NULL;
-   ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), state, make_automatic);
-   dst->rows = rows;
-   dst->cols = cols;
-   if (dst->rows > 0 && dst->cols > 0) {
-      ae_int_t i, rowsize;
-      char *p_row;
-      void **pp_ptr;
-
-      p_row = (char *)src->x_ptr;
-      rowsize = dst->stride * ae_sizeof(dst->datatype);
-      pp_ptr = (void **)dst->data.ptr;
-      dst->xyX = pp_ptr;
-      for (i = 0; i < dst->rows; i++, p_row += rowsize)
-         pp_ptr[i] = p_row;
    }
 }
 
@@ -1691,6 +1499,79 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
       *(dst->subscriber) = NULL;
 }
 
+// This function initializes ae_vector using X-structure as source. New copy
+// of data is created, which is owned/managed by ae_vector  structure.  Both
+// structures (source and destination) remain completely  independent  after
+// this call.
+//
+// dst                 destination vector, MUST be zero-filled (we  check  it
+//                     and call abort() if *dst is non-zero; the rationale is
+//                     that we can not correctly handle errors in constructors
+//                     without zero-filling).
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
+   AE_CRITICAL_ASSERT(state != NULL);
+
+   ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, state, make_automatic);
+   if (src->cnt > 0)
+      memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
+}
+
+// This function initializes ae_vector using X-structure as source.
+//
+// New vector is attached to source:
+// * DST shares memory with SRC
+// * both DST and SRC are writable - all writes to DST  change  elements  of
+//   SRC and vice versa.
+// * DST can be reallocated with ae_vector_set_length(), in  this  case  SRC
+//   remains untouched
+// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
+//
+// NOTE: is_attached field is set  to  true  in  order  to  indicate  that
+//       vector does not own its memory.
+//
+// dst                 destination vector
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
+   volatile ae_int_t cnt;
+
+   AE_CRITICAL_ASSERT(state != NULL);
+   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
+
+   cnt = (ae_int_t) src->cnt;
+
+// ensure that size is correct
+   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x(): 32/64 overflow", state);
+   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x(): negative length", state);
+
+// prepare for possible errors during allocation
+   dst->cnt = 0;
+   dst->xX = NULL;
+   dst->datatype = (ae_datatype) src->datatype;
+
+// zero-size init in order to correctly register in the frame
+   ae_db_init(&dst->data, 0, state, make_automatic);
+
+// init
+   dst->cnt = cnt;
+   dst->xX = src->x_ptr;
+   dst->is_attached = true;
+}
+
 // This function copies contents of ae_vector (SRC) to x_vector (DST).
 //
 // This function should not be called for  DST  which  is  attached  to  SRC
@@ -1742,6 +1623,135 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
    }
    if (src->cnt)
       memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
+}
+
+// This function attaches x_vector to ae_vector's contents.
+// Ownership of memory allocated is not changed (it is still managed by
+// ae_matrix).
+//
+// dst                 destination vector
+// src                 source, vector in x-format
+// state               ALGLIB environment state
+//
+// NOTES:
+// * dst is assumed to be initialized. Its contents is freed before
+//   attaching to src.
+// * this function doesn't need ae_state parameter because it can't fail
+//   (assuming correctly initialized src)
+void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
+   if (dst->owner == OWN_AE)
+      ae_free(dst->x_ptr);
+   dst->x_ptr = src->xX;
+   dst->last_action = ACT_NEW_LOCATION;
+   dst->cnt = src->cnt;
+   dst->datatype = src->datatype;
+   dst->owner = OWN_CALLER;
+}
+
+// This function clears x_vector. It does nothing  if vector is not owned by
+// ALGLIB environment.
+//
+// dst                 vector
+void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
+   if (dst->owner == OWN_AE)
+      aligned_free(dst->x_ptr);
+   dst->x_ptr = NULL;
+   dst->cnt = 0;
+}
+
+// This function initializes ae_matrix using X-structure as source. New copy
+// of data is created, which is owned/managed by ae_matrix  structure.  Both
+// structures (source and destination) remain completely  independent  after
+// this call.
+//
+// dst                 destination matrix, must be zero-filled
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
+   char *p_src_row;
+   char *p_dst_row;
+   ae_int_t row_size;
+   ae_int_t i;
+   AE_CRITICAL_ASSERT(state != NULL);
+   ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, state, make_automatic);
+   if (src->rows != 0 && src->cols != 0) {
+      p_src_row = (char *)src->x_ptr;
+      p_dst_row = (char *)(dst->xyX[0]);
+      row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
+      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
+         memmove(p_dst_row, p_src_row, (size_t)(row_size));
+   }
+}
+
+// This function initializes ae_matrix using X-structure as source.
+//
+// New matrix is attached to source:
+// * DST shares memory with SRC
+// * both DST and SRC are writable - all writes to DST  change  elements  of
+//   SRC and vice versa.
+// * DST can be reallocated with ae_matrix_set_length(), in  this  case  SRC
+//   remains untouched
+// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
+//
+// dst                 destination matrix, must be zero-filled
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
+   ae_int_t rows, cols;
+
+   AE_CRITICAL_ASSERT(state != NULL);
+   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
+
+   rows = (ae_int_t) src->rows;
+   cols = (ae_int_t) src->cols;
+
+// check that X-source is densely packed
+   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x(): unsupported stride", state);
+
+// ensure that size is correct
+   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
+   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
+   ae_assert(rows >= 0 && cols >= 0, "ae_matrix_init_attach_to_x(): negative length", state);
+
+// if one of rows/cols is zero, another MUST be too
+   if (rows == 0 || cols == 0) {
+      rows = 0;
+      cols = 0;
+   }
+// init, being ready for allocation error
+   dst->is_attached = true;
+   dst->rows = 0;
+   dst->cols = 0;
+   dst->stride = cols;
+   dst->datatype = (ae_datatype) src->datatype;
+   dst->xyX = NULL;
+   ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), state, make_automatic);
+   dst->rows = rows;
+   dst->cols = cols;
+   if (dst->rows > 0 && dst->cols > 0) {
+      ae_int_t i, rowsize;
+      char *p_row;
+      void **pp_ptr;
+
+      p_row = (char *)src->x_ptr;
+      rowsize = dst->stride * ae_sizeof(dst->datatype);
+      pp_ptr = (void **)dst->data.ptr;
+      dst->xyX = pp_ptr;
+      for (i = 0; i < dst->rows; i++, p_row += rowsize)
+         pp_ptr[i] = p_row;
+   }
 }
 
 // This function copies contents of ae_matrix to x_matrix.
@@ -1808,29 +1818,6 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
    }
 }
 
-// This function attaches x_vector to ae_vector's contents.
-// Ownership of memory allocated is not changed (it is still managed by
-// ae_matrix).
-//
-// dst                 destination vector
-// src                 source, vector in x-format
-// state               ALGLIB environment state
-//
-// NOTES:
-// * dst is assumed to be initialized. Its contents is freed before
-//   attaching to src.
-// * this function doesn't need ae_state parameter because it can't fail
-//   (assuming correctly initialized src)
-void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
-   if (dst->owner == OWN_AE)
-      ae_free(dst->x_ptr);
-   dst->x_ptr = src->xX;
-   dst->last_action = ACT_NEW_LOCATION;
-   dst->cnt = src->cnt;
-   dst->datatype = src->datatype;
-   dst->owner = OWN_CALLER;
-}
-
 // This function attaches x_matrix to ae_matrix's contents.
 // Ownership of memory allocated is not changed (it is still managed by
 // ae_matrix).
@@ -1856,572 +1843,7 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    dst->owner = OWN_CALLER;
 }
 
-// This function clears x_vector. It does nothing  if vector is not owned by
-// ALGLIB environment.
-//
-// dst                 vector
-void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
-   if (dst->owner == OWN_AE)
-      aligned_free(dst->x_ptr);
-   dst->x_ptr = NULL;
-   dst->cnt = 0;
-}
-
-// Assertion
-//
-// For  non-NULL  state  it  allows  to  gracefully  leave  ALGLIB  session,
-// removing all frames and deallocating registered dynamic data structure.
-//
-// For NULL state it just abort()'s program.
-//
-// IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
-//            replaced by macro which does nothing. So, you may place actual
-//            function calls at cond, and these will always be performed.
-void ae_assert(bool cond, const char *msg, ae_state *state) {
-   if (!cond)
-      ae_break(state, ERR_ASSERTION_FAILED, msg);
-}
-
-// CPUID
-//
-// Returns information about features CPU and compiler support.
-//
-// You must tell ALGLIB what CPU family is used by defining AE_CPU symbol
-// (without this hint zero will be returned).
-//
-// Note: results of this function depend on both CPU and compiler;
-// if compiler doesn't support SSE intrinsics, function won't set
-// corresponding flag.
-static volatile bool _ae_cpuid_initialized = false;
-static volatile bool _ae_cpuid_has_sse2 = false;
-static volatile bool _ae_cpuid_has_avx2 = false;
-static volatile bool _ae_cpuid_has_fma = false;
-ae_int_t ae_cpuid() {
-// to speed up CPU detection we cache results from previous attempts
-// there is no synchronization, but it is still thread safe.
-//
-// thread safety is guaranteed on all modern architectures which
-// have following property: simultaneous writes by different cores
-// to the same location will be executed in serial manner.
-//
-   ae_int_t result;
-
-// if not initialized, determine system properties
-   if (!_ae_cpuid_initialized) {
-   // SSE2
-#if defined AE_CPU && AE_CPU == AE_INTEL
-#   if AE_COMPILER == AE_MSVC
-      {
-      // SSE2 support
-#      if defined _ALGLIB_HAS_SSE2_INTRINSICS
-         int CPUInfo[4];
-         __cpuid(CPUInfo, 1);
-         if ((CPUInfo[3] & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = true;
-#      endif
-
-      // check OS support for XSAVE XGETBV
-#      if defined _ALGLIB_HAS_AVX2_INTRINSICS
-         __cpuid(CPUInfo, 1);
-         if ((CPUInfo[2] & (0x1 << 27)) != 0)
-            if ((_xgetbv(0) & 0x6) == 0x6) {
-            // AVX2 support
-#         if defined _ALGLIB_HAS_AVX2_INTRINSICS && (_MSC_VER >= 1600)
-               if (_ae_cpuid_has_sse2) {
-                  __cpuidex(CPUInfo, 7, 0);
-                  if ((CPUInfo[1] & (0x1 << 5)) != 0)
-                     _ae_cpuid_has_avx2 = true;
-               }
-#         endif
-
-            // FMA support
-#         if defined _ALGLIB_HAS_FMA_INTRINSICS && (_MSC_VER >= 1600)
-               if (_ae_cpuid_has_avx2) {
-                  __cpuid(CPUInfo, 1);
-                  if ((CPUInfo[2] & (0x1 << 12)) != 0)
-                     _ae_cpuid_has_fma = true;
-               }
-#         endif
-            }
-#      endif
-      }
-#   elif AE_COMPILER == AE_GNUC
-      {
-         ae_int_t a, b, c, d;
-
-      // SSE2 support
-#      if defined _ALGLIB_HAS_SSE2_INTRINSICS
-         __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-         if ((d & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = true;
-#      endif
-
-      // check OS support for XSAVE XGETBV
-#      if defined _ALGLIB_HAS_AVX2_INTRINSICS
-         __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-         if ((c & (0x1 << 27)) != 0) {
-            __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
-            if ((a & 0x6) == 0x6) {
-            // AVX2 support
-#         if defined _ALGLIB_HAS_AVX2_INTRINSICS
-               if (_ae_cpuid_has_sse2) {
-                  __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
-                  if ((b & (0x1 << 5)) != 0)
-                     _ae_cpuid_has_avx2 = true;
-               }
-#         endif
-
-            // FMA support
-#         if defined _ALGLIB_HAS_FMA_INTRINSICS
-               if (_ae_cpuid_has_avx2) {
-                  __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-                  if ((c & (0x1 << 12)) != 0)
-                     _ae_cpuid_has_fma = true;
-               }
-#         endif
-            }
-         }
-#      endif
-      }
-#   elif AE_COMPILER == AE_SUNC
-      {
-         ae_int_t a, b, c, d;
-         __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-         if ((d & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = true;
-      }
-#   else
-#   endif
-#endif
-   // Perform one more CPUID call to generate memory fence
-#if AE_CPU == AE_INTEL
-#   if AE_COMPILER == AE_MSVC
-      {
-         int CPUInfo[4];
-         __cpuid(CPUInfo, 1);
-      }
-#   elif AE_COMPILER == AE_GNUC
-      {
-         ae_int_t a, b, c, d;
-         __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-      }
-#   elif AE_COMPILER == AE_SUNC
-      {
-         ae_int_t a, b, c, d;
-         __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-      }
-#   else
-#   endif
-#endif
-
-   // set initialization flag
-      _ae_cpuid_initialized = true;
-   }
-// return
-   result = 0;
-   if (_ae_cpuid_has_sse2)
-      result = result | CPU_SSE2;
-   if (_ae_cpuid_has_avx2)
-      result = result | CPU_AVX2;
-   if (_ae_cpuid_has_fma)
-      result = result | CPU_FMA;
-   return result;
-}
-
-// Activates tracing to file
-//
-// IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
-//            threads will result in undefined  behavior.  Calling  it  when
-//            some thread calls ALGLIB functions  may  result  in  undefined
-//            behavior.
-void ae_trace_file(const char *tags, const char *filename) {
-// clean up previous call
-   if (alglib_fclose_trace) {
-      if (alglib_trace_file != NULL)
-         fclose(alglib_trace_file);
-      alglib_trace_file = NULL;
-      alglib_fclose_trace = false;
-   }
-// store ",tags," to buffer. Leading and trailing commas allow us
-// to perform checks for various tags by simply calling strstr().
-   memset(alglib_trace_tags, 0, ALGLIB_TRACE_BUFFER_LEN);
-   strcat(alglib_trace_tags, ",");
-   strncat(alglib_trace_tags, tags, ALGLIB_TRACE_TAGS_LEN);
-   strcat(alglib_trace_tags, ",");
-   for (int i = 0; alglib_trace_tags[i] != 0; i++)
-      alglib_trace_tags[i] = tolower(alglib_trace_tags[i]);
-
-// set up trace
-   alglib_trace_type = ALGLIB_TRACE_FILE;
-   alglib_trace_file = fopen(filename, "ab");
-   alglib_fclose_trace = true;
-}
-
-// Disables tracing
-void ae_trace_disable() {
-   alglib_trace_type = ALGLIB_TRACE_NONE;
-   if (alglib_fclose_trace)
-      fclose(alglib_trace_file);
-   alglib_trace_file = NULL;
-   alglib_fclose_trace = false;
-}
-
-// Checks whether specific kind of tracing is enabled
-bool ae_is_trace_enabled(const char *tag) {
-   char buf[ALGLIB_TRACE_BUFFER_LEN];
-
-// check global trace status
-   if (alglib_trace_type == ALGLIB_TRACE_NONE || alglib_trace_file == NULL)
-      return false;
-
-// copy tag to buffer, lowercase it
-   memset(buf, 0, ALGLIB_TRACE_BUFFER_LEN);
-   strcat(buf, ",");
-   strncat(buf, tag, ALGLIB_TRACE_TAGS_LEN);
-   strcat(buf, "?");
-   for (int i = 0; buf[i] != 0; i++)
-      buf[i] = tolower(buf[i]);
-
-// contains tag (followed by comma, which means exact match)
-   buf[strlen(buf) - 1] = ',';
-   if (strstr(alglib_trace_tags, buf) != NULL)
-      return true;
-
-// contains tag (followed by dot, which means match with child)
-   buf[strlen(buf) - 1] = '.';
-   if (strstr(alglib_trace_tags, buf) != NULL)
-      return true;
-
-// nothing
-   return false;
-}
-
-void ae_trace(const char *printf_fmt, ...) {
-// check global trace status
-   if (alglib_trace_type == ALGLIB_TRACE_FILE && alglib_trace_file != NULL) {
-      va_list args;
-
-   // fprintf()
-      va_start(args, printf_fmt);
-      vfprintf(alglib_trace_file, printf_fmt, args);
-      va_end(args);
-
-   // flush output
-      fflush(alglib_trace_file);
-   }
-}
-
-int ae_tickcount() {
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   struct timeval now;
-   ae_int64_t r, v;
-   gettimeofday(&now, NULL);
-   v = now.tv_sec;
-   r = v * 1000;
-   v = now.tv_usec / 1000;
-   r = r + v;
-   return r;
-#   if 0
-   struct timespec now;
-   if (clock_gettime(CLOCK_MONOTONIC, &now))
-      return 0;
-   return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
-#   endif
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   return (int)GetTickCount();
-#else
-   return 0;
-#endif
-}
-
-// Real math functions
-bool ae_fp_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x == y;
-}
-
-bool ae_fp_neq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   return !ae_fp_eq(v1, v2);
-}
-
-bool ae_fp_less(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x < y;
-}
-
-bool ae_fp_less_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x <= y;
-}
-
-bool ae_fp_greater(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x > y;
-}
-
-bool ae_fp_greater_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x >= y;
-}
-
-bool ae_isfinite_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN)
-      high = u.p[1];
-   else
-      high = u.p[0];
-   return (high & (ae_int32_t) 0x7FF00000) != (ae_int32_t) 0x7FF00000;
-}
-
-bool ae_isnan_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-   return ((high & 0x7FF00000) == 0x7FF00000) && (((high & 0x000FFFFF) != 0) || (low != 0));
-}
-
-bool ae_isinf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-
-// 31 least significant bits of high are compared
-   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (low == 0);
-}
-
-bool ae_isposinf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-
-// all 32 bits of high are compared
-   return (high == (ae_int32_t) 0x7FF00000) && (low == 0);
-}
-
-bool ae_isneginf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-
-// this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers
-   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (high != (ae_int32_t) 0x7FF00000) && (low == 0);
-}
-
-ae_int_t ae_get_endianness() {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-
-// determine endianness
-// two types are supported: big-endian and little-endian.
-// mixed-endian hardware is NOT supported.
-//
-// 1983 is used as magic number because its non-periodic double
-// representation allow us to easily distinguish between upper
-// and lower halfs and to detect mixed endian hardware.
-//
-   u.a = 1.0 / 1983.0;
-   if (u.p[1] == (ae_int32_t) 0x3f408642)
-      return AE_LITTLE_ENDIAN;
-   if (u.p[0] == (ae_int32_t) 0x3f408642)
-      return AE_BIG_ENDIAN;
-   return AE_MIXED_ENDIAN;
-}
-
-bool ae_isfinite(double x, ae_state *state) {
-   return ae_isfinite_stateless(x, state->endianness);
-}
-
-bool ae_isnan(double x, ae_state *state) {
-   return ae_isnan_stateless(x, state->endianness);
-}
-
-bool ae_isinf(double x, ae_state *state) {
-   return ae_isinf_stateless(x, state->endianness);
-}
-
-bool ae_isposinf(double x, ae_state *state) {
-   return ae_isposinf_stateless(x, state->endianness);
-}
-
-bool ae_isneginf(double x, ae_state *state) {
-   return ae_isneginf_stateless(x, state->endianness);
-}
-
-double ae_fabs(double x, ae_state *state) {
-   return fabs(x);
-}
-
-ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
-   return x >= 0 ? x : -x;
-}
-
-double ae_sqr(double x, ae_state *state) {
-   return x * x;
-}
-
-double ae_sqrt(double x, ae_state *state) {
-   return sqrt(x);
-}
-
-ae_int_t ae_sign(double x, ae_state *state) {
-   if (x > 0) return 1;
-   if (x < 0) return -1;
-   return 0;
-}
-
-ae_int_t ae_round(double x, ae_state *state) {
-   return (ae_int_t) (ae_ifloor(x + 0.5, state));
-}
-
-ae_int_t ae_trunc(double x, ae_state *state) {
-   return (ae_int_t) (x > 0 ? ae_ifloor(x, state) : ae_iceil(x, state));
-}
-
-ae_int_t ae_ifloor(double x, ae_state *state) {
-   return (ae_int_t) (floor(x));
-}
-
-ae_int_t ae_iceil(double x, ae_state *state) {
-   return (ae_int_t) (ceil(x));
-}
-
-ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
-   return m1 > m2 ? m1 : m2;
-}
-
-ae_int_t ae_minint(ae_int_t m1, ae_int_t m2, ae_state *state) {
-   return m1 > m2 ? m2 : m1;
-}
-
-double ae_maxreal(double m1, double m2, ae_state *state) {
-   return m1 > m2 ? m1 : m2;
-}
-
-double ae_minreal(double m1, double m2, ae_state *state) {
-   return m1 > m2 ? m2 : m1;
-}
-
-double ae_randomreal(ae_state *state) {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)(RAND_MAX) + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
-}
-
-ae_int_t ae_randominteger(ae_int_t maxv, ae_state *state) {
-   return rand() % maxv;
-}
-
-double ae_sin(double x, ae_state *state) {
-   return sin(x);
-}
-
-double ae_cos(double x, ae_state *state) {
-   return cos(x);
-}
-
-double ae_tan(double x, ae_state *state) {
-   return tan(x);
-}
-
-double ae_sinh(double x, ae_state *state) {
-   return sinh(x);
-}
-
-double ae_cosh(double x, ae_state *state) {
-   return cosh(x);
-}
-double ae_tanh(double x, ae_state *state) {
-   return tanh(x);
-}
-
-double ae_asin(double x, ae_state *state) {
-   return asin(x);
-}
-
-double ae_acos(double x, ae_state *state) {
-   return acos(x);
-}
-
-double ae_atan(double x, ae_state *state) {
-   return atan(x);
-}
-
-double ae_atan2(double y, double x, ae_state *state) {
-   return atan2(y, x);
-}
-
-double ae_log(double x, ae_state *state) {
-   return log(x);
-}
-
-double ae_pow(double x, double y, ae_state *state) {
-   return pow(x, y);
-}
-
-double ae_exp(double x, ae_state *state) {
-   return exp(x);
-}
+static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-conquer x-matrix routines.
 
 // Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
@@ -2567,6 +1989,28 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
    }
 }
 
+static bool x_is_symmetric(x_matrix *a) {
+   double mx, err;
+   bool nonfinite;
+   ae_state _alglib_env_state;
+   if (a->datatype != DT_REAL)
+      return false;
+   if (a->cols != a->rows)
+      return false;
+   if (a->cols == 0 || a->rows == 0)
+      return true;
+   ae_state_init(&_alglib_env_state);
+   mx = 0;
+   err = 0;
+   nonfinite = false;
+   is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
+   if (nonfinite)
+      return false;
+   if (mx == 0)
+      return true;
+   return err / mx <= 1.0E-14;
+}
+
 // this function checks difference between offdiagonal blocks BL and BU
 // (see below). Block BL is specified by offsets (offset0,offset1)  and
 // sizes (len0,len1).
@@ -2677,6 +2121,28 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
    }
 }
 
+static bool x_is_hermitian(x_matrix *a) {
+   double mx, err;
+   bool nonfinite;
+   ae_state _alglib_env_state;
+   if (a->datatype != DT_COMPLEX)
+      return false;
+   if (a->cols != a->rows)
+      return false;
+   if (a->cols == 0 || a->rows == 0)
+      return true;
+   ae_state_init(&_alglib_env_state);
+   mx = 0;
+   err = 0;
+   nonfinite = false;
+   is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
+   if (nonfinite)
+      return false;
+   if (mx == 0)
+      return true;
+   return err / mx <= 1.0E-14;
+}
+
 // this function copies offdiagonal block BL to its symmetric counterpart
 // BU (see below). Block BL is specified by offsets (offset0,offset1)
 // and sizes (len0,len1).
@@ -2750,6 +2216,17 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
    }
 }
 
+static bool x_force_symmetric(x_matrix *a) {
+   if (a->datatype != DT_REAL)
+      return false;
+   if (a->cols != a->rows)
+      return false;
+   if (a->cols == 0 || a->rows == 0)
+      return true;
+   force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
+   return true;
+}
+
 // this function copies Hermitian transpose of offdiagonal block BL to
 // its symmetric counterpart BU (see below). Block BL is specified by
 // offsets (offset0,offset1) and sizes (len0,len1).
@@ -2821,59 +2298,8 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
          *pcol = *prow;
    }
 }
-bool x_is_symmetric(x_matrix *a) {
-   double mx, err;
-   bool nonfinite;
-   ae_state _alglib_env_state;
-   if (a->datatype != DT_REAL)
-      return false;
-   if (a->cols != a->rows)
-      return false;
-   if (a->cols == 0 || a->rows == 0)
-      return true;
-   ae_state_init(&_alglib_env_state);
-   mx = 0;
-   err = 0;
-   nonfinite = false;
-   is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
-   if (nonfinite)
-      return false;
-   if (mx == 0)
-      return true;
-   return err / mx <= 1.0E-14;
-}
-bool x_is_hermitian(x_matrix *a) {
-   double mx, err;
-   bool nonfinite;
-   ae_state _alglib_env_state;
-   if (a->datatype != DT_COMPLEX)
-      return false;
-   if (a->cols != a->rows)
-      return false;
-   if (a->cols == 0 || a->rows == 0)
-      return true;
-   ae_state_init(&_alglib_env_state);
-   mx = 0;
-   err = 0;
-   nonfinite = false;
-   is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
-   if (nonfinite)
-      return false;
-   if (mx == 0)
-      return true;
-   return err / mx <= 1.0E-14;
-}
-bool x_force_symmetric(x_matrix *a) {
-   if (a->datatype != DT_REAL)
-      return false;
-   if (a->cols != a->rows)
-      return false;
-   if (a->cols == 0 || a->rows == 0)
-      return true;
-   force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
-   return true;
-}
-bool x_force_hermitian(x_matrix *a) {
+
+static bool x_force_hermitian(x_matrix *a) {
    if (a->datatype != DT_COMPLEX)
       return false;
    if (a->cols != a->rows)
@@ -2912,471 +2338,27 @@ bool ae_force_hermitian(ae_matrix *a) {
    return x_force_hermitian(&x);
 }
 
-// This function converts six-bit value (from 0 to 63)  to  character  (only
-// digits, lowercase and uppercase letters, minus and underscore are used).
+// This function causes the calling thread to relinquish the CPU. The thread
+// is moved to the end of the queue and some other thread gets to run.
 //
-// If v is negative or greater than 63, this function returns '?'.
-static char _sixbits2char_tbl[64] = {
-   '0', '1', '2', '3', '4', '5', '6', '7',
-   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-   'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-   'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-   'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
-   'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-   'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-   'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
-};
-
-char ae_sixbits2char(ae_int_t v) {
-
-   if (v < 0 || v > 63)
-      return '?';
-   return _sixbits2char_tbl[v];
-
-// v is correct, process it
-#if 0
-   if (v < 10)
-      return '0' + v;
-   v -= 10;
-   if (v < 26)
-      return 'A' + v;
-   v -= 26;
-   if (v < 26)
-      return 'a' + v;
-   v -= 26;
-   return v == 0 ? '-' : '_';
+// NOTE: this function should NOT be called when AE_OS is AE_OTHER_OS -  the
+//       whole program will be abnormally terminated.
+static void ae_yield() {
+#if AE_OS == AE_POSIX
+   sched_yield();
+#elif AE_OS == AE_WINDOWS
+   if (!SwitchToThread())
+      Sleep(0);
+#else
+   abort();
 #endif
 }
 
-// This function converts character to six-bit value (from 0 to 63).
-//
-// This function is inverse of ae_sixbits2char()
-// If c is not correct character, this function returns -1.
-static ae_int_t _ae_char2sixbits_tbl[] = {
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, 62, -1, -1,
-   0, 1, 2, 3, 4, 5, 6, 7,
-   8, 9, -1, -1, -1, -1, -1, -1,
-   -1, 10, 11, 12, 13, 14, 15, 16,
-   17, 18, 19, 20, 21, 22, 23, 24,
-   25, 26, 27, 28, 29, 30, 31, 32,
-   33, 34, 35, -1, -1, -1, -1, 63,
-   -1, 36, 37, 38, 39, 40, 41, 42,
-   43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58,
-   59, 60, 61, -1, -1, -1, -1, -1
-};
-ae_int_t ae_char2sixbits(char c) {
-   return (c >= 0 && c < 127) ? _ae_char2sixbits_tbl[(int)c] : -1;
-}
-
-// This function converts three bytes (24 bits) to four six-bit values
-// (24 bits again).
-//
-// src     pointer to three bytes
-// dst     pointer to four ints
-void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
-   dst[0] = src[0] & 0x3F;
-   dst[1] = (src[0] >> 6) | ((src[1] & 0x0F) << 2);
-   dst[2] = (src[1] >> 4) | ((src[2] & 0x03) << 4);
-   dst[3] = src[2] >> 2;
-}
-
-// This function converts four six-bit values (24 bits) to three bytes
-// (24 bits again).
-//
-// src     pointer to four ints
-// dst     pointer to three bytes
-void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
-   dst[0] = (unsigned char)(src[0] | ((src[1] & 0x03) << 6));
-   dst[1] = (unsigned char)((src[1] >> 2) | ((src[2] & 0x0F) << 4));
-   dst[2] = (unsigned char)((src[2] >> 4) | (src[3] << 2));
-}
-
-// This function serializes boolean value into buffer
-//
-// v           boolean value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-// state       ALGLIB environment state
-void ae_bool2str(bool v, char *buf, ae_state *state) {
-   char c = v ? '1' : '0';
-   ae_int_t i;
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = c;
-   buf[AE_SER_ENTRY_LENGTH] = 0;
-}
-
-// This function unserializes boolean value from buffer
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// state       ALGLIB environment state
-//
-// This function raises an error in case unexpected symbol is found
-bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
-   bool was0, was1;
-   const char *emsg = "ALGLIB: unable to read boolean value from stream";
-
-   was0 = false;
-   was1 = false;
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      if (*buf == '0') {
-         was0 = true;
-         buf++;
-         continue;
-      }
-      if (*buf == '1') {
-         was1 = true;
-         buf++;
-         continue;
-      }
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   }
-   *pasttheend = buf;
-   if ((!was0) && (!was1))
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   if (was0 && was1)
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   return was1 ? true : false;
-}
-
-// This function serializes integer value into buffer
-//
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-// state       ALGLIB environment state
-void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
-   unsigned char c;
-
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill u.bytes by zeros or ones (depending on sign of v)
-// 2. we copy v to u.ival
-// 3. if we run on big endian architecture, we reorder u.bytes
-// 4. now we have signed 64-bit representation of v stored in u.bytes
-// 5. additionally, we set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
-   c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
-   u.ival = v;
-   for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
-      u.bytes[i] = c;
-   u.bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function serializes 64-bit integer value into buffer
-//
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-// state       ALGLIB environment state
-void ae_int642str(ae_int64_t v, char *buf, ae_state *state) {
-   unsigned char bytes[9];
-   ae_int_t i;
-   ae_int_t sixbits[12];
-
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill bytes by zeros or ones (depending on sign of v)
-// 2. we memmove v to bytes
-// 3. if we run on big endian architecture, we reorder bytes
-// 4. now we have signed 64-bit representation of v stored in bytes
-// 5. additionally, we set 9th byte of bytes to zero in order to
-//    simplify conversion to six-bit representation
-   memset(bytes, v < 0 ? 0xFF : 0x00, 8);
-   memmove(bytes, &v, 8);
-   bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
-   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function unserializes integer value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// state       ALGLIB environment state
-//
-// This function raises an error in case unexpected symbol is found
-ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(state, ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-   return u.ival;
-}
-
-// This function unserializes 64-bit integer value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// state       ALGLIB environment state
-//
-// This function raises an error in case unexpected symbol is found
-ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   unsigned char bytes[9];
-   ae_int64_t result;
-
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(state, ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-   memmove(&result, bytes, sizeof(result));
-   return result;
-}
-
-// This function serializes double value into buffer
-//
-// v           double value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-// state       ALGLIB environment state
-void ae_double2str(double v, char *buf, ae_state *state) {
-   union {
-      double dval;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
-
-// handle special quantities
-   if (ae_isnan(v, state)) {
-      const char *s = ".nan_______";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-   if (ae_isposinf(v, state)) {
-      const char *s = ".posinf____";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-   if (ae_isneginf(v, state)) {
-      const char *s = ".neginf____";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-// process general case:
-// 1. copy v to array of chars
-// 2. set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
-// 3. convert to little endian (if needed)
-// 4. convert to six-bit representation
-//    (last 12th element of sixbits is always zero, we do not output it)
-   u.dval = v;
-   u.bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
-      }
-   }
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function unserializes double value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// state       ALGLIB environment state
-//
-// This function raises an error in case unexpected symbol is found
-double ae_str2double(const char *buf, ae_state *state, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read double value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union {
-      double dval;
-      unsigned char bytes[9];
-   } u;
-
-// skip leading spaces
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-
-// Handle special cases
-   if (*buf == '.') {
-      const char *s_nan = ".nan_______";
-      const char *s_posinf = ".posinf____";
-      const char *s_neginf = ".neginf____";
-      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) {
-         *pasttheend = buf + strlen(s_nan);
-         return state->v_nan;
-      }
-      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) {
-         *pasttheend = buf + strlen(s_posinf);
-         return state->v_posinf;
-      }
-      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) {
-         *pasttheend = buf + strlen(s_neginf);
-         return state->v_neginf;
-      }
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   }
-// General case:
-// 1. read and decode six-bit digits
-// 2. check that all 11 digits were read
-// 3. set last 12th digit to zero (needed for simplicity of conversion)
-// 4. convert to 8 bytes
-// 5. convert to big endian representation, if needed
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(state, ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread != AE_SER_ENTRY_LENGTH)
-      ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   sixbits[AE_SER_ENTRY_LENGTH] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
-      }
-   }
-   return u.dval;
-}
-
-// This function performs given number of spin-wait iterations
+// This function performs given number of spin-wait iterations.
 void ae_spin_wait(ae_int_t cnt) {
+// It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
+   static volatile ae_int_t ae_never_change_it = 1;
+// This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
 // these strange operations with ae_never_change_it are necessary to
 // prevent compiler optimization of the loop.
    volatile ae_int_t i;
@@ -3391,21 +2373,22 @@ void ae_spin_wait(ae_int_t cnt) {
          ae_never_change_it--;
 }
 
-// This function causes the calling thread to relinquish the CPU. The thread
-// is moved to the end of the queue and some other thread gets to run.
+// Internal OS-dependent lock routines.
+static const int AE_LOCK_ALIGNMENT = 0x10, AE_LOCK_CYCLES = 0x200, AE_LOCK_TESTS_BEFORE_YIELD = 0x10;
+
+// Lock.
 //
-// NOTE: this function should NOT be called when AE_OS is AE_OTHER_OS  -  the
-//       whole program will be abnormally terminated.
-void ae_yield() {
+// This is internal structure which implements lock functionality.
+struct _lock {
 #if AE_OS == AE_POSIX
-   sched_yield();
+   pthread_mutex_t mutex;
 #elif AE_OS == AE_WINDOWS
-   if (!SwitchToThread())
-      Sleep(0);
+   volatile ae_int_t *volatile p_lock;
+   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
 #else
-   abort();
+   bool is_locked;
 #endif
-}
+};
 
 // This function initializes _lock structure which  is  internally  used  by
 // ae_lock high-level structure.
@@ -3514,6 +2497,10 @@ void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic) {
    lock->lock_ptr = lock->db.ptr;
    p = (_lock *) lock->lock_ptr;
    _ae_init_lock_raw(p);
+}
+
+static void *eternal_malloc(size_t size) {
+   return size == 0 ? NULL : _force_malloc_failure ? NULL : malloc(size);
 }
 
 // This function initializes "eternal" ae_lock structure which  is  expected
@@ -3670,7 +2657,8 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 // copy seed object
    if (src->seed_object != NULL) {
       dst->seed_object = ae_malloc(dst->size_of_object, state);
-      memset(dst->seed_object, 0, dst->size_of_object), dst->copy(dst->seed_object, src->seed_object, state, false);
+      memset(dst->seed_object, 0, dst->size_of_object);
+      dst->copy(dst->seed_object, src->seed_object, state, false);
    }
 // copy recycled objects
    dst->recycled_objects = NULL;
@@ -3686,7 +2674,8 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 
    // prepare place for object, copy() it
       tmp->obj = ae_malloc(dst->size_of_object, state);
-      memset(tmp->obj, 0, dst->size_of_object), dst->copy(tmp->obj, ptr->obj, state, false);
+      memset(tmp->obj, 0, dst->size_of_object);
+      dst->copy(tmp->obj, ptr->obj, state, false);
    }
 
 // recycled entries are not copied because they do not store any information
@@ -3757,7 +2746,8 @@ void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t si
    dst->free = free;
 // set seed object
    dst->seed_object = ae_malloc(size_of_object, state);
-   memset(dst->seed_object, 0, size_of_object), copy(dst->seed_object, seed_object, state, false);
+   memset(dst->seed_object, 0, size_of_object);
+   copy(dst->seed_object, seed_object, state, false);
 }
 
 // This  function  retrieves  a  copy  of  the seed object from the pool and
@@ -3984,6 +2974,81 @@ void ae_shared_pool_reset(ae_shared_pool *pool, ae_state *state) {
    pool->free = NULL;
 }
 
+// This function converts six-bit value (from 0 to 63)  to  character  (only
+// digits, lowercase and uppercase letters, minus and underscore are used).
+//
+// If v is negative or greater than 63, this function returns '?'.
+static char ae_sixbits2char(ae_int_t v) {
+   static char _sixbits2char_tbl[100] = {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+      'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+      'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+      'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+      'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+      'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
+   };
+   return v >= 0 && v < 100 ? _sixbits2char_tbl[v] : '?';
+// v is correct, process it
+#if 0
+   return
+      v < 10 ? '0' + v :
+      (v -= 10) < 26 ? 'A' + v :
+      (v -= 26) < 26 ? 'a' + v :
+      (v -= 26) == 0 ? '-' : '_';
+#endif
+}
+
+// This function converts character to six-bit value (from 0 to 63).
+//
+// This function is inverse of ae_sixbits2char()
+// If c is not correct character, this function returns -1.
+static ae_int_t ae_char2sixbits(char c) {
+   static ae_int_t _ae_char2sixbits_tbl[] = {
+      -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, 62, -1, -1,
+      0, 1, 2, 3, 4, 5, 6, 7,
+      8, 9, -1, -1, -1, -1, -1, -1,
+      -1, 10, 11, 12, 13, 14, 15, 16,
+      17, 18, 19, 20, 21, 22, 23, 24,
+      25, 26, 27, 28, 29, 30, 31, 32,
+      33, 34, 35, -1, -1, -1, -1, 63,
+      -1, 36, 37, 38, 39, 40, 41, 42,
+      43, 44, 45, 46, 47, 48, 49, 50,
+      51, 52, 53, 54, 55, 56, 57, 58,
+      59, 60, 61, -1, -1, -1, -1, -1
+   };
+   return (c >= 0 && c < 127) ? _ae_char2sixbits_tbl[(int)c] : -1;
+}
+
+// This function converts three bytes (24 bits) to four six-bit values
+// (24 bits again).
+//
+// src     pointer to three bytes
+// dst     pointer to four ints
+static void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
+   dst[0] = src[0] & 0x3F;
+   dst[1] = (src[0] >> 6) | ((src[1] & 0x0F) << 2);
+   dst[2] = (src[1] >> 4) | ((src[2] & 0x03) << 4);
+   dst[3] = src[2] >> 2;
+}
+
+// This function converts four six-bit values (24 bits) to three bytes
+// (24 bits again).
+//
+// src     pointer to four ints
+// dst     pointer to three bytes
+static void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
+   dst[0] = (unsigned char)(src[0] | ((src[1] & 0x03) << 6));
+   dst[1] = (unsigned char)((src[1] >> 2) | ((src[2] & 0x0F) << 4));
+   dst[2] = (unsigned char)((src[2] >> 4) | (src[3] << 2));
+}
+
 // This function initializes serializer
 void ae_serializer_init(ae_serializer *serializer) {
    serializer->mode = AE_SM_DEFAULT;
@@ -3992,20 +3057,13 @@ void ae_serializer_init(ae_serializer *serializer) {
 }
 
 void ae_serializer_alloc_start(ae_serializer *serializer) {
+   serializer->mode = AE_SM_ALLOC;
    serializer->entries_needed = 0;
    serializer->bytes_asked = 0;
-   serializer->mode = AE_SM_ALLOC;
 }
 
 void ae_serializer_alloc_entry(ae_serializer *serializer) {
    serializer->entries_needed++;
-}
-
-void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t n;
-   n = bytes->cnt;
-   n = n / 8 + (n % 8 > 0 ? 1 : 0);
-   serializer->entries_needed += 1 + n;
 }
 
 // After allocation phase is done, this function returns  required  size  of
@@ -4013,9 +3071,7 @@ void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes)
 // the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    ae_int_t rows, lastrowsize, result;
-
    serializer->mode = AE_SM_READY2S;
-
 // if no entries needes (degenerate case)
    if (serializer->entries_needed == 0) {
       serializer->bytes_asked = 4; // a pair of chars for \r\n, one for dot, one for trailing zero
@@ -4038,6 +3094,28 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    return result;
 }
 
+ae_int_t ae_get_endianness() {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+
+// determine endianness
+// two types are supported: big-endian and little-endian.
+// mixed-endian hardware is NOT supported.
+//
+// 1983 is used as magic number because its non-periodic double
+// representation allow us to easily distinguish between upper
+// and lower halfs and to detect mixed endian hardware.
+//
+   u.a = 1.0 / 1983.0;
+   if (u.p[1] == (ae_int32_t) 0x3f408642)
+      return AE_LITTLE_ENDIAN;
+   if (u.p[0] == (ae_int32_t) 0x3f408642)
+      return AE_BIG_ENDIAN;
+   return AE_MIXED_ENDIAN;
+}
+
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf) {
    serializer->mode = AE_SM_TO_CPPSTRING;
@@ -4051,33 +3129,32 @@ void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf)
    serializer->in_str = buf->c_str();
 }
 
-static char cpp_writer(const char *p_string, ae_int_t aux) {
+static bool cpp_writer(const char *p_string, ae_int_t aux) {
    std::ostream * stream = reinterpret_cast < std::ostream * >(aux);
    stream->write(p_string, strlen(p_string));
-   return stream->bad()? 1 : 0;
+   return !stream->bad();
 }
 
-static char cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
+static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
    std::istream * stream = reinterpret_cast < std::istream * >(aux);
    int c;
    if (cnt <= 0)
-      return 1; // unexpected cnt
+      return false; // Unexpected cnt.
    for (;;) {
       c = stream->get();
       if (c < 0 || c > 255)
-         return 1; // failure!
-      if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
-         break;
+         return false; // Failure!
+      if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
    }
    p_buf[0] = (char)c;
    for (int k = 1; k < cnt; k++) {
       c = stream->get();
       if (c < 0 || c > 255 || c == ' ' || c == '\t' || c == '\n' || c == '\r')
-         return 1; // failure!
+         return false; // Failure!
       p_buf[k] = (char)c;
    }
    p_buf[cnt] = 0;
-   return 0; // success
+   return true; // Success.
 }
 
 void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream) {
@@ -4122,6 +3199,73 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
    serializer->stream_aux = aux;
 }
 
+// This function unserializes boolean value from buffer
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
+static bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
+   bool was0, was1;
+   const char *emsg = "ALGLIB: unable to read boolean value from stream";
+
+   was0 = false;
+   was1 = false;
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      if (*buf == '0') {
+         was0 = true;
+         buf++;
+         continue;
+      }
+      if (*buf == '1') {
+         was1 = true;
+         buf++;
+         continue;
+      }
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   }
+   *pasttheend = buf;
+   if ((!was0) && (!was1))
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   if (was0 && was1)
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   return was1 ? true : false;
+}
+
+void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING:
+         *v = ae_str2bool(serializer->in_str, state, &serializer->in_str);
+      break;
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
+         *v = ae_str2bool(buf, state, &p);
+      }
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+   }
+}
+
+// This function serializes boolean value into buffer
+//
+// v           boolean value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
+static void ae_bool2str(bool v, char *buf, ae_state *state) {
+   char c = v ? '1' : '0';
+   ae_int_t i;
+   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = c;
+   buf[AE_SER_ENTRY_LENGTH] = 0;
+}
+
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *state) {
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
@@ -4137,24 +3281,140 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *s
    bytes_appended = (ae_int_t) strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
-
-// append to buffer
+// Append to the buffer.
+   switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
-   if (serializer->mode == AE_SM_TO_CPPSTRING) {
-      *(serializer->out_cppstr) += buf;
-      return;
-   }
+      case AE_SM_TO_CPPSTRING:
+         *serializer->out_cppstr += buf;
+      break;
 #endif
-   if (serializer->mode == AE_SM_TO_STRING) {
-      strcat(serializer->out_str, buf);
-      serializer->out_str += bytes_appended;
-      return;
+      case AE_SM_TO_STRING:
+         strcat(serializer->out_str, buf);
+         serializer->out_str += bytes_appended;
+      break;
+      case AE_SM_TO_STREAM:
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream", state);
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, emsg);
    }
-   if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream", state);
-      return;
+}
+
+// This function unserializes integer value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
+static ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend) {
+   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread, i;
+   union {
+      ae_int_t ival;
+      unsigned char bytes[9];
+   } u;
+// 1. skip leading spaces
+// 2. read and decode six-bit digits
+// 3. set trailing digits to zeros
+// 4. convert to little endian 64-bit integer representation
+// 5. convert to big endian representation, if needed
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d;
+      d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(state, ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
    }
-   ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   *pasttheend = buf;
+   if (sixbitsread == 0)
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   for (i = sixbitsread; i < 12; i++)
+      sixbits[i] = 0;
+   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+         unsigned char tc;
+         tc = u.bytes[i];
+         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
+         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
+      }
+   }
+   return u.ival;
+}
+
+void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v, ae_state *state) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING:
+         *v = ae_str2int(serializer->in_str, state, &serializer->in_str);
+      break;
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
+         *v = ae_str2int(buf, state, &p);
+      }
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+   }
+}
+
+// This function serializes integer value into buffer
+//
+// v           integer value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
+static void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
+   union {
+      ae_int_t ival;
+      unsigned char bytes[9];
+   } u;
+   ae_int_t i;
+   ae_int_t sixbits[12];
+   unsigned char c;
+
+// copy v to array of chars, sign extending it and
+// converting to little endian order
+//
+// because we don't want to mention size of ae_int_t explicitly,
+// we do it as follows:
+// 1. we fill u.bytes by zeros or ones (depending on sign of v)
+// 2. we copy v to u.ival
+// 3. if we run on big endian architecture, we reorder u.bytes
+// 4. now we have signed 64-bit representation of v stored in u.bytes
+// 5. additionally, we set 9th byte of u.bytes to zero in order to
+//    simplify conversion to six-bit representation
+   c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
+   u.ival = v;
+   for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
+      u.bytes[i] = c;
+   u.bytes[8] = 0;
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+         unsigned char tc;
+         tc = u.bytes[i];
+         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
+         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
+      }
+   }
+// convert to six-bit representation, output
+//
+// NOTE: last 12th element of sixbits is always zero, we do not output it
+   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
+   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state *state) {
@@ -4172,24 +3432,134 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state
    bytes_appended = (ae_int_t) strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
-
-// append to buffer
+// Append to the buffer.
+   switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
-   if (serializer->mode == AE_SM_TO_CPPSTRING) {
-      *(serializer->out_cppstr) += buf;
-      return;
-   }
+      case AE_SM_TO_CPPSTRING:
+         *serializer->out_cppstr += buf;
+      break;
 #endif
-   if (serializer->mode == AE_SM_TO_STRING) {
-      strcat(serializer->out_str, buf);
-      serializer->out_str += bytes_appended;
-      return;
+      case AE_SM_TO_STRING:
+         strcat(serializer->out_str, buf);
+         serializer->out_str += bytes_appended;
+      break;
+      case AE_SM_TO_STREAM:
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream", state);
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, emsg);
    }
-   if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream", state);
-      return;
+}
+
+// This function unserializes 64-bit integer value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
+static ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheend) {
+   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread, i;
+   unsigned char bytes[9];
+   ae_int64_t result;
+
+// 1. skip leading spaces
+// 2. read and decode six-bit digits
+// 3. set trailing digits to zeros
+// 4. convert to little endian 64-bit integer representation
+// 5. convert to big endian representation, if needed
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d;
+      d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(state, ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
    }
-   ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   *pasttheend = buf;
+   if (sixbitsread == 0)
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   for (i = sixbitsread; i < 12; i++)
+      sixbits[i] = 0;
+   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+         unsigned char tc;
+         tc = bytes[i];
+         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
+         bytes[sizeof(ae_int_t) - 1 - i] = tc;
+      }
+   }
+   memmove(&result, bytes, sizeof(result));
+   return result;
+}
+
+void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v, ae_state *state) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING:
+         *v = ae_str2int64(serializer->in_str, state, &serializer->in_str);
+      break;
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
+         *v = ae_str2int64(buf, state, &p);
+      }
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+   }
+}
+
+// This function serializes 64-bit integer value into buffer
+//
+// v           integer value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
+static void ae_int642str(ae_int64_t v, char *buf, ae_state *state) {
+   unsigned char bytes[9];
+   ae_int_t i;
+   ae_int_t sixbits[12];
+
+// copy v to array of chars, sign extending it and
+// converting to little endian order
+//
+// because we don't want to mention size of ae_int_t explicitly,
+// we do it as follows:
+// 1. we fill bytes by zeros or ones (depending on sign of v)
+// 2. we memmove v to bytes
+// 3. if we run on big endian architecture, we reorder bytes
+// 4. now we have signed 64-bit representation of v stored in bytes
+// 5. additionally, we set 9th byte of bytes to zero in order to
+//    simplify conversion to six-bit representation
+   memset(bytes, v < 0 ? 0xFF : 0x00, 8);
+   memmove(bytes, &v, 8);
+   bytes[8] = 0;
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+         unsigned char tc;
+         tc = bytes[i];
+         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
+         bytes[sizeof(ae_int_t) - 1 - i] = tc;
+      }
+   }
+// convert to six-bit representation, output
+//
+// NOTE: last 12th element of sixbits is always zero, we do not output it
+   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
+   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_state *state) {
@@ -4207,24 +3577,167 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_s
    bytes_appended = (ae_int_t) strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
-
-// append to buffer
+// Append to the buffer.
+   switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
-   if (serializer->mode == AE_SM_TO_CPPSTRING) {
-      *(serializer->out_cppstr) += buf;
-      return;
-   }
+      case AE_SM_TO_CPPSTRING:
+         *serializer->out_cppstr += buf;
+      break;
 #endif
-   if (serializer->mode == AE_SM_TO_STRING) {
-      strcat(serializer->out_str, buf);
-      serializer->out_str += bytes_appended;
+      case AE_SM_TO_STRING:
+         strcat(serializer->out_str, buf);
+         serializer->out_str += bytes_appended;
+      break;
+      case AE_SM_TO_STREAM:
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream", state);
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   }
+}
+
+// This function unserializes double value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
+static double ae_str2double(const char *buf, ae_state *state, const char **pasttheend) {
+   const char *emsg = "ALGLIB: unable to read double value from stream";
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread, i;
+   union {
+      double dval;
+      unsigned char bytes[9];
+   } u;
+
+// skip leading spaces
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+
+// Handle special cases
+   if (*buf == '.') {
+      const char *s_nan = ".nan_______";
+      const char *s_posinf = ".posinf____";
+      const char *s_neginf = ".neginf____";
+      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) {
+         *pasttheend = buf + strlen(s_nan);
+         return state->v_nan;
+      }
+      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) {
+         *pasttheend = buf + strlen(s_posinf);
+         return state->v_posinf;
+      }
+      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) {
+         *pasttheend = buf + strlen(s_neginf);
+         return state->v_neginf;
+      }
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   }
+// General case:
+// 1. read and decode six-bit digits
+// 2. check that all 11 digits were read
+// 3. set last 12th digit to zero (needed for simplicity of conversion)
+// 4. convert to 8 bytes
+// 5. convert to big endian representation, if needed
+   sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d;
+      d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(state, ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
+   }
+   *pasttheend = buf;
+   if (sixbitsread != AE_SER_ENTRY_LENGTH)
+      ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   sixbits[AE_SER_ENTRY_LENGTH] = 0;
+   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
+         unsigned char tc;
+         tc = u.bytes[i];
+         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
+         u.bytes[sizeof(double) - 1 - i] = tc;
+      }
+   }
+   return u.dval;
+}
+
+void ae_serializer_unserialize_double(ae_serializer *serializer, double *v, ae_state *state) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING:
+         *v = ae_str2double(serializer->in_str, state, &serializer->in_str);
+      break;
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
+         *v = ae_str2double(buf, state, &p);
+      }
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+   }
+}
+
+// This function serializes double value into buffer
+//
+// v           double value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
+static void ae_double2str(double v, char *buf, ae_state *state) {
+   union {
+      double dval;
+      unsigned char bytes[9];
+   } u;
+   ae_int_t i;
+   ae_int_t sixbits[12];
+
+// handle special quantities
+   if (ae_isnan(v, state)) {
+      const char *s = ".nan_______";
+      memmove(buf, s, strlen(s) + 1);
       return;
    }
-   if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream", state);
+   if (ae_isposinf(v, state)) {
+      const char *s = ".posinf____";
+      memmove(buf, s, strlen(s) + 1);
       return;
    }
-   ae_break(state, ERR_ASSERTION_FAILED, emsg);
+   if (ae_isneginf(v, state)) {
+      const char *s = ".neginf____";
+      memmove(buf, s, strlen(s) + 1);
+      return;
+   }
+// process general case:
+// 1. copy v to array of chars
+// 2. set 9th byte of u.bytes to zero in order to
+//    simplify conversion to six-bit representation
+// 3. convert to little endian (if needed)
+// 4. convert to six-bit representation
+//    (last 12th element of sixbits is always zero, we do not output it)
+   u.dval = v;
+   u.bytes[8] = 0;
+   if (state->endianness == AE_BIG_ENDIAN) {
+      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
+         unsigned char tc;
+         tc = u.bytes[i];
+         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
+         u.bytes[sizeof(double) - 1 - i] = tc;
+      }
+   }
+   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
+   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_state *state) {
@@ -4242,105 +3755,64 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_stat
    bytes_appended = (ae_int_t) strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
-
-// append to buffer
+// Append to the buffer.
+   switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
-   if (serializer->mode == AE_SM_TO_CPPSTRING) {
-      *(serializer->out_cppstr) += buf;
-      return;
-   }
+      case AE_SM_TO_CPPSTRING:
+         *serializer->out_cppstr += buf;
+      break;
 #endif
-   if (serializer->mode == AE_SM_TO_STRING) {
-      strcat(serializer->out_str, buf);
-      serializer->out_str += bytes_appended;
-      return;
-   }
-   if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream", state);
-      return;
-   }
-   ae_break(state, ERR_ASSERTION_FAILED, emsg);
-}
-
-void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state) {
-   ae_int_t chunk_size, entries_count;
-
-   chunk_size = 8;
-
-// save array length
-   ae_serializer_serialize_int(serializer, bytes->cnt, state);
-
-// determine entries count
-   entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
-   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
-      ae_int64_t tmpi;
-      ae_int_t elen;
-      elen = bytes->cnt - eidx * chunk_size;
-      elen = elen > chunk_size ? chunk_size : elen;
-      memset(&tmpi, 0, sizeof tmpi);
-      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
-      ae_serializer_serialize_int64(serializer, tmpi, state);
+      case AE_SM_TO_STRING:
+         strcat(serializer->out_str, buf);
+         serializer->out_str += bytes_appended;
+      break;
+      case AE_SM_TO_STREAM:
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream", state);
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, emsg);
    }
 }
 
-void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state) {
-   if (serializer->mode == AE_SM_FROM_STRING) {
-      *v = ae_str2bool(serializer->in_str, state, &serializer->in_str);
-      return;
+void ae_serializer_stop(ae_serializer *serializer, ae_state *state) {
+   switch (serializer->mode) {
+#ifdef AE_USE_CPP_SERIALIZATION
+      case AE_SM_TO_CPPSTRING:
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
+         serializer->bytes_written++;
+         *serializer->out_cppstr += ".";
+      break;
+#endif
+      case AE_SM_TO_STRING:
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
+         serializer->bytes_written++;
+         strcat(serializer->out_str, ".");
+         serializer->out_str += 1;
+      break;
+      case AE_SM_TO_STREAM:
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
+         serializer->bytes_written++;
+         ae_assert(serializer->stream_writer(".", serializer->stream_aux), "ae_serializer: error writing to stream", state);
+      break;
+   // For compatibility with the pre-3.11 serializer, which does not require a trailing '.', we do not test for a trailing '.'.
+   // Anyway, because the string is not a stream, we do not have to read ALL trailing symbols.
+      case AE_SM_FROM_STRING:
+      break;
+      case AE_SM_FROM_STREAM: {
+      // Read a trailing '.', perform an integrity check.
+         char buf[2];
+         ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf), "ae_serializer: error reading from stream", state);
+         ae_assert(buf[0] == '.', "ae_serializer: trailing . is not found in the stream", state);
+      }
+      break;
+      default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
    }
-   if (serializer->mode == AE_SM_FROM_STREAM) {
-      char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-      const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream", state);
-      *v = ae_str2bool(buf, state, &p);
-      return;
-   }
-   ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
 }
 
-void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v, ae_state *state) {
-   if (serializer->mode == AE_SM_FROM_STRING) {
-      *v = ae_str2int(serializer->in_str, state, &serializer->in_str);
-      return;
-   }
-   if (serializer->mode == AE_SM_FROM_STREAM) {
-      char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-      const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream", state);
-      *v = ae_str2int(buf, state, &p);
-      return;
-   }
-   ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
-}
-
-void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v, ae_state *state) {
-   if (serializer->mode == AE_SM_FROM_STRING) {
-      *v = ae_str2int64(serializer->in_str, state, &serializer->in_str);
-      return;
-   }
-   if (serializer->mode == AE_SM_FROM_STREAM) {
-      char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-      const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream", state);
-      *v = ae_str2int64(buf, state, &p);
-      return;
-   }
-   ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
-}
-
-void ae_serializer_unserialize_double(ae_serializer *serializer, double *v, ae_state *state) {
-   if (serializer->mode == AE_SM_FROM_STRING) {
-      *v = ae_str2double(serializer->in_str, state, &serializer->in_str);
-      return;
-   }
-   if (serializer->mode == AE_SM_FROM_STREAM) {
-      char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-      const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream", state);
-      *v = ae_str2double(buf, state, &p);
-      return;
-   }
-   ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes) {
+   ae_int_t n;
+   n = bytes->cnt;
+   n = n / 8 + (n % 8 > 0 ? 1 : 0);
+   serializer->entries_needed += 1 + n;
 }
 
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state) {
@@ -4365,43 +3837,292 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
    }
 }
 
-void ae_serializer_stop(ae_serializer *serializer, ae_state *state) {
-#ifdef AE_USE_CPP_SERIALIZATION
-   if (serializer->mode == AE_SM_TO_CPPSTRING) {
-      ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
-      serializer->bytes_written++;
-      *(serializer->out_cppstr) += ".";
-      return;
+void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state) {
+   ae_int_t chunk_size, entries_count;
+
+   chunk_size = 8;
+
+// save array length
+   ae_serializer_serialize_int(serializer, bytes->cnt, state);
+
+// determine entries count
+   entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
+   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
+      ae_int64_t tmpi;
+      ae_int_t elen;
+      elen = bytes->cnt - eidx * chunk_size;
+      elen = elen > chunk_size ? chunk_size : elen;
+      memset(&tmpi, 0, sizeof tmpi);
+      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
+      ae_serializer_serialize_int64(serializer, tmpi, state);
    }
-#endif
-   if (serializer->mode == AE_SM_TO_STRING) {
-      ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
-      serializer->bytes_written++;
-      strcat(serializer->out_str, ".");
-      serializer->out_str += 1;
-      return;
+}
+
+// Real math functions
+bool ae_fp_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x == y;
+}
+
+bool ae_fp_neq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   return !ae_fp_eq(v1, v2);
+}
+
+bool ae_fp_less(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x < y;
+}
+
+bool ae_fp_less_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x <= y;
+}
+
+bool ae_fp_greater(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x > y;
+}
+
+bool ae_fp_greater_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x >= y;
+}
+
+bool ae_isfinite_stateless(double x, ae_int_t endianness) {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   ae_int32_t high;
+   u.a = x;
+   if (endianness == AE_LITTLE_ENDIAN)
+      high = u.p[1];
+   else
+      high = u.p[0];
+   return (high & (ae_int32_t) 0x7FF00000) != (ae_int32_t) 0x7FF00000;
+}
+
+bool ae_isnan_stateless(double x, ae_int_t endianness) {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   ae_int32_t high, low;
+   u.a = x;
+   if (endianness == AE_LITTLE_ENDIAN) {
+      high = u.p[1];
+      low = u.p[0];
+   } else {
+      high = u.p[0];
+      low = u.p[1];
    }
-   if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
-      serializer->bytes_written++;
-      ae_assert(serializer->stream_writer(".", serializer->stream_aux) == 0, "ae_serializer: error writing to stream", state);
-      return;
+   return ((high & 0x7FF00000) == 0x7FF00000) && (((high & 0x000FFFFF) != 0) || (low != 0));
+}
+
+bool ae_isinf_stateless(double x, ae_int_t endianness) {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   ae_int32_t high, low;
+   u.a = x;
+   if (endianness == AE_LITTLE_ENDIAN) {
+      high = u.p[1];
+      low = u.p[0];
+   } else {
+      high = u.p[0];
+      low = u.p[1];
    }
-   if (serializer->mode == AE_SM_FROM_STRING) {
-   // because input string may be from pre-3.11 serializer,
-   // which does not include trailing dot, we do not test
-   // string for presence of "." symbol. Anyway, because string
-   // is not stream, we do not have to read ALL trailing symbols.
-      return;
+
+// 31 least significant bits of high are compared
+   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (low == 0);
+}
+
+bool ae_isposinf_stateless(double x, ae_int_t endianness) {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   ae_int32_t high, low;
+   u.a = x;
+   if (endianness == AE_LITTLE_ENDIAN) {
+      high = u.p[1];
+      low = u.p[0];
+   } else {
+      high = u.p[0];
+      low = u.p[1];
    }
-   if (serializer->mode == AE_SM_FROM_STREAM) {
-   // Read trailing dot, perform integrity check
-      char buf[2];
-      ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf) == 0, "ae_serializer: error reading from stream", state);
-      ae_assert(buf[0] == '.', "ae_serializer: trailing . is not found in the stream", state);
-      return;
+
+// all 32 bits of high are compared
+   return (high == (ae_int32_t) 0x7FF00000) && (low == 0);
+}
+
+bool ae_isneginf_stateless(double x, ae_int_t endianness) {
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   ae_int32_t high, low;
+   u.a = x;
+   if (endianness == AE_LITTLE_ENDIAN) {
+      high = u.p[1];
+      low = u.p[0];
+   } else {
+      high = u.p[0];
+      low = u.p[1];
    }
-   ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+
+// this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers
+   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (high != (ae_int32_t) 0x7FF00000) && (low == 0);
+}
+
+bool ae_isfinite(double x, ae_state *state) {
+   return ae_isfinite_stateless(x, state->endianness);
+}
+
+bool ae_isnan(double x, ae_state *state) {
+   return ae_isnan_stateless(x, state->endianness);
+}
+
+bool ae_isinf(double x, ae_state *state) {
+   return ae_isinf_stateless(x, state->endianness);
+}
+
+bool ae_isposinf(double x, ae_state *state) {
+   return ae_isposinf_stateless(x, state->endianness);
+}
+
+bool ae_isneginf(double x, ae_state *state) {
+   return ae_isneginf_stateless(x, state->endianness);
+}
+
+double ae_fabs(double x, ae_state *state) {
+   return fabs(x);
+}
+
+ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
+   return x >= 0 ? x : -x;
+}
+
+double ae_sqr(double x, ae_state *state) {
+   return x * x;
+}
+
+double ae_sqrt(double x, ae_state *state) {
+   return sqrt(x);
+}
+
+ae_int_t ae_sign(double x, ae_state *state) {
+   if (x > 0) return 1;
+   if (x < 0) return -1;
+   return 0;
+}
+
+ae_int_t ae_round(double x, ae_state *state) {
+   return (ae_int_t) (ae_ifloor(x + 0.5, state));
+}
+
+ae_int_t ae_trunc(double x, ae_state *state) {
+   return (ae_int_t) (x > 0 ? ae_ifloor(x, state) : ae_iceil(x, state));
+}
+
+ae_int_t ae_ifloor(double x, ae_state *state) {
+   return (ae_int_t) (floor(x));
+}
+
+ae_int_t ae_iceil(double x, ae_state *state) {
+   return (ae_int_t) (ceil(x));
+}
+
+ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
+   return m1 > m2 ? m1 : m2;
+}
+
+ae_int_t ae_minint(ae_int_t m1, ae_int_t m2, ae_state *state) {
+   return m1 > m2 ? m2 : m1;
+}
+
+double ae_maxreal(double m1, double m2, ae_state *state) {
+   return m1 > m2 ? m1 : m2;
+}
+
+double ae_minreal(double m1, double m2, ae_state *state) {
+   return m1 > m2 ? m2 : m1;
+}
+
+double ae_randomreal(ae_state *state) {
+   int i1 = rand();
+   int i2 = rand();
+   double mx = (double)(RAND_MAX) + 1.0;
+   volatile double tmp0 = i2 / mx;
+   volatile double tmp1 = i1 + tmp0;
+   return tmp1 / mx;
+}
+
+ae_int_t ae_randominteger(ae_int_t maxv, ae_state *state) {
+   return rand() % maxv;
+}
+
+double ae_sin(double x, ae_state *state) {
+   return sin(x);
+}
+
+double ae_cos(double x, ae_state *state) {
+   return cos(x);
+}
+
+double ae_tan(double x, ae_state *state) {
+   return tan(x);
+}
+
+double ae_sinh(double x, ae_state *state) {
+   return sinh(x);
+}
+
+double ae_cosh(double x, ae_state *state) {
+   return cosh(x);
+}
+double ae_tanh(double x, ae_state *state) {
+   return tanh(x);
+}
+
+double ae_asin(double x, ae_state *state) {
+   return asin(x);
+}
+
+double ae_acos(double x, ae_state *state) {
+   return acos(x);
+}
+
+double ae_atan(double x, ae_state *state) {
+   return atan(x);
+}
+
+double ae_atan2(double y, double x, ae_state *state) {
+   return atan2(y, x);
+}
+
+double ae_log(double x, ae_state *state) {
+   return log(x);
+}
+
+double ae_pow(double x, double y, ae_state *state) {
+   return pow(x, y);
+}
+
+double ae_exp(double x, ae_state *state) {
+   return exp(x);
 }
 
 // Complex math functions
@@ -5094,6 +4815,136 @@ ae_int_t ae_v_len(ae_int_t a, ae_int_t b) {
    return b - a + 1;
 }
 
+#if 0
+// Global and local constants and variables.
+const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
+const double pi = 3.1415926535897932384626433832795;
+#endif
+
+// Error tracking facilities; this fields are modified every time ae_set_error_flag()
+// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
+static const char *sef_file = "";
+static int sef_line = 0;
+static const char *sef_xdesc = "";
+
+void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
+   if (cond) {
+      *p_flag = true;
+      sef_file = filename;
+      sef_line = lineno;
+      sef_xdesc = xdesc;
+#ifdef ALGLIB_ABORT_ON_ERROR_FLAG
+      printf("[ALGLIB] aborting on ae_set_error_flag(cond=true)\n");
+      printf("[ALGLIB] %s:%d\n", filename, lineno);
+      printf("[ALGLIB] %s\n", xdesc);
+      fflush(stdout);
+      if (alglib_trace_file != NULL) fflush(alglib_trace_file);
+      abort();
+#endif
+   }
+}
+
+// This function returns file name for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
+const char *ae_get_last_error_file() {
+   return sef_file;
+}
+
+// This function returns line number for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
+int ae_get_last_error_line() {
+   return sef_line;
+}
+
+// This function returns extra description for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
+const char *ae_get_last_error_xdesc() {
+   return sef_xdesc;
+}
+
+// Activates tracing to file
+//
+// IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
+//            threads will result in undefined  behavior.  Calling  it  when
+//            some thread calls ALGLIB functions  may  result  in  undefined
+//            behavior.
+void ae_trace_file(const char *tags, const char *filename) {
+// clean up previous call
+   if (alglib_fclose_trace) {
+      if (alglib_trace_file != NULL)
+         fclose(alglib_trace_file);
+      alglib_trace_file = NULL;
+      alglib_fclose_trace = false;
+   }
+// store ",tags," to buffer. Leading and trailing commas allow us
+// to perform checks for various tags by simply calling strstr().
+   memset(alglib_trace_tags, 0, ALGLIB_TRACE_BUFFER_LEN);
+   strcat(alglib_trace_tags, ",");
+   strncat(alglib_trace_tags, tags, ALGLIB_TRACE_TAGS_LEN);
+   strcat(alglib_trace_tags, ",");
+   for (int i = 0; alglib_trace_tags[i] != 0; i++)
+      alglib_trace_tags[i] = tolower(alglib_trace_tags[i]);
+
+// set up trace
+   alglib_trace_type = ALGLIB_TRACE_FILE;
+   alglib_trace_file = fopen(filename, "ab");
+   alglib_fclose_trace = true;
+}
+
+// Disables tracing
+void ae_trace_disable() {
+   alglib_trace_type = ALGLIB_TRACE_NONE;
+   if (alglib_fclose_trace)
+      fclose(alglib_trace_file);
+   alglib_trace_file = NULL;
+   alglib_fclose_trace = false;
+}
+
+// Checks whether specific kind of tracing is enabled
+bool ae_is_trace_enabled(const char *tag) {
+   char buf[ALGLIB_TRACE_BUFFER_LEN];
+
+// check global trace status
+   if (alglib_trace_type == ALGLIB_TRACE_NONE || alglib_trace_file == NULL)
+      return false;
+
+// copy tag to buffer, lowercase it
+   memset(buf, 0, ALGLIB_TRACE_BUFFER_LEN);
+   strcat(buf, ",");
+   strncat(buf, tag, ALGLIB_TRACE_TAGS_LEN);
+   strcat(buf, "?");
+   for (int i = 0; buf[i] != 0; i++)
+      buf[i] = tolower(buf[i]);
+
+// contains tag (followed by comma, which means exact match)
+   buf[strlen(buf) - 1] = ',';
+   if (strstr(alglib_trace_tags, buf) != NULL)
+      return true;
+
+// contains tag (followed by dot, which means match with child)
+   buf[strlen(buf) - 1] = '.';
+   if (strstr(alglib_trace_tags, buf) != NULL)
+      return true;
+
+// nothing
+   return false;
+}
+
+void ae_trace(const char *printf_fmt, ...) {
+// check global trace status
+   if (alglib_trace_type == ALGLIB_TRACE_FILE && alglib_trace_file != NULL) {
+      va_list args;
+
+   // fprintf()
+      va_start(args, printf_fmt);
+      vfprintf(alglib_trace_file, printf_fmt, args);
+      va_end(args);
+
+   // flush output
+      fflush(alglib_trace_file);
+   }
+}
+
 // RComm functions
 void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
 // zero-filled initialization
@@ -5120,15 +4971,9 @@ void rcommstate_free(rcommstate *p, bool make_automatic) {
 }
 
 // Optimized shared C/C++ linear algebra code.
-#define alglib_simd_alignment 16
-
-#define alglib_r_block        32
-#define alglib_half_r_block   16
-#define alglib_twice_r_block  64
-
-#define alglib_c_block        16
-#define alglib_half_c_block    8
-#define alglib_twice_c_block  32
+static const ae_int_t alglib_simd_alignment = 0x10;
+static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block / 2, alglib_twice_r_block = 2 * alglib_r_block;
+static const ae_int_t alglib_c_block = 0x10, alglib_half_c_block = alglib_c_block / 2, alglib_twice_c_block = 2 * alglib_c_block;
 
 // This subroutine calculates fast 32x32 real matrix-vector product:
 //
@@ -5142,7 +4987,7 @@ void rcommstate_free(rcommstate *p, bool make_automatic) {
 //   aligned on alglib_simd_alignment boundary
 // * X must be aligned on alglib_simd_alignment boundary
 // * Y may be non-aligned
-void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
    ae_int_t i, k;
    const double *pa0, *pa1, *pb;
 
@@ -5185,148 +5030,7 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
    }
 }
 
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
-   if (m == 0)
-      return;
-   if (alpha == 0.0 || n == 0) {
-      ae_int_t i;
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
-            *y = 0.0;
-            y += stride;
-         }
-      } else {
-         for (i = 0; i < m; i++) {
-            *y *= beta;
-            y += stride;
-         }
-      }
-      return;
-   }
-// Handle general case: nonzero alpha, n and m
-//
-   if (m == 32 && n == 32) {
-   // 32x32, may be we have something better than general implementation
-      _ialglib_mv_32(a, x, y, stride, alpha, beta);
-   } else {
-      ae_int_t i, k, m2, n8, n2, ntrail2;
-      const double *pa0, *pa1, *pb;
-
-   // First M/2 rows of A are processed in pairs.
-   // optimized code is used.
-      m2 = m / 2;
-      n8 = n / 8;
-      ntrail2 = (n - 8 * n8) / 2;
-      for (i = 0; i < m2; i++) {
-         double v0 = 0, v1 = 0;
-
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-         pa1 = a + alglib_r_block;
-         a += alglib_twice_r_block;
-
-      // 8 elements per iteration
-         for (k = 0; k < n8; k++) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-            v0 += pa0[1] * pb[1];
-            v1 += pa1[1] * pb[1];
-            v0 += pa0[2] * pb[2];
-            v1 += pa1[2] * pb[2];
-            v0 += pa0[3] * pb[3];
-            v1 += pa1[3] * pb[3];
-            v0 += pa0[4] * pb[4];
-            v1 += pa1[4] * pb[4];
-            v0 += pa0[5] * pb[5];
-            v1 += pa1[5] * pb[5];
-            v0 += pa0[6] * pb[6];
-            v1 += pa1[6] * pb[6];
-            v0 += pa0[7] * pb[7];
-            v1 += pa1[7] * pb[7];
-            pa0 += 8;
-            pa1 += 8;
-            pb += 8;
-         }
-
-      // 2 elements per iteration
-         for (k = 0; k < ntrail2; k++) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-            v0 += pa0[1] * pb[1];
-            v1 += pa1[1] * pb[1];
-            pa0 += 2;
-            pa1 += 2;
-            pb += 2;
-         }
-
-      // last element, if needed
-         if (n % 2 != 0) {
-            v0 += pa0[0] * pb[0];
-            v1 += pa1[0] * pb[0];
-         }
-      // final update
-         if (beta != 0) {
-            y[0] = beta * y[0] + alpha * v0;
-            y[stride] = beta * y[stride] + alpha * v1;
-         } else {
-            y[0] = alpha * v0;
-            y[stride] = alpha * v1;
-         }
-
-      // move to the next pair of elements
-         y += 2 * stride;
-      }
-
-   // Last (odd) row is processed with less optimized code.
-      if (m % 2 != 0) {
-         double v0 = 0;
-
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-
-      // 2 elements per iteration
-         n2 = n / 2;
-         for (k = 0; k < n2; k++) {
-            v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
-            pa0 += 2;
-            pb += 2;
-         }
-
-      // last element, if needed
-         if (n % 2 != 0)
-            v0 += pa0[0] * pb[0];
-
-      // final update
-         if (beta != 0)
-            y[0] = beta * y[0] + alpha * v0;
-         else
-            y[0] = alpha * v0;
-      }
-   }
-}
-
+#if defined AE_HAS_SSE2_INTRINSICS
 // This function calculates MxN real matrix-vector product:
 //
 //     y := beta*y + alpha*A*x
@@ -5350,16 +5054,14 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
 // If (1) is failed, this function will be undefined. If (2) is failed,  call
 // to this function will probably crash your system.
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
    ae_int_t i, k, n2;
    ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
    const double *pa0, *pa1, *pa2, *pb;
@@ -5608,62 +5310,149 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
 }
 #endif
 
-// This subroutine calculates fast MxN complex matrix-vector product:
+// This function calculates MxN real matrix-vector product:
 //
 //     y := beta*y + alpha*A*x
 //
-// using generic C code, where A, x, y, alpha and beta are complex.
+// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
 //
 // If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
+// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
+// product is calculated (only beta is updated); however, this update  is not
+// efficient  and  this  function  should  NOT  be used for multiplication of
+// vector and scalar.
 //
 // IMPORTANT:
-// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
-   ae_int_t i, j;
-   const double *pa, *parow, *pb;
-
-   parow = a;
-   for (i = 0; i < m; i++) {
-      double v0 = 0, v1 = 0;
-      pa = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
-         v0 += pa[0] * pb[0];
-         v1 += pa[0] * pb[1];
-         v0 -= pa[1] * pb[1];
-         v1 += pa[1] * pb[0];
-
-         pa += 2;
-         pb += 2;
-      }
-      if (cy != NULL) {
-         double tx = (beta.x * cy->x - beta.y * cy->y) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * cy->y + beta.y * cy->x) + (alpha.x * v1 + alpha.y * v0);
-         cy->x = tx;
-         cy->y = ty;
-         cy += stride;
+// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
+// * A must be stored in row-major order with stride equal to alglib_r_block
+static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+// Handle special cases:
+// - alpha is zero or n is zero
+// - m is zero
+   if (m == 0)
+      return;
+   if (alpha == 0.0 || n == 0) {
+      ae_int_t i;
+      if (beta == 0.0) {
+         for (i = 0; i < m; i++) {
+            *y = 0.0;
+            y += stride;
+         }
       } else {
-         double tx = (beta.x * dy[0] - beta.y * dy[1]) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * dy[1] + beta.y * dy[0]) + (alpha.x * v1 + alpha.y * v0);
-         dy[0] = tx;
-         dy[1] = ty;
-         dy += 2 * stride;
+         for (i = 0; i < m; i++) {
+            *y *= beta;
+            y += stride;
+         }
       }
-      parow += 2 * alglib_c_block;
+      return;
+   }
+// Handle general case: nonzero alpha, n and m
+//
+   if (m == 32 && n == 32) {
+   // 32x32, may be we have something better than general implementation
+      _ialglib_mv_32(a, x, y, stride, alpha, beta);
+   } else {
+      ae_int_t i, k, m2, n8, n2, ntrail2;
+      const double *pa0, *pa1, *pb;
+
+   // First M/2 rows of A are processed in pairs.
+   // optimized code is used.
+      m2 = m / 2;
+      n8 = n / 8;
+      ntrail2 = (n - 8 * n8) / 2;
+      for (i = 0; i < m2; i++) {
+         double v0 = 0, v1 = 0;
+
+      // 'a' points to the part of the matrix which
+      // is not processed yet
+         pb = x;
+         pa0 = a;
+         pa1 = a + alglib_r_block;
+         a += alglib_twice_r_block;
+
+      // 8 elements per iteration
+         for (k = 0; k < n8; k++) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+            v0 += pa0[1] * pb[1];
+            v1 += pa1[1] * pb[1];
+            v0 += pa0[2] * pb[2];
+            v1 += pa1[2] * pb[2];
+            v0 += pa0[3] * pb[3];
+            v1 += pa1[3] * pb[3];
+            v0 += pa0[4] * pb[4];
+            v1 += pa1[4] * pb[4];
+            v0 += pa0[5] * pb[5];
+            v1 += pa1[5] * pb[5];
+            v0 += pa0[6] * pb[6];
+            v1 += pa1[6] * pb[6];
+            v0 += pa0[7] * pb[7];
+            v1 += pa1[7] * pb[7];
+            pa0 += 8;
+            pa1 += 8;
+            pb += 8;
+         }
+
+      // 2 elements per iteration
+         for (k = 0; k < ntrail2; k++) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+            v0 += pa0[1] * pb[1];
+            v1 += pa1[1] * pb[1];
+            pa0 += 2;
+            pa1 += 2;
+            pb += 2;
+         }
+
+      // last element, if needed
+         if (n % 2 != 0) {
+            v0 += pa0[0] * pb[0];
+            v1 += pa1[0] * pb[0];
+         }
+      // final update
+         if (beta != 0) {
+            y[0] = beta * y[0] + alpha * v0;
+            y[stride] = beta * y[stride] + alpha * v1;
+         } else {
+            y[0] = alpha * v0;
+            y[stride] = alpha * v1;
+         }
+
+      // move to the next pair of elements
+         y += 2 * stride;
+      }
+
+   // Last (odd) row is processed with less optimized code.
+      if (m % 2 != 0) {
+         double v0 = 0;
+
+      // 'a' points to the part of the matrix which
+      // is not processed yet
+         pb = x;
+         pa0 = a;
+
+      // 2 elements per iteration
+         n2 = n / 2;
+         for (k = 0; k < n2; k++) {
+            v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
+            pa0 += 2;
+            pb += 2;
+         }
+
+      // last element, if needed
+         if (n % 2 != 0)
+            v0 += pa0[0] * pb[0];
+
+      // final update
+         if (beta != 0)
+            y[0] = beta * y[0] + alpha * v0;
+         else
+            y[0] = alpha * v0;
+      }
    }
 }
 
+#if defined AE_HAS_SSE2_INTRINSICS
 // This subroutine calculates fast MxN complex matrix-vector product:
 //
 //     y := beta*y + alpha*A*x
@@ -5688,16 +5477,14 @@ void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_c
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
 // If (1) is failed, this function will be undefined. If (2) is failed,  call
 // to this function will probably crash your system.
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
    ae_int_t i, j, m2;
    const double *pa0, *pa1, *parow, *pb;
    __m128d vbeta, vbetax, vbetay;
@@ -5796,8 +5583,64 @@ void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
 }
 #endif
 
+// This subroutine calculates fast MxN complex matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code, where A, x, y, alpha and beta are complex.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
+// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
+// important when A or x contain infinities/NANs).
+//
+// IMPORTANT:
+// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
+// * A must be stored in row-major order, as sequence of double precision
+//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
+//   in doubles).
+// * Y may be referenced by cy (pointer to ae_complex) or
+//   dy (pointer to array of double precision pair) depending on what type of
+//   output you wish. Pass pointer to Y as one of these parameters,
+//   AND SET OTHER PARAMETER TO NULL.
+// * both A and x must be aligned; y may be non-aligned.
+static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+   ae_int_t i, j;
+   const double *pa, *parow, *pb;
+
+   parow = a;
+   for (i = 0; i < m; i++) {
+      double v0 = 0, v1 = 0;
+      pa = parow;
+      pb = x;
+      for (j = 0; j < n; j++) {
+         v0 += pa[0] * pb[0];
+         v1 += pa[0] * pb[1];
+         v0 -= pa[1] * pb[1];
+         v1 += pa[1] * pb[0];
+
+         pa += 2;
+         pb += 2;
+      }
+      if (cy != NULL) {
+         double tx = (beta.x * cy->x - beta.y * cy->y) + (alpha.x * v0 - alpha.y * v1);
+         double ty = (beta.x * cy->y + beta.y * cy->x) + (alpha.x * v1 + alpha.y * v0);
+         cy->x = tx;
+         cy->y = ty;
+         cy += stride;
+      } else {
+         double tx = (beta.x * dy[0] - beta.y * dy[1]) + (alpha.x * v0 - alpha.y * v1);
+         double ty = (beta.x * dy[1] + beta.y * dy[0]) + (alpha.x * v1 + alpha.y * v0);
+         dy[0] = tx;
+         dy[1] = ty;
+         dy += 2 * stride;
+      }
+      parow += 2 * alglib_c_block;
+   }
+}
+
 // This subroutine sets vector to zero
-void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
+static void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
    ae_int_t i;
    if (stride == 1) {
       for (i = 0; i < n; i++, p++)
@@ -5809,7 +5652,7 @@ void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
 }
 
 // This subroutine sets vector to zero
-void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
+static void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
    ae_int_t i;
    if (stride == 1) {
       for (i = 0; i < n; i++, p++) {
@@ -5825,7 +5668,7 @@ void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
 }
 
 // This subroutine copies unaligned real vector
-void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
+static void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
    ae_int_t i, n2;
    if (stridea == 1 && strideb == 1) {
       n2 = n / 2;
@@ -5846,7 +5689,7 @@ void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae
 //
 // 1. strideb is stride measured in complex numbers, not doubles
 // 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+static void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
    ae_int_t i;
 
 // more general case
@@ -5867,7 +5710,7 @@ void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, d
 //
 // 1. strideb is stride measured in complex numbers, not doubles
 // 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+static void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
    ae_int_t i;
 
 // more general case
@@ -5884,50 +5727,7 @@ void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, doub
    }
 }
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
-            pdst[0] = psrc[0];
-            pdst[1] = psrc[1];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 1, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
-            pdst[0] = psrc[0];
-            pdst[alglib_r_block] = psrc[1];
-         }
-         if (n % 2 != 0)
-            pdst[0] = psrc[0];
-      }
-   }
-}
-
+#if defined AE_HAS_SSE2_INTRINSICS
 // This subroutine copies matrix from  non-aligned non-contigous storage
 // to aligned contigous storage
 //
@@ -5948,16 +5748,14 @@ void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, a
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
 // If (1) is failed, this function will be undefined. If (2) is failed,  call
 // to this function will probably crash your system.
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
    ae_int_t i, j, mb2;
    const double *psrc0, *psrc1;
    double *pdst;
@@ -6047,6 +5845,50 @@ void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t 
 }
 #endif
 
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_r_block
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+static void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
+   ae_int_t i, j, n2;
+   const double *psrc;
+   double *pdst;
+   if (op == 0) {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+            pdst[0] = psrc[0];
+            pdst[1] = psrc[1];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   } else {
+      n2 = n / 2;
+      for (i = 0, psrc = a; i < m; i++, a += stride, b += 1, psrc = a) {
+         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
+            pdst[0] = psrc[0];
+            pdst[alglib_r_block] = psrc[1];
+         }
+         if (n % 2 != 0)
+            pdst[0] = psrc[0];
+      }
+   }
+}
+
 // This subroutine copies matrix from  aligned contigous storage to non-
 // aligned non-contigous storage
 //
@@ -6064,7 +5906,7 @@ void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t 
 // Transformation types:
 // * 0 - no transform
 // * 1 - transposition
-void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
+static void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
    ae_int_t i, j, n2;
    const double *psrc;
    double *pdst;
@@ -6112,7 +5954,7 @@ void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op,
 // * 1 - transposition
 // * 2 - conjugate transposition
 // * 3 - conjugate, but no  transposition
-void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
+static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
    ae_int_t i, j;
    const ae_complex *psrc;
    double *pdst;
@@ -6167,7 +6009,7 @@ void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae
 // * 1 - transposition
 // * 2 - conjugate transposition
 // * 3 - conjugate, but no  transposition
-void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
+static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
    ae_int_t i, j;
    const double *psrc;
    ae_complex *pdst;
@@ -6201,8 +6043,8 @@ void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_i
    }
 }
 
-// Real GEMM kernel
-bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
+// Real GEMM kernel.
+static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
    int i;
    double *crow;
    double _abuf[alglib_r_block + alglib_simd_alignment];
@@ -6217,7 +6059,7 @@ bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, doub
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
+   if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
@@ -6256,8 +6098,8 @@ bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, doub
    return true;
 }
 
-// Complex GEMM kernel
-bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
+// Complex GEMM kernel.
+static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
    const ae_complex *arow;
    ae_complex *crow;
    ae_int_t i;
@@ -6274,7 +6116,7 @@ bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, 
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
+   if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
@@ -6312,8 +6154,66 @@ bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, 
    return true;
 }
 
-// complex TRSM kernel
-bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+// Real Right TRSM kernel.
+static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+// local buffers
+   double *pdiag;
+   ae_int_t i;
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   bool uppera;
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+
+   if (m > alglib_r_block || n > alglib_r_block)
+      return false;
+
+// Check for SSE2 support
+#ifdef AE_HAS_SSE2_INTRINSICS
+   if (CurCPU & CPU_SSE2) {
+      rmv = &_ialglib_rmv_sse2;
+      mcopyblock = &_ialglib_mcopyblock_sse2;
+   }
+#endif
+
+// Prepare
+   mcopyblock(n, n, _a, optype, _a_stride, abuf);
+   mcopyblock(m, n, _x, 0, _x_stride, xbuf);
+   if (isunit)
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
+         *pdiag = 1.0;
+   if (optype == 0)
+      uppera = isupper;
+   else
+      uppera = !isupper;
+
+// Solve Y*A^-1=X where A is upper or lower triangular
+   if (uppera) {
+      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
+         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+   } else {
+      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+         double beta = 1.0 / (*pdiag);
+         double alpha = -beta;
+         _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
+         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+   }
+   return true;
+}
+
+// Complex Right TRSM kernel.
+static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag;
    ae_int_t i;
@@ -6331,7 +6231,7 @@ bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t 
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
+   if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
@@ -6382,10 +6282,10 @@ bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t 
    return true;
 }
 
-// real TRSM kernel
-bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+// Real Left TRSM kernel.
+static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
 // local buffers
-   double *pdiag;
+   double *pdiag, *arow;
    ae_int_t i;
    double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
@@ -6402,46 +6302,47 @@ bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_s
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
+   if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
 
 // Prepare
-   mcopyblock(n, n, _a, optype, _a_stride, abuf);
-   mcopyblock(m, n, _x, 0, _x_stride, xbuf);
+// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+   mcopyblock(m, m, _a, optype, _a_stride, abuf);
+   mcopyblock(m, n, _x, 1, _x_stride, xbuf);
    if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
+      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
          *pdiag = 1.0;
    if (optype == 0)
       uppera = isupper;
    else
       uppera = !isupper;
 
-// Solve Y*A^-1=X where A is upper or lower triangular
+// Solve A^-1*Y^T=X^T where A is upper or lower triangular
    if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
+      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
-         _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
-         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+         _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
+         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
       }
-      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    } else {
-      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
-         _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
-         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+         _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
+         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
       }
-      _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
+      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    }
    return true;
 }
 
-// complex TRSM kernel
-bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+// Complex Left TRSM kernel.
+static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag, *arow;
    ae_int_t i;
@@ -6459,7 +6360,7 @@ bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
+   if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
@@ -6511,67 +6412,60 @@ bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
    return true;
 }
 
-// real TRSM kernel
-bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+// Real SYRK/HERK kernel.
+static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
 // local buffers
-   double *pdiag, *arow;
+   double *arow, *crow;
    ae_int_t i;
    double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
 
-   if (m > alglib_r_block || n > alglib_r_block)
+   if (n > alglib_r_block || k > alglib_r_block)
       return false;
+   if (n == 0)
+      return true;
 
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (ae_cpuid() & CPU_SSE2) {
-      rmv = &_ialglib_rmv_sse2;
-      mcopyblock = &_ialglib_mcopyblock_sse2;
+// copy A and C, task is transformed to "A*A^T"-form.
+// if beta == 0, then C is filled by zeros (and not referenced)
+//
+// alpha == 0 or k == 0 are correctly processed (A is not referenced)
+   if (alpha == 0)
+      k = 0;
+   if (k > 0) {
+      if (optypea == 0)
+         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
+      else
+         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
    }
-#endif
-
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
-   mcopyblock(m, m, _a, optype, _a_stride, abuf);
-   mcopyblock(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
-         *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
-         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
+   if (beta == 0) {
+      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
+         if (isupper)
+            _ialglib_vzero(n - i, crow + i, 1);
+         else
+            _ialglib_vzero(i + 1, crow, 1);
+   }
+// update C
+   if (isupper) {
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
+         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
       }
-      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
-         _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
-         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
+         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
       }
-      _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    }
+
+// copy back
+   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
+
    return true;
 }
 
-// complex SYRK kernel
-bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
+// Complex SYRK/HERK kernel.
+static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
 // local buffers
    double *arow, *crow;
    ae_complex c_alpha, c_beta;
@@ -6631,104 +6525,9 @@ bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, 
    return true;
 }
 
-// real SYRK kernel
-bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
-
-   if (n > alglib_r_block || k > alglib_r_block)
-      return false;
-   if (n == 0)
-      return true;
-
-// copy A and C, task is transformed to "A*A^T"-form.
-// if beta == 0, then C is filled by zeros (and not referenced)
-//
-// alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   if (alpha == 0)
-      k = 0;
-   if (k > 0) {
-      if (optypea == 0)
-         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
-      else
-         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
-   }
-   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
-         if (isupper)
-            _ialglib_vzero(n - i, crow + i, 1);
-         else
-            _ialglib_vzero(i + 1, crow, 1);
-   }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
-      }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
-      }
-   }
-
-// copy back
-   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
-
-   return true;
-}
-
-// complex rank-1 kernel
-bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
-// Locals
-   ae_complex *arow, *pu, *pv, *vtmp, *dst;
-   ae_int_t n2 = n / 2;
-   ae_int_t i, j;
-
-// Quick exit
-   if (m <= 0 || n <= 0)
-      return false;
-
-// update pairs of rows
-   arow = _a;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
-   // update by two
-      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
-         double ux = pu[0].x;
-         double uy = pu[0].y;
-         double v0x = pv[0].x;
-         double v0y = pv[0].y;
-         double v1x = pv[1].x;
-         double v1y = pv[1].y;
-         dst[0].x += ux * v0x - uy * v0y;
-         dst[0].y += ux * v0y + uy * v0x;
-         dst[1].x += ux * v1x - uy * v1y;
-         dst[1].y += ux * v1y + uy * v1x;
-      }
-
-   // final update
-      if (n % 2 != 0) {
-         double ux = pu[0].x;
-         double uy = pu[0].y;
-         double vx = pv[0].x;
-         double vy = pv[0].y;
-         dst[0].x += ux * vx - uy * vy;
-         dst[0].y += ux * vy + uy * vx;
-      }
-   }
-   return true;
-}
-
-// real rank-1 kernel
+// Real rank-1 kernel.
 // deprecated version
-bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
+static bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
 // Locals
    double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
    ae_int_t m2 = m / 2;
@@ -6777,9 +6576,52 @@ bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_strid
    return true;
 }
 
-// real rank-1 kernel
+// Complex rank-1 kernel.
+static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
+// Locals
+   ae_complex *arow, *pu, *pv, *vtmp, *dst;
+   ae_int_t n2 = n / 2;
+   ae_int_t i, j;
+
+// Quick exit
+   if (m <= 0 || n <= 0)
+      return false;
+
+// update pairs of rows
+   arow = _a;
+   pu = _u;
+   vtmp = _v;
+   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
+   // update by two
+      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
+         double ux = pu[0].x;
+         double uy = pu[0].y;
+         double v0x = pv[0].x;
+         double v0y = pv[0].y;
+         double v1x = pv[1].x;
+         double v1y = pv[1].y;
+         dst[0].x += ux * v0x - uy * v0y;
+         dst[0].y += ux * v0y + uy * v0x;
+         dst[1].x += ux * v1x - uy * v1y;
+         dst[1].y += ux * v1y + uy * v1x;
+      }
+
+   // final update
+      if (n % 2 != 0) {
+         double ux = pu[0].x;
+         double uy = pu[0].y;
+         double vx = pv[0].x;
+         double vy = pv[0].y;
+         dst[0].x += ux * vx - uy * vy;
+         dst[0].y += ux * vy + uy * vx;
+      }
+   }
+   return true;
+}
+
+// Real rank-1 kernel.
 // deprecated version
-bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
+static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
 // Locals
    double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
    ae_int_t m2 = m / 2;
@@ -6833,7 +6675,7 @@ bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride,
    return true;
 }
 
-// Interface functions for efficient kernels
+// Interface functions for efficient kernels.
 bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
@@ -6852,15 +6694,6 @@ bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alph
    return _ialglib_cmatrixgemm(m, n, k, alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, beta, _c->xyC[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
-}
-
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
@@ -6870,13 +6703,13 @@ bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t
    return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
 
 // handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
+   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6888,13 +6721,13 @@ bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t 
    return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
+   if (m == 0 || n == 0)
       return false;
 
-// ALGLIB kernel
-   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
+// handle with optimized ALGLIB kernel
+   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -6906,55 +6739,28 @@ bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a,
    return _ialglib_rmatrixsyrk(n, k, alpha, &a->xyR[ia][ja], a->stride, optypea, beta, &c->xyR[ic][jc], c->stride, isupper);
 }
 
-bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+   if (alpha == 0.0 || k == 0 || n == 0)
+      return false;
+
+// ALGLIB kernel
+   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixrank1(m, n, &a->xyR[ia][ja], a->stride, &u->xR[uoffs], &v->xR[voffs]);
 }
 
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
+}
+
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixger(m, n, &a->xyR[ia][ja], a->stride, alpha, &u->xR[uoffs], &v->xR[voffs]);
 }
 
-// This function reads rectangular matrix A given by two column pointers
-// col0 and col1 and stride src_stride and moves it into contiguous row-
-// by-row storage given by dst.
-//
-// It can handle following special cases:
-// * col1 == NULL    in this case second column of A is filled by zeros
-void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-
-// handle special case
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
-         dst[0] = *col0;
-         dst[1] = 0.0;
-         col0 += src_stride;
-         dst += 2;
-      }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-   }
-}
-
+#if defined AE_HAS_SSE2_INTRINSICS
 // This function reads rectangular matrix A given by two column pointers col0
 // and  col1  and  stride src_stride and moves it into  contiguous row-by-row
 // storage given by dst.
@@ -6968,13 +6774,11 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
    ae_int_t n2, j, stride2;
 
 // handle special case: col1 == NULL
@@ -7044,82 +6848,44 @@ void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_
 }
 #endif
 
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
+// This function reads rectangular matrix A given by two column pointers
+// col0 and col1 and stride src_stride and moves it into contiguous row-
+// by-row storage given by dst.
 //
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-   double v00, v01, v10, v11;
-   ae_int_t t;
-   v00 = 0.0;
-   v01 = 0.0;
-   v10 = 0.0;
-   v11 = 0.0;
-   for (t = 0; t < k; t++) {
-      v00 += a[0] * b[0];
-      v01 += a[0] * b[1];
-      v10 += a[1] * b[0];
-      v11 += a[1] * b[1];
-      a += 2;
-      b += 2;
-   }
-   if (store_mode == 0) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-         r[stride + 0] = alpha * v10;
-         r[stride + 1] = alpha * v11;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
+// It can handle following special cases:
+// * col1 == NULL    in this case second column of A is filled by zeros
+void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
+   ae_int_t n2, j, stride2;
+
+// handle special case
+   if (col1 == NULL) {
+      for (j = 0; j < n; j++) {
+         dst[0] = *col0;
+         dst[1] = 0.0;
+         col0 += src_stride;
+         dst += 2;
       }
       return;
    }
-   if (store_mode == 1) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-      }
-      return;
+// handle general case
+   n2 = n / 2;
+   stride2 = src_stride * 2;
+   for (j = 0; j < n2; j++) {
+      dst[0] = *col0;
+      dst[1] = *col1;
+      dst[2] = col0[src_stride];
+      dst[3] = col1[src_stride];
+      col0 += stride2;
+      col1 += stride2;
+      dst += 4;
    }
-   if (store_mode == 2) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[stride + 0] = alpha * v10;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-      }
-      return;
-   }
-   if (store_mode == 3) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-      }
-      return;
+   if (n % 2) {
+      dst[0] = *col0;
+      dst[1] = *col1;
    }
 }
 
+#if defined AE_HAS_SSE2_INTRINSICS
 // This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
 // matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
 // stored in non-contiguous row-by-row storage.
@@ -7140,17 +6906,15 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
 // If (1) is failed, this function will still be defined and callable, but it
 // will do nothing.  If (2)  is  failed , call to this function will probably
 // crash your system.
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
 // We calculate product of two Kx2 matrices (result is 2x2).
 // VA and VB store result as follows:
 //
@@ -7241,28 +7005,83 @@ void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t
 }
 #endif
 
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
+// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
 // stored in non-contiguous row-by-row storage.
 //
-// A, B0 and B1 must be aligned; R may be non-aligned.
+// A and B must be aligned; R may be non-aligned.
 //
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
+// If beta is zero, contents of R is ignored (not  multiplied  by zero -
+// just ignored).
 //
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// However, when alpha is zero, we still calculate A'*B, which is
 // multiplied by zero afterwards.
 //
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-   _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
-   _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
+// Function accepts additional parameter store_mode:
+// * if 0, full R is stored
+// * if 1, only first row of R is stored
+// * if 2, only first column of R is stored
+// * if 3, only top left element of R is stored
+void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+   double v00, v01, v10, v11;
+   ae_int_t t;
+   v00 = 0.0;
+   v01 = 0.0;
+   v10 = 0.0;
+   v11 = 0.0;
+   for (t = 0; t < k; t++) {
+      v00 += a[0] * b[0];
+      v01 += a[0] * b[1];
+      v10 += a[1] * b[0];
+      v11 += a[1] * b[1];
+      a += 2;
+      b += 2;
+   }
+   if (store_mode == 0) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[1] = alpha * v01;
+         r[stride + 0] = alpha * v10;
+         r[stride + 1] = alpha * v11;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[1] = beta * r[1] + alpha * v01;
+         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
+      }
+      return;
+   }
+   if (store_mode == 1) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[1] = alpha * v01;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[1] = beta * r[1] + alpha * v01;
+      }
+      return;
+   }
+   if (store_mode == 2) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+         r[stride + 0] = alpha * v10;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+      }
+      return;
+   }
+   if (store_mode == 3) {
+      if (beta == 0) {
+         r[0] = alpha * v00;
+      } else {
+         r[0] = beta * r[0] + alpha * v00;
+      }
+      return;
+   }
 }
 
+#if defined AE_HAS_SSE2_INTRINSICS
 // This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
 // are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
 // stored in non-contiguous row-by-row storage.
@@ -7283,17 +7102,15 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 //
 // This function supports SSE2; it can be used when:
 // 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+// 2. CurCPU contains CPU_SSE2 (checked at run-time)
 //
 // If (1) is failed, this function will still be defined and callable, but it
 // will do nothing.  If (2)  is  failed , call to this function will probably
 // crash your system.
 //
-// If  you  want  to  know  whether  it  is safe to call it, you should check
-// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-// and will do its work.
-#if defined AE_HAS_SSE2_INTRINSICS
-void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
+// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
+static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
 // We calculate product of two Kx2 matrices (result is 2x2).
 // V0, V1, V2, V3 store result as follows:
 //
@@ -7371,6 +7188,28 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
    }
 }
 #endif
+
+// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
+// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A, B0 and B1 must be aligned; R may be non-aligned.
+//
+// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
+// locations.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
+// ignored).
+//
+// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// multiplied by zero afterwards.
+//
+// Unlike mm22 functions, this function does NOT support partial  output of R
+// - we always store full 2x4 matrix.
+void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
+   _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
+   _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
+}
 
 #if !defined ALGLIB_NO_FAST_KERNELS
 
@@ -8684,16 +8523,15 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
    ae_int_t out0, out1;
    double *c;
    ae_int_t stride_c;
-   ae_int_t cpu_id = ae_cpuid();
    ae_int_t(*ablasf_packblk) (const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
    void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = ablasf_dotblkh_avx2;
    void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = ablasf_daxpby_avx2;
 
 // Determine CPU and kernel support
-   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(cpu_id & CPU_AVX2))
+   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(CurCPU & CPU_AVX2))
       return false;
 #      if defined _ALGLIB_HAS_FMA_INTRINSICS
-   if (cpu_id & CPU_FMA)
+   if (CurCPU & CPU_FMA)
       ablasf_dotblk = ablasf_dotblkh_fma;
 #      endif
 
@@ -8781,7 +8619,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 // Try SIMD kernels
 #   if defined _ALGLIB_HAS_FMA_INTRINSICS
    if (sstride == 4 || (blocksize == 2 && sstride == 2))
-      if (ae_cpuid() & CPU_FMA) {
+      if (CurCPU & CPU_FMA) {
          spchol_propagatefwd_fma(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth, _state);
          return;
       }
@@ -9159,51 +8997,13 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
    return result;
 }
 
-// ALGLIB_NO_FAST_KERNELS
-#endif
+#endif // ALGLIB_NO_FAST_KERNELS
 } // end of namespace alglib_impl
 
 namespace alglib {
 // Declarations for C++-related functionality.
-// Internal forwards
-double get_aenv_nan();
-double get_aenv_posinf();
-double get_aenv_neginf();
-ae_int_t my_stricmp(const char *s1, const char *s2);
-char *filter_spaces(const char *s);
-void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec);
-void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat);
 
-bool parse_bool_delim(const char *s, const char *delim);
-ae_int_t parse_int_delim(const char *s, const char *delim);
-bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s);
-double parse_real_delim(const char *s, const char *delim);
-complex parse_complex_delim(const char *s, const char *delim);
-
-std::string arraytostring(const bool *ptr, ae_int_t n);
-std::string arraytostring(const ae_int_t *ptr, ae_int_t n);
-std::string arraytostring(const double *ptr, ae_int_t n, int dps);
-std::string arraytostring(const complex *ptr, ae_int_t n, int dps);
-
-// Global and local constants/variables
-const double machineepsilon = 5E-16;
-const double maxrealnumber = 1E300;
-const double minrealnumber = 1E-300;
-const ae_int_t endianness = alglib_impl::ae_get_endianness();
-const double fp_nan = get_aenv_nan();
-const double fp_posinf = get_aenv_posinf();
-const double fp_neginf = get_aenv_neginf();
-#if defined AE_NO_EXCEPTIONS
-static const char *_alglib_last_error = NULL;
-#endif
-static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
-static const alglib_impl::ae_uint64_t _i64_xserial = _ALGLIB_FLG_THREADING_SERIAL;
-static const alglib_impl::ae_uint64_t _i64_xparallel = _ALGLIB_FLG_THREADING_PARALLEL;
-const xparams &xdefault = *((const xparams *)(&_i64_xdefault));
-const xparams &serial = *((const xparams *)(&_i64_xserial));
-const xparams &parallel = *((const xparams *)(&_i64_xparallel));
-
-// Exception handling
+// Exception handling.
 #if !defined AE_NO_EXCEPTIONS
 ap_error::ap_error() {
 }
@@ -9222,6 +9022,8 @@ void ap_error::make_assertion(bool Cond, const char *Msg) {
       ThrowError(Msg);
 }
 #else
+static const char *_alglib_last_error = NULL;
+
 void set_error_flag(const char *Msg) {
    if (Msg == NULL)
       Msg = "ALGLIB: unknown error";
@@ -9240,6 +9042,164 @@ void clear_error_flag() {
    _alglib_last_error = NULL;
 }
 #endif
+
+// Global and local constants/variables.
+#if 0
+const double machineepsilon = 5E-16, maxrealnumber = 1E300, minrealnumber = 1E-300;
+#endif
+const ae_int_t endianness = alglib_impl::ae_get_endianness();
+
+// standard functions
+int sign(double x) {
+   if (x > 0) return 1;
+   if (x < 0) return -1;
+   return 0;
+}
+
+double randomreal() {
+   int i1 = rand();
+   int i2 = rand();
+   double mx = (double)(RAND_MAX) + 1.0;
+   volatile double tmp0 = i2 / mx;
+   volatile double tmp1 = i1 + tmp0;
+   return tmp1 / mx;
+}
+
+ae_int_t randominteger(ae_int_t maxv) {
+   return ((ae_int_t) rand()) % maxv;
+}
+
+int round(double x) {
+   return int (floor(x + 0.5));
+}
+
+int trunc(double x) {
+   return int (x > 0 ? floor(x) : ceil(x));
+}
+
+int ifloor(double x) {
+   return int (floor(x));
+}
+
+int iceil(double x) {
+   return int (ceil(x));
+}
+
+double pi() {
+   return 3.14159265358979323846;
+}
+
+double sqr(double x) {
+   return x * x;
+}
+
+int maxint(int m1, int m2) {
+   return m1 > m2 ? m1 : m2;
+}
+
+int minint(int m1, int m2) {
+   return m1 > m2 ? m2 : m1;
+}
+
+double maxreal(double m1, double m2) {
+   return m1 > m2 ? m1 : m2;
+}
+
+double minreal(double m1, double m2) {
+   return m1 > m2 ? m2 : m1;
+}
+
+bool fp_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x == y;
+}
+
+bool fp_neq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   return !fp_eq(v1, v2);
+}
+
+bool fp_less(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x < y;
+}
+
+bool fp_less_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x <= y;
+}
+
+bool fp_greater(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x > y;
+}
+
+bool fp_greater_eq(double v1, double v2) {
+// IEEE-strict floating point comparison
+   volatile double x = v1;
+   volatile double y = v2;
+   return x >= y;
+}
+
+bool fp_isnan(double x) {
+   return alglib_impl::ae_isnan_stateless(x, endianness);
+}
+
+bool fp_isposinf(double x) {
+   return alglib_impl::ae_isposinf_stateless(x, endianness);
+}
+
+bool fp_isneginf(double x) {
+   return alglib_impl::ae_isneginf_stateless(x, endianness);
+}
+
+bool fp_isinf(double x) {
+   return alglib_impl::ae_isinf_stateless(x, endianness);
+}
+
+bool fp_isfinite(double x) {
+   return alglib_impl::ae_isfinite_stateless(x, endianness);
+}
+
+// Internal functions and constants.
+static double get_aenv_nan() {
+   double r;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   r = _alglib_env_state.v_nan;
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return r;
+}
+
+static double get_aenv_posinf() {
+   double r;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   r = _alglib_env_state.v_posinf;
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return r;
+}
+
+static double get_aenv_neginf() {
+   double r;
+   alglib_impl::ae_state _alglib_env_state;
+   alglib_impl::ae_state_init(&_alglib_env_state);
+   r = _alglib_env_state.v_neginf;
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return r;
+}
+
+const double fp_nan = get_aenv_nan();
+const double fp_posinf = get_aenv_posinf();
+const double fp_neginf = get_aenv_neginf();
 
 // Complex number with double precision.
 complex::complex ():x(0.0), y(0.0) {
@@ -9507,23 +9467,24 @@ complex csqr(const complex &z) {
    return complex (z.x * z.x - z.y * z.y, 2 * z.x * z.y);
 }
 
-void setnworkers(ae_int_t nworkers) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_cores_to_use(nworkers);
-#endif
-}
-
-void setglobalthreading(const xparams settings) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_global_threading(settings.flags);
-#endif
-}
+static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
+static const alglib_impl::ae_uint64_t _i64_xserial = _ALGLIB_FLG_THREADING_SERIAL;
+static const alglib_impl::ae_uint64_t _i64_xparallel = _ALGLIB_FLG_THREADING_PARALLEL;
+const xparams &xdefault = *(const xparams *)&_i64_xdefault;
+const xparams &serial = *(const xparams *)&_i64_xserial;
+const xparams &parallel = *(const xparams *)&_i64_xparallel;
 
 ae_int_t getnworkers() {
 #ifdef AE_HPC
    return alglib_impl::ae_get_cores_to_use();
 #else
    return 1;
+#endif
+}
+
+void setnworkers(ae_int_t nworkers) {
+#ifdef AE_HPC
+   alglib_impl::ae_set_cores_to_use(nworkers);
 #endif
 }
 
@@ -9535,17 +9496,23 @@ ae_int_t _ae_cores_count() {
 #endif
 }
 
+alglib_impl::ae_uint64_t _ae_get_global_threading() {
+#ifdef AE_HPC
+   return alglib_impl::ae_get_global_threading();
+#else
+   return _ALGLIB_FLG_THREADING_SERIAL;
+#endif
+}
+
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) {
 #ifdef AE_HPC
    alglib_impl::ae_set_global_threading(flg_value);
 #endif
 }
 
-alglib_impl::ae_uint64_t _ae_get_global_threading() {
+void setglobalthreading(const xparams settings) {
 #ifdef AE_HPC
-   return alglib_impl::ae_get_global_threading();
-#else
-   return _ALGLIB_FLG_THREADING_SERIAL;
+   alglib_impl::ae_set_global_threading(settings.flags);
 #endif
 }
 
@@ -10213,918 +10180,19 @@ ae_int_t vlen(ae_int_t n1, ae_int_t n2) {
    return n2 - n1 + 1;
 }
 
-// Matrices and vectors
-ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype) {
-   if (e_ptr == NULL || e_ptr->datatype != datatype) {
-      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
-#if !defined AE_NO_EXCEPTIONS
-      ThrowError(msg);
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(msg);
-      return;
-#endif
-   }
-   is_frozen_proxy = true, ptr = e_ptr;
-}
-
-ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init(ptr, 0, datatype, &_state, false);
-   ae_state_clear(&_state);
-}
-
-ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   alglib_impl::ae_assert(rhs.ptr != NULL, "ALGLIB: ae_vector_wrapper source is not initialized", &_state);
-   alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_vector_wrapper datatype check failed", &_state);
-   is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_copy(ptr, rhs.ptr, &_state, false);
-   ae_state_clear(&_state);
-}
-
-ae_vector_wrapper::~ae_vector_wrapper() {
-   if (ptr == &inner_vec)
-      ae_vector_free(ptr, true);
-}
-
-void ae_vector_wrapper::setlength(ae_int_t iLen) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, )
-   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, ptr == NULL (array was not correctly initialized)", &_state);
-   alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, ptr is frozen proxy array", &_state);
-   alglib_impl::ae_vector_set_length(ptr, iLen, &_state);
-   alglib_impl::ae_state_clear(&_state);
-}
-
-ae_int_t ae_vector_wrapper::length() const {
-   if (ptr == NULL)
-      return 0;
-   return ptr->cnt;
-}
-
-void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state) {
-   if (ptr == &inner_vec)
-      ae_vector_free(ptr, true);
-   is_frozen_proxy = true, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init_attach_to_x(ptr, new_ptr, _state, false);
-}
-
-const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
-   if (this == &rhs)
-      return *this;
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, *this)
-   ae_assert(ptr != NULL, "ALGLIB: incorrect assignment (uninitialized destination)", &_state);
-   ae_assert(rhs.ptr != NULL, "ALGLIB: incorrect assignment (uninitialized source)", &_state);
-   ae_assert(rhs.ptr->datatype == ptr->datatype, "ALGLIB: incorrect assignment to array (types do not match)", &_state);
-   if (is_frozen_proxy)
-      ae_assert(rhs.ptr->cnt == ptr->cnt, "ALGLIB: incorrect assignment to proxy array (sizes do not match)", &_state);
-   if (rhs.ptr->cnt != ptr->cnt)
-      ae_vector_set_length(ptr, rhs.ptr->cnt, &_state);
-   memcpy(ptr->xX, rhs.ptr->xX, ptr->cnt * alglib_impl::ae_sizeof(ptr->datatype));
-   alglib_impl::ae_state_clear(&_state);
-   return *this;
-}
-
-const alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() const {
-   return ptr;
-}
-
-alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() {
-   return ptr;
-}
-
-#if !defined AE_NO_EXCEPTIONS
-ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
-   std::vector < const char *>svec;
-   size_t i;
-   char *p = filter_spaces(s);
-   if (p == NULL)
-      ThrowError("ALGLIB: allocation error");
-   try {
-      str_vector_create(p, true, &svec);
-      {
-         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-         TryCatch(_state, )
-         is_frozen_proxy = false, ptr = &inner_vec, memset(ptr, 0, sizeof *ptr), ae_vector_init(ptr, (ae_int_t) (svec.size()), datatype, &_state, false);
-         ae_state_clear(&_state);
-      }
-      for (i = 0; i < svec.size(); i++) {
-         if (datatype == alglib_impl::DT_BOOL)
-            ptr->xB[i] = parse_bool_delim(svec[i], ",]");
-         if (datatype == alglib_impl::DT_INT)
-            ptr->xZ[i] = parse_int_delim(svec[i], ",]");
-         if (datatype == alglib_impl::DT_REAL)
-            ptr->xR[i] = parse_real_delim(svec[i], ",]");
-         if (datatype == alglib_impl::DT_COMPLEX) {
-            complex t = parse_complex_delim(svec[i], ",]");
-            ptr->xC[i].x = t.x;
-            ptr->xC[i].y = t.y;
-         }
-      }
-      alglib_impl::ae_free(p);
-   } catch(...) {
-      alglib_impl::ae_free(p);
-      throw;
-   }
-}
-#endif
-
-boolean_1d_array::boolean_1d_array():ae_vector_wrapper(alglib_impl::DT_BOOL) {
-}
-
-boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) {
-}
-
-boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_BOOL) {
-}
-
-const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) {
-   return static_cast < const boolean_1d_array &>(assign(rhs));
-}
-
-boolean_1d_array::~boolean_1d_array() {
-}
-
-const bool &boolean_1d_array::operator() (ae_int_t i) const {
-   return ptr->xB[i];
-}
-bool &boolean_1d_array::operator() (ae_int_t i) {
-   return ptr->xB[i];
-}
-
-const bool &boolean_1d_array::operator[] (ae_int_t i) const {
-   return ptr->xB[i];
-}
-bool &boolean_1d_array::operator[] (ae_int_t i) {
-   return ptr->xB[i];
-}
-
-void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
-   ae_int_t i;
-
-// setlength, with exception-free error handling fallback code
-   setlength(iLen);
-   if (ptr == NULL || ptr->cnt != iLen)
-      return;
-
-// copy
-   for (i = 0; i < iLen; i++)
-      ptr->xB[i] = pContent[i];
-}
-
-bool *boolean_1d_array::getcontent() {
-   return ptr->xB;
-}
-
-const bool *boolean_1d_array::getcontent() const {
-   return ptr->xB;
-}
-
-#if !defined AE_NO_EXCEPTIONS
-boolean_1d_array::boolean_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_BOOL) {
-}
-
-std::string boolean_1d_array::tostring() const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&(operator()(0)), length());
-}
-#endif
-
-integer_1d_array::integer_1d_array():ae_vector_wrapper(alglib_impl::DT_INT) {
-}
-
-integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_INT) {
-}
-
-integer_1d_array::integer_1d_array(const integer_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_INT) {
-}
-
-const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) {
-   return static_cast < const integer_1d_array &>(assign(rhs));
-}
-
-integer_1d_array::~integer_1d_array() {
-}
-
-const ae_int_t &integer_1d_array::operator() (ae_int_t i) const {
-   return ptr->xZ[i];
-}
-ae_int_t &integer_1d_array::operator() (ae_int_t i) {
-   return ptr->xZ[i];
-}
-
-const ae_int_t &integer_1d_array::operator[] (ae_int_t i) const {
-   return ptr->xZ[i];
-}
-ae_int_t &integer_1d_array::operator[] (ae_int_t i) {
-   return ptr->xZ[i];
-}
-
-void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
-   ae_int_t i;
-
-// setlength(), handle possible exception-free errors
-   setlength(iLen);
-   if (ptr == NULL || ptr->cnt != iLen)
-      return;
-
-// copy
-   for (i = 0; i < iLen; i++)
-      ptr->xZ[i] = pContent[i];
-}
-
-ae_int_t *integer_1d_array::getcontent() {
-   return ptr->xZ;
-}
-
-const ae_int_t *integer_1d_array::getcontent() const {
-   return ptr->xZ;
-}
-
-#if !defined AE_NO_EXCEPTIONS
-integer_1d_array::integer_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_INT) {
-}
-
-std::string integer_1d_array::tostring() const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length());
-}
-#endif
-
-real_1d_array::real_1d_array():ae_vector_wrapper(alglib_impl::DT_REAL) {
-}
-
-real_1d_array::real_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_REAL) {
-}
-
-real_1d_array::real_1d_array(const real_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_REAL) {
-}
-
-const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) {
-   return static_cast < const real_1d_array &>(assign(rhs));
-}
-
-real_1d_array::~real_1d_array() {
-}
-
-const double &real_1d_array::operator() (ae_int_t i) const {
-   return ptr->xR[i];
-}
-double &real_1d_array::operator() (ae_int_t i) {
-   return ptr->xR[i];
-}
-
-const double &real_1d_array::operator[] (ae_int_t i) const {
-   return ptr->xR[i];
-}
-double &real_1d_array::operator[] (ae_int_t i) {
-   return ptr->xR[i];
-}
-
-void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
-   ae_int_t i;
-
-// setlength(), handle possible exception-free errors
-   setlength(iLen);
-   if (ptr == NULL || ptr->cnt != iLen)
-      return;
-
-// copy
-   for (i = 0; i < iLen; i++)
-      ptr->xR[i] = pContent[i];
-}
-
-// TODO: convert to constructor!!!!!!!
-void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
-   alglib_impl::x_vector x;
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: unable to attach proxy object to something else", &_state);
-   alglib_impl::ae_assert(iLen > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
-   x.cnt = iLen;
-   x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
-   x.last_action = alglib_impl::ACT_UNCHANGED;
-   x.x_ptr = pContent;
-   attach_to(&x, &_state);
-   ae_state_clear(&_state);
-}
-
-double *real_1d_array::getcontent() {
-   return ptr->xR;
-}
-
-const double *real_1d_array::getcontent() const {
-   return ptr->xR;
-}
-
-#if !defined AE_NO_EXCEPTIONS
-real_1d_array::real_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_REAL) {
-}
-
-std::string real_1d_array::tostring(int dps) const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length(), dps);
-}
-#endif
-
-complex_1d_array::complex_1d_array():ae_vector_wrapper(alglib_impl::DT_COMPLEX) {
-}
-
-complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) {
-}
-
-complex_1d_array::complex_1d_array(const complex_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) {
-}
-
-const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) {
-   return static_cast < const complex_1d_array &>(assign(rhs));
-}
-
-complex_1d_array::~complex_1d_array() {
-}
-
-const complex &complex_1d_array::operator() (ae_int_t i) const {
-   return *((const complex *)(ptr->xC + i));
-}
-complex &complex_1d_array::operator() (ae_int_t i) {
-   return *((complex *)(ptr->xC + i));
-}
-
-const complex &complex_1d_array::operator[] (ae_int_t i) const {
-   return *((const complex *)(ptr->xC + i));
-}
-complex &complex_1d_array::operator[] (ae_int_t i) {
-   return *((complex *)(ptr->xC + i));
-}
-
-void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
-   ae_int_t i;
-
-// setlength(), handle possible exception-free errors
-   setlength(iLen);
-   if (ptr == NULL || ptr->cnt != iLen)
-      return;
-
-// copy
-   for (i = 0; i < iLen; i++) {
-      ptr->xC[i].x = pContent[i].x;
-      ptr->xC[i].y = pContent[i].y;
-   }
-}
-
-complex *complex_1d_array::getcontent() {
-   return (complex *)ptr->xC;
-}
-
-const complex *complex_1d_array::getcontent() const {
-   return (const complex *)ptr->xC;
-}
-
-#if !defined AE_NO_EXCEPTIONS
-complex_1d_array::complex_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) {
-}
-
-std::string complex_1d_array::tostring(int dps) const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length(), dps);
-}
-#endif
-
-ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype) {
-   if (e_ptr->datatype != datatype) {
-      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
-#if !defined AE_NO_EXCEPTIONS
-      ThrowError(msg);
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(msg);
-      return;
-#endif
-   }
-   is_frozen_proxy = true, ptr = e_ptr;
-}
-
-ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   is_frozen_proxy = false, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
-   ae_state_clear(&_state);
-
-}
-
-ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   is_frozen_proxy = false, ptr = NULL;
-   alglib_impl::ae_assert(rhs.ptr->datatype == datatype, "ALGLIB: ae_matrix_wrapper datatype check failed", &_state);
-   if (rhs.ptr != NULL) {
-      ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_copy(ptr, rhs.ptr, &_state, false);
-   }
-   ae_state_clear(&_state);
-}
-
-ae_matrix_wrapper::~ae_matrix_wrapper() {
-   if (ptr == &inner_mat)
-      ae_matrix_free(ptr, true);
-}
-
-#if !defined AE_NO_EXCEPTIONS
-ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
-   std::vector< std::vector<const char *> > smat;
-   size_t i, j;
-   char *p = filter_spaces(s);
-   if (p == NULL)
-      ThrowError("ALGLIB: allocation error");
-   try {
-      str_matrix_create(p, &smat);
-      {
-         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-         TryCatch(_state, )
-         is_frozen_proxy = false, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr);
-         if (smat.size() != 0)
-            ae_matrix_init(ptr, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, false);
-         else
-            ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
-         ae_state_clear(&_state);
-      }
-      for (i = 0; i < smat.size(); i++)
-         for (j = 0; j < smat[0].size(); j++) {
-            if (datatype == alglib_impl::DT_BOOL)
-               ptr->xyB[i][j] = parse_bool_delim(smat[i][j], ",]");
-            if (datatype == alglib_impl::DT_INT)
-               ptr->xyZ[i][j] = parse_int_delim(smat[i][j], ",]");
-            if (datatype == alglib_impl::DT_REAL)
-               ptr->xyR[i][j] = parse_real_delim(smat[i][j], ",]");
-            if (datatype == alglib_impl::DT_COMPLEX) {
-               complex t = parse_complex_delim(smat[i][j], ",]");
-               ptr->xyC[i][j].x = t.x;
-               ptr->xyC[i][j].y = t.y;
-            }
-         }
-      alglib_impl::ae_free(p);
-   } catch(...) {
-      alglib_impl::ae_free(p);
-      throw;
-   }
-}
-#endif
-
-// TODO: automatic allocation of NULL ptr!!!!!
-void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, )
-   alglib_impl::ae_assert(ptr != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)", &_state);
-   alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: setlength() error, attempt to resize proxy array", &_state);
-   alglib_impl::ae_matrix_set_length(ptr, rows, cols, &_state);
-   alglib_impl::ae_state_clear(&_state);
-}
-
-ae_int_t ae_matrix_wrapper::rows() const {
-   if (ptr == NULL)
-      return 0;
-   return ptr->rows;
-}
-
-ae_int_t ae_matrix_wrapper::cols() const {
-   if (ptr == NULL)
-      return 0;
-   return ptr->cols;
-}
-
-bool ae_matrix_wrapper::isempty() const {
-   return rows() == 0 || cols() == 0;
-}
-
-ae_int_t ae_matrix_wrapper::getstride() const {
-   if (ptr == NULL)
-      return 0;
-   return ptr->stride;
-}
-
-void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state) {
-   if (ptr == &inner_mat)
-      ae_matrix_free(ptr, true);
-   is_frozen_proxy = true, ptr = &inner_mat, memset(ptr, 0, sizeof *ptr), ae_matrix_init_attach_to_x(ptr, new_ptr, _state, false);
-}
-
-const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
-   ae_int_t i;
-   if (this == &rhs)
-      return *this;
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, *this)
-   ae_assert(ptr != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)", &_state);
-   ae_assert(rhs.ptr != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)", &_state);
-   ae_assert(rhs.ptr->datatype == ptr->datatype, "ALGLIB: incorrect assignment to array (types dont match)", &_state);
-   if (is_frozen_proxy) {
-      ae_assert(rhs.ptr->rows == ptr->rows, "ALGLIB: incorrect assignment to proxy array (sizes dont match)", &_state);
-      ae_assert(rhs.ptr->cols == ptr->cols, "ALGLIB: incorrect assignment to proxy array (sizes dont match)", &_state);
-   }
-   if ((rhs.ptr->rows != ptr->rows) || (rhs.ptr->cols != ptr->cols))
-      ae_matrix_set_length(ptr, rhs.ptr->rows, rhs.ptr->cols, &_state);
-   for (i = 0; i < ptr->rows; i++)
-      memcpy(ptr->xyX[i], rhs.ptr->xyX[i], ptr->cols * alglib_impl::ae_sizeof(ptr->datatype));
-   alglib_impl::ae_state_clear(&_state);
-   return *this;
-}
-
-const alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() const {
-   return ptr;
-}
-
-alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() {
-   return ptr;
-}
-
-boolean_2d_array::boolean_2d_array():ae_matrix_wrapper(alglib_impl::DT_BOOL) {
-}
-
-boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) {
-}
-
-boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_BOOL) {
-}
-
-boolean_2d_array::~boolean_2d_array() {
-}
-
-const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) {
-   return static_cast < const boolean_2d_array &>(assign(rhs));
-}
-
-const bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->xyB[i][j];
-}
-bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->xyB[i][j];
-}
-
-const bool *boolean_2d_array::operator[] (ae_int_t i) const {
-   return ptr->xyB[i];
-}
-bool *boolean_2d_array::operator[] (ae_int_t i) {
-   return ptr->xyB[i];
-}
-
-void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
-   ae_int_t i, j;
-
-// setlength(), handle possible exception-free errors
-   setlength(irows, icols);
-   if (ptr == NULL || ptr->rows != irows || ptr->cols != icols)
-      return;
-
-// copy
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         ptr->xyB[i][j] = pContent[i * icols + j];
-}
-
-#if !defined AE_NO_EXCEPTIONS
-boolean_2d_array::boolean_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_BOOL) {
-}
-
-std::string boolean_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
-      result += arraytostring(&operator()(i, 0), cols());
-   }
-   result += "]";
-   return result;
-}
-#endif
-
-integer_2d_array::integer_2d_array():ae_matrix_wrapper(alglib_impl::DT_INT) {
-}
-
-integer_2d_array::integer_2d_array(const integer_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_INT) {
-}
-
-integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_INT) {
-}
-
-integer_2d_array::~integer_2d_array() {
-}
-
-const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) {
-   return static_cast < const integer_2d_array &>(assign(rhs));
-}
-
-const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->xyZ[i][j];
-}
-ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->xyZ[i][j];
-}
-
-const ae_int_t *integer_2d_array::operator[] (ae_int_t i) const {
-   return ptr->xyZ[i];
-}
-ae_int_t *integer_2d_array::operator[] (ae_int_t i) {
-   return ptr->xyZ[i];
-}
-
-void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
-   ae_int_t i, j;
-
-// setlength(), handle possible exception-free errors
-   setlength(irows, icols);
-   if (ptr == NULL || ptr->rows != irows || ptr->cols != icols)
-      return;
-
-// copy
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         ptr->xyZ[i][j] = pContent[i * icols + j];
-}
-
-#if !defined AE_NO_EXCEPTIONS
-integer_2d_array::integer_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_INT) {
-}
-
-std::string integer_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
-      result += arraytostring(&operator()(i, 0), cols());
-   }
-   result += "]";
-   return result;
-}
-#endif
-
-real_2d_array::real_2d_array():ae_matrix_wrapper(alglib_impl::DT_REAL) {
-}
-
-real_2d_array::real_2d_array(const real_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) {
-}
-
-real_2d_array::real_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_REAL) {
-}
-
-real_2d_array::~real_2d_array() {
-}
-
-const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
-   return static_cast < const real_2d_array &>(assign(rhs));
-}
-
-const double &real_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return ptr->xyR[i][j];
-}
-double &real_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return ptr->xyR[i][j];
-}
-
-const double *real_2d_array::operator[] (ae_int_t i) const {
-   return ptr->xyR[i];
-}
-double *real_2d_array::operator[] (ae_int_t i) {
-   return ptr->xyR[i];
-}
-
-void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
-   ae_int_t i, j;
-
-// setlength(), handle possible exception-free errors
-   setlength(irows, icols);
-   if (ptr == NULL || ptr->rows != irows || ptr->cols != icols)
-      return;
-
-// copy
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         ptr->xyR[i][j] = pContent[i * icols + j];
-}
-
-void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
-   alglib_impl::x_matrix x;
-   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
-#if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
-#else
-      is_frozen_proxy = false, ptr = NULL;
-      set_error_flag(_state.error_msg);
-      return;
-#endif
-   }
-   alglib_impl::ae_assert(!is_frozen_proxy, "ALGLIB: unable to attach proxy object to something else", &_state);
-   alglib_impl::ae_assert(irows > 0 && icols > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
-   x.rows = irows;
-   x.cols = icols;
-   x.stride = icols;
-   x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
-   x.last_action = alglib_impl::ACT_UNCHANGED;
-   x.x_ptr = pContent;
-   attach_to(&x, &_state);
-   ae_state_clear(&_state);
-}
-
-#if !defined AE_NO_EXCEPTIONS
-real_2d_array::real_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_REAL) {
-}
-
-std::string real_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
-      result += arraytostring(&operator()(i, 0), cols(), dps);
-   }
-   result += "]";
-   return result;
-}
-#endif
-
-complex_2d_array::complex_2d_array():ae_matrix_wrapper(alglib_impl::DT_COMPLEX) {
-}
-
-complex_2d_array::complex_2d_array(const complex_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) {
-}
-
-complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) {
-}
-
-complex_2d_array::~complex_2d_array() {
-}
-
-const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) {
-   return static_cast < const complex_2d_array &>(assign(rhs));
-}
-
-const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) const {
-   return *((const complex *)(ptr->xyC[i] + j));
-}
-complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
-   return *((complex *)(ptr->xyC[i] + j));
-}
-
-const complex *complex_2d_array::operator[] (ae_int_t i) const {
-   return (const complex *)(ptr->xyC[i]);
-}
-complex *complex_2d_array::operator[] (ae_int_t i) {
-   return (complex *)(ptr->xyC[i]);
-}
-
-void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
-   ae_int_t i, j;
-
-// setlength(), handle possible exception-free errors
-   setlength(irows, icols);
-   if (ptr == NULL || ptr->rows != irows || ptr->cols != icols)
-      return;
-
-// copy
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++) {
-         ptr->xyC[i][j].x = pContent[i * icols + j].x;
-         ptr->xyC[i][j].y = pContent[i * icols + j].y;
-      }
-}
-
-#if !defined AE_NO_EXCEPTIONS
-complex_2d_array::complex_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) {
-}
-
-std::string complex_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
-      result += arraytostring(&operator()(i, 0), cols(), dps);
-   }
-   result += "]";
-   return result;
-}
-#endif
-
-// Internal functions
-double get_aenv_nan() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_nan;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-double get_aenv_posinf() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_posinf;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-double get_aenv_neginf() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_neginf;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-ae_int_t my_stricmp(const char *s1, const char *s2) {
-   int c1, c2;
-
-//
-// handle special cases
-//
-   if (s1 == NULL && s2 != NULL)
-      return -1;
-   if (s1 != NULL && s2 == NULL)
-      return +1;
-   if (s1 == NULL && s2 == NULL)
-      return 0;
-
-//
-// compare
-//
-   for (;;) {
-      c1 = *s1;
-      c2 = *s2;
-      s1++;
-      s2++;
-      if (c1 == 0)
-         return c2 == 0 ? 0 : -1;
-      if (c2 == 0)
-         return c1 == 0 ? 0 : +1;
-      c1 = tolower(c1);
-      c2 = tolower(c2);
-      if (c1 < c2)
-         return -1;
-      if (c1 > c2)
-         return +1;
+// Matrices and vectors: I/O.
+
+static bool strimatch(const char *s1, const char *s2) {
+// Handle the special cases.
+   bool NoS1 = s1 == NULL, NoS2 = s2 == NULL;
+   if (NoS1 || NoS2) return NoS1 == NoS2;
+// Compare.
+   else for (;;) {
+      int c1 = *s1++, c2 = *s2++;
+      bool NoC1 = c1 == '\0', NoC2 = c2 == '\0';
+      if (NoC1 || NoC2) return NoC1 == NoC2;
+      c1 = tolower(c1), c2 = tolower(c2);
+      if (c1 != c2) return false;
    }
 }
 
@@ -11134,7 +10202,7 @@ ae_int_t my_stricmp(const char *s1, const char *s2) {
 // It returns string allocated with ae_malloc().
 // On allocaction failure returns NULL.
 //
-char *filter_spaces(const char *s) {
+static char *filter_spaces(const char *s) {
    size_t i, n;
    char *r;
    char *r0;
@@ -11150,7 +10218,7 @@ char *filter_spaces(const char *s) {
    return r;
 }
 
-void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec) {
+static void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec) {
 //
 // parse beginning of the string.
 // try to handle "[]" string
@@ -11179,7 +10247,7 @@ void str_vector_create(const char *src, bool match_head_only, std::vector < cons
    }
 }
 
-void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat) {
+static void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat) {
    p_mat->clear();
 
 //
@@ -11216,7 +10284,7 @@ void str_matrix_create(const char *src, std::vector < std::vector < const char *
       ThrowError("Incorrect initializer for matrix");
 }
 
-bool parse_bool_delim(const char *s, const char *delim) {
+static bool parse_bool_delim(const char *s, const char *delim) {
    const char *p;
    char buf[8];
 
@@ -11224,7 +10292,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
    p = "false";
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
-   if (my_stricmp(buf, p) == 0) {
+   if (strimatch(buf, p)) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return false;
@@ -11233,7 +10301,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
    p = "true";
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
-   if (my_stricmp(buf, p) == 0) {
+   if (strimatch(buf, p)) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return true;
@@ -11242,7 +10310,7 @@ bool parse_bool_delim(const char *s, const char *delim) {
    ThrowError("Cannot parse value");
 }
 
-ae_int_t parse_int_delim(const char *s, const char *delim) {
+static ae_int_t parse_int_delim(const char *s, const char *delim) {
    const char *p;
    long long_val;
    volatile ae_int_t ae_val;
@@ -11273,7 +10341,7 @@ ae_int_t parse_int_delim(const char *s, const char *delim) {
    return ae_val;
 }
 
-bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s) {
+static bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s) {
    const char *p;
    char *t;
    bool has_digits;
@@ -11293,7 +10361,7 @@ bool _parse_real_delim(const char *s, const char *delim, double *result, const c
    }
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, 3);
-   if (my_stricmp(buf, "nan") != 0 && my_stricmp(buf, "inf") != 0) {
+   if (!strimatch(buf, "nan") && !strimatch(buf, "inf")) {
    //
    // [sign] [ddd] [.] [ddd] [e|E[sign]ddd]
    //
@@ -11350,15 +10418,15 @@ bool _parse_real_delim(const char *s, const char *delim, double *result, const c
    //
    // NAN, INF conversion
    //
-      if (my_stricmp(buf, "nan") == 0)
+      if (strimatch(buf, "nan"))
          *result = fp_nan;
-      if (my_stricmp(buf, "inf") == 0)
+      if (strimatch(buf, "inf"))
          *result = isign > 0 ? fp_posinf : fp_neginf;
       return true;
    }
 }
 
-double parse_real_delim(const char *s, const char *delim) {
+static double parse_real_delim(const char *s, const char *delim) {
    double result;
    const char *new_s;
    if (!_parse_real_delim(s, delim, &result, &new_s))
@@ -11366,7 +10434,7 @@ double parse_real_delim(const char *s, const char *delim) {
    return result;
 }
 
-complex parse_complex_delim(const char *s, const char *delim) {
+static complex parse_complex_delim(const char *s, const char *delim) {
    double d_result;
    const char *new_s;
    complex c_result;
@@ -11476,128 +10544,869 @@ std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
 }
 #endif
 
-// standard functions
-int sign(double x) {
-   if (x > 0) return 1;
-   if (x < 0) return -1;
-   return 0;
-}
+// Matrices and Vectors: Wrappers.
 
-double randomreal() {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)(RAND_MAX) + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
-}
-
-ae_int_t randominteger(ae_int_t maxv) {
-   return ((ae_int_t) rand()) % maxv;
-}
-
-int round(double x) {
-   return int (floor(x + 0.5));
-}
-
-int trunc(double x) {
-   return int (x > 0 ? floor(x) : ceil(x));
-}
-
-int ifloor(double x) {
-   return int (floor(x));
-}
-
-int iceil(double x) {
-   return int (ceil(x));
-}
-
-double pi() {
-   return 3.14159265358979323846;
-}
-
-double sqr(double x) {
-   return x * x;
-}
-
-int maxint(int m1, int m2) {
-   return m1 > m2 ? m1 : m2;
-}
-
-int minint(int m1, int m2) {
-   return m1 > m2 ? m2 : m1;
-}
-
-double maxreal(double m1, double m2) {
-   return m1 > m2 ? m1 : m2;
-}
-
-double minreal(double m1, double m2) {
-   return m1 > m2 ? m2 : m1;
-}
-
-bool fp_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x == y;
-}
-
-bool fp_neq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   return !fp_eq(v1, v2);
-}
-
-bool fp_less(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x < y;
-}
-
-bool fp_less_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x <= y;
-}
-
-bool fp_greater(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x > y;
-}
-
-bool fp_greater_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x >= y;
-}
-
-bool fp_isnan(double x) {
-   return alglib_impl::ae_isnan_stateless(x, endianness);
-}
-
-bool fp_isposinf(double x) {
-   return alglib_impl::ae_isposinf_stateless(x, endianness);
-}
-
-bool fp_isneginf(double x) {
-   return alglib_impl::ae_isneginf_stateless(x, endianness);
-}
-
-bool fp_isinf(double x) {
-   return alglib_impl::ae_isinf_stateless(x, endianness);
-}
-
-bool fp_isfinite(double x) {
-   return alglib_impl::ae_isfinite_stateless(x, endianness);
-}
-
-// CSV functions
+ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
 #if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, 0, datatype, &_state, false);
+   ae_state_clear(&_state);
+}
+
+ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype) {
+   if (e_ptr == NULL || e_ptr->datatype != datatype) {
+      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
+#if !defined AE_NO_EXCEPTIONS
+      ThrowError(msg);
+#else
+      owner = true, This = NULL;
+      set_error_flag(msg);
+      return;
+#endif
+   }
+   owner = false, This = e_ptr;
+}
+
+ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
+#if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: ae_vector_wrapper source is not initialized", &_state);
+   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ALGLIB: ae_vector_wrapper datatype check failed", &_state);
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_copy(This, rhs.This, &_state, false);
+   ae_state_clear(&_state);
+}
+
+ae_vector_wrapper::~ae_vector_wrapper() {
+   if (This == &Obj)
+      ae_vector_free(This, true);
+}
+
+void ae_vector_wrapper::setlength(ae_int_t iLen) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, )
+   alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, This == NULL (array was not correctly initialized)", &_state);
+   alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, This is frozen proxy array", &_state);
+   alglib_impl::ae_vector_set_length(This, iLen, &_state);
+   alglib_impl::ae_state_clear(&_state);
+}
+
+ae_int_t ae_vector_wrapper::length() const {
+   return This == NULL ? 0 : This->cnt;
+}
+
+const alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() const {
+   return This;
+}
+
+alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() {
+   return This;
+}
+
+void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state) {
+   if (This == &Obj)
+      ae_vector_free(This, true);
+   owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init_attach_to_x(This, new_ptr, _state, false);
+}
+
+const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
+   if (this == &rhs)
+      return *this;
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, *this)
+   ae_assert(This != NULL, "ALGLIB: incorrect assignment (uninitialized destination)", &_state);
+   ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment (uninitialized source)", &_state);
+   ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types do not match)", &_state);
+   if (!owner)
+      ae_assert(rhs.This->cnt == This->cnt, "ALGLIB: incorrect assignment to proxy array (sizes do not match)", &_state);
+   if (rhs.This->cnt != This->cnt)
+      ae_vector_set_length(This, rhs.This->cnt, &_state);
+   memcpy(This->xX, rhs.This->xX, This->cnt * alglib_impl::ae_sizeof(This->datatype));
+   alglib_impl::ae_state_clear(&_state);
+   return *this;
+}
+
+#if !defined AE_NO_EXCEPTIONS
+ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
+   std::vector < const char *>svec;
+   size_t i;
+   char *p = filter_spaces(s);
+   if (p == NULL)
+      ThrowError("ALGLIB: allocation error");
+   try {
+      str_vector_create(p, true, &svec);
+      {
+         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+         TryCatch(_state, )
+         owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t) (svec.size()), datatype, &_state, false);
+         ae_state_clear(&_state);
+      }
+      for (i = 0; i < svec.size(); i++) switch (datatype) {
+      // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
+         case alglib_impl::DT_BOOL: This->xB[i] = parse_bool_delim(svec[i], ",]"); break;
+         case alglib_impl::DT_INT: This->xZ[i] = parse_int_delim(svec[i], ",]"); break;
+         case alglib_impl::DT_REAL: This->xR[i] = parse_real_delim(svec[i], ",]"); break;
+         case alglib_impl::DT_COMPLEX: {
+            complex t = parse_complex_delim(svec[i], ",]");
+            This->xC[i].x = t.x;
+            This->xC[i].y = t.y;
+         }
+         break;
+      }
+      alglib_impl::ae_free(p);
+   } catch(...) {
+      alglib_impl::ae_free(p);
+      throw;
+   }
+}
+#endif
+
+boolean_1d_array::boolean_1d_array():ae_vector_wrapper(alglib_impl::DT_BOOL) {
+}
+
+boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_BOOL) {
+}
+
+boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+boolean_1d_array::boolean_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_BOOL) {
+}
+
+std::string boolean_1d_array::tostring() const {
+   if (length() == 0)
+      return "[]";
+   return arraytostring(&(operator()(0)), length());
+}
+#endif
+
+boolean_1d_array::~boolean_1d_array() {
+}
+
+const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) {
+   return static_cast < const boolean_1d_array &>(assign(rhs));
+}
+
+const bool &boolean_1d_array::operator() (ae_int_t i) const {
+   return This->xB[i];
+}
+
+bool &boolean_1d_array::operator() (ae_int_t i) {
+   return This->xB[i];
+}
+
+const bool &boolean_1d_array::operator[] (ae_int_t i) const {
+   return This->xB[i];
+}
+
+bool &boolean_1d_array::operator[] (ae_int_t i) {
+   return This->xB[i];
+}
+
+void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
+   ae_int_t i;
+
+// setlength, with exception-free error handling fallback code
+   setlength(iLen);
+   if (This == NULL || This->cnt != iLen)
+      return;
+
+// copy
+   for (i = 0; i < iLen; i++)
+      This->xB[i] = pContent[i];
+}
+
+const bool *boolean_1d_array::getcontent() const {
+   return This->xB;
+}
+
+bool *boolean_1d_array::getcontent() {
+   return This->xB;
+}
+
+integer_1d_array::integer_1d_array():ae_vector_wrapper(alglib_impl::DT_INT) {
+}
+
+integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_INT) {
+}
+
+integer_1d_array::integer_1d_array(const integer_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_INT) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+integer_1d_array::integer_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_INT) {
+}
+
+std::string integer_1d_array::tostring() const {
+   if (length() == 0)
+      return "[]";
+   return arraytostring(&operator()(0), length());
+}
+#endif
+
+integer_1d_array::~integer_1d_array() {
+}
+
+const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) {
+   return static_cast < const integer_1d_array &>(assign(rhs));
+}
+
+const ae_int_t &integer_1d_array::operator() (ae_int_t i) const {
+   return This->xZ[i];
+}
+
+ae_int_t &integer_1d_array::operator() (ae_int_t i) {
+   return This->xZ[i];
+}
+
+const ae_int_t &integer_1d_array::operator[] (ae_int_t i) const {
+   return This->xZ[i];
+}
+
+ae_int_t &integer_1d_array::operator[] (ae_int_t i) {
+   return This->xZ[i];
+}
+
+void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
+   ae_int_t i;
+
+// setlength(), handle possible exception-free errors
+   setlength(iLen);
+   if (This == NULL || This->cnt != iLen)
+      return;
+
+// copy
+   for (i = 0; i < iLen; i++)
+      This->xZ[i] = pContent[i];
+}
+
+const ae_int_t *integer_1d_array::getcontent() const {
+   return This->xZ;
+}
+
+ae_int_t *integer_1d_array::getcontent() {
+   return This->xZ;
+}
+
+real_1d_array::real_1d_array():ae_vector_wrapper(alglib_impl::DT_REAL) {
+}
+
+real_1d_array::real_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_REAL) {
+}
+
+real_1d_array::real_1d_array(const real_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_REAL) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+real_1d_array::real_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_REAL) {
+}
+
+std::string real_1d_array::tostring(int dps) const {
+   if (length() == 0)
+      return "[]";
+   return arraytostring(&operator()(0), length(), dps);
+}
+#endif
+
+real_1d_array::~real_1d_array() {
+}
+
+const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) {
+   return static_cast < const real_1d_array &>(assign(rhs));
+}
+
+const double &real_1d_array::operator() (ae_int_t i) const {
+   return This->xR[i];
+}
+
+double &real_1d_array::operator() (ae_int_t i) {
+   return This->xR[i];
+}
+
+const double &real_1d_array::operator[] (ae_int_t i) const {
+   return This->xR[i];
+}
+
+double &real_1d_array::operator[] (ae_int_t i) {
+   return This->xR[i];
+}
+
+void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
+   ae_int_t i;
+
+// setlength(), handle possible exception-free errors
+   setlength(iLen);
+   if (This == NULL || This->cnt != iLen)
+      return;
+
+// copy
+   for (i = 0; i < iLen; i++)
+      This->xR[i] = pContent[i];
+}
+
+const double *real_1d_array::getcontent() const {
+   return This->xR;
+}
+
+double *real_1d_array::getcontent() {
+   return This->xR;
+}
+
+// TODO: convert to constructor!!!!!!!
+void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
+   alglib_impl::x_vector x;
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
+#if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else", &_state);
+   alglib_impl::ae_assert(iLen > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
+   x.cnt = iLen;
+   x.datatype = alglib_impl::DT_REAL;
+   x.owner = alglib_impl::OWN_CALLER;
+   x.last_action = alglib_impl::ACT_UNCHANGED;
+   x.x_ptr = pContent;
+   attach_to(&x, &_state);
+   ae_state_clear(&_state);
+}
+
+complex_1d_array::complex_1d_array():ae_vector_wrapper(alglib_impl::DT_COMPLEX) {
+}
+
+complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) {
+}
+
+complex_1d_array::complex_1d_array(const complex_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+complex_1d_array::complex_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) {
+}
+
+std::string complex_1d_array::tostring(int dps) const {
+   if (length() == 0)
+      return "[]";
+   return arraytostring(&operator()(0), length(), dps);
+}
+#endif
+
+complex_1d_array::~complex_1d_array() {
+}
+
+const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) {
+   return static_cast < const complex_1d_array &>(assign(rhs));
+}
+
+const complex &complex_1d_array::operator() (ae_int_t i) const {
+   return *((const complex *)(This->xC + i));
+}
+
+complex &complex_1d_array::operator() (ae_int_t i) {
+   return *((complex *)(This->xC + i));
+}
+
+const complex &complex_1d_array::operator[] (ae_int_t i) const {
+   return *((const complex *)(This->xC + i));
+}
+
+complex &complex_1d_array::operator[] (ae_int_t i) {
+   return *((complex *)(This->xC + i));
+}
+
+void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
+   ae_int_t i;
+
+// setlength(), handle possible exception-free errors
+   setlength(iLen);
+   if (This == NULL || This->cnt != iLen)
+      return;
+
+// copy
+   for (i = 0; i < iLen; i++) {
+      This->xC[i].x = pContent[i].x;
+      This->xC[i].y = pContent[i].y;
+   }
+}
+
+const complex *complex_1d_array::getcontent() const {
+   return (const complex *)This->xC;
+}
+
+complex *complex_1d_array::getcontent() {
+   return (complex *)This->xC;
+}
+
+ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
+#if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, 0, 0, datatype, &_state, false);
+   ae_state_clear(&_state);
+
+}
+
+ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype) {
+   if (e_ptr->datatype != datatype) {
+      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
+#if !defined AE_NO_EXCEPTIONS
+      ThrowError(msg);
+#else
+      owner = true, This = NULL;
+      set_error_flag(msg);
+      return;
+#endif
+   }
+   owner = false, This = e_ptr;
+}
+
+ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
+#if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   owner = true, This = NULL;
+   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ALGLIB: ae_matrix_wrapper datatype check failed", &_state);
+   if (rhs.This != NULL) {
+      This = &Obj, memset(This, 0, sizeof *This), ae_matrix_copy(This, rhs.This, &_state, false);
+   }
+   ae_state_clear(&_state);
+}
+
+ae_matrix_wrapper::~ae_matrix_wrapper() {
+   if (This == &Obj)
+      ae_matrix_free(This, true);
+}
+
+// TODO: automatic allocation of NULL pointer!!!!!
+void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, )
+   alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)", &_state);
+   alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, attempt to resize proxy array", &_state);
+   alglib_impl::ae_matrix_set_length(This, rows, cols, &_state);
+   alglib_impl::ae_state_clear(&_state);
+}
+
+ae_int_t ae_matrix_wrapper::cols() const {
+   return This == NULL ? 0 : This->cols;
+}
+
+ae_int_t ae_matrix_wrapper::rows() const {
+   return This == NULL ? 0 : This->rows;
+}
+
+ae_int_t ae_matrix_wrapper::getstride() const {
+   return This == NULL ? 0 : This->stride;
+}
+
+bool ae_matrix_wrapper::isempty() const {
+   return rows() == 0 || cols() == 0;
+}
+
+const alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() const {
+   return This;
+}
+
+alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() {
+   return This;
+}
+
+void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state) {
+   if (This == &Obj)
+      ae_matrix_free(This, true);
+   owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init_attach_to_x(This, new_ptr, _state, false);
+}
+
+const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
+   ae_int_t i;
+   if (this == &rhs)
+      return *this;
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryCatch(_state, *this)
+   ae_assert(This != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)", &_state);
+   ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)", &_state);
+   ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types dont match)", &_state);
+   if (!owner) {
+      ae_assert(rhs.This->rows == This->rows, "ALGLIB: incorrect assignment to proxy array (sizes dont match)", &_state);
+      ae_assert(rhs.This->cols == This->cols, "ALGLIB: incorrect assignment to proxy array (sizes dont match)", &_state);
+   }
+   if ((rhs.This->rows != This->rows) || (rhs.This->cols != This->cols))
+      ae_matrix_set_length(This, rhs.This->rows, rhs.This->cols, &_state);
+   for (i = 0; i < This->rows; i++)
+      memcpy(This->xyX[i], rhs.This->xyX[i], This->cols * alglib_impl::ae_sizeof(This->datatype));
+   alglib_impl::ae_state_clear(&_state);
+   return *this;
+}
+
+#if !defined AE_NO_EXCEPTIONS
+ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
+   std::vector< std::vector<const char *> > smat;
+   size_t i, j;
+   char *p = filter_spaces(s);
+   if (p == NULL)
+      ThrowError("ALGLIB: allocation error");
+   try {
+      str_matrix_create(p, &smat);
+      {
+         alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+         TryCatch(_state, )
+         owner = true, This = &Obj, memset(This, 0, sizeof *This);
+         if (smat.size() != 0)
+            ae_matrix_init(This, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, false);
+         else
+            ae_matrix_init(This, 0, 0, datatype, &_state, false);
+         ae_state_clear(&_state);
+      }
+      for (i = 0; i < smat.size(); i++) for (j = 0; j < smat[0].size(); j++) switch (datatype) {
+      // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
+         case alglib_impl::DT_BOOL: This->xyB[i][j] = parse_bool_delim(smat[i][j], ",]"); break;
+         case alglib_impl::DT_INT: This->xyZ[i][j] = parse_int_delim(smat[i][j], ",]"); break;
+         case alglib_impl::DT_REAL: This->xyR[i][j] = parse_real_delim(smat[i][j], ",]"); break;
+         case alglib_impl::DT_COMPLEX: {
+            complex t = parse_complex_delim(smat[i][j], ",]");
+            This->xyC[i][j].x = t.x;
+            This->xyC[i][j].y = t.y;
+         }
+         break;
+      }
+      alglib_impl::ae_free(p);
+   } catch(...) {
+      alglib_impl::ae_free(p);
+      throw;
+   }
+}
+#endif
+
+boolean_2d_array::boolean_2d_array():ae_matrix_wrapper(alglib_impl::DT_BOOL) {
+}
+
+boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_BOOL) {
+}
+
+boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+boolean_2d_array::boolean_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_BOOL) {
+}
+
+std::string boolean_2d_array::tostring() const {
+   std::string result;
+   ae_int_t i;
+   if (isempty())
+      return "[[]]";
+   result = "[";
+   for (i = 0; i < rows(); i++) {
+      if (i != 0)
+         result += ",";
+      result += arraytostring(&operator()(i, 0), cols());
+   }
+   result += "]";
+   return result;
+}
+#endif
+
+boolean_2d_array::~boolean_2d_array() {
+}
+
+const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) {
+   return static_cast < const boolean_2d_array &>(assign(rhs));
+}
+
+const bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+   return This->xyB[i][j];
+}
+
+bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
+   return This->xyB[i][j];
+}
+
+const bool *boolean_2d_array::operator[] (ae_int_t i) const {
+   return This->xyB[i];
+}
+
+bool *boolean_2d_array::operator[] (ae_int_t i) {
+   return This->xyB[i];
+}
+
+void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
+   ae_int_t i, j;
+
+// setlength(), handle possible exception-free errors
+   setlength(irows, icols);
+   if (This == NULL || This->rows != irows || This->cols != icols)
+      return;
+
+// copy
+   for (i = 0; i < irows; i++)
+      for (j = 0; j < icols; j++)
+         This->xyB[i][j] = pContent[i * icols + j];
+}
+
+integer_2d_array::integer_2d_array():ae_matrix_wrapper(alglib_impl::DT_INT) {
+}
+
+integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_INT) {
+}
+
+integer_2d_array::integer_2d_array(const integer_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_INT) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+integer_2d_array::integer_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_INT) {
+}
+
+std::string integer_2d_array::tostring() const {
+   std::string result;
+   ae_int_t i;
+   if (isempty())
+      return "[[]]";
+   result = "[";
+   for (i = 0; i < rows(); i++) {
+      if (i != 0)
+         result += ",";
+      result += arraytostring(&operator()(i, 0), cols());
+   }
+   result += "]";
+   return result;
+}
+#endif
+
+integer_2d_array::~integer_2d_array() {
+}
+
+const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) {
+   return static_cast < const integer_2d_array &>(assign(rhs));
+}
+
+const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+   return This->xyZ[i][j];
+}
+
+ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) {
+   return This->xyZ[i][j];
+}
+
+const ae_int_t *integer_2d_array::operator[] (ae_int_t i) const {
+   return This->xyZ[i];
+}
+
+ae_int_t *integer_2d_array::operator[] (ae_int_t i) {
+   return This->xyZ[i];
+}
+
+void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
+   ae_int_t i, j;
+
+// setlength(), handle possible exception-free errors
+   setlength(irows, icols);
+   if (This == NULL || This->rows != irows || This->cols != icols)
+      return;
+
+// copy
+   for (i = 0; i < irows; i++)
+      for (j = 0; j < icols; j++)
+         This->xyZ[i][j] = pContent[i * icols + j];
+}
+
+real_2d_array::real_2d_array():ae_matrix_wrapper(alglib_impl::DT_REAL) {
+}
+
+real_2d_array::real_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_REAL) {
+}
+
+real_2d_array::real_2d_array(const real_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+real_2d_array::real_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_REAL) {
+}
+
+std::string real_2d_array::tostring(int dps) const {
+   std::string result;
+   ae_int_t i;
+   if (isempty())
+      return "[[]]";
+   result = "[";
+   for (i = 0; i < rows(); i++) {
+      if (i != 0)
+         result += ",";
+      result += arraytostring(&operator()(i, 0), cols(), dps);
+   }
+   result += "]";
+   return result;
+}
+#endif
+
+real_2d_array::~real_2d_array() {
+}
+
+const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
+   return static_cast < const real_2d_array &>(assign(rhs));
+}
+
+const double &real_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+   return This->xyR[i][j];
+}
+
+double &real_2d_array::operator() (ae_int_t i, ae_int_t j) {
+   return This->xyR[i][j];
+}
+
+const double *real_2d_array::operator[] (ae_int_t i) const {
+   return This->xyR[i];
+}
+
+double *real_2d_array::operator[] (ae_int_t i) {
+   return This->xyR[i];
+}
+
+void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
+   ae_int_t i, j;
+
+// setlength(), handle possible exception-free errors
+   setlength(irows, icols);
+   if (This == NULL || This->rows != irows || This->cols != icols)
+      return;
+
+// copy
+   for (i = 0; i < irows; i++)
+      for (j = 0; j < icols; j++)
+         This->xyR[i][j] = pContent[i * icols + j];
+}
+
+void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
+   alglib_impl::x_matrix x;
+   alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
+   TryX(_state) {
+#if !defined AE_NO_EXCEPTIONS
+      ThrowErrorMsg(_state, );
+#else
+      owner = true, This = NULL;
+      set_error_flag(_state.error_msg);
+      return;
+#endif
+   }
+   alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else", &_state);
+   alglib_impl::ae_assert(irows > 0 && icols > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
+   x.rows = irows;
+   x.cols = icols;
+   x.stride = icols;
+   x.datatype = alglib_impl::DT_REAL;
+   x.owner = alglib_impl::OWN_CALLER;
+   x.last_action = alglib_impl::ACT_UNCHANGED;
+   x.x_ptr = pContent;
+   attach_to(&x, &_state);
+   ae_state_clear(&_state);
+}
+
+complex_2d_array::complex_2d_array():ae_matrix_wrapper(alglib_impl::DT_COMPLEX) {
+}
+
+complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) {
+}
+
+complex_2d_array::complex_2d_array(const complex_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) {
+}
+
+#if !defined AE_NO_EXCEPTIONS
+complex_2d_array::complex_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) {
+}
+
+std::string complex_2d_array::tostring(int dps) const {
+   std::string result;
+   ae_int_t i;
+   if (isempty())
+      return "[[]]";
+   result = "[";
+   for (i = 0; i < rows(); i++) {
+      if (i != 0)
+         result += ",";
+      result += arraytostring(&operator()(i, 0), cols(), dps);
+   }
+   result += "]";
+   return result;
+}
+#endif
+
+complex_2d_array::~complex_2d_array() {
+}
+
+const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) {
+   return static_cast < const complex_2d_array &>(assign(rhs));
+}
+
+const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+   return *((const complex *)(This->xyC[i] + j));
+}
+
+complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
+   return *((complex *)(This->xyC[i] + j));
+}
+
+const complex *complex_2d_array::operator[] (ae_int_t i) const {
+   return (const complex *)(This->xyC[i]);
+}
+
+complex *complex_2d_array::operator[] (ae_int_t i) {
+   return (complex *)(This->xyC[i]);
+}
+
+void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
+   ae_int_t i, j;
+
+// setlength(), handle possible exception-free errors
+   setlength(irows, icols);
+   if (This == NULL || This->rows != irows || This->cols != icols)
+      return;
+
+// copy
+   for (i = 0; i < irows; i++)
+      for (j = 0; j < icols; j++) {
+         This->xyC[i][j].x = pContent[i * icols + j].x;
+         This->xyC[i][j].y = pContent[i * icols + j].y;
+      }
+}
+
+#if !defined AE_NO_EXCEPTIONS
+const int CSV_DEFAULT = 0x0, CSV_SKIP_HEADERS = 0x1;
+
+// CSV function.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out) {
    int flag;
 
