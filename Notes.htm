@@ -99,10 +99,10 @@ Object classes are defined in the C++ (<code>alglib::</code>) namespace of a *.c
 <p>
 <u>Examples:</u>
 <pre class=p_example>
-   DefClass(hqrndstate, EndD)
-   DecClass(hqrndstate, EndD);
+   DefClass(hqrndstate, )
+   DecClass(hqrndstate, );
 <span class=s_comment>// define/declare the object class alglib::hqrndstate for the type alglib_impl::hqrndstate, with no public members.</span>
-   DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
+   DefClass(xdebugrecord1, DecVal(i) DecComplex(c) DecVar(a))
    DecClass(xdebugrecord1, ae_int_t &amp;i; complex &amp;c; real_1d_array a;);
 <span class=s_comment>// define/declare the object class alglib::xdebugrecord1 for the type alglib_impl::xdebugrecord, with the data members i, c and a made public.</span>
 </pre>
