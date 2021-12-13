@@ -24,8 +24,8 @@
 #include <locale.h>
 #include <ctype.h>
 #if defined AE_CPU && AE_CPU == AE_INTEL
-#   if AE_COMPILER == AE_GNUC
-#      include <fpu_control.h> // For _FPU_SETCW.
+#   if AE_COMPILER == AE_GNUC && 0
+#      include <fpu_control.h> //(@) For _FPU_GETCW and _FPU_SETCW, for a fix that's apparently no longer needed.
 #   elif AE_COMPILER == AE_MSVC
 #      include <intrin.h>
 #   endif
@@ -242,9 +242,12 @@ static ae_cpuid_t ae_cpuid() {
       __cpuid(CPUInfo, 1);
 #   endif
    } { // Perform other CPU-related initializations.
-#   if AE_COMPILER == AE_GNUC
-      unsigned CpuMode = 0x27f; // Set rounding for floating-point math to double precision for x86/x64 processors under GCC.
-      asm("fldcw %0" : : "m"(*&CpuMode));
+#   if AE_COMPILER == AE_GNUC && 0
+   // (@) Legacy code required for earlier versions of GCC, no longer needed here.
+   // (@) TODO: If it still needed to be used, then make ModeCPU externally accessible, so that it can be used to reset the CPU.
+   // Set rounding for floating-point math to double precision for x86/x64 processors under GCC.
+      fp_control_t ModeCPU; _FPU_GETCW(ModeCPU);
+      _FPU_SETCW(ModeCPU & ~(_FPU_EXTENDED | _FPU_SINGLE) | FPU_DOUBLE);
 #   endif
    }
 #endif

@@ -386,6 +386,8 @@ However, the FPU already provides the means to convert the 80-bit internal repre
 which some compilers such as GCC fail to make proper use of.
 To compensate for this, the CPU-identification function of ALGLIB has been remade into a CPU-identifying startup function in ALGLIB++.
 A similar solution may need to be adopted for other compilers that target Intel, such as VCC; but none has been implemented or tested here.
+Since GCC, in its most recent versions, appears to handle the issue consistently,
+the initialization routine, under ae_cpuid(), has been commented out for now.
 </p>
 <p>
 <a name=gs_compatibility_os class=sheader></a><h3>3.2. OS</h3>
