@@ -82,14 +82,14 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
       ae_vector_set_length(s2, nvars, _state);
       ae_matrix_set_length(v, nvars, nvars, _state);
       for (i = 0; i <= nvars - 1; i++) {
-         s2->xR[i] = (double)(0);
+         s2->xR[i] = 0.0;
       }
       for (i = 0; i <= nvars - 1; i++) {
          for (j = 0; j <= nvars - 1; j++) {
             if (i == j) {
-               v->xyR[i][j] = (double)(1);
+               v->xyR[i][j] = 1.0;
             } else {
-               v->xyR[i][j] = (double)(0);
+               v->xyR[i][j] = 0.0;
             }
          }
       }
@@ -113,7 +113,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
    }
    for (i = npoints; i <= nvars - 1; i++) {
       for (j = 0; j <= nvars - 1; j++) {
-         a.xyR[i][j] = (double)(0);
+         a.xyR[i][j] = 0.0;
       }
    }
    if (!rmatrixsvd(&a, ae_maxint(npoints, nvars, _state), nvars, 0, 1, 2, s2, &u, &vt, _state)) {
@@ -194,7 +194,7 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
    ae_assert(nneeded > 0, "PCATruncatedSubspace: nneeded<1", _state);
    ae_assert(nneeded <= nvars, "PCATruncatedSubspace: nneeded>nvars", _state);
    ae_assert(maxits >= 0, "PCATruncatedSubspace: maxits<0", _state);
-   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, (double)(0)), "PCATruncatedSubspace: eps<0 or is not finite", _state);
+   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, 0.0), "PCATruncatedSubspace: eps<0 or is not finite", _state);
    ae_assert(x->rows >= npoints, "PCATruncatedSubspace: rows(x)<npoints", _state);
    ae_assert(x->cols >= nvars || npoints == 0, "PCATruncatedSubspace: cols(x)<nvars", _state);
 
@@ -203,14 +203,14 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
       ae_vector_set_length(s2, nneeded, _state);
       ae_matrix_set_length(v, nvars, nneeded, _state);
       for (i = 0; i <= nvars - 1; i++) {
-         s2->xR[i] = (double)(0);
+         s2->xR[i] = 0.0;
       }
       for (i = 0; i <= nvars - 1; i++) {
          for (j = 0; j <= nneeded - 1; j++) {
             if (i == j) {
-               v->xyR[i][j] = (double)(1);
+               v->xyR[i][j] = 1.0;
             } else {
-               v->xyR[i][j] = (double)(0);
+               v->xyR[i][j] = 0.0;
             }
          }
       }
@@ -220,9 +220,9 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 // Center matrix
    ae_vector_set_length(&means, nvars, _state);
    for (i = 0; i <= nvars - 1; i++) {
-      means.xR[i] = (double)(0);
+      means.xR[i] = 0.0;
    }
-   vv = (double)1 / (double)npoints;
+   vv = 1.0 / npoints;
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_addd(&means.xR[0], 1, &x->xyR[i][0], 1, ae_v_len(0, nvars - 1), vv);
    }
@@ -324,7 +324,7 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
    ae_assert(nneeded > 0, "PCATruncatedSubspaceSparse: nneeded<1", _state);
    ae_assert(nneeded <= nvars, "PCATruncatedSubspaceSparse: nneeded>nvars", _state);
    ae_assert(maxits >= 0, "PCATruncatedSubspaceSparse: maxits<0", _state);
-   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, (double)(0)), "PCATruncatedSubspaceSparse: eps<0 or is not finite", _state);
+   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, 0.0), "PCATruncatedSubspaceSparse: eps<0 or is not finite", _state);
    if (npoints > 0) {
       ae_assert(sparsegetnrows(x, _state) == npoints, "PCATruncatedSubspaceSparse: rows(x) != npoints", _state);
       ae_assert(sparsegetncols(x, _state) == nvars, "PCATruncatedSubspaceSparse: cols(x) != nvars", _state);
@@ -334,14 +334,14 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
       ae_vector_set_length(s2, nneeded, _state);
       ae_matrix_set_length(v, nvars, nneeded, _state);
       for (i = 0; i <= nvars - 1; i++) {
-         s2->xR[i] = (double)(0);
+         s2->xR[i] = 0.0;
       }
       for (i = 0; i <= nvars - 1; i++) {
          for (j = 0; j <= nneeded - 1; j++) {
             if (i == j) {
-               v->xyR[i][j] = (double)(1);
+               v->xyR[i][j] = 1.0;
             } else {
-               v->xyR[i][j] = (double)(0);
+               v->xyR[i][j] = 0.0;
             }
          }
       }
@@ -358,14 +358,14 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
 // Initialize parameters, prepare buffers
    ae_vector_set_length(&b1, npoints, _state);
    ae_vector_set_length(&z1, nvars, _state);
-   if (ae_fp_eq(eps, (double)(0)) && maxits == 0) {
+   if (ae_fp_eq(eps, 0.0) && maxits == 0) {
       eps = 1.0E-6;
    }
    if (maxits == 0) {
       maxits = 50 + 2 * nvars;
    }
 // Calculate mean values
-   vv = (double)1 / (double)npoints;
+   vv = 1.0 / npoints;
    for (i = 0; i <= npoints - 1; i++) {
       b1.xR[i] = vv;
    }
@@ -389,7 +389,7 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
 
       // Calculate (X-meansX)^T*B1
          sparsemtv(x, &b1, &c1, _state);
-         vv = (double)(0);
+         vv = 0.0;
          for (i = 0; i <= npoints - 1; i++) {
             vv = vv + b1.xR[i];
          }
@@ -474,14 +474,14 @@ void dserrallocate(ae_int_t nclasses, RVector *buf, ae_state *_state) {
    SetVector(buf);
 
    ae_vector_set_length(buf, 7 + 1, _state);
-   buf->xR[0] = (double)(0);
-   buf->xR[1] = (double)(0);
-   buf->xR[2] = (double)(0);
-   buf->xR[3] = (double)(0);
-   buf->xR[4] = (double)(0);
-   buf->xR[5] = (double)(nclasses);
-   buf->xR[6] = (double)(0);
-   buf->xR[7] = (double)(0);
+   buf->xR[0] = 0.0;
+   buf->xR[1] = 0.0;
+   buf->xR[2] = 0.0;
+   buf->xR[3] = 0.0;
+   buf->xR[4] = 0.0;
+   buf->xR[5] = (double)nclasses;
+   buf->xR[6] = 0.0;
+   buf->xR[7] = 0.0;
 }
 
 // See DSErrAllocate for comments on this routine.
@@ -511,7 +511,7 @@ void dserraccumulate(RVector *buf, RVector *y, RVector *desiredy, ae_state *_sta
       if (mmax != rmax) {
          buf->xR[0] = buf->xR[0] + 1;
       }
-      if (ae_fp_greater(y->xR[rmax], (double)(0))) {
+      if (ae_fp_greater(y->xR[rmax], 0.0)) {
          buf->xR[1] = buf->xR[1] - ae_log(y->xR[rmax], _state);
       } else {
          buf->xR[1] = buf->xR[1] + ae_log(ae_maxrealnumber, _state);
@@ -519,13 +519,13 @@ void dserraccumulate(RVector *buf, RVector *y, RVector *desiredy, ae_state *_sta
       for (j = 0; j <= nclasses - 1; j++) {
          v = y->xR[j];
          if (j == rmax) {
-            ev = (double)(1);
+            ev = 1.0;
          } else {
-            ev = (double)(0);
+            ev = 0.0;
          }
          buf->xR[2] = buf->xR[2] + ae_sqr(v - ev, _state);
          buf->xR[3] = buf->xR[3] + ae_fabs(v - ev, _state);
-         if (ae_fp_neq(ev, (double)(0))) {
+         if (ae_fp_neq(ev, 0.0)) {
             buf->xR[4] = buf->xR[4] + ae_fabs((v - ev) / ev, _state);
             buf->xR[offs + 2] = buf->xR[offs + 2] + 1;
          }
@@ -555,7 +555,7 @@ void dserraccumulate(RVector *buf, RVector *y, RVector *desiredy, ae_state *_sta
          ev = desiredy->xR[j];
          buf->xR[2] = buf->xR[2] + ae_sqr(v - ev, _state);
          buf->xR[3] = buf->xR[3] + ae_fabs(v - ev, _state);
-         if (ae_fp_neq(ev, (double)(0))) {
+         if (ae_fp_neq(ev, 0.0)) {
             buf->xR[4] = buf->xR[4] + ae_fabs((v - ev) / ev, _state);
             buf->xR[offs + 2] = buf->xR[offs + 2] + 1;
          }
@@ -572,13 +572,13 @@ void dserrfinish(RVector *buf, ae_state *_state) {
 
    offs = 5;
    nout = ae_iabs(ae_round(buf->xR[offs], _state), _state);
-   if (ae_fp_neq(buf->xR[offs + 1], (double)(0))) {
+   if (ae_fp_neq(buf->xR[offs + 1], 0.0)) {
       buf->xR[0] = buf->xR[0] / buf->xR[offs + 1];
       buf->xR[1] = buf->xR[1] / buf->xR[offs + 1];
       buf->xR[2] = ae_sqrt(buf->xR[2] / (nout * buf->xR[offs + 1]), _state);
       buf->xR[3] = buf->xR[3] / (nout * buf->xR[offs + 1]);
    }
-   if (ae_fp_neq(buf->xR[offs + 2], (double)(0))) {
+   if (ae_fp_neq(buf->xR[offs + 2], 0.0)) {
       buf->xR[4] = buf->xR[4] / buf->xR[offs + 2];
    }
 }
@@ -616,8 +616,8 @@ void dsnormalize(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, 
       samplemoments(&tmp, npoints, &mean, &variance, &skewness, &kurtosis, _state);
       means->xR[j] = mean;
       sigmas->xR[j] = ae_sqrt(variance, _state);
-      if (ae_fp_eq(sigmas->xR[j], (double)(0))) {
-         sigmas->xR[j] = (double)(1);
+      if (ae_fp_eq(sigmas->xR[j], 0.0)) {
+         sigmas->xR[j] = 1.0;
       }
       for (i = 0; i <= npoints - 1; i++) {
          xy->xyR[i][j] = (xy->xyR[i][j] - means->xR[j]) / sigmas->xR[j];
@@ -658,8 +658,8 @@ void dsnormalizec(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
       samplemoments(&tmp, npoints, &mean, &variance, &skewness, &kurtosis, _state);
       means->xR[j] = mean;
       sigmas->xR[j] = ae_sqrt(variance, _state);
-      if (ae_fp_eq(sigmas->xR[j], (double)(0))) {
-         sigmas->xR[j] = (double)(1);
+      if (ae_fp_eq(sigmas->xR[j], 0.0)) {
+         sigmas->xR[j] = 1.0;
       }
    }
    ae_frame_leave(_state);
@@ -679,7 +679,7 @@ double dsgetmeanmindistance(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_st
 
 // Test parameters
    if (npoints <= 0 || nvars < 1) {
-      result = (double)(0);
+      result = 0.0;
       ae_frame_leave(_state);
       return result;
    }
@@ -699,7 +699,7 @@ double dsgetmeanmindistance(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_st
          tmp.xR[j] = ae_minreal(tmp.xR[j], v, _state);
       }
    }
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       result = result + tmp.xR[i] / npoints;
    }
@@ -871,10 +871,10 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 //
 // NOTE: we assume that P[i,j] equals to 0 or 1,
 //       intermediate values are not allowed.
-   *pal = (double)(0);
-   *pbl = (double)(0);
-   *par = (double)(0);
-   *pbr = (double)(0);
+   *pal = 0.0;
+   *pbl = 0.0;
+   *par = 0.0;
+   *pbr = 0.0;
    for (i = 0; i <= n - 1; i++) {
       if (c->xZ[i] == 0) {
          *par = *par + 1;
@@ -889,8 +889,8 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 
    // first, obtain information about K-th tie which is
    // moved from R-part to L-part
-      pak = (double)(0);
-      pbk = (double)(0);
+      pak = 0.0;
+      pbk = 0.0;
       for (i = ties.xZ[k]; i <= ties.xZ[k + 1] - 1; i++) {
          if (c->xZ[i] == 0) {
             pak = pak + 1;
@@ -901,7 +901,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
       }
 
    // Calculate cross-validation CE
-      cv = (double)(0);
+      cv = 0.0;
       cv = cv - bdss_xlny(*pal + pak, (*pal + pak) / (*pal + pak + (*pbl) + pbk + 1), _state);
       cv = cv - bdss_xlny(*pbl + pbk, (*pbl + pbk) / (*pal + pak + 1 + (*pbl) + pbk), _state);
       cv = cv - bdss_xlny(*par - pak, (*par - pak) / (*par - pak + (*pbr) - pbk + 1), _state);
@@ -920,10 +920,10 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    }
    *cve = cvoptimal;
    *threshold = 0.5 * (a->xR[ties.xZ[koptimal]] + a->xR[ties.xZ[koptimal + 1]]);
-   *pal = (double)(0);
-   *pbl = (double)(0);
-   *par = (double)(0);
-   *pbr = (double)(0);
+   *pal = 0.0;
+   *pbl = 0.0;
+   *par = 0.0;
+   *pbr = 0.0;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_less(a->xR[i], *threshold)) {
          if (c->xZ[i] == 0) {
@@ -1033,9 +1033,9 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
       sr = sr - (tiesbuf->xZ[k + 1] - tiesbuf->xZ[k]);
 
    // Calculate RMS error
-      v = (double)(0);
+      v = 0.0;
       for (i = 0; i <= nc - 1; i++) {
-         w = (double)(cntbuf->xZ[i]);
+         w = (double)cntbuf->xZ[i];
          v = v + w * ae_sqr(w / sl - 1, _state);
          v = v + (sl - w) * ae_sqr(w / sl, _state);
          w = (double)(cntbuf->xZ[nc + i]);
@@ -1045,7 +1045,7 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
       v = ae_sqrt(v / (nc * n), _state);
 
    // Compare with best
-      x = (double)(2 * sl) / (double)(sl + sr) - 1;
+      x = (double)(2 * sl) / (sl + sr) - 1;
       cc = v * (1 - alpha + alpha * ae_sqr(x, _state));
       if (ae_fp_less(cc, cbest)) {
 
@@ -1055,16 +1055,16 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
          cbest = cc;
 
       // calculate CVRMS error
-         *cvrms = (double)(0);
+         *cvrms = 0.0;
          for (i = 0; i <= nc - 1; i++) {
             if (sl > 1) {
-               w = (double)(cntbuf->xZ[i]);
+               w = (double)cntbuf->xZ[i];
                *cvrms = *cvrms + w * ae_sqr((w - 1) / (sl - 1) - 1, _state);
                *cvrms = *cvrms + (sl - w) * ae_sqr(w / (sl - 1), _state);
             } else {
-               w = (double)(cntbuf->xZ[i]);
-               *cvrms = *cvrms + w * ae_sqr((double)1 / (double)nc - 1, _state);
-               *cvrms = *cvrms + (sl - w) * ae_sqr((double)1 / (double)nc, _state);
+               w = (double)cntbuf->xZ[i];
+               *cvrms = *cvrms + w * ae_sqr(1.0 / nc - 1.0, _state);
+               *cvrms = *cvrms + (sl - w) * ae_sqr(1.0 / nc, _state);
             }
             if (sr > 1) {
                w = (double)(cntbuf->xZ[nc + i]);
@@ -1072,8 +1072,8 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
                *cvrms = *cvrms + (sr - w) * ae_sqr(w / (sr - 1), _state);
             } else {
                w = (double)(cntbuf->xZ[nc + i]);
-               *cvrms = *cvrms + w * ae_sqr((double)1 / (double)nc - 1, _state);
-               *cvrms = *cvrms + (sr - w) * ae_sqr((double)1 / (double)nc, _state);
+               *cvrms = *cvrms + w * ae_sqr(1.0 / nc - 1.0, _state);
+               *cvrms = *cvrms + (sr - w) * ae_sqr(1.0 / nc, _state);
             }
          }
          *cvrms = ae_sqrt(*cvrms / (nc * n), _state);
@@ -1169,7 +1169,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    bestk = 2;
    bestsizes.xZ[0] = ties.xZ[j];
    bestsizes.xZ[1] = n - j;
-   bestcve = (double)(0);
+   bestcve = 0.0;
    for (i = 0; i <= nc - 1; i++) {
       cnt.xZ[i] = 0;
    }
@@ -1215,7 +1215,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
             continue;
          }
       // Place J-th tie in I-th bin, or leave for I+1-th bin.
-         if (ae_fp_less(ae_fabs(cursizes.xZ[i] + ties.xZ[j + 1] - ties.xZ[j] - (double)n / (double)k, _state), ae_fabs(cursizes.xZ[i] - (double)n / (double)k, _state))) {
+         if (ae_fp_less(ae_fabs(cursizes.xZ[i] + ties.xZ[j + 1] - ties.xZ[j] - (double)n / k, _state), ae_fabs(cursizes.xZ[i] - (double)n / k, _state))) {
             cursizes.xZ[i] = cursizes.xZ[i] + ties.xZ[j + 1] - ties.xZ[j];
             j = j + 1;
          } else {
@@ -1225,7 +1225,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
       ae_assert(cursizes.xZ[k - 1] != 0 && j == tiecount, "DSSplitK: internal error #1", _state);
 
    // Calculate CVE
-      curcve = (double)(0);
+      curcve = 0.0;
       j = 0;
       for (i = 0; i <= k - 1; i++) {
          for (j1 = 0; j1 <= nc - 1; j1++) {
@@ -1399,7 +1399,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
       ae_vector_set_length(thresholds, 0 + 1, _state);
       thresholds->xR[0] = 0.5 * (a->xR[ties.xZ[j - 1]] + a->xR[ties.xZ[j]]);
       *ni = 2;
-      *cve = (double)(0);
+      *cve = 0.0;
       for (i = 0; i <= nc - 1; i++) {
          cnt.xZ[i] = 0;
       }
@@ -1439,8 +1439,8 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
 static double bdss_xlny(double x, double y, ae_state *_state) {
    double result;
 
-   if (ae_fp_eq(x, (double)(0))) {
-      result = (double)(0);
+   if (ae_fp_eq(x, 0.0)) {
+      result = 0.0;
    } else {
       result = x * ae_log(y, _state);
    }
@@ -1454,13 +1454,13 @@ static double bdss_getcv(ZVector *cnt, ae_int_t nc, ae_state *_state) {
    double s;
    double result;
 
-   s = (double)(0);
+   s = 0.0;
    for (i = 0; i <= nc - 1; i++) {
       s = s + cnt->xZ[i];
    }
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= nc - 1; i++) {
-      result = result - bdss_xlny((double)(cnt->xZ[i]), cnt->xZ[i] / (s + nc - 1), _state);
+      result = result - bdss_xlny((double)cnt->xZ[i], cnt->xZ[i] / (s + nc - 1), _state);
    }
    return result;
 }
@@ -1484,13 +1484,13 @@ static void bdss_tiesubc(ZVector *c, ZVector *ties, ae_int_t ntie, ae_int_t nc, 
 }
 
 void cvreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   cvreport *p = (cvreport *) _p;
+   cvreport *p = (cvreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void cvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   cvreport *dst = (cvreport *) _dst;
-   cvreport *src = (cvreport *) _src;
+   cvreport *dst = (cvreport *)_dst;
+   cvreport *src = (cvreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -1499,7 +1499,7 @@ void cvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 }
 
 void cvreport_free(void *_p, bool make_automatic) {
-   cvreport *p = (cvreport *) _p;
+   cvreport *p = (cvreport *)_p;
    ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
@@ -1710,10 +1710,10 @@ void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperc
    NewVector(lconnlast, 0, DT_INT, _state);
 
    layerscount = 1 + 3;
-   if (ae_fp_greater_eq(d, (double)(0))) {
-      d = (double)(1);
+   if (ae_fp_greater_eq(d, 0.0)) {
+      d = 1.0;
    } else {
-      d = (double)(-1);
+      d = -1.0;
    }
 
 // Allocate arrays
@@ -1756,10 +1756,10 @@ void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d,
    NewVector(lconnlast, 0, DT_INT, _state);
 
    layerscount = 1 + 3 + 3;
-   if (ae_fp_greater_eq(d, (double)(0))) {
-      d = (double)(1);
+   if (ae_fp_greater_eq(d, 0.0)) {
+      d = 1.0;
    } else {
-      d = (double)(-1);
+      d = -1.0;
    }
 
 // Allocate arrays
@@ -1804,10 +1804,10 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
    NewVector(lconnlast, 0, DT_INT, _state);
 
    layerscount = 1 + 3 + 3 + 3;
-   if (ae_fp_greater_eq(d, (double)(0))) {
-      d = (double)(1);
+   if (ae_fp_greater_eq(d, 0.0)) {
+      d = 1.0;
    } else {
-      d = (double)(-1);
+      d = -1.0;
    }
 
 // Allocate arrays
@@ -2364,12 +2364,12 @@ void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen,
 //      SigmaLen    ColumnSigmas
    *rlen = 3 + ssize + wcount + 2 * sigmalen;
    ae_vector_set_length(ra, *rlen - 1 + 1, _state);
-   ra->xR[0] = (double)(*rlen);
-   ra->xR[1] = (double)(mlpbase_mlpvnum);
-   ra->xR[2] = (double)(ssize);
+   ra->xR[0] = (double)*rlen;
+   ra->xR[1] = (double)mlpbase_mlpvnum;
+   ra->xR[2] = (double)ssize;
    offs = 3;
    for (i = 0; i <= ssize - 1; i++) {
-      ra->xR[offs + i] = (double)(network->structinfo.xZ[i]);
+      ra->xR[offs + i] = (double)network->structinfo.xZ[i];
    }
    offs = offs + ssize;
    ae_v_move(&ra->xR[offs], 1, &network->weights.xR[0], 1, ae_v_len(offs, offs + wcount - 1));
@@ -2567,7 +2567,7 @@ void mlprandomize(multilayerperceptron *network, ae_state *_state) {
          i = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 2];
          vmean = network->rndbuf.xR[entrysize * i + 0];
          vvar = ae_sqr(network->rndbuf.xR[entrysize * i + 1], _state);
-         if (ae_fp_greater(vvar, (double)(0))) {
+         if (ae_fp_greater(vvar, 0.0)) {
             wscale = desiredsigma / ae_sqrt(vvar, _state);
          } else {
             wscale = 1.0;
@@ -2587,7 +2587,7 @@ void mlprandomize(multilayerperceptron *network, ae_state *_state) {
          i = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 2];
          vmean = network->rndbuf.xR[entrysize * i + 0];
          vvar = ae_sqr(network->rndbuf.xR[entrysize * i + 1], _state);
-         if (ae_fp_greater(vvar, (double)(0))) {
+         if (ae_fp_greater(vvar, 0.0)) {
             wscale = desiredsigma / ae_sqrt(vvar, _state);
          } else {
             wscale = 1.0;
@@ -2693,8 +2693,8 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
    ae_vector_set_length(&means, jmax + 1, _state);
    ae_vector_set_length(&sigmas, jmax + 1, _state);
    for (i = 0; i <= jmax; i++) {
-      means.xR[i] = (double)(0);
-      sigmas.xR[i] = (double)(0);
+      means.xR[i] = 0.0;
+      sigmas.xR[i] = 0.0;
    }
    for (i = 0; i <= ssize - 1; i++) {
       for (j = 0; j <= jmax; j++) {
@@ -2717,8 +2717,8 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
    for (i = 0; i <= nin - 1; i++) {
       network->columnmeans.xR[i] = means.xR[i];
       network->columnsigmas.xR[i] = sigmas.xR[i];
-      if (ae_fp_eq(network->columnsigmas.xR[i], (double)(0))) {
-         network->columnsigmas.xR[i] = (double)(1);
+      if (ae_fp_eq(network->columnsigmas.xR[i], 0.0)) {
+         network->columnsigmas.xR[i] = 1.0;
       }
    }
 
@@ -2732,22 +2732,22 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
             network->columnsigmas.xR[nin + i] = sigmas.xR[nin + i];
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       // Bounded outputs (half-interval)
          if (ntype == 3) {
             s = means.xR[nin + i] - network->columnmeans.xR[nin + i];
-            if (ae_fp_eq(s, (double)(0))) {
-               s = (double)(ae_sign(network->columnsigmas.xR[nin + i], _state));
+            if (ae_fp_eq(s, 0.0)) {
+               s = (double)ae_sign(network->columnsigmas.xR[nin + i], _state);
             }
-            if (ae_fp_eq(s, (double)(0))) {
+            if (ae_fp_eq(s, 0.0)) {
                s = 1.0;
             }
             network->columnsigmas.xR[nin + i] = ae_sign(network->columnsigmas.xR[nin + i], _state) * ae_fabs(s, _state);
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       }
@@ -2797,8 +2797,8 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
    ae_vector_set_length(&means, jmax + 1, _state);
    ae_vector_set_length(&sigmas, jmax + 1, _state);
    for (i = 0; i <= jmax; i++) {
-      means.xR[i] = (double)(0);
-      sigmas.xR[i] = (double)(0);
+      means.xR[i] = 0.0;
+      sigmas.xR[i] = 0.0;
    }
    for (i = 0; i <= ssize - 1; i++) {
       sparsegetrow(xy, i, &network->xyrow, _state);
@@ -2823,8 +2823,8 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
    for (i = 0; i <= nin - 1; i++) {
       network->columnmeans.xR[i] = means.xR[i];
       network->columnsigmas.xR[i] = sigmas.xR[i];
-      if (ae_fp_eq(network->columnsigmas.xR[i], (double)(0))) {
-         network->columnsigmas.xR[i] = (double)(1);
+      if (ae_fp_eq(network->columnsigmas.xR[i], 0.0)) {
+         network->columnsigmas.xR[i] = 1.0;
       }
    }
 
@@ -2838,22 +2838,22 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
             network->columnsigmas.xR[nin + i] = sigmas.xR[nin + i];
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       // Bounded outputs (half-interval)
          if (ntype == 3) {
             s = means.xR[nin + i] - network->columnmeans.xR[nin + i];
-            if (ae_fp_eq(s, (double)(0))) {
-               s = (double)(ae_sign(network->columnsigmas.xR[nin + i], _state));
+            if (ae_fp_eq(s, 0.0)) {
+               s = (double)ae_sign(network->columnsigmas.xR[nin + i], _state);
             }
-            if (ae_fp_eq(s, (double)(0))) {
+            if (ae_fp_eq(s, 0.0)) {
                s = 1.0;
             }
             network->columnsigmas.xR[nin + i] = ae_sign(network->columnsigmas.xR[nin + i], _state) * ae_fabs(s, _state);
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       }
@@ -2931,8 +2931,8 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
    ae_vector_set_length(&means, jmax + 1, _state);
    ae_vector_set_length(&sigmas, jmax + 1, _state);
    for (i = 0; i <= jmax; i++) {
-      means.xR[i] = (double)(0);
-      sigmas.xR[i] = (double)(0);
+      means.xR[i] = 0.0;
+      sigmas.xR[i] = 0.0;
    }
    for (i = 0; i <= subsetsize - 1; i++) {
       for (j = 0; j <= jmax; j++) {
@@ -2955,8 +2955,8 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
    for (i = 0; i <= nin - 1; i++) {
       network->columnmeans.xR[i] = means.xR[i];
       network->columnsigmas.xR[i] = sigmas.xR[i];
-      if (ae_fp_eq(network->columnsigmas.xR[i], (double)(0))) {
-         network->columnsigmas.xR[i] = (double)(1);
+      if (ae_fp_eq(network->columnsigmas.xR[i], 0.0)) {
+         network->columnsigmas.xR[i] = 1.0;
       }
    }
 
@@ -2970,22 +2970,22 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
             network->columnsigmas.xR[nin + i] = sigmas.xR[nin + i];
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       // Bounded outputs (half-interval)
          if (ntype == 3) {
             s = means.xR[nin + i] - network->columnmeans.xR[nin + i];
-            if (ae_fp_eq(s, (double)(0))) {
-               s = (double)(ae_sign(network->columnsigmas.xR[nin + i], _state));
+            if (ae_fp_eq(s, 0.0)) {
+               s = (double)ae_sign(network->columnsigmas.xR[nin + i], _state);
             }
-            if (ae_fp_eq(s, (double)(0))) {
+            if (ae_fp_eq(s, 0.0)) {
                s = 1.0;
             }
             network->columnsigmas.xR[nin + i] = ae_sign(network->columnsigmas.xR[nin + i], _state) * ae_fabs(s, _state);
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       }
@@ -3064,8 +3064,8 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
    ae_vector_set_length(&means, jmax + 1, _state);
    ae_vector_set_length(&sigmas, jmax + 1, _state);
    for (i = 0; i <= jmax; i++) {
-      means.xR[i] = (double)(0);
-      sigmas.xR[i] = (double)(0);
+      means.xR[i] = 0.0;
+      sigmas.xR[i] = 0.0;
    }
    for (i = 0; i <= subsetsize - 1; i++) {
       sparsegetrow(xy, idx->xZ[i], &network->xyrow, _state);
@@ -3090,8 +3090,8 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
    for (i = 0; i <= nin - 1; i++) {
       network->columnmeans.xR[i] = means.xR[i];
       network->columnsigmas.xR[i] = sigmas.xR[i];
-      if (ae_fp_eq(network->columnsigmas.xR[i], (double)(0))) {
-         network->columnsigmas.xR[i] = (double)(1);
+      if (ae_fp_eq(network->columnsigmas.xR[i], 0.0)) {
+         network->columnsigmas.xR[i] = 1.0;
       }
    }
 
@@ -3105,22 +3105,22 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
             network->columnsigmas.xR[nin + i] = sigmas.xR[nin + i];
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       // Bounded outputs (half-interval)
          if (ntype == 3) {
             s = means.xR[nin + i] - network->columnmeans.xR[nin + i];
-            if (ae_fp_eq(s, (double)(0))) {
-               s = (double)(ae_sign(network->columnsigmas.xR[nin + i], _state));
+            if (ae_fp_eq(s, 0.0)) {
+               s = (double)ae_sign(network->columnsigmas.xR[nin + i], _state);
             }
-            if (ae_fp_eq(s, (double)(0))) {
+            if (ae_fp_eq(s, 0.0)) {
                s = 1.0;
             }
             network->columnsigmas.xR[nin + i] = ae_sign(network->columnsigmas.xR[nin + i], _state) * ae_fabs(s, _state);
-            if (ae_fp_eq(network->columnsigmas.xR[nin + i], (double)(0))) {
-               network->columnsigmas.xR[nin + i] = (double)(1);
+            if (ae_fp_eq(network->columnsigmas.xR[nin + i], 0.0)) {
+               network->columnsigmas.xR[nin + i] = 1.0;
             }
          }
       }
@@ -3245,8 +3245,8 @@ void mlpgetinputscaling(multilayerperceptron *network, ae_int_t i, double *mean,
    ae_assert(i >= 0 && i < network->hllayersizes.xZ[0], "MLPGetInputScaling: incorrect (nonexistent) I", _state);
    *mean = network->columnmeans.xR[i];
    *sigma = network->columnsigmas.xR[i];
-   if (ae_fp_eq(*sigma, (double)(0))) {
-      *sigma = (double)(1);
+   if (ae_fp_eq(*sigma, 0.0)) {
+      *sigma = 1.0;
    }
 }
 
@@ -3274,8 +3274,8 @@ void mlpgetoutputscaling(multilayerperceptron *network, ae_int_t i, double *mean
 
    ae_assert(i >= 0 && i < network->hllayersizes.xZ[network->hllayersizes.cnt - 1], "MLPGetOutputScaling: incorrect (nonexistent) I", _state);
    if (network->structinfo.xZ[6] == 1) {
-      *mean = (double)(0);
-      *sigma = (double)(1);
+      *mean = 0.0;
+      *sigma = 1.0;
    } else {
       *mean = network->columnmeans.xR[network->hllayersizes.xZ[0] + i];
       *sigma = network->columnsigmas.xR[network->hllayersizes.xZ[0] + i];
@@ -3327,7 +3327,7 @@ void mlpgetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_
    if (network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 3] >= 0) {
       *threshold = network->weights.xR[network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 3]];
    } else {
-      *threshold = (double)(0);
+      *threshold = 0.0;
    }
 }
 
@@ -3371,7 +3371,7 @@ double mlpgetweight(multilayerperceptron *network, ae_int_t k0, ae_int_t i0, ae_
    if (highlevelidx >= 0) {
       result = network->weights.xR[network->hlconnections.xZ[highlevelidx * mlpbase_hlconnfieldwidth + 4]];
    } else {
-      result = (double)(0);
+      result = 0.0;
    }
    return result;
 }
@@ -3395,8 +3395,8 @@ void mlpsetinputscaling(multilayerperceptron *network, ae_int_t i, double mean, 
    ae_assert(i >= 0 && i < network->hllayersizes.xZ[0], "MLPSetInputScaling: incorrect (nonexistent) I", _state);
    ae_assert(ae_isfinite(mean, _state), "MLPSetInputScaling: infinite or NAN Mean", _state);
    ae_assert(ae_isfinite(sigma, _state), "MLPSetInputScaling: infinite or NAN Sigma", _state);
-   if (ae_fp_eq(sigma, (double)(0))) {
-      sigma = (double)(1);
+   if (ae_fp_eq(sigma, 0.0)) {
+      sigma = 1.0;
    }
    network->columnmeans.xR[i] = mean;
    network->columnsigmas.xR[i] = sigma;
@@ -3426,11 +3426,11 @@ void mlpsetoutputscaling(multilayerperceptron *network, ae_int_t i, double mean,
    ae_assert(ae_isfinite(mean, _state), "MLPSetOutputScaling: infinite or NAN Mean", _state);
    ae_assert(ae_isfinite(sigma, _state), "MLPSetOutputScaling: infinite or NAN Sigma", _state);
    if (network->structinfo.xZ[6] == 1) {
-      ae_assert(ae_fp_eq(mean, (double)(0)), "MLPSetOutputScaling: you can not set non-zero Mean term for classifier network", _state);
-      ae_assert(ae_fp_eq(sigma, (double)(1)), "MLPSetOutputScaling: you can not set non-unit Sigma term for classifier network", _state);
+      ae_assert(ae_fp_eq(mean, 0.0), "MLPSetOutputScaling: you can not set non-zero Mean term for classifier network", _state);
+      ae_assert(ae_fp_eq(sigma, 1.0), "MLPSetOutputScaling: you can not set non-unit Sigma term for classifier network", _state);
    } else {
-      if (ae_fp_eq(sigma, (double)(0))) {
-         sigma = (double)(1);
+      if (ae_fp_eq(sigma, 0.0)) {
+         sigma = 1.0;
       }
       network->columnmeans.xR[network->hllayersizes.xZ[0] + i] = mean;
       network->columnsigmas.xR[network->hllayersizes.xZ[0] + i] = sigma;
@@ -3490,7 +3490,7 @@ void mlpsetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_
    if (network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 3] >= 0) {
       network->weights.xR[network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 3]] = threshold;
    } else {
-      ae_assert(ae_fp_eq(threshold, (double)(0)), "MLPSetNeuronInfo: you try to set non-zero threshold for neuron which can not have one", _state);
+      ae_assert(ae_fp_eq(threshold, 0.0), "MLPSetNeuronInfo: you try to set non-zero threshold for neuron which can not have one", _state);
    }
 }
 
@@ -3534,7 +3534,7 @@ void mlpsetweight(multilayerperceptron *network, ae_int_t k0, ae_int_t i0, ae_in
    if (highlevelidx >= 0) {
       network->weights.xR[network->hlconnections.xZ[highlevelidx * mlpbase_hlconnfieldwidth + 4]] = w;
    } else {
-      ae_assert(ae_fp_eq(w, (double)(0)), "MLPSetWeight: you try to set non-zero weight for non-existent connection", _state);
+      ae_assert(ae_fp_eq(w, 0.0), "MLPSetWeight: you try to set non-zero weight for non-existent connection", _state);
    }
 }
 
@@ -3562,17 +3562,17 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
 
    if (k == 0 || k == -5) {
       *f = net;
-      *df = (double)(1);
-      *d2f = (double)(0);
+      *df = 1.0;
+      *d2f = 0.0;
       return;
    }
    if (k == 1) {
 
    // TanH activation function
-      if (ae_fp_less(ae_fabs(net, _state), (double)(100))) {
+      if (ae_fp_less(ae_fabs(net, _state), 100.0)) {
          *f = ae_tanh(net, _state);
       } else {
-         *f = (double)(ae_sign(net, _state));
+         *f = (double)ae_sign(net, _state);
       }
       *df = 1 - *f * (*f);
       *d2f = -2 * (*f) * (*df);
@@ -3581,7 +3581,7 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
    if (k == 3) {
 
    // EX activation function
-      if (ae_fp_greater_eq(net, (double)(0))) {
+      if (ae_fp_greater_eq(net, 0.0)) {
          net2 = net * net;
          arg = net2 + 1;
          root = ae_sqrt(arg, _state);
@@ -3602,9 +3602,9 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
       *d2f = -2 * (*f + *df * net);
       return;
    }
-   *f = (double)(0);
-   *df = (double)(0);
-   *d2f = (double)(0);
+   *f = 0.0;
+   *df = 0.0;
+   *d2f = 0.0;
 }
 
 // Procesing
@@ -3757,7 +3757,7 @@ double mlperrorn(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, ae_
    double result;
 
    mlpproperties(network, &nin, &nout, &wcount, _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= ssize - 1; i++) {
 
    // Process vector
@@ -3776,7 +3776,7 @@ double mlperrorn(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, ae_
       // Cross-entropy error function
          k = ae_round(xy->xyR[i][nin], _state);
          if (k >= 0 && k < nout) {
-            result = result + mlpbase_safecrossentropy((double)(1), network->y.xR[k], _state);
+            result = result + mlpbase_safecrossentropy(1.0, network->y.xR[k], _state);
          }
       }
    }
@@ -3872,7 +3872,7 @@ double mlprelclserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoin
       }
    }
    if (npoints > 0) {
-      result = (double)mlpclserror(network, xy, npoints, _state) / (double)npoints;
+      result = (double)mlpclserror(network, xy, npoints, _state) / npoints;
    } else {
       result = 0.0;
    }
@@ -4359,9 +4359,9 @@ void mlpgrad(multilayerperceptron *network, RVector *x, RVector *desiredy, doubl
    mlpprocess(network, x, &network->y, _state);
    nout = network->structinfo.xZ[2];
    ntotal = network->structinfo.xZ[3];
-   *e = (double)(0);
+   *e = 0.0;
    for (i = 0; i <= ntotal - 1; i++) {
-      network->derror.xR[i] = (double)(0);
+      network->derror.xR[i] = 0.0;
    }
    for (i = 0; i <= nout - 1; i++) {
       network->derror.xR[ntotal - nout + i] = network->y.xR[i] - desiredy->xR[i];
@@ -4405,9 +4405,9 @@ void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, doub
    nout = network->structinfo.xZ[2];
    ntotal = network->structinfo.xZ[3];
    for (i = 0; i <= ntotal - 1; i++) {
-      network->derror.xR[i] = (double)(0);
+      network->derror.xR[i] = 0.0;
    }
-   *e = (double)(0);
+   *e = 0.0;
    if (network->structinfo.xZ[6] == 0) {
 
    // Regression network, least squares
@@ -4418,7 +4418,7 @@ void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, doub
    } else {
 
    // Classification network, cross-entropy
-      s = (double)(0);
+      s = 0.0;
       for (i = 0; i <= nout - 1; i++) {
          s = s + desiredy->xR[i];
       }
@@ -4897,9 +4897,9 @@ void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, d
    hpcpreparechunkedgradient(&network->weights, wcount, mlpntotal(network, _state), nin, nout, pbuf, _state);
    rvectorsetlengthatleast(grad, wcount, _state);
    for (i = 0; i <= wcount - 1; i++) {
-      grad->xR[i] = (double)(0);
+      grad->xR[i] = 0.0;
    }
-   *e = (double)(0);
+   *e = 0.0;
    i = 0;
    while (i <= ssize - 1) {
       mlpbase_mlpchunkedgradient(network, xy, i, ae_minint(ssize, i + pbuf->chunksize, _state) - i, &pbuf->batch4buf, &pbuf->hpcbuf, e, true, _state);
@@ -4969,7 +4969,7 @@ void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *co
 
 // Inputs standartisation and putting in the network
    for (i = 0; i <= nin - 1; i++) {
-      if (ae_fp_neq(columnsigmas->xR[i], (double)(0))) {
+      if (ae_fp_neq(columnsigmas->xR[i], 0.0)) {
          neurons->xR[i] = (x->xR[i] - columnmeans->xR[i]) / columnsigmas->xR[i];
       } else {
          neurons->xR[i] = x->xR[i] - columnmeans->xR[i];
@@ -5010,13 +5010,13 @@ void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *co
          if (structinfo->xZ[offs + 0] == -3) {
 
          // "-1" neuron
-            neurons->xR[i] = (double)(-1);
+            neurons->xR[i] = -1.0;
             perr = false;
          }
          if (structinfo->xZ[offs + 0] == -4) {
 
          // "0" neuron
-            neurons->xR[i] = (double)(0);
+            neurons->xR[i] = 0.0;
             perr = false;
          }
          ae_assert(!perr, "MLPInternalProcessVector: internal error - unknown neuron type!", _state);
@@ -5036,7 +5036,7 @@ void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *co
       for (i = 1; i <= nout - 1; i++) {
          mx = ae_maxreal(mx, y->xR[i], _state);
       }
-      net = (double)(0);
+      net = 0.0;
       for (i = 0; i <= nout - 1; i++) {
          y->xR[i] = ae_exp(y->xR[i] - mx, _state);
          net = net + y->xR[i];
@@ -5590,7 +5590,7 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    }
    dserrfinish(&pbuf->tmp0, _state);
    rep->relclserror = pbuf->tmp0.xR[0];
-   rep->avgce = pbuf->tmp0.xR[1] / ae_log((double)(2), _state);
+   rep->avgce = pbuf->tmp0.xR[1] / ae_log(2.0, _state);
    rep->rmserror = pbuf->tmp0.xR[2];
    rep->avgerror = pbuf->tmp0.xR[3];
    rep->avgrelerror = pbuf->tmp0.xR[4];
@@ -6048,13 +6048,13 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
 // Fill weights by small random values
 // Initialize means and sigmas
    for (i = 0; i <= nin - 1; i++) {
-      network->columnmeans.xR[i] = (double)(0);
-      network->columnsigmas.xR[i] = (double)(1);
+      network->columnmeans.xR[i] = 0.0;
+      network->columnsigmas.xR[i] = 1.0;
    }
    if (!isclsnet) {
       for (i = 0; i <= nout - 1; i++) {
-         network->columnmeans.xR[nin + i] = (double)(0);
-         network->columnsigmas.xR[nin + i] = (double)(1);
+         network->columnmeans.xR[nin + i] = 0.0;
+         network->columnsigmas.xR[nin + i] = 1.0;
       }
    }
    mlprandomize(network, _state);
@@ -6129,9 +6129,9 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
    ae_matrix_set_length(&ry, ntotal + nout - 1 + 1, wcount - 1 + 1, _state);
    ae_matrix_set_length(&rdx, ntotal + nout - 1 + 1, wcount - 1 + 1, _state);
    ae_matrix_set_length(&rdy, ntotal + nout - 1 + 1, wcount - 1 + 1, _state);
-   *e = (double)(0);
+   *e = 0.0;
    for (i = 0; i <= wcount - 1; i++) {
-      zeros.xR[i] = (double)(0);
+      zeros.xR[i] = 0.0;
    }
    ae_v_move(&grad->xR[0], 1, &zeros.xR[0], 1, ae_v_len(0, wcount - 1));
    for (i = 0; i <= wcount - 1; i++) {
@@ -6150,9 +6150,9 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          kl = ae_round(xy->xyR[k][nin], _state);
          for (i = 0; i <= nout - 1; i++) {
             if (i == kl) {
-               desiredy.xR[i] = (double)(1);
+               desiredy.xR[i] = 1.0;
             } else {
-               desiredy.xR[i] = (double)(0);
+               desiredy.xR[i] = 0.0;
             }
          }
       } else {
@@ -6281,7 +6281,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          //
          // j=i:   d(ei)/d(yj) = T*exp(yi)*(S-exp(yi))/S^2
          // j<>i:  d(ei)/d(yj) = -T*exp(yi)*exp(yj)/S^2
-            t = (double)(0);
+            t = 0.0;
             for (i = 0; i <= nout - 1; i++) {
                t = t + desiredy.xR[i];
             }
@@ -6289,7 +6289,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             for (i = 0; i <= nout - 1; i++) {
                mx = ae_maxreal(mx, network->neurons.xR[ntotal - nout + i], _state);
             }
-            s = (double)(0);
+            s = 0.0;
             for (i = 0; i <= nout - 1; i++) {
                network->nwbuf.xR[i] = ae_exp(network->neurons.xR[ntotal - nout + i] - mx, _state);
                s = s + network->nwbuf.xR[i];
@@ -6317,14 +6317,14 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             for (i = 0; i <= nout - 1; i++) {
                mx = ae_maxreal(mx, network->neurons.xR[ntotal - nout + i], _state);
             }
-            s = (double)(0);
-            s2 = (double)(0);
+            s = 0.0;
+            s2 = 0.0;
             for (i = 0; i <= nout - 1; i++) {
                network->nwbuf.xR[i] = ae_exp(network->neurons.xR[ntotal - nout + i] - mx, _state);
                s = s + network->nwbuf.xR[i];
                s2 = s2 + ae_sqr(network->nwbuf.xR[i], _state);
             }
-            q = (double)(0);
+            q = 0.0;
             for (i = 0; i <= nout - 1; i++) {
                q = q + (network->y.xR[i] - desiredy.xR[i]) * network->nwbuf.xR[i];
             }
@@ -6453,7 +6453,7 @@ static void mlpbase_mlpinternalcalculategradient(multilayerperceptron *network, 
          for (i = 0; i <= nout - 1; i++) {
             mx = ae_maxreal(mx, network->neurons.xR[ntotal - nout + i], _state);
          }
-         net = (double)(0);
+         net = 0.0;
          for (i = 0; i <= nout - 1; i++) {
             network->nwbuf.xR[i] = ae_exp(network->neurons.xR[ntotal - nout + i] - mx, _state);
             net = net + network->nwbuf.xR[i];
@@ -6585,7 +6585,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
 // will be initialized by zeros - and won't be  rewritten  by  non-zero
 // values during backpropagation.
    for (i = 0; i <= entrysize * ntotal - 1; i++) {
-      batch4buf->xR[i] = (double)(0);
+      batch4buf->xR[i] = 0.0;
    }
 
 // Forward pass:
@@ -6594,7 +6594,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    for (i = 0; i <= nin - 1; i++) {
       entryoffs = entrysize * i;
       for (j = 0; j <= csize - 1; j++) {
-         if (ae_fp_neq(network->columnsigmas.xR[i], (double)(0))) {
+         if (ae_fp_neq(network->columnsigmas.xR[i], 0.0)) {
             batch4buf->xR[entryoffs + j] = (xy->xyR[cstart + j][i] - network->columnmeans.xR[i]) / network->columnsigmas.xR[i];
          } else {
             batch4buf->xR[entryoffs + j] = xy->xyR[cstart + j][i] - network->columnmeans.xR[i];
@@ -6635,10 +6635,10 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          srcneuronidx = network->structinfo.xZ[offs + 2];
          srcentryoffs = entrysize * srcneuronidx;
          srcweightidx = network->structinfo.xZ[offs + 3];
-         v0 = (double)(0);
-         v1 = (double)(0);
-         v2 = (double)(0);
-         v3 = (double)(0);
+         v0 = 0.0;
+         v1 = 0.0;
+         v2 = 0.0;
+         v3 = 0.0;
          for (j = 0; j <= nweights - 1; j++) {
             v = network->weights.xR[srcweightidx];
             srcweightidx = srcweightidx + 1;
@@ -6652,10 +6652,10 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          batch4buf->xR[entryoffs + 1] = v1;
          batch4buf->xR[entryoffs + 2] = v2;
          batch4buf->xR[entryoffs + 3] = v3;
-         batch4buf->xR[entryoffs + 0 + dfoffs] = (double)(1);
-         batch4buf->xR[entryoffs + 1 + dfoffs] = (double)(1);
-         batch4buf->xR[entryoffs + 2 + dfoffs] = (double)(1);
-         batch4buf->xR[entryoffs + 3 + dfoffs] = (double)(1);
+         batch4buf->xR[entryoffs + 0 + dfoffs] = 1.0;
+         batch4buf->xR[entryoffs + 1 + dfoffs] = 1.0;
+         batch4buf->xR[entryoffs + 2 + dfoffs] = 1.0;
+         batch4buf->xR[entryoffs + 3 + dfoffs] = 1.0;
          continue;
       }
       if (neurontype < 0) {
@@ -6668,27 +6668,27 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          if (neurontype == -3) {
 
          // "-1" neuron
-            batch4buf->xR[entryoffs + 0] = (double)(-1);
-            batch4buf->xR[entryoffs + 1] = (double)(-1);
-            batch4buf->xR[entryoffs + 2] = (double)(-1);
-            batch4buf->xR[entryoffs + 3] = (double)(-1);
-            batch4buf->xR[entryoffs + 0 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 1 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 2 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 3 + dfoffs] = (double)(0);
+            batch4buf->xR[entryoffs + 0] = -1.0;
+            batch4buf->xR[entryoffs + 1] = -1.0;
+            batch4buf->xR[entryoffs + 2] = -1.0;
+            batch4buf->xR[entryoffs + 3] = -1.0;
+            batch4buf->xR[entryoffs + 0 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 1 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 2 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 3 + dfoffs] = 0.0;
             bflag = true;
          }
          if (neurontype == -4) {
 
          // "0" neuron
-            batch4buf->xR[entryoffs + 0] = (double)(0);
-            batch4buf->xR[entryoffs + 1] = (double)(0);
-            batch4buf->xR[entryoffs + 2] = (double)(0);
-            batch4buf->xR[entryoffs + 3] = (double)(0);
-            batch4buf->xR[entryoffs + 0 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 1 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 2 + dfoffs] = (double)(0);
-            batch4buf->xR[entryoffs + 3 + dfoffs] = (double)(0);
+            batch4buf->xR[entryoffs + 0] = 0.0;
+            batch4buf->xR[entryoffs + 1] = 0.0;
+            batch4buf->xR[entryoffs + 2] = 0.0;
+            batch4buf->xR[entryoffs + 3] = 0.0;
+            batch4buf->xR[entryoffs + 0 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 1 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 2 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + 3 + dfoffs] = 0.0;
             bflag = true;
          }
          ae_assert(bflag, "MLPChunkedGradient: internal error - unknown neuron type!", _state);
@@ -6761,10 +6761,10 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    // exponentials.
       entryoffs = entrysize * (ntotal - nout);
       offs0 = entrysize * ntotal;
-      s0 = (double)(0);
-      s1 = (double)(0);
-      s2 = (double)(0);
-      s3 = (double)(0);
+      s0 = 0.0;
+      s1 = 0.0;
+      s2 = 0.0;
+      s3 = 0.0;
       for (i = 0; i <= nout - 1; i++) {
          v = ae_exp(batch4buf->xR[entryoffs + 0] - v0, _state);
          s0 = s0 + v;
@@ -6821,9 +6821,9 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
             offs2 = entrysize * ntotal + k;
             for (i = 0; i <= nout - 1; i++) {
                if (i == kl) {
-                  v = (double)(1);
+                  v = 1.0;
                } else {
-                  v = (double)(0);
+                  v = 0.0;
                }
                vv = batch4buf->xR[offs2];
                batch4buf->xR[offs1] = vv / s - v;
@@ -6841,7 +6841,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          for (k = 0; k <= csize - 1; k++) {
             s = batch4buf->xR[offs0 + k];
             kl = ae_round(xy->xyR[cstart + k][nin], _state);
-            vv = (double)(0);
+            vv = 0.0;
             offs1 = entrysize * ntotal + k;
             offs2 = entrysize * ntotal + nout * chunksize + k;
             for (i = 0; i <= nout - 1; i++) {
@@ -7004,7 +7004,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
 // simply  working  with  ALL  components  of  Batch4Buf,  without ever
 // looking at CSize.
    for (i = 0; i <= entrysize * ntotal - 1; i++) {
-      batch4buf->xR[i] = (double)(0);
+      batch4buf->xR[i] = 0.0;
    }
 
 // Forward pass:
@@ -7013,7 +7013,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
    for (i = 0; i <= nin - 1; i++) {
       entryoffs = entrysize * i;
       for (j = 0; j <= csize - 1; j++) {
-         if (ae_fp_neq(network->columnsigmas.xR[i], (double)(0))) {
+         if (ae_fp_neq(network->columnsigmas.xR[i], 0.0)) {
             batch4buf->xR[entryoffs + j] = (xy->xyR[cstart + j][i] - network->columnmeans.xR[i]) / network->columnsigmas.xR[i];
          } else {
             batch4buf->xR[entryoffs + j] = xy->xyR[cstart + j][i] - network->columnmeans.xR[i];
@@ -7050,10 +7050,10 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
          srcneuronidx = network->structinfo.xZ[offs + 2];
          srcentryoffs = entrysize * srcneuronidx;
          srcweightidx = network->structinfo.xZ[offs + 3];
-         v0 = (double)(0);
-         v1 = (double)(0);
-         v2 = (double)(0);
-         v3 = (double)(0);
+         v0 = 0.0;
+         v1 = 0.0;
+         v2 = 0.0;
+         v3 = 0.0;
          for (j = 0; j <= nweights - 1; j++) {
             v = network->weights.xR[srcweightidx];
             srcweightidx = srcweightidx + 1;
@@ -7079,19 +7079,19 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
          if (neurontype == -3) {
 
          // "-1" neuron
-            batch4buf->xR[entryoffs + 0] = (double)(-1);
-            batch4buf->xR[entryoffs + 1] = (double)(-1);
-            batch4buf->xR[entryoffs + 2] = (double)(-1);
-            batch4buf->xR[entryoffs + 3] = (double)(-1);
+            batch4buf->xR[entryoffs + 0] = -1.0;
+            batch4buf->xR[entryoffs + 1] = -1.0;
+            batch4buf->xR[entryoffs + 2] = -1.0;
+            batch4buf->xR[entryoffs + 3] = -1.0;
             bflag = true;
          }
          if (neurontype == -4) {
 
          // "0" neuron
-            batch4buf->xR[entryoffs + 0] = (double)(0);
-            batch4buf->xR[entryoffs + 1] = (double)(0);
-            batch4buf->xR[entryoffs + 2] = (double)(0);
-            batch4buf->xR[entryoffs + 3] = (double)(0);
+            batch4buf->xR[entryoffs + 0] = 0.0;
+            batch4buf->xR[entryoffs + 1] = 0.0;
+            batch4buf->xR[entryoffs + 2] = 0.0;
+            batch4buf->xR[entryoffs + 3] = 0.0;
             bflag = true;
          }
          ae_assert(bflag, "MLPChunkedProcess: internal error - unknown neuron type!", _state);
@@ -7147,10 +7147,10 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
    // calculate sum of exponentials.
       entryoffs = entrysize * (ntotal - nout);
       offs0 = entrysize * ntotal;
-      s0 = (double)(0);
-      s1 = (double)(0);
-      s2 = (double)(0);
-      s3 = (double)(0);
+      s0 = 0.0;
+      s1 = 0.0;
+      s2 = 0.0;
+      s3 = 0.0;
       for (i = 0; i <= nout - 1; i++) {
          v = ae_exp(batch4buf->xR[entryoffs + 0] - v0, _state);
          s0 = s0 + v;
@@ -7212,14 +7212,14 @@ static double mlpbase_safecrossentropy(double t, double z, ae_state *_state) {
    double r;
    double result;
 
-   if (ae_fp_eq(t, (double)(0))) {
-      result = (double)(0);
+   if (ae_fp_eq(t, 0.0)) {
+      result = 0.0;
    } else {
-      if (ae_fp_greater(ae_fabs(z, _state), (double)(1))) {
+      if (ae_fp_greater(ae_fabs(z, _state), 1.0)) {
 
       // Shouldn't be the case with softmax,
       // but we just want to be sure.
-         if (ae_fp_eq(t / z, (double)(0))) {
+         if (ae_fp_eq(t / z, 0.0)) {
             r = ae_minrealnumber;
          } else {
             r = t / z;
@@ -7227,7 +7227,7 @@ static double mlpbase_safecrossentropy(double t, double z, ae_state *_state) {
       } else {
 
       // Normal case
-         if (ae_fp_eq(z, (double)(0)) || ae_fp_greater_eq(ae_fabs(t, _state), ae_maxrealnumber * ae_fabs(z, _state))) {
+         if (ae_fp_eq(z, 0.0) || ae_fp_greater_eq(ae_fabs(t, _state), ae_maxrealnumber * ae_fabs(z, _state))) {
             r = ae_maxrealnumber;
          } else {
             r = t / z;
@@ -7305,13 +7305,13 @@ static void mlpbase_randomizebackwardpass(multilayerperceptron *network, ae_int_
 }
 
 void modelerrors_init(void *_p, ae_state *_state, bool make_automatic) {
-   modelerrors *p = (modelerrors *) _p;
+   modelerrors *p = (modelerrors *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void modelerrors_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   modelerrors *dst = (modelerrors *) _dst;
-   modelerrors *src = (modelerrors *) _src;
+   modelerrors *dst = (modelerrors *)_dst;
+   modelerrors *src = (modelerrors *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -7320,31 +7320,31 @@ void modelerrors_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void modelerrors_free(void *_p, bool make_automatic) {
-   modelerrors *p = (modelerrors *) _p;
+   modelerrors *p = (modelerrors *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void smlpgrad_init(void *_p, ae_state *_state, bool make_automatic) {
-   smlpgrad *p = (smlpgrad *) _p;
+   smlpgrad *p = (smlpgrad *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
 }
 
 void smlpgrad_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   smlpgrad *dst = (smlpgrad *) _dst;
-   smlpgrad *src = (smlpgrad *) _src;
+   smlpgrad *dst = (smlpgrad *)_dst;
+   smlpgrad *src = (smlpgrad *)_src;
    dst->f = src->f;
    ae_vector_copy(&dst->g, &src->g, _state, make_automatic);
 }
 
 void smlpgrad_free(void *_p, bool make_automatic) {
-   smlpgrad *p = (smlpgrad *) _p;
+   smlpgrad *p = (smlpgrad *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->g, make_automatic);
 }
 
 void multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic) {
-   multilayerperceptron *p = (multilayerperceptron *) _p;
+   multilayerperceptron *p = (multilayerperceptron *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->hllayersizes, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->hlconnections, 0, DT_INT, _state, make_automatic);
@@ -7373,8 +7373,8 @@ void multilayerperceptron_init(void *_p, ae_state *_state, bool make_automatic) 
 }
 
 void multilayerperceptron_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   multilayerperceptron *dst = (multilayerperceptron *) _dst;
-   multilayerperceptron *src = (multilayerperceptron *) _src;
+   multilayerperceptron *dst = (multilayerperceptron *)_dst;
+   multilayerperceptron *src = (multilayerperceptron *)_src;
    dst->hlnetworktype = src->hlnetworktype;
    dst->hlnormtype = src->hlnormtype;
    ae_vector_copy(&dst->hllayersizes, &src->hllayersizes, _state, make_automatic);
@@ -7404,7 +7404,7 @@ void multilayerperceptron_copy(void *_dst, void *_src, ae_state *_state, bool ma
 }
 
 void multilayerperceptron_free(void *_p, bool make_automatic) {
-   multilayerperceptron *p = (multilayerperceptron *) _p;
+   multilayerperceptron *p = (multilayerperceptron *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->hllayersizes, make_automatic);
    ae_vector_free(&p->hlconnections, make_automatic);
@@ -8410,10 +8410,10 @@ void mlpeprocess(mlpensemble *ensemble, RVector *x, RVector *y, ae_state *_state
    } else {
       cc = mlpgetinputscount(&ensemble->network, _state) + mlpgetoutputscount(&ensemble->network, _state);
    }
-   v = (double)1 / (double)es;
+   v = 1.0 / es;
    nout = mlpgetoutputscount(&ensemble->network, _state);
    for (i = 0; i <= nout - 1; i++) {
-      y->xR[i] = (double)(0);
+      y->xR[i] = 0.0;
    }
    for (i = 0; i <= es - 1; i++) {
       ae_v_move(&ensemble->network.weights.xR[0], 1, &ensemble->weights.xR[i * wc], 1, ae_v_len(0, wc - 1));
@@ -8508,7 +8508,7 @@ void mlpeallerrorsx(mlpensemble *ensemble, RMatrix *densexy, sparsematrix *spars
    }
    dserrfinish(&pbuf->tmp0, _state);
    rep->relclserror = pbuf->tmp0.xR[0];
-   rep->avgce = pbuf->tmp0.xR[1] / ae_log((double)(2), _state);
+   rep->avgce = pbuf->tmp0.xR[1] / ae_log(2.0, _state);
    rep->rmserror = pbuf->tmp0.xR[2];
    rep->avgerror = pbuf->tmp0.xR[3];
    rep->avgrelerror = pbuf->tmp0.xR[4];
@@ -8763,7 +8763,7 @@ void mlpeunserialize(ae_serializer *s, mlpensemble *ensemble, ae_state *_state) 
 }
 
 void mlpensemble_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlpensemble *p = (mlpensemble *) _p;
+   mlpensemble *p = (mlpensemble *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->weights, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->columnmeans, 0, DT_REAL, _state, make_automatic);
@@ -8773,8 +8773,8 @@ void mlpensemble_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void mlpensemble_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlpensemble *dst = (mlpensemble *) _dst;
-   mlpensemble *src = (mlpensemble *) _src;
+   mlpensemble *dst = (mlpensemble *)_dst;
+   mlpensemble *src = (mlpensemble *)_src;
    dst->ensemblesize = src->ensemblesize;
    ae_vector_copy(&dst->weights, &src->weights, _state, make_automatic);
    ae_vector_copy(&dst->columnmeans, &src->columnmeans, _state, make_automatic);
@@ -8784,7 +8784,7 @@ void mlpensemble_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void mlpensemble_free(void *_p, bool make_automatic) {
-   mlpensemble *p = (mlpensemble *) _p;
+   mlpensemble *p = (mlpensemble *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->weights, make_automatic);
    ae_vector_free(&p->columnmeans, make_automatic);
@@ -9214,11 +9214,11 @@ void clusterizersetdistances(clusterizerstate *s, RMatrix *d, ae_int_t npoints, 
          j1 = i - 1;
       }
       for (j = j0; j <= j1; j++) {
-         ae_assert(ae_isfinite(d->xyR[i][j], _state) && ae_fp_greater_eq(d->xyR[i][j], (double)(0)), "ClusterizerSetDistances: D contains infinite, NAN or negative elements", _state);
+         ae_assert(ae_isfinite(d->xyR[i][j], _state) && ae_fp_greater_eq(d->xyR[i][j], 0.0), "ClusterizerSetDistances: D contains infinite, NAN or negative elements", _state);
          s->d.xyR[i][j] = d->xyR[i][j];
          s->d.xyR[j][i] = d->xyR[i][j];
       }
-      s->d.xyR[i][i] = (double)(0);
+      s->d.xyR[i][i] = 0.0;
    }
 }
 
@@ -9568,7 +9568,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
    }
    if (npoints == 1) {
       rmatrixsetlengthatleast(d, 1, 1, _state);
-      d->xyR[0][0] = (double)(0);
+      d->xyR[0][0] = 0.0;
       return;
    }
 // Build distance matrix D.
@@ -9594,7 +9594,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
       for (j = 0; j <= nfeatures - 1; j++) {
          buf->ra1.xR[j] = 0.0;
       }
-      v = (double)1 / (double)npoints;
+      v = 1.0 / npoints;
       for (i = 0; i <= npoints - 1; i++) {
          ae_v_addd(&buf->ra1.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, nfeatures - 1), v);
       }
@@ -9692,7 +9692,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
       rankdatacentered(&buf->rm0, npoints, nfeatures, _state);
       rmatrixsyrk(npoints, nfeatures, 1.0, &buf->rm0, 0, 0, 0, 0.0, d, 0, 0, true, _state);
       for (i = 0; i <= npoints - 1; i++) {
-         if (ae_fp_greater(d->xyR[i][i], (double)(0))) {
+         if (ae_fp_greater(d->xyR[i][i], 0.0)) {
             buf->ra0.xR[i] = 1 / ae_sqrt(d->xyR[i][i], _state);
          } else {
             buf->ra0.xR[i] = 0.0;
@@ -9708,7 +9708,7 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
             } else {
                vr = 1 - ae_fabs(vv, _state);
             }
-            if (ae_fp_less(vr, (double)(0))) {
+            if (ae_fp_less(vr, 0.0)) {
                vr = 0.0;
             }
             d->xyR[i][j] = vr;
@@ -9907,7 +9907,7 @@ void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *
    SetVector(cidx);
    SetVector(cz);
 
-   ae_assert(ae_isfinite(r, _state) && ae_fp_greater_eq(r, (double)(0)), "ClusterizerSeparatedByDist: R is infinite or less than 0", _state);
+   ae_assert(ae_isfinite(r, _state) && ae_fp_greater_eq(r, 0.0), "ClusterizerSeparatedByDist: R is infinite or less than 0", _state);
    *k = 1;
    while (*k < rep->npoints && ae_fp_greater_eq(rep->mergedist.xR[rep->npoints - 1 - (*k)], r)) {
       *k = *k + 1;
@@ -9967,7 +9967,7 @@ void clusterizerseparatedbycorr(ahcreport *rep, double r, ae_int_t *k, ZVector *
    SetVector(cidx);
    SetVector(cz);
 
-   ae_assert((ae_isfinite(r, _state) && ae_fp_greater_eq(r, (double)(-1))) && ae_fp_less_eq(r, (double)(1)), "ClusterizerSeparatedByCorr: R is infinite or less than 0", _state);
+   ae_assert((ae_isfinite(r, _state) && ae_fp_greater_eq(r, -1.0)) && ae_fp_less_eq(r, 1.0), "ClusterizerSeparatedByCorr: R is infinite or less than 0", _state);
    *k = 1;
    while (*k < rep->npoints && ae_fp_greater_eq(rep->mergedist.xR[rep->npoints - 1 - (*k)], 1 - r)) {
       *k = *k + 1;
@@ -10136,7 +10136,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
             }
             for (i = 0; i <= k - 1; i++) {
                for (j = 0; j <= nvars - 1; j++) {
-                  buf->ct.xyR[i][j] = (double)(0);
+                  buf->ct.xyR[i][j] = 0.0;
                }
             }
             for (i = 0; i <= npoints - 1; i++) {
@@ -10146,7 +10146,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
             zerosizeclusters = false;
             for (j = 0; j <= k - 1; j++) {
                if (buf->csizes.xZ[j] != 0) {
-                  v = (double)1 / (double)buf->csizes.xZ[j];
+                  v = 1.0 / buf->csizes.xZ[j];
                   ae_v_muld(&buf->ct.xyR[j][0], 1, ae_v_len(0, nvars - 1), v);
                }
                zerosizeclusters = zerosizeclusters || buf->csizes.xZ[j] == 0;
@@ -10169,7 +10169,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
          // Stop if one of two conditions is met:
          // 1. nothing has changed during iteration
          // 2. energy function increased after recalculation on new centers
-            e = (double)(0);
+            e = 0.0;
             for (i = 0; i <= npoints - 1; i++) {
                v = 0.0;
                i1 = xyc->xZ[i];
@@ -10190,7 +10190,7 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
       // Debug mode: no Lloyd's iteration.
       // We just calculate potential E.
          kmeansupdatedistances(xy, 0, npoints, nvars, &buf->ct, 0, k, xyc, &buf->d2, &buf->updatepool, _state);
-         e = (double)(0);
+         e = 0.0;
          for (i = 0; i <= npoints - 1; i++) {
             e = e + buf->d2.xR[i];
          }
@@ -10311,7 +10311,7 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 // Try to recursively divide/process dataset
 //
 // NOTE: real arithmetics is used to avoid integer overflow on large problem sizes
-   rcomplexity = 2 * rmul3((double)(idx1 - idx0), (double)(cidx1 - cidx0), (double)(nvars), _state);
+   rcomplexity = 2 * rmul3((double)(idx1 - idx0), (double)(cidx1 - cidx0), (double)nvars, _state);
    if (ae_fp_greater_eq(rcomplexity, smpactivationlevel(_state)) && idx1 - idx0 >= 2 * clustering_kmeansblocksize) {
       if (_trypexec_kmeansupdatedistances(xy, idx0, idx1, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool, _state)) {
          ae_frame_leave(_state);
@@ -11189,7 +11189,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
    if (j1 <= j0 || i1 <= i0) {
       return;
    }
-   rcomplexity = clustering_complexitymultiplier * rmul3((double)(i1 - i0), (double)(j1 - j0), (double)(nfeatures), _state);
+   rcomplexity = clustering_complexitymultiplier * rmul3((double)(i1 - i0), (double)(j1 - j0), (double)nfeatures, _state);
    if ((i1 - i0 > 2 || j1 - j0 > 2) && ae_fp_greater_eq(rcomplexity, smpactivationlevel(_state))) {
       if (_trypexec_clustering_evaluatedistancematrixrec(xy, nfeatures, disttype, d, i0, i1, j0, j1, _state)) {
          return;
@@ -11228,7 +11228,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
             if (disttype == 0) {
                for (k = 0; k <= nfeatures - 1; k++) {
                   vv = xy->xyR[i][k] - xy->xyR[j][k];
-                  if (ae_fp_less(vv, (double)(0))) {
+                  if (ae_fp_less(vv, 0.0)) {
                      vv = -vv;
                   }
                   if (ae_fp_greater(vv, v)) {
@@ -11239,7 +11239,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
             if (disttype == 1) {
                for (k = 0; k <= nfeatures - 1; k++) {
                   vv = xy->xyR[i][k] - xy->xyR[j][k];
-                  if (ae_fp_less(vv, (double)(0))) {
+                  if (ae_fp_less(vv, 0.0)) {
                      vv = -vv;
                   }
                   v = v + vv;
@@ -11257,7 +11257,7 @@ bool _trypexec_clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatu
 }
 
 void kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
-   kmeansbuffers *p = (kmeansbuffers *) _p;
+   kmeansbuffers *p = (kmeansbuffers *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->ct, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->ctbest, 0, 0, DT_REAL, _state, make_automatic);
@@ -11270,8 +11270,8 @@ void kmeansbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void kmeansbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   kmeansbuffers *dst = (kmeansbuffers *) _dst;
-   kmeansbuffers *src = (kmeansbuffers *) _src;
+   kmeansbuffers *dst = (kmeansbuffers *)_dst;
+   kmeansbuffers *src = (kmeansbuffers *)_src;
    ae_matrix_copy(&dst->ct, &src->ct, _state, make_automatic);
    ae_matrix_copy(&dst->ctbest, &src->ctbest, _state, make_automatic);
    ae_vector_copy(&dst->xycbest, &src->xycbest, _state, make_automatic);
@@ -11283,7 +11283,7 @@ void kmeansbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 }
 
 void kmeansbuffers_free(void *_p, bool make_automatic) {
-   kmeansbuffers *p = (kmeansbuffers *) _p;
+   kmeansbuffers *p = (kmeansbuffers *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->ct, make_automatic);
    ae_matrix_free(&p->ctbest, make_automatic);
@@ -11296,7 +11296,7 @@ void kmeansbuffers_free(void *_p, bool make_automatic) {
 }
 
 void clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic) {
-   clusterizerstate *p = (clusterizerstate *) _p;
+   clusterizerstate *p = (clusterizerstate *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->xy, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->d, 0, 0, DT_REAL, _state, make_automatic);
@@ -11306,8 +11306,8 @@ void clusterizerstate_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void clusterizerstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   clusterizerstate *dst = (clusterizerstate *) _dst;
-   clusterizerstate *src = (clusterizerstate *) _src;
+   clusterizerstate *dst = (clusterizerstate *)_dst;
+   clusterizerstate *src = (clusterizerstate *)_src;
    dst->npoints = src->npoints;
    dst->nfeatures = src->nfeatures;
    dst->disttype = src->disttype;
@@ -11325,7 +11325,7 @@ void clusterizerstate_copy(void *_dst, void *_src, ae_state *_state, bool make_a
 }
 
 void clusterizerstate_free(void *_p, bool make_automatic) {
-   clusterizerstate *p = (clusterizerstate *) _p;
+   clusterizerstate *p = (clusterizerstate *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->xy, make_automatic);
    ae_matrix_free(&p->d, make_automatic);
@@ -11335,7 +11335,7 @@ void clusterizerstate_free(void *_p, bool make_automatic) {
 }
 
 void ahcreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   ahcreport *p = (ahcreport *) _p;
+   ahcreport *p = (ahcreport *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->p, 0, DT_INT, _state, make_automatic);
    ae_matrix_init(&p->z, 0, 0, DT_INT, _state, make_automatic);
@@ -11345,8 +11345,8 @@ void ahcreport_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void ahcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   ahcreport *dst = (ahcreport *) _dst;
-   ahcreport *src = (ahcreport *) _src;
+   ahcreport *dst = (ahcreport *)_dst;
+   ahcreport *src = (ahcreport *)_src;
    dst->terminationtype = src->terminationtype;
    dst->npoints = src->npoints;
    ae_vector_copy(&dst->p, &src->p, _state, make_automatic);
@@ -11357,7 +11357,7 @@ void ahcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void ahcreport_free(void *_p, bool make_automatic) {
-   ahcreport *p = (ahcreport *) _p;
+   ahcreport *p = (ahcreport *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->p, make_automatic);
    ae_matrix_free(&p->z, make_automatic);
@@ -11367,15 +11367,15 @@ void ahcreport_free(void *_p, bool make_automatic) {
 }
 
 void kmeansreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   kmeansreport *p = (kmeansreport *) _p;
+   kmeansreport *p = (kmeansreport *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->c, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cidx, 0, DT_INT, _state, make_automatic);
 }
 
 void kmeansreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   kmeansreport *dst = (kmeansreport *) _dst;
-   kmeansreport *src = (kmeansreport *) _src;
+   kmeansreport *dst = (kmeansreport *)_dst;
+   kmeansreport *src = (kmeansreport *)_src;
    dst->npoints = src->npoints;
    dst->nfeatures = src->nfeatures;
    dst->terminationtype = src->terminationtype;
@@ -11387,7 +11387,7 @@ void kmeansreport_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void kmeansreport_free(void *_p, bool make_automatic) {
-   kmeansreport *p = (kmeansreport *) _p;
+   kmeansreport *p = (kmeansreport *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->c, make_automatic);
    ae_vector_free(&p->cidx, make_automatic);
@@ -11888,7 +11888,7 @@ void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints
 // API: void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars, const xparams _xparams = xdefault);
 void dfbuildersetrndvars(decisionforestbuilder *s, ae_int_t rndvars, ae_state *_state) {
 
-   s->rdfvars = (double)(ae_maxint(rndvars, 1, _state));
+   s->rdfvars = (double)ae_maxint(rndvars, 1, _state);
 }
 
 // This function sets number of variables used by decision forest construction
@@ -11923,7 +11923,7 @@ void dfbuildersetrndvarsratio(decisionforestbuilder *s, double f, ae_state *_sta
 // API: void dfbuildersetrndvarsauto(const decisionforestbuilder &s, const xparams _xparams = xdefault);
 void dfbuildersetrndvarsauto(decisionforestbuilder *s, ae_state *_state) {
 
-   s->rdfvars = (double)(0);
+   s->rdfvars = 0.0;
 }
 
 // This function sets size of dataset subsample generated the decision forest
@@ -12244,9 +12244,9 @@ double dfbuildergetprogress(decisionforestbuilder *s, ae_state *_state) {
 double dfbuilderpeekprogress(decisionforestbuilder *s, ae_state *_state) {
    double result;
 
-   result = s->rdfprogress / ae_maxreal((double)(s->rdftotal), (double)(1), _state);
-   result = ae_maxreal(result, (double)(0), _state);
-   result = ae_minreal(result, (double)(1), _state);
+   result = s->rdfprogress / ae_maxreal((double)s->rdftotal, 1.0, _state);
+   result = ae_maxreal(result, 0.0, _state);
+   result = ae_minreal(result, 1.0, _state);
    return result;
 }
 
@@ -12351,7 +12351,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
       df->bufsize = 1 + dforest_leafnodewidth;
       ae_vector_set_length(&df->trees, 1 + dforest_leafnodewidth, _state);
       df->trees.xR[0] = (double)(1 + dforest_leafnodewidth);
-      df->trees.xR[1] = (double)(-1);
+      df->trees.xR[1] = -1.0;
       df->trees.xR[2] = 0.0;
       dfcreatebuffer(df, &df->buffer, _state);
       ae_frame_leave(_state);
@@ -12392,8 +12392,8 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
    ae_vector_set_length(&votebufseed.trntotals, npoints * nclasses, _state);
    ae_vector_set_length(&votebufseed.oobtotals, npoints * nclasses, _state);
    for (i = 0; i <= npoints * nclasses - 1; i++) {
-      votebufseed.trntotals.xR[i] = (double)(0);
-      votebufseed.oobtotals.xR[i] = (double)(0);
+      votebufseed.trntotals.xR[i] = 0.0;
+      votebufseed.oobtotals.xR[i] = 0.0;
    }
    ae_vector_set_length(&votebufseed.trncounts, npoints, _state);
    ae_vector_set_length(&votebufseed.oobcounts, npoints, _state);
@@ -12540,7 +12540,7 @@ void dfprocess(decisionforest *df, RVector *x, RVector *y, ae_state *_state) {
       ae_vector_set_length(y, df->nclasses, _state);
    }
    for (i = 0; i <= df->nclasses - 1; i++) {
-      y->xR[i] = (double)(0);
+      y->xR[i] = 0.0;
    }
    processed = false;
    if (df->forestformat == dforest_dfuncompressedv0) {
@@ -12565,7 +12565,7 @@ void dfprocess(decisionforest *df, RVector *x, RVector *y, ae_state *_state) {
       processed = true;
    }
    ae_assert(processed, "DFProcess: integrity check failed (unexpected format?)", _state);
-   v = (double)1 / (double)df->ntrees;
+   v = 1.0 / df->ntrees;
    ae_v_muld(&y->xR[0], 1, ae_v_len(0, df->nclasses - 1), v);
 }
 
@@ -12728,7 +12728,7 @@ void dftsprocess(decisionforest *df, decisionforestbuffer *buf, RVector *x, RVec
 double dfrelclserror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_state) {
    double result;
 
-   result = (double)dforest_dfclserror(df, xy, npoints, _state) / (double)npoints;
+   result = (double)dforest_dfclserror(df, xy, npoints, _state) / npoints;
    return result;
 }
 
@@ -12758,7 +12758,7 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_sta
 
    ae_vector_set_length(&x, df->nvars - 1 + 1, _state);
    ae_vector_set_length(&y, df->nclasses - 1 + 1, _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&x.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, df->nvars - 1));
       dfprocess(df, &x, &y, _state);
@@ -12772,7 +12772,7 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_sta
                tmpi = j;
             }
          }
-         if (ae_fp_neq(y.xR[k], (double)(0))) {
+         if (ae_fp_neq(y.xR[k], 0.0)) {
             result = result - ae_log(y.xR[k], _state);
          } else {
             result = result - ae_log(ae_minrealnumber, _state);
@@ -12812,7 +12812,7 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_
 
    ae_vector_set_length(&x, df->nvars - 1 + 1, _state);
    ae_vector_set_length(&y, df->nclasses - 1 + 1, _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&x.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, df->nvars - 1));
       dfprocess(df, &x, &y, _state);
@@ -12870,7 +12870,7 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state *_
 
    ae_vector_set_length(&x, df->nvars - 1 + 1, _state);
    ae_vector_set_length(&y, df->nclasses - 1 + 1, _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&x.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, df->nvars - 1));
       dfprocess(df, &x, &y, _state);
@@ -12923,7 +12923,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state
 
    ae_vector_set_length(&x, df->nvars - 1 + 1, _state);
    ae_vector_set_length(&y, df->nclasses - 1 + 1, _state);
-   result = (double)(0);
+   result = 0.0;
    relcnt = 0;
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&x.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, df->nvars - 1));
@@ -12941,7 +12941,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints, ae_state
       } else {
 
       // regression-specific code
-         if (ae_fp_neq(xy->xyR[i][df->nvars], (double)(0))) {
+         if (ae_fp_neq(xy->xyR[i][df->nvars], 0.0)) {
             result = result + ae_fabs((y.xR[0] - xy->xyR[i][df->nvars]) / xy->xyR[i][df->nvars], _state);
             relcnt = relcnt + 1;
          }
@@ -13127,7 +13127,7 @@ void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, 
    SetObj(decisionforest, df);
    SetObj(dfreport, rep);
 
-   if (ae_fp_less_eq(r, (double)(0)) || ae_fp_greater(r, (double)(1))) {
+   if (ae_fp_less_eq(r, 0.0) || ae_fp_greater(r, 1.0)) {
       *info = -1;
       return;
    }
@@ -13147,7 +13147,7 @@ void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars
    SetObj(decisionforest, df);
    SetObj(dfreport, rep);
 
-   if (ae_fp_less_eq(r, (double)(0)) || ae_fp_greater(r, (double)(1))) {
+   if (ae_fp_less_eq(r, 0.0) || ae_fp_greater(r, 1.0)) {
       *info = -1;
       return;
    }
@@ -13187,7 +13187,7 @@ void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t ncl
    *info = 1;
    dfbuildercreate(&builder, _state);
    dfbuildersetdataset(&builder, xy, npoints, nvars, nclasses, _state);
-   dfbuildersetsubsampleratio(&builder, (double)samplesize / (double)npoints, _state);
+   dfbuildersetsubsampleratio(&builder, (double)samplesize / npoints, _state);
    dfbuildersetrndvars(&builder, nfeatures, _state);
    dfbuilderbuildrandomforest(&builder, ntrees, df, rep, _state);
    ae_frame_leave(_state);
@@ -13284,11 +13284,11 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
          workbuf->ooblabelsr.xR[i] = s->dsrval.xR[j];
       }
    }
-   varstoselect = ae_round(ae_sqrt((double)(nvars), _state), _state);
-   if (ae_fp_greater(s->rdfvars, (double)(0))) {
+   varstoselect = ae_round(ae_sqrt((double)nvars, _state), _state);
+   if (ae_fp_greater(s->rdfvars, 0.0)) {
       varstoselect = ae_round(s->rdfvars, _state);
    }
-   if (ae_fp_less(s->rdfvars, (double)(0))) {
+   if (ae_fp_less(s->rdfvars, 0.0)) {
       varstoselect = ae_round(-nvars * s->rdfvars, _state);
    }
    varstoselect = ae_maxint(varstoselect, 1, _state);
@@ -13302,7 +13302,7 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
    }
    treesize = 1;
    dforest_buildrandomtreerec(s, workbuf, workingsetsize, varstoselect, &workbuf->treebuf, votebuf, &rs, 0, workbuf->trnsize, 0, workbuf->oobsize, meanloss, meanloss, &treesize, _state);
-   workbuf->treebuf.xR[0] = (double)(treesize);
+   workbuf->treebuf.xR[0] = (double)treesize;
 
 // Store tree
    ae_shared_pool_retrieve(&s->treefactory, &_treebuf, _state);
@@ -13388,7 +13388,7 @@ static void dforest_buildrandomtreerec(decisionforestbuilder *s, dfworkbuf *work
       if (nclasses == 1) {
          dforest_outputleaf(s, workbuf, treebuf, votebuf, idx0, idx1, oobidx0, oobidx1, treesize, workbuf->trnlabelsr.xR[idx0], _state);
       } else {
-         dforest_outputleaf(s, workbuf, treebuf, votebuf, idx0, idx1, oobidx0, oobidx1, treesize, (double)(workbuf->trnlabelsi.xZ[idx0]), _state);
+         dforest_outputleaf(s, workbuf, treebuf, votebuf, idx0, idx1, oobidx0, oobidx1, treesize, (double)workbuf->trnlabelsi.xZ[idx0], _state);
       }
       return;
    }
@@ -13494,12 +13494,12 @@ static void dforest_buildrandomtreerec(decisionforestbuilder *s, dfworkbuf *work
    votebuf->giniimportances.xR[varbest] = votebuf->giniimportances.xR[varbest] + (meanloss - (meanloss0 + meanloss1)) / (topmostmeanloss + 1.0e-20);
 
 // Generate tree node and subtrees (recursively)
-   treebuf->xR[*treesize] = (double)(varbest);
+   treebuf->xR[*treesize] = (double)varbest;
    treebuf->xR[*treesize + 1] = splitbest;
    i = *treesize;
    *treesize = *treesize + dforest_innernodewidth;
    dforest_buildrandomtreerec(s, workbuf, workingset, varstoselect, treebuf, votebuf, rs, idx0, idxtrn, oobidx0, idxoob, meanloss0, topmostmeanloss, treesize, _state);
-   treebuf->xR[i + 2] = (double)(*treesize);
+   treebuf->xR[i + 2] = (double)*treesize;
    dforest_buildrandomtreerec(s, workbuf, workingset, varstoselect, treebuf, votebuf, rs, idxtrn, idx1, idxoob, oobidx1, meanloss1, topmostmeanloss, treesize, _state);
 }
 
@@ -13554,7 +13554,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
          ae_shared_pool_next_recycled(&s->votepool, &_vote, _state);
       }
       for (i = 0; i <= nvars - 1; i++) {
-         rep->varimportances.xR[i] = boundval(rep->varimportances.xR[i], (double)(0), (double)(1), _state);
+         rep->varimportances.xR[i] = boundval(rep->varimportances.xR[i], 0.0, 1.0, _state);
       }
 
    // Compute topvars[] array
@@ -13600,7 +13600,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       nperm = nvars + 2;
       ae_vector_set_length(&permseed.losses, nperm, _state);
       for (j = 0; j <= nperm - 1; j++) {
-         permseed.losses.xR[j] = (double)(0);
+         permseed.losses.xR[j] = 0.0;
       }
       ae_vector_set_length(&permseed.yv, nperm * nclasses, _state);
       ae_vector_set_length(&permseed.xraw, nvars, _state);
@@ -13632,7 +13632,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       totalpermloss = losses.xR[nvars];
       for (i = 0; i <= nvars - 1; i++) {
          rep->varimportances.xR[i] = 1 - nopermloss / totalpermloss - (1 - losses.xR[i] / totalpermloss);
-         rep->varimportances.xR[i] = boundval(rep->varimportances.xR[i], (double)(0), (double)(1), _state);
+         rep->varimportances.xR[i] = boundval(rep->varimportances.xR[i], 0.0, 1.0, _state);
       }
 
    // Compute topvars[] array
@@ -13714,9 +13714,9 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
       }
       if (nclasses > 1) {
          for (j = 0; j <= nclasses - 1; j++) {
-            permimpbuf->targety.xR[j] = (double)(0);
+            permimpbuf->targety.xR[j] = 0.0;
          }
-         permimpbuf->targety.xR[s->dsival.xZ[i]] = (double)(1);
+         permimpbuf->targety.xR[s->dsival.xZ[i]] = 1.0;
       } else {
          permimpbuf->targety.xR[0] = s->dsrval.xR[i];
       }
@@ -13724,7 +13724,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    // Process all trees, for each tree compute NPerm losses corresponding
    // to various permutations of variable values
       for (j = 0; j <= nperm * nclasses - 1; j++) {
-         permimpbuf->yv.xR[j] = (double)(0);
+         permimpbuf->yv.xR[j] = 0.0;
       }
       oobcounts = 0;
       treeroot = 0;
@@ -13742,9 +13742,9 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
             for (j = 0; j <= nvars - 1; j++) {
                permimpbuf->startnodes.xZ[j] = -1;
             }
-            prediction = (double)(0);
+            prediction = 0.0;
             for (;;) {
-               if (ae_fp_eq(df->trees.xR[nodeoffs], (double)(-1))) {
+               if (ae_fp_eq(df->trees.xR[nodeoffs], -1.0)) {
                   prediction = df->trees.xR[nodeoffs + 1];
                   break;
                }
@@ -13772,7 +13772,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
          // This loss is used as a reference loss when we compute R-squared.
             varidx = nvars;
             for (j = 0; j <= nclasses - 1; j++) {
-               permimpbuf->y.xR[j] = (double)(0);
+               permimpbuf->y.xR[j] = 0.0;
             }
             dforest_dfprocessinternaluncompressed(df, treeroot, treeroot + 1, &permimpbuf->xdist, &permimpbuf->y, _state);
             for (j = 0; j <= nclasses - 1; j++) {
@@ -13795,7 +13795,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
                   permimpbuf->xcur.xR[varidx] = permimpbuf->xdist.xR[varidx];
                   nodeoffs = permimpbuf->startnodes.xZ[varidx];
                   for (;;) {
-                     if (ae_fp_eq(df->trees.xR[nodeoffs], (double)(-1))) {
+                     if (ae_fp_eq(df->trees.xR[nodeoffs], -1.0)) {
                         if (nclasses > 1) {
                            j = ae_round(df->trees.xR[nodeoffs + 1], _state);
                            permimpbuf->yv.xR[varidx * nclasses + j] = permimpbuf->yv.xR[varidx * nclasses + j] + 1;
@@ -13835,9 +13835,9 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    // Update losses.
       for (j = 0; j <= nperm - 1; j++) {
          for (k = 0; k <= nclasses - 1; k++) {
-            permimpbuf->yv.xR[j * nclasses + k] = permimpbuf->yv.xR[j * nclasses + k] / coalesce((double)(oobcounts), (double)(1), _state);
+            permimpbuf->yv.xR[j * nclasses + k] = permimpbuf->yv.xR[j * nclasses + k] / coalesce((double)oobcounts, 1.0, _state);
          }
-         v = (double)(0);
+         v = 0.0;
          for (k = 0; k <= nclasses - 1; k++) {
             v = v + ae_sqr(permimpbuf->yv.xR[j * nclasses + k] - permimpbuf->targety.xR[k], _state);
          }
@@ -13863,21 +13863,21 @@ bool _trypexec_dforest_estimatepermutationimportances(decisionforestbuilder *s, 
 static void dforest_cleanreport(decisionforestbuilder *s, dfreport *rep, ae_state *_state) {
    ae_int_t i;
 
-   rep->relclserror = (double)(0);
-   rep->avgce = (double)(0);
-   rep->rmserror = (double)(0);
-   rep->avgerror = (double)(0);
-   rep->avgrelerror = (double)(0);
-   rep->oobrelclserror = (double)(0);
-   rep->oobavgce = (double)(0);
-   rep->oobrmserror = (double)(0);
-   rep->oobavgerror = (double)(0);
-   rep->oobavgrelerror = (double)(0);
+   rep->relclserror = 0.0;
+   rep->avgce = 0.0;
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
+   rep->oobrelclserror = 0.0;
+   rep->oobavgce = 0.0;
+   rep->oobrmserror = 0.0;
+   rep->oobavgerror = 0.0;
+   rep->oobavgrelerror = 0.0;
    ae_vector_set_length(&rep->topvars, s->nvars, _state);
    ae_vector_set_length(&rep->varimportances, s->nvars, _state);
    for (i = 0; i <= s->nvars - 1; i++) {
       rep->topvars.xZ[i] = i;
-      rep->varimportances.xR[i] = (double)(0);
+      rep->varimportances.xR[i] = 0.0;
    }
 }
 
@@ -13918,7 +13918,7 @@ static double dforest_meannrms2(ae_int_t nclasses, ZVector *trnlabelsi, RVector 
 
    ae_assert(trnidx0 <= trnidx1, "MeanNRMS2: integrity check failed (8754)", _state);
    ae_assert(tstidx0 <= tstidx1, "MeanNRMS2: integrity check failed (8754)", _state);
-   result = (double)(0);
+   result = 0.0;
    ntrn = trnidx1 - trnidx0;
    ntst = tstidx1 - tstidx0;
    if (ntrn == 0 || ntst == 0) {
@@ -13949,7 +13949,7 @@ static double dforest_meannrms2(ae_int_t nclasses, ZVector *trnlabelsi, RVector 
    } else {
 
    // regression-specific code
-      v = (double)(0);
+      v = 0.0;
       for (i = trnidx0; i <= trnidx1 - 1; i++) {
          v = v + trnlabelsr->xR[i];
       }
@@ -13994,7 +13994,7 @@ static void dforest_choosecurrentsplitdense(decisionforestbuilder *s, dfworkbuf 
 // Select split according to dense direct RDF algorithm
    *varbest = -1;
    errbest = ae_maxrealnumber;
-   *splitbest = (double)(0);
+   *splitbest = 0.0;
    varstried = 0;
    while (varstried <= ae_minint(varstoselect, *varsinpool, _state) - 1) {
 
@@ -14098,9 +14098,9 @@ static void dforest_evaluatedensesplit(decisionforestbuilder *s, dfworkbuf *work
          }
          sr = idx1 - idx0 - sl;
          ae_assert(sl != 0 && sr != 0, "BuildRandomTreeRec: something strange, impossible failure!", _state);
-         v0 = (double)1 / (double)sl;
-         v1 = (double)1 / (double)sr;
-         *rms = (double)(0);
+         v0 = 1.0 / sl;
+         v1 = 1.0 / sr;
+         *rms = 0.0;
          for (j = 0; j <= nclasses - 1; j++) {
             k0 = workbuf->classtotals0.xZ[j];
             k1 = workbuf->classpriors.xZ[j] - k0;
@@ -14112,8 +14112,8 @@ static void dforest_evaluatedensesplit(decisionforestbuilder *s, dfworkbuf *work
       // regression-specific code
          sl = 0;
          sr = 0;
-         v1 = (double)(0);
-         v2 = (double)(0);
+         v1 = 0.0;
+         v2 = 0.0;
          for (j = idx0; j <= idx1 - 1; j++) {
             if (workbuf->curvals.xR[j] < *split) {
                v1 = v1 + workbuf->trnlabelsr.xR[j];
@@ -14126,7 +14126,7 @@ static void dforest_evaluatedensesplit(decisionforestbuilder *s, dfworkbuf *work
          ae_assert(sl != 0 && sr != 0, "BuildRandomTreeRec: something strange, impossible failure!", _state);
          v1 = v1 / sl;
          v2 = v2 / sr;
-         *rms = (double)(0);
+         *rms = 0.0;
          for (j = 0; j <= idx1 - idx0 - 1; j++) {
             v = workbuf->trnlabelsr.xR[idx0 + j];
             if (workbuf->curvals.xR[j] < *split) {
@@ -14187,7 +14187,7 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
       advanceby = ae_maxint(2, ae_round(n * 0.05, _state), _state);
    }
    *info = -1;
-   *threshold = (double)(0);
+   *threshold = 0.0;
    *e = ae_maxrealnumber;
 
 // Random split
@@ -14225,9 +14225,9 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
          }
       }
       ae_assert(n0 > 0 && n0 < n, "RDF: critical integrity check failed at ClassifierSplit()", _state);
-      v0 = (double)1 / (double)n0;
-      v1 = (double)1 / (double)(n - n0);
-      rms = (double)(0);
+      v0 = 1.0 / n0;
+      v1 = 1.0 / (n - n0);
+      rms = 0.0;
       for (j = 0; j <= nclasses - 1; j++) {
          k0 = workbuf->classtotals0.xZ[j];
          k1 = workbuf->classpriors.xZ[j] - k0;
@@ -14271,9 +14271,9 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
          }
       }
       ae_assert(n0 > 0 && n0 < n, "RDF: critical integrity check failed at ClassifierSplit()", _state);
-      v0 = (double)1 / (double)n0;
-      v1 = (double)1 / (double)(n - n0);
-      rms = (double)(0);
+      v0 = 1.0 / n0;
+      v1 = 1.0 / (n - n0);
+      rms = 0.0;
       for (j = 0; j <= nclasses - 1; j++) {
          k0 = workbuf->classtotals0.xZ[j];
          k1 = workbuf->classpriors.xZ[j] - k0;
@@ -14307,9 +14307,9 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
       while (n0 < n) {
 
       // RMS error associated with current split
-         v0 = (double)1 / (double)n0;
-         v1 = (double)1 / (double)(n - n0);
-         rms = (double)(0);
+         v0 = 1.0 / n0;
+         v1 = 1.0 / (n - n0);
+         rms = 0.0;
          for (j = 0; j <= nclasses - 1; j++) {
             k0 = workbuf->classtotals0.xZ[j];
             k1 = workbuf->classpriors.xZ[j] - k0;
@@ -14453,9 +14453,9 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
    while (n0 < n) {
 
    // RMS error associated with current split
-      v0 = (double)1 / (double)n0;
-      v1 = (double)1 / (double)(n - n0);
-      rms = (double)(0);
+      v0 = 1.0 / n0;
+      v1 = 1.0 / (n - n0);
+      rms = 0.0;
       k0 = cnt0;
       k1 = total0 - cnt0;
       rms = rms + k0 * (1 - v0 * k0) + k1 * (1 - v1 * k1);
@@ -14535,7 +14535,7 @@ static void dforest_outputleaf(decisionforestbuilder *s, dfworkbuf *workbuf, RVe
    if (nclasses == 1) {
 
    // Store split to the tree
-      treebuf->xR[*treesize] = (double)(-1);
+      treebuf->xR[*treesize] = -1.0;
       treebuf->xR[*treesize + 1] = leafval;
 
    // Update training and OOB voting stats
@@ -14552,7 +14552,7 @@ static void dforest_outputleaf(decisionforestbuilder *s, dfworkbuf *workbuf, RVe
    } else {
 
    // Store split to the tree
-      treebuf->xR[*treesize] = (double)(-1);
+      treebuf->xR[*treesize] = -1.0;
       treebuf->xR[*treesize + 1] = leafval;
 
    // Update training and OOB voting stats
@@ -14629,7 +14629,7 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s, ae_sta
       s->dsbinary.xB[i] = isbinary;
    }
    if (nclasses == 1) {
-      s->dsravg = (double)(0);
+      s->dsravg = 0.0;
       for (i = 0; i <= npoints - 1; i++) {
          s->dsravg = s->dsravg + s->dsrval.xR[i];
       }
@@ -14762,8 +14762,8 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
    rvectorsetlengthatleast(&buf->trntotals, npoints * nclasses, _state);
    rvectorsetlengthatleast(&buf->oobtotals, npoints * nclasses, _state);
    for (i = 0; i <= npoints * nclasses - 1; i++) {
-      buf->trntotals.xR[i] = (double)(0);
-      buf->oobtotals.xR[i] = (double)(0);
+      buf->trntotals.xR[i] = 0.0;
+      buf->oobtotals.xR[i] = 0.0;
    }
    ivectorsetlengthatleast(&buf->trncounts, npoints, _state);
    ivectorsetlengthatleast(&buf->oobcounts, npoints, _state);
@@ -14786,11 +14786,11 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
       ae_shared_pool_next_recycled(&s->votepool, &_vote, _state);
    }
    for (i = 0; i <= npoints - 1; i++) {
-      v = 1 / coalesce((double)(buf->trncounts.xZ[i]), (double)(1), _state);
+      v = 1 / coalesce((double)buf->trncounts.xZ[i], 1.0, _state);
       for (j = 0; j <= nclasses - 1; j++) {
          buf->trntotals.xR[i * nclasses + j] = buf->trntotals.xR[i * nclasses + j] * v;
       }
-      v = 1 / coalesce((double)(buf->oobcounts.xZ[i]), (double)(1), _state);
+      v = 1 / coalesce((double)buf->oobcounts.xZ[i], 1.0, _state);
       for (j = 0; j <= nclasses - 1; j++) {
          buf->oobtotals.xR[i * nclasses + j] = buf->oobtotals.xR[i * nclasses + j] * v;
       }
@@ -14799,16 +14799,16 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
 // Use aggregated voting data to output error metrics
    avgrelcnt = 0;
    oobavgrelcnt = 0;
-   rep->rmserror = (double)(0);
-   rep->avgerror = (double)(0);
-   rep->avgrelerror = (double)(0);
-   rep->relclserror = (double)(0);
-   rep->avgce = (double)(0);
-   rep->oobrmserror = (double)(0);
-   rep->oobavgerror = (double)(0);
-   rep->oobavgrelerror = (double)(0);
-   rep->oobrelclserror = (double)(0);
-   rep->oobavgce = (double)(0);
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
+   rep->relclserror = 0.0;
+   rep->avgce = 0.0;
+   rep->oobrmserror = 0.0;
+   rep->oobavgerror = 0.0;
+   rep->oobavgrelerror = 0.0;
+   rep->oobrelclserror = 0.0;
+   rep->oobavgce = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       if (nclasses > 1) {
 
@@ -14864,14 +14864,14 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
          v = buf->trntotals.xR[i] - s->dsrval.xR[i];
          rep->rmserror = rep->rmserror + ae_sqr(v, _state);
          rep->avgerror = rep->avgerror + ae_fabs(v, _state);
-         if (ae_fp_neq(s->dsrval.xR[i], (double)(0))) {
+         if (ae_fp_neq(s->dsrval.xR[i], 0.0)) {
             rep->avgrelerror = rep->avgrelerror + ae_fabs(v / s->dsrval.xR[i], _state);
             avgrelcnt = avgrelcnt + 1;
          }
          v = buf->oobtotals.xR[i] - s->dsrval.xR[i];
          rep->oobrmserror = rep->oobrmserror + ae_sqr(v, _state);
          rep->oobavgerror = rep->oobavgerror + ae_fabs(v, _state);
-         if (ae_fp_neq(s->dsrval.xR[i], (double)(0))) {
+         if (ae_fp_neq(s->dsrval.xR[i], 0.0)) {
             rep->oobavgrelerror = rep->oobavgrelerror + ae_fabs(v / s->dsrval.xR[i], _state);
             oobavgrelcnt = oobavgrelcnt + 1;
          }
@@ -14880,11 +14880,11 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
    rep->relclserror = rep->relclserror / npoints;
    rep->rmserror = ae_sqrt(rep->rmserror / (npoints * nclasses), _state);
    rep->avgerror = rep->avgerror / (npoints * nclasses);
-   rep->avgrelerror = rep->avgrelerror / coalesce((double)(avgrelcnt), (double)(1), _state);
+   rep->avgrelerror = rep->avgrelerror / coalesce((double)avgrelcnt, 1.0, _state);
    rep->oobrelclserror = rep->oobrelclserror / npoints;
    rep->oobrmserror = ae_sqrt(rep->oobrmserror / (npoints * nclasses), _state);
    rep->oobavgerror = rep->oobavgerror / (npoints * nclasses);
-   rep->oobavgrelerror = rep->oobavgrelerror / coalesce((double)(oobavgrelcnt), (double)(1), _state);
+   rep->oobavgrelerror = rep->oobavgrelerror / coalesce((double)oobavgrelcnt, 1.0, _state);
    ae_frame_leave(_state);
 }
 
@@ -14912,7 +14912,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8, a
 
 // Quick exit if already compressed
    if (df->forestformat == dforest_dfcompressedv0) {
-      result = (double)(1);
+      result = 1.0;
       ae_frame_leave(_state);
       return result;
    }
@@ -14929,7 +14929,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8, a
       maxrawtreesize = ae_maxint(maxrawtreesize, ae_round(df->trees.xR[offssrc], _state), _state);
       offssrc = offssrc + ae_round(df->trees.xR[offssrc], _state);
    }
-   result = (double)(8 * df->trees.cnt) / (double)(size8 + 1);
+   result = (double)(8 * df->trees.cnt) / (size8 + 1);
 
 // Allocate memory and perform compression
    ae_vector_set_length(&(df->trees8), size8, _state);
@@ -14991,7 +14991,7 @@ static ae_int_t dforest_computecompressedsizerec(decisionforest *df, bool useman
    }
 
 // Leaf or split?
-   if (ae_fp_eq(df->trees.xR[treepos], (double)(-1))) {
+   if (ae_fp_eq(df->trees.xR[treepos], -1.0)) {
 
    // Leaf
       result = dforest_computecompresseduintsize(2 * df->nvars, _state);
@@ -15219,8 +15219,8 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
       signbit = 128;
    }
 // Compute exponent
-   twopow30 = (double)(1073741824);
-   twopow10 = (double)(1024);
+   twopow30 = 1073741824.0;
+   twopow10 = 1024.0;
    twopowm30 = 1.0 / twopow30;
    twopowm10 = 1.0 / twopow10;
    e = 0;
@@ -15254,7 +15254,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
    if (e < -63) {
       signbit = 0;
       e = 0;
-      v = (double)(0);
+      v = 0.0;
    }
    if (e > 63) {
       e = 63;
@@ -15315,7 +15315,7 @@ static double dforest_unstreamfloat(ae_vector *buf, bool usemantissa8, ae_int_t 
       e = e - 128;
    }
    e = e - 64;
-   result = dforest_xfastpow((double)(2), e, _state) * v;
+   result = dforest_xfastpow(2.0, e, _state) * v;
    return result;
 }
 
@@ -15368,7 +15368,7 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
 
 // Navigate through the tree
    for (;;) {
-      if (ae_fp_eq(df->trees.xR[nodeoffs], (double)(-1))) {
+      if (ae_fp_eq(df->trees.xR[nodeoffs], -1.0)) {
          if (df->nclasses == 1) {
             y->xR[0] = y->xR[0] + df->trees.xR[nodeoffs + 1];
          } else {
@@ -15445,7 +15445,7 @@ static void dforest_dfprocessinternalcompressed(decisionforest *df, ae_int_t off
 static double dforest_xfastpow(double r, ae_int_t n, ae_state *_state) {
    double result;
 
-   result = (double)(0);
+   result = 0.0;
    if (n > 0) {
       if (n % 2 == 0) {
          result = dforest_xfastpow(r, n / 2, _state);
@@ -15456,7 +15456,7 @@ static double dforest_xfastpow(double r, ae_int_t n, ae_state *_state) {
       return result;
    }
    if (n == 0) {
-      result = (double)(1);
+      result = 1.0;
    }
    if (n < 0) {
       result = dforest_xfastpow(1 / r, -n, _state);
@@ -15465,7 +15465,7 @@ static double dforest_xfastpow(double r, ae_int_t n, ae_state *_state) {
 }
 
 void decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic) {
-   decisionforestbuilder *p = (decisionforestbuilder *) _p;
+   decisionforestbuilder *p = (decisionforestbuilder *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->dsdata, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dsrval, 0, DT_REAL, _state, make_automatic);
@@ -15483,8 +15483,8 @@ void decisionforestbuilder_init(void *_p, ae_state *_state, bool make_automatic)
 }
 
 void decisionforestbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   decisionforestbuilder *dst = (decisionforestbuilder *) _dst;
-   decisionforestbuilder *src = (decisionforestbuilder *) _src;
+   decisionforestbuilder *dst = (decisionforestbuilder *)_dst;
+   decisionforestbuilder *src = (decisionforestbuilder *)_src;
    dst->dstype = src->dstype;
    dst->npoints = src->npoints;
    dst->nvars = src->nvars;
@@ -15515,7 +15515,7 @@ void decisionforestbuilder_copy(void *_dst, void *_src, ae_state *_state, bool m
 }
 
 void decisionforestbuilder_free(void *_p, bool make_automatic) {
-   decisionforestbuilder *p = (decisionforestbuilder *) _p;
+   decisionforestbuilder *p = (decisionforestbuilder *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->dsdata, make_automatic);
    ae_vector_free(&p->dsrval, make_automatic);
@@ -15533,7 +15533,7 @@ void decisionforestbuilder_free(void *_p, bool make_automatic) {
 }
 
 void dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic) {
-   dfworkbuf *p = (dfworkbuf *) _p;
+   dfworkbuf *p = (dfworkbuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->classpriors, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->varpool, 0, DT_INT, _state, make_automatic);
@@ -15559,8 +15559,8 @@ void dfworkbuf_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void dfworkbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dfworkbuf *dst = (dfworkbuf *) _dst;
-   dfworkbuf *src = (dfworkbuf *) _src;
+   dfworkbuf *dst = (dfworkbuf *)_dst;
+   dfworkbuf *src = (dfworkbuf *)_src;
    ae_vector_copy(&dst->classpriors, &src->classpriors, _state, make_automatic);
    ae_vector_copy(&dst->varpool, &src->varpool, _state, make_automatic);
    dst->varpoolsize = src->varpoolsize;
@@ -15588,7 +15588,7 @@ void dfworkbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void dfworkbuf_free(void *_p, bool make_automatic) {
-   dfworkbuf *p = (dfworkbuf *) _p;
+   dfworkbuf *p = (dfworkbuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->classpriors, make_automatic);
    ae_vector_free(&p->varpool, make_automatic);
@@ -15614,7 +15614,7 @@ void dfworkbuf_free(void *_p, bool make_automatic) {
 }
 
 void dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic) {
-   dfvotebuf *p = (dfvotebuf *) _p;
+   dfvotebuf *p = (dfvotebuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->trntotals, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->oobtotals, 0, DT_REAL, _state, make_automatic);
@@ -15624,8 +15624,8 @@ void dfvotebuf_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void dfvotebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dfvotebuf *dst = (dfvotebuf *) _dst;
-   dfvotebuf *src = (dfvotebuf *) _src;
+   dfvotebuf *dst = (dfvotebuf *)_dst;
+   dfvotebuf *src = (dfvotebuf *)_src;
    ae_vector_copy(&dst->trntotals, &src->trntotals, _state, make_automatic);
    ae_vector_copy(&dst->oobtotals, &src->oobtotals, _state, make_automatic);
    ae_vector_copy(&dst->trncounts, &src->trncounts, _state, make_automatic);
@@ -15634,7 +15634,7 @@ void dfvotebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void dfvotebuf_free(void *_p, bool make_automatic) {
-   dfvotebuf *p = (dfvotebuf *) _p;
+   dfvotebuf *p = (dfvotebuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->trntotals, make_automatic);
    ae_vector_free(&p->oobtotals, make_automatic);
@@ -15644,7 +15644,7 @@ void dfvotebuf_free(void *_p, bool make_automatic) {
 }
 
 void dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic) {
-   dfpermimpbuf *p = (dfpermimpbuf *) _p;
+   dfpermimpbuf *p = (dfpermimpbuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->losses, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xraw, 0, DT_REAL, _state, make_automatic);
@@ -15657,8 +15657,8 @@ void dfpermimpbuf_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void dfpermimpbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dfpermimpbuf *dst = (dfpermimpbuf *) _dst;
-   dfpermimpbuf *src = (dfpermimpbuf *) _src;
+   dfpermimpbuf *dst = (dfpermimpbuf *)_dst;
+   dfpermimpbuf *src = (dfpermimpbuf *)_src;
    ae_vector_copy(&dst->losses, &src->losses, _state, make_automatic);
    ae_vector_copy(&dst->xraw, &src->xraw, _state, make_automatic);
    ae_vector_copy(&dst->xdist, &src->xdist, _state, make_automatic);
@@ -15670,7 +15670,7 @@ void dfpermimpbuf_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void dfpermimpbuf_free(void *_p, bool make_automatic) {
-   dfpermimpbuf *p = (dfpermimpbuf *) _p;
+   dfpermimpbuf *p = (dfpermimpbuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->losses, make_automatic);
    ae_vector_free(&p->xraw, make_automatic);
@@ -15683,47 +15683,47 @@ void dfpermimpbuf_free(void *_p, bool make_automatic) {
 }
 
 void dftreebuf_init(void *_p, ae_state *_state, bool make_automatic) {
-   dftreebuf *p = (dftreebuf *) _p;
+   dftreebuf *p = (dftreebuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->treebuf, 0, DT_REAL, _state, make_automatic);
 }
 
 void dftreebuf_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dftreebuf *dst = (dftreebuf *) _dst;
-   dftreebuf *src = (dftreebuf *) _src;
+   dftreebuf *dst = (dftreebuf *)_dst;
+   dftreebuf *src = (dftreebuf *)_src;
    ae_vector_copy(&dst->treebuf, &src->treebuf, _state, make_automatic);
    dst->treeidx = src->treeidx;
 }
 
 void dftreebuf_free(void *_p, bool make_automatic) {
-   dftreebuf *p = (dftreebuf *) _p;
+   dftreebuf *p = (dftreebuf *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->treebuf, make_automatic);
 }
 
 void decisionforestbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
-   decisionforestbuffer *p = (decisionforestbuffer *) _p;
+   decisionforestbuffer *p = (decisionforestbuffer *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->y, 0, DT_REAL, _state, make_automatic);
 }
 
 void decisionforestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   decisionforestbuffer *dst = (decisionforestbuffer *) _dst;
-   decisionforestbuffer *src = (decisionforestbuffer *) _src;
+   decisionforestbuffer *dst = (decisionforestbuffer *)_dst;
+   decisionforestbuffer *src = (decisionforestbuffer *)_src;
    ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    ae_vector_copy(&dst->y, &src->y, _state, make_automatic);
 }
 
 void decisionforestbuffer_free(void *_p, bool make_automatic) {
-   decisionforestbuffer *p = (decisionforestbuffer *) _p;
+   decisionforestbuffer *p = (decisionforestbuffer *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->y, make_automatic);
 }
 
 void decisionforest_init(void *_p, ae_state *_state, bool make_automatic) {
-   decisionforest *p = (decisionforest *) _p;
+   decisionforest *p = (decisionforest *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->trees, 0, DT_REAL, _state, make_automatic);
    decisionforestbuffer_init(&p->buffer, _state, make_automatic);
@@ -15731,8 +15731,8 @@ void decisionforest_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void decisionforest_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   decisionforest *dst = (decisionforest *) _dst;
-   decisionforest *src = (decisionforest *) _src;
+   decisionforest *dst = (decisionforest *)_dst;
+   decisionforest *src = (decisionforest *)_src;
    dst->forestformat = src->forestformat;
    dst->usemantissa8 = src->usemantissa8;
    dst->nvars = src->nvars;
@@ -15745,7 +15745,7 @@ void decisionforest_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 }
 
 void decisionforest_free(void *_p, bool make_automatic) {
-   decisionforest *p = (decisionforest *) _p;
+   decisionforest *p = (decisionforest *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->trees, make_automatic);
    decisionforestbuffer_free(&p->buffer, make_automatic);
@@ -15753,15 +15753,15 @@ void decisionforest_free(void *_p, bool make_automatic) {
 }
 
 void dfreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   dfreport *p = (dfreport *) _p;
+   dfreport *p = (dfreport *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->topvars, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->varimportances, 0, DT_REAL, _state, make_automatic);
 }
 
 void dfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dfreport *dst = (dfreport *) _dst;
-   dfreport *src = (dfreport *) _src;
+   dfreport *dst = (dfreport *)_dst;
+   dfreport *src = (dfreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -15777,14 +15777,14 @@ void dfreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 }
 
 void dfreport_free(void *_p, bool make_automatic) {
-   dfreport *p = (dfreport *) _p;
+   dfreport *p = (dfreport *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->topvars, make_automatic);
    ae_vector_free(&p->varimportances, make_automatic);
 }
 
 void dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
-   dfinternalbuffers *p = (dfinternalbuffers *) _p;
+   dfinternalbuffers *p = (dfinternalbuffers *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->treebuf, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->idxbuf, 0, DT_INT, _state, make_automatic);
@@ -15801,8 +15801,8 @@ void dfinternalbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void dfinternalbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   dfinternalbuffers *dst = (dfinternalbuffers *) _dst;
-   dfinternalbuffers *src = (dfinternalbuffers *) _src;
+   dfinternalbuffers *dst = (dfinternalbuffers *)_dst;
+   dfinternalbuffers *src = (dfinternalbuffers *)_src;
    ae_vector_copy(&dst->treebuf, &src->treebuf, _state, make_automatic);
    ae_vector_copy(&dst->idxbuf, &src->idxbuf, _state, make_automatic);
    ae_vector_copy(&dst->tmpbufr, &src->tmpbufr, _state, make_automatic);
@@ -15818,7 +15818,7 @@ void dfinternalbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_
 }
 
 void dfinternalbuffers_free(void *_p, bool make_automatic) {
-   dfinternalbuffers *p = (dfinternalbuffers *) _p;
+   dfinternalbuffers *p = (dfinternalbuffers *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->treebuf, make_automatic);
    ae_vector_free(&p->idxbuf, make_automatic);
@@ -16313,7 +16313,7 @@ void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, line
    }
    ae_vector_set_length(&s, npoints - 1 + 1, _state);
    for (i = 0; i <= npoints - 1; i++) {
-      s.xR[i] = (double)(1);
+      s.xR[i] = 1.0;
    }
    lrbuilds(xy, &s, npoints, nvars, info, lm, ar, _state);
    if (*info < 0) {
@@ -16383,7 +16383,7 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
    ae_matrix_set_length(&xyi, npoints - 1 + 1, nvars + 1 + 1, _state);
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&xyi.xyR[i][0], 1, &xy->xyR[i][0], 1, ae_v_len(0, nvars - 1));
-      xyi.xyR[i][nvars] = (double)(1);
+      xyi.xyR[i][nvars] = 1.0;
       xyi.xyR[i][nvars + 1] = xy->xyR[i][nvars];
    }
 
@@ -16396,8 +16396,8 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
       samplemoments(&x, npoints, &mean, &variance, &skewness, &kurtosis, _state);
       means.xR[j] = mean;
       sigmas.xR[j] = ae_sqrt(variance, _state);
-      if (ae_fp_eq(sigmas.xR[j], (double)(0))) {
-         sigmas.xR[j] = (double)(1);
+      if (ae_fp_eq(sigmas.xR[j], 0.0)) {
+         sigmas.xR[j] = 1.0;
       }
       for (i = 0; i <= npoints - 1; i++) {
          xyi.xyR[i][j] = (xyi.xyR[i][j] - means.xR[j]) / sigmas.xR[j];
@@ -16466,7 +16466,7 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
    ae_matrix_set_length(&xyi, npoints - 1 + 1, nvars + 1 + 1, _state);
    for (i = 0; i <= npoints - 1; i++) {
       ae_v_move(&xyi.xyR[i][0], 1, &xy->xyR[i][0], 1, ae_v_len(0, nvars - 1));
-      xyi.xyR[i][nvars] = (double)(0);
+      xyi.xyR[i][nvars] = 0.0;
       xyi.xyR[i][nvars + 1] = xy->xyR[i][nvars];
    }
 
@@ -16484,8 +16484,8 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
       } else {
 
       // variation is large, it is better to bring variance to 1
-         if (ae_fp_eq(variance, (double)(0))) {
-            variance = (double)(1);
+         if (ae_fp_eq(variance, 0.0)) {
+            variance = 1.0;
          }
          c.xR[j] = ae_sqrt(variance, _state);
       }
@@ -16538,7 +16538,7 @@ void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, lin
    }
    ae_vector_set_length(&s, npoints - 1 + 1, _state);
    for (i = 0; i <= npoints - 1; i++) {
-      s.xR[i] = (double)(1);
+      s.xR[i] = 1.0;
    }
    lrbuildzs(xy, &s, npoints, nvars, info, lm, ar, _state);
    if (*info < 0) {
@@ -16596,9 +16596,9 @@ void lrpack(RVector *v, ae_int_t nvars, linearmodel *lm, ae_state *_state) {
    ae_vector_set_length(&lm->w, 4 + nvars + 1, _state);
    offs = 4;
    lm->w.xR[0] = (double)(4 + nvars + 1);
-   lm->w.xR[1] = (double)(linreg_lrvnum);
-   lm->w.xR[2] = (double)(nvars);
-   lm->w.xR[3] = (double)(offs);
+   lm->w.xR[1] = (double)linreg_lrvnum;
+   lm->w.xR[2] = (double)nvars;
+   lm->w.xR[3] = (double)offs;
    ae_v_move(&lm->w.xR[offs], 1, &v->xR[0], 1, ae_v_len(offs, offs + nvars));
 }
 
@@ -16647,7 +16647,7 @@ double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_sta
    ae_assert(ae_round(lm->w.xR[1], _state) == linreg_lrvnum, "LINREG: Incorrect LINREG version!", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    offs = ae_round(lm->w.xR[3], _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       v = ae_v_dotproduct(&xy->xyR[i][0], 1, &lm->w.xR[offs], 1, ae_v_len(0, nvars - 1));
       v = v + lm->w.xR[offs + nvars];
@@ -16678,7 +16678,7 @@ double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_sta
    ae_assert(ae_round(lm->w.xR[1], _state) == linreg_lrvnum, "LINREG: Incorrect LINREG version!", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    offs = ae_round(lm->w.xR[3], _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       v = ae_v_dotproduct(&xy->xyR[i][0], 1, &lm->w.xR[offs], 1, ae_v_len(0, nvars - 1));
       v = v + lm->w.xR[offs + nvars];
@@ -16710,10 +16710,10 @@ double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_
    ae_assert(ae_round(lm->w.xR[1], _state) == linreg_lrvnum, "LINREG: Incorrect LINREG version!", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    offs = ae_round(lm->w.xR[3], _state);
-   result = (double)(0);
+   result = 0.0;
    k = 0;
    for (i = 0; i <= npoints - 1; i++) {
-      if (ae_fp_neq(xy->xyR[i][nvars], (double)(0))) {
+      if (ae_fp_neq(xy->xyR[i][nvars], 0.0)) {
          v = ae_v_dotproduct(&xy->xyR[i][0], 1, &lm->w.xR[offs], 1, ae_v_len(0, nvars - 1));
          v = v + lm->w.xR[offs + nvars];
          result = result + ae_fabs((v - xy->xyR[i][nvars]) / xy->xyR[i][nvars], _state);
@@ -16770,7 +16770,7 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_less_eq(s->xR[i], (double)(0))) {
+      if (ae_fp_less_eq(s->xR[i], 0.0)) {
          *info = -2;
          return;
       }
@@ -16778,10 +16778,10 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
    *info = 1;
 
 // Calculate S, SX, SY, SXX
-   ss = (double)(0);
-   sx = (double)(0);
-   sy = (double)(0);
-   sxx = (double)(0);
+   ss = 0.0;
+   sx = 0.0;
+   sy = 0.0;
+   sxx = 0.0;
    for (i = 0; i <= n - 1; i++) {
       t = ae_sqr(s->xR[i], _state);
       ss = ss + 1 / t;
@@ -16799,9 +16799,9 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
       return;
    }
 // Calculate A, B
-   *a = (double)(0);
-   *b = (double)(0);
-   stt = (double)(0);
+   *a = 0.0;
+   *b = 0.0;
+   stt = 0.0;
    for (i = 0; i <= n - 1; i++) {
       t = (xy->xyR[i][0] - sx / ss) / s->xR[i];
       *b = *b + t * xy->xyR[i][1] / s->xR[i];
@@ -16812,13 +16812,13 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
 
 // Calculate goodness-of-fit
    if (n > 2) {
-      chi2 = (double)(0);
+      chi2 = 0.0;
       for (i = 0; i <= n - 1; i++) {
          chi2 = chi2 + ae_sqr((xy->xyR[i][1] - (*a) - *b * xy->xyR[i][0]) / s->xR[i], _state);
       }
-      *p = incompletegammac((double)(n - 2) / (double)2, chi2 / 2, _state);
+      *p = incompletegammac((double)(n - 2) / 2.0, chi2 / 2, _state);
    } else {
-      *p = (double)(1);
+      *p = 1.0;
    }
 
 // Calculate other parameters
@@ -16850,7 +16850,7 @@ void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b, ae_st
    }
    ae_vector_set_length(&s, n - 1 + 1, _state);
    for (i = 0; i <= n - 1; i++) {
-      s.xR[i] = (double)(1);
+      s.xR[i] = 1.0;
    }
    lrlines(xy, &s, n, info, a, b, &vara, &varb, &covab, &corrab, &p, _state);
    ae_frame_leave(_state);
@@ -16887,7 +16887,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    NewObj(lrreport, ar2, _state);
    NewObj(linearmodel, tlm, _state);
 
-   epstol = (double)(1000);
+   epstol = 1000.0;
 
 // Check for errors in data
    if (npoints < nvars || nvars < 1) {
@@ -16896,7 +16896,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       return;
    }
    for (i = 0; i <= npoints - 1; i++) {
-      if (ae_fp_less_eq(s->xR[i], (double)(0))) {
+      if (ae_fp_less_eq(s->xR[i], 0.0)) {
          *info = -2;
          ae_frame_leave(_state);
          return;
@@ -16921,9 +16921,9 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    ae_vector_set_length(&lm->w, 4 + nvars - 1 + 1, _state);
    offs = 4;
    lm->w.xR[0] = (double)(4 + nvars);
-   lm->w.xR[1] = (double)(linreg_lrvnum);
+   lm->w.xR[1] = (double)linreg_lrvnum;
    lm->w.xR[2] = (double)(nvars - 1);
-   lm->w.xR[3] = (double)(offs);
+   lm->w.xR[3] = (double)offs;
 
 // Solve problem using SVD:
 //
@@ -16943,11 +16943,11 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       ae_frame_leave(_state);
       return;
    }
-   if (ae_fp_less_eq(sv.xR[0], (double)(0))) {
+   if (ae_fp_less_eq(sv.xR[0], 0.0)) {
 
    // Degenerate case: zero design matrix.
       for (i = offs; i <= offs + nvars - 1; i++) {
-         lm->w.xR[i] = (double)(0);
+         lm->w.xR[i] = 0.0;
       }
       ar->rmserror = lrrmserror(lm, xy, npoints, _state);
       ar->avgerror = lravgerror(lm, xy, npoints, _state);
@@ -16963,7 +16963,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       ae_matrix_set_length(&ar->c, nvars - 1 + 1, nvars - 1 + 1, _state);
       for (i = 0; i <= nvars - 1; i++) {
          for (j = 0; j <= nvars - 1; j++) {
-            ar->c.xyR[i][j] = (double)(0);
+            ar->c.xyR[i][j] = 0.0;
          }
       }
       ae_frame_leave(_state);
@@ -16998,7 +16998,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
             }
          // Convert back to un-reduced format
             for (j = 0; j <= nvars - 1; j++) {
-               lm->w.xR[offs + j] = (double)(0);
+               lm->w.xR[offs + j] = 0.0;
             }
             for (j = 0; j <= k - 1; j++) {
                r = tlm.w.xR[offs + j];
@@ -17034,18 +17034,18 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       if (ae_fp_greater(sv.xR[i], epstol * ae_machineepsilon * sv.xR[0])) {
          svi.xR[i] = 1 / sv.xR[i];
       } else {
-         svi.xR[i] = (double)(0);
+         svi.xR[i] = 0.0;
       }
    }
    for (i = 0; i <= nvars - 1; i++) {
-      t.xR[i] = (double)(0);
+      t.xR[i] = 0.0;
    }
    for (i = 0; i <= npoints - 1; i++) {
       r = b.xR[i];
       ae_v_addd(&t.xR[0], 1, &u.xyR[i][0], 1, ae_v_len(0, nvars - 1), r);
    }
    for (i = 0; i <= nvars - 1; i++) {
-      lm->w.xR[offs + i] = (double)(0);
+      lm->w.xR[offs + i] = 0.0;
    }
    for (i = 0; i <= nvars - 1; i++) {
       r = t.xR[i] * svi.xR[i];
@@ -17102,12 +17102,12 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    ncv = 0;
    na = 0;
    nacv = 0;
-   ar->rmserror = (double)(0);
-   ar->avgerror = (double)(0);
-   ar->avgrelerror = (double)(0);
-   ar->cvrmserror = (double)(0);
-   ar->cvavgerror = (double)(0);
-   ar->cvavgrelerror = (double)(0);
+   ar->rmserror = 0.0;
+   ar->avgerror = 0.0;
+   ar->avgrelerror = 0.0;
+   ar->cvrmserror = 0.0;
+   ar->cvavgerror = 0.0;
+   ar->cvavgrelerror = 0.0;
    ar->ncvdefects = 0;
    ae_vector_set_length(&ar->cvdefects, nvars - 1 + 1, _state);
    for (i = 0; i <= nvars - 1; i++) {
@@ -17119,7 +17119,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       r = ae_v_dotproduct(&xy->xyR[i][0], 1, &lm->w.xR[offs], 1, ae_v_len(0, nvars - 1));
       ar->rmserror = ar->rmserror + ae_sqr(r - xy->xyR[i][nvars], _state);
       ar->avgerror = ar->avgerror + ae_fabs(r - xy->xyR[i][nvars], _state);
-      if (ae_fp_neq(xy->xyR[i][nvars], (double)(0))) {
+      if (ae_fp_neq(xy->xyR[i][nvars], 0.0)) {
          ar->avgrelerror = ar->avgrelerror + ae_fabs((r - xy->xyR[i][nvars]) / xy->xyR[i][nvars], _state);
          na = na + 1;
       }
@@ -17133,7 +17133,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       r = s->xR[i] * (r / s->xR[i] - b.xR[i] * p) / (1 - p);
       ar->cvrmserror = ar->cvrmserror + ae_sqr(r - xy->xyR[i][nvars], _state);
       ar->cvavgerror = ar->cvavgerror + ae_fabs(r - xy->xyR[i][nvars], _state);
-      if (ae_fp_neq(xy->xyR[i][nvars], (double)(0))) {
+      if (ae_fp_neq(xy->xyR[i][nvars], 0.0)) {
          ar->cvavgrelerror = ar->cvavgrelerror + ae_fabs((r - xy->xyR[i][nvars]) / xy->xyR[i][nvars], _state);
          nacv = nacv + 1;
       }
@@ -17161,33 +17161,33 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 }
 
 void linearmodel_init(void *_p, ae_state *_state, bool make_automatic) {
-   linearmodel *p = (linearmodel *) _p;
+   linearmodel *p = (linearmodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->w, 0, DT_REAL, _state, make_automatic);
 }
 
 void linearmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   linearmodel *dst = (linearmodel *) _dst;
-   linearmodel *src = (linearmodel *) _src;
+   linearmodel *dst = (linearmodel *)_dst;
+   linearmodel *src = (linearmodel *)_src;
    ae_vector_copy(&dst->w, &src->w, _state, make_automatic);
 }
 
 void linearmodel_free(void *_p, bool make_automatic) {
-   linearmodel *p = (linearmodel *) _p;
+   linearmodel *p = (linearmodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->w, make_automatic);
 }
 
 void lrreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   lrreport *p = (lrreport *) _p;
+   lrreport *p = (lrreport *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->c, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cvdefects, 0, DT_INT, _state, make_automatic);
 }
 
 void lrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   lrreport *dst = (lrreport *) _dst;
-   lrreport *src = (lrreport *) _src;
+   lrreport *dst = (lrreport *)_dst;
+   lrreport *src = (lrreport *)_src;
    ae_matrix_copy(&dst->c, &src->c, _state, make_automatic);
    dst->rmserror = src->rmserror;
    dst->avgerror = src->avgerror;
@@ -17200,7 +17200,7 @@ void lrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 }
 
 void lrreport_free(void *_p, bool make_automatic) {
-   lrreport *p = (lrreport *) _p;
+   lrreport *p = (lrreport *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->c, make_automatic);
    ae_vector_free(&p->cvdefects, make_automatic);
@@ -17378,14 +17378,14 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
    }
 // Prepare variables (see below for explanation)
    runningsum = 0.0;
-   termsinsum = (double)(0);
+   termsinsum = 0.0;
    for (i = ae_maxint(n - k, 0, _state); i <= n - 1; i++) {
       runningsum = runningsum + x->xR[i];
       termsinsum = termsinsum + 1;
    }
    i = ae_maxint(n - k, 0, _state);
    zeroprefix = 0;
-   while (i <= n - 1 && ae_fp_eq(x->xR[i], (double)(0))) {
+   while (i <= n - 1 && ae_fp_eq(x->xR[i], 0.0)) {
       zeroprefix = zeroprefix + 1;
       i = i + 1;
    }
@@ -17421,7 +17421,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
    // In case we have ZeroPrefix=TermsInSum,
    // RunningSum is reset to zero.
       if (i - k >= 0) {
-         if (ae_fp_neq(x->xR[i - k], (double)(0))) {
+         if (ae_fp_neq(x->xR[i - k], 0.0)) {
             zeroprefix = 0;
          } else {
             zeroprefix = ae_minint(zeroprefix + 1, k, _state);
@@ -17429,8 +17429,8 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
       } else {
          zeroprefix = ae_minint(zeroprefix, i + 1, _state);
       }
-      if (ae_fp_eq((double)(zeroprefix), termsinsum)) {
-         runningsum = (double)(0);
+      if (ae_fp_eq((double)zeroprefix, termsinsum)) {
+         runningsum = 0.0;
       }
    }
 }
@@ -17470,11 +17470,11 @@ void filterema(RVector *x, ae_int_t n, double alpha, ae_state *_state) {
    ae_assert(n >= 0, "FilterEMA: N<0", _state);
    ae_assert(x->cnt >= n, "FilterEMA: Length(X)<N", _state);
    ae_assert(isfinitevector(x, n, _state), "FilterEMA: X contains INF or NAN", _state);
-   ae_assert(ae_fp_greater(alpha, (double)(0)), "FilterEMA: Alpha <= 0", _state);
-   ae_assert(ae_fp_less_eq(alpha, (double)(1)), "FilterEMA: Alpha>1", _state);
+   ae_assert(ae_fp_greater(alpha, 0.0), "FilterEMA: Alpha <= 0", _state);
+   ae_assert(ae_fp_less_eq(alpha, 1.0), "FilterEMA: Alpha>1", _state);
 
 // Quick exit, if necessary
-   if (n <= 1 || ae_fp_eq(alpha, (double)(1))) {
+   if (n <= 1 || ae_fp_eq(alpha, 1.0)) {
       return;
    }
 // Process
@@ -17556,7 +17556,7 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
    ae_matrix_set_length(&xy, k, 2, _state);
    ae_vector_set_length(&s, k, _state);
    for (i = 0; i <= k - 1; i++) {
-      xy.xyR[i][0] = (double)(i);
+      xy.xyR[i][0] = (double)i;
       s.xR[i] = 1.0;
    }
    for (i = n - 1; i >= 2; i--) {
@@ -17937,7 +17937,7 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits, ae_state *
 
    ae_assert(ae_isfinite(x, _state), "SSAAppendPointAndUpdate: X is not finite", _state);
    ae_assert(ae_isfinite(updateits, _state), "SSAAppendPointAndUpdate: UpdateIts is not finite", _state);
-   ae_assert(ae_fp_greater_eq(updateits, (double)(0)), "SSAAppendPointAndUpdate: UpdateIts<0", _state);
+   ae_assert(ae_fp_greater_eq(updateits, 0.0), "SSAAppendPointAndUpdate: UpdateIts<0", _state);
    ae_assert(s->nsequences > 0, "SSAAppendPointAndUpdate: dataset is empty, no sequence to modify", _state);
 
 // Append point to dataset
@@ -18446,8 +18446,8 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state) || !ssa_issequencebigenough(s, -1, _state)) {
       for (i = 0; i <= *nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
-         noise->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
+         noise->xR[i] = 0.0;
       }
       if (s->nsequences >= 1) {
          cnt = ae_minint(s->sequenceidx.xZ[s->nsequences] - s->sequenceidx.xZ[s->nsequences - 1], *nticks, _state);
@@ -18581,8 +18581,8 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state) || !ssa_issequencebigenough(s, -1, _state)) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
-         noise->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
+         noise->xR[i] = 0.0;
       }
       if (s->nsequences >= 1) {
          cnt = ae_minint(s->sequenceidx.xZ[s->nsequences] - s->sequenceidx.xZ[s->nsequences - 1], nticks, _state);
@@ -18712,7 +18712,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state) || nticks < s->windowwidth) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
          noise->xR[i] = data->xR[i];
       }
       return;
@@ -18814,14 +18814,14 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend, ae_state *_st
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state)) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
    ae_assert(s->nsequences > 0, "SSAForecastLast: integrity check failed", _state);
    if (s->sequenceidx.xZ[s->nsequences] - s->sequenceidx.xZ[s->nsequences - 1] < winw) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
@@ -18968,7 +18968,7 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state) || datalen < winw) {
       for (i = 0; i <= forecastlen - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
@@ -19112,14 +19112,14 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state)) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
    ae_assert(s->nsequences > 0, "SSAForecastAvgLast: integrity check failed", _state);
    if (s->sequenceidx.xZ[s->nsequences] - s->sequenceidx.xZ[s->nsequences - 1] < winw) {
       for (i = 0; i <= nticks - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
@@ -19251,7 +19251,7 @@ void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int
 // Is it degenerate case?
    if (!ssa_hassomethingtoanalyze(s, _state) || datalen < winw) {
       for (i = 0; i <= forecastlen - 1; i++) {
-         trend->xR[i] = (double)(0);
+         trend->xR[i] = 0.0;
       }
       return;
    }
@@ -19416,7 +19416,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits, a
          ae_assert(windowstotal > 0, "SSA: integrity check in UpdateBasis() failed / 76t34", _state);
          for (i = 0; i <= winw - 1; i++) {
             for (j = 0; j <= winw - 1; j++) {
-               s->xxt.xyR[i][j] = (double)(0);
+               s->xxt.xyR[i][j] = 0.0;
             }
          }
          ssa_updatexxtprepare(s, windowstotal, winw, s->memorylimit, _state);
@@ -19535,7 +19535,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits, a
       //
       // Update is performed for invalid basis or for non-zero UpdateIts.
          needevd = !s->arebasisandsolvervalid;
-         needevd = needevd || ae_fp_greater_eq(updateits, (double)(1));
+         needevd = needevd || ae_fp_greater_eq(updateits, 1.0);
          needevd = needevd || ae_fp_less(hqrnduniformr(&s->rs, _state), updateits - ae_ifloor(updateits, _state));
          if (needevd) {
             inc(&s->dbgcntevd, _state);
@@ -19580,7 +19580,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits, a
             }
             if (appendlen > 0) {
                ae_assert(s->arebasisandsolvervalid, "SSA: integrity check in UpdateBasis() failed / srg6f", _state);
-               ae_assert(ae_fp_greater_eq(updateits, (double)(0)), "SSA: integrity check in UpdateBasis() failed / srg4f", _state);
+               ae_assert(ae_fp_greater_eq(updateits, 0.0), "SSA: integrity check in UpdateBasis() failed / srg4f", _state);
                subspaceits = ae_ifloor(updateits, _state);
                if (ae_fp_less(hqrnduniformr(&s->rs, _state), updateits - ae_ifloor(updateits, _state))) {
                   inc(&subspaceits, _state);
@@ -19855,14 +19855,14 @@ static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt, ae_state
    ae_int_t winw;
 
    ae_assert(cnt > 0, "SSA: RealTimeDequeue() integrity check failed / 43tdv", _state);
-   ae_assert(ae_isfinite(beta, _state) && ae_fp_greater_eq(beta, (double)(0)), "SSA: RealTimeDequeue() integrity check failed / 5gdg6", _state);
+   ae_assert(ae_isfinite(beta, _state) && ae_fp_greater_eq(beta, 0.0), "SSA: RealTimeDequeue() integrity check failed / 5gdg6", _state);
    ae_assert(cnt <= s->rtqueuecnt, "SSA: RealTimeDequeue() integrity check failed / 547yh", _state);
    ae_assert(s->xxt.cols >= s->windowwidth, "SSA: RealTimeDequeue() integrity check failed / 54bf4", _state);
    ae_assert(s->xxt.rows >= s->windowwidth, "SSA: RealTimeDequeue() integrity check failed / 9gdfn", _state);
    winw = s->windowwidth;
 
 // Premultiply XXT by Beta
-   if (ae_fp_neq(beta, (double)(0))) {
+   if (ae_fp_neq(beta, 0.0)) {
       for (i = 0; i <= winw - 1; i++) {
          for (j = 0; j <= winw - 1; j++) {
             s->xxt.xyR[i][j] = s->xxt.xyR[i][j] * beta;
@@ -19871,7 +19871,7 @@ static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt, ae_state
    } else {
       for (i = 0; i <= winw - 1; i++) {
          for (j = 0; j <= winw - 1; j++) {
-            s->xxt.xyR[i][j] = (double)(0);
+            s->xxt.xyR[i][j] = 0.0;
          }
       }
    }
@@ -19974,7 +19974,7 @@ static void ssa_updatexxtfinalize(ssamodel *s, RMatrix *xxt, ae_state *_state) {
 }
 
 void ssamodel_init(void *_p, ae_state *_state, bool make_automatic) {
-   ssamodel *p = (ssamodel *) _p;
+   ssamodel *p = (ssamodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sequenceidx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->sequencedata, 0, DT_REAL, _state, make_automatic);
@@ -20002,8 +20002,8 @@ void ssamodel_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void ssamodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   ssamodel *dst = (ssamodel *) _dst;
-   ssamodel *src = (ssamodel *) _src;
+   ssamodel *dst = (ssamodel *)_dst;
+   ssamodel *src = (ssamodel *)_src;
    dst->nsequences = src->nsequences;
    ae_vector_copy(&dst->sequenceidx, &src->sequenceidx, _state, make_automatic);
    ae_vector_copy(&dst->sequencedata, &src->sequencedata, _state, make_automatic);
@@ -20048,7 +20048,7 @@ void ssamodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 }
 
 void ssamodel_free(void *_p, bool make_automatic) {
-   ssamodel *p = (ssamodel *) _p;
+   ssamodel *p = (ssamodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->sequenceidx, make_automatic);
    ae_vector_free(&p->sequencedata, make_automatic);
@@ -20474,9 +20474,9 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       for (i = 0; i <= nvars - 1; i++) {
          for (j = 0; j <= nvars - 1; j++) {
             if (i == j) {
-               w->xyR[i][j] = (double)(1);
+               w->xyR[i][j] = 1.0;
             } else {
-               w->xyR[i][j] = (double)(0);
+               w->xyR[i][j] = 0.0;
             }
          }
       }
@@ -20499,12 +20499,12 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
    ae_matrix_set_length(&muc, nclasses, nvars, _state);
    ae_vector_set_length(&nc, nclasses, _state);
    for (j = 0; j <= nvars - 1; j++) {
-      mu.xR[j] = (double)(0);
+      mu.xR[j] = 0.0;
    }
    for (i = 0; i <= nclasses - 1; i++) {
       nc.xZ[i] = 0;
       for (j = 0; j <= nvars - 1; j++) {
-         muc.xyR[i][j] = (double)(0);
+         muc.xyR[i][j] = 0.0;
       }
    }
    for (i = 0; i <= npoints - 1; i++) {
@@ -20513,17 +20513,17 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       nc.xZ[c.xZ[i]] = nc.xZ[c.xZ[i]] + 1;
    }
    for (i = 0; i <= nclasses - 1; i++) {
-      v = (double)1 / (double)nc.xZ[i];
+      v = 1.0 / nc.xZ[i];
       ae_v_muld(&muc.xyR[i][0], 1, ae_v_len(0, nvars - 1), v);
    }
-   v = (double)1 / (double)npoints;
+   v = 1.0 / npoints;
    ae_v_muld(&mu.xR[0], 1, ae_v_len(0, nvars - 1), v);
 
 // Create ST matrix
    ae_matrix_set_length(&st, nvars, nvars, _state);
    for (i = 0; i <= nvars - 1; i++) {
       for (j = 0; j <= nvars - 1; j++) {
-         st.xyR[i][j] = (double)(0);
+         st.xyR[i][j] = 0.0;
       }
    }
    for (k = 0; k <= npoints - 1; k++) {
@@ -20536,7 +20536,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
    ae_matrix_set_length(&sw, nvars, nvars, _state);
    for (i = 0; i <= nvars - 1; i++) {
       for (j = 0; j <= nvars - 1; j++) {
-         sw.xyR[i][j] = (double)(0);
+         sw.xyR[i][j] = 0.0;
       }
    }
    for (k = 0; k <= npoints - 1; k++) {
@@ -20565,18 +20565,18 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       return;
    }
    ae_matrix_set_length(w, nvars, nvars, _state);
-   if (ae_fp_less_eq(d.xR[nvars - 1], (double)(0)) || ae_fp_less_eq(d.xR[0], 1000 * ae_machineepsilon * d.xR[nvars - 1])) {
+   if (ae_fp_less_eq(d.xR[nvars - 1], 0.0) || ae_fp_less_eq(d.xR[0], 1000 * ae_machineepsilon * d.xR[nvars - 1])) {
 
    // Special case: D[NVars-1] <= 0
    // Degenerate task (all variables takes the same value).
-      if (ae_fp_less_eq(d.xR[nvars - 1], (double)(0))) {
+      if (ae_fp_less_eq(d.xR[nvars - 1], 0.0)) {
          *info = 2;
          for (i = 0; i <= nvars - 1; i++) {
             for (j = 0; j <= nvars - 1; j++) {
                if (i == j) {
-                  w->xyR[i][j] = (double)(1);
+                  w->xyR[i][j] = 1.0;
                } else {
-                  w->xyR[i][j] = (double)(0);
+                  w->xyR[i][j] = 0.0;
                }
             }
          }
@@ -20648,11 +20648,11 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       v = ae_v_dotproduct(&w->xyR[0][k], w->stride, &w->xyR[0][k], w->stride, ae_v_len(0, nvars - 1));
       v = 1 / ae_sqrt(v, _state);
       ae_v_muld(&w->xyR[0][k], w->stride, ae_v_len(0, nvars - 1), v);
-      v = (double)(0);
+      v = 0.0;
       for (i = 0; i <= nvars - 1; i++) {
          v = v + w->xyR[i][k];
       }
-      if (ae_fp_less(v, (double)(0))) {
+      if (ae_fp_less(v, 0.0)) {
          ae_v_muld(&w->xyR[0][k], w->stride, ae_v_len(0, nvars - 1), -1);
       }
    }
@@ -20964,7 +20964,7 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k, ae_state *_state) {
    ae_assert(apservisfinitematrix(xy, k, n, _state), "MCPDAddTrack: XY contains infinite or NaN elements", _state);
    for (i = 0; i <= k - 1; i++) {
       for (j = 0; j <= n - 1; j++) {
-         ae_assert(ae_fp_greater_eq(xy->xyR[i][j], (double)(0)), "MCPDAddTrack: XY contains negative elements", _state);
+         ae_assert(ae_fp_greater_eq(xy->xyR[i][j], 0.0), "MCPDAddTrack: XY contains negative elements", _state);
       }
    }
    if (k < 2) {
@@ -20974,8 +20974,8 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k, ae_state *_state) {
       rmatrixresize(&s->data, ae_maxint(2 * s->data.rows, s->npairs + k - 1, _state), 2 * n, _state);
    }
    for (i = 0; i <= k - 2; i++) {
-      s0 = (double)(0);
-      s1 = (double)(0);
+      s0 = 0.0;
+      s1 = 0.0;
       for (j = 0; j <= n - 1; j++) {
          if (s->states.xZ[j] >= 0) {
             s0 = s0 + xy->xyR[i][j];
@@ -20984,7 +20984,7 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k, ae_state *_state) {
             s1 = s1 + xy->xyR[i + 1][j];
          }
       }
-      if (ae_fp_greater(s0, (double)(0)) && ae_fp_greater(s1, (double)(0))) {
+      if (ae_fp_greater(s0, 0.0) && ae_fp_greater(s1, 0.0)) {
          for (j = 0; j <= n - 1; j++) {
             if (s->states.xZ[j] >= 0) {
                s->data.xyR[s->npairs][j] = xy->xyR[i][j] / s0;
@@ -21407,7 +21407,7 @@ void mcpdsetpredictionweights(mcpdstate *s, RVector *pw, ae_state *_state) {
    ae_assert(pw->cnt >= n, "MCPDSetPredictionWeights: Length(PW)<N", _state);
    for (i = 0; i <= n - 1; i++) {
       ae_assert(ae_isfinite(pw->xR[i], _state), "MCPDSetPredictionWeights: PW containts infinite or NAN elements", _state);
-      ae_assert(ae_fp_greater_eq(pw->xR[i], (double)(0)), "MCPDSetPredictionWeights: PW containts negative elements", _state);
+      ae_assert(ae_fp_greater_eq(pw->xR[i], 0.0), "MCPDSetPredictionWeights: PW containts negative elements", _state);
       s->pw.xR[i] = pw->xR[i];
    }
 }
@@ -21445,11 +21445,11 @@ void mcpdsolve(mcpdstate *s, ae_state *_state) {
 
 // Generate "effective" weights for prediction and calculate preconditioner
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(s->pw.xR[i], (double)(0))) {
-         v = (double)(0);
+      if (ae_fp_eq(s->pw.xR[i], 0.0)) {
+         v = 0.0;
          k = 0;
          for (j = 0; j <= npairs - 1; j++) {
-            if (ae_fp_neq(s->data.xyR[j][n + i], (double)(0))) {
+            if (ae_fp_neq(s->data.xyR[j][n + i], 0.0)) {
                v = v + s->data.xyR[j][n + i];
                k = k + 1;
             }
@@ -21477,8 +21477,8 @@ void mcpdsolve(mcpdstate *s, ae_state *_state) {
    }
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= n - 1; j++) {
-         if (ae_fp_eq(s->h.xR[i * n + j], (double)(0))) {
-            s->h.xR[i * n + j] = (double)(1);
+         if (ae_fp_eq(s->h.xR[i * n + j], 0.0)) {
+            s->h.xR[i * n + j] = 1.0;
          }
       }
    }
@@ -21537,10 +21537,10 @@ void mcpdsolve(mcpdstate *s, ae_state *_state) {
    for (i = 0; i <= n - 1; i++) {
       if (s->states.xZ[i] >= 0) {
          for (k = 0; k <= n * n - 1; k++) {
-            s->effectivec.xyR[ccnt][k] = (double)(0);
+            s->effectivec.xyR[ccnt][k] = 0.0;
          }
          for (k = 0; k <= n - 1; k++) {
-            s->effectivec.xyR[ccnt][k * n + i] = (double)(1);
+            s->effectivec.xyR[ccnt][k * n + i] = 1.0;
          }
          s->effectivec.xyR[ccnt][n * n] = 1.0;
          s->effectivect.xZ[ccnt] = 0;
@@ -21551,7 +21551,7 @@ void mcpdsolve(mcpdstate *s, ae_state *_state) {
 // create optimizer
    for (i = 0; i <= n - 1; i++) {
       for (j = 0; j <= n - 1; j++) {
-         s->tmpp.xR[i * n + j] = (double)1 / (double)n;
+         s->tmpp.xR[i * n + j] = 1.0 / n;
       }
    }
    minbleicrestartfrom(&s->bs, &s->tmpp, _state);
@@ -21691,7 +21691,7 @@ static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, m
 }
 
 void mcpdstate_init(void *_p, ae_state *_state, bool make_automatic) {
-   mcpdstate *p = (mcpdstate *) _p;
+   mcpdstate *p = (mcpdstate *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->states, 0, DT_INT, _state, make_automatic);
    ae_matrix_init(&p->data, 0, 0, DT_REAL, _state, make_automatic);
@@ -21715,8 +21715,8 @@ void mcpdstate_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void mcpdstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mcpdstate *dst = (mcpdstate *) _dst;
-   mcpdstate *src = (mcpdstate *) _src;
+   mcpdstate *dst = (mcpdstate *)_dst;
+   mcpdstate *src = (mcpdstate *)_src;
    dst->n = src->n;
    ae_vector_copy(&dst->states, &src->states, _state, make_automatic);
    dst->npairs = src->npairs;
@@ -21747,7 +21747,7 @@ void mcpdstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void mcpdstate_free(void *_p, bool make_automatic) {
-   mcpdstate *p = (mcpdstate *) _p;
+   mcpdstate *p = (mcpdstate *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->states, make_automatic);
    ae_matrix_free(&p->data, make_automatic);
@@ -21771,13 +21771,13 @@ void mcpdstate_free(void *_p, bool make_automatic) {
 }
 
 void mcpdreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   mcpdreport *p = (mcpdreport *) _p;
+   mcpdreport *p = (mcpdreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mcpdreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mcpdreport *dst = (mcpdreport *) _dst;
-   mcpdreport *src = (mcpdreport *) _src;
+   mcpdreport *dst = (mcpdreport *)_dst;
+   mcpdreport *src = (mcpdreport *)_src;
    dst->inneriterationscount = src->inneriterationscount;
    dst->outeriterationscount = src->outeriterationscount;
    dst->nfev = src->nfev;
@@ -21785,7 +21785,7 @@ void mcpdreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 }
 
 void mcpdreport_free(void *_p, bool make_automatic) {
-   mcpdreport *p = (mcpdreport *) _p;
+   mcpdreport *p = (mcpdreport *)_p;
    ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
@@ -22070,11 +22070,11 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    offs = 5;
    ssize = 5 + (nvars + 1) * (nclasses - 1) + nclasses;
    ae_vector_set_length(&lm->w, ssize - 1 + 1, _state);
-   lm->w.xR[0] = (double)(ssize);
-   lm->w.xR[1] = (double)(logit_logitvnum);
-   lm->w.xR[2] = (double)(nvars);
-   lm->w.xR[3] = (double)(nclasses);
-   lm->w.xR[4] = (double)(offs);
+   lm->w.xR[0] = (double)ssize;
+   lm->w.xR[1] = (double)logit_logitvnum;
+   lm->w.xR[2] = (double)nvars;
+   lm->w.xR[3] = (double)nclasses;
+   lm->w.xR[4] = (double)offs;
 
 // Degenerate case: all outputs are equal
    allsame = true;
@@ -22085,7 +22085,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    }
    if (allsame) {
       for (i = 0; i <= (nvars + 1) * (nclasses - 1) - 1; i++) {
-         lm->w.xR[offs + i] = (double)(0);
+         lm->w.xR[offs + i] = 0.0;
       }
       v = -2 * ae_log(ae_minrealnumber, _state);
       k = ae_round(xy->xyR[0][nvars], _state);
@@ -22098,7 +22098,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
             if (i == k) {
                lm->w.xR[offs + i * (nvars + 1) + nvars] = v;
             } else {
-               lm->w.xR[offs + i * (nvars + 1) + nvars] = (double)(0);
+               lm->w.xR[offs + i * (nvars + 1) + nvars] = 0.0;
             }
          }
       }
@@ -22205,8 +22205,8 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    for (k = 0; k <= nvars - 1; k++) {
       for (i = 0; i <= nclasses - 2; i++) {
          s = network.columnsigmas.xR[k];
-         if (ae_fp_eq(s, (double)(0))) {
-            s = (double)(1);
+         if (ae_fp_eq(s, 0.0)) {
+            s = 1.0;
          }
          j = offs + (nvars + 1) * i;
          v = lm->w.xR[j + k];
@@ -22244,12 +22244,12 @@ void mnlprocess(logitmodel *lm, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i1;
    double s;
 
-   ae_assert(ae_fp_eq(lm->w.xR[1], (double)(logit_logitvnum)), "MNLProcess: unexpected model version", _state);
+   ae_assert(ae_fp_eq(lm->w.xR[1], (double)logit_logitvnum), "MNLProcess: unexpected model version", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    nclasses = ae_round(lm->w.xR[3], _state);
    offs = ae_round(lm->w.xR[4], _state);
    logit_mnliexp(&lm->w, x, _state);
-   s = (double)(0);
+   s = 0.0;
    i1 = offs + (nvars + 1) * (nclasses - 1);
    for (i = i1; i <= i1 + nclasses - 1; i++) {
       s = s + lm->w.xR[i];
@@ -22301,7 +22301,7 @@ void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses, 
    *nvars = 0;
    *nclasses = 0;
 
-   ae_assert(ae_fp_eq(lm->w.xR[1], (double)(logit_logitvnum)), "MNLUnpack: unexpected model version", _state);
+   ae_assert(ae_fp_eq(lm->w.xR[1], (double)logit_logitvnum), "MNLUnpack: unexpected model version", _state);
    *nvars = ae_round(lm->w.xR[2], _state);
    *nclasses = ae_round(lm->w.xR[3], _state);
    offs = ae_round(lm->w.xR[4], _state);
@@ -22333,11 +22333,11 @@ void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm, ae_s
    offs = 5;
    ssize = 5 + (nvars + 1) * (nclasses - 1) + nclasses;
    ae_vector_set_length(&lm->w, ssize - 1 + 1, _state);
-   lm->w.xR[0] = (double)(ssize);
-   lm->w.xR[1] = (double)(logit_logitvnum);
-   lm->w.xR[2] = (double)(nvars);
-   lm->w.xR[3] = (double)(nclasses);
-   lm->w.xR[4] = (double)(offs);
+   lm->w.xR[0] = (double)ssize;
+   lm->w.xR[1] = (double)logit_logitvnum;
+   lm->w.xR[2] = (double)nvars;
+   lm->w.xR[3] = (double)nclasses;
+   lm->w.xR[4] = (double)offs;
    for (i = 0; i <= nclasses - 2; i++) {
       ae_v_move(&lm->w.xR[offs + i * (nvars + 1)], 1, &a->xyR[i][0], 1, ae_v_len(offs + i * (nvars + 1), offs + i * (nvars + 1) + nvars));
    }
@@ -22383,25 +22383,25 @@ double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state)
    NewVector(workx, 0, DT_REAL, _state);
    NewVector(worky, 0, DT_REAL, _state);
 
-   ae_assert(ae_fp_eq(lm->w.xR[1], (double)(logit_logitvnum)), "MNLClsError: unexpected model version", _state);
+   ae_assert(ae_fp_eq(lm->w.xR[1], (double)logit_logitvnum), "MNLClsError: unexpected model version", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    nclasses = ae_round(lm->w.xR[3], _state);
    ae_vector_set_length(&workx, nvars - 1 + 1, _state);
    ae_vector_set_length(&worky, nclasses - 1 + 1, _state);
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= npoints - 1; i++) {
       ae_assert(ae_round(xy->xyR[i][nvars], _state) >= 0 && ae_round(xy->xyR[i][nvars], _state) < nclasses, "MNLAvgCE: incorrect class number!", _state);
 
    // Process
       ae_v_move(&workx.xR[0], 1, &xy->xyR[i][0], 1, ae_v_len(0, nvars - 1));
       mnlprocess(lm, &workx, &worky, _state);
-      if (ae_fp_greater(worky.xR[ae_round(xy->xyR[i][nvars], _state)], (double)(0))) {
+      if (ae_fp_greater(worky.xR[ae_round(xy->xyR[i][nvars], _state)], 0.0)) {
          result = result - ae_log(worky.xR[ae_round(xy->xyR[i][nvars], _state)], _state);
       } else {
          result = result - ae_log(ae_minrealnumber, _state);
       }
    }
-   result = result / (npoints * ae_log((double)(2), _state));
+   result = result / (npoints * ae_log(2.0, _state));
    ae_frame_leave(_state);
    return result;
 }
@@ -22420,7 +22420,7 @@ double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state)
 double mnlrelclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_state) {
    double result;
 
-   result = (double)mnlclserror(lm, xy, npoints, _state) / (double)npoints;
+   result = (double)mnlclserror(lm, xy, npoints, _state) / npoints;
    return result;
 }
 
@@ -22515,7 +22515,7 @@ ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints, ae_state *_s
    NewVector(workx, 0, DT_REAL, _state);
    NewVector(worky, 0, DT_REAL, _state);
 
-   ae_assert(ae_fp_eq(lm->w.xR[1], (double)(logit_logitvnum)), "MNLClsError: unexpected model version", _state);
+   ae_assert(ae_fp_eq(lm->w.xR[1], (double)logit_logitvnum), "MNLClsError: unexpected model version", _state);
    nvars = ae_round(lm->w.xR[2], _state);
    nclasses = ae_round(lm->w.xR[3], _state);
    ae_vector_set_length(&workx, nvars - 1 + 1, _state);
@@ -22555,7 +22555,7 @@ static void logit_mnliexp(RVector *w, RVector *x, ae_state *_state) {
    double v;
    double mx;
 
-   ae_assert(ae_fp_eq(w->xR[1], (double)(logit_logitvnum)), "LOGIT: unexpected model version", _state);
+   ae_assert(ae_fp_eq(w->xR[1], (double)logit_logitvnum), "LOGIT: unexpected model version", _state);
    nvars = ae_round(w->xR[2], _state);
    nclasses = ae_round(w->xR[3], _state);
    offs = ae_round(w->xR[4], _state);
@@ -22564,8 +22564,8 @@ static void logit_mnliexp(RVector *w, RVector *x, ae_state *_state) {
       v = ae_v_dotproduct(&w->xR[offs + i * (nvars + 1)], 1, &x->xR[0], 1, ae_v_len(offs + i * (nvars + 1), offs + i * (nvars + 1) + nvars - 1));
       w->xR[i1 + i] = v + w->xR[offs + i * (nvars + 1) + nvars];
    }
-   w->xR[i1 + nclasses - 1] = (double)(0);
-   mx = (double)(0);
+   w->xR[i1 + nclasses - 1] = 0.0;
+   mx = 0.0;
    for (i = i1; i <= i1 + nclasses - 1; i++) {
       mx = ae_maxreal(mx, w->xR[i], _state);
    }
@@ -22710,7 +22710,7 @@ static void logit_mnlmcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVect
    p5 = 0.5;
    p66 = 0.66;
    state->xtrapf = 4.0;
-   zero = (double)(0);
+   zero = 0.0;
 
 // Main cycle
    for (;;) {
@@ -22725,7 +22725,7 @@ static void logit_mnlmcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVect
          *info = 0;
 
       //     CHECK THE INPUT PARAMETERS FOR ERRORS.
-         if (((((((n <= 0 || ae_fp_less_eq(*stp, (double)(0))) || ae_fp_less(logit_ftol, (double)(0))) || ae_fp_less(logit_gtol, zero)) || ae_fp_less(logit_xtol, zero)) || ae_fp_less(logit_stpmin, zero)) || ae_fp_less(logit_stpmax, logit_stpmin)) || logit_maxfev <= 0) {
+         if (((((((n <= 0 || ae_fp_less_eq(*stp, 0.0)) || ae_fp_less(logit_ftol, 0.0)) || ae_fp_less(logit_gtol, zero)) || ae_fp_less(logit_xtol, zero)) || ae_fp_less(logit_stpmin, zero)) || ae_fp_less(logit_stpmax, logit_stpmin)) || logit_maxfev <= 0) {
             *stage = 0;
             return;
          }
@@ -22733,7 +22733,7 @@ static void logit_mnlmcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVect
       //     AND CHECK THAT S IS A DESCENT DIRECTION.
          v = ae_v_dotproduct(&g->xR[0], 1, &s->xR[0], 1, ae_v_len(0, n - 1));
          state->dginit = v;
-         if (ae_fp_greater_eq(state->dginit, (double)(0))) {
+         if (ae_fp_greater_eq(state->dginit, 0.0)) {
             *stage = 0;
             return;
          }
@@ -22754,10 +22754,10 @@ static void logit_mnlmcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVect
       //     THE INTERVAL OF UNCERTAINTY.
       //     THE VARIABLES STP, F, DG CONTAIN THE VALUES OF THE STEP,
       //     FUNCTION, AND DERIVATIVE AT THE CURRENT STEP.
-         state->stx = (double)(0);
+         state->stx = 0.0;
          state->fx = state->finit;
          state->dgx = state->dginit;
-         state->sty = (double)(0);
+         state->sty = 0.0;
          state->fy = state->finit;
          state->dgy = state->dginit;
 
@@ -22904,7 +22904,7 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
    *info = 0;
 
 //     CHECK THE INPUT PARAMETERS FOR ERRORS.
-   if (((*brackt && (ae_fp_less_eq(*stp, ae_minreal(*stx, *sty, _state)) || ae_fp_greater_eq(*stp, ae_maxreal(*stx, *sty, _state)))) || ae_fp_greater_eq(*dx * (*stp - (*stx)), (double)(0))) || ae_fp_less(stmax, stmin)) {
+   if (((*brackt && (ae_fp_less_eq(*stp, ae_minreal(*stx, *sty, _state)) || ae_fp_greater_eq(*stp, ae_maxreal(*stx, *sty, _state)))) || ae_fp_greater_eq(*dx * (*stp - (*stx)), 0.0)) || ae_fp_less(stmax, stmin)) {
       return;
    }
 //     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
@@ -22935,7 +22935,7 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
       }
       *brackt = true;
    } else {
-      if (ae_fp_less(sgnd, (double)(0))) {
+      if (ae_fp_less(sgnd, 0.0)) {
 
       //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
       //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
@@ -22978,14 +22978,14 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
 
          //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
          //        TO INFINITY IN THE DIRECTION OF THE STEP.
-            gamma = s * ae_sqrt(ae_maxreal((double)(0), ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state), _state);
+            gamma = s * ae_sqrt(ae_maxreal(0.0, ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state), _state);
             if (ae_fp_greater(*stp, *stx)) {
                gamma = -gamma;
             }
             p = gamma - dp + theta;
             q = gamma + (*dx - dp) + gamma;
             r = p / q;
-            if (ae_fp_less(r, (double)(0)) && ae_fp_neq(gamma, (double)(0))) {
+            if (ae_fp_less(r, 0.0) && ae_fp_neq(gamma, 0.0)) {
                stpc = *stp + r * (*stx - (*stp));
             } else {
                if (ae_fp_greater(*stp, *stx)) {
@@ -23070,31 +23070,31 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
 }
 
 void logitmodel_init(void *_p, ae_state *_state, bool make_automatic) {
-   logitmodel *p = (logitmodel *) _p;
+   logitmodel *p = (logitmodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->w, 0, DT_REAL, _state, make_automatic);
 }
 
 void logitmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   logitmodel *dst = (logitmodel *) _dst;
-   logitmodel *src = (logitmodel *) _src;
+   logitmodel *dst = (logitmodel *)_dst;
+   logitmodel *src = (logitmodel *)_src;
    ae_vector_copy(&dst->w, &src->w, _state, make_automatic);
 }
 
 void logitmodel_free(void *_p, bool make_automatic) {
-   logitmodel *p = (logitmodel *) _p;
+   logitmodel *p = (logitmodel *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->w, make_automatic);
 }
 
 void logitmcstate_init(void *_p, ae_state *_state, bool make_automatic) {
-   logitmcstate *p = (logitmcstate *) _p;
+   logitmcstate *p = (logitmcstate *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void logitmcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   logitmcstate *dst = (logitmcstate *) _dst;
-   logitmcstate *src = (logitmcstate *) _src;
+   logitmcstate *dst = (logitmcstate *)_dst;
+   logitmcstate *src = (logitmcstate *)_src;
    dst->brackt = src->brackt;
    dst->stage1 = src->stage1;
    dst->infoc = src->infoc;
@@ -23123,24 +23123,24 @@ void logitmcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void logitmcstate_free(void *_p, bool make_automatic) {
-   logitmcstate *p = (logitmcstate *) _p;
+   logitmcstate *p = (logitmcstate *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mnlreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   mnlreport *p = (mnlreport *) _p;
+   mnlreport *p = (mnlreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mnlreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mnlreport *dst = (mnlreport *) _dst;
-   mnlreport *src = (mnlreport *) _src;
+   mnlreport *dst = (mnlreport *)_dst;
+   mnlreport *src = (mnlreport *)_src;
    dst->ngrad = src->ngrad;
    dst->nhess = src->nhess;
 }
 
 void mnlreport_free(void *_p, bool make_automatic) {
-   mnlreport *p = (mnlreport *) _p;
+   mnlreport *p = (mnlreport *)_p;
    ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
@@ -23518,7 +23518,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
 
 // Check settings
    ae_assert(k >= 1, "knnbuilderbuildknnmodel: k<1", _state);
-   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, (double)(0)), "knnbuilderbuildknnmodel: eps<0", _state);
+   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, 0.0), "knnbuilderbuildknnmodel: eps<0", _state);
 
 // Prepare output
    knn_clearreport(rep, _state);
@@ -23543,7 +23543,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
          for (j = 0; j <= nvars - 1; j++) {
             xy.xyR[i][j] = s->dsdata.xyR[i][j];
          }
-         xy.xyR[i][nvars] = (double)(s->dsival.xZ[i]);
+         xy.xyR[i][nvars] = (double)s->dsival.xZ[i];
          tags.xZ[i] = s->dsival.xZ[i];
       }
       kdtreebuildtagged(&xy, &tags, npoints, nvars, 0, s->knnnrm, &model->tree, _state);
@@ -23595,7 +23595,7 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
 void knnrewritekeps(knnmodel *model, ae_int_t k, double eps, ae_state *_state) {
 
    ae_assert(k >= 1, "knnrewritekeps: k<1", _state);
-   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, (double)(0)), "knnrewritekeps: eps<0", _state);
+   ae_assert(ae_isfinite(eps, _state) && ae_fp_greater_eq(eps, 0.0), "knnrewritekeps: eps<0", _state);
    model->k = k;
    model->eps = eps;
 }
@@ -24015,7 +24015,7 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
       if (iscls) {
          j = ae_round(xy->xyR[i][nvars], _state);
          ae_assert(j >= 0 && j < nout, "knnallerrors: one of the class labels is not in [0,NClasses)", _state);
-         desiredy.xR[0] = (double)(j);
+         desiredy.xR[0] = (double)j;
       } else {
          for (j = 0; j <= nout - 1; j++) {
             desiredy.xR[j] = xy->xyR[i][nvars + j];
@@ -24124,11 +24124,11 @@ void knnunserialize(ae_serializer *s, knnmodel *model, ae_state *_state) {
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 static void knn_clearreport(knnreport *rep, ae_state *_state) {
 
-   rep->relclserror = (double)(0);
-   rep->avgce = (double)(0);
-   rep->rmserror = (double)(0);
-   rep->avgerror = (double)(0);
-   rep->avgrelerror = (double)(0);
+   rep->relclserror = 0.0;
+   rep->avgce = 0.0;
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
 }
 
 // This function processes buf.X and stores result to buf.Y
@@ -24160,16 +24160,16 @@ static void knn_processinternal(knnmodel *model, knnbuffer *buf, ae_state *_stat
 // Quick exit if needed
    if (model->isdummy) {
       for (i = 0; i <= nout - 1; i++) {
-         buf->y.xR[i] = (double)(0);
+         buf->y.xR[i] = 0.0;
       }
       return;
    }
 // Perform request, average results
    for (i = 0; i <= nout - 1; i++) {
-      buf->y.xR[i] = (double)(0);
+      buf->y.xR[i] = 0.0;
    }
    nncnt = kdtreetsqueryaknn(&model->tree, &buf->treebuf, &buf->x, model->k, true, model->eps, _state);
-   v = 1 / coalesce((double)(nncnt), (double)(1), _state);
+   v = 1 / coalesce((double)nncnt, 1.0, _state);
    if (iscls) {
       kdtreetsqueryresultstags(&model->tree, &buf->treebuf, &buf->tags, _state);
       for (i = 0; i <= nncnt - 1; i++) {
@@ -24187,7 +24187,7 @@ static void knn_processinternal(knnmodel *model, knnbuffer *buf, ae_state *_stat
 }
 
 void knnbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
-   knnbuffer *p = (knnbuffer *) _p;
+   knnbuffer *p = (knnbuffer *)_p;
    ae_touch_ptr((void *)p);
    kdtreerequestbuffer_init(&p->treebuf, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -24197,8 +24197,8 @@ void knnbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void knnbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   knnbuffer *dst = (knnbuffer *) _dst;
-   knnbuffer *src = (knnbuffer *) _src;
+   knnbuffer *dst = (knnbuffer *)_dst;
+   knnbuffer *src = (knnbuffer *)_src;
    kdtreerequestbuffer_copy(&dst->treebuf, &src->treebuf, _state, make_automatic);
    ae_vector_copy(&dst->x, &src->x, _state, make_automatic);
    ae_vector_copy(&dst->y, &src->y, _state, make_automatic);
@@ -24207,7 +24207,7 @@ void knnbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void knnbuffer_free(void *_p, bool make_automatic) {
-   knnbuffer *p = (knnbuffer *) _p;
+   knnbuffer *p = (knnbuffer *)_p;
    ae_touch_ptr((void *)p);
    kdtreerequestbuffer_free(&p->treebuf, make_automatic);
    ae_vector_free(&p->x, make_automatic);
@@ -24217,7 +24217,7 @@ void knnbuffer_free(void *_p, bool make_automatic) {
 }
 
 void knnbuilder_init(void *_p, ae_state *_state, bool make_automatic) {
-   knnbuilder *p = (knnbuilder *) _p;
+   knnbuilder *p = (knnbuilder *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->dsdata, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dsrval, 0, DT_REAL, _state, make_automatic);
@@ -24225,8 +24225,8 @@ void knnbuilder_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void knnbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   knnbuilder *dst = (knnbuilder *) _dst;
-   knnbuilder *src = (knnbuilder *) _src;
+   knnbuilder *dst = (knnbuilder *)_dst;
+   knnbuilder *src = (knnbuilder *)_src;
    dst->dstype = src->dstype;
    dst->npoints = src->npoints;
    dst->nvars = src->nvars;
@@ -24239,7 +24239,7 @@ void knnbuilder_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 }
 
 void knnbuilder_free(void *_p, bool make_automatic) {
-   knnbuilder *p = (knnbuilder *) _p;
+   knnbuilder *p = (knnbuilder *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->dsdata, make_automatic);
    ae_vector_free(&p->dsrval, make_automatic);
@@ -24247,15 +24247,15 @@ void knnbuilder_free(void *_p, bool make_automatic) {
 }
 
 void knnmodel_init(void *_p, ae_state *_state, bool make_automatic) {
-   knnmodel *p = (knnmodel *) _p;
+   knnmodel *p = (knnmodel *)_p;
    ae_touch_ptr((void *)p);
    kdtree_init(&p->tree, _state, make_automatic);
    knnbuffer_init(&p->buffer, _state, make_automatic);
 }
 
 void knnmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   knnmodel *dst = (knnmodel *) _dst;
-   knnmodel *src = (knnmodel *) _src;
+   knnmodel *dst = (knnmodel *)_dst;
+   knnmodel *src = (knnmodel *)_src;
    dst->nvars = src->nvars;
    dst->nout = src->nout;
    dst->k = src->k;
@@ -24267,20 +24267,20 @@ void knnmodel_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 }
 
 void knnmodel_free(void *_p, bool make_automatic) {
-   knnmodel *p = (knnmodel *) _p;
+   knnmodel *p = (knnmodel *)_p;
    ae_touch_ptr((void *)p);
    kdtree_free(&p->tree, make_automatic);
    knnbuffer_free(&p->buffer, make_automatic);
 }
 
 void knnreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   knnreport *p = (knnreport *) _p;
+   knnreport *p = (knnreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void knnreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   knnreport *dst = (knnreport *) _dst;
-   knnreport *src = (knnreport *) _src;
+   knnreport *dst = (knnreport *)_dst;
+   knnreport *src = (knnreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -24289,7 +24289,7 @@ void knnreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void knnreport_free(void *_p, bool make_automatic) {
-   knnreport *p = (knnreport *) _p;
+   knnreport *p = (knnreport *)_p;
    ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
@@ -24639,7 +24639,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
    NewObj(densesolverreport, solverrep, _state);
 
    mlpproperties(network, &nin, &nout, &wcount, _state);
-   lambdaup = (double)(10);
+   lambdaup = 10.0;
    lambdadown = 0.3;
    lmsteptol = 0.001;
 
@@ -24688,7 +24688,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
    // First stage of the hybrid algorithm: LBFGS
       ae_v_move(&wbase.xR[0], 1, &network->weights.xR[0], 1, ae_v_len(0, wcount - 1));
       minlbfgscreate(wcount, ae_minint(wcount, 5, _state), &wbase, &state, _state);
-      minlbfgssetcond(&state, (double)(0), (double)(0), (double)(0), ae_maxint(25, wcount, _state), _state);
+      minlbfgssetcond(&state, 0.0, 0.0, 0.0, ae_maxint(25, wcount, _state), _state);
       while (minlbfgsiteration(&state, _state)) {
 
       // gradient
@@ -24720,7 +24720,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
       }
       rep->nhess = rep->nhess + 1;
       lambdav = 0.001;
-      nu = (double)(2);
+      nu = 2.0;
       for (;;) {
 
       // 1. HMod = H+lambda*I
@@ -24774,10 +24774,10 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
          }
          ae_v_move(&wbase.xR[0], 1, &network->weights.xR[0], 1, ae_v_len(0, wcount - 1));
          for (i = 0; i <= wcount - 1; i++) {
-            wt.xR[i] = (double)(0);
+            wt.xR[i] = 0.0;
          }
          minlbfgscreatex(wcount, wcount, &wt, 1, 0.0, &state, _state);
-         minlbfgssetcond(&state, (double)(0), (double)(0), (double)(0), 5, _state);
+         minlbfgssetcond(&state, 0.0, 0.0, 0.0, 5, _state);
          while (minlbfgsiteration(&state, _state)) {
 
          // gradient
@@ -24787,7 +24787,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
             }
             mlpgradbatch(network, xy, npoints, &state.f, &g, _state);
             for (i = 0; i <= wcount - 1; i++) {
-               state.g.xR[i] = (double)(0);
+               state.g.xR[i] = 0.0;
             }
             for (i = 0; i <= wcount - 1; i++) {
                v = g.xR[i];
@@ -24825,7 +24825,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 
       // Update lambda
          lambdav = lambdav * lambdadown;
-         nu = (double)(2);
+         nu = 2.0;
       }
 
    // update WBest
@@ -24896,12 +24896,12 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
    NewObj(minlbfgsstate, state, _state);
 
 // Test inputs, parse flags, read network geometry
-   if (ae_fp_eq(wstep, (double)(0)) && maxits == 0) {
+   if (ae_fp_eq(wstep, 0.0) && maxits == 0) {
       *info = -8;
       ae_frame_leave(_state);
       return;
    }
-   if (((npoints <= 0 || restarts < 1) || ae_fp_less(wstep, (double)(0))) || maxits < 0) {
+   if (((npoints <= 0 || restarts < 1) || ae_fp_less(wstep, 0.0)) || maxits < 0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -25036,7 +25036,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    wstep = 0.001;
 
 // Test inputs, parse flags, read network geometry
-   if (((trnsize <= 0 || valsize <= 0) || (restarts < 1 && restarts != -1)) || ae_fp_less(decay, (double)(0))) {
+   if (((trnsize <= 0 || valsize <= 0) || (restarts < 1 && restarts != -1)) || ae_fp_less(decay, 0.0)) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -25073,7 +25073,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    ae_vector_set_length(&wfinal, wcount - 1 + 1, _state);
    efinal = ae_maxrealnumber;
    for (i = 0; i <= wcount - 1; i++) {
-      wfinal.xR[i] = (double)(0);
+      wfinal.xR[i] = 0.0;
    }
 
 // Multiple starts
@@ -25114,7 +25114,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
                ae_v_move(&wbest.xR[0], 1, &network->weights.xR[0], 1, ae_v_len(0, wcount - 1));
                itbest = itcnt;
             }
-            if (itcnt > 30 && ae_fp_greater((double)(itcnt), 1.5 * itbest)) {
+            if (itcnt > 30 && ae_fp_greater((double)itcnt, 1.5 * itbest)) {
                *info = 6;
                break;
             }
@@ -25292,11 +25292,11 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
    if (foldscount > s->npoints) {
       foldscount = s->npoints;
    }
-   rep->relclserror = (double)(0);
-   rep->avgce = (double)(0);
-   rep->rmserror = (double)(0);
-   rep->avgerror = (double)(0);
-   rep->avgrelerror = (double)(0);
+   rep->relclserror = 0.0;
+   rep->avgce = 0.0;
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
    hqrndrandomize(&rs, _state);
    rep->ngrad = 0;
    rep->nhess = 0;
@@ -25399,7 +25399,7 @@ void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s, ae_state *_sta
    s->rcpar = true;
    s->lbfgsfactor = mlptrain_defaultlbfgsfactor;
    s->decay = 1.0E-6;
-   mlpsetcond(s, (double)(0), 0, _state);
+   mlpsetcond(s, 0.0, 0, _state);
    s->datatype = 0;
    s->npoints = 0;
    mlpsetalgobatch(s, _state);
@@ -25428,7 +25428,7 @@ void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s, ae_stat
    s->rcpar = false;
    s->lbfgsfactor = mlptrain_defaultlbfgsfactor;
    s->decay = 1.0E-6;
-   mlpsetcond(s, (double)(0), 0, _state);
+   mlpsetcond(s, 0.0, 0, _state);
    s->datatype = 0;
    s->npoints = 0;
    mlpsetalgobatch(s, _state);
@@ -25590,7 +25590,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints, ae_s
 void mlpsetdecay(mlptrainer *s, double decay, ae_state *_state) {
 
    ae_assert(ae_isfinite(decay, _state), "MLPSetDecay: parameter Decay contains Infinite or NaN.", _state);
-   ae_assert(ae_fp_greater_eq(decay, (double)(0)), "MLPSetDecay: Decay<0.", _state);
+   ae_assert(ae_fp_greater_eq(decay, 0.0), "MLPSetDecay: Decay<0.", _state);
    s->decay = decay;
 }
 
@@ -25620,9 +25620,9 @@ void mlpsetdecay(mlptrainer *s, double decay, ae_state *_state) {
 void mlpsetcond(mlptrainer *s, double wstep, ae_int_t maxits, ae_state *_state) {
 
    ae_assert(ae_isfinite(wstep, _state), "MLPSetCond: parameter WStep contains Infinite or NaN.", _state);
-   ae_assert(ae_fp_greater_eq(wstep, (double)(0)), "MLPSetCond: WStep<0.", _state);
+   ae_assert(ae_fp_greater_eq(wstep, 0.0), "MLPSetCond: WStep<0.", _state);
    ae_assert(maxits >= 0, "MLPSetCond: MaxIts<0.", _state);
-   if (ae_fp_neq(wstep, (double)(0)) || maxits != 0) {
+   if (ae_fp_neq(wstep, 0.0) || maxits != 0) {
       s->wstep = wstep;
       s->maxits = maxits;
    } else {
@@ -25994,7 +25994,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    nin = mlpgetinputscount(&ensemble->network, _state);
    nout = mlpgetoutputscount(&ensemble->network, _state);
    wcount = mlpgetweightscount(&ensemble->network, _state);
-   if ((npoints < 2 || restarts < 1) || ae_fp_less(decay, (double)(0))) {
+   if ((npoints < 2 || restarts < 1) || ae_fp_less(decay, 0.0)) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -26133,11 +26133,11 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
    ae_assert(nrestarts >= 0, "MLPTrainEnsembleES: NRestarts<0.", _state);
 
 // Initialize parameter Rep
-   rep->relclserror = (double)(0);
-   rep->avgce = (double)(0);
-   rep->rmserror = (double)(0);
-   rep->avgerror = (double)(0);
-   rep->avgrelerror = (double)(0);
+   rep->relclserror = 0.0;
+   rep->avgce = 0.0;
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
    rep->ngrad = 0;
    rep->nhess = 0;
    rep->ncholesky = 0;
@@ -26220,11 +26220,11 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
    ae_vector_set_length(&x, nin - 1 + 1, _state);
    ae_vector_set_length(&y, nout - 1 + 1, _state);
    mlptrain_mlpkfoldsplit(xy, npoints, nclasses, foldscount, false, &folds, _state);
-   cvrep->relclserror = (double)(0);
-   cvrep->avgce = (double)(0);
-   cvrep->rmserror = (double)(0);
-   cvrep->avgerror = (double)(0);
-   cvrep->avgrelerror = (double)(0);
+   cvrep->relclserror = 0.0;
+   cvrep->avgce = 0.0;
+   cvrep->rmserror = 0.0;
+   cvrep->avgerror = 0.0;
+   cvrep->avgrelerror = 0.0;
    rep->ngrad = 0;
    rep->nhess = 0;
    rep->ncholesky = 0;
@@ -26251,11 +26251,11 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
          mlptrainlbfgs(&network, &cvset, cvssize, decay, restarts, wstep, maxits, info, &internalrep, _state);
       }
       if (*info < 0) {
-         cvrep->relclserror = (double)(0);
-         cvrep->avgce = (double)(0);
-         cvrep->rmserror = (double)(0);
-         cvrep->avgerror = (double)(0);
-         cvrep->avgrelerror = (double)(0);
+         cvrep->relclserror = 0.0;
+         cvrep->avgce = 0.0;
+         cvrep->rmserror = 0.0;
+         cvrep->avgerror = 0.0;
+         cvrep->avgrelerror = 0.0;
          ae_frame_leave(_state);
          return;
       }
@@ -26294,7 +26294,7 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
             for (j = 0; j <= nout - 1; j++) {
                cvrep->rmserror = cvrep->rmserror + ae_sqr(y.xR[j] - testset.xyR[i][nin + j], _state);
                cvrep->avgerror = cvrep->avgerror + ae_fabs(y.xR[j] - testset.xyR[i][nin + j], _state);
-               if (ae_fp_neq(testset.xyR[i][nin + j], (double)(0))) {
+               if (ae_fp_neq(testset.xyR[i][nin + j], 0.0)) {
                   cvrep->avgrelerror = cvrep->avgrelerror + ae_fabs((y.xR[j] - testset.xyR[i][nin + j]) / testset.xyR[i][nin + j], _state);
                   relcnt = relcnt + 1;
                }
@@ -26304,7 +26304,7 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
    }
    if (mlpissoftmax(&network, _state)) {
       cvrep->relclserror = cvrep->relclserror / npoints;
-      cvrep->avgce = cvrep->avgce / (ae_log((double)(2), _state) * npoints);
+      cvrep->avgce = cvrep->avgce / (ae_log(2.0, _state) * npoints);
    }
    cvrep->rmserror = ae_sqrt(cvrep->rmserror / (npoints * nout), _state);
    cvrep->avgerror = cvrep->avgerror / (npoints * nout);
@@ -26414,7 +26414,7 @@ static void mlptrain_mthreadcv(mlptrainer *s, ae_int_t rowsize, ae_int_t nrestar
 
    // We expect that minimum number of iterations before convergence is 100.
    // Hence is our approach to evaluation of task complexity.
-      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * rmul3((double)(2 * wcount), (double)(s->npoints), (double)(100), _state), smpactivationlevel(_state))) {
+      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * rmul3((double)(2 * wcount), (double)s->npoints, 100.0, _state), smpactivationlevel(_state))) {
          if (_trypexec_mlptrain_mthreadcv(s, rowsize, nrestarts, folds, fold, dfold, cvy, pooldatacv, wcount, _state)) {
             ae_frame_leave(_state);
             return;
@@ -26481,7 +26481,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
    // Try parallelization
    // We expect that minimum number of iterations before convergence is 100.
    // Hence is our approach to evaluation of task complexity.
-      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * rmul3((double)(2 * wcount), (double)(s->npoints), (double)(100), _state), smpactivationlevel(_state))) {
+      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * rmul3((double)(2 * wcount), (double)s->npoints, 100.0, _state), smpactivationlevel(_state))) {
          if (_trypexec_mlptrain_mlptrainnetworkx(s, nrestarts, algokind, trnsubset, trnsubsetsize, valsubset, valsubsetsize, network, rep, isrootcall, sessions, _state)) {
             ae_frame_leave(_state);
             return;
@@ -26580,8 +26580,8 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
    // zero, most recent state of network is stored.
       rndstart = nrestarts != 0;
       ngradbatch = 0;
-      eval = (double)(0);
-      ebest = (double)(0);
+      eval = 0.0;
+      ebest = 0.0;
       itbest = 0;
       itcnt = 0;
       mlptrain_mlpstarttrainingx(s, rndstart, algokind, trnsubset, trnsubsetsize, psession, _state);
@@ -26604,7 +26604,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
             ebest = eval;
             itbest = itcnt;
          }
-         if (itcnt > 30 && ae_fp_greater((double)(itcnt), 1.5 * itbest)) {
+         if (itcnt > 30 && ae_fp_greater((double)itcnt, 1.5 * itbest)) {
             break;
          }
          itcnt = itcnt + 1;
@@ -26613,7 +26613,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       rep->ngrad = ngradbatch;
    } else {
       for (i = 0; i <= wcount - 1; i++) {
-         psession->network.weights.xR[i] = (double)(0);
+         psession->network.weights.xR[i] = 0.0;
       }
    }
 
@@ -26694,7 +26694,7 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
    // Try parallelization
    // We expect that minimum number of iterations before convergence is 100.
    // Hence is our approach to evaluation of task complexity.
-      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * (idx1 - idx0) * rmul3((double)(2 * wcount), (double)(s->npoints), (double)(100), _state), smpactivationlevel(_state))) {
+      if (ae_fp_greater_eq(ae_maxint(nrestarts, 1, _state) * (idx1 - idx0) * rmul3((double)(2 * wcount), (double)s->npoints, 100.0, _state), smpactivationlevel(_state))) {
          if (_trypexec_mlptrain_mlptrainensemblex(s, ensemble, idx0, idx1, nrestarts, trainingmethod, ngrad, isrootcall, esessions, _state)) {
             ae_frame_leave(_state);
             return;
@@ -26836,7 +26836,7 @@ static void mlptrain_mlpstarttrainingx(mlptrainer *s, bool randomstart, ae_int_t
       minlbfgsrestartfrom(&session->optimizer, &session->network.weights, _state);
    } else {
       for (i = 0; i <= wcount - 1; i++) {
-         session->network.weights.xR[i] = (double)(0);
+         session->network.weights.xR[i] = 0.0;
       }
    }
    if (algokind == -1) {
@@ -27067,12 +27067,12 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    wcount = mlpgetweightscount(&ensemble->network, _state);
 
 // Test for inputs
-   if ((!lmalgorithm && ae_fp_eq(wstep, (double)(0))) && maxits == 0) {
+   if ((!lmalgorithm && ae_fp_eq(wstep, 0.0)) && maxits == 0) {
       *info = -8;
       ae_frame_leave(_state);
       return;
    }
-   if (((npoints <= 0 || restarts < 1) || ae_fp_less(wstep, (double)(0))) || maxits < 0) {
+   if (((npoints <= 0 || restarts < 1) || ae_fp_less(wstep, 0.0)) || maxits < 0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -27091,11 +27091,11 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    rep->ngrad = 0;
    rep->nhess = 0;
    rep->ncholesky = 0;
-   ooberrors->relclserror = (double)(0);
-   ooberrors->avgce = (double)(0);
-   ooberrors->rmserror = (double)(0);
-   ooberrors->avgerror = (double)(0);
-   ooberrors->avgrelerror = (double)(0);
+   ooberrors->relclserror = 0.0;
+   ooberrors->avgce = 0.0;
+   ooberrors->rmserror = 0.0;
+   ooberrors->avgerror = 0.0;
+   ooberrors->avgrelerror = 0.0;
    if (mlpissoftmax(&ensemble->network, _state)) {
       ccnt = nin + 1;
       pcnt = nin;
@@ -27116,7 +27116,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    }
    for (i = 0; i <= npoints - 1; i++) {
       for (j = 0; j <= nout - 1; j++) {
-         oobbuf.xyR[i][j] = (double)(0);
+         oobbuf.xyR[i][j] = 0.0;
       }
    }
    for (i = 0; i <= npoints - 1; i++) {
@@ -27174,7 +27174,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    }
    for (i = 0; i <= npoints - 1; i++) {
       if (oobcntbuf.xZ[i] != 0) {
-         v = (double)1 / (double)oobcntbuf.xZ[i];
+         v = 1.0 / oobcntbuf.xZ[i];
          ae_v_moved(&y.xR[0], 1, &oobbuf.xyR[i][0], 1, ae_v_len(0, nout - 1), v);
          if (mlpissoftmax(&ensemble->network, _state)) {
             dy.xR[0] = xy->xyR[i][nin];
@@ -27301,13 +27301,13 @@ static void mlptrain_initmlpetrnsessions(multilayerperceptron *individualnetwork
 }
 
 void mlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlpreport *p = (mlpreport *) _p;
+   mlpreport *p = (mlpreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlpreport *dst = (mlpreport *) _dst;
-   mlpreport *src = (mlpreport *) _src;
+   mlpreport *dst = (mlpreport *)_dst;
+   mlpreport *src = (mlpreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -27319,18 +27319,18 @@ void mlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 }
 
 void mlpreport_free(void *_p, bool make_automatic) {
-   mlpreport *p = (mlpreport *) _p;
+   mlpreport *p = (mlpreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mlpcvreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlpcvreport *p = (mlpcvreport *) _p;
+   mlpcvreport *p = (mlpcvreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void mlpcvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlpcvreport *dst = (mlpcvreport *) _dst;
-   mlpcvreport *src = (mlpcvreport *) _src;
+   mlpcvreport *dst = (mlpcvreport *)_dst;
+   mlpcvreport *src = (mlpcvreport *)_src;
    dst->relclserror = src->relclserror;
    dst->avgce = src->avgce;
    dst->rmserror = src->rmserror;
@@ -27339,12 +27339,12 @@ void mlpcvreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void mlpcvreport_free(void *_p, bool make_automatic) {
-   mlpcvreport *p = (mlpcvreport *) _p;
+   mlpcvreport *p = (mlpcvreport *)_p;
    ae_touch_ptr((void *)p);
 }
 
 void smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic) {
-   smlptrnsession *p = (smlptrnsession *) _p;
+   smlptrnsession *p = (smlptrnsession *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->bestparameters, 0, DT_REAL, _state, make_automatic);
    multilayerperceptron_init(&p->network, _state, make_automatic);
@@ -27359,8 +27359,8 @@ void smlptrnsession_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void smlptrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   smlptrnsession *dst = (smlptrnsession *) _dst;
-   smlptrnsession *src = (smlptrnsession *) _src;
+   smlptrnsession *dst = (smlptrnsession *)_dst;
+   smlptrnsession *src = (smlptrnsession *)_src;
    ae_vector_copy(&dst->bestparameters, &src->bestparameters, _state, make_automatic);
    dst->bestrmserror = src->bestrmserror;
    dst->randomizenetwork = src->randomizenetwork;
@@ -27378,7 +27378,7 @@ void smlptrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 }
 
 void smlptrnsession_free(void *_p, bool make_automatic) {
-   smlptrnsession *p = (smlptrnsession *) _p;
+   smlptrnsession *p = (smlptrnsession *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->bestparameters, make_automatic);
    multilayerperceptron_free(&p->network, make_automatic);
@@ -27393,7 +27393,7 @@ void smlptrnsession_free(void *_p, bool make_automatic) {
 }
 
 void mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlpetrnsession *p = (mlpetrnsession *) _p;
+   mlpetrnsession *p = (mlpetrnsession *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->trnsubset, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->valsubset, 0, DT_INT, _state, make_automatic);
@@ -27403,8 +27403,8 @@ void mlpetrnsession_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void mlpetrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlpetrnsession *dst = (mlpetrnsession *) _dst;
-   mlpetrnsession *src = (mlpetrnsession *) _src;
+   mlpetrnsession *dst = (mlpetrnsession *)_dst;
+   mlpetrnsession *src = (mlpetrnsession *)_src;
    ae_vector_copy(&dst->trnsubset, &src->trnsubset, _state, make_automatic);
    ae_vector_copy(&dst->valsubset, &src->valsubset, _state, make_automatic);
    ae_shared_pool_copy(&dst->mlpsessions, &src->mlpsessions, _state, make_automatic);
@@ -27413,7 +27413,7 @@ void mlpetrnsession_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 }
 
 void mlpetrnsession_free(void *_p, bool make_automatic) {
-   mlpetrnsession *p = (mlpetrnsession *) _p;
+   mlpetrnsession *p = (mlpetrnsession *)_p;
    ae_touch_ptr((void *)p);
    ae_vector_free(&p->trnsubset, make_automatic);
    ae_vector_free(&p->valsubset, make_automatic);
@@ -27423,7 +27423,7 @@ void mlpetrnsession_free(void *_p, bool make_automatic) {
 }
 
 void mlptrainer_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlptrainer *p = (mlptrainer *) _p;
+   mlptrainer *p = (mlptrainer *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densexy, 0, 0, DT_REAL, _state, make_automatic);
    sparsematrix_init(&p->sparsexy, _state, make_automatic);
@@ -27433,8 +27433,8 @@ void mlptrainer_init(void *_p, ae_state *_state, bool make_automatic) {
 }
 
 void mlptrainer_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlptrainer *dst = (mlptrainer *) _dst;
-   mlptrainer *src = (mlptrainer *) _src;
+   mlptrainer *dst = (mlptrainer *)_dst;
+   mlptrainer *src = (mlptrainer *)_src;
    dst->nin = src->nin;
    dst->nout = src->nout;
    dst->rcpar = src->rcpar;
@@ -27457,7 +27457,7 @@ void mlptrainer_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 }
 
 void mlptrainer_free(void *_p, bool make_automatic) {
-   mlptrainer *p = (mlptrainer *) _p;
+   mlptrainer *p = (mlptrainer *)_p;
    ae_touch_ptr((void *)p);
    ae_matrix_free(&p->densexy, make_automatic);
    sparsematrix_free(&p->sparsexy, make_automatic);
@@ -27467,7 +27467,7 @@ void mlptrainer_free(void *_p, bool make_automatic) {
 }
 
 void mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic) {
-   mlpparallelizationcv *p = (mlpparallelizationcv *) _p;
+   mlpparallelizationcv *p = (mlpparallelizationcv *)_p;
    ae_touch_ptr((void *)p);
    multilayerperceptron_init(&p->network, _state, make_automatic);
    mlpreport_init(&p->rep, _state, make_automatic);
@@ -27478,8 +27478,8 @@ void mlpparallelizationcv_init(void *_p, ae_state *_state, bool make_automatic) 
 }
 
 void mlpparallelizationcv_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
-   mlpparallelizationcv *dst = (mlpparallelizationcv *) _dst;
-   mlpparallelizationcv *src = (mlpparallelizationcv *) _src;
+   mlpparallelizationcv *dst = (mlpparallelizationcv *)_dst;
+   mlpparallelizationcv *src = (mlpparallelizationcv *)_src;
    multilayerperceptron_copy(&dst->network, &src->network, _state, make_automatic);
    mlpreport_copy(&dst->rep, &src->rep, _state, make_automatic);
    ae_vector_copy(&dst->subset, &src->subset, _state, make_automatic);
@@ -27491,7 +27491,7 @@ void mlpparallelizationcv_copy(void *_dst, void *_src, ae_state *_state, bool ma
 }
 
 void mlpparallelizationcv_free(void *_p, bool make_automatic) {
-   mlpparallelizationcv *p = (mlpparallelizationcv *) _p;
+   mlpparallelizationcv *p = (mlpparallelizationcv *)_p;
    ae_touch_ptr((void *)p);
    multilayerperceptron_free(&p->network, make_automatic);
    mlpreport_free(&p->rep, make_automatic);

@@ -42,14 +42,14 @@ typedef struct {
 } seedrec;
 
 void innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
-   innerrec *p = (innerrec *) _p;
+   innerrec *p = (innerrec *)_p;
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, _state, make_automatic);
 }
 
 void innerrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
-   innerrec *dst = (innerrec *) _dst;
-   innerrec *src = (innerrec *) _src;
+   innerrec *dst = (innerrec *)_dst;
+   innerrec *src = (innerrec *)_src;
    dst->cval = src->cval;
    dst->rval = src->rval;
    dst->ival = src->ival;
@@ -58,28 +58,28 @@ void innerrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool m
 }
 
 void innerrec_free(void *_p, bool make_automatic) {
-   innerrec *p = (innerrec *) _p;
+   innerrec *p = (innerrec *)_p;
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
 void seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
-   seedrec *p = (seedrec *) _p;
+   seedrec *p = (seedrec *)_p;
    alglib_impl::ae_touch_ptr((void *)p);
    innerrec_init(&p->recval, _state, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, _state, make_automatic);
 }
 
 void seedrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
-   seedrec *dst = (seedrec *) _dst;
-   seedrec *src = (seedrec *) _src;
+   seedrec *dst = (seedrec *)_dst;
+   seedrec *src = (seedrec *)_src;
    dst->bval = src->bval;
    innerrec_copy(&dst->recval, &src->recval, _state, make_automatic);
    alglib_impl::ae_shared_pool_copy(&dst->pool, &src->pool, _state, make_automatic);
 }
 
 void seedrec_free(void *_p, bool make_automatic) {
-   seedrec *p = (seedrec *) _p;
+   seedrec *p = (seedrec *)_p;
    alglib_impl::ae_touch_ptr((void *)p);
    innerrec_free(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
@@ -198,11 +198,11 @@ void issue813_callback(const real_1d_array &, real_1d_array &, void *) {
 }
 
 void issue824_callback_i(const real_1d_array &, double &, void *) {
-   throw(int *) (NULL);
+   throw (int *)NULL;
 }
 
 void issue824_callback_d(const real_1d_array &, double &, void *) {
-   throw(double *) (NULL);
+   throw (double *)NULL;
 }
 
 void file_put_contents(const char *filename, const char *contents) {
@@ -221,7 +221,7 @@ struct async_rbf_record {
    bool thread_finished;
 };
 void *async_build_rbf_model(void *T) {
-   async_rbf_record *p = (async_rbf_record *) T;
+   async_rbf_record *p = (async_rbf_record *)T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return NULL;
@@ -233,7 +233,7 @@ struct async_rbf_record {
    bool thread_finished;
 };
 DWORD WINAPI async_build_rbf_model(LPVOID T) {
-   async_rbf_record *p = (async_rbf_record *) T;
+   async_rbf_record *p = (async_rbf_record *)T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return 0;
@@ -2316,7 +2316,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
             t = alglib_impl::ae_tickcount() - t;
             perf0 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
-            printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, (double)perf0);
+            printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, perf0);
 
             setnworkers(0);
             t = alglib_impl::ae_tickcount();
@@ -2324,7 +2324,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0, parallel);
             t = alglib_impl::ae_tickcount() - t;
             perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
-            printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2 / perf0));
+            printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, perf2 / perf0);
             setnworkers(1);
 
          }

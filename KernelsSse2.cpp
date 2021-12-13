@@ -191,7 +191,7 @@ void rcopyv_sse2(const ae_int_t n, const Real *__restrict x, Real *__restrict y,
    const ae_int_t sse2len = n >> 1;
    const ae_int_t tail = sse2len << 1;
    const __m128d *__restrict pSrc = (const __m128d *)(x);
-   __m128d *__restrict pDest = (__m128d *) (y);
+   __m128d *__restrict pDest = (__m128d *)y;
 
    for (i = 0; i < sse2len; i++)
       pDest[i] = pSrc[i];
@@ -204,7 +204,7 @@ void rcopymulv_sse2(const ae_int_t n, const double v, const Real *__restrict x, 
 
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(x);
-   __m128d *__restrict pDest = (__m128d *) (y);
+   __m128d *__restrict pDest = (__m128d *)y;
    const __m128d sse2v = _mm_set1_pd(v);
    const ae_int_t tail = sse2len << 1;
    for (i = 0; i < sse2len; i++) {
@@ -218,7 +218,7 @@ void rcopymulv_sse2(const ae_int_t n, const double v, const Real *__restrict x, 
 void icopyv_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__restrict y, ae_state *__restrict _state) {
    const ae_int_t tail = (n * sizeof(ae_int_t)) & 15;
    const ae_int_t even = (n * sizeof(ae_int_t)) - tail;
-   __m128i *__restrict pDest = (__m128i *) y;
+   __m128i *__restrict pDest = (__m128i *)y;
    const __m128i *__restrict pSrc = (const __m128i *)x;
    const ae_int_t nVec = even >> 4;
    ae_int_t i;
@@ -227,18 +227,18 @@ void icopyv_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__res
    }
    i = even / sizeof(ae_int_t);
    if (tail & 8) {
-      *(ae_int64_t *) (y + i) = *(const ae_int64_t *)(x + i);
+      *(ae_int64_t *)(y + i) = *(const ae_int64_t *)(x + i);
       i += 8 / sizeof(ae_int_t);
    }
    if (tail & 4) {
-      *(ae_int32_t *) (y + i) = *(const ae_int32_t *)(x + i);
+      *(ae_int32_t *)(y + i) = *(const ae_int32_t *)(x + i);
    }
 }
 
 void bcopyv_sse2(const ae_int_t n, const bool *__restrict x, bool *__restrict y, ae_state *__restrict _state) {
    const ae_int_t tail = n & 15;
    const ae_int_t even = n - tail;
-   __m128i *__restrict pDest = (__m128i *) y;
+   __m128i *__restrict pDest = (__m128i *)y;
    const __m128i *__restrict pSrc = (const __m128i *)x;
    const ae_int_t nVec = even >> 4;
    ae_int_t i;
@@ -247,11 +247,11 @@ void bcopyv_sse2(const ae_int_t n, const bool *__restrict x, bool *__restrict y,
    }
    i = even;
    if (tail & 8) {
-      *(ae_int64_t *) (y + i) = *(const ae_int64_t *)(x + i);
+      *(ae_int64_t *)(y + i) = *(const ae_int64_t *)(x + i);
       i += 8;
    }
    if (tail & 4) {
-      *(ae_int32_t *) (y + i) = *(const ae_int32_t *)(x + i);
+      *(ae_int32_t *)(y + i) = *(const ae_int32_t *)(x + i);
       i += 4;
    }
    if (tail & 2) {
@@ -268,7 +268,7 @@ void rsetv_sse2(const ae_int_t n, const double v, Real *__restrict x, const ae_s
    ae_int_t i;
 
    const ae_int_t sse2len = n >> 1;
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    const __m128d sse2v = _mm_set1_pd(v);
    for (i = 0; i < sse2len; i++) {
       pDest[i] = sse2v;
@@ -297,9 +297,9 @@ void rsetvx_sse2(const ae_int_t n, const double v, Real *__restrict x, const ae_
 void isetv_sse2(const ae_int_t n, const ae_int_t v, ae_int_t *__restrict x, ae_state *__restrict _state) {
    const ae_int_t tail = (n * sizeof(ae_int_t)) & 15;
    const ae_int_t even = (n * sizeof(ae_int_t)) - tail;
-   __m128i *__restrict pDest = (__m128i *) x;
+   __m128i *__restrict pDest = (__m128i *)x;
    const ae_int_t v2[2] = { v, v };
-   const __m128i sse2v = ((sizeof(v) == 4) ? _mm_set1_epi32((ae_int32_t) v) : _mm_loadu_si128((const __m128i *)(&v2[0])));
+   const __m128i sse2v = ((sizeof(v) == 4) ? _mm_set1_epi32((ae_int32_t)v) : _mm_loadu_si128((const __m128i *)(&v2[0])));
    const ae_int_t nVec = even >> 4;
    ae_int_t i;
    for (i = 0; i < nVec; i++) {
@@ -311,7 +311,7 @@ void isetv_sse2(const ae_int_t n, const ae_int_t v, ae_int_t *__restrict x, ae_s
 void bsetv_sse2(const ae_int_t n, const bool v, bool *__restrict x, ae_state *__restrict _state) {
    const ae_int_t tail = n & 15;
    const ae_int_t even = n - tail;
-   __m128i *__restrict pDest = (__m128i *) x;
+   __m128i *__restrict pDest = (__m128i *)x;
    const __m128i sse2v = _mm_set1_epi8(v);
    const ae_int_t nVec = even >> 4;
    ae_int_t i;
@@ -326,7 +326,7 @@ void rmulv_sse2(const ae_int_t n, const double v, double *__restrict x, const ae
    ae_int_t i;
 
    const ae_int_t sse2len = n >> 1;
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    const __m128d sse2v = _mm_set1_pd(v);
    for (i = 0; i < sse2len; i++) {
       pDest[i] = _mm_mul_pd(sse2v, pDest[i]);
@@ -357,7 +357,7 @@ void raddv_sse2(const ae_int_t n, const double alpha, const Real *__restrict y, 
 
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    const __m128d sse2alpha = _mm_set1_pd(alpha);
    for (i = 0; i < sse2len; i++) {
       pDest[i] = _mm_add_pd(_mm_mul_pd(sse2alpha, pSrc[i]), pDest[i]);
@@ -374,7 +374,7 @@ void raddvx_sse2_xaligned(const ae_int_t n, const double alpha, const double *__
 
    const ae_int_t vecLen = (n >> 1) << 1;
    const __m128d sse2alpha = _mm_set1_pd(alpha);
-   __m128d *__restrict pDest = (__m128d *) x;
+   __m128d *__restrict pDest = (__m128d *)x;
    for (i = 0; i < vecLen; i += 2) {
       const ae_int_t iDest = i >> 1;
       pDest[iDest] = _mm_add_pd(_mm_mul_pd(sse2alpha, _mm_loadu_pd(y + i)), pDest[iDest]);
@@ -403,7 +403,7 @@ void rmergemulv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    for (i = 0; i < sse2len; i++) {
       pDest[i] = _mm_mul_pd(pSrc[i], pDest[i]);
    }
@@ -419,7 +419,7 @@ void rmergemaxv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    for (i = 0; i < sse2len; i++) {
       pDest[i] = _mm_max_pd(pSrc[i], pDest[i]);
    }
@@ -434,7 +434,7 @@ void rmergeminv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
-   __m128d *__restrict pDest = (__m128d *) (x);
+   __m128d *__restrict pDest = (__m128d *)x;
    for (i = 0; i < sse2len; i++) {
       pDest[i] = _mm_min_pd(pSrc[i], pDest[i]);
    }
@@ -538,15 +538,15 @@ static void icopyvx_sse2_xaligned(const ae_int_t n, const ae_int_t *__restrict x
    ae_int_t i;
    for (i = 0; i < nVec; i++) {
       const ae_int_t j = i << shift_by;
-      _mm_storeu_si128((__m128i *) (y + j), pSrc[i]);
+      _mm_storeu_si128((__m128i *)(y + j), pSrc[i]);
    }
    i = even / sizeof(ae_int_t);
    if (tail & 8) {
-      *(ae_int64_t *) (y + i) = *(const ae_int64_t *)(x + i);
+      *(ae_int64_t *)(y + i) = *(const ae_int64_t *)(x + i);
       i += 8 / sizeof(ae_int_t);
    }
    if (tail & 4) {
-      *(ae_int32_t *) (y + i) = *(const ae_int32_t *)(x + i);
+      *(ae_int32_t *)(y + i) = *(const ae_int32_t *)(x + i);
    }
 }
 

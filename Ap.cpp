@@ -137,7 +137,7 @@ void ae_frame_make(ae_state *state, ae_frame *tmp) {
 void ae_frame_leave(ae_state *state) {
    while (state->p_top_block->ptr != &DynFrame && state->p_top_block->ptr != &DynBottom) {
       if (state->p_top_block->ptr != NULL && state->p_top_block->deallocator != NULL)
-         ((ae_deallocator) (state->p_top_block->deallocator)) (state->p_top_block->ptr);
+         state->p_top_block->deallocator(state->p_top_block->ptr);
       state->p_top_block = state->p_top_block->p_next;
    }
    state->p_top_block = state->p_top_block->p_next;
@@ -170,25 +170,25 @@ void ae_state_init(ae_state *state) {
 // determine endianness and initialize precomputed IEEE special quantities.
    state->endianness = ae_get_endianness();
    if (state->endianness == AE_LITTLE_ENDIAN) {
-      vp = (ae_int32_t *) (&state->v_nan);
+      vp = (ae_int32_t *)&state->v_nan;
       vp[0] = 0;
-      vp[1] = (ae_int32_t) 0x7FF80000;
-      vp = (ae_int32_t *) (&state->v_posinf);
+      vp[1] = (ae_int32_t)0x7FF80000;
+      vp = (ae_int32_t *)&state->v_posinf;
       vp[0] = 0;
-      vp[1] = (ae_int32_t) 0x7FF00000;
-      vp = (ae_int32_t *) (&state->v_neginf);
+      vp[1] = (ae_int32_t)0x7FF00000;
+      vp = (ae_int32_t *)&state->v_neginf;
       vp[0] = 0;
-      vp[1] = (ae_int32_t) 0xFFF00000;
+      vp[1] = (ae_int32_t)0xFFF00000;
    } else if (state->endianness == AE_BIG_ENDIAN) {
-      vp = (ae_int32_t *) (&state->v_nan);
+      vp = (ae_int32_t *)&state->v_nan;
       vp[1] = 0;
-      vp[0] = (ae_int32_t) 0x7FF80000;
-      vp = (ae_int32_t *) (&state->v_posinf);
+      vp[0] = (ae_int32_t)0x7FF80000;
+      vp = (ae_int32_t *)&state->v_posinf;
       vp[1] = 0;
-      vp[0] = (ae_int32_t) 0x7FF00000;
-      vp = (ae_int32_t *) (&state->v_neginf);
+      vp[0] = (ae_int32_t)0x7FF00000;
+      vp = (ae_int32_t *)&state->v_neginf;
       vp[1] = 0;
-      vp[0] = (ae_int32_t) 0xFFF00000;
+      vp[0] = (ae_int32_t)0xFFF00000;
    } else
       abort();
 
@@ -221,7 +221,7 @@ static unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERI
 // * multithreading, if cores_to_use allows it
 //
 ae_uint64_t ae_get_global_threading() {
-   return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
+   return (ae_uint64_t)_alglib_global_threading_flags << _ALGLIB_FLG_THREADING_SHIFT;
 }
 
 // This function sets default (global) threading model:
@@ -334,7 +334,7 @@ static ae_cpuid_t ae_cpuid() {
    // Set the initialization flag.
       _ae_cpuid_initialized = true;
    }
-   return (ae_cpuid_t) (
+   return (ae_cpuid_t)(
       (_ae_cpuid_has_sse2 ? (int)CPU_SSE2 : 0) |
       (_ae_cpuid_has_avx2 ? (int)CPU_AVX2 : 0) |
       (_ae_cpuid_has_fma ? (int)CPU_FMA : 0)
@@ -365,7 +365,7 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 #elif AE_OS == AE_WINDOWS
    SYSTEM_INFO sysInfo;
    GetSystemInfo(&sysInfo);
-   ncores = (ae_int_t) (sysInfo.dwNumberOfProcessors);
+   ncores = (ae_int_t)sysInfo.dwNumberOfProcessors;
 #else
    ncores = 1;
 #endif
@@ -451,8 +451,8 @@ ae_int64_t ae_get_dbg_value(debug_flag_t id) {
 #else
       case _ALGLIB_CORES_COUNT: return 0;
 #endif
-      case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t) ae_get_global_threading();
-      case _ALGLIB_NWORKERS: return (ae_int64_t) _alglib_cores_to_use;
+      case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t)ae_get_global_threading();
+      case _ALGLIB_NWORKERS: return (ae_int64_t)_alglib_cores_to_use;
    // Unknown value.
       default: return 0;
    }
@@ -464,8 +464,8 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
       case _ALGLIB_TOTAL_ALLOC_SIZE: _use_dbg_counters = flag_val != 0; break;
       case _ALGLIB_USE_VENDOR_KERNELS: _use_vendor_kernels = flag_val != 0; break;
       case _ALGLIB_DEBUG_WORKSTEALING: debug_workstealing = flag_val != 0; break;
-      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t) flag_val); break;
-      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
+      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t)flag_val); break;
+      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t)flag_val; break;
    }
 }
 
@@ -554,7 +554,7 @@ ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
       ae_int_t iptr;
    } u;
    u.ptr = ptr;
-   return (ae_int_t) (u.iptr % alignment);
+   return (ae_int_t)(u.iptr % alignment);
 }
 
 void *ae_align(void *ptr, size_t alignment) {
@@ -592,7 +592,7 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
 
    // increment cached value and store
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) + v), v0) == v0)
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 + v), v0) == v0)
          break;
    }
 #elif defined __clang__ && (AE_CPU == AE_INTEL)
@@ -632,7 +632,7 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
 
    // increment cached value and store
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID) (((char *)v0) - v), v0) == v0)
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 - v), v0) == v0)
          break;
    }
 #elif defined __clang__ && (AE_CPU == AE_INTEL)
@@ -673,7 +673,7 @@ void set_memory_pool(void *ptr, size_t size) {
    AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);
    sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
-   sm_page_tbl = (ae_int_t *) ptr;
+   sm_page_tbl = (ae_int_t *)ptr;
    sm_mem = (unsigned char *)ae_align(sm_page_tbl + sm_page_cnt, sm_page_size);
 
 // Mark all pages as free
@@ -826,7 +826,7 @@ void *aligned_malloc(size_t size, size_t alignment) {
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
    if (_use_dbg_counters)
-      ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t) size);
+      ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
 
 // return
    return (void *)result;
@@ -1000,7 +1000,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state) {
 //       memory allocation.
    ae_assert(size >= 0, "ae_db_realloc(): negative size", state);
    if (block->ptr != NULL) {
-      ((ae_deallocator) block->deallocator) (block->ptr);
+      block->deallocator(block->ptr);
       block->ptr = NULL;
       block->valgrind_hint = NULL;
    }
@@ -1019,7 +1019,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state) {
 // * never call it for special blocks which marks frame boundaries!
 void ae_db_free(ae_dyn_block *block) {
    if (block->ptr != NULL)
-      ((ae_deallocator) block->deallocator) (block->ptr);
+      block->deallocator(block->ptr);
    block->ptr = NULL;
    block->valgrind_hint = NULL;
    block->deallocator = ae_free;
@@ -1054,10 +1054,10 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
 ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
    // case DT_BYTE: // The same as DT_BOOL.
-      case DT_BOOL: return (ae_int_t) sizeof(bool);
-      case DT_INT: return (ae_int_t) sizeof(ae_int_t);
-      case DT_REAL: return (ae_int_t) sizeof(double);
-      case DT_COMPLEX: return 2 * (ae_int_t) sizeof(double);
+      case DT_BOOL: return (ae_int_t)sizeof(bool);
+      case DT_INT: return (ae_int_t)sizeof(ae_int_t);
+      case DT_REAL: return (ae_int_t)sizeof(double);
+      case DT_COMPLEX: return 2 * (ae_int_t)sizeof(double);
       default: return 0;
    }
 }
@@ -1274,7 +1274,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
    while (dst->stride * ae_sizeof(datatype) % AE_DATA_ALIGN != 0)
       dst->stride++;
    dst->datatype = datatype;
-   ae_db_init(&dst->data, rows * ((ae_int_t) sizeof(void *) + dst->stride * ae_sizeof(datatype)) + AE_DATA_ALIGN - 1, state, make_automatic);
+   ae_db_init(&dst->data, rows * ((ae_int_t)sizeof(void *) + dst->stride * ae_sizeof(datatype)) + AE_DATA_ALIGN - 1, state, make_automatic);
    dst->rows = rows;
    dst->cols = cols;
    ae_matrix_update_row_pointers(dst, ae_align((char *)dst->data.ptr + rows * sizeof(void *), AE_DATA_ALIGN));
@@ -1334,7 +1334,7 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
    dst->rows = 0;
    dst->cols = 0;
    dst->xyX = NULL;
-   ae_db_realloc(&dst->data, rows * ((ae_int_t) sizeof(void *) + dst->stride * ae_sizeof(dst->datatype)) + AE_DATA_ALIGN - 1, state);
+   ae_db_realloc(&dst->data, rows * ((ae_int_t)sizeof(void *) + dst->stride * ae_sizeof(dst->datatype)) + AE_DATA_ALIGN - 1, state);
    dst->rows = rows;
    dst->cols = cols;
 
@@ -1435,7 +1435,7 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bo
 // is  propagated  to  its  subscriber  (in  cases  non-NULL  subscruber was
 // specified during pointer creation).
 void ae_smart_ptr_free(void *_dst) {
-   ae_smart_ptr *dst = (ae_smart_ptr *) _dst;
+   ae_smart_ptr *dst = (ae_smart_ptr *)_dst;
    if (dst->is_owner && dst->ptr != NULL) {
       dst->free(dst->ptr, false);
       if (dst->is_dynamic)
@@ -1519,9 +1519,9 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
 void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
 
-   ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, state, make_automatic);
+   ae_vector_init(dst, (ae_int_t)src->cnt, (ae_datatype)src->datatype, state, make_automatic);
    if (src->cnt > 0)
-      memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
+      memmove(dst->xX, src->x_ptr, (size_t)((ae_int_t)src->cnt * ae_sizeof((ae_datatype)src->datatype)));
 }
 
 // This function initializes ae_vector using X-structure as source.
@@ -1552,7 +1552,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
 
-   cnt = (ae_int_t) src->cnt;
+   cnt = (ae_int_t)src->cnt;
 
 // ensure that size is correct
    ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x(): 32/64 overflow", state);
@@ -1561,7 +1561,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 // prepare for possible errors during allocation
    dst->cnt = 0;
    dst->xX = NULL;
-   dst->datatype = (ae_datatype) src->datatype;
+   dst->datatype = (ae_datatype)src->datatype;
 
 // zero-size init in order to correctly register in the frame
    ae_db_init(&dst->data, 0, state, make_automatic);
@@ -1679,12 +1679,12 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool 
    ae_int_t row_size;
    ae_int_t i;
    AE_CRITICAL_ASSERT(state != NULL);
-   ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, state, make_automatic);
+   ae_matrix_init(dst, (ae_int_t)src->rows, (ae_int_t)src->cols, (ae_datatype)src->datatype, state, make_automatic);
    if (src->rows != 0 && src->cols != 0) {
       p_src_row = (char *)src->x_ptr;
       p_dst_row = (char *)(dst->xyX[0]);
-      row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
-      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
+      row_size = ae_sizeof((ae_datatype)src->datatype) * (ae_int_t)src->cols;
+      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype)src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype)src->datatype))
          memmove(p_dst_row, p_src_row, (size_t)(row_size));
    }
 }
@@ -1714,8 +1714,8 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
 
-   rows = (ae_int_t) src->rows;
-   cols = (ae_int_t) src->cols;
+   rows = (ae_int_t)src->rows;
+   cols = (ae_int_t)src->cols;
 
 // check that X-source is densely packed
    ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x(): unsupported stride", state);
@@ -1735,9 +1735,9 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
    dst->rows = 0;
    dst->cols = 0;
    dst->stride = cols;
-   dst->datatype = (ae_datatype) src->datatype;
+   dst->datatype = (ae_datatype)src->datatype;
    dst->xyX = NULL;
-   ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), state, make_automatic);
+   ae_db_init(&dst->data, rows * (ae_int_t)sizeof(void *), state, make_automatic);
    dst->rows = rows;
    dst->cols = cols;
    if (dst->rows > 0 && dst->cols > 0) {
@@ -1794,7 +1794,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
       dst->cols = src->cols;
       dst->stride = src->cols;
       dst->datatype = src->datatype;
-      dst->x_ptr = ae_malloc((size_t)(dst->rows * ((ae_int_t) dst->stride) * ae_sizeof(src->datatype)), state);
+      dst->x_ptr = ae_malloc((size_t)(dst->rows * (ae_int_t)dst->stride * ae_sizeof(src->datatype)), state);
       if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr == NULL)
          ae_break(state, ERR_OUT_OF_MEMORY, "ae_malloc(): out of memory");
       dst->last_action = ACT_NEW_LOCATION;
@@ -2003,7 +2003,7 @@ static bool x_is_symmetric(x_matrix *a) {
    mx = 0;
    err = 0;
    nonfinite = false;
-   is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
+   is_symmetric_rec_diag_stat(a, 0, (ae_int_t)a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
    if (nonfinite)
       return false;
    if (mx == 0)
@@ -2044,8 +2044,8 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       double v;
       ae_int_t i, j;
 
-      p1 = (ae_complex *) (a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *) (a->x_ptr) + offset1 * a->stride + offset0;
+      p1 = (ae_complex *)a->x_ptr + offset0 * a->stride + offset1;
+      p2 = (ae_complex *)a->x_ptr + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2094,7 +2094,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       return;
    }
 // base case
-   p = (ae_complex *) (a->x_ptr) + offset * a->stride + offset;
+   p = (ae_complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2135,7 +2135,7 @@ static bool x_is_hermitian(x_matrix *a) {
    mx = 0;
    err = 0;
    nonfinite = false;
-   is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
+   is_hermitian_rec_diag_stat(a, 0, (ae_int_t)a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
    if (nonfinite)
       return false;
    if (mx == 0)
@@ -2223,7 +2223,7 @@ static bool x_force_symmetric(x_matrix *a) {
       return false;
    if (a->cols == 0 || a->rows == 0)
       return true;
-   force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
+   force_symmetric_rec_diag_stat(a, 0, (ae_int_t)a->rows);
    return true;
 }
 
@@ -2254,8 +2254,8 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       ae_complex *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
 
-      p1 = (ae_complex *) (a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *) (a->x_ptr) + offset1 * a->stride + offset0;
+      p1 = (ae_complex *)a->x_ptr + offset0 * a->stride + offset1;
+      p2 = (ae_complex *)a->x_ptr + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2290,7 +2290,7 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       return;
    }
 // base case
-   p = (ae_complex *) (a->x_ptr) + offset * a->stride + offset;
+   p = (ae_complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2306,7 +2306,7 @@ static bool x_force_hermitian(x_matrix *a) {
       return false;
    if (a->cols == 0 || a->rows == 0)
       return true;
-   force_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows);
+   force_hermitian_rec_diag_stat(a, 0, (ae_int_t)a->rows);
    return true;
 }
 
@@ -2400,7 +2400,7 @@ void _ae_init_lock_raw(_lock *p) {
 #if AE_OS == AE_POSIX
    pthread_mutex_init(&p->mutex, NULL);
 #elif AE_OS == AE_WINDOWS
-   p->p_lock = (ae_int_t *) ae_align((void *)(&p->buf), AE_LOCK_ALIGNMENT);
+   p->p_lock = (ae_int_t *)ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
    p->p_lock[0] = 0;
 #else
    p->is_locked = false;
@@ -2495,7 +2495,7 @@ void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic) {
    lock->eternal = false;
    ae_db_init(&lock->db, sizeof(_lock), state, make_automatic);
    lock->lock_ptr = lock->db.ptr;
-   p = (_lock *) lock->lock_ptr;
+   p = (_lock *)lock->lock_ptr;
    _ae_init_lock_raw(p);
 }
 
@@ -2521,7 +2521,7 @@ void ae_init_lock_eternal(ae_lock *lock) {
    AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
    lock->eternal = true;
    lock->lock_ptr = eternal_malloc(sizeof(_lock));
-   p = (_lock *) lock->lock_ptr;
+   p = (_lock *)lock->lock_ptr;
    _ae_init_lock_raw(p);
 }
 
@@ -2529,14 +2529,14 @@ void ae_init_lock_eternal(ae_lock *lock) {
 // iterations inside tight loop before trying again.
 void ae_acquire_lock(ae_lock *lock) {
    _lock *p;
-   p = (_lock *) lock->lock_ptr;
+   p = (_lock *)lock->lock_ptr;
    _ae_acquire_lock_raw(p);
 }
 
 // This function releases lock.
 void ae_release_lock(ae_lock *lock) {
    _lock *p;
-   p = (_lock *) lock->lock_ptr;
+   p = (_lock *)lock->lock_ptr;
    _ae_release_lock_raw(p);
 }
 
@@ -2544,7 +2544,7 @@ void ae_release_lock(ae_lock *lock) {
 void ae_free_lock(ae_lock *lock) {
    _lock *p;
    AE_CRITICAL_ASSERT(!lock->eternal);
-   p = (_lock *) lock->lock_ptr;
+   p = (_lock *)lock->lock_ptr;
    if (p != NULL)
       _ae_free_lock_raw(p);
    ae_db_free(&lock->db);
@@ -2574,7 +2574,7 @@ void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic) {
    ae_shared_pool *dst;
 
    AE_CRITICAL_ASSERT(state != NULL);
-   dst = (ae_shared_pool *) _dst;
+   dst = (ae_shared_pool *)_dst;
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
 
 // init
@@ -2607,7 +2607,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
    }
 // destroy recycled objects
    for (ptr = dst->recycled_objects; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      tmp = (ae_shared_pool_entry *)ptr->next_entry;
       dst->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
@@ -2616,7 +2616,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
    dst->recycled_objects = NULL;
 // destroy recycled entries
    for (ptr = dst->recycled_entries; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      tmp = (ae_shared_pool_entry *)ptr->next_entry;
       ae_free(ptr);
       ptr = tmp;
    }
@@ -2644,8 +2644,8 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 // state != NULL, allocation errors result in exception
 // AE_CRITICAL_ASSERT(state != NULL);
 
-   dst = (ae_shared_pool *) _dst;
-   src = (ae_shared_pool *) _src;
+   dst = (ae_shared_pool *)_dst;
+   src = (ae_shared_pool *)_src;
    ae_shared_pool_init(dst, state, make_automatic);
 
 // copy non-pointer fields
@@ -2662,12 +2662,12 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
    }
 // copy recycled objects
    dst->recycled_objects = NULL;
-   for (ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *) ptr->next_entry) {
+   for (ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *)ptr->next_entry) {
       ae_shared_pool_entry *tmp;
 
    // allocate entry, immediately add to the recycled list
    // (we do not want to lose it in case of future malloc failures)
-      tmp = (ae_shared_pool_entry *) ae_malloc(sizeof *tmp, state);
+      tmp = (ae_shared_pool_entry *)ae_malloc(sizeof *tmp, state);
       memset(tmp, 0, sizeof *tmp);
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
@@ -2694,7 +2694,7 @@ void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_auto
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when pool can be used by another thread.
 void ae_shared_pool_free(void *_dst, bool make_automatic) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // clear seed and lists
    ae_shared_pool_internalclear(dst, make_automatic);
 // clear fields
@@ -2717,7 +2717,7 @@ void ae_shared_pool_free(void *_dst, bool make_automatic) {
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
 bool ae_shared_pool_is_initialized(void *_dst) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
    return dst->seed_object != NULL;
 }
 
@@ -2781,7 +2781,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
 
    // retrieve entry/object from list of recycled objects
       result = pool->recycled_objects;
-      pool->recycled_objects = (ae_shared_pool_entry *) pool->recycled_objects->next_entry;
+      pool->recycled_objects = (ae_shared_pool_entry *)pool->recycled_objects->next_entry;
       new_obj = result->obj;
       result->obj = NULL;
 
@@ -2841,14 +2841,14 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *
    if (pool->recycled_entries != NULL) {
    // reuse previously allocated entry
       new_entry = pool->recycled_entries;
-      pool->recycled_entries = (ae_shared_pool_entry *) new_entry->next_entry;
+      pool->recycled_entries = (ae_shared_pool_entry *)new_entry->next_entry;
    } else {
    // Allocate memory for new entry.
    //
    // NOTE: we release pool lock during allocation because ae_malloc() may raise
    //       exception and we do not want our pool to be left in the locked state.
       ae_release_lock(&pool->pool_lock);
-      new_entry = (ae_shared_pool_entry *) ae_malloc(sizeof(ae_shared_pool_entry), state);
+      new_entry = (ae_shared_pool_entry *)ae_malloc(sizeof(ae_shared_pool_entry), state);
       ae_acquire_lock(&pool->pool_lock);
    }
 
@@ -2877,7 +2877,7 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic, ae
 
 // clear recycled objects
    for (ptr = pool->recycled_objects; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      tmp = (ae_shared_pool_entry *)ptr->next_entry;
       pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
@@ -2940,7 +2940,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_s
       return;
    }
 // modify internal enumeration counter
-   pool->enumeration_counter = (ae_shared_pool_entry *) pool->enumeration_counter->next_entry;
+   pool->enumeration_counter = (ae_shared_pool_entry *)pool->enumeration_counter->next_entry;
 
 // exit on empty list
    if (pool->enumeration_counter == NULL) {
@@ -3109,9 +3109,9 @@ ae_int_t ae_get_endianness() {
 // and lower halfs and to detect mixed endian hardware.
 //
    u.a = 1.0 / 1983.0;
-   if (u.p[1] == (ae_int32_t) 0x3f408642)
+   if (u.p[1] == (ae_int32_t)0x3f408642)
       return AE_LITTLE_ENDIAN;
-   if (u.p[0] == (ae_int32_t) 0x3f408642)
+   if (u.p[0] == (ae_int32_t)0x3f408642)
       return AE_BIG_ENDIAN;
    return AE_MIXED_ENDIAN;
 }
@@ -3278,7 +3278,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *s
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
+   bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -3341,7 +3341,7 @@ static ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pastth
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
          u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
@@ -3399,7 +3399,7 @@ static void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
       u.bytes[i] = c;
    u.bytes[8] = 0;
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
          u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
@@ -3429,7 +3429,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
+   bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -3491,7 +3491,7 @@ static ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pa
    ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = bytes[i];
          bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
@@ -3544,7 +3544,7 @@ static void ae_int642str(ae_int64_t v, char *buf, ae_state *state) {
    memmove(bytes, &v, 8);
    bytes[8] = 0;
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(ae_int_t) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = bytes[i];
          bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
@@ -3574,7 +3574,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_s
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
+   bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -3659,7 +3659,7 @@ static double ae_str2double(const char *buf, ae_state *state, const char **pastt
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
          u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
@@ -3725,7 +3725,7 @@ static void ae_double2str(double v, char *buf, ae_state *state) {
    u.dval = v;
    u.bytes[8] = 0;
    if (state->endianness == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t) (sizeof(double) / 2); i++) {
+      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
          u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
@@ -3752,7 +3752,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_stat
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
+   bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -3859,6 +3859,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 }
 
 // Real math functions
+#if 0
 bool ae_fp_eq(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
@@ -3898,6 +3899,7 @@ bool ae_fp_greater_eq(double v1, double v2) {
    volatile double y = v2;
    return x >= y;
 }
+#endif
 
 bool ae_isfinite_stateless(double x, ae_int_t endianness) {
    union {
@@ -3910,7 +3912,7 @@ bool ae_isfinite_stateless(double x, ae_int_t endianness) {
       high = u.p[1];
    else
       high = u.p[0];
-   return (high & (ae_int32_t) 0x7FF00000) != (ae_int32_t) 0x7FF00000;
+   return (high & (ae_int32_t)0x7FF00000) != (ae_int32_t)0x7FF00000;
 }
 
 bool ae_isnan_stateless(double x, ae_int_t endianness) {
@@ -3965,7 +3967,7 @@ bool ae_isposinf_stateless(double x, ae_int_t endianness) {
    }
 
 // all 32 bits of high are compared
-   return (high == (ae_int32_t) 0x7FF00000) && (low == 0);
+   return (high == (ae_int32_t)0x7FF00000) && (low == 0);
 }
 
 bool ae_isneginf_stateless(double x, ae_int_t endianness) {
@@ -3984,7 +3986,7 @@ bool ae_isneginf_stateless(double x, ae_int_t endianness) {
    }
 
 // this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers
-   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (high != (ae_int32_t) 0x7FF00000) && (low == 0);
+   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (high != (ae_int32_t)0x7FF00000) && (low == 0);
 }
 
 bool ae_isfinite(double x, ae_state *state) {
@@ -4030,19 +4032,19 @@ ae_int_t ae_sign(double x, ae_state *state) {
 }
 
 ae_int_t ae_round(double x, ae_state *state) {
-   return (ae_int_t) (ae_ifloor(x + 0.5, state));
+   return (ae_int_t)ae_ifloor(x + 0.5, state);
 }
 
 ae_int_t ae_trunc(double x, ae_state *state) {
-   return (ae_int_t) (x > 0 ? ae_ifloor(x, state) : ae_iceil(x, state));
+   return (ae_int_t)(x > 0 ? ae_ifloor(x, state) : ae_iceil(x, state));
 }
 
 ae_int_t ae_ifloor(double x, ae_state *state) {
-   return (ae_int_t) (floor(x));
+   return (ae_int_t)floor(x);
 }
 
 ae_int_t ae_iceil(double x, ae_state *state) {
-   return (ae_int_t) (ceil(x));
+   return (ae_int_t)ceil(x);
 }
 
 ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
@@ -4064,7 +4066,7 @@ double ae_minreal(double m1, double m2, ae_state *state) {
 double ae_randomreal(ae_state *state) {
    int i1 = rand();
    int i2 = rand();
-   double mx = (double)(RAND_MAX) + 1.0;
+   double mx = (double)RAND_MAX + 1.0;
    volatile double tmp0 = i2 / mx;
    volatile double tmp1 = i1 + tmp0;
    return tmp1 / mx;
@@ -5706,7 +5708,7 @@ static void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t str
    }
 }
 
-// This subroutine copies unaligned complex vector (passed as double*)
+// This subroutine copies unaligned complex vector (passed as double *)
 //
 // 1. strideb is stride measured in complex numbers, not doubles
 // 2. conj may be "N" (no conj.) or "C" (conj.)
@@ -7233,7 +7235,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    // use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, y->xR, _state))
 // Original generic C implementation
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= n - 1; i++) {
       result = result + x->xR[i] * y->xR[i];
    }
@@ -7259,7 +7261,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, a->xyR[i], _state))
-   result = (double)(0);
+   result = 0.0;
    for (j = 0; j <= n - 1; j++) {
       result = result + x->xR[j] * a->xyR[i][j];
    }
@@ -7285,7 +7287,7 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->xyR[ia], b->xyR[ib], _state))
-   result = (double)(0);
+   result = 0.0;
    for (j = 0; j <= n - 1; j++) {
       result = result + a->xyR[ia][j] * b->xyR[ib][j];
    }
@@ -7310,7 +7312,7 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->xR, _state))
-   result = (double)(0);
+   result = 0.0;
    for (i = 0; i <= n - 1; i++) {
       v = x->xR[i];
       result = result + v * v;
@@ -8125,7 +8127,7 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xR, _state))
-      result = (double)(0);
+      result = 0.0;
    for (i = 0; i <= n - 1; i++) {
       v = ae_fabs(x->xR[i], _state);
       if (v > result) {
@@ -8154,7 +8156,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xyR[rowidx], _state))
-      result = (double)(0);
+      result = 0.0;
    for (i = 0; i <= n - 1; i++) {
       v = ae_fabs(x->xyR[rowidx][i], _state);
       if (v > result) {
@@ -8260,7 +8262,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
    if (m <= 0) {
       return;
    }
-   if (ae_fp_neq(beta, (double)(0))) {
+   if (ae_fp_neq(beta, 0.0)) {
       rmulv(m, beta, y, _state);
    } else {
       rsetv(m, 0.0, y, _state);
@@ -8275,7 +8277,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->xR, y->xR, _state))
    // Generic C version: y += A*x
       for (i = 0; i <= m - 1; i++) {
-         v = (double)(0);
+         v = 0.0;
          for (j = 0; j <= n - 1; j++) {
             v = v + a->xyR[i][j] * x->xR[j];
          }
@@ -8348,7 +8350,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
    if (m <= 0) {
       return;
    }
-   if (ae_fp_neq(beta, (double)(0))) {
+   if (ae_fp_neq(beta, 0.0)) {
       rmulvx(m, beta, y, iy, _state);
    } else {
       rsetvx(m, 0.0, y, iy, _state);
@@ -8363,7 +8365,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy, _state))
    // Generic C code: y += A*x
       for (i = 0; i <= m - 1; i++) {
-         v = (double)(0);
+         v = 0.0;
          for (j = 0; j <= n - 1; j++) {
             v = v + a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
@@ -8405,7 +8407,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    ae_int_t j;
    double s;
 
-   if ((m <= 0 || n <= 0) || ae_fp_eq(alpha, (double)(0))) {
+   if ((m <= 0 || n <= 0) || ae_fp_eq(alpha, 0.0)) {
       return;
    }
    for (i = 0; i <= m - 1; i++) {
@@ -8523,7 +8525,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
    ae_int_t out0, out1;
    double *c;
    ae_int_t stride_c;
-   ae_int_t(*ablasf_packblk) (const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
+   ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
    void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = ablasf_dotblkh_avx2;
    void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = ablasf_daxpby_avx2;
 
@@ -8747,26 +8749,26 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
 
 // Load update matrix into aligned/rearranged 4x4 storage
-   d0 = (double)(0);
-   d1 = (double)(0);
-   d2 = (double)(0);
-   d3 = (double)(0);
-   u00 = (double)(0);
-   u01 = (double)(0);
-   u02 = (double)(0);
-   u03 = (double)(0);
-   u10 = (double)(0);
-   u11 = (double)(0);
-   u12 = (double)(0);
-   u13 = (double)(0);
-   u20 = (double)(0);
-   u21 = (double)(0);
-   u22 = (double)(0);
-   u23 = (double)(0);
-   u30 = (double)(0);
-   u31 = (double)(0);
-   u32 = (double)(0);
-   u33 = (double)(0);
+   d0 = 0.0;
+   d1 = 0.0;
+   d2 = 0.0;
+   d3 = 0.0;
+   u00 = 0.0;
+   u01 = 0.0;
+   u02 = 0.0;
+   u03 = 0.0;
+   u10 = 0.0;
+   u11 = 0.0;
+   u12 = 0.0;
+   u13 = 0.0;
+   u20 = 0.0;
+   u21 = 0.0;
+   u22 = 0.0;
+   u23 = 0.0;
+   u30 = 0.0;
+   u31 = 0.0;
+   u32 = 0.0;
+   u33 = 0.0;
    if (urank >= 1) {
       d0 = diagd->xR[offsd + 0];
    }
@@ -9059,30 +9061,30 @@ int sign(double x) {
 double randomreal() {
    int i1 = rand();
    int i2 = rand();
-   double mx = (double)(RAND_MAX) + 1.0;
+   double mx = (double)RAND_MAX + 1.0;
    volatile double tmp0 = i2 / mx;
    volatile double tmp1 = i1 + tmp0;
    return tmp1 / mx;
 }
 
 ae_int_t randominteger(ae_int_t maxv) {
-   return ((ae_int_t) rand()) % maxv;
+   return (ae_int_t)rand() % maxv;
 }
 
 int round(double x) {
-   return int (floor(x + 0.5));
+   return int(floor(x + 0.5));
 }
 
 int trunc(double x) {
-   return int (x > 0 ? floor(x) : ceil(x));
+   return int(x > 0 ? floor(x) : ceil(x));
 }
 
 int ifloor(double x) {
-   return int (floor(x));
+   return int(floor(x));
 }
 
 int iceil(double x) {
-   return int (ceil(x));
+   return int(ceil(x));
 }
 
 double pi() {
@@ -9109,6 +9111,7 @@ double minreal(double m1, double m2) {
    return m1 > m2 ? m2 : m1;
 }
 
+#if 0
 bool fp_eq(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
@@ -9148,6 +9151,7 @@ bool fp_greater_eq(double v1, double v2) {
    volatile double y = v2;
    return x >= y;
 }
+#endif
 
 bool fp_isnan(double x) {
    return alglib_impl::ae_isnan_stateless(x, endianness);
@@ -9287,7 +9291,7 @@ complex &complex::operator/=(const complex &z) {
 }
 
 alglib_impl::ae_complex *complex::c_ptr() {
-   return (alglib_impl::ae_complex *) this;
+   return (alglib_impl::ae_complex *)this;
 }
 
 const alglib_impl::ae_complex *complex::c_ptr() const {
@@ -9315,11 +9319,11 @@ std::string complex::tostring(int _dps) const {
       ThrowError("complex::tostring(): buffer overflow");
 
 // print |x|, |y| and zero with same mask and compare
-   if (sprintf(buf_x, mask, (double)(fabs(x))) >= (int)sizeof(buf_x))
+   if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof(buf_x))
       ThrowError("complex::tostring(): buffer overflow");
-   if (sprintf(buf_y, mask, (double)(fabs(y))) >= (int)sizeof(buf_y))
+   if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof(buf_y))
       ThrowError("complex::tostring(): buffer overflow");
-   if (sprintf(buf_zero, mask, (double)0) >= (int)sizeof(buf_zero))
+   if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof(buf_zero))
       ThrowError("complex::tostring(): buffer overflow");
 
 // different zero/nonzero patterns
@@ -10184,15 +10188,12 @@ ae_int_t vlen(ae_int_t n1, ae_int_t n2) {
 
 static bool strimatch(const char *s1, const char *s2) {
 // Handle the special cases.
-   bool NoS1 = s1 == NULL, NoS2 = s2 == NULL;
-   if (NoS1 || NoS2) return NoS1 == NoS2;
+   if (s1 == NULL || s2 == NULL) return s1 == s2;
 // Compare.
    else for (;;) {
       int c1 = *s1++, c2 = *s2++;
-      bool NoC1 = c1 == '\0', NoC2 = c2 == '\0';
-      if (NoC1 || NoC2) return NoC1 == NoC2;
-      c1 = tolower(c1), c2 = tolower(c2);
-      if (c1 != c2) return false;
+      if (c1 == '\0' || c2 == '\0') return c1 == c2;
+      else if (tolower(c1) != tolower(c2)) return false;
    }
 }
 
@@ -10516,7 +10517,7 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    for (i = 0; i < n; i++) {
       buf[0] = 0;
       if (fp_isfinite(ptr[i])) {
-         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof(buf))
+         if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof(buf))
             ThrowError("arraytostring(): buffer overflow");
       } else if (fp_isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
@@ -10653,7 +10654,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
       {
          alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
          TryCatch(_state, )
-         owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t) (svec.size()), datatype, &_state, false);
+         owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)svec.size(), datatype, &_state, false);
          ae_state_clear(&_state);
       }
       for (i = 0; i < svec.size(); i++) switch (datatype) {
@@ -10703,19 +10704,19 @@ const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs)
    return static_cast < const boolean_1d_array &>(assign(rhs));
 }
 
-const bool &boolean_1d_array::operator() (ae_int_t i) const {
+const bool &boolean_1d_array::operator()(ae_int_t i) const {
    return This->xB[i];
 }
 
-bool &boolean_1d_array::operator() (ae_int_t i) {
+bool &boolean_1d_array::operator()(ae_int_t i) {
    return This->xB[i];
 }
 
-const bool &boolean_1d_array::operator[] (ae_int_t i) const {
+const bool &boolean_1d_array::operator[](ae_int_t i) const {
    return This->xB[i];
 }
 
-bool &boolean_1d_array::operator[] (ae_int_t i) {
+bool &boolean_1d_array::operator[](ae_int_t i) {
    return This->xB[i];
 }
 
@@ -10767,19 +10768,19 @@ const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs)
    return static_cast < const integer_1d_array &>(assign(rhs));
 }
 
-const ae_int_t &integer_1d_array::operator() (ae_int_t i) const {
+const ae_int_t &integer_1d_array::operator()(ae_int_t i) const {
    return This->xZ[i];
 }
 
-ae_int_t &integer_1d_array::operator() (ae_int_t i) {
+ae_int_t &integer_1d_array::operator()(ae_int_t i) {
    return This->xZ[i];
 }
 
-const ae_int_t &integer_1d_array::operator[] (ae_int_t i) const {
+const ae_int_t &integer_1d_array::operator[](ae_int_t i) const {
    return This->xZ[i];
 }
 
-ae_int_t &integer_1d_array::operator[] (ae_int_t i) {
+ae_int_t &integer_1d_array::operator[](ae_int_t i) {
    return This->xZ[i];
 }
 
@@ -10831,19 +10832,19 @@ const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) {
    return static_cast < const real_1d_array &>(assign(rhs));
 }
 
-const double &real_1d_array::operator() (ae_int_t i) const {
+const double &real_1d_array::operator()(ae_int_t i) const {
    return This->xR[i];
 }
 
-double &real_1d_array::operator() (ae_int_t i) {
+double &real_1d_array::operator()(ae_int_t i) {
    return This->xR[i];
 }
 
-const double &real_1d_array::operator[] (ae_int_t i) const {
+const double &real_1d_array::operator[](ae_int_t i) const {
    return This->xR[i];
 }
 
-double &real_1d_array::operator[] (ae_int_t i) {
+double &real_1d_array::operator[](ae_int_t i) {
    return This->xR[i];
 }
 
@@ -10919,19 +10920,19 @@ const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs)
    return static_cast < const complex_1d_array &>(assign(rhs));
 }
 
-const complex &complex_1d_array::operator() (ae_int_t i) const {
+const complex &complex_1d_array::operator()(ae_int_t i) const {
    return *((const complex *)(This->xC + i));
 }
 
-complex &complex_1d_array::operator() (ae_int_t i) {
+complex &complex_1d_array::operator()(ae_int_t i) {
    return *((complex *)(This->xC + i));
 }
 
-const complex &complex_1d_array::operator[] (ae_int_t i) const {
+const complex &complex_1d_array::operator[](ae_int_t i) const {
    return *((const complex *)(This->xC + i));
 }
 
-complex &complex_1d_array::operator[] (ae_int_t i) {
+complex &complex_1d_array::operator[](ae_int_t i) {
    return *((complex *)(This->xC + i));
 }
 
@@ -11087,7 +11088,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
          TryCatch(_state, )
          owner = true, This = &Obj, memset(This, 0, sizeof *This);
          if (smat.size() != 0)
-            ae_matrix_init(This, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, false);
+            ae_matrix_init(This, (ae_int_t)smat.size(), (ae_int_t)smat[0].size(), datatype, &_state, false);
          else
             ae_matrix_init(This, 0, 0, datatype, &_state, false);
          ae_state_clear(&_state);
@@ -11148,19 +11149,19 @@ const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs)
    return static_cast < const boolean_2d_array &>(assign(rhs));
 }
 
-const bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+const bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) const {
    return This->xyB[i][j];
 }
 
-bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
+bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) {
    return This->xyB[i][j];
 }
 
-const bool *boolean_2d_array::operator[] (ae_int_t i) const {
+const bool *boolean_2d_array::operator[](ae_int_t i) const {
    return This->xyB[i];
 }
 
-bool *boolean_2d_array::operator[] (ae_int_t i) {
+bool *boolean_2d_array::operator[](ae_int_t i) {
    return This->xyB[i];
 }
 
@@ -11214,19 +11215,19 @@ const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs)
    return static_cast < const integer_2d_array &>(assign(rhs));
 }
 
-const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+const ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) const {
    return This->xyZ[i][j];
 }
 
-ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) {
+ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) {
    return This->xyZ[i][j];
 }
 
-const ae_int_t *integer_2d_array::operator[] (ae_int_t i) const {
+const ae_int_t *integer_2d_array::operator[](ae_int_t i) const {
    return This->xyZ[i];
 }
 
-ae_int_t *integer_2d_array::operator[] (ae_int_t i) {
+ae_int_t *integer_2d_array::operator[](ae_int_t i) {
    return This->xyZ[i];
 }
 
@@ -11280,19 +11281,19 @@ const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
    return static_cast < const real_2d_array &>(assign(rhs));
 }
 
-const double &real_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+const double &real_2d_array::operator()(ae_int_t i, ae_int_t j) const {
    return This->xyR[i][j];
 }
 
-double &real_2d_array::operator() (ae_int_t i, ae_int_t j) {
+double &real_2d_array::operator()(ae_int_t i, ae_int_t j) {
    return This->xyR[i][j];
 }
 
-const double *real_2d_array::operator[] (ae_int_t i) const {
+const double *real_2d_array::operator[](ae_int_t i) const {
    return This->xyR[i];
 }
 
-double *real_2d_array::operator[] (ae_int_t i) {
+double *real_2d_array::operator[](ae_int_t i) {
    return This->xyR[i];
 }
 
@@ -11371,19 +11372,19 @@ const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs)
    return static_cast < const complex_2d_array &>(assign(rhs));
 }
 
-const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+const complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) const {
    return *((const complex *)(This->xyC[i] + j));
 }
 
-complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
+complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) {
    return *((complex *)(This->xyC[i] + j));
 }
 
-const complex *complex_2d_array::operator[] (ae_int_t i) const {
+const complex *complex_2d_array::operator[](ae_int_t i) const {
    return (const complex *)(This->xyC[i]);
 }
 
-complex *complex_2d_array::operator[] (ae_int_t i) {
+complex *complex_2d_array::operator[](ae_int_t i) {
    return (complex *)(This->xyC[i]);
 }
 

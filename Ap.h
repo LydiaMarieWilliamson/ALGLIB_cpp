@@ -373,8 +373,8 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
 #define SetVector(P)			ae_vector_free(P, true)
 
 struct ae_matrix {
-   ae_int_t rows;
    ae_int_t cols;
+   ae_int_t rows;
    ae_int_t stride;
    ae_datatype datatype;
 // True if and only if the ae_matrix was attached to an x_matrix by ae_matrix_init_attach_to_x().
@@ -670,12 +670,21 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * IEEE-compliant floating point comparisons
+#if 0
 bool ae_fp_eq(double v1, double v2);
 bool ae_fp_neq(double v1, double v2);
 bool ae_fp_less(double v1, double v2);
 bool ae_fp_less_eq(double v1, double v2);
 bool ae_fp_greater(double v1, double v2);
 bool ae_fp_greater_eq(double v1, double v2);
+#else
+#   define ae_fp_eq(A, B) ((A) == (B))
+#   define ae_fp_neq(A, B) ((A) != (B))
+#   define ae_fp_less(A, B) ((A) < (B))
+#   define ae_fp_less_eq(A, B) ((A) <= (B))
+#   define ae_fp_greater(A, B) ((A) > (B))
+#   define ae_fp_greater_eq(A, B) ((A) >= (B))
+#endif
 
 bool ae_isfinite_stateless(double x, ae_int_t endianness);
 bool ae_isnan_stateless(double x, ae_int_t endianness);
@@ -934,7 +943,7 @@ bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, a
 #      define _ABLASF_BLOCK_SIZE 32
 #      define _ABLASF_MICRO_SIZE  2
 #      if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
-#         define ULOAD256PD(x) _mm256_loadu_pd((const double*)(&x))
+#         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&x)
 #      endif
 #   endif
 
@@ -1132,12 +1141,21 @@ int minint(int m1, int m2);
 double maxreal(double m1, double m2);
 double minreal(double m1, double m2);
 
+#if 0
 bool fp_eq(double v1, double v2);
 bool fp_neq(double v1, double v2);
 bool fp_less(double v1, double v2);
 bool fp_less_eq(double v1, double v2);
 bool fp_greater(double v1, double v2);
 bool fp_greater_eq(double v1, double v2);
+#else
+#   define fp_eq(A, B)		((A) == (B))
+#   define fp_neq(A, B)		((A) != (B))
+#   define fp_less(A, B)	((A) < (B))
+#   define fp_less_eq(A, B)	((A) <= (B))
+#   define fp_greater(A, B)	((A) > (B))
+#   define fp_greater_eq(A, B)	((A) >= (B))
+#endif
 
 bool fp_isnan(double x);
 bool fp_isposinf(double x);
@@ -1346,8 +1364,8 @@ struct boolean_1d_array: public ae_vector_wrapper {
 #endif
    virtual ~boolean_1d_array();
    const boolean_1d_array &operator=(const boolean_1d_array &rhs);
-   const bool &operator() (ae_int_t i) const; bool &operator() (ae_int_t i);
-   const bool &operator[] (ae_int_t i) const; bool &operator[] (ae_int_t i);
+   const bool &operator()(ae_int_t i) const; bool &operator()(ae_int_t i);
+   const bool &operator[](ae_int_t i) const; bool &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
 // Completely independent copy of data is created.
    void setcontent(ae_int_t iLen, const bool *pContent);
@@ -1365,8 +1383,8 @@ struct integer_1d_array: public ae_vector_wrapper {
 #endif
    virtual ~integer_1d_array();
    const integer_1d_array &operator=(const integer_1d_array &rhs);
-   const ae_int_t &operator() (ae_int_t i) const; ae_int_t &operator() (ae_int_t i);
-   const ae_int_t &operator[] (ae_int_t i) const; ae_int_t &operator[] (ae_int_t i);
+   const ae_int_t &operator()(ae_int_t i) const; ae_int_t &operator()(ae_int_t i);
+   const ae_int_t &operator[](ae_int_t i) const; ae_int_t &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
    void setcontent(ae_int_t iLen, const ae_int_t *pContent);
 // A pointer to internal memory.
@@ -1383,8 +1401,8 @@ struct real_1d_array: public ae_vector_wrapper {
 #endif
    virtual ~real_1d_array();
    const real_1d_array &operator=(const real_1d_array &rhs);
-   const double &operator() (ae_int_t i) const; double &operator() (ae_int_t i);
-   const double &operator[] (ae_int_t i) const; double &operator[] (ae_int_t i);
+   const double &operator()(ae_int_t i) const; double &operator()(ae_int_t i);
+   const double &operator[](ae_int_t i) const; double &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
    void setcontent(ae_int_t iLen, const double *pContent);
 // A pointer to internal memory.
@@ -1407,8 +1425,8 @@ struct complex_1d_array: public ae_vector_wrapper {
 #endif
    virtual ~complex_1d_array();
    const complex_1d_array &operator=(const complex_1d_array &rhs);
-   const complex &operator() (ae_int_t i) const; complex &operator() (ae_int_t i);
-   const complex &operator[] (ae_int_t i) const; complex &operator[] (ae_int_t i);
+   const complex &operator()(ae_int_t i) const; complex &operator()(ae_int_t i);
+   const complex &operator[](ae_int_t i) const; complex &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
    void setcontent(ae_int_t iLen, const complex *pContent);
    const complex *getcontent() const; complex *getcontent();
@@ -1497,8 +1515,8 @@ struct boolean_2d_array: public ae_matrix_wrapper {
 #endif
    virtual ~boolean_2d_array();
    const boolean_2d_array &operator=(const boolean_2d_array &rhs);
-   const bool &operator() (ae_int_t i, ae_int_t j) const; bool &operator() (ae_int_t i, ae_int_t j);
-   const bool *operator[] (ae_int_t i) const; bool *operator[] (ae_int_t i);
+   const bool &operator()(ae_int_t i, ae_int_t j) const; bool &operator()(ae_int_t i, ae_int_t j);
+   const bool *operator[](ae_int_t i) const; bool *operator[](ae_int_t i);
 // A new irows x icols matrix filled with a completely independent copy of the data at pContent.
    void setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent);
 };
@@ -1513,8 +1531,8 @@ struct integer_2d_array: public ae_matrix_wrapper {
 #endif
    virtual ~integer_2d_array();
    const integer_2d_array &operator=(const integer_2d_array &rhs);
-   const ae_int_t &operator() (ae_int_t i, ae_int_t j) const; ae_int_t &operator() (ae_int_t i, ae_int_t j);
-   const ae_int_t *operator[] (ae_int_t i) const; ae_int_t *operator[] (ae_int_t i);
+   const ae_int_t &operator()(ae_int_t i, ae_int_t j) const; ae_int_t &operator()(ae_int_t i, ae_int_t j);
+   const ae_int_t *operator[](ae_int_t i) const; ae_int_t *operator[](ae_int_t i);
 // A new irows x icols matrix filled with a completely independent copy of the data at pContent.
    void setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent);
 };
@@ -1529,8 +1547,8 @@ struct real_2d_array: public ae_matrix_wrapper {
 #endif
    virtual ~real_2d_array();
    const real_2d_array &operator=(const real_2d_array &rhs);
-   const double &operator() (ae_int_t i, ae_int_t j) const; double &operator() (ae_int_t i, ae_int_t j);
-   const double *operator[] (ae_int_t i) const; double *operator[] (ae_int_t i);
+   const double &operator()(ae_int_t i, ae_int_t j) const; double &operator()(ae_int_t i, ae_int_t j);
+   const double *operator[](ae_int_t i) const; double *operator[](ae_int_t i);
 // A new irows x icols matrix filled with a completely independent copy of the data at pContent.
    void setcontent(ae_int_t irows, ae_int_t icols, const double *pContent);
 // Attach an array to the matrix at pContent.
@@ -1552,8 +1570,8 @@ struct complex_2d_array: public ae_matrix_wrapper {
 #endif
    virtual ~complex_2d_array();
    const complex_2d_array &operator=(const complex_2d_array &rhs);
-   const complex &operator() (ae_int_t i, ae_int_t j) const; complex &operator() (ae_int_t i, ae_int_t j);
-   const complex *operator[] (ae_int_t i) const; complex *operator[] (ae_int_t i);
+   const complex &operator()(ae_int_t i, ae_int_t j) const; complex &operator()(ae_int_t i, ae_int_t j);
+   const complex *operator[](ae_int_t i) const; complex *operator[](ae_int_t i);
 // A new irows x icols matrix filled with a completely independent copy of the data at pContent.
    void setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent);
 };

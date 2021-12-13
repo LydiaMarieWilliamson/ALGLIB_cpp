@@ -143,7 +143,7 @@ void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, R
 
    const ae_int_t avx2len = n >> 2;
    const __m256d *__restrict pSrc = (const __m256d *)(y);
-   __m256d *__restrict pDest = (__m256d *) (x);
+   __m256d *__restrict pDest = (__m256d *)x;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
    for (i = 0; i < avx2len; i++) {
       pDest[i] = _mm256_fmadd_pd(avx2alpha, pSrc[i], pDest[i]);
@@ -154,10 +154,10 @@ void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, R
          *(double *)(pDest + i) += alpha * (*(const double *)(pSrc + i));
          break;
       case 2:
-         *(__m128d *) (pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
+         *(__m128d *)(pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          break;
       case 3:
-         *(__m128d *) (pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
+         *(__m128d *)(pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          x[tail + 2] += alpha * y[tail + 2];
          break;
    }
@@ -167,7 +167,7 @@ void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double 
    ae_int_t i;
    const ae_int_t vecLen = (n >> 2) << 2;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
-   __m256d *__restrict pDest = (__m256d *) x;
+   __m256d *__restrict pDest = (__m256d *)x;
    for (i = 0; i < vecLen; i += 4) {
       const ae_int_t iDest = i >> 2;
       pDest[iDest] = _mm256_fmadd_pd(avx2alpha, _mm256_loadu_pd(y + i), pDest[iDest]);
@@ -178,13 +178,13 @@ void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double 
          break;
       case 2:{
          const ae_int_t iDest = i >> 2;
-         *(__m128d *) (pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
+         *(__m128d *)(pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
          break;
       }
       case 3:
       {
          const ae_int_t iDest = i >> 2;
-         *(__m128d *) (pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
+         *(__m128d *)(pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
          x[i + 2] += alpha * y[i + 2];
          break;
       }
@@ -306,7 +306,7 @@ void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, 
 void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
-   __m256d *__restrict pY = (__m256d *) y;
+   __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {
@@ -446,7 +446,7 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
 void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
-   __m256d *__restrict pY = (__m256d *) y;
+   __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
    for (i = 0; i <= n - 1; i++) {

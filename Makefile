@@ -12,6 +12,9 @@ X=
 #X=.exe
 O=.o
 #O=.obj
+Rm=rm -f
+#Rm=del
+
 ModA=Ap KernelsAvx2 KernelsFma KernelsSse2
 Mods=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
 Objs=$(Mods:%=%$O)
@@ -86,9 +89,10 @@ test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestC: Internal Routines"
 	./TestC$X
 clean:
-	rm -f Test{I,X,Y,Z,C}$O ${Objs}
+	${Rm} ${Objs}
+	${Rm} Test{I,X,Y,Z,C}$O
 clobber: clean
-	rm -f Test{I,X,Y,Z,C}$X
+	${Rm} Test{I,X,Y,Z,C}$X
 
 ## Source - Header dependencies:
 Ap.cpp: Ap.h
