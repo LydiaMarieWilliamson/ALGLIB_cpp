@@ -17798,6 +17798,7 @@ static bool testlincgunit_complextest() {
             printf("* GetRNorm(%0.2e) != Rep.R2(%0.2e)\n",
                (double)getrnorm, (double)(rep.r2)
             );
+            printf("* GetRNorm(%0.2e) != Rep.R2(%0.2e)\n", getrnorm, rep.r2);
          }
          Ok = false;
          ae_frame_leave();
@@ -17948,6 +17949,7 @@ static bool testlincgunit_complextest() {
                      printf("* (rm,rk) != 0, {Sclr = %0.15f, NV0 = %0.15f, NV1 = %0.15f}\n",
                         (double)sclr, (double)nv0, (double)nv1
                      );
+                     printf("* (rm,rk) != 0, {Sclr = %0.15f, NV0 = %0.15f, NV1 = %0.15f}\n", sclr, nv0, nv1);
                   }
                   Ok = false;
                   ae_frame_leave();
@@ -84539,7 +84541,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       ae_frame_leave();
       return Ok;
    }
-// Test 9: non-null pointer is nulled by calling SetNull()
+// Test 10: non-null pointer is nulled by calling SetNull()
    testalglibbasicsunit_createpoolandrecords(&seedrec2, &seedrec2copy, &pool);
    ae_shared_pool_retrieve(&pool, &_p0);
    if (p0 == NULL) {

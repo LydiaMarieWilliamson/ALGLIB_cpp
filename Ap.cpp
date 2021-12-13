@@ -14,7 +14,7 @@
 #define InAlgLib
 
 // if AE_OS == AE_LINUX (will be redefined to AE_POSIX in Ap.h),
-// set _GNU_SOURCE flag BEFORE any #includes to get affinity management functions
+// set _GNU_SOURCE flag BEFORE any #includes to get affinity management functions.
 #if AE_OS == AE_LINUX && !defined _GNU_SOURCE
 #   define _GNU_SOURCE
 #endif
@@ -103,7 +103,7 @@ AutoS ae_uint64_t CurFlags;
 // Set CurFlags.
 void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
 
-// pointer to the top block in a stack of frames which hold dynamically allocated objects.
+// A pointer to the top block in a stack of frames which hold dynamically allocated objects.
 AutoS ae_frame *volatile TopFr;
 
 // The stack and frame boundary special blocks.
@@ -175,8 +175,8 @@ static void ae_impose(bool cond, const char *msg) {
 
 // Make flags variables into one or more char-sized variables in order to avoid problem with non-atomic reads/writes
 // (single-byte ops are atomic on all contemporary CPUs);
-#define _ALGLIB_FLG_THREADING_MASK          0x7
-#define _ALGLIB_FLG_THREADING_SHIFT         0
+#define _ALGLIB_FLG_THREADING_MASK	0x7
+#define _ALGLIB_FLG_THREADING_SHIFT	0
 static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
 
 // Get/Set the default (global) threading model:
@@ -206,7 +206,7 @@ void ae_set_global_threading(ae_uint64_t flg_value) {
 static ae_int_t _alglib_cores_to_use = 0;
 
 // CPUID
-// Information about features the CPU and compiler support.
+// Information about the features the CPU and compiler support.
 // You must tell ALGLIB++ what CPU family is used by defining AE_CPU (without this hint zero will be returned).
 // NOTE:
 // *	The results of this function depend on both the CPU and compiler;
@@ -295,7 +295,7 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 static ae_int_t _dbg_alloc_total = 0;
 static bool _use_dbg_counters = false;
 static bool _use_vendor_kernels = true;
-static bool debug_workstealing = false; // Debug workstealing environment? false by default.
+static bool debug_workstealing = false; // Debug work-stealing environment? false by default.
 static ae_int_t dbgws_pushroot_ok = 0;
 static ae_int_t dbgws_pushroot_failed = 0;
 
@@ -384,8 +384,8 @@ void *ae_align(void *ptr, size_t alignment) {
 
 // The "optional atomic" functions:
 // i.e. functions which either perform atomic changes - or do nothing at all,
-// if current compiler settings cannot generate atomic code.
-// They are synchronized, i.e. either all of them work - or none of them do.
+// if the current compiler settings cannot generate atomic code.
+// They are all synchronized, i.e. either all of them work - or none of them do.
 
 // Perform atomic addition on a pointer-sized and pointer-size aligned value.
 // NOTE:
@@ -440,7 +440,7 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
 // Fields for memory allocation over static array.
 #   if AE_THREADING != NonTH
-#      error Basis static malloc is thread-unsafe; define AE_THREADING=NonTH to prove that you know it
+#      error Basis static malloc is thread-unsafe; define AE_THREADING = NonTH to prove that you know it
 #   endif
 
 static ae_int_t sm_page_size = 0;
@@ -667,7 +667,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // NOTE:
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
    ae_assert(size >= 0, "ae_db_realloc: negative size");
-   if (block->ptr != NULL) ((ae_deallocator)block->deallocator)(block->ptr), block->ptr = NULL;
+   if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL;
    block->ptr = ae_malloc((size_t)size);
    block->deallocator = ae_free;
 }
@@ -677,7 +677,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // NOTE:
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_free(ae_dyn_block *block) {
-   if (block->ptr != NULL) ((ae_deallocator)block->deallocator)(block->ptr), block->ptr = NULL;
+   if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL;
    block->deallocator = ae_free;
 }
 
@@ -3319,7 +3319,7 @@ static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t
 //	You will crash your system if you try to use this with misaligned or incorrectly aligned data.
 // This function supports SSE2; it can be used when:
 // *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 	Otherwise, this function will be undefined.
+//	Otherwise, this function will be undefined.
 // *	CurCPU contains CPU_SSE2 (checked at run-time)
 //	Otherwise, calling this function will probably crash your system.
 // If you want to know whether it is safe to call it, you should check CurCPU.
@@ -3671,7 +3671,7 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
 // *	Both a and x must be aligned, but y may be non-aligned.
 // This function supports SSE2; it can be used when:
 // *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 	Otherwise, this function will be undefined.
+//	Otherwise, this function will be undefined.
 // *	CurCPU contains CPU_SSE2 (checked at run-time)
 //	Otherwise, calling this function will probably crash your system.
 // If you want to know whether it is safe to call it, you should check CurCPU.
@@ -3879,7 +3879,7 @@ static void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stride
 // The stride is stride for a, alglib_r_block for b.
 // This function supports SSE2; it can be used when:
 // *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 	Otherwise, this function will be undefined.
+//	Otherwise, this function will be undefined.
 // *	CurCPU contains CPU_SSE2 (checked at run-time)
 //	Otherwise, calling this function will probably crash your system.
 // If you want to know whether it is safe to call it, you should check CurCPU.
@@ -4830,7 +4830,7 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 // *	store_mode == 3:	only the top left element of r is stored
 // This function supports SSE2; it can be used when:
 // *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 	Otherwise, this function will be undefined.
+//	Otherwise, this function will be undefined.
 // *	CurCPU contains CPU_SSE2 (checked at run-time)
 //	Otherwise, calling this function will probably crash your system.
 // If you want to know whether it is safe to call it, you should check CurCPU.
@@ -4996,7 +4996,7 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
 // Unlike the mm22 functions, this function does NOT support partial output formats for r - we always store the full 2 x 4 matrix.
 // This function supports SSE2; it can be used when:
 // *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 	Otherwise, this function will be undefined.
+//	Otherwise, this function will be undefined.
 // *	CurCPU contains CPU_SSE2 (checked at run-time)
 //	Otherwise, calling this function will probably crash your system.
 // If you want to know whether it is safe to call it, you should check CurCPU.
@@ -5737,22 +5737,19 @@ void vmul(complex *A, ae_int_t N, complex Alpha) {
 
 static bool strimatch(const char *s1, const char *s2) {
 // Handle the special cases.
-   bool NoS1 = s1 == NULL, NoS2 = s2 == NULL;
-   if (NoS1 || NoS2) return NoS1 == NoS2;
+   if (s1 == NULL || s2 == NULL) return s1 == s2;
 // Compare.
    else while (true) {
       int c1 = *s1++, c2 = *s2++;
-      bool NoC1 = c1 == '\0', NoC2 = c2 == '\0';
-      if (NoC1 || NoC2) return NoC1 == NoC2;
-      c1 = tolower(c1), c2 = tolower(c2);
-      if (c1 != c2) return false;
+      if (c1 == '\0' || c2 == '\0') return c1 == c2;
+      else if (tolower(c1) != tolower(c2)) return false;
    }
 }
 
 #if !defined AE_NO_EXCEPTIONS
 // Filter out all the spaces from the string s.
 // Return a string allocated with ae_malloc().
-// On allocaction failure returns NULL.
+// On allocation failure, return NULL.
 static char *filter_spaces(const char *s) {
    size_t n = strlen(s);
    char *r = (char *)alglib_impl::ae_malloc(n + 1);
@@ -5820,7 +5817,7 @@ static bool parse_bool_delim(const char *s, const char *delim) {
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
-      if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
+      if (s[strlen(p)] == '\0' || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return false;
    }
@@ -5828,7 +5825,7 @@ static bool parse_bool_delim(const char *s, const char *delim) {
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
-      if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
+      if (s[strlen(p)] == '\0' || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return true;
    }

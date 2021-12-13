@@ -113,7 +113,7 @@
 #   include <stdint.h>
 #endif
 
-// SSE2 intrinsics
+// SSE2 intrinsics.
 // The preprocessor directives below:
 // -	include headers for SSE2 intrinsics,
 // -	define AE_HAS_SSE2_INTRINSICS definition.
@@ -204,6 +204,8 @@ extern ae_int_t _malloc_failure_after;
 // Frame marker.
 typedef struct ae_dyn_block ae_frame;
 
+// A legible message associated with the last error; filled when an exception is thrown.
+//(@) Originally part of the global state structure, this should be made thread-local.
 void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
@@ -215,7 +217,7 @@ void ae_state_clear();
 
 void ae_assert(bool cond, const char *msg);
 
-// The threading model type.
+// Get/set the threading model type.
 ae_uint64_t ae_get_global_threading();
 void ae_set_global_threading(ae_uint64_t flg_value);
 
@@ -327,8 +329,8 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
 #define SetVector(P)			ae_vector_free(P, true)
 
 struct ae_matrix {
-   ae_int_t rows;
    ae_int_t cols;
+   ae_int_t rows;
    ae_int_t stride;
    ae_datatype datatype;
 // True if and only if the ae_matrix was attached to an x_matrix by ae_matrix_init_attach_to_x().
@@ -400,7 +402,7 @@ struct x_string {
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
-//	ACT_NEW_LOCATION:	stored at  new location.
+//	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ALIGNED ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
 // A pointer to the actual data.
@@ -922,7 +924,7 @@ typedef alglib_impl::ae_uint64_t xparams;	// enum { NonTH, SerTH, ParTH };
 ae_int_t getnworkers();
 void setnworkers(ae_int_t nworkers);
 
-// Internal functions used by TestX.cpp, interfaces for functions present in commercial version of ALGLIB.
+// Internal functions used by TestX.cpp, interfaces for functions present only in commercial version of ALGLIB.
 ae_int_t _ae_cores_count();
 alglib_impl::ae_uint64_t _ae_get_global_threading();
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
@@ -1017,7 +1019,7 @@ private:
 #endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
-// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not the vector's memory).
+// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the vector's memory).
 // NOTES:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object pointed to by new_ptr is used only once;
@@ -1146,10 +1148,13 @@ struct ae_matrix_wrapper {
 // The destructor.
    virtual ~ae_matrix_wrapper();
    void setlength(ae_int_t rows, ae_int_t cols);
+// The column and row count and stride.
    ae_int_t cols() const;
    ae_int_t rows() const;
    ae_int_t getstride() const;
    bool isempty() const;
+// Access to the internal c-structure used by the c-core.
+// Not meant for external use.
    const alglib_impl::ae_matrix *c_ptr() const { return This; }
    alglib_impl::ae_matrix *c_ptr() { return This; }
 #if 0 //(@) Not implemented.

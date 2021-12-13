@@ -389,7 +389,7 @@ void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f);
 namespace alglib_impl {
 double nulog1p(double x);
 double nuexpm1(double x);
-double nucosm1(double x);
+double nucosm1(double x); //(@) Not used or tested anywhere.
 } // end of namespace alglib_impl
 
 // === NTHEORY Package ===
