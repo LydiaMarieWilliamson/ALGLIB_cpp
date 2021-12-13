@@ -1072,18 +1072,18 @@ The most important "basic" functions from ALGLIB namespace (<code>Ap.h</code> he
 <ul>
 <li><code>alglib::randomreal()</code>&nbsp;-&nbsp;returns random real number from [0,1)</li>
 <li><code>alglib::randominteger(mx)</code>&nbsp;-&nbsp;returns random integer number from [0,nx); <i>mx</i> must be less than RAND_MAX</li>
-<li><code>alglib::fp_eq(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.
-If numbers are represented with greater precision than specified by IEEE 754 (as with Intel 80-bit FPU), this functions converts them to 64 bits before comparing.</li>
-<li><code>alglib::fp_neq(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.</li>
-<li><code>alglib::fp_less(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.</li>
-<li><code>alglib::fp_less_eq(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.</li>
-<li><code>alglib::fp_greater(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.</li>
-<li><code>alglib::fp_greater_eq(v1,v2)</code>&nbsp;-&nbsp;makes IEEE-compliant comparison of two double precision numbers.</li>
 <li><code>alglib::fp_isnan</code>&nbsp;-&nbsp;checks whether number is NAN</li>
 <li><code>alglib::fp_isposinf</code>&nbsp;-&nbsp;checks whether number is +INF</li>
 <li><code>alglib::fp_isneginf</code>&nbsp;-&nbsp;checks whether number is -INF</li>
 <li><code>alglib::fp_isinf</code>&nbsp;-&nbsp;checks whether number is +INF or -INF</li>
 <li><code>alglib::fp_isfinite</code>&nbsp;-&nbsp;checks whether number is finite value (possibly subnormalized)</li>
+</ul>
+In addition, the following are inherited C++, itself, or from the native C++ library:
+<ul>
+<li><code>A {==,!=,&lt;,&le;,&gt;,&ge;} B</code> &mdash; IEEE-compliant comparisons of two double precision numbers.
+Discussed in further detail below.</li>
+<li><code>std::isinf(x)</code> &mdash; checks whether the number x is +INF or -INF</li>
+<li><code>std::isfinite(x)</code> &mdash; checks whether the number x is finite value (possibly subnormalized)</li>
 </ul>
 
 <a name='gs_vecmat' class='sheader'></a><h2>5.6 Working with vectors and matrices</h2>

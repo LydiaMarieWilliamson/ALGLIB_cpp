@@ -75,7 +75,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
    ae_vector_set_length(&e, n, _state);
    for (i = 1; i <= n - 1; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
-      if (ae_fp_less_eq(beta->xR[i], 0.0)) {
+      if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave(_state);
          return;
@@ -178,7 +178,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
       d.xR[i - 1] = alpha->xR[i - 1];
    }
    for (i = 1; i <= n; i++) {
-      if (ae_fp_less_eq(beta->xR[i], 0.0)) {
+      if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave(_state);
          return;
@@ -212,7 +212,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    a22 = pim1b;
    b1 = a * pia;
    b2 = b * pib;
-   if (ae_fp_greater(ae_fabs(a11, _state), ae_fabs(a21, _state))) {
+   if (ae_fabs(a11, _state) > ae_fabs(a21, _state)) {
       a22 = a22 - a12 * a21 / a11;
       b2 = b2 - b1 * a21 / a11;
       bet = b2 / a22;
@@ -223,7 +223,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
       bet = b1 / a12;
       alph = (b2 - bet * a22) / a21;
    }
-   if (ae_fp_less(bet, 0.0)) {
+   if (bet < 0.0) {
       *info = -3;
       ae_frame_leave(_state);
       return;
@@ -312,7 +312,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
    ae_vector_set_length(&e, n, _state);
    for (i = 1; i <= n; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
-      if (ae_fp_less_eq(beta->xR[i], 0.0)) {
+      if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave(_state);
          return;
@@ -396,11 +396,11 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
 
 // test basic properties to detect errors
    if (*info > 0) {
-      if (ae_fp_less(x->xR[0], -1.0) || ae_fp_greater(x->xR[n - 1], 1.0)) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -447,7 +447,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    NewVector(a, 0, DT_REAL, _state);
    NewVector(b, 0, DT_REAL, _state);
 
-   if ((n < 1 || ae_fp_less_eq(alpha, -1.0)) || ae_fp_less_eq(beta, -1.0)) {
+   if ((n < 1 || alpha <= -1.0) || beta <= -1.0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -457,7 +457,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
    t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
-   if (ae_fp_greater(t, ae_log(ae_maxrealnumber, _state))) {
+   if (t > ae_log(ae_maxrealnumber, _state)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
@@ -477,11 +477,11 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 
 // test basic properties to detect errors
    if (*info > 0) {
-      if (ae_fp_less(x->xR[0], -1.0) || ae_fp_greater(x->xR[n - 1], 1.0)) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -524,7 +524,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    NewVector(a, 0, DT_REAL, _state);
    NewVector(b, 0, DT_REAL, _state);
 
-   if (n < 1 || ae_fp_less_eq(alpha, -1.0)) {
+   if (n < 1 || alpha <= -1.0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -533,7 +533,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    ae_vector_set_length(&b, n, _state);
    a.xR[0] = alpha + 1;
    t = lngamma(alpha + 1, &s, _state);
-   if (ae_fp_greater_eq(t, ae_log(ae_maxrealnumber, _state))) {
+   if (t >= ae_log(ae_maxrealnumber, _state)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
@@ -549,11 +549,11 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 
 // test basic properties to detect errors
    if (*info > 0) {
-      if (ae_fp_less(x->xR[0], 0.0)) {
+      if (x->xR[0] < 0.0) {
          *info = -4;
       }
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -612,7 +612,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
 // test basic properties to detect errors
    if (*info > 0) {
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -762,7 +762,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       return;
    }
    for (i = 0; i <= ae_iceil((double)(3 * (n / 2)) / 2.0, _state); i++) {
-      if (ae_fp_less_eq(beta->xR[i], 0.0)) {
+      if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave(_state);
          return;
@@ -856,7 +856,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       return;
    }
    for (i = 0; i <= 2 * n - 1; i++) {
-      if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+      if (x->xR[i] >= x->xR[i + 1]) {
          *info = -4;
       }
    }
@@ -907,7 +907,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
    SetVector(wkronrod);
    SetVector(wgauss);
 
-   if (ae_fp_greater(ae_machineepsilon, 1.0E-32) && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
+   if (ae_machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
       *info = 1;
       gkqlegendretbl(n, x, wkronrod, wgauss, &eps, _state);
    } else {
@@ -970,7 +970,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       ae_frame_leave(_state);
       return;
    }
-   if (ae_fp_less_eq(alpha, -1.0) || ae_fp_less_eq(beta, -1.0)) {
+   if (alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -984,7 +984,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
    t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
-   if (ae_fp_greater(t, ae_log(ae_maxrealnumber, _state))) {
+   if (t > ae_log(ae_maxrealnumber, _state)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
@@ -1004,11 +1004,11 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
 
 // test basic properties to detect errors
    if (*info > 0) {
-      if (ae_fp_less(x->xR[0], -1.0) || ae_fp_greater(x->xR[n - 1], 1.0)) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = 2;
       }
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -1076,11 +1076,11 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
 
 // test basic properties to detect errors
    if (*info > 0) {
-      if (ae_fp_less(x->xR[0], -1.0) || ae_fp_greater(x->xR[n - 1], 1.0)) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
       for (i = 0; i <= n - 2; i++) {
-         if (ae_fp_greater_eq(x->xR[i], x->xR[i + 1])) {
+         if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
       }
@@ -1713,7 +1713,7 @@ bool autogkiteration(autogkstate *state, ae_state *_state) {
       goto lbl_3;
    }
 // special case
-   if (ae_fp_eq(a, b)) {
+   if (a == b) {
       state->terminationtype = 1;
       state->v = 0.0;
       result = false;
@@ -1750,21 +1750,21 @@ lbl_3:
       goto lbl_7;
    }
 // test coefficients
-   if (ae_fp_less_eq(alpha, -1.0) || ae_fp_less_eq(beta, -1.0)) {
+   if (alpha <= -1.0 || beta <= -1.0) {
       state->terminationtype = -1;
       state->v = 0.0;
       result = false;
       return result;
    }
 // special cases
-   if (ae_fp_eq(a, b)) {
+   if (a == b) {
       state->terminationtype = 1;
       state->v = 0.0;
       result = false;
       return result;
    }
 // reduction to general form
-   if (ae_fp_less(a, b)) {
+   if (a < b) {
       s = 1.0;
    } else {
       s = -1.0;
@@ -1791,7 +1791,7 @@ lbl_9:
    x = state->internalstate.x;
    t = ae_pow(x, 1 / (1 + alpha), _state);
    state->x = a + t;
-   if (ae_fp_greater(s, 0.0)) {
+   if (s > 0.0) {
       state->xminusa = t;
       state->bminusx = b - (a + t);
    } else {
@@ -1803,7 +1803,7 @@ lbl_9:
    goto lbl_rcomm;
 lbl_1:
    state->needf = false;
-   if (ae_fp_neq(alpha, 0.0)) {
+   if (alpha != 0.0) {
       state->internalstate.f = state->f * ae_pow(x, -alpha / (1 + alpha), _state) / (1 + alpha);
    } else {
       state->internalstate.f = state->f;
@@ -1827,7 +1827,7 @@ lbl_11:
    x = state->internalstate.x;
    t = ae_pow(x, 1 / (1 + beta), _state);
    state->x = b - t;
-   if (ae_fp_greater(s, 0.0)) {
+   if (s > 0.0) {
       state->xminusa = b - t - a;
       state->bminusx = t;
    } else {
@@ -1839,7 +1839,7 @@ lbl_11:
    goto lbl_rcomm;
 lbl_2:
    state->needf = false;
-   if (ae_fp_neq(beta, 0.0)) {
+   if (beta != 0.0) {
       state->internalstate.f = state->f * ae_pow(x, -beta / (1 + beta), _state) / (1 + beta);
    } else {
       state->internalstate.f = state->f;
@@ -2008,21 +2008,21 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
    }
 
 // special case
-   if (ae_fp_eq(state->a, state->b)) {
+   if (state->a == state->b) {
       state->info = 1;
       state->r = 0.0;
       result = false;
       return result;
    }
 // test parameters
-   if (ae_fp_less(state->eps, 0.0) || ae_fp_less(state->xwidth, 0.0)) {
+   if (state->eps < 0.0 || state->xwidth < 0.0) {
       state->info = -1;
       state->r = 0.0;
       result = false;
       return result;
    }
    state->info = 1;
-   if (ae_fp_eq(state->eps, 0.0)) {
+   if (state->eps == 0.0) {
       state->eps = 100000 * ae_machineepsilon;
    }
 // First, prepare heap
@@ -2031,7 +2031,7 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
 // * column 2   -   integral of a |F(x)| (calculated using modified rect. method)
 // * column 3   -   left boundary of a subinterval
 // * column 4   -   right boundary of a subinterval
-   if (ae_fp_neq(state->xwidth, 0.0)) {
+   if (state->xwidth != 0.0) {
       goto lbl_3;
    }
 // no maximum width requirements
@@ -2150,7 +2150,7 @@ lbl_14:
       autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth, _state);
    }
 // TODO: every 20 iterations recalculate errors/sums
-   if (ae_fp_less_eq(state->sumerr, state->eps * state->sumabs) || state->heapused >= autogk_maxsubintervals) {
+   if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
       state->r = 0.0;
       for (j = 0; j <= state->heapused - 1; j++) {
          state->r = state->r + state->heap.xyR[j][1];
@@ -2259,11 +2259,11 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
    while (2 * p + 1 < heapsize - 1) {
       maxcp = 2 * p + 1;
       if (2 * p + 2 < heapsize - 1) {
-         if (ae_fp_greater(heap->xyR[2 * p + 2][0], heap->xyR[2 * p + 1][0])) {
+         if (heap->xyR[2 * p + 2][0] > heap->xyR[2 * p + 1][0]) {
             maxcp = 2 * p + 2;
          }
       }
-      if (ae_fp_less(heap->xyR[p][0], heap->xyR[maxcp][0])) {
+      if (heap->xyR[p][0] < heap->xyR[maxcp][0]) {
          for (i = 0; i <= heapwidth - 1; i++) {
             t = heap->xyR[p][i];
             heap->xyR[p][i] = heap->xyR[maxcp][i];
@@ -2288,7 +2288,7 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
    p = heapsize;
    while (p != 0) {
       parent = (p - 1) / 2;
-      if (ae_fp_greater(heap->xyR[p][0], heap->xyR[parent][0])) {
+      if (heap->xyR[p][0] > heap->xyR[parent][0]) {
          for (i = 0; i <= heapwidth - 1; i++) {
             t = heap->xyR[p][i];
             heap->xyR[p][i] = heap->xyR[parent][i];

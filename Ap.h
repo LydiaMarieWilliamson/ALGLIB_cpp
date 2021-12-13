@@ -670,22 +670,6 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * IEEE-compliant floating point comparisons
-#if 0
-bool ae_fp_eq(double v1, double v2);
-bool ae_fp_neq(double v1, double v2);
-bool ae_fp_less(double v1, double v2);
-bool ae_fp_less_eq(double v1, double v2);
-bool ae_fp_greater(double v1, double v2);
-bool ae_fp_greater_eq(double v1, double v2);
-#else
-#   define ae_fp_eq(A, B) ((A) == (B))
-#   define ae_fp_neq(A, B) ((A) != (B))
-#   define ae_fp_less(A, B) ((A) < (B))
-#   define ae_fp_less_eq(A, B) ((A) <= (B))
-#   define ae_fp_greater(A, B) ((A) > (B))
-#   define ae_fp_greater_eq(A, B) ((A) >= (B))
-#endif
-
 bool ae_isfinite_stateless(double x, ae_int_t endianness);
 bool ae_isnan_stateless(double x, ae_int_t endianness);
 bool ae_isinf_stateless(double x, ae_int_t endianness);
@@ -1140,22 +1124,6 @@ int maxint(int m1, int m2);
 int minint(int m1, int m2);
 double maxreal(double m1, double m2);
 double minreal(double m1, double m2);
-
-#if 0
-bool fp_eq(double v1, double v2);
-bool fp_neq(double v1, double v2);
-bool fp_less(double v1, double v2);
-bool fp_less_eq(double v1, double v2);
-bool fp_greater(double v1, double v2);
-bool fp_greater_eq(double v1, double v2);
-#else
-#   define fp_eq(A, B)		((A) == (B))
-#   define fp_neq(A, B)		((A) != (B))
-#   define fp_less(A, B)	((A) < (B))
-#   define fp_less_eq(A, B)	((A) <= (B))
-#   define fp_greater(A, B)	((A) > (B))
-#   define fp_greater_eq(A, B)	((A) >= (B))
-#endif
 
 bool fp_isnan(double x);
 bool fp_isposinf(double x);

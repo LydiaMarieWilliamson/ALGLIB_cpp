@@ -1194,7 +1194,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 
          // special code for circular convolution of a sequence with a smooth length
             flopcand = 3 * ftbasegetflopestimate(m, _state) + 6 * m;
-            if (ae_fp_less(flopcand, flopbest)) {
+            if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
             }
@@ -1203,7 +1203,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmooth(m + n - 1, _state);
             flopcand = 3 * ftbasegetflopestimate(p, _state) + 6 * p;
-            if (ae_fp_less(flopcand, flopbest)) {
+            if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
             }
@@ -1218,7 +1218,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       while (ptotal <= m + n - 1) {
          p = ptotal - n + 1;
          flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal, _state) + 8 * ptotal);
-         if (ae_fp_less(flopcand, flopbest)) {
+         if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
             q = p;
@@ -1552,7 +1552,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 
          // special code for circular convolution of a sequence with a smooth length
             flopcand = 3 * ftbasegetflopestimate(m / 2, _state) + (double)(6 * m) / 2.0;
-            if (ae_fp_less(flopcand, flopbest)) {
+            if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
             }
@@ -1561,7 +1561,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmootheven(m + n - 1, _state);
             flopcand = 3 * ftbasegetflopestimate(p / 2, _state) + (double)(6 * p) / 2.0;
-            if (ae_fp_less(flopcand, flopbest)) {
+            if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
             }
@@ -1576,7 +1576,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       while (ptotal <= m + n - 1) {
          p = ptotal - n + 1;
          flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal / 2, _state) + 1 * (ptotal / 2));
-         if (ae_fp_less(flopcand, flopbest)) {
+         if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
             q = p;

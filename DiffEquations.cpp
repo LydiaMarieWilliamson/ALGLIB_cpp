@@ -77,7 +77,7 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
    ae_assert(isfinitevector(y, n, _state), "ODESolverRKCK: Y contains infinite or NaN values!", _state);
    ae_assert(isfinitevector(x, m, _state), "ODESolverRKCK: Y contains infinite or NaN values!", _state);
    ae_assert(ae_isfinite(eps, _state), "ODESolverRKCK: Eps is not finite!", _state);
-   ae_assert(ae_fp_neq(eps, 0.0), "ODESolverRKCK: Eps is zero!", _state);
+   ae_assert(eps != 0.0, "ODESolverRKCK: Eps is zero!", _state);
    ae_assert(ae_isfinite(h, _state), "ODESolverRKCK: H is not finite!", _state);
    odesolver_odesolverinit(0, y, n, x, m, eps, h, state, _state);
 }
@@ -158,7 +158,7 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
 
 // some preliminary checks for internal errors
 // after this we assume that H>0 and M>1
-   ae_assert(ae_fp_greater(state->h, 0.0), "ODESolver: internal error", _state);
+   ae_assert(state->h > 0.0, "ODESolver: internal error", _state);
    ae_assert(m > 1, "ODESolverIteration: internal error", _state);
 
 // choose solver
@@ -231,7 +231,7 @@ lbl_6:
    }
 // truncate step if needed (beyond right boundary).
 // determine should we store X or not
-   if (ae_fp_greater_eq(xc + h, state->xg.xR[i])) {
+   if (xc + h >= state->xg.xR[i]) {
       h = state->xg.xR[i] - xc;
       gridpoint = true;
    } else {
@@ -298,7 +298,7 @@ lbl_10:
 
       // Relative error is estimated
          v = state->escale.xR[j];
-         if (ae_fp_eq(v, 0.0)) {
+         if (v == 0.0) {
             v = 1.0;
          }
          err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
@@ -306,15 +306,15 @@ lbl_10:
    }
 
 // calculate new step, restart if necessary
-   if (ae_fp_less_eq(maxgrowpow * err, state->eps)) {
+   if (maxgrowpow * err <= state->eps) {
       h2 = odesolver_odesolvermaxgrow * h;
    } else {
       h2 = h * ae_pow(state->eps / err, 0.2, _state);
    }
-   if (ae_fp_less(h2, h / odesolver_odesolvermaxshrink)) {
+   if (h2 < h / odesolver_odesolvermaxshrink) {
       h2 = h / odesolver_odesolvermaxshrink;
    }
-   if (ae_fp_greater(err, state->eps)) {
+   if (err > state->eps) {
       h = ae_minreal(h2, odesolver_odesolverguaranteeddecay * h, _state);
       goto lbl_6;
    }
@@ -423,11 +423,11 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    state->needdy = false;
 
 // check parameters.
-   if ((n <= 0 || m < 1) || ae_fp_eq(eps, 0.0)) {
+   if ((n <= 0 || m < 1) || eps == 0.0) {
       state->repterminationtype = -1;
       return;
    }
-   if (ae_fp_less(h, 0.0)) {
+   if (h < 0.0) {
       h = -h;
    }
 // quick exit if necessary.
@@ -442,19 +442,19 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       return;
    }
 // check again: correct order of X[]
-   if (ae_fp_eq(x->xR[1], x->xR[0])) {
+   if (x->xR[1] == x->xR[0]) {
       state->repterminationtype = -2;
       return;
    }
    for (i = 1; i <= m - 1; i++) {
-      if ((ae_fp_greater(x->xR[1], x->xR[0]) && ae_fp_less_eq(x->xR[i], x->xR[i - 1])) || (ae_fp_less(x->xR[1], x->xR[0]) && ae_fp_greater_eq(x->xR[i], x->xR[i - 1]))) {
+      if ((x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1]) || (x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1])) {
          state->repterminationtype = -2;
          return;
       }
    }
 
 // auto-select H if necessary
-   if (ae_fp_eq(h, 0.0)) {
+   if (h == 0.0) {
       v = ae_fabs(x->xR[1] - x->xR[0], _state);
       for (i = 2; i <= m - 1; i++) {
          v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
@@ -466,10 +466,10 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    state->m = m;
    state->h = h;
    state->eps = ae_fabs(eps, _state);
-   state->fraceps = ae_fp_less(eps, 0.0);
+   state->fraceps = eps < 0.0;
    ae_vector_set_length(&state->xg, m, _state);
    ae_v_move(&state->xg.xR[0], 1, &x->xR[0], 1, ae_v_len(0, m - 1));
-   if (ae_fp_greater(x->xR[1], x->xR[0])) {
+   if (x->xR[1] > x->xR[0]) {
       state->xscale = 1.0;
    } else {
       state->xscale = -1.0;

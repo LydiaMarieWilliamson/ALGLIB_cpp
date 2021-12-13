@@ -263,7 +263,7 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
    do {
       hqrndnormal2(state, x, y, _state);
    }
-   while (!(ae_fp_neq(*x, 0.0) || ae_fp_neq(*y, 0.0)));
+   while (!(*x != 0.0 || *y != 0.0));
    mx = ae_maxreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
    mn = ae_minreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
    v = mx * ae_sqrt(1 + ae_sqr(mn / mx, _state), _state);
@@ -291,7 +291,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
       u = 2 * hqrnduniformr(state, _state) - 1;
       v = 2 * hqrnduniformr(state, _state) - 1;
       s = ae_sqr(u, _state) + ae_sqr(v, _state);
-      if (ae_fp_greater(s, 0.0) && ae_fp_less(s, 1.0)) {
+      if (s > 0.0 && s < 1.0) {
 
       // two Sqrt's instead of one to
       // avoid overflow when S is too small
@@ -311,7 +311,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
    double result;
 
-   ae_assert(ae_fp_greater(lambdav, 0.0), "HQRNDExponential: LambdaV <= 0!", _state);
+   ae_assert(lambdav > 0.0, "HQRNDExponential: LambdaV <= 0!", _state);
    result = -ae_log(hqrnduniformr(state, _state), _state) / lambdav;
    return result;
 }
@@ -369,8 +369,8 @@ double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_sta
    i = hqrnduniformi(state, n - 1, _state);
    mn = x->xR[i];
    mx = x->xR[i + 1];
-   ae_assert(ae_fp_greater_eq(mx, mn), "HQRNDDiscrete: X is not sorted by ascending", _state);
-   if (ae_fp_neq(mx, mn)) {
+   ae_assert(mx >= mn, "HQRNDDiscrete: X is not sorted by ascending", _state);
+   if (mx != mn) {
       result = (mx - mn) * hqrnduniformr(state, _state) + mn;
    } else {
       result = mn;
@@ -979,7 +979,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i <= a->rows - 1; i++) {
       for (j = 0; j <= a->cols - 1; j++) {
-         a->xyB[i][j] = ae_fp_greater(ae_sin((double)(3 * i + 5 * j), _state), 0.0);
+         a->xyB[i][j] = ae_sin((double)(3 * i + 5 * j), _state) > 0.0;
       }
    }
 }
@@ -1961,7 +1961,7 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_
 ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
 
-   ae_assert(ae_fp_greater(r, 0.0), "KDTreeQueryRNN: incorrect R!", _state);
+   ae_assert(r > 0.0, "KDTreeQueryRNN: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNN: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeQueryRNN: X contains infinite or NaN values!", _state);
    result = kdtreetsqueryrnn(kdt, &kdt->innerbuf, x, r, selfmatch, _state);
@@ -2007,7 +2007,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_st
 ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
 
-   ae_assert(ae_fp_greater(r, 0.0), "KDTreeQueryRNNU: incorrect R!", _state);
+   ae_assert(r > 0.0, "KDTreeQueryRNNU: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNNU: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeQueryRNNU: X contains infinite or NaN values!", _state);
    result = kdtreetsqueryrnnu(kdt, &kdt->innerbuf, x, r, selfmatch, _state);
@@ -2061,7 +2061,7 @@ ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_s
 ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
 
-   ae_assert(ae_isfinite(r, _state) && ae_fp_greater(r, 0.0), "KDTreeTsQueryRNN: incorrect R!", _state);
+   ae_assert(ae_isfinite(r, _state) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNN: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryRNN: X contains infinite or NaN values!", _state);
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, true, _state);
@@ -2114,7 +2114,7 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, dou
 ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
 
-   ae_assert(ae_isfinite(r, _state) && ae_fp_greater(r, 0.0), "KDTreeTsQueryRNNU: incorrect R!", _state);
+   ae_assert(ae_isfinite(r, _state) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNNU: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryRNNU: X contains infinite or NaN values!", _state);
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, false, _state);
@@ -2219,7 +2219,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
    ae_int_t result;
 
    ae_assert(k > 0, "KDTreeTsQueryAKNN: incorrect K!", _state);
-   ae_assert(ae_fp_greater_eq(eps, 0.0), "KDTreeTsQueryAKNN: incorrect Eps!", _state);
+   ae_assert(eps >= 0.0, "KDTreeTsQueryAKNN: incorrect Eps!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryAKNN: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryAKNN: X contains infinite or NaN values!", _state);
 
@@ -2352,7 +2352,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
 
 // Quick exit for degenerate boxes
    for (j = 0; j <= kdt->nx - 1; j++) {
-      if (ae_fp_greater(boxmin->xR[j], boxmax->xR[j])) {
+      if (boxmin->xR[j] > boxmax->xR[j]) {
          buf->kcur = 0;
          result = 0;
          return result;
@@ -3208,7 +3208,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          d = i;
       }
    }
-   if (ae_fp_eq(ds, 0.0)) {
+   if (ds == 0.0) {
       kdt->nodes.xZ[*nodesoffs + 0] = i2 - i1;
       kdt->nodes.xZ[*nodesoffs + 1] = i1;
       *nodesoffs = *nodesoffs + 2;

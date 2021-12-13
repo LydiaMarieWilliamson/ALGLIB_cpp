@@ -77,7 +77,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_assert(n > 0, "PolynomialSolve: N <= 0", _state);
    ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1", _state);
    ae_assert(isfinitevector(a, n + 1, _state), "PolynomialSolve: A contains infitite numbers", _state);
-   ae_assert(ae_fp_neq(a->xR[n], 0.0), "PolynomialSolve: A[N]=0", _state);
+   ae_assert(a->xR[n] != 0.0, "PolynomialSolve: A[N]=0", _state);
 
 // Prepare
    ae_vector_set_length(x, n, _state);
@@ -88,7 +88,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 // * make residual NE-th degree polynomial monic
 //   (here NE=N-NZ)
    nz = 0;
-   while (nz < n && ae_fp_eq(a->xR[nz], 0.0)) {
+   while (nz < n && a->xR[nz] == 0.0) {
       nz = nz + 1;
    }
    ne = n - nz;
@@ -296,7 +296,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
    }
    rmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(a->xyR[i][i], 0.0)) {
+      if (a->xyR[i][i] == 0.0) {
          for (j = 0; j <= n - 1; j++) {
             b->xR[j] = 0.0;
          }
@@ -456,7 +456,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    }
    rmatrixlu(a, n, n, &p, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(a->xyR[i][i], 0.0)) {
+      if (a->xyR[i][i] == 0.0) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
                b->xyR[j][k] = 0.0;
@@ -597,7 +597,7 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(lua->xyR[i][i], 0.0)) {
+      if (lua->xyR[i][i] == 0.0) {
          for (j = 0; j <= n - 1; j++) {
             b->xR[j] = 0.0;
          }
@@ -726,7 +726,7 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
       return;
    }
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(lua->xyR[i][i], 0.0)) {
+      if (lua->xyR[i][i] == 0.0) {
          for (j = 0; j <= n - 1; j++) {
             for (k = 0; k <= m - 1; k++) {
                b->xyR[j][k] = 0.0;
@@ -1895,7 +1895,7 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->xyR[k][k], 0.0)) {
+      if (cha->xyR[k][k] == 0.0) {
          for (i = 0; i <= n - 1; i++) {
             for (j = 0; j <= m - 1; j++) {
                b->xyR[i][j] = 0.0;
@@ -2027,7 +2027,7 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->xyR[k][k], 0.0)) {
+      if (cha->xyR[k][k] == 0.0) {
          for (i = 0; i <= n - 1; i++) {
             b->xR[i] = 0.0;
          }
@@ -2429,7 +2429,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->xyC[k][k].x, 0.0) && ae_fp_eq(cha->xyC[k][k].y, 0.0)) {
+      if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i <= n - 1; i++) {
             for (j = 0; j <= m - 1; j++) {
                b->xyC[i][j] = ae_complex_from_d(0.0);
@@ -2561,7 +2561,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
       return;
    }
    for (k = 0; k <= n - 1; k++) {
-      if (ae_fp_eq(cha->xyC[k][k].x, 0.0) && ae_fp_eq(cha->xyC[k][k].y, 0.0)) {
+      if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i <= n - 1; i++) {
             b->xC[i] = ae_complex_from_d(0.0);
          }
@@ -2645,17 +2645,17 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(w, 0, DT_REAL, _state);
 
-   if ((nrows <= 0 || ncols <= 0) || ae_fp_less(threshold, 0.0)) {
+   if ((nrows <= 0 || ncols <= 0) || threshold < 0.0) {
       *info = -1;
       ae_frame_leave(_state);
       return;
    }
-   if (ae_fp_eq(threshold, 0.0)) {
+   if (threshold == 0.0) {
       threshold = 1000 * ae_machineepsilon;
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt, _state);
-   zeroa = ae_fp_eq(sv.xR[0], 0.0);
+   zeroa = sv.xR[0] == 0.0;
    if (svdfailed || zeroa) {
       if (svdfailed) {
          *info = -4;
@@ -2713,7 +2713,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    }
    kernelidx = nsv;
    for (i = 0; i <= nsv - 1; i++) {
-      if (ae_fp_less_eq(sv.xR[i], threshold * sv.xR[0])) {
+      if (sv.xR[i] <= threshold * sv.xR[0]) {
          kernelidx = i;
          break;
       }
@@ -2738,7 +2738,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
             tx.xR[ncols] = b->xR[i];
             xdot(&ta, &tx, ncols + 1, &buf, &v, &verr, _state);
             rp.xR[i] = -v;
-            smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
+            smallerr = smallerr && ae_fabs(v, _state) < 4 * verr;
          }
          if (smallerr) {
             terminatenexttime = true;
@@ -2832,7 +2832,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
 // estimate condition number, test for near singularity
    rep->r1 = rmatrixlurcond1(lua, n, _state);
    rep->rinf = rmatrixlurcondinf(lua, n, _state);
-   if (ae_fp_less(rep->r1, rcondthreshold(_state)) || ae_fp_less(rep->rinf, rcondthreshold(_state))) {
+   if (rep->r1 < rcondthreshold(_state) || rep->rinf < rcondthreshold(_state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
             x->xyR[i][j] = 0.0;
@@ -2885,7 +2885,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
                xb.xR[n] = b->xyR[i][k];
                xdot(&xa, &xb, n + 1, &tx, &v, &verr, _state);
                y.xR[i] = -v;
-               smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
+               smallerr = smallerr && ae_fabs(v, _state) < 4 * verr;
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -2919,7 +2919,7 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
 // estimate condition number, test for near singularity
    rep->r1 = spdmatrixcholeskyrcond(cha, n, isupper, _state);
    rep->rinf = rep->r1;
-   if (ae_fp_less(rep->r1, rcondthreshold(_state))) {
+   if (rep->r1 < rcondthreshold(_state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
             x->xyR[i][j] = 0.0;
@@ -2998,7 +2998,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
 // estimate condition number, test for near singularity
    rep->r1 = cmatrixlurcond1(lua, n, _state);
    rep->rinf = cmatrixlurcondinf(lua, n, _state);
-   if (ae_fp_less(rep->r1, rcondthreshold(_state)) || ae_fp_less(rep->rinf, rcondthreshold(_state))) {
+   if (rep->r1 < rcondthreshold(_state) || rep->rinf < rcondthreshold(_state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
             x->xyC[i][j] = ae_complex_from_i(0);
@@ -3059,7 +3059,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
                xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr, _state);
                y.xC[i] = ae_c_neg(v);
-               smallerr = smallerr && ae_fp_less(ae_c_abs(v, _state), 4 * verr);
+               smallerr = smallerr && ae_c_abs(v, _state) < 4 * verr;
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -3111,7 +3111,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
 // estimate condition number, test for near singularity
    rep->r1 = hpdmatrixcholeskyrcond(cha, n, isupper, _state);
    rep->rinf = rep->r1;
-   if (ae_fp_less(rep->r1, rcondthreshold(_state))) {
+   if (rep->r1 < rcondthreshold(_state)) {
       for (i = 0; i <= n - 1; i++) {
          for (j = 0; j <= m - 1; j++) {
             x->xyC[i][j] = ae_complex_from_i(0);
@@ -3884,7 +3884,7 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
    initsparsesolverreport(rep, _state);
    ae_vector_set_length(x, n, _state);
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(sparseget(a, i, i, _state), 0.0)) {
+      if (sparseget(a, i, i, _state) == 0.0) {
          rep->terminationtype = -3;
          for (i = 0; i <= n - 1; i++) {
             x->xR[i] = 0.0;
@@ -4222,9 +4222,9 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
    ae_assert(sparsegetncols(a, _state) == n, "SparseSolveSymmetricGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveSymmetricGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveSymmetricGMRES: B contains NAN/INF", _state);
-   ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, 0.0), "SparseSolveSymmetricGMRES: EpsF<0 or infinite", _state);
+   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolveSymmetricGMRES: EpsF<0 or infinite", _state);
    ae_assert(maxits >= 0, "SparseSolveSymmetricGMRES: MaxIts<0", _state);
-   if (ae_fp_eq(epsf, 0.0) && maxits == 0) {
+   if (epsf == 0.0 && maxits == 0) {
       epsf = 1.0E-6;
    }
 // If A is non-CRS, perform conversion
@@ -4307,9 +4307,9 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    ae_assert(sparsegetncols(a, _state) == n, "SparseSolveGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveGMRES: B contains NAN/INF", _state);
-   ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, 0.0), "SparseSolveGMRES: EpsF<0 or infinite", _state);
+   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolveGMRES: EpsF<0 or infinite", _state);
    ae_assert(maxits >= 0, "SparseSolveGMRES: MaxIts<0", _state);
-   if (ae_fp_eq(epsf, 0.0) && maxits == 0) {
+   if (epsf == 0.0 && maxits == 0) {
       epsf = 1.0E-6;
    }
 // If A is non-CRS, perform conversion
@@ -4473,9 +4473,9 @@ void sparsesolversetstartingpoint(sparsesolverstate *state, RVector *x, ae_state
 // API: void sparsesolversetcond(const sparsesolverstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
 void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
 
-   ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, 0.0), "SparseSolverSetCond: EpsF is negative or contains infinite or NaN values", _state);
+   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolverSetCond: EpsF is negative or contains infinite or NaN values", _state);
    ae_assert(maxits >= 0, "SparseSolverSetCond: MaxIts is negative", _state);
-   if (ae_fp_eq(epsf, 0.0) && maxits == 0) {
+   if (epsf == 0.0 && maxits == 0) {
       state->epsf = 1.0E-6;
       state->maxits = 0;
    } else {
@@ -4968,7 +4968,7 @@ static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_s
    if (state->algotype != 0) {
       goto lbl_5;
    }
-   if (ae_fp_neq(rdotv2(state->n, &state->x0, _state), 0.0)) {
+   if (rdotv2(state->n, &state->x0, _state) != 0.0) {
       goto lbl_7;
    }
 // Starting point is default one (zero), quick initialization
@@ -5007,7 +5007,7 @@ lbl_1:
    state->requesttype = -999;
 lbl_9:
 lbl_11:
-   if (!(ae_fp_greater(res, 0.0) && (state->maxits == 0 || state->repiterationscount < state->maxits))) {
+   if (!(res > 0.0 && (state->maxits == 0 || state->repiterationscount < state->maxits))) {
       goto lbl_12;
    }
 // Solve with GMRES(k) for current residual.
@@ -5071,13 +5071,13 @@ lbl_3:
 lbl_4:
    state->requesttype = -999;
 lbl_15:
-   if (ae_fp_less_eq(res, state->epsf * res0)) {
+   if (res <= state->epsf * res0) {
 
    // Residual decrease condition met, stopping
       state->repterminationtype = 1;
       goto lbl_12;
    }
-   if (ae_fp_greater_eq(res, prevres * (1 - ae_sqrt(ae_machineepsilon, _state)))) {
+   if (res >= prevres * (1 - ae_sqrt(ae_machineepsilon, _state))) {
 
    // The algorithm stagnated
       state->repterminationtype = 7;
@@ -5510,9 +5510,9 @@ void lincgsetprecdiag(lincgstate *state, ae_state *_state) {
 void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
 
    ae_assert(!state->running, "LinCGSetCond: you can not change stopping criteria when LinCGIteration() is running", _state);
-   ae_assert(ae_isfinite(epsf, _state) && ae_fp_greater_eq(epsf, 0.0), "LinCGSetCond: EpsF is negative or contains infinite or NaN values", _state);
+   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "LinCGSetCond: EpsF is negative or contains infinite or NaN values", _state);
    ae_assert(maxits >= 0, "LinCGSetCond: MaxIts is negative", _state);
-   if (ae_fp_eq(epsf, 0.0) && maxits == 0) {
+   if (epsf == 0.0 && maxits == 0) {
       state->epsf = lincg_defaultprecision;
       state->maxits = maxits;
    } else {
@@ -5615,7 +5615,7 @@ lbl_1:
 lbl_8:
 
 // Is x0 a solution?
-   if (!ae_isfinite(state->r2, _state) || ae_fp_less_eq(ae_sqrt(state->r2, _state), state->epsf * bnorm)) {
+   if (!ae_isfinite(state->r2, _state) || ae_sqrt(state->r2, _state) <= state->epsf * bnorm) {
       state->running = false;
       if (ae_isfinite(state->r2, _state)) {
          state->repterminationtype = 1;
@@ -5656,7 +5656,7 @@ lbl_10:
    goto lbl_rcomm;
 lbl_3:
    state->needvmv = false;
-   if (!ae_isfinite(state->vmv, _state) || ae_fp_less_eq(state->vmv, 0.0)) {
+   if (!ae_isfinite(state->vmv, _state) || state->vmv <= 0.0) {
 
    // a) Overflow when calculating VMV
    // b) non-positive VMV (non-SPD matrix)
@@ -5722,7 +5722,7 @@ lbl_4:
    for (i = 0; i <= state->n - 1; i++) {
       v = v + state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
    }
-   if (ae_fp_less(v, state->meritfunction)) {
+   if (v < state->meritfunction) {
       goto lbl_14;
    }
    for (i = 0; i <= state->n - 1; i++) {
@@ -5778,7 +5778,7 @@ lbl_18:
 
 // stopping criterion
 // achieved the required precision
-   if (!ae_isfinite(state->r2, _state) || ae_fp_less_eq(ae_sqrt(state->r2, _state), state->epsf * bnorm)) {
+   if (!ae_isfinite(state->r2, _state) || ae_sqrt(state->r2, _state) <= state->epsf * bnorm) {
       state->running = false;
       if (ae_isfinite(state->r2, _state)) {
          state->repterminationtype = 1;
@@ -5824,7 +5824,7 @@ lbl_7:
       }
 
    // check that UVar is't INF or is't zero
-      if (!ae_isfinite(uvar, _state) || ae_fp_eq(uvar, 0.0)) {
+      if (!ae_isfinite(uvar, _state) || uvar == 0.0) {
          state->running = false;
          state->repterminationtype = -4;
          result = false;
@@ -5912,7 +5912,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
    // Default preconditioner - inverse of matrix diagonal
       for (i = 0; i <= n - 1; i++) {
          v = sparsegetdiagonal(a, i, _state);
-         if (ae_fp_greater(v, 0.0)) {
+         if (v > 0.0) {
             state->tmpd.xR[i] = 1 / ae_sqrt(v, _state);
          } else {
             state->tmpd.xR[i] = 1.0;
@@ -6425,7 +6425,7 @@ void linlsqrsetprecdiag(linlsqrstate *state, ae_state *_state) {
 void linlsqrsetlambdai(linlsqrstate *state, double lambdai, ae_state *_state) {
 
    ae_assert(!state->running, "LinLSQRSetLambdaI: you can not set LambdaI, because function LinLSQRIteration is running", _state);
-   ae_assert(ae_isfinite(lambdai, _state) && ae_fp_greater_eq(lambdai, 0.0), "LinLSQRSetLambdaI: LambdaI is infinite or NaN", _state);
+   ae_assert(ae_isfinite(lambdai, _state) && lambdai >= 0.0, "LinLSQRSetLambdaI: LambdaI is infinite or NaN", _state);
    state->lambdai = lambdai;
 }
 
@@ -6571,7 +6571,7 @@ lbl_13:
 // It is very important that S2 always checked AFTER S1. It is necessary
 // to avoid division by zero when Rk=0.
    state->betai = bnorm;
-   if (ae_fp_eq(state->betai, 0.0)) {
+   if (state->betai == 0.0) {
 
    // Zero right part
       state->running = false;
@@ -6602,7 +6602,7 @@ lbl_3:
       state->alphai = state->alphai + state->mtv.xR[i] * state->mtv.xR[i];
    }
    state->alphai = ae_sqrt(state->alphai, _state);
-   if (ae_fp_eq(state->alphai, 0.0)) {
+   if (state->alphai == 0.0) {
 
    // Orthogonality stopping criterion is met
       state->running = false;
@@ -6656,7 +6656,7 @@ lbl_4:
       state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
       state->betaip1 = state->betaip1 + state->uip1.xR[i] * state->uip1.xR[i];
    }
-   if (ae_fp_neq(state->betaip1, 0.0)) {
+   if (state->betaip1 != 0.0) {
       state->betaip1 = ae_sqrt(state->betaip1, _state);
       for (i = 0; i <= summn - 1; i++) {
          state->uip1.xR[i] = state->uip1.xR[i] / state->betaip1;
@@ -6678,7 +6678,7 @@ lbl_5:
       state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
       state->alphaip1 = state->alphaip1 + state->vip1.xR[i] * state->vip1.xR[i];
    }
-   if (ae_fp_neq(state->alphaip1, 0.0)) {
+   if (state->alphaip1 != 0.0) {
       state->alphaip1 = ae_sqrt(state->alphaip1, _state);
       for (i = 0; i <= state->n - 1; i++) {
          state->vip1.xR[i] = state->vip1.xR[i] / state->alphaip1;
@@ -6708,7 +6708,7 @@ lbl_5:
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
       state->dnorm = state->dnorm + state->d.xR[i] * state->d.xR[i];
    }
-   if (ae_fp_greater_eq(ae_sqrt(state->dnorm, _state) * state->anorm, state->epsc)) {
+   if (ae_sqrt(state->dnorm, _state) * state->anorm >= state->epsc) {
       state->running = false;
       state->repterminationtype = 7;
       result = false;
@@ -6742,7 +6742,7 @@ lbl_17:
       result = false;
       return result;
    }
-   if (ae_fp_less_eq(state->phibarip1, state->epsb * bnorm)) {
+   if (state->phibarip1 <= state->epsb * bnorm) {
 
    // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
       state->running = false;
@@ -6750,7 +6750,7 @@ lbl_17:
       result = false;
       return result;
    }
-   if (ae_fp_less_eq(state->alphaip1 * ae_fabs(state->ci, _state) / state->anorm, state->epsa)) {
+   if (state->alphaip1 * ae_fabs(state->ci, _state) / state->anorm <= state->epsa) {
 
    // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
       state->running = false;
@@ -6847,7 +6847,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
          state->tmpd.xR[j] = state->tmpd.xR[j] + ae_sqr(v, _state);
       }
       for (i = 0; i <= n - 1; i++) {
-         if (ae_fp_greater(state->tmpd.xR[i], 0.0)) {
+         if (state->tmpd.xR[i] > 0.0) {
             state->tmpd.xR[i] = 1 / ae_sqrt(state->tmpd.xR[i], _state);
          } else {
             state->tmpd.xR[i] = 1.0;
@@ -6906,10 +6906,10 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
 void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits, ae_state *_state) {
 
    ae_assert(!state->running, "LinLSQRSetCond: you can not call this function when LinLSQRIteration is running", _state);
-   ae_assert(ae_isfinite(epsa, _state) && ae_fp_greater_eq(epsa, 0.0), "LinLSQRSetCond: EpsA is negative, INF or NAN", _state);
-   ae_assert(ae_isfinite(epsb, _state) && ae_fp_greater_eq(epsb, 0.0), "LinLSQRSetCond: EpsB is negative, INF or NAN", _state);
+   ae_assert(ae_isfinite(epsa, _state) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN", _state);
+   ae_assert(ae_isfinite(epsb, _state) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN", _state);
    ae_assert(maxits >= 0, "LinLSQRSetCond: MaxIts is negative", _state);
-   if ((ae_fp_eq(epsa, 0.0) && ae_fp_eq(epsb, 0.0)) && maxits == 0) {
+   if ((epsa == 0.0 && epsb == 0.0) && maxits == 0) {
       state->epsa = linlsqr_atol;
       state->epsb = linlsqr_btol;
       state->maxits = state->n;
@@ -7388,9 +7388,9 @@ void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state
 void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
 
    ae_assert(ae_isfinite(epsf, _state), "NLEQSetCond: EpsF is not finite number!", _state);
-   ae_assert(ae_fp_greater_eq(epsf, 0.0), "NLEQSetCond: negative EpsF!", _state);
+   ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!", _state);
    ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!", _state);
-   if (ae_fp_eq(epsf, 0.0) && maxits == 0) {
+   if (epsf == 0.0 && maxits == 0) {
       epsf = 1.0E-6;
    }
    state->epsf = epsf;
@@ -7429,7 +7429,7 @@ void nleqsetxrep(nleqstate *state, bool needxrep, ae_state *_state) {
 void nleqsetstpmax(nleqstate *state, double stpmax, ae_state *_state) {
 
    ae_assert(ae_isfinite(stpmax, _state), "NLEQSetStpMax: StpMax is not finite!", _state);
-   ae_assert(ae_fp_greater_eq(stpmax, 0.0), "NLEQSetStpMax: StpMax<0!", _state);
+   ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!", _state);
    state->stpmax = stpmax;
 }
 
@@ -7529,7 +7529,7 @@ lbl_0:
 lbl_1:
    state->xupdated = false;
 lbl_5:
-   if (ae_fp_less_eq(state->f, ae_sqr(state->epsf, _state))) {
+   if (state->f <= ae_sqr(state->epsf, _state)) {
       state->repterminationtype = 1;
       result = false;
       return result;
@@ -7577,13 +7577,13 @@ lbl_9:
 // Normalize step (it must be no more than StpMax)
    stepnorm = 0.0;
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_neq(state->candstep.xR[i], 0.0)) {
+      if (state->candstep.xR[i] != 0.0) {
          stepnorm = 1.0;
          break;
       }
    }
    linminnormalized(&state->candstep, &stepnorm, n, _state);
-   if (ae_fp_neq(state->stpmax, 0.0)) {
+   if (state->stpmax != 0.0) {
       stepnorm = ae_minreal(stepnorm, state->stpmax, _state);
    }
 // Test new step - is it good enough?
@@ -7597,7 +7597,7 @@ lbl_9:
    ae_v_addd(&state->x.xR[0], 1, &state->candstep.xR[0], 1, ae_v_len(0, n - 1), stepnorm);
    b = true;
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_neq(state->x.xR[i], state->xbase.xR[i])) {
+      if (state->x.xR[i] != state->xbase.xR[i]) {
          b = false;
          break;
       }
@@ -7617,7 +7617,7 @@ lbl_9:
 lbl_3:
    state->needf = false;
    state->repnfunc = state->repnfunc + 1;
-   if (ae_fp_less(state->f, state->fbase)) {
+   if (state->f < state->fbase) {
 
    // function value decreased, move on
       nleq_decreaselambda(&lambdav, &rho, lambdadown, _state);
@@ -7657,10 +7657,10 @@ lbl_11:
 
 // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
 // If one of the conditions is met, RepTerminationType is changed.
-   if (ae_fp_less_eq(ae_sqrt(state->f, _state), state->epsf)) {
+   if (ae_sqrt(state->f, _state) <= state->epsf) {
       state->repterminationtype = 1;
    }
-   if (ae_fp_eq(stepnorm, 0.0) && state->repterminationtype == 0) {
+   if (stepnorm == 0.0 && state->repterminationtype == 0) {
       state->repterminationtype = -4;
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
@@ -7788,10 +7788,10 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
    lnlambdaup = ae_log(lambdaup, _state);
    lnnu = ae_log(*nu, _state);
    lnmax = 0.5 * ae_log(ae_maxrealnumber, _state);
-   if (ae_fp_greater(lnlambda + lnlambdaup + lnnu, lnmax)) {
+   if (lnlambda + lnlambdaup + lnnu > lnmax) {
       return result;
    }
-   if (ae_fp_greater(lnnu + ae_log(2.0, _state), lnmax)) {
+   if (lnnu + ae_log(2.0, _state) > lnmax) {
       return result;
    }
    *lambdav = *lambdav * lambdaup * (*nu);
@@ -7804,7 +7804,7 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
 static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, ae_state *_state) {
 
    *nu = 1.0;
-   if (ae_fp_less(ae_log(*lambdav, _state) + ae_log(lambdadown, _state), ae_log(ae_minrealnumber, _state))) {
+   if (ae_log(*lambdav, _state) + ae_log(lambdadown, _state) < ae_log(ae_minrealnumber, _state)) {
       *lambdav = ae_minrealnumber;
    } else {
       *lambdav = *lambdav * lambdadown;

@@ -84,13 +84,13 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
       }
       v2 = ae_sqr(v2, _state) / n;
       *variance = (v1 - v2) / (n - 1);
-      if (ae_fp_less(*variance, 0.0)) {
+      if (*variance < 0.0) {
          *variance = 0.0;
       }
       stddev = ae_sqrt(*variance, _state);
    }
 // Skewness and kurtosis
-   if (ae_fp_neq(stddev, 0.0)) {
+   if (stddev != 0.0) {
       for (i = 0; i <= n - 1; i++) {
          v = (x->xR[i] - (*mean)) / stddev;
          v2 = ae_sqr(v, _state);
@@ -309,7 +309,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
       if (ir <= l + 1) {
 
       // 1 or 2 elements in partition
-         if (ir == l + 1 && ae_fp_less(x->xR[ir], x->xR[l])) {
+         if (ir == l + 1 && x->xR[ir] < x->xR[l]) {
             tval = x->xR[l];
             x->xR[l] = x->xR[ir];
             x->xR[ir] = tval;
@@ -320,17 +320,17 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
          tval = x->xR[midp];
          x->xR[midp] = x->xR[l + 1];
          x->xR[l + 1] = tval;
-         if (ae_fp_greater(x->xR[l], x->xR[ir])) {
+         if (x->xR[l] > x->xR[ir]) {
             tval = x->xR[l];
             x->xR[l] = x->xR[ir];
             x->xR[ir] = tval;
          }
-         if (ae_fp_greater(x->xR[l + 1], x->xR[ir])) {
+         if (x->xR[l + 1] > x->xR[ir]) {
             tval = x->xR[l + 1];
             x->xR[l + 1] = x->xR[ir];
             x->xR[ir] = tval;
          }
-         if (ae_fp_greater(x->xR[l], x->xR[l + 1])) {
+         if (x->xR[l] > x->xR[l + 1]) {
             tval = x->xR[l];
             x->xR[l] = x->xR[l + 1];
             x->xR[l + 1] = tval;
@@ -342,11 +342,11 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
             do {
                i = i + 1;
             }
-            while (ae_fp_less(x->xR[i], a));
+            while (x->xR[i] < a);
             do {
                j = j - 1;
             }
-            while (ae_fp_greater(x->xR[j], a));
+            while (x->xR[j] > a);
             if (j < i) {
                break;
             }
@@ -373,7 +373,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
    }
    a = x->xR[n - 1];
    for (i = k + 1; i <= n - 1; i++) {
-      if (ae_fp_less(x->xR[i], a)) {
+      if (x->xR[i] < a) {
          a = x->xR[i];
       }
    }
@@ -409,14 +409,14 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
    ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, n, _state), "SamplePercentile: X is not finite vector", _state);
    ae_assert(ae_isfinite(p, _state), "SamplePercentile: incorrect P!", _state);
-   ae_assert(ae_fp_greater_eq(p, 0.0) && ae_fp_less_eq(p, 1.0), "SamplePercentile: incorrect P!", _state);
+   ae_assert(p >= 0.0 && p <= 1.0, "SamplePercentile: incorrect P!", _state);
    tagsortfast(x, &rbuf, n, _state);
-   if (ae_fp_eq(p, 0.0)) {
+   if (p == 0.0) {
       *v = x->xR[0];
       ae_frame_leave(_state);
       return;
    }
-   if (ae_fp_eq(p, 1.0)) {
+   if (p == 1.0) {
       *v = x->xR[n - 1];
       ae_frame_leave(_state);
       return;
@@ -484,10 +484,10 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    v = 1.0 / n;
    for (i = 0; i <= n - 1; i++) {
       s = x->xR[i];
-      samex = samex && ae_fp_eq(s, x0);
+      samex = samex && s == x0;
       xmean = xmean + s * v;
       s = y->xR[i];
-      samey = samey && ae_fp_eq(s, y0);
+      samey = samey && s == y0;
       ymean = ymean + s * v;
    }
    if (samex || samey) {
@@ -564,10 +564,10 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    v = 1.0 / n;
    for (i = 0; i <= n - 1; i++) {
       s = x->xR[i];
-      samex = samex && ae_fp_eq(s, x0);
+      samex = samex && s == x0;
       xmean = xmean + s * v;
       s = y->xR[i];
-      samey = samey && ae_fp_eq(s, y0);
+      samey = samey && s == y0;
       ymean = ymean + s * v;
    }
    if (samex || samey) {
@@ -585,7 +585,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
       yv = yv + ae_sqr(t2, _state);
       s = s + t1 * t2;
    }
-   if (ae_fp_eq(xv, 0.0) || ae_fp_eq(yv, 0.0)) {
+   if (xv == 0.0 || yv == 0.0) {
       result = 0.0;
    } else {
       result = s / (ae_sqrt(xv, _state) * ae_sqrt(yv, _state));
@@ -699,7 +699,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
    for (i = 0; i <= n - 1; i++) {
       ae_v_addd(&t.xR[0], 1, &x->xyR[i][0], 1, ae_v_len(0, m - 1), v);
       for (j = 0; j <= m - 1; j++) {
-         same.xB[j] = same.xB[j] && ae_fp_eq(x->xyR[i][j], x0.xR[j]);
+         same.xB[j] = same.xB[j] && x->xyR[i][j] == x0.xR[j];
       }
    }
 
@@ -757,7 +757,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
    ae_vector_set_length(&t, m, _state);
    covm(x, n, m, c, _state);
    for (i = 0; i <= m - 1; i++) {
-      if (ae_fp_greater(c->xyR[i][i], 0.0)) {
+      if (c->xyR[i][i] > 0.0) {
          t.xR[i] = 1 / ae_sqrt(c->xyR[i][i], _state);
       } else {
          t.xR[i] = 0.0;
@@ -846,7 +846,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
       for (j = 0; j <= n - 1; j++) {
          vv = xc.xyR[i][j];
          v = v + vv;
-         b = b && ae_fp_eq(vv, x0);
+         b = b && vv == x0;
       }
       v = v / n;
 
@@ -871,7 +871,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i <= m - 1; i++) {
-      if (ae_fp_greater(c->xyR[i][i], 0.0)) {
+      if (c->xyR[i][i] > 0.0) {
          t.xR[i] = 1 / ae_sqrt(c->xyR[i][i], _state);
       } else {
          t.xR[i] = 0.0;
@@ -972,7 +972,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
    for (i = 0; i <= n - 1; i++) {
       ae_v_addd(&t.xR[0], 1, &x->xyR[i][0], 1, ae_v_len(0, m1 - 1), v);
       for (j = 0; j <= m1 - 1; j++) {
-         samex.xB[j] = samex.xB[j] && ae_fp_eq(x->xyR[i][j], x0.xR[j]);
+         samex.xB[j] = samex.xB[j] && x->xyR[i][j] == x0.xR[j];
       }
    }
    for (i = 0; i <= n - 1; i++) {
@@ -994,7 +994,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
    for (i = 0; i <= n - 1; i++) {
       ae_v_addd(&t.xR[0], 1, &y->xyR[i][0], 1, ae_v_len(0, m2 - 1), v);
       for (j = 0; j <= m2 - 1; j++) {
-         samey.xB[j] = samey.xB[j] && ae_fp_eq(y->xyR[i][j], y0.xR[j]);
+         samey.xB[j] = samey.xB[j] && y->xyR[i][j] == y0.xR[j];
       }
    }
    for (i = 0; i <= n - 1; i++) {
@@ -1100,7 +1100,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
    for (i = 0; i <= n - 1; i++) {
       ae_v_addd(&t.xR[0], 1, &x->xyR[i][0], 1, ae_v_len(0, m1 - 1), v);
       for (j = 0; j <= m1 - 1; j++) {
-         samex.xB[j] = samex.xB[j] && ae_fp_eq(x->xyR[i][j], x0.xR[j]);
+         samex.xB[j] = samex.xB[j] && x->xyR[i][j] == x0.xR[j];
       }
    }
    for (i = 0; i <= n - 1; i++) {
@@ -1127,7 +1127,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
    for (i = 0; i <= n - 1; i++) {
       ae_v_addd(&t.xR[0], 1, &y->xyR[i][0], 1, ae_v_len(0, m2 - 1), v);
       for (j = 0; j <= m2 - 1; j++) {
-         samey.xB[j] = samey.xB[j] && ae_fp_eq(y->xyR[i][j], y0.xR[j]);
+         samey.xB[j] = samey.xB[j] && y->xyR[i][j] == y0.xR[j];
       }
    }
    for (i = 0; i <= n - 1; i++) {
@@ -1148,14 +1148,14 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 
 // Divide by standard deviations
    for (i = 0; i <= m1 - 1; i++) {
-      if (ae_fp_neq(sx.xR[i], 0.0)) {
+      if (sx.xR[i] != 0.0) {
          sx.xR[i] = 1 / sx.xR[i];
       } else {
          sx.xR[i] = 0.0;
       }
    }
    for (i = 0; i <= m2 - 1; i++) {
-      if (ae_fp_neq(sy.xR[i], 0.0)) {
+      if (sy.xR[i] != 0.0) {
          sy.xR[i] = 1 / sy.xR[i];
       } else {
          sy.xR[i] = 0.0;
@@ -1267,7 +1267,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       for (j = 0; j <= n - 1; j++) {
          vv = xc.xyR[i][j];
          v = v + vv;
-         b = b && ae_fp_eq(vv, x0);
+         b = b && vv == x0;
       }
       v = v / n;
       if (b) {
@@ -1291,7 +1291,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       for (j = 0; j <= n - 1; j++) {
          vv = yc.xyR[i][j];
          v = v + vv;
-         b = b && ae_fp_eq(vv, y0);
+         b = b && vv == y0;
       }
       v = v / n;
       if (b) {
@@ -1313,14 +1313,14 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 
 // Divide by standard deviations
    for (i = 0; i <= m1 - 1; i++) {
-      if (ae_fp_neq(sx.xR[i], 0.0)) {
+      if (sx.xR[i] != 0.0) {
          sx.xR[i] = 1 / sx.xR[i];
       } else {
          sx.xR[i] = 0.0;
       }
    }
    for (i = 0; i <= m2 - 1; i++) {
-      if (ae_fp_neq(sy.xR[i], 0.0)) {
+      if (sy.xR[i] != 0.0) {
          sy.xR[i] = 1 / sy.xR[i];
       } else {
          sy.xR[i] = 0.0;
@@ -1377,7 +1377,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_stat
 //
 // Try to use serial code for basecase problems, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if (ae_fp_less(rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state), (double)basecasecost)) {
+   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1, _state);
       ae_frame_leave(_state);
       return;
@@ -1437,7 +1437,7 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_stat
 //
 // Try to use serial code, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if (ae_fp_less(rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state), (double)basecasecost)) {
+   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1, _state);
       ae_frame_leave(_state);
       return;
@@ -1506,7 +1506,7 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
    ae_assert(i1 >= i0, "RankDataRec: internal error", _state);
 
 // Try to activate parallelism
-   if (i1 - i0 >= 4 && ae_fp_greater_eq(rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state), smpactivationlevel(_state))) {
+   if (i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state) >= smpactivationlevel(_state)) {
       if (_trypexec_basestat_rankdatarec(xy, i0, i1, nfeatures, iscentered, pool, basecasecost, _state)) {
          ae_frame_leave(_state);
          return;
@@ -1514,7 +1514,7 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
    }
 // Recursively split problem, if it is too large
    problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state);
-   if (i1 - i0 >= 2 && ae_fp_greater(problemcost, spawnlevel(_state))) {
+   if (i1 - i0 >= 2 && problemcost > spawnlevel(_state)) {
       im = (i1 + i0) / 2;
       basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost, _state);
       basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost, _state);
@@ -2063,13 +2063,13 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
    *righttail = 0;
 
 // Some special cases
-   if (ae_fp_greater_eq(r, 1.0)) {
+   if (r >= 1.0) {
       *bothtails = 0.0;
       *lefttail = 1.0;
       *righttail = 0.0;
       return;
    }
-   if (ae_fp_less_eq(r, -1.0)) {
+   if (r <= -1.0) {
       *bothtails = 0.0;
       *lefttail = 0.0;
       *righttail = 1.0;
@@ -2140,16 +2140,16 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
       return;
    }
 // General case
-   if (ae_fp_greater_eq(r, 1.0)) {
+   if (r >= 1.0) {
       t = 1.0E10;
    } else {
-      if (ae_fp_less_eq(r, -1.0)) {
+      if (r <= -1.0) {
          t = -1.0E10;
       } else {
          t = r * ae_sqrt((n - 2) / (1 - ae_sqr(r, _state)), _state);
       }
    }
-   if (ae_fp_less(t, 0.0)) {
+   if (t < 0.0) {
       p = correlationtests_spearmantail(t, n, _state);
       *bothtails = 2 * p;
       *lefttail = p;
@@ -2166,51 +2166,51 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 static double correlationtests_spearmantail5(double s, ae_state *_state) {
    double result;
 
-   if (ae_fp_less(s, 0.000e+00)) {
+   if (s < 0.000e+00) {
       result = studenttdistribution(3, -s, _state);
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.580e+00)) {
+   if (s >= 3.580e+00) {
       result = 8.304e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.322e+00)) {
+   if (s >= 2.322e+00) {
       result = 4.163e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.704e+00)) {
+   if (s >= 1.704e+00) {
       result = 6.641e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.303e+00)) {
+   if (s >= 1.303e+00) {
       result = 1.164e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.003e+00)) {
+   if (s >= 1.003e+00) {
       result = 1.748e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 7.584e-01)) {
+   if (s >= 7.584e-01) {
       result = 2.249e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 5.468e-01)) {
+   if (s >= 5.468e-01) {
       result = 2.581e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.555e-01)) {
+   if (s >= 3.555e-01) {
       result = 3.413e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.759e-01)) {
+   if (s >= 1.759e-01) {
       result = 3.911e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.741e-03)) {
+   if (s >= 1.741e-03) {
       result = 4.747e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 0.000e+00)) {
+   if (s >= 0.000e+00) {
       result = 5.248e-01;
       return result;
    }
@@ -2222,47 +2222,47 @@ static double correlationtests_spearmantail5(double s, ae_state *_state) {
 static double correlationtests_spearmantail6(double s, ae_state *_state) {
    double result;
 
-   if (ae_fp_less(s, 1.001e+00)) {
+   if (s < 1.001e+00) {
       result = studenttdistribution(4, -s, _state);
       return result;
    }
-   if (ae_fp_greater_eq(s, 5.663e+00)) {
+   if (s >= 5.663e+00) {
       result = 1.366e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.834e+00)) {
+   if (s >= 3.834e+00) {
       result = 8.350e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.968e+00)) {
+   if (s >= 2.968e+00) {
       result = 1.668e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.430e+00)) {
+   if (s >= 2.430e+00) {
       result = 2.921e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.045e+00)) {
+   if (s >= 2.045e+00) {
       result = 5.144e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.747e+00)) {
+   if (s >= 1.747e+00) {
       result = 6.797e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.502e+00)) {
+   if (s >= 1.502e+00) {
       result = 8.752e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.295e+00)) {
+   if (s >= 1.295e+00) {
       result = 1.210e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.113e+00)) {
+   if (s >= 1.113e+00) {
       result = 1.487e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.001e+00)) {
+   if (s >= 1.001e+00) {
       result = 1.780e-01;
       return result;
    }
@@ -2274,75 +2274,75 @@ static double correlationtests_spearmantail6(double s, ae_state *_state) {
 static double correlationtests_spearmantail7(double s, ae_state *_state) {
    double result;
 
-   if (ae_fp_less(s, 1.001e+00)) {
+   if (s < 1.001e+00) {
       result = studenttdistribution(5, -s, _state);
       return result;
    }
-   if (ae_fp_greater_eq(s, 8.159e+00)) {
+   if (s >= 8.159e+00) {
       result = 2.081e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 5.620e+00)) {
+   if (s >= 5.620e+00) {
       result = 1.393e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.445e+00)) {
+   if (s >= 4.445e+00) {
       result = 3.398e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.728e+00)) {
+   if (s >= 3.728e+00) {
       result = 6.187e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.226e+00)) {
+   if (s >= 3.226e+00) {
       result = 1.200e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.844e+00)) {
+   if (s >= 2.844e+00) {
       result = 1.712e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.539e+00)) {
+   if (s >= 2.539e+00) {
       result = 2.408e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.285e+00)) {
+   if (s >= 2.285e+00) {
       result = 3.320e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.068e+00)) {
+   if (s >= 2.068e+00) {
       result = 4.406e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.879e+00)) {
+   if (s >= 1.879e+00) {
       result = 5.478e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.710e+00)) {
+   if (s >= 1.710e+00) {
       result = 6.946e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.559e+00)) {
+   if (s >= 1.559e+00) {
       result = 8.331e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.420e+00)) {
+   if (s >= 1.420e+00) {
       result = 1.001e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.292e+00)) {
+   if (s >= 1.292e+00) {
       result = 1.180e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.173e+00)) {
+   if (s >= 1.173e+00) {
       result = 1.335e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.062e+00)) {
+   if (s >= 1.062e+00) {
       result = 1.513e-01;
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.001e+00)) {
+   if (s >= 1.001e+00) {
       result = 1.770e-01;
       return result;
    }
@@ -2354,71 +2354,71 @@ static double correlationtests_spearmantail7(double s, ae_state *_state) {
 static double correlationtests_spearmantail8(double s, ae_state *_state) {
    double result;
 
-   if (ae_fp_less(s, 2.001e+00)) {
+   if (s < 2.001e+00) {
       result = studenttdistribution(6, -s, _state);
       return result;
    }
-   if (ae_fp_greater_eq(s, 1.103e+01)) {
+   if (s >= 1.103e+01) {
       result = 2.194e-05;
       return result;
    }
-   if (ae_fp_greater_eq(s, 7.685e+00)) {
+   if (s >= 7.685e+00) {
       result = 2.008e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 6.143e+00)) {
+   if (s >= 6.143e+00) {
       result = 5.686e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 5.213e+00)) {
+   if (s >= 5.213e+00) {
       result = 1.138e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.567e+00)) {
+   if (s >= 4.567e+00) {
       result = 2.310e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.081e+00)) {
+   if (s >= 4.081e+00) {
       result = 3.634e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.697e+00)) {
+   if (s >= 3.697e+00) {
       result = 5.369e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.381e+00)) {
+   if (s >= 3.381e+00) {
       result = 7.708e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.114e+00)) {
+   if (s >= 3.114e+00) {
       result = 1.087e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.884e+00)) {
+   if (s >= 2.884e+00) {
       result = 1.397e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.682e+00)) {
+   if (s >= 2.682e+00) {
       result = 1.838e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.502e+00)) {
+   if (s >= 2.502e+00) {
       result = 2.288e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.340e+00)) {
+   if (s >= 2.340e+00) {
       result = 2.883e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.192e+00)) {
+   if (s >= 2.192e+00) {
       result = 3.469e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.057e+00)) {
+   if (s >= 2.057e+00) {
       result = 4.144e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.001e+00)) {
+   if (s >= 2.001e+00) {
       result = 4.804e-02;
       return result;
    }
@@ -2430,99 +2430,99 @@ static double correlationtests_spearmantail8(double s, ae_state *_state) {
 static double correlationtests_spearmantail9(double s, ae_state *_state) {
    double result;
 
-   if (ae_fp_less(s, 2.001e+00)) {
+   if (s < 2.001e+00) {
       result = studenttdistribution(7, -s, _state);
       return result;
    }
-   if (ae_fp_greater_eq(s, 9.989e+00)) {
+   if (s >= 9.989e+00) {
       result = 2.306e-05;
       return result;
    }
-   if (ae_fp_greater_eq(s, 8.069e+00)) {
+   if (s >= 8.069e+00) {
       result = 8.167e-05;
       return result;
    }
-   if (ae_fp_greater_eq(s, 6.890e+00)) {
+   if (s >= 6.890e+00) {
       result = 1.744e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 6.077e+00)) {
+   if (s >= 6.077e+00) {
       result = 3.625e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 5.469e+00)) {
+   if (s >= 5.469e+00) {
       result = 6.450e-04;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.991e+00)) {
+   if (s >= 4.991e+00) {
       result = 1.001e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.600e+00)) {
+   if (s >= 4.600e+00) {
       result = 1.514e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 4.272e+00)) {
+   if (s >= 4.272e+00) {
       result = 2.213e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.991e+00)) {
+   if (s >= 3.991e+00) {
       result = 2.990e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.746e+00)) {
+   if (s >= 3.746e+00) {
       result = 4.101e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.530e+00)) {
+   if (s >= 3.530e+00) {
       result = 5.355e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.336e+00)) {
+   if (s >= 3.336e+00) {
       result = 6.887e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.161e+00)) {
+   if (s >= 3.161e+00) {
       result = 8.598e-03;
       return result;
    }
-   if (ae_fp_greater_eq(s, 3.002e+00)) {
+   if (s >= 3.002e+00) {
       result = 1.065e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.855e+00)) {
+   if (s >= 2.855e+00) {
       result = 1.268e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.720e+00)) {
+   if (s >= 2.720e+00) {
       result = 1.552e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.595e+00)) {
+   if (s >= 2.595e+00) {
       result = 1.836e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.477e+00)) {
+   if (s >= 2.477e+00) {
       result = 2.158e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.368e+00)) {
+   if (s >= 2.368e+00) {
       result = 2.512e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.264e+00)) {
+   if (s >= 2.264e+00) {
       result = 2.942e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.166e+00)) {
+   if (s >= 2.166e+00) {
       result = 3.325e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.073e+00)) {
+   if (s >= 2.073e+00) {
       result = 3.800e-02;
       return result;
    }
-   if (ae_fp_greater_eq(s, 2.001e+00)) {
+   if (s >= 2.001e+00) {
       result = 4.285e-02;
       return result;
    }
@@ -2691,13 +2691,13 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
       }
       v2 = ae_sqr(v2, _state) / n;
       variance = (v1 - v2) / (n - 1);
-      if (ae_fp_less(variance, 0.0)) {
+      if (variance < 0.0) {
          variance = 0.0;
       }
       stddev = ae_sqrt(variance, _state);
    }
 // Skewness and kurtosis
-   if (ae_fp_neq(stddev, 0.0)) {
+   if (stddev != 0.0) {
       for (i = 0; i <= n - 1; i++) {
          v = (x->xR[i] - mean) / stddev;
          v2 = ae_sqr(v, _state);
@@ -2803,7 +2803,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2824,7 +2824,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2845,7 +2845,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2866,7 +2866,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2887,7 +2887,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2897,7 +2897,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
 // Asymptotic expansion
    if (n > 1401) {
       result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * ae_sqrt(1401.0 / n, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       result = ae_exp(result, _state);
@@ -2915,19 +2915,19 @@ static double jarquebera_jbtbl5(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 0.4000)) {
+   if (s <= 0.4000) {
       x = 2 * (s - 0.000000) / 0.400000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 1.1000)) {
+   if (s <= 1.1000) {
       x = 2 * (s - 0.400000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -2947,7 +2947,7 @@ static double jarquebera_jbtbl5(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -2963,19 +2963,19 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 0.2500)) {
+   if (s <= 0.2500) {
       x = 2 * (s - 0.000000) / 0.250000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -2.274707e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.700471e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.425764e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 1.3000)) {
+   if (s <= 1.3000) {
       x = 2 * (s - 0.250000) / 1.050000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -2992,12 +2992,12 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -5.410222e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.893768e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 8.114564e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 1.8500)) {
+   if (s <= 1.8500) {
       x = 2 * (s - 1.300000) / 0.550000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3012,7 +3012,7 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -5.058903e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.856915e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.710887e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3028,7 +3028,7 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.4000)) {
+   if (s <= 1.4000) {
       x = 2 * (s - 0.000000) / 1.400000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3043,12 +3043,12 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.180067e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.487610e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.436561e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 1.400000) / 1.600000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3065,12 +3065,12 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -2.497964e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.636814e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -9.581640e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 3.2000)) {
+   if (s <= 3.2000) {
       x = 2 * (s - 3.000000) / 0.200000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3085,7 +3085,7 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3101,7 +3101,7 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.3000)) {
+   if (s <= 1.3000) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3114,12 +3114,12 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 4.810470e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.139780e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.708443e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 2.0000)) {
+   if (s <= 2.0000) {
       x = 2 * (s - 1.300000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3132,12 +3132,12 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -5.125597e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.584426e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.546069e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 5.0000)) {
+   if (s <= 5.0000) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3152,7 +3152,7 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.552085e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.787029e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.359774e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3168,7 +3168,7 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.3000)) {
+   if (s <= 1.3000) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3181,12 +3181,12 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.007048e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 7.482245e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.355615e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 2.0000)) {
+   if (s <= 2.0000) {
       x = 2 * (s - 1.300000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3199,12 +3199,12 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.378767e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.108510e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.915372e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 7.0000)) {
+   if (s <= 7.0000) {
       x = 2 * (s - 2.000000) / 5.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3219,7 +3219,7 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 9.619892e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.758763e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 4.790977e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3235,7 +3235,7 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.2000)) {
+   if (s <= 1.2000) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3248,12 +3248,12 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.636295e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.178340e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -8.917749e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 2.0000)) {
+   if (s <= 2.0000) {
       x = 2 * (s - 1.200000) / 0.800000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3266,12 +3266,12 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.770362e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -4.838983e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.999052e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 7.0000)) {
+   if (s <= 7.0000) {
       x = 2 * (s - 2.000000) / 5.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3281,7 +3281,7 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -4.249254e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.320250e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.432266e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3297,7 +3297,7 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.2000)) {
+   if (s <= 1.2000) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3310,12 +3310,12 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.575081e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.086173e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.089011e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 2.2500)) {
+   if (s <= 2.2500) {
       x = 2 * (s - 1.200000) / 1.050000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3328,12 +3328,12 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 4.895771e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.762774e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -8.201340e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 8.0000)) {
+   if (s <= 8.0000) {
       x = 2 * (s - 2.250000) / 5.750000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3343,7 +3343,7 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -3.606261e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 7.310869e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.320115e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3359,7 +3359,7 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.0000)) {
+   if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3372,12 +3372,12 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.815679e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.213519e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.256838e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3392,12 +3392,12 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 4.890761e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.233175e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.946156e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 12.0000)) {
+   if (s <= 12.0000) {
       x = 2 * (s - 3.000000) / 9.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3412,7 +3412,7 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.073743e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.022621e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.501343e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3428,7 +3428,7 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.0000)) {
+   if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3441,12 +3441,12 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.349456e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.025669e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.590242e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3461,12 +3461,12 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 5.915919e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.522390e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.144701e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 13.0000)) {
+   if (s <= 13.0000) {
       x = 2 * (s - 3.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3481,7 +3481,7 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.193310e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.442421e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.547756e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3497,7 +3497,7 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 1.0000)) {
+   if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3510,12 +3510,12 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.965975e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -4.710210e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.327808e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3530,12 +3530,12 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.453123e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.917559e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.151067e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 3.000000) / 12.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3550,7 +3550,7 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.620685e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 7.289618e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.112350e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3566,7 +3566,7 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 2.0000)) {
+   if (s <= 2.0000) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3577,12 +3577,12 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 4.377903e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.003253e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.271309e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 5.0000)) {
+   if (s <= 5.0000) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3593,12 +3593,12 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.222591e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.635124e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.815993e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 17.0000)) {
+   if (s <= 17.0000) {
       x = 2 * (s - 5.000000) / 12.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3613,7 +3613,7 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -9.468696e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.728509e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.206470e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3629,7 +3629,7 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 2.0000)) {
+   if (s <= 2.0000) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3640,12 +3640,12 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.539436e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 8.439658e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -4.756911e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 5.0000)) {
+   if (s <= 5.0000) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3656,12 +3656,12 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.512373e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -8.054876e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.556839e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 20.0000)) {
+   if (s <= 20.0000) {
       x = 2 * (s - 5.000000) / 15.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3676,7 +3676,7 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.454439e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.177513e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.819209e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3692,7 +3692,7 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3705,12 +3705,12 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -8.656965e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.404569e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.447867e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 6.0000)) {
+   if (s <= 6.0000) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3723,12 +3723,12 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -4.099683e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.161105e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.225465e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 24.0000)) {
+   if (s <= 24.0000) {
       x = 2 * (s - 6.000000) / 18.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3743,7 +3743,7 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.771761e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.232581e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.029083e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3759,7 +3759,7 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3772,12 +3772,12 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.064501e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.014932e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.953513e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 6.0000)) {
+   if (s <= 6.0000) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3790,12 +3790,12 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.502800e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.165796e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.034960e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 20.0000)) {
+   if (s <= 20.0000) {
       x = 2 * (s - 6.000000) / 14.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3810,7 +3810,7 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.877982e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.160963e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.547247e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3826,7 +3826,7 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 3.0000)) {
+   if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3839,12 +3839,12 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.054022e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 7.525623e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.277360e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 6.0000)) {
+   if (s <= 6.0000) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3857,12 +3857,12 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 4.254794e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 9.034207e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.498107e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 20.0000)) {
+   if (s <= 20.0000) {
       x = 2 * (s - 6.000000) / 14.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3877,7 +3877,7 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 8.428839e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.170682e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.006647e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3893,7 +3893,7 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3913,12 +3913,12 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -7.061348e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.908404e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.978353e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3938,19 +3938,19 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 5.367378e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 9.890859e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.679782e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -7.015854e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.487737e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.244254e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -3966,7 +3966,7 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -3986,12 +3986,12 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -2.821395e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.392603e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.353313e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4006,19 +4006,19 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 5.046235e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -9.536469e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.489642e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -6.263462e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.177316e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.590637e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4034,7 +4034,7 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4049,12 +4049,12 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 2.588280e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.851653e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.287733e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4069,19 +4069,19 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 6.496987e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.605249e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 8.162282e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -5.921095e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.888603e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.080113e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4097,7 +4097,7 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4108,12 +4108,12 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.158197e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.121233e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.051056e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4128,19 +4128,19 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 3.097305e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.181031e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.256975e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -5.858951e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.895179e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.933237e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4156,7 +4156,7 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4167,12 +4167,12 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.518487e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.499826e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -4.836044e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4183,19 +4183,19 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.487632e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.704465e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.211669e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -5.866099e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.399767e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.498208e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4211,7 +4211,7 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4222,12 +4222,12 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.210546e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -4.732602e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.410527e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4238,19 +4238,19 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.669077e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.679136e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 8.833221e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -5.893951e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.475304e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.116734e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4266,7 +4266,7 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4277,12 +4277,12 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.717288e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.982108e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.427636e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4293,19 +4293,19 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.418812e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.156778e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 4.896705e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -6.086071e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.152176e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.725393e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4321,7 +4321,7 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4332,12 +4332,12 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.502210e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.414543e-05, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.754115e-05, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4348,19 +4348,19 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
       jarquebera_jbcheb(x, 1.105779e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.197391e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -8.386780e-04, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -6.311384e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -7.918763e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.626584e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4376,7 +4376,7 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4384,12 +4384,12 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.079765e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -5.463005e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 6.875659e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4399,19 +4399,19 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -3.746714e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 3.810594e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 1.197111e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -6.628194e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -8.846221e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 4.386405e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4427,7 +4427,7 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4435,12 +4435,12 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.059769e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -3.922680e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 4.847054e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4450,19 +4450,19 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -2.838711e-02, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -2.893112e-04, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.159788e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -6.917851e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -9.817020e-01, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.383727e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4478,7 +4478,7 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
    double result;
 
    result = 0.0;
-   if (ae_fp_less_eq(s, 4.0000)) {
+   if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4486,12 +4486,12 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -1.030061e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.259222e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 2.536254e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 15.0000)) {
+   if (s <= 15.0000) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
@@ -4501,19 +4501,19 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
       jarquebera_jbcheb(x, -7.751359e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -6.124368e-03, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.793114e-03, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
    }
-   if (ae_fp_less_eq(s, 25.0000)) {
+   if (s <= 25.0000) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
       jarquebera_jbcheb(x, -7.544330e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, -1.225382e+00, &tj, &tj1, &result, _state);
       jarquebera_jbcheb(x, 5.392349e-02, &tj, &tj1, &result, _state);
-      if (ae_fp_greater(result, 0.0)) {
+      if (result > 0.0) {
          result = 0.0;
       }
       return result;
@@ -4622,7 +4622,7 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
       yvar = yvar + ae_sqr(y->xR[i] - ymean, _state);
    }
    yvar = yvar / (m - 1);
-   if (ae_fp_eq(xvar, 0.0) || ae_fp_eq(yvar, 0.0)) {
+   if (xvar == 0.0 || yvar == 0.0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
@@ -4698,7 +4698,7 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
       xvar = xvar + ae_sqr(x->xR[i] - xmean, _state);
    }
    xvar = xvar / (n - 1);
-   if (ae_fp_eq(xvar, 0.0)) {
+   if (xvar == 0.0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
@@ -4849,7 +4849,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    }
    ns = 0;
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_eq(x->xR[i], e)) {
+      if (x->xR[i] == e) {
          continue;
       }
       x->xR[ns] = x->xR[i];
@@ -4876,7 +4876,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
          t = i;
          while (t != 1) {
             k = t / 2;
-            if (ae_fp_greater_eq(r.xR[k - 1], r.xR[t - 1])) {
+            if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
                tmp = r.xR[k - 1];
@@ -4906,11 +4906,11 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
                t = 0;
             } else {
                if (k < i) {
-                  if (ae_fp_greater(r.xR[k], r.xR[k - 1])) {
+                  if (r.xR[k] > r.xR[k - 1]) {
                      k = k + 1;
                   }
                }
-               if (ae_fp_greater_eq(r.xR[t - 1], r.xR[k - 1])) {
+               if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
                   tmp = r.xR[k - 1];
@@ -4932,7 +4932,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    while (i <= ns - 1) {
       j = i + 1;
       while (j <= ns - 1) {
-         if (ae_fp_neq(r.xR[j], r.xR[i])) {
+         if (r.xR[j] != r.xR[i]) {
             break;
          }
          j = j + 1;
@@ -4946,7 +4946,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
 // Compute W+
    w = 0.0;
    for (i = 0; i <= ns - 1; i++) {
-      if (ae_fp_greater(x->xR[c.xZ[i]], e)) {
+      if (x->xR[c.xZ[i]] > e) {
          w = w + r.xR[i];
       }
    }
@@ -4955,7 +4955,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    mu = rmul2((double)ns, (double)(ns + 1), _state) / 4;
    sigma = ae_sqrt(mu * (2 * ns + 1) / 6, _state);
    s = (w - mu) / sigma;
-   if (ae_fp_less_eq(s, 0.0)) {
+   if (s <= 0.0) {
       p = ae_exp(wsr_wsigma(-(w - mu) / sigma, ns, _state), _state);
       mp = 1 - ae_exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state), _state);
    } else {
@@ -9747,7 +9747,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
          t = i;
          while (t != 1) {
             k = t / 2;
-            if (ae_fp_greater_eq(r.xR[k - 1], r.xR[t - 1])) {
+            if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
                tmp = r.xR[k - 1];
@@ -9777,11 +9777,11 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
                t = 0;
             } else {
                if (k < i) {
-                  if (ae_fp_greater(r.xR[k], r.xR[k - 1])) {
+                  if (r.xR[k] > r.xR[k - 1]) {
                      k = k + 1;
                   }
                }
-               if (ae_fp_greater_eq(r.xR[t - 1], r.xR[k - 1])) {
+               if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
                   tmp = r.xR[k - 1];
@@ -9805,7 +9805,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    while (i <= ns - 1) {
       j = i + 1;
       while (j <= ns - 1) {
-         if (ae_fp_neq(r.xR[j], r.xR[i])) {
+         if (r.xR[j] != r.xR[i]) {
             break;
          }
          j = j + 1;
@@ -9835,7 +9835,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    }
    sigma = ae_sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp, _state);
    s = (u - mu) / sigma;
-   if (ae_fp_less_eq(s, 0.0)) {
+   if (s <= 0.0) {
       p = ae_exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state), _state);
       mp = 1 - ae_exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state), _state);
    } else {
@@ -13314,10 +13314,10 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
       return result;
    }
 // N1 >= 15, N2 >= 15
-   if (ae_fp_greater(s, 4.0)) {
+   if (s > 4.0) {
       s = 4.0;
    }
-   if (ae_fp_less(s, 3.0)) {
+   if (s < 3.0) {
       s0 = 0.000000e+00;
       f0 = mannwhitneyu_usigma000(n1, n2, _state);
       s1 = 7.500000e-01;
@@ -13432,10 +13432,10 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
    gtcnt = 0;
    necnt = 0;
    for (i = 0; i <= n - 1; i++) {
-      if (ae_fp_greater(x->xR[i], median)) {
+      if (x->xR[i] > median) {
          gtcnt = gtcnt + 1;
       }
-      if (ae_fp_neq(x->xR[i], median)) {
+      if (x->xR[i] != median) {
          necnt = necnt + 1;
       }
    }
@@ -13536,7 +13536,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    for (i = 0; i <= n - 1; i++) {
       v = x->xR[i];
       xmean = xmean + v;
-      samex = samex && ae_fp_eq(v, x0);
+      samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
@@ -13558,23 +13558,23 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
       }
       v2 = ae_sqr(v2, _state) / n;
       xvariance = (v1 - v2) / (n - 1);
-      if (ae_fp_less(xvariance, 0.0)) {
+      if (xvariance < 0.0) {
          xvariance = 0.0;
       }
       xstddev = ae_sqrt(xvariance, _state);
    }
-   if (ae_fp_eq(xstddev, 0.0)) {
-      if (ae_fp_eq(xmean, mean)) {
+   if (xstddev == 0.0) {
+      if (xmean == mean) {
          *bothtails = 1.0;
       } else {
          *bothtails = 0.0;
       }
-      if (ae_fp_greater_eq(xmean, mean)) {
+      if (xmean >= mean) {
          *lefttail = 1.0;
       } else {
          *lefttail = 0.0;
       }
-      if (ae_fp_less_eq(xmean, mean)) {
+      if (xmean <= mean) {
          *righttail = 1.0;
       } else {
          *righttail = 0.0;
@@ -13657,7 +13657,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    for (i = 0; i <= n - 1; i++) {
       v = x->xR[i];
       xmean = xmean + v;
-      samex = samex && ae_fp_eq(v, x0);
+      samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
@@ -13670,7 +13670,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    for (i = 0; i <= m - 1; i++) {
       v = y->xR[i];
       ymean = ymean + v;
-      samey = samey && ae_fp_eq(v, y0);
+      samey = samey && v == y0;
    }
    if (samey) {
       ymean = y0;
@@ -13689,18 +13689,18 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
       }
       s = ae_sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2), _state);
    }
-   if (ae_fp_eq(s, 0.0)) {
-      if (ae_fp_eq(xmean, ymean)) {
+   if (s == 0.0) {
+      if (xmean == ymean) {
          *bothtails = 1.0;
       } else {
          *bothtails = 0.0;
       }
-      if (ae_fp_greater_eq(xmean, ymean)) {
+      if (xmean >= ymean) {
          *lefttail = 1.0;
       } else {
          *lefttail = 0.0;
       }
-      if (ae_fp_less_eq(xmean, ymean)) {
+      if (xmean <= ymean) {
          *righttail = 1.0;
       } else {
          *righttail = 0.0;
@@ -13788,7 +13788,7 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    for (i = 0; i <= n - 1; i++) {
       v = x->xR[i];
       xmean = xmean + v;
-      samex = samex && ae_fp_eq(v, x0);
+      samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
@@ -13801,7 +13801,7 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    for (i = 0; i <= m - 1; i++) {
       v = y->xR[i];
       ymean = ymean + v;
-      samey = samey && ae_fp_eq(v, y0);
+      samey = samey && v == y0;
    }
    if (samey) {
       ymean = y0;
@@ -13826,25 +13826,25 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    }
 // Handle different special cases
 // (one or both variances are zero).
-   if (ae_fp_eq(xvar, 0.0) && ae_fp_eq(yvar, 0.0)) {
-      if (ae_fp_eq(xmean, ymean)) {
+   if (xvar == 0.0 && yvar == 0.0) {
+      if (xmean == ymean) {
          *bothtails = 1.0;
       } else {
          *bothtails = 0.0;
       }
-      if (ae_fp_greater_eq(xmean, ymean)) {
+      if (xmean >= ymean) {
          *lefttail = 1.0;
       } else {
          *lefttail = 0.0;
       }
-      if (ae_fp_less_eq(xmean, ymean)) {
+      if (xmean <= ymean) {
          *righttail = 1.0;
       } else {
          *righttail = 0.0;
       }
       return;
    }
-   if (ae_fp_eq(xvar, 0.0)) {
+   if (xvar == 0.0) {
 
    // X is constant, unpooled 2-sample test reduces to 1-sample test.
    //
@@ -13854,7 +13854,7 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
       studentttest1(y, m, xmean, bothtails, righttail, lefttail, _state);
       return;
    }
-   if (ae_fp_eq(yvar, 0.0)) {
+   if (yvar == 0.0) {
 
    // Y is constant, unpooled 2-sample test reduces to 1-sample test.
       studentttest1(x, n, ymean, bothtails, lefttail, righttail, _state);
@@ -13864,7 +13864,7 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    stat = (xmean - ymean) / ae_sqrt(xvar / n + yvar / m, _state);
    c = xvar / n / (xvar / n + yvar / m);
    df = rmul2((double)(n - 1), (double)(m - 1), _state) / ((m - 1) * ae_sqr(c, _state) + (n - 1) * ae_sqr(1 - c, _state));
-   if (ae_fp_greater(stat, 0.0)) {
+   if (stat > 0.0) {
       p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat, _state)), _state);
    } else {
       p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat, _state)), _state);

@@ -3859,48 +3859,6 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 }
 
 // Real math functions
-#if 0
-bool ae_fp_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x == y;
-}
-
-bool ae_fp_neq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   return !ae_fp_eq(v1, v2);
-}
-
-bool ae_fp_less(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x < y;
-}
-
-bool ae_fp_less_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x <= y;
-}
-
-bool ae_fp_greater(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x > y;
-}
-
-bool ae_fp_greater_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x >= y;
-}
-#endif
-
 bool ae_isfinite_stateless(double x, ae_int_t endianness) {
    union {
       double a;
@@ -8262,12 +8220,12 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
    if (m <= 0) {
       return;
    }
-   if (ae_fp_neq(beta, 0.0)) {
+   if (beta != 0.0) {
       rmulv(m, beta, y, _state);
    } else {
       rsetv(m, 0.0, y, _state);
    }
-   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
+   if (n <= 0 || alpha == 0.0) {
       return;
    }
 // Straight or transposed?
@@ -8350,12 +8308,12 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
    if (m <= 0) {
       return;
    }
-   if (ae_fp_neq(beta, 0.0)) {
+   if (beta != 0.0) {
       rmulvx(m, beta, y, iy, _state);
    } else {
       rsetvx(m, 0.0, y, iy, _state);
    }
-   if (n <= 0 || ae_fp_eq(alpha, 0.0)) {
+   if (n <= 0 || alpha == 0.0) {
       return;
    }
 // Straight or transposed?
@@ -8407,7 +8365,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    ae_int_t j;
    double s;
 
-   if ((m <= 0 || n <= 0) || ae_fp_eq(alpha, 0.0)) {
+   if ((m <= 0 || n <= 0) || alpha == 0.0) {
       return;
    }
    for (i = 0; i <= m - 1; i++) {
@@ -9110,48 +9068,6 @@ double maxreal(double m1, double m2) {
 double minreal(double m1, double m2) {
    return m1 > m2 ? m2 : m1;
 }
-
-#if 0
-bool fp_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x == y;
-}
-
-bool fp_neq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   return !fp_eq(v1, v2);
-}
-
-bool fp_less(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x < y;
-}
-
-bool fp_less_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x <= y;
-}
-
-bool fp_greater(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x > y;
-}
-
-bool fp_greater_eq(double v1, double v2) {
-// IEEE-strict floating point comparison
-   volatile double x = v1;
-   volatile double y = v2;
-   return x >= y;
-}
-#endif
 
 bool fp_isnan(double x) {
    return alglib_impl::ae_isnan_stateless(x, endianness);

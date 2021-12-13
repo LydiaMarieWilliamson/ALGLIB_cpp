@@ -308,6 +308,7 @@ Other exceptions include array parameters, which are documented as (Type &), but
 A6.2. Test Stages
 ─────────────────
 39	Integration of version 3.18.0 ― being done separately from the main branch.
+39	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
 
 A6.3. Test Results
 ──────────────────
@@ -327,6 +328,7 @@ A6.3. Test Results
 39	7874 1.0x 12347 0.9x 11769 1.0x 9523 1.0x 1638850198 (61aede96) 89
 39	7874 1.0x 12049 1.0x 12199 1.0x 9227 1.0x 1638953198 (61b070ee) 87
 39	7752 1.0x 12049 1.0x 12052 1.0x 9327 1.0x 1638958917 (61b08745) 84
+39	7634 1.0x 11906 1.0x 11115 1.1x 8792 1.0x 1639431222 (61b7bc36) 83
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -383,19 +385,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7752
+* RGEMM-SEQ-16   (MFLOPS)   7634
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12049
+* RGEMM-SEQ-32   (MFLOPS)  11906
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
-* RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9327
+* RGEMM-SEQ-64   (MFLOPS)  11115
+* RGEMM-MTN-64              1.1x
+* RGEMM-SEQ-1024 (MFLOPS)   8792
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1638958917
+SEED: 1639431222
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -495,4 +497,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 84 seconds
+Done in 83 seconds
