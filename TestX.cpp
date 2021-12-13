@@ -59,12 +59,12 @@ struct innerrec {
    alglib_impl::ae_vector i1val;
 };
 
-void innerrec_init(void *_p, bool make_automatic) {
+static void innerrec_init(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *)_p;
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, make_automatic);
 }
 
-void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
+static void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
    innerrec *dst = (innerrec *)_dst;
    innerrec *src = (innerrec *)_src;
    dst->cval = src->cval;
@@ -74,7 +74,7 @@ void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
    alglib_impl::ae_vector_copy(&dst->i1val, &src->i1val, make_automatic);
 }
 
-void innerrec_free(void *_p, bool make_automatic) {
+static void innerrec_free(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *)_p;
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
@@ -85,13 +85,13 @@ struct seedrec {
    alglib_impl::ae_shared_pool pool;
 };
 
-void seedrec_init(void *_p, bool make_automatic) {
+static void seedrec_init(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *)_p;
    innerrec_init(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, make_automatic);
 }
 
-void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
+static void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
    seedrec *dst = (seedrec *)_dst;
    seedrec *src = (seedrec *)_src;
    dst->bval = src->bval;
@@ -99,7 +99,7 @@ void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
    alglib_impl::ae_shared_pool_copy(&dst->pool, &src->pool, make_automatic);
 }
 
-void seedrec_free(void *_p, bool make_automatic) {
+static void seedrec_free(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *)_p;
    innerrec_free(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
