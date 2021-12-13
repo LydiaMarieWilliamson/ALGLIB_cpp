@@ -1328,8 +1328,8 @@ RandomQ::RandomQ() {
 
 // A random real number in (0, 1), not including interval boundaries.
 // AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
-double RandomQ::RandomUniformR() { return (double)(RandBase() + 1)/(double)(RandMax + 2); }
-double RandomQ::RandMidUniformR() { return (double)(2*RandBase() - RandMax)/(double)(RandMax + 2); }
+double RandomQ::RandomUniformR() { return (double)(RandBase() + 1)/(RandMax + 2); }
+double RandomQ::RandMidUniformR() { return (double)(2*RandBase() - RandMax)/(RandMax + 2); }
 
 // A random integer number in [0, N).
 // N can be any positive number except for very large numbers:
@@ -1380,7 +1380,7 @@ static bool TestIdwContinuity(IdwQ &Q, Integer Xs, Integer Ys, RVector &X0, RVec
 // Compute sequence of function values.
    RVector Xc(Xs); RMatrix Yv(Steps, Ys); RVector Yc;
    for (Integer s = 0; s < Steps; s++) {
-      double T = (double)s/(double)(Steps - 1);
+      double T = (double)s/(Steps - 1);
       for (Integer x = 0; x < Xs; x++) Xc[x] = X0[x]*T + X1[x]*(1 - T);
       Q.IdwCalcBuf(Xc, Yc); for (Integer y = 0; y < Ys; y++) Yv[s][y] = Yc[y];
    }
@@ -1671,9 +1671,9 @@ static bool TestIdwMStab() {
    Integer Ps = 100;
    XY.ReSizeMatrix(3*Ps, 3);
    for (Integer n = 0; n < Ps; n++) {
-      XY[3*n][0] = (double)n/(double)(Ps - 1), XY[3*n][1] = -0.1, XY[3*n][2] = 0.0;
-      XY[3*n + 1][0] = (double)n/(double)(Ps - 1), XY[3*n + 1][1] = 0.0, XY[3*n + 1][2] = 1.0;
-      XY[3*n + 2][0] = (double)n/(double)(Ps - 1), XY[3*n + 2][1] = 0.1, XY[3*n + 2][2] = 0.0;
+      XY[3*n][0] = (double)n/(Ps - 1), XY[3*n][1] = -0.1, XY[3*n][2] = 0.0;
+      XY[3*n + 1][0] = (double)n/(Ps - 1), XY[3*n + 1][1] = 0.0, XY[3*n + 1][2] = 1.0;
+      XY[3*n + 2][0] = (double)n/(Ps - 1), XY[3*n + 2][1] = 0.1, XY[3*n + 2][2] = 0.0;
    }
 {
    IdwB Qb(2, 1); Qb.IdbSetMStab(1.0), Qb.IdbSetPoints(XY, 3*Ps);

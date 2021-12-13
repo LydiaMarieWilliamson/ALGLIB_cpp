@@ -837,7 +837,7 @@ double safeminposrv(double x, double y, double v) {
 void apperiodicmap(double *x, double a, double b, double *k) {
    *k = 0;
    ae_assert(a < b, "apperiodicmap: internal error!");
-   *k = (double)(FloorZ((*x - a) / (b - a)));
+   *k = floor((*x - a) / (b - a));
    *x -= *k * (b - a);
    while (*x < a) {
       *x += b - a;
@@ -6697,7 +6697,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 // we have chosen upper limit (2^29) with enough space left
 // to tolerate possible problems with rounding and N's close
 // to the limit, so we don't want to be very strict here.
-   k = TruncZ(log(536870912.0 / (double)n) / ln2);
+   k = TruncZ(log(536870912.0 / n) / ln2);
    chunk = xblas_xfastpow(2.0, k);
    if (chunk < 2.0) {
       chunk = 2.0;

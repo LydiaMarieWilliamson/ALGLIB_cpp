@@ -5181,10 +5181,10 @@ std::string complex::tostring(int _dps) const {
       ThrowError("complex::tostring(): buffer overflow");
 // Print |x|, |y| and zero with the same mask and compare.
    char buf_x[0x20];
-   if (sprintf(buf_x, mask, (double)(fabs(x))) >= (int)sizeof buf_x)
+   if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof buf_x)
       ThrowError("complex::tostring(): buffer overflow");
    char buf_y[0x20];
-   if (sprintf(buf_y, mask, (double)(fabs(y))) >= (int)sizeof buf_y)
+   if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof buf_y)
       ThrowError("complex::tostring(): buffer overflow");
    char buf_zero[0x20];
    if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof buf_zero)
@@ -5997,7 +5997,7 @@ static std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
       char buf[0x40];
       buf[0] = '\0';
       if (isfinite(ptr[i])) {
-         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof buf)
+         if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof buf)
              ThrowError("arraytostring(): buffer overflow");
       } else if (isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");

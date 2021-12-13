@@ -2230,7 +2230,7 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
    for (i = 0; i < k; i++) {
       ae_assert(dc->xZ[i] >= 0, "LSFitScaleXY: internal error!");
       xc->xR[i] = 2 * (xc->xR[i] - 0.5 * (*xa + (*xb))) / (*xb - (*xa));
-      yc->xR[i] = yc->xR[i] * pow(0.5 * (*xb - (*xa)), (double)(dc->xZ[i]));
+      yc->xR[i] = yc->xR[i] * pow(0.5 * (*xb - (*xa)), (double)dc->xZ[i]);
    }
    ae_vector_set_length(yoriginal, n);
    ae_v_move(yoriginal->xR, 1, y->xR, 1, n);
@@ -3312,7 +3312,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
    j = 0;
    s = t - a;
    for (i = 1; i < n; i++) {
-      x = a + (double)i / (double)(n - 1) * (b - a);
+      x = a + (double)i / (n - 1) * (b - a);
       if (fabs(t - x) < fabs(s)) {
          s = t - x;
          j = i;
@@ -5854,7 +5854,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    for (b = 0; b < m; b++) {
    // Prepare I-th basis function
       for (j = 0; j < m; j++) {
-         bx.xR[j] = (double)(2 * j) / (double)(m - 1) - 1;
+         bx.xR[j] = (double)(2 * j) / (m - 1) - 1;
          by.xR[j] = 0.0;
       }
       by.xR[b] = 1.0;
@@ -6124,13 +6124,13 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
 // Generate design matrix AV ("vertical") and its transpose AH ("horizontal").
    ae_vector_set_length(&tmpx, 7);
    ae_vector_set_length(&tmpy, 7);
-   tmpx.xR[0] = -3.0 / (double)(m - 1);
-   tmpx.xR[1] = -2.0 / (double)(m - 1);
-   tmpx.xR[2] = -1.0 / (double)(m - 1);
-   tmpx.xR[3] = 0.0 / (double)(m - 1);
-   tmpx.xR[4] = 1.0 / (double)(m - 1);
-   tmpx.xR[5] = 2.0 / (double)(m - 1);
-   tmpx.xR[6] = 3.0 / (double)(m - 1);
+   tmpx.xR[0] = -3.0 / (m - 1);
+   tmpx.xR[1] = -2.0 / (m - 1);
+   tmpx.xR[2] = -1.0 / (m - 1);
+   tmpx.xR[3] = 0.0 / (m - 1);
+   tmpx.xR[4] = 1.0 / (m - 1);
+   tmpx.xR[5] = 2.0 / (m - 1);
+   tmpx.xR[6] = 3.0 / (m - 1);
    tmpy.xR[0] = 0.0;
    tmpy.xR[1] = 0.0;
    tmpy.xR[2] = 1.0 / 12.0;
@@ -6150,7 +6150,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
       k0 = imax2(k - (bfrad - 1), 0);
       k1 = imin2(k + bfrad, m - 1);
       for (j = k0; j <= k1; j++) {
-         sparseset(&av, i, j, spline1dcalc(&basis1, xywork.xR[2 * i] - (double)j / (double)(m - 1)) * scaletargetsby);
+         sparseset(&av, i, j, spline1dcalc(&basis1, xywork.xR[2 * i] - (double)j / (m - 1)) * scaletargetsby);
       }
       targets.xR[i] = xywork.xR[2 * i + 1] * scaletargetsby;
    }
@@ -6159,7 +6159,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
       k0 = imax2(i - (bfrad - 1), 0);
       k1 = imin2(i + (bfrad - 1), m - 1);
       for (j = k0; j <= k1; j++) {
-         spline1ddiff(&basis1, (double)i / (double)(m - 1) - (double)j / (double)(m - 1), &v, &dv, &d2v);
+         spline1ddiff(&basis1, (double)i / (m - 1) - (double)j / (m - 1), &v, &dv, &d2v);
          sparseset(&av, n + i, j, lambdans * d2v * scalepenaltyby);
       }
    }
@@ -6244,7 +6244,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    ae_vector_set_length(&sy, m);
    ae_vector_set_length(&sdy, m);
    for (i = 0; i < m; i++) {
-      sx.xR[i] = (double)i / (double)(m - 1);
+      sx.xR[i] = (double)i / (m - 1);
       sy.xR[i] = 0.0;
       sdy.xR[i] = 0.0;
    }
@@ -6252,7 +6252,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
       k0 = imax2(i - (bfrad - 1), 0);
       k1 = imin2(i + bfrad, m - 1);
       for (j = k0; j <= k1; j++) {
-         spline1ddiff(&basis1, (double)j / (double)(m - 1) - (double)i / (double)(m - 1), &v, &dv, &d2v);
+         spline1ddiff(&basis1, (double)j / (m - 1) - (double)i / (m - 1), &v, &dv, &d2v);
          sy.xR[j] += tmp1.xR[i] * v;
          sdy.xR[j] += tmp1.xR[i] * dv;
       }
@@ -7838,7 +7838,7 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
    ae_vector_set_length(&points, *nsections + 1);
    k = RoundZ(sections.xyR[0][1]);
    for (i = 0; i < *nsections; i++) {
-      points.xR[i] = (double)(RoundZ(sections.xyR[i][0]));
+      points.xR[i] = round(sections.xyR[i][0]);
       if (x->xR[RoundZ(sections.xyR[i][1])] > x->xR[k]) {
          k = RoundZ(sections.xyR[i][1]);
       }
@@ -9758,7 +9758,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    ae_vector_set_length(&sy, m);
    ae_vector_set_length(&sbf, m);
    for (j = 0; j < m; j++) {
-      sx.xR[j] = (double)(2 * j) / (double)(m - 1) - 1;
+      sx.xR[j] = (double)(2 * j) / (m - 1) - 1;
    }
    for (i = 0; i < m; i++) {
       sy.xR[i] = 1.0;
@@ -10145,7 +10145,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       ae_vector_set_length(&sx, m - 2);
       ae_vector_set_length(&sy, m - 2);
       for (j = 0; j < m - 2; j++) {
-         sx.xR[j] = (double)(2 * j) / (double)(m - 2 - 1) - 1;
+         sx.xR[j] = (double)(2 * j) / (m - 2 - 1) - 1;
       }
    }
    if (st == 1) {
@@ -10154,7 +10154,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       ae_vector_set_length(&sy, m / 2);
       ae_vector_set_length(&sd, m / 2);
       for (j = 0; j < m / 2; j++) {
-         sx.xR[j] = (double)(2 * j) / (double)(m / 2 - 1) - 1;
+         sx.xR[j] = (double)(2 * j) / (m / 2 - 1) - 1;
       }
    }
 // Prepare design and constraints matrices:
@@ -15208,7 +15208,7 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
    *worsterror = 0.0;
    for (i = i0 + 1; i < i1; i++) {
    // Determine t_s - parameter value for projected point.
-      ts = (double)(i - i0) / (double)(i1 - i0);
+      ts = (double)(i - i0) / (i1 - i0);
    // Estimate error norm
       vv = 0.0;
       for (j = 0; j < d; j++) {
@@ -15381,7 +15381,7 @@ void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, doub
 // Convert from sections to indexes
    ae_vector_set_length(&buf0, *nsections + 1);
    for (i = 0; i < *nsections; i++) {
-      buf0.xR[i] = (double)(RoundZ(sections.xyR[i][0]));
+      buf0.xR[i] = round(sections.xyR[i][0]);
    }
    buf0.xR[*nsections] = (double)(n - 1);
    tagsortfast(&buf0, &buf1, *nsections + 1);
@@ -18349,26 +18349,26 @@ void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, 
    for (i = 0; i < oldheight; i++) {
    // Fill X, Y
       for (j = 0; j < oldwidth; j++) {
-         x.xR[j] = (double)j / (double)(oldwidth - 1);
+         x.xR[j] = (double)j / (oldwidth - 1);
          y.xR[j] = a->xyR[i][j];
       }
    // Interpolate and place result into temporary matrix
       spline1dbuildcubic(&x, &y, oldwidth, 0, 0.0, 0, 0.0, &c);
       for (j = 0; j < newwidth; j++) {
-         buf.xyR[i][j] = spline1dcalc(&c, (double)j / (double)(newwidth - 1));
+         buf.xyR[i][j] = spline1dcalc(&c, (double)j / (newwidth - 1));
       }
    }
 // Vertical interpolation
    for (j = 0; j < newwidth; j++) {
    // Fill X, Y
       for (i = 0; i < oldheight; i++) {
-         x.xR[i] = (double)i / (double)(oldheight - 1);
+         x.xR[i] = (double)i / (oldheight - 1);
          y.xR[i] = buf.xyR[i][j];
       }
    // Interpolate and place result into B
       spline1dbuildcubic(&x, &y, oldheight, 0, 0.0, 0, 0.0, &c);
       for (i = 0; i < newheight; i++) {
-         b->xyR[i][j] = spline1dcalc(&c, (double)i / (double)(newheight - 1));
+         b->xyR[i][j] = spline1dcalc(&c, (double)i / (newheight - 1));
       }
    }
    ae_frame_leave();
@@ -18406,12 +18406,12 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
          if (l == oldheight - 1) {
             l = oldheight - 2;
          }
-         u = (double)i / (double)(newheight - 1) * (oldheight - 1) - l;
+         u = (double)i / (newheight - 1) * (oldheight - 1) - l;
          c = j * (oldwidth - 1) / (newwidth - 1);
          if (c == oldwidth - 1) {
             c = oldwidth - 2;
          }
-         t = (double)(j * (oldwidth - 1)) / (double)(newwidth - 1) - c;
+         t = (double)(j * (oldwidth - 1)) / (newwidth - 1) - c;
          b->xyR[i][j] = (1 - t) * (1 - u) * a->xyR[l][c] + t * (1 - u) * a->xyR[l][c + 1] + t * u * a->xyR[l + 1][c + 1] + (1 - t) * u * a->xyR[l + 1][c];
       }
    }
@@ -19598,7 +19598,7 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
    blockbandwidth = 3;
 // Determine problem cost, perform recursive subdivision
 // (with optional parallelization)
-   avgrowlen = (double)ah->ridx.xZ[kx * ky] / (double)(kx * ky);
+   avgrowlen = (double)ah->ridx.xZ[kx * ky] / (kx * ky);
    cellcost = (double)kx * (1 + 2 * blockbandwidth) * avgrowlen;
    totalcost = (double)(ky1 - ky0) * (1 + 2 * blockbandwidth) * cellcost;
 // Parallelism was activated if: ky1 - ky0 >= 2 && totalcost > smpactivationlevel()
@@ -20148,7 +20148,7 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
    double invscalexy;
    ae_assert(n == (kx - 1) * scalexy + 1, "Spline2DFit.UpdateSplineTable: integrity check failed");
    ae_assert(m == (ky - 1) * scalexy + 1, "Spline2DFit.UpdateSplineTable: integrity check failed");
-   invscalexy = 1.0 / (double)scalexy;
+   invscalexy = 1.0 / scalexy;
    sfx = n * m * d;
    sfy = 2 * n * m * d;
    sfxy = 3 * n * m * d;
@@ -20318,8 +20318,8 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
       }
       for (k1 = 0; k1 <= 2; k1++) {
          for (k0 = 0; k0 <= 2; k0++) {
-            spline1ddiff(basis1, (double)(-(k0 - 1)), &v0, &v1, &v2);
-            spline1ddiff(basis1, (double)(-(k1 - 1)), &w0, &w1, &w2);
+            spline1ddiff(basis1, (double)-(k0 - 1), &v0, &v1, &v2);
+            spline1ddiff(basis1, (double)-(k1 - 1), &w0, &w1, &w2);
             d2x.xyR[k0][k1] += v2 * w0;
             d2y.xyR[k0][k1] += w2 * v0;
             dxy.xyR[k0][k1] += v1 * w1;
@@ -20420,7 +20420,7 @@ static void spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalexy, 
 // Dataset metrics and fast integrity checks;
 // no code with side effects is allowed before parallel split.
    bfrad = 2;
-   invscalexy = 1.0 / (double)scalexy;
+   invscalexy = 1.0 / scalexy;
    kx = basecasex * tilescountx + 1;
    ky = basecasey * tilescounty + 1;
 // Parallelism; because this function is intended for
@@ -20880,8 +20880,8 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
       }
       for (k1 = 0; k1 <= 2; k1++) {
          for (k0 = 0; k0 <= 2; k0++) {
-            spline1ddiff(basis1, (double)(-(k0 - 1)), &v0, &v1, &v2);
-            spline1ddiff(basis1, (double)(-(k1 - 1)), &w0, &w1, &w2);
+            spline1ddiff(basis1, (double)-(k0 - 1), &v0, &v1, &v2);
+            spline1ddiff(basis1, (double)-(k1 - 1), &w0, &w1, &w2);
             d2x.xyR[k0][k1] += v2 * w0;
             d2y.xyR[k0][k1] += w2 * v0;
             dxy.xyR[k0][k1] += v1 * w1;
@@ -21007,7 +21007,7 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
       scalexy *= 2;
       ntotallayers++;
    }
-   invscalexy = 1.0 / (double)scalexy;
+   invscalexy = 1.0 / scalexy;
    ae_assert(kxcur <= maxcoresize + 1 && kxcur == basecasex + 1 || kxcur % basecasex == 1, "Spline2DFit: integrity error");
    ae_assert(kycur <= maxcoresize + 1 && kycur == basecasey + 1 || kycur % basecasey == 1, "Spline2DFit: integrity error");
    ae_assert(kxcur == basecasex + 1 || kycur == basecasey + 1, "Spline2DFit: integrity error");
@@ -21045,7 +21045,7 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
          kxcur = 2 * kxcur - 1;
          kycur = 2 * kycur - 1;
          scalexy /= 2;
-         invscalexy = 1.0 / (double)scalexy;
+         invscalexy = 1.0 / scalexy;
          spline2d_rescaledatasetandrefineindex(xy, npoints, d, &yraw, d, kxcur, kycur, &xyindex, &bufi);
       // Clear temporaries from previous round.
       //
@@ -23250,7 +23250,7 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
    ae_assert(n > 0, "RBFV2BuildHierarchical: integrity check failed");
    ae_vector_set_length(&ri, nh);
    for (levelidx = 0; levelidx < nh; levelidx++) {
-      ri.xR[levelidx] = rbase * pow(2.0, (double)(-levelidx));
+      ri.xR[levelidx] = rbase * pow(2.0, (double)-levelidx);
    }
    ae_vector_set_length(&hidx, n);
    ae_vector_set_length(&xr, n);
@@ -24213,7 +24213,7 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
          tx.xR[2] = x2->xR[hqrnduniformi(&rs, n2)];
          tx.xR[3] = x3->xR[hqrnduniformi(&rs, n3)];
          rbfv2_preparepartialquery(&tx, &s->kdboxmin, &s->kdboxmax, nx, &bufseedv2.calcbuf, &dummy);
-         avgfuncpernode += (double)rbfv2_partialcountrec(&s->kdnodes, &s->kdsplits, &s->cw, nx, ny, &bufseedv2.calcbuf, s->kdroots.xZ[levelidx], searchradius2, &tx) / (double)ntrials;
+         avgfuncpernode += (double)rbfv2_partialcountrec(&s->kdnodes, &s->kdsplits, &s->cw, nx, ny, &bufseedv2.calcbuf, s->kdroots.xZ[levelidx], searchradius2, &tx) / ntrials;
       }
    // Perform calculation in multithreaded mode
       rbfv2partialgridcalcrec(s, x0, n0, x1, n1, x2, n2, x3, n3, &blocks0, 0, blockscnt0, &blocks1, 0, blockscnt1, &blocks2, 0, blockscnt2, &blocks3, 0, blockscnt3, flagy, sparsey, levelidx, avgfuncpernode, &bufpool, y);
@@ -25430,17 +25430,17 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
             if (ix == oldxcount - 1) {
                ix = oldxcount - 2;
             }
-            xd = (double)(i * (oldxcount - 1)) / (double)(newxcount - 1) - ix;
+            xd = (double)(i * (oldxcount - 1)) / (newxcount - 1) - ix;
             iy = j * (oldycount - 1) / (newycount - 1);
             if (iy == oldycount - 1) {
                iy = oldycount - 2;
             }
-            yd = (double)(j * (oldycount - 1)) / (double)(newycount - 1) - iy;
+            yd = (double)(j * (oldycount - 1)) / (newycount - 1) - iy;
             iz = k * (oldzcount - 1) / (newzcount - 1);
             if (iz == oldzcount - 1) {
                iz = oldzcount - 2;
             }
-            zd = (double)(k * (oldzcount - 1)) / (double)(newzcount - 1) - iz;
+            zd = (double)(k * (oldzcount - 1)) / (newzcount - 1) - iz;
             c0 = a->xR[oldxcount * (oldycount * iz + iy) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * iz + iy) + (ix + 1)] * xd;
             c1 = a->xR[oldxcount * (oldycount * iz + (iy + 1)) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * iz + (iy + 1)) + (ix + 1)] * xd;
             c2 = a->xR[oldxcount * (oldycount * (iz + 1) + iy) + ix] * (1 - xd) + a->xR[oldxcount * (oldycount * (iz + 1) + iy) + (ix + 1)] * xd;
@@ -27550,14 +27550,14 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
       rmax = s->model1.rmax;
       blockwidth = 2 * rmax;
       maxblocksize = 8;
-      searchradius = rmax * rbf_rbffarradius + 0.5 * sqrt((double)(s->nx)) * blockwidth;
+      searchradius = rmax * rbf_rbffarradius + 0.5 * sqrt((double)s->nx) * blockwidth;
       ntrials = 100;
       avgfuncpernode = 0.0;
       for (i = 0; i < ntrials; i++) {
          bufseedv1.tx.xR[0] = x0->xR[hqrnduniformi(&rs, n0)];
          bufseedv1.tx.xR[1] = x1->xR[hqrnduniformi(&rs, n1)];
          bufseedv1.tx.xR[2] = x2->xR[hqrnduniformi(&rs, n2)];
-         avgfuncpernode += (double)kdtreetsqueryrnn(&s->model1.tree, &bufseedv1.requestbuf, &bufseedv1.tx, searchradius, true) / (double)ntrials;
+         avgfuncpernode += (double)kdtreetsqueryrnn(&s->model1.tree, &bufseedv1.requestbuf, &bufseedv1.tx, searchradius, true) / ntrials;
       }
       ae_vector_set_length(&blocks0, n0 + 1);
       blockscnt0 = 0;

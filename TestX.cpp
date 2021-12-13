@@ -2148,7 +2148,7 @@ int main() {
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
             t = alglib_impl::tickcount() - t;
             perf0 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
-            printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, (double)perf0);
+            printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, perf0);
             setnworkers(0);
             t = alglib_impl::tickcount();
             for (k = 0; k < nrepeat; k++)
@@ -2157,7 +2157,7 @@ int main() {
                alglib_impl::ae_state_set_flags(NonTH);
             t = alglib_impl::tickcount() - t;
             perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
-            printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2 / perf0));
+            printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, perf2 / perf0);
             setnworkers(1);
          }
       }

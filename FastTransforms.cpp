@@ -360,7 +360,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    buf->xR[n2] = a->xR[1];
    fftr1dinternaleven(buf, n, a, plan);
    a->xR[0] = buf->xR[0] / n;
-   t = 1.0 / (double)n;
+   t = 1.0 / n;
    for (i = 1; i < n2; i++) {
       x = buf->xR[2 * i];
       y = buf->xR[2 * i + 1];
@@ -627,7 +627,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
       buf.xR[2 * i + 1] = -c3.y;
    }
    ftapplyplan(&plan, &buf);
-   t = 1.0 / (double)p;
+   t = 1.0 / p;
    ae_vector_set_length(r, m - n + 1);
    for (i = 0; i <= m - n; i++) {
       r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
@@ -775,7 +775,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
       buf.xR[2 * i + 1] = -c3.y;
    }
    ftapplyplan(&plan, &buf);
-   t = 1.0 / (double)m;
+   t = 1.0 / m;
    ae_vector_set_length(r, m);
    for (i = 0; i < m; i++) {
       r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
@@ -1124,7 +1124,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = CeilZ((double)m / (double)p) * (2 * ftbasegetflopestimate(ptotal) + 8 * ptotal);
+         flopcand = CeilZ((double)m / p) * (2 * ftbasegetflopestimate(ptotal) + 8 * ptotal);
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
@@ -1222,7 +1222,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * i + 1] = -ty;
          }
          ftapplyplan(&plan, &buf);
-         t = 1.0 / (double)m;
+         t = 1.0 / m;
          ae_vector_set_length(r, m);
          for (i = 0; i < m; i++) {
             r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
@@ -1267,7 +1267,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * i + 1] = -ty;
          }
          ftapplyplan(&plan, &buf);
-         t = 1.0 / (double)p;
+         t = 1.0 / p;
          if (circular) {
          // circular, add tail to head
             ae_vector_set_length(r, m);
@@ -1344,7 +1344,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * j + 1] = -ty;
          }
          ftapplyplan(&plan, &buf);
-         t = 1.0 / (double)(q + n - 1);
+         t = 1.0 / (q + n - 1);
          if (circular) {
             j1 = imin2(i + p + n - 2, m - 1) - i;
             j2 = j1 + 1;
@@ -1461,7 +1461,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = CeilZ((double)m / (double)p) * (2 * ftbasegetflopestimate(ptotal / 2) + 1 * (ptotal / 2));
+         flopcand = CeilZ((double)m / p) * (2 * ftbasegetflopestimate(ptotal / 2) + 1 * (ptotal / 2));
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;

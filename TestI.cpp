@@ -367,7 +367,7 @@ void nsfunc1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 //
 // and Jacobian matrix J = [df0/dx0 df0/dx1]
 //
-   fi[0] = 2 * fabs(double (x[0])) + fabs(double (x[1]));
+   fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
    jac[0][0] = 2 * sign(x[0]);
    jac[0][1] = sign(x[1]);
 }
@@ -378,7 +378,7 @@ void nsfunc1_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
 //
 //     f0(x0,x1) = 2*|x0|+x1
 //
-   fi[0] = 2 * fabs(double (x[0])) + fabs(double (x[1]));
+   fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
 }
 
 void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
@@ -395,7 +395,7 @@ void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 //     J = [ df1/dx0   df1/dx1 ]
 //         [ df2/dx0   df2/dx1 ]
 //
-   fi[0] = 2 * fabs(double (x[0])) + fabs(double (x[1]));
+   fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
    jac[0][0] = 2 * sign(x[0]);
    jac[0][1] = sign(x[1]);
    fi[1] = x[0] - 1;

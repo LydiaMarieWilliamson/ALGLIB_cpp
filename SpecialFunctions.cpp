@@ -79,7 +79,7 @@ double gammafunction(double x) {
    q = fabs(x);
    if (q > 33.0) {
       if (x < 0.0) {
-         p = (double)(FloorZ(q));
+         p = floor(q);
          i = RoundZ(p);
          if (i % 2 == 0) {
             sgngam = -1.0;
@@ -199,7 +199,7 @@ double lngamma(double x, double *sgngam) {
    if (x < -34.0) {
       q = -x;
       w = lngamma(q, &tmp);
-      p = (double)(FloorZ(q));
+      p = floor(q);
       i = RoundZ(p);
       if (i % 2 == 0) {
          *sgngam = -1.0;
@@ -671,7 +671,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
    // by means of 20-point Gauss-Legendre quadrature.
       x = -x;
       y = -y;
-      s = (double)(sign(rho));
+      s = (double)sign(rho);
       if (s > 0.0) {
          fxys = normalcdf(-rmax2(x, y));
       } else {
@@ -2817,7 +2817,7 @@ double exponentialintegralen(double x, ae_int_t n) {
       return result;
    }
    if (x == 0.0) {
-      result = 1.0 / (double)(n - 1);
+      result = 1.0 / (n - 1);
       return result;
    }
    if (n == 0) {
@@ -2837,7 +2837,7 @@ double exponentialintegralen(double x, ae_int_t n) {
    if (x <= 1.0) {
       psi = -Eul - log(x);
       for (i = 1; i < n; i++) {
-         psi += 1.0 / (double)i;
+         psi += 1.0 / i;
       }
       z = -x;
       xk = 0.0;
@@ -3673,8 +3673,8 @@ double beta(double a, double b) {
    double s;
    double result;
    sg = 1.0;
-   ae_assert(a > 0.0 || a != (double)(FloorZ(a)), "Overflow in Beta");
-   ae_assert(b > 0.0 || b != (double)(FloorZ(b)), "Overflow in Beta");
+   ae_assert(a > 0.0 || a != floor(a), "Overflow in Beta");
+   ae_assert(b > 0.0 || b != floor(b), "Overflow in Beta");
    y = a + b;
    if (!SmallAtR(y, 171.624376956302725)) {
       y = lngamma(y, &s);
@@ -3936,7 +3936,7 @@ double psi(double x) {
    if (x <= 0.0) {
       negative = 1;
       q = x;
-      p = (double)(FloorZ(q));
+      p = floor(q);
       if (p == q) {
          ae_assert(false, "Singularity in Psi(x)");
          result = maxrealnumber;
@@ -3954,7 +3954,7 @@ double psi(double x) {
       }
       x = 1.0 - x;
    }
-   if (x <= 10.0 && x == (double)(FloorZ(x))) {
+   if (x <= 10.0 && x == floor(x)) {
       y = 0.0;
       n = FloorZ(x);
       for (i = 1; i < n; i++) {

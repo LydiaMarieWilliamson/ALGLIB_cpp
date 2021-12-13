@@ -439,7 +439,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
    samey = true;
    x0 = x->xR[0];
    y0 = y->xR[0];
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       s = x->xR[i];
       samex = samex && s == x0;
@@ -453,7 +453,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
       return result;
    }
 // covariance
-   v = 1.0 / (double)(n - 1);
+   v = 1.0 / (n - 1);
    result = 0.0;
    for (i = 0; i < n; i++) {
       result += v * (x->xR[i] - xmean) * (y->xR[i] - ymean);
@@ -516,7 +516,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    samey = true;
    x0 = x->xR[0];
    y0 = y->xR[0];
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       s = x->xR[i];
       samex = samex && s == x0;
@@ -662,7 +662,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
       same.xB[i] = true;
    }
    ae_v_move(x0.xR, 1, x->xyR[0], 1, m);
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       ae_v_addd(t.xR, 1, x->xyR[i], 1, m, v);
       for (j = 0; j < m; j++) {
@@ -682,7 +682,7 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
          }
       }
    }
-   rmatrixsyrk(m, n, 1.0 / (double)(n - 1), x, 0, 0, 1, 0.0, c, 0, 0, true);
+   rmatrixsyrk(m, n, 1.0 / (n - 1), x, 0, 0, 1, 0.0, c, 0, 0, true);
    rmatrixenforcesymmetricity(c, m, true);
    ae_frame_leave();
 }
@@ -821,7 +821,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
       }
    }
 // Calculate upper half of symmetric covariance matrix
-   rmatrixsyrk(m, n, 1.0 / (double)(n - 1), &xc, 0, 0, 0, 0.0, c, 0, 0, true);
+   rmatrixsyrk(m, n, 1.0 / (n - 1), &xc, 0, 0, 0, 0.0, c, 0, 0, true);
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
@@ -916,7 +916,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
       samex.xB[i] = true;
    }
    ae_v_move(x0.xR, 1, x->xyR[0], 1, m1);
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       ae_v_addd(t.xR, 1, x->xyR[i], 1, m1, v);
       for (j = 0; j < m1; j++) {
@@ -937,7 +937,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
       samey.xB[i] = true;
    }
    ae_v_move(y0.xR, 1, y->xyR[0], 1, m2);
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       ae_v_addd(t.xR, 1, y->xyR[i], 1, m2, v);
       for (j = 0; j < m2; j++) {
@@ -953,7 +953,7 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
       }
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
    ae_frame_leave();
 }
 
@@ -1038,7 +1038,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       sx.xR[i] = 0.0;
    }
    ae_v_move(x0.xR, 1, x->xyR[0], 1, m1);
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       ae_v_addd(t.xR, 1, x->xyR[i], 1, m1, v);
       for (j = 0; j < m1; j++) {
@@ -1064,7 +1064,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       sy.xR[i] = 0.0;
    }
    ae_v_move(y0.xR, 1, y->xyR[0], 1, m2);
-   v = 1.0 / (double)n;
+   v = 1.0 / n;
    for (i = 0; i < n; i++) {
       ae_v_addd(t.xR, 1, y->xyR[i], 1, m2, v);
       for (j = 0; j < m2; j++) {
@@ -1084,7 +1084,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       sy.xR[j] = sqrt(sy.xR[j] / (n - 1));
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
@@ -1242,7 +1242,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       sy.xR[i] = sqrt(v2 / (n - 1));
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0);
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
@@ -2895,7 +2895,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
       if (result > 0.0) result = 0.0;
    } else {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
+      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / n);
       if (result > 0.0) result = 0.0;
    }
    result = exp(result);
@@ -7448,7 +7448,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    mu = (double)n * m / 2;
    tmp = ns * (sqr((double)ns) - 1) / 12;
    for (i = 0; i < tiecount; i++) {
-      tmp -= tiesize.xZ[i] * (sqr((double)(tiesize.xZ[i])) - 1) / 12;
+      tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i]) - 1) / 12;
    }
    sigma = sqrt((double)n * m / ns / (ns - 1) * tmp);
    s = (u - mu) / sigma;
@@ -7780,7 +7780,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
       for (i = 0; i < m; i++) {
          s += sqr(y->xR[i] - ymean);
       }
-      s = sqrt(s * (1.0 / (double)n + 1.0 / (double)m) / (n + m - 2));
+      s = sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2));
    }
    if (s == 0.0) {
       if (xmean == ymean) {

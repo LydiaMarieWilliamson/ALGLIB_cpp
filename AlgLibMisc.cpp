@@ -105,7 +105,7 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state) {
 // API: double hqrnduniformr(const hqrndstate &state);
 double hqrnduniformr(hqrndstate *state) {
    double result;
-   result = (double)(hqrnd_hqrndintegerbase(state) + 1) / (double)(hqrnd_hqrndmax + 2);
+   result = (double)(hqrnd_hqrndintegerbase(state) + 1) / (hqrnd_hqrndmax + 2);
    return result;
 }
 
@@ -117,7 +117,7 @@ double hqrnduniformr(hqrndstate *state) {
 // API: double hqrndmiduniformr(const hqrndstate &state);
 double hqrndmiduniformr(hqrndstate *state) {
    double result;
-   result = (double)(2 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (double)(hqrnd_hqrndmax + 2);
+   result = (double)(2 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (hqrnd_hqrndmax + 2);
    return result;
 }
 

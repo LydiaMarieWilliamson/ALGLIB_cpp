@@ -6514,7 +6514,7 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    }
    tcode = -1;
    k = s->tablesize;
-   if ((1 - sparse_maxloadfactor) * k >= (double)(s->nfree)) {
+   if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
       sparseresizematrix(s);
       k = s->tablesize;
    }
@@ -6599,7 +6599,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    if (s->matrixtype == 0) {
       tcode = -1;
       k = s->tablesize;
-      if ((1 - sparse_maxloadfactor) * k >= (double)(s->nfree)) {
+      if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
          sparseresizematrix(s);
          k = s->tablesize;
       }
@@ -8890,7 +8890,7 @@ double sparsegetaveragelengthofchain(sparsematrix *s) {
    if (nchains == 0) {
       result = 0.0;
    } else {
-      result = (double)talc / (double)nchains;
+      result = (double)talc / nchains;
    }
    return result;
 }
@@ -21020,7 +21020,7 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
             i = colcount + childcolcount;
             k = i * (i + 1) / 2 + offdiagcnt * i;
             fakezerosinnewsupernode = tfakenonzeros->xZ[nsuper - 2] + tfakenonzeros->xZ[nsuper - 1] + (offdiagcnt - (childoffdiagcnt - 1)) * childcolcount;
-            mergeinefficiency = (double)fakezerosinnewsupernode / (double)k;
+            mergeinefficiency = (double)fakezerosinnewsupernode / k;
             if (colcount + childcolcount == 2 && fakezerosinnewsupernode <= smallfakestolerance) {
                createsupernode = true;
             }
@@ -25761,7 +25761,7 @@ Spawn:
    ae_vector_set_length(v, n + 1);
    ae_vector_set_length(x, n + 1);
    ae_vector_set_length(isgn, n + 1);
-   t = 1.0 / (double)n;
+   t = 1.0 / n;
    for (i = 1; i <= n; i++) {
       x->xR[i] = t;
    }
@@ -25834,7 +25834,7 @@ Spawn:
 // ITERATION COMPLETE.  FINAL STAGE.
    altsgn = 1.0;
    for (i = 1; i <= n; i++) {
-      x->xR[i] = altsgn * (1 + (double)(i - 1) / (double)(n - 1));
+      x->xR[i] = altsgn * (1 + (double)(i - 1) / (n - 1));
       altsgn = -altsgn;
    }
    *kase = 1; jump = 5; goto Pause; Resume5: // X HAS BEEN OVERWRITTEN BY A*X.
@@ -25905,7 +25905,7 @@ Spawn:
    ae_vector_set_length(v, n + 1);
    ae_vector_set_length(x, n + 1);
    for (i = 1; i <= n; i++) {
-      x->xC[i] = ae_complex_from_d(1.0 / (double)n);
+      x->xC[i] = ae_complex_from_d(1.0 / n);
    }
    *kase = 1; jump = 1; goto Pause; Resume1: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
    if (n == 1) {
@@ -25954,7 +25954,7 @@ Spawn:
 // ITERATION COMPLETE.  FINAL STAGE.
    altsgn = 1.0;
    for (i = 1; i <= n; i++) {
-      x->xC[i] = ae_complex_from_d(altsgn * (1 + (double)(i - 1) / (double)(n - 1)));
+      x->xC[i] = ae_complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
       altsgn = -altsgn;
    }
    *kase = 1; jump = 5; goto Pause; Resume5: // X HAS BEEN OVERWRITTEN BY A*X.

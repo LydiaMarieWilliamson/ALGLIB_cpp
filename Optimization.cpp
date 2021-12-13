@@ -29362,7 +29362,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
          k++;
       }
    }
-   result = (double)k / (double)n;
+   result = (double)k / n;
    return result;
 }
 
@@ -29468,8 +29468,8 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
 // Integrity checks
    ae_assert(m > 0, "BTranStep: M <= 0");
 // Determine operation counts for columnwise and rowwise approaches
-   avgrowwise = rhor->k * ((double)state->at.ridx.xZ[nx] / (double)m);
-   avgcolwise = ns * ((double)state->at.ridx.xZ[nx] / (double)nx);
+   avgrowwise = rhor->k * ((double)state->at.ridx.xZ[nx] / m);
+   avgcolwise = ns * ((double)state->at.ridx.xZ[nx] / nx);
 // Pivot row
    if (avgrowwise < avgcolwise) {
    // Use rowwise algorithm
@@ -38466,7 +38466,7 @@ static void minns_generatemeritfunction(minnsstate *state, ae_int_t sampleidx) {
          continue;
       }
       state->samplef.xR[sampleidx] += state->rholinear.xR[i] * fabs(v);
-      s = (double)(sign(v));
+      s = (double)sign(v);
       for (j = 0; j < n; j++) {
          state->samplegm.xyR[sampleidx][j] += state->rholinear.xR[i] * s * state->scaledcleic.xyR[i][j];
       }
@@ -38481,7 +38481,7 @@ static void minns_generatemeritfunction(minnsstate *state, ae_int_t sampleidx) {
          continue;
       }
       state->samplef.xR[sampleidx] += state->agsrhononlinear * fabs(v);
-      s = (double)(sign(v));
+      s = (double)sign(v);
       for (j = 0; j < n; j++) {
          state->samplegm.xyR[sampleidx][j] += state->agsrhononlinear * s * state->j.xyR[i][j] * state->s.xR[j];
       }
@@ -38967,8 +38967,8 @@ Spawn:
          for (j = 0; j < n; j++) {
             v = state->samplegmbc.xyR[i][j];
             state->colmax.xR[j] = rmax2(state->colmax.xR[j], fabs(v));
-            state->signmin.xR[j] = rmin2(state->signmin.xR[j], (double)(sign(v)));
-            state->signmax.xR[j] = rmax2(state->signmax.xR[j], (double)(sign(v)));
+            state->signmin.xR[j] = rmin2(state->signmin.xR[j], (double)sign(v));
+            state->signmax.xR[j] = rmax2(state->signmax.xR[j], (double)sign(v));
          }
       }
       for (j = 0; j < n; j++) {
