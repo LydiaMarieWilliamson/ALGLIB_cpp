@@ -6481,7 +6481,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 8)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = NAN;
             if (_spoil_scenario == 10)
@@ -6559,7 +6559,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 8)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = NAN;
             if (_spoil_scenario == 10)
@@ -6604,7 +6604,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 8)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = NAN;
             if (_spoil_scenario == 10)
@@ -6678,7 +6678,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 7)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = NAN;
             if (_spoil_scenario == 9)
@@ -6723,7 +6723,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 7)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = NAN;
             if (_spoil_scenario == 9)
@@ -6797,7 +6797,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 7)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = NAN;
             if (_spoil_scenario == 9)
@@ -6840,7 +6840,7 @@ int main() {
                a = +INFINITY;
             if (_spoil_scenario == 7)
                a = -INFINITY;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = NAN;
             if (_spoil_scenario == 9)

@@ -6622,7 +6622,7 @@ using namespace alglib;
 
 <font color=navy>// we build KNN model with k=1 and eps=0 (exact k-nn search is performed)</font>
    ae_int_t k = 1;
-   <b>double</b> eps = 0;
+   <b>double</b> eps = 0.0;
    knnmodel model;
    knnreport rep;
    knnbuilderbuildknnmodel(builder, k, eps, model, rep);
@@ -6691,7 +6691,7 @@ using namespace alglib;
 
 <font color=navy>// we build KNN model with k=1 and eps=0 (exact k-nn search is performed)</font>
    ae_int_t k = 1;
-   <b>double</b> eps = 0;
+   <b>double</b> eps = 0.0;
    knnmodel model;
    knnreport rep;
    knnbuilderbuildknnmodel(builder, k, eps, model, rep);
@@ -13122,7 +13122,7 @@ using namespace alglib;
    real_1d_array y = <font color=blue><b>&quot;[1]&quot;</b></font>;
    real_1d_array x = <font color=blue><b>&quot;[0, 1, 2, 3]&quot;</b></font>;
    <b>double</b> eps = 0.00001;
-   <b>double</b> h = 0;
+   <b>double</b> h = 0.0;
    odesolverstate s;
    ae_int_t m;
    real_1d_array xtbl;
@@ -14046,8 +14046,8 @@ using namespace alglib;
 <font color=navy>// * first, autogkstate is initialized</font>
 <font color=navy>// * then we call integration function</font>
 <font color=navy>// * and finally we obtain results with autogkresults() call</font>
-   <b>double</b> a = 0;
-   <b>double</b> b = 1;
+   <b>double</b> a = 0.0;
+   <b>double</b> b = 1.0;
    autogkstate s;
    <b>double</b> v;
    autogkreport rep;
@@ -18310,7 +18310,7 @@ using namespace alglib;
    real_1d_array x = <font color=blue><b>&quot;[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]&quot;</b></font>;
    real_1d_array y = <font color=blue><b>&quot;[0.00,0.05,0.26,0.32,0.33,0.43,0.60,0.60,0.77,0.98,1.02]&quot;</b></font>;
    ae_int_t m = 2;
-   <b>double</b> t = 2;
+   <b>double</b> t = 2.0;
    ae_int_t info;
    barycentricinterpolant p;
    polynomialfitreport rep;
@@ -18370,7 +18370,7 @@ using namespace alglib;
    real_1d_array xc = <font color=blue><b>&quot;[0]&quot;</b></font>;
    real_1d_array yc = <font color=blue><b>&quot;[0]&quot;</b></font>;
    integer_1d_array dc = <font color=blue><b>&quot;[0]&quot;</b></font>;
-   <b>double</b> t = 2;
+   <b>double</b> t = 2.0;
    ae_int_t m = 2;
    ae_int_t info;
    barycentricinterpolant p;
@@ -19425,7 +19425,7 @@ using namespace alglib;
 <font color=navy>// of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.</font>
    real_1d_array x = <font color=blue><b>&quot;[0,1,2]&quot;</b></font>;
    real_1d_array y = <font color=blue><b>&quot;[0,0,2]&quot;</b></font>;
-   <b>double</b> t = -1;
+   <b>double</b> t = -1.0;
    <b>double</b> v;
    <b>double</b> dv;
    <b>double</b> d2v;
@@ -19464,7 +19464,7 @@ using namespace alglib;
 <font color=navy>// Here we demonstrate conversion of y=x^2-x</font>
 <font color=navy>// between power basis and barycentric representation.</font>
    real_1d_array a = <font color=blue><b>&quot;[0,-1,+1]&quot;</b></font>;
-   <b>double</b> t = 2;
+   <b>double</b> t = 2.0;
    real_1d_array a2;
    <b>double</b> v;
    barycentricinterpolant p;
@@ -19530,7 +19530,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// We calculate interpolant value at x=-2.</font>
 <font color=navy>// In all three cases we should get same f=6</font>
-   <b>double</b> t = -2;
+   <b>double</b> t = -2.0;
    <b>double</b> v;
    v = polynomialcalceqdist(0.0, 2.0, y_eqdist, t);
    printf(<font color=blue><b>&quot;%.4f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 6.0</font>
@@ -31838,8 +31838,8 @@ using namespace alglib;
    real_1d_array bndl = <font color=blue><b>&quot;[-1,-1]&quot;</b></font>;
    real_1d_array bndu = <font color=blue><b>&quot;[+1,+1]&quot;</b></font>;
    minbcstate state;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
    minbccreate(x, state);
@@ -31916,8 +31916,8 @@ using namespace alglib;
    real_1d_array bndl = <font color=blue><b>&quot;[-1,-1]&quot;</b></font>;
    real_1d_array bndu = <font color=blue><b>&quot;[+1,+1]&quot;</b></font>;
    minbcstate state;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
    <b>double</b> diffstep = 1.0e-6;
@@ -32938,8 +32938,8 @@ using namespace alglib;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
    real_1d_array bndl = <font color=blue><b>&quot;[-1,-1]&quot;</b></font>;
    real_1d_array bndu = <font color=blue><b>&quot;[+1,+1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
    minbleicstate state;
@@ -33026,8 +33026,8 @@ using namespace alglib;
    real_2d_array c = <font color=blue><b>&quot;[[1,0,2],[1,1,6]]&quot;</b></font>;
    integer_1d_array ct = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
    minbleicstate state;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
 
@@ -33111,8 +33111,8 @@ using namespace alglib;
    real_1d_array bndl = <font color=blue><b>&quot;[-1,-1]&quot;</b></font>;
    real_1d_array bndu = <font color=blue><b>&quot;[+1,+1]&quot;</b></font>;
    minbleicstate state;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
    <b>double</b> diffstep = 1.0e-6;
@@ -34041,8 +34041,8 @@ using namespace alglib;
 <font color=navy>// First, we create optimizer object and tune its properties</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
    ae_int_t maxits = 0;
    mincgstate state;
@@ -34110,8 +34110,8 @@ using namespace alglib;
 <font color=navy>// * restart from new point</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
    <b>double</b> stpmax = 0.1;
    ae_int_t maxits = 0;
@@ -34184,8 +34184,8 @@ using namespace alglib;
 <font color=navy>// First, we set up optimizer...</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
    <b>double</b> diffstep = 1.0e-6;
    ae_int_t maxits = 0;
@@ -35294,8 +35294,8 @@ using namespace alglib;
 <font color=navy>// First, we create optimizer object and tune its properties</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
    ae_int_t maxits = 0;
    minlbfgsstate state;
@@ -35363,8 +35363,8 @@ using namespace alglib;
 <font color=navy>// * restart from new point</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1,1]&quot;</b></font>;
-   <b>double</b> epsg = 0;
-   <b>double</b> epsf = 0;
+   <b>double</b> epsg = 0.0;
+   <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
    <b>double</b> stpmax = 0.1;
    ae_int_t maxits = 0;
@@ -35428,8 +35428,8 @@ using namespace alglib;
 <font color=navy>// using numerical differentiation to calculate gradient.</font>
    real_1d_array x = <font color=blue><b>&quot;[0,0]&quot;</b></font>;
    <b>double</b> epsg = 0.0000000001;
-   <b>double</b> epsf = 0;
-   <b>double</b> epsx = 0;
+   <b>double</b> epsf = 0.0;
+   <b>double</b> epsx = 0.0;
    <b>double</b> diffstep = 1.0e-6;
    ae_int_t maxits = 0;
    minlbfgsstate state;
