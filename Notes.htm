@@ -848,27 +848,27 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	―	Remade _ALGLIB_FLG_THREADING_MASK, _ALGLIB_FLG_THREADING_SHIFT as manifest constants local to Ap.cpp.
 	―	The constants DynBottom, DynFrame made local in Ap.cpp
 	―	ae_db_attach(), ae_break(), ae_optional_atomic_{add,sub}_i(), ae_yield(),
-	 	x_is_symmetric(), x_is_hermitian(), x_force_symmetric(), x_force_hermitian(),
-	 	aligned_extract_ptr(), ae_matrix_update_row_pointers(),
-	 	ae_static_malloc(), ae_static_free(),
-	 	ae_sixbits2char(), ae_char2sixbits(), ae_threebytes2foursixbits(), ae_foursixbits2threebytes()
+		x_is_symmetric(), x_is_hermitian(), x_force_symmetric(), x_force_hermitian(),
+		aligned_extract_ptr(), ae_matrix_update_row_pointers(),
+		ae_static_malloc(), ae_static_free(),
+		ae_sixbits2char(), ae_char2sixbits(), ae_threebytes2foursixbits(), ae_foursixbits2threebytes()
 		all made local to Ap.cpp.
 	―	ae_never_change_it, _sixbits2char_tbl[], _ae_char2sixbits_tbl[] in Ap.cpp made local respectively to ae_spin_wait(), ae_sixbits2char() and _ae_char2sixbits().
 	―	_ialglib_vzero(), _ialglib_vzero_complex(),
 		_ialglib_vcopy(), _ialglib_vcopy_complex(), _ialglib_vcopy_dcomplex(),
 		_ialglib_mcopyblock(), _ialglib_mcopyunblock(), _ialglib_mcopyblock_complex(), _ialglib_mcopyunblock_complex(),
-	 	_ialglib_mv_32(), _ialglib_rmatrixger() made local in Ap.cpp,
-	 	_ialglib_rmv(), _ialglib_rmatrixgemm(), _ialglib_rmatrixrighttrsm(), _ialglib_rmatrixlefttrsm(),
-	 	_ialglib_cmv(), _ialglib_cmatrixgemm(), _ialglib_cmatrixrighttrsm(), _ialglib_cmatrixlefttrsm(),
-	 	_ialglib_rmatrixsyrk(), _ialglib_rmatrixrank1(),
-	 	_ialglib_cmatrixherk(), _ialglib_cmatrixrank1()
+		_ialglib_mv_32(), _ialglib_rmatrixger() made local in Ap.cpp,
+		_ialglib_rmv(), _ialglib_rmatrixgemm(), _ialglib_rmatrixrighttrsm(), _ialglib_rmatrixlefttrsm(),
+		_ialglib_cmv(), _ialglib_cmatrixgemm(), _ialglib_cmatrixrighttrsm(), _ialglib_cmatrixlefttrsm(),
+		_ialglib_rmatrixsyrk(), _ialglib_rmatrixrank1(),
+		_ialglib_cmatrixherk(), _ialglib_cmatrixrank1()
 		all made local to Ap.cpp.
 	― 	_dbg_alloc_total, _use_dbg_counters, _use_vendor_kernels
-	  	debug_workstealing, dbgws_pushroot_ok, dbgws_pushroot_failed
+		debug_workstealing, dbgws_pushroot_ok, dbgws_pushroot_failed
 		all made local in Ap.cpp.
 	― 	x_nb, alglib_simd_alignment
-	 	alglib_r_block, alglib_half_r_block/2, alglib_twice_r_block,
-	 	alglib_c_block, alglib_half_c_block/2, alglib_twice_c_block
+		alglib_r_block, alglib_half_r_block/2, alglib_twice_r_block,
+		alglib_c_block, alglib_half_c_block/2, alglib_twice_c_block
 		all remade as ae_int_t constants.
 	―	alglib::ByteOrder made local in Ap.cpp and commented out (it's not used).
 	―	Combined the threading model names AE_{SERIAL_UNSAFE,SERIAL,PARALLEL}
