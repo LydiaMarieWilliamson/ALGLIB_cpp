@@ -1191,7 +1191,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
    breakihalvecycle = 6;
 
 // main loop
-   for (;;) {
+   while (true) {
 
    // start
       if (mainlooppos == 0) {
@@ -1545,8 +1545,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
          qkm1 = qkm1 * big;
       }
       n = n + 1;
-   }
-   while (n != 300);
+   } while (n != 300);
    result = ans;
    return result;
 }
@@ -1645,8 +1644,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
          qkm1 = qkm1 * big;
       }
       n = n + 1;
-   }
-   while (n != 300);
+   } while (n != 300);
    result = ans;
    return result;
 }
@@ -1803,7 +1801,7 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
          f = 1.0;
          tz = 1.0;
          j = 3;
-         while (j <= k - 2 && tz / f > ae_machineepsilon) {
+         while (j < k - 1 && tz / f > ae_machineepsilon) {
             tz = tz * ((j - 1) / (z * j));
             f = f + tz;
             j = j + 2;
@@ -1815,7 +1813,7 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
       f = 1.0;
       tz = 1.0;
       j = 2;
-      while (j <= k - 2 && tz / f > ae_machineepsilon) {
+      while (j < k - 1 && tz / f > ae_machineepsilon) {
          tz = tz * ((j - 1) / (z * j));
          f = f + tz;
          j = j + 2;
@@ -2146,8 +2144,7 @@ double incompletegamma(double a, double x, ae_state *_state) {
       r = r + 1;
       c = c * x / r;
       ans = ans + c;
-   }
-   while (c / ans > igammaepsilon);
+   } while (c / ans > igammaepsilon);
    result = ans * ax / a;
    return result;
 }
@@ -2254,8 +2251,7 @@ double incompletegammac(double a, double x, ae_state *_state) {
          qkm2 = qkm2 * igammabignumberinv;
          qkm1 = qkm1 * igammabignumberinv;
       }
-   }
-   while (t > igammaepsilon);
+   } while (t > igammaepsilon);
    result = ans * ax;
    return result;
 }
@@ -3074,7 +3070,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
    }
    if (x <= 1.0) {
       psi = -eul - ae_log(x, _state);
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          psi = psi + 1.0 / i;
       }
       z = -x;
@@ -3098,10 +3094,9 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
          } else {
             t = 1.0;
          }
-      }
-      while (t >= ae_machineepsilon);
+      } while (t >= ae_machineepsilon);
       t = 1.0;
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          t = t * z / i;
       }
       result = psi * t - result;
@@ -3141,8 +3136,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
             qkm2 = qkm2 / big;
             qkm1 = qkm1 / big;
          }
-      }
-      while (t >= ae_machineepsilon);
+      } while (t >= ae_machineepsilon);
       result = result * ae_exp(-x, _state);
    }
    return result;
@@ -3281,8 +3275,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       b = phi;
       phi = (ae_asin(t, _state) + phi) / 2.0;
       i = i - 1;
-   }
-   while (i != 0);
+   } while (i != 0);
    *sn = ae_sin(phi, _state);
    t = ae_cos(phi, _state);
    *cn = t;
@@ -3577,8 +3570,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
          a = a / k;
          s = s + a / k;
          k = k + 1.0;
-      }
-      while (ae_fabs(a / s, _state) >= ae_machineepsilon);
+      } while (ae_fabs(a / s, _state) >= ae_machineepsilon);
       s = s * x;
    } else {
       if (x < 18.0) {
@@ -3840,7 +3832,7 @@ void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
       c->xR[n] = 1.0;
    } else {
       c->xR[n] = ae_exp((n - 1) * ae_log(2.0, _state), _state);
-      for (i = 0; i <= n / 2 - 1; i++) {
+      for (i = 0; i < n / 2; i++) {
          c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1) / (n - i - 1);
       }
    }
@@ -3889,8 +3881,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
          }
          d = e;
          k = k + 1;
-      }
-      while (k <= n);
+      } while (k <= n);
       d = b->xR[i];
       e = 0.0;
       k = i;
@@ -3900,8 +3891,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
       }
       b->xR[i] = e;
       i = i + 1;
-   }
-   while (i <= n);
+   } while (i <= n);
 }
 } // end of namespace alglib_impl
 
@@ -4400,7 +4390,7 @@ double psi(double x, ae_state *_state) {
    if (x <= 10.0 && x == floor(x)) {
       y = 0.0;
       n = ae_ifloor(x, _state);
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          w = (double)i;
          y = y + 1.0 / w;
       }
@@ -5001,7 +4991,7 @@ void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
       c->xR[i] = 0.0;
    }
    c->xR[n] = ae_exp(n * ae_log(2.0, _state), _state);
-   for (i = 0; i <= n / 2 - 1; i++) {
+   for (i = 0; i < n / 2; i++) {
       c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1);
    }
 }
@@ -5124,7 +5114,7 @@ void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    for (i = 1; i <= n; i++) {
       c->xR[n] = c->xR[n] * (n + i) / 2 / i;
    }
-   for (i = 0; i <= n / 2 - 1; i++) {
+   for (i = 0; i < n / 2; i++) {
       c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2 / (i + 1) / (2 * (n - i) - 1);
    }
 }
@@ -5386,8 +5376,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       pk = pk - 2.0;
       ans = pk - xk / ans;
       k = k - 1;
-   }
-   while (k != 0);
+   } while (k != 0);
    ans = x / ans;
    pk = 1.0;
    pkm1 = 1.0 / ans;
@@ -5399,8 +5388,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       pkm1 = pkm2;
       r = r - 2.0;
       k = k - 1;
-   }
-   while (k != 0);
+   } while (k != 0);
    if (ae_fabs(pk, _state) > ae_fabs(pkm1, _state)) {
       ans = besselj1(x, _state) / pk;
    } else {
@@ -5580,7 +5568,7 @@ double besselyn(ae_int_t n, double x, ae_state *_state) {
    }
    a = bessely0(x, _state);
    b = bessely1(x, _state);
-   for (i = 1; i <= n - 1; i++) {
+   for (i = 1; i < n; i++) {
       tmp = b;
       b = 2 * i / x * b - a;
       a = tmp;
@@ -6004,7 +5992,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       if (n > 0) {
          pn = -eul;
          k = 1.0;
-         for (i = 1; i <= n - 1; i++) {
+         for (i = 1; i < n; i++) {
             pn = pn + 1.0 / k;
             k = k + 1.0;
             fn = fn * k;
@@ -6018,7 +6006,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
             s = nk1f;
             z = -z0;
             zn = 1.0;
-            for (i = 1; i <= n - 1; i++) {
+            for (i = 1; i < n; i++) {
                nk1f = nk1f / (n - i);
                kf = kf * i;
                zn = zn * z;
@@ -6052,8 +6040,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
          pn = pn + 1.0 / (k + n);
          s = s + (pk + pn - tlg) * t;
          k = k + 1.0;
-      }
-      while (ae_fabs(t / s, _state) > ae_machineepsilon);
+      } while (ae_fabs(t / s, _state) > ae_machineepsilon);
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
          s = -s;
@@ -6087,8 +6074,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       fn = fn + 1.0;
       pk = pk + 2.0;
       i = i + 1;
-   }
-   while (ae_fabs(t / s, _state) > ae_machineepsilon);
+   } while (ae_fabs(t / s, _state) > ae_machineepsilon);
    result = ae_exp(-x, _state) * ae_sqrt(ae_pi / (2.0 * x), _state) * s;
    return result;
 }
@@ -6410,7 +6396,7 @@ void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 
    ae_vector_set_length(c, n + 1, _state);
    c->xR[0] = 1.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       c->xR[i + 1] = -c->xR[i] * (n - i) / (i + 1) / (i + 1);
    }
 }

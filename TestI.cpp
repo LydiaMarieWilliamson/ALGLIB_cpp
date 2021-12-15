@@ -1444,14 +1444,14 @@ int main() {
                spoil_vector_by_posinf(s);
             if (_spoil_scenario == 5)
                spoil_vector_by_neginf(s);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 6)
                epsg = fp_nan;
             if (_spoil_scenario == 7)
                epsg = fp_posinf;
             if (_spoil_scenario == 8)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 9)
                epsf = fp_nan;
             if (_spoil_scenario == 10)
@@ -1554,14 +1554,14 @@ int main() {
                spoil_vector_by_posinf(s);
             if (_spoil_scenario == 5)
                spoil_vector_by_neginf(s);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 6)
                epsg = fp_nan;
             if (_spoil_scenario == 7)
                epsg = fp_posinf;
             if (_spoil_scenario == 8)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 9)
                epsf = fp_nan;
             if (_spoil_scenario == 10)
@@ -1667,14 +1667,14 @@ int main() {
                epsg = fp_posinf;
             if (_spoil_scenario == 5)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 6)
                epsf = fp_nan;
             if (_spoil_scenario == 7)
                epsf = fp_posinf;
             if (_spoil_scenario == 8)
                epsf = fp_neginf;
-            double epsx = 0;
+            double epsx = 0.0;
             if (_spoil_scenario == 9)
                epsx = fp_nan;
             if (_spoil_scenario == 10)
@@ -1765,14 +1765,14 @@ int main() {
                spoil_vector_by_nan(bndu);
             if (_spoil_scenario == 10)
                spoil_vector_by_deleting_element(bndu);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 11)
                epsg = fp_nan;
             if (_spoil_scenario == 12)
                epsg = fp_posinf;
             if (_spoil_scenario == 13)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 14)
                epsf = fp_nan;
             if (_spoil_scenario == 15)
@@ -1908,14 +1908,14 @@ int main() {
             if (_spoil_scenario == 12)
                spoil_vector_by_deleting_element(ct);
             minbleicstate state;
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 13)
                epsg = fp_nan;
             if (_spoil_scenario == 14)
                epsg = fp_posinf;
             if (_spoil_scenario == 15)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 16)
                epsf = fp_nan;
             if (_spoil_scenario == 17)
@@ -2047,14 +2047,14 @@ int main() {
             if (_spoil_scenario == 10)
                spoil_vector_by_deleting_element(bndu);
             minbleicstate state;
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 11)
                epsg = fp_nan;
             if (_spoil_scenario == 12)
                epsg = fp_posinf;
             if (_spoil_scenario == 13)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 14)
                epsf = fp_nan;
             if (_spoil_scenario == 15)
@@ -3342,14 +3342,14 @@ int main() {
                spoil_vector_by_posinf(s);
             if (_spoil_scenario == 5)
                spoil_vector_by_neginf(s);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 6)
                epsg = fp_nan;
             if (_spoil_scenario == 7)
                epsg = fp_posinf;
             if (_spoil_scenario == 8)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 9)
                epsf = fp_nan;
             if (_spoil_scenario == 10)
@@ -3452,14 +3452,14 @@ int main() {
                spoil_vector_by_posinf(s);
             if (_spoil_scenario == 5)
                spoil_vector_by_neginf(s);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 6)
                epsg = fp_nan;
             if (_spoil_scenario == 7)
                epsg = fp_posinf;
             if (_spoil_scenario == 8)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 9)
                epsf = fp_nan;
             if (_spoil_scenario == 10)
@@ -3574,14 +3574,14 @@ int main() {
                spoil_vector_by_posinf(s);
             if (_spoil_scenario == 5)
                spoil_vector_by_neginf(s);
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 6)
                epsg = fp_nan;
             if (_spoil_scenario == 7)
                epsg = fp_posinf;
             if (_spoil_scenario == 8)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 9)
                epsf = fp_nan;
             if (_spoil_scenario == 10)
@@ -4947,14 +4947,14 @@ int main() {
             if (_spoil_scenario == 10)
                spoil_vector_by_deleting_element(bndu);
             minbcstate state;
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 11)
                epsg = fp_nan;
             if (_spoil_scenario == 12)
                epsg = fp_posinf;
             if (_spoil_scenario == 13)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 14)
                epsf = fp_nan;
             if (_spoil_scenario == 15)
@@ -5079,14 +5079,14 @@ int main() {
             if (_spoil_scenario == 10)
                spoil_vector_by_deleting_element(bndu);
             minbcstate state;
-            double epsg = 0;
+            double epsg = 0.0;
             if (_spoil_scenario == 11)
                epsg = fp_nan;
             if (_spoil_scenario == 12)
                epsg = fp_posinf;
             if (_spoil_scenario == 13)
                epsg = fp_neginf;
-            double epsf = 0;
+            double epsf = 0.0;
             if (_spoil_scenario == 14)
                epsf = fp_nan;
             if (_spoil_scenario == 15)
@@ -5332,7 +5332,7 @@ int main() {
                eps = fp_posinf;
             if (_spoil_scenario == 9)
                eps = fp_neginf;
-            double h = 0;
+            double h = 0.0;
             if (_spoil_scenario == 10)
                h = fp_nan;
             if (_spoil_scenario == 11)
@@ -5774,14 +5774,14 @@ int main() {
          // * then we call integration function
          // * and finally we obtain results with autogkresults() call
          //
-            double a = 0;
+            double a = 0.0;
             if (_spoil_scenario == 0)
                a = fp_nan;
             if (_spoil_scenario == 1)
                a = fp_posinf;
             if (_spoil_scenario == 2)
                a = fp_neginf;
-            double b = 1;
+            double b = 1.0;
             if (_spoil_scenario == 3)
                b = fp_nan;
             if (_spoil_scenario == 4)
@@ -6683,7 +6683,7 @@ int main() {
                spoil_vector_by_adding_element(y);
             if (_spoil_scenario == 9)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 10)
                t = fp_posinf;
             if (_spoil_scenario == 11)
@@ -6743,7 +6743,7 @@ int main() {
                spoil_vector_by_posinf(a);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(a);
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
@@ -6850,7 +6850,7 @@ int main() {
          // We calculate interpolant value at x=-2.
          // In all three cases we should get same f=6
          //
-            double t = -2;
+            double t = -2.0;
             if (_spoil_scenario == 9)
                t = fp_posinf;
             if (_spoil_scenario == 10)
@@ -6901,7 +6901,7 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 7)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 8)
                t = fp_posinf;
             if (_spoil_scenario == 9)
@@ -6939,7 +6939,7 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
@@ -6977,7 +6977,7 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
@@ -7015,19 +7015,19 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -2;
+            double t = -2.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 6)
                a = fp_nan;
             if (_spoil_scenario == 7)
                a = fp_posinf;
             if (_spoil_scenario == 8)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = fp_nan;
             if (_spoil_scenario == 10)
@@ -7067,7 +7067,7 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
@@ -7103,19 +7103,19 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 6)
                a = fp_nan;
             if (_spoil_scenario == 7)
                a = fp_posinf;
             if (_spoil_scenario == 8)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = fp_nan;
             if (_spoil_scenario == 10)
@@ -7153,19 +7153,19 @@ int main() {
                spoil_vector_by_neginf(y);
             if (_spoil_scenario == 3)
                spoil_vector_by_deleting_element(y);
-            double t = -2;
+            double t = -2.0;
             if (_spoil_scenario == 4)
                t = fp_posinf;
             if (_spoil_scenario == 5)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 6)
                a = fp_nan;
             if (_spoil_scenario == 7)
                a = fp_posinf;
             if (_spoil_scenario == 8)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 9)
                b = fp_nan;
             if (_spoil_scenario == 10)
@@ -7201,7 +7201,7 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
@@ -7237,19 +7237,19 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 5)
                a = fp_nan;
             if (_spoil_scenario == 6)
                a = fp_posinf;
             if (_spoil_scenario == 7)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = fp_nan;
             if (_spoil_scenario == 9)
@@ -7287,19 +7287,19 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -2;
+            double t = -2.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 5)
                a = fp_nan;
             if (_spoil_scenario == 6)
                a = fp_posinf;
             if (_spoil_scenario == 7)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = fp_nan;
             if (_spoil_scenario == 9)
@@ -7337,7 +7337,7 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
@@ -7371,19 +7371,19 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -1;
+            double t = -1.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 5)
                a = fp_nan;
             if (_spoil_scenario == 6)
                a = fp_posinf;
             if (_spoil_scenario == 7)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = fp_nan;
             if (_spoil_scenario == 9)
@@ -7419,19 +7419,19 @@ int main() {
                spoil_vector_by_posinf(y);
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(y);
-            double t = -2;
+            double t = -2.0;
             if (_spoil_scenario == 3)
                t = fp_posinf;
             if (_spoil_scenario == 4)
                t = fp_neginf;
-            double a = -1;
+            double a = -1.0;
             if (_spoil_scenario == 5)
                a = fp_nan;
             if (_spoil_scenario == 6)
                a = fp_posinf;
             if (_spoil_scenario == 7)
                a = fp_neginf;
-            double b = +1;
+            double b = +1.0;
             if (_spoil_scenario == 8)
                b = fp_nan;
             if (_spoil_scenario == 9)
@@ -8561,7 +8561,7 @@ int main() {
             if (_spoil_scenario == 9)
                spoil_vector_by_deleting_element(y);
             ae_int_t m = 2;
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 10)
                t = fp_posinf;
             if (_spoil_scenario == 11)
@@ -8712,7 +8712,7 @@ int main() {
                spoil_vector_by_adding_element(dc);
             if (_spoil_scenario == 26)
                spoil_vector_by_deleting_element(dc);
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 27)
                t = fp_posinf;
             if (_spoil_scenario == 28)
@@ -8868,7 +8868,7 @@ int main() {
             if (_spoil_scenario == 7)
                spoil_vector_by_deleting_element(y);
             ae_int_t m = 2;
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 8)
                t = fp_posinf;
             if (_spoil_scenario == 9)
@@ -8930,7 +8930,7 @@ int main() {
             real_1d_array yc = "[]";
             integer_1d_array dc = "[]";
             ae_int_t m = 2;
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 12)
                t = fp_posinf;
             if (_spoil_scenario == 13)
@@ -9010,7 +9010,7 @@ int main() {
             if (_spoil_scenario == 20)
                spoil_vector_by_deleting_element(dc);
             ae_int_t m = 2;
-            double t = 2;
+            double t = 2.0;
             if (_spoil_scenario == 21)
                t = fp_posinf;
             if (_spoil_scenario == 22)
@@ -11710,7 +11710,7 @@ int main() {
 
          // we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
             ae_int_t k = 1;
-            double eps = 0;
+            double eps = 0.0;
             knnmodel model;
             knnreport rep;
             knnbuilderbuildknnmodel(builder, k, eps, model, rep);
@@ -11796,7 +11796,7 @@ int main() {
 
          // we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
             ae_int_t k = 1;
-            double eps = 0;
+            double eps = 0.0;
             knnmodel model;
             knnreport rep;
             knnbuilderbuildknnmodel(builder, k, eps, model, rep);

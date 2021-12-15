@@ -99,31 +99,31 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 // For NZ<N, build companion matrix and find NE non-zero roots
    if (ne > 0) {
       ae_matrix_set_length(&c, ne, ne, _state);
-      for (i = 0; i <= ne - 1; i++) {
-         for (j = 0; j <= ne - 1; j++) {
+      for (i = 0; i < ne; i++) {
+         for (j = 0; j < ne; j++) {
             c.xyR[i][j] = 0.0;
          }
       }
       c.xyR[0][ne - 1] = -a->xR[0];
-      for (i = 1; i <= ne - 1; i++) {
+      for (i = 1; i < ne; i++) {
          c.xyR[i][i - 1] = 1.0;
          c.xyR[i][ne - 1] = -a->xR[i];
       }
       status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr, _state);
       ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed", _state);
-      for (i = 0; i <= ne - 1; i++) {
+      for (i = 0; i < ne; i++) {
          x->xC[i].x = wr.xR[i];
          x->xC[i].y = wi.xR[i];
       }
    }
 // Remaining NZ zero roots
-   for (i = ne; i <= n - 1; i++) {
+   for (i = ne; i < n; i++) {
       x->xC[i] = ae_complex_from_i(0);
    }
 
 // Rep
    rep->maxerr = 0.0;
-   for (i = 0; i <= ne - 1; i++) {
+   for (i = 0; i < ne; i++) {
       v = ae_complex_from_i(0);
       vv = ae_complex_from_i(1);
       for (j = 0; j <= ne; j++) {
@@ -242,10 +242,10 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave(_state);
 }
 
@@ -295,9 +295,9 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
       return;
    }
    rmatrixlu(a, n, n, &p, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (a->xyR[i][i] == 0.0) {
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             b->xR[j] = 0.0;
          }
          *info = -3;
@@ -387,8 +387,8 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 
 // 1. factorize matrix
 // 3. solve
-   for (i = 0; i <= n - 1; i++) {
-      ae_v_move(&da.xyR[i][0], 1, &a->xyR[i][0], 1, ae_v_len(0, n - 1));
+   for (i = 0; i < n; i++) {
+      ae_v_move(da.xyR[i], 1, a->xyR[i], 1, n);
    }
    rmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
@@ -455,10 +455,10 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
       return;
    }
    rmatrixlu(a, n, n, &p, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (a->xyR[i][i] == 0.0) {
-         for (j = 0; j <= n - 1; j++) {
-            for (k = 0; k <= m - 1; k++) {
+         for (j = 0; j < n; j++) {
+            for (k = 0; k < m; k++) {
                b->xyR[j][k] = 0.0;
             }
          }
@@ -469,9 +469,9 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    }
 
 // Solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p.xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = b->xyR[i][j];
             b->xyR[i][j] = b->xyR[p.xZ[i]][j];
             b->xyR[p.xZ[i]][j] = v;
@@ -550,10 +550,10 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave(_state);
 }
 
@@ -596,9 +596,9 @@ void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int
       *info = -1;
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (lua->xyR[i][i] == 0.0) {
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             b->xR[j] = 0.0;
          }
          *info = -3;
@@ -725,10 +725,10 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
       *info = -1;
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (lua->xyR[i][i] == 0.0) {
-         for (j = 0; j <= n - 1; j++) {
-            for (k = 0; k <= m - 1; k++) {
+         for (j = 0; j < n; j++) {
+            for (k = 0; k < m; k++) {
                b->xyR[j][k] = 0.0;
             }
          }
@@ -738,9 +738,9 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
    }
 
 // Solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = b->xyR[i][j];
             b->xyR[i][j] = b->xyR[p->xZ[i]][j];
             b->xyR[p->xZ[i]][j] = v;
@@ -801,10 +801,10 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    rmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave(_state);
 }
 
@@ -930,8 +930,8 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
    ae_matrix_set_length(&da, n, n, _state);
 
 // factorize, solve
-   for (i = 0; i <= n - 1; i++) {
-      ae_v_cmove(&da.xyC[i][0], 1, &a->xyC[i][0], 1, "N", ae_v_len(0, n - 1));
+   for (i = 0; i < n; i++) {
+      ae_v_cmove(da.xyC[i], 1, a->xyC[i], 1, "N", n);
    }
    cmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
@@ -987,10 +987,10 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
       return;
    }
    cmatrixlu(a, n, n, &p, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
-         for (j = 0; j <= n - 1; j++) {
-            for (k = 0; k <= m - 1; k++) {
+         for (j = 0; j < n; j++) {
+            for (k = 0; k < m; k++) {
                b->xyC[j][k] = ae_complex_from_d(0.0);
             }
          }
@@ -1001,9 +1001,9 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    }
 
 // Solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p.xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = b->xyC[i][j];
             b->xyC[i][j] = b->xyC[p.xZ[i]][j];
             b->xyC[p.xZ[i]][j] = v;
@@ -1076,10 +1076,10 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave(_state);
 }
 
@@ -1122,9 +1122,9 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
       return;
    }
    cmatrixlu(a, n, n, &p, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             b->xC[j] = ae_complex_from_d(0.0);
          }
          *info = -3;
@@ -1244,10 +1244,10 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
       *info = -1;
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
-         for (j = 0; j <= n - 1; j++) {
-            for (k = 0; k <= m - 1; k++) {
+         for (j = 0; j < n; j++) {
+            for (k = 0; k < m; k++) {
                b->xyC[j][k] = ae_complex_from_d(0.0);
             }
          }
@@ -1257,9 +1257,9 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
    }
 
 // Solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = b->xyC[i][j];
             b->xyC[i][j] = b->xyC[p->xZ[i]][j];
             b->xyC[p->xZ[i]][j] = v;
@@ -1336,10 +1336,10 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave(_state);
 }
 
@@ -1384,9 +1384,9 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
       *info = -1;
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             b->xC[j] = ae_complex_from_d(0.0);
          }
          *info = -3;
@@ -1487,10 +1487,10 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    cmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave(_state);
 }
 
@@ -1567,7 +1567,7 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
 
 // factorize
 // solve
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (isupper) {
          j1 = i;
          j2 = n - 1;
@@ -1575,12 +1575,12 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t 
          j1 = 0;
          j2 = i;
       }
-      ae_v_move(&da.xyR[i][j1], 1, &a->xyR[i][j1], 1, ae_v_len(j1, j2));
+      ae_v_move(&da.xyR[i][j1], 1, &a->xyR[i][j1], 1, j2 - j1 + 1);
    }
    if (!spdmatrixcholesky(&da, n, isupper, _state)) {
       ae_matrix_set_length(x, n, m, _state);
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyR[i][j] = 0.0;
          }
       }
@@ -1636,8 +1636,8 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_in
       return;
    }
    if (!spdmatrixcholesky(a, n, isupper, _state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             b->xyR[i][j] = 0.0;
          }
       }
@@ -1721,10 +1721,10 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    spdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave(_state);
 }
 
@@ -1768,7 +1768,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int
       return;
    }
    if (!spdmatrixcholesky(a, n, isupper, _state)) {
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          b->xR[i] = 0.0;
       }
       *info = -3;
@@ -1894,10 +1894,10 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix
       *info = -1;
       return;
    }
-   for (k = 0; k <= n - 1; k++) {
+   for (k = 0; k < n; k++) {
       if (cha->xyR[k][k] == 0.0) {
-         for (i = 0; i <= n - 1; i++) {
-            for (j = 0; j <= m - 1; j++) {
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
                b->xyR[i][j] = 0.0;
             }
          }
@@ -1981,10 +1981,10 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, 
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_move(&bm.xyR[0][0], bm.stride, &b->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
    spdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_move(&x->xR[0], 1, &xm.xyR[0][0], xm.stride, ae_v_len(0, n - 1));
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave(_state);
 }
 
@@ -2026,9 +2026,9 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
       *info = -1;
       return;
    }
-   for (k = 0; k <= n - 1; k++) {
+   for (k = 0; k < n; k++) {
       if (cha->xyR[k][k] == 0.0) {
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             b->xR[i] = 0.0;
          }
          *info = -3;
@@ -2103,7 +2103,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
    ae_matrix_set_length(&da, n, n, _state);
 
 // factorize matrix, solve
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (isupper) {
          j1 = i;
          j2 = n - 1;
@@ -2111,12 +2111,12 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
          j1 = 0;
          j2 = i;
       }
-      ae_v_cmove(&da.xyC[i][j1], 1, &a->xyC[i][j1], 1, "N", ae_v_len(j1, j2));
+      ae_v_cmove(&da.xyC[i][j1], 1, &a->xyC[i][j1], 1, "N", j2 - j1 + 1);
    }
    if (!hpdmatrixcholesky(&da, n, isupper, _state)) {
       ae_matrix_set_length(x, n, m, _state);
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
@@ -2173,8 +2173,8 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
       return;
    }
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             b->xyC[i][j] = ae_complex_from_d(0.0);
          }
       }
@@ -2251,10 +2251,10 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    hpdmatrixsolvem(a, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave(_state);
 }
 
@@ -2300,7 +2300,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
       return;
    }
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          b->xC[i] = ae_complex_from_d(0.0);
       }
       *info = -3;
@@ -2428,10 +2428,10 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
       *info = -1;
       return;
    }
-   for (k = 0; k <= n - 1; k++) {
+   for (k = 0; k < n; k++) {
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
-         for (i = 0; i <= n - 1; i++) {
-            for (j = 0; j <= m - 1; j++) {
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
                b->xyC[i][j] = ae_complex_from_d(0.0);
             }
          }
@@ -2515,10 +2515,10 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, 
       return;
    }
    ae_matrix_set_length(&bm, n, 1, _state);
-   ae_v_cmove(&bm.xyC[0][0], bm.stride, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(bm.xyC[0], bm.stride, b->xC, 1, "N", n);
    hpdmatrixcholeskysolvem(cha, n, isupper, &bm, 1, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
-   ae_v_cmove(&x->xC[0], 1, &xm.xyC[0][0], xm.stride, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave(_state);
 }
 
@@ -2560,9 +2560,9 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
       *info = -1;
       return;
    }
-   for (k = 0; k <= n - 1; k++) {
+   for (k = 0; k < n; k++) {
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             b->xC[i] = ae_complex_from_d(0.0);
          }
          *info = -3;
@@ -2663,14 +2663,14 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
          *info = 1;
       }
       ae_vector_set_length(x, ncols, _state);
-      for (i = 0; i <= ncols - 1; i++) {
+      for (i = 0; i < ncols; i++) {
          x->xR[i] = 0.0;
       }
       rep->n = ncols;
       rep->k = ncols;
       ae_matrix_set_length(&rep->cx, ncols, ncols, _state);
-      for (i = 0; i <= ncols - 1; i++) {
-         for (j = 0; j <= ncols - 1; j++) {
+      for (i = 0; i < ncols; i++) {
+         for (j = 0; j < ncols; j++) {
             if (i == j) {
                rep->cx.xyR[i][j] = 1.0;
             } else {
@@ -2708,11 +2708,11 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    ae_vector_set_length(&ta, ncols + 1, _state);
    ae_vector_set_length(&tx, ncols + 1, _state);
    ae_vector_set_length(&buf, ncols + 1, _state);
-   for (i = 0; i <= ncols - 1; i++) {
+   for (i = 0; i < ncols; i++) {
       x->xR[i] = 0.0;
    }
    kernelidx = nsv;
-   for (i = 0; i <= nsv - 1; i++) {
+   for (i = 0; i < nsv; i++) {
       if (sv.xR[i] <= threshold * sv.xR[0]) {
          kernelidx = i;
          break;
@@ -2728,13 +2728,13 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       }
    // calculate right part
       if (rfs == 0) {
-         ae_v_move(&rp.xR[0], 1, &b->xR[0], 1, ae_v_len(0, nrows - 1));
+         ae_v_move(rp.xR, 1, b->xR, 1, nrows);
       } else {
          smallerr = true;
-         for (i = 0; i <= nrows - 1; i++) {
-            ae_v_move(&ta.xR[0], 1, &a->xyR[i][0], 1, ae_v_len(0, ncols - 1));
+         for (i = 0; i < nrows; i++) {
+            ae_v_move(ta.xR, 1, a->xyR[i], 1, ncols);
             ta.xR[ncols] = -1.0;
-            ae_v_move(&tx.xR[0], 1, &x->xR[0], 1, ae_v_len(0, ncols - 1));
+            ae_v_move(tx.xR, 1, x->xR, 1, ncols);
             tx.xR[ncols] = b->xR[i];
             xdot(&ta, &tx, ncols + 1, &buf, &v, &verr, _state);
             rp.xR[i] = -v;
@@ -2746,37 +2746,37 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       }
 
    // solve A*dx = rp
-      for (i = 0; i <= ncols - 1; i++) {
+      for (i = 0; i < ncols; i++) {
          tmp.xR[i] = 0.0;
       }
-      for (i = 0; i <= nsv - 1; i++) {
+      for (i = 0; i < nsv; i++) {
          utb.xR[i] = 0.0;
       }
-      for (i = 0; i <= nrows - 1; i++) {
+      for (i = 0; i < nrows; i++) {
          v = rp.xR[i];
-         ae_v_addd(&utb.xR[0], 1, &u.xyR[i][0], 1, ae_v_len(0, nsv - 1), v);
+         ae_v_addd(utb.xR, 1, u.xyR[i], 1, nsv, v);
       }
-      for (i = 0; i <= nsv - 1; i++) {
+      for (i = 0; i < nsv; i++) {
          if (i < kernelidx) {
             sutb.xR[i] = utb.xR[i] / sv.xR[i];
          } else {
             sutb.xR[i] = 0.0;
          }
       }
-      for (i = 0; i <= nsv - 1; i++) {
+      for (i = 0; i < nsv; i++) {
          v = sutb.xR[i];
-         ae_v_addd(&tmp.xR[0], 1, &vt.xyR[i][0], 1, ae_v_len(0, ncols - 1), v);
+         ae_v_addd(tmp.xR, 1, vt.xyR[i], 1, ncols, v);
       }
 
    // update x:  x:=x+dx
-      ae_v_add(&x->xR[0], 1, &tmp.xR[0], 1, ae_v_len(0, ncols - 1));
+      ae_v_add(x->xR, 1, tmp.xR, 1, ncols);
    }
 
 // fill CX
    if (rep->k > 0) {
       ae_matrix_set_length(&rep->cx, ncols, rep->k, _state);
-      for (i = 0; i <= rep->k - 1; i++) {
-         ae_v_move(&rep->cx.xyR[0][i], rep->cx.stride, &vt.xyR[kernelidx + i][0], 1, ae_v_len(0, ncols - 1));
+      for (i = 0; i < rep->k; i++) {
+         ae_v_move(&rep->cx.xyR[0][i], rep->cx.stride, vt.xyR[kernelidx + i], 1, ncols);
       }
    }
    ae_frame_leave(_state);
@@ -2814,7 +2814,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
       ae_frame_leave(_state);
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave(_state);
@@ -2833,8 +2833,8 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    rep->r1 = rmatrixlurcond1(lua, n, _state);
    rep->rinf = rmatrixlurcondinf(lua, n, _state);
    if (rep->r1 < rcondthreshold(_state) || rep->rinf < rcondthreshold(_state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyR[i][j] = 0.0;
          }
       }
@@ -2848,16 +2848,16 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
 
 // First stage of solution: rough solution with TRSM()
    mxb = 0.0;
-   for (i = 0; i <= n - 1; i++) {
-      for (j = 0; j <= m - 1; j++) {
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
          v = b->xyR[i][j];
          mxb = ae_maxreal(mxb, ae_fabs(v, _state), _state);
          x->xyR[i][j] = v;
       }
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = x->xyR[i][j];
             x->xyR[i][j] = x->xyR[p->xZ[i]][j];
             x->xyR[p->xZ[i]][j] = v;
@@ -2869,18 +2869,18 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
 
 // Second stage: iterative refinement
    if (havea) {
-      for (k = 0; k <= m - 1; k++) {
+      for (k = 0; k < m; k++) {
          nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf, _state);
          terminatenexttime = false;
-         for (rfs = 0; rfs <= nrfs - 1; rfs++) {
+         for (rfs = 0; rfs < nrfs; rfs++) {
             if (terminatenexttime) {
                break;
             }
          // generate right part
             smallerr = true;
-            ae_v_move(&xb.xR[0], 1, &x->xyR[0][k], x->stride, ae_v_len(0, n - 1));
-            for (i = 0; i <= n - 1; i++) {
-               ae_v_move(&xa.xR[0], 1, &a->xyR[i][0], 1, ae_v_len(0, n - 1));
+            ae_v_move(xb.xR, 1, &x->xyR[0][k], x->stride, n);
+            for (i = 0; i < n; i++) {
+               ae_v_move(xa.xR, 1, a->xyR[i], 1, n);
                xa.xR[n] = -1.0;
                xb.xR[n] = b->xyR[i][k];
                xdot(&xa, &xb, n + 1, &tx, &v, &verr, _state);
@@ -2892,7 +2892,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
             }
          // solve and update
             directdensesolvers_rbasiclusolve(lua, p, n, &y, _state);
-            ae_v_add(&x->xyR[0][k], x->stride, &y.xR[0], 1, ae_v_len(0, n - 1));
+            ae_v_add(&x->xyR[0][k], x->stride, y.xR, 1, n);
          }
       }
    }
@@ -2920,8 +2920,8 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
    rep->r1 = spdmatrixcholeskyrcond(cha, n, isupper, _state);
    rep->rinf = rep->r1;
    if (rep->r1 < rcondthreshold(_state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyR[i][j] = 0.0;
          }
       }
@@ -2933,8 +2933,8 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
    *info = 1;
 
 // Solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
-      for (j = 0; j <= m - 1; j++) {
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
          x->xyR[i][j] = b->xyR[i][j];
       }
    }
@@ -2979,7 +2979,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
       ae_frame_leave(_state);
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave(_state);
@@ -2999,8 +2999,8 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    rep->r1 = cmatrixlurcond1(lua, n, _state);
    rep->rinf = cmatrixlurcondinf(lua, n, _state);
    if (rep->r1 < rcondthreshold(_state) || rep->rinf < rcondthreshold(_state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
@@ -3013,14 +3013,14 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    *info = 1;
 
 // First phase: solve with TRSM()
-   for (i = 0; i <= n - 1; i++) {
-      for (j = 0; j <= m - 1; j++) {
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
          x->xyC[i][j] = b->xyC[i][j];
       }
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             v = x->xyC[i][j];
             x->xyC[i][j] = x->xyC[p->xZ[i]][j];
             x->xyC[p->xZ[i]][j] = v;
@@ -3031,9 +3031,9 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    cmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, x, 0, 0, _state);
 
 // solve
-   for (k = 0; k <= m - 1; k++) {
-      ae_v_cmove(&bc.xC[0], 1, &b->xyC[0][k], b->stride, "N", ae_v_len(0, n - 1));
-      ae_v_cmove(&xc.xC[0], 1, &x->xyC[0][k], x->stride, "N", ae_v_len(0, n - 1));
+   for (k = 0; k < m; k++) {
+      ae_v_cmove(bc.xC, 1, &b->xyC[0][k], b->stride, "N", n);
+      ae_v_cmove(xc.xC, 1, &x->xyC[0][k], x->stride, "N", n);
 
    // Iterative refinement of xc:
    // * calculate r = bc-A*xc using extra-precise dot product
@@ -3046,15 +3046,15 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
       if (havea) {
          nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf, _state);
          terminatenexttime = false;
-         for (rfs = 0; rfs <= nrfs - 1; rfs++) {
+         for (rfs = 0; rfs < nrfs; rfs++) {
             if (terminatenexttime) {
                break;
             }
          // generate right part
             smallerr = true;
-            ae_v_cmove(&xb.xC[0], 1, &xc.xC[0], 1, "N", ae_v_len(0, n - 1));
-            for (i = 0; i <= n - 1; i++) {
-               ae_v_cmove(&xa.xC[0], 1, &a->xyC[i][0], 1, "N", ae_v_len(0, n - 1));
+            ae_v_cmove(xb.xC, 1, xc.xC, 1, "N", n);
+            for (i = 0; i < n; i++) {
+               ae_v_cmove(xa.xC, 1, a->xyC[i], 1, "N", n);
                xa.xC[n] = ae_complex_from_i(-1);
                xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr, _state);
@@ -3066,12 +3066,12 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
             }
          // solve and update
             directdensesolvers_cbasiclusolve(lua, p, n, &y, _state);
-            ae_v_cadd(&xc.xC[0], 1, &y.xC[0], 1, "N", ae_v_len(0, n - 1));
+            ae_v_cadd(xc.xC, 1, y.xC, 1, "N", n);
          }
       }
    // Store xc.
    // Post-scale result.
-      ae_v_cmove(&x->xyC[0][k], x->stride, &xc.xC[0], 1, "N", ae_v_len(0, n - 1));
+      ae_v_cmove(&x->xyC[0][k], x->stride, xc.xC, 1, "N", n);
    }
    ae_frame_leave(_state);
 }
@@ -3112,8 +3112,8 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    rep->r1 = hpdmatrixcholeskyrcond(cha, n, isupper, _state);
    rep->rinf = rep->r1;
    if (rep->r1 < rcondthreshold(_state)) {
-      for (i = 0; i <= n - 1; i++) {
-         for (j = 0; j <= m - 1; j++) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
             x->xyC[i][j] = ae_complex_from_i(0);
          }
       }
@@ -3126,8 +3126,8 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    *info = 1;
 
 // solve
-   for (i = 0; i <= n - 1; i++) {
-      for (j = 0; j <= m - 1; j++) {
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
          x->xyC[i][j] = b->xyC[i][j];
       }
    }
@@ -3176,20 +3176,20 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
    ae_int_t i;
    double v;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          v = xb->xR[i];
          xb->xR[i] = xb->xR[p->xZ[i]];
          xb->xR[p->xZ[i]] = v;
       }
    }
-   for (i = 1; i <= n - 1; i++) {
-      v = ae_v_dotproduct(&lua->xyR[i][0], 1, &xb->xR[0], 1, ae_v_len(0, i - 1));
+   for (i = 1; i < n; i++) {
+      v = ae_v_dotproduct(lua->xyR[i], 1, xb->xR, 1, i);
       xb->xR[i] = xb->xR[i] - v;
    }
    xb->xR[n - 1] = xb->xR[n - 1] / lua->xyR[n - 1][n - 1];
    for (i = n - 2; i >= 0; i--) {
-      v = ae_v_dotproduct(&lua->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, ae_v_len(i + 1, n - 1));
+      v = ae_v_dotproduct(&lua->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
       xb->xR[i] = (xb->xR[i] - v) / lua->xyR[i][i];
    }
 }
@@ -3208,18 +3208,18 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
    if (isupper) {
 
    // Solve U'*y=b first.
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
          if (i < n - 1) {
             v = xb->xR[i];
-            ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, ae_v_len(i + 1, n - 1), v);
+            ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, n - i - 1, v);
          }
       }
 
    // Solve U*x=y then.
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
-            v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, ae_v_len(i + 1, n - 1));
+            v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
             xb->xR[i] = xb->xR[i] - v;
          }
          xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
@@ -3227,9 +3227,9 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
    } else {
 
    // Solve L*y=b first
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          if (i > 0) {
-            v = ae_v_dotproduct(&cha->xyR[i][0], 1, &xb->xR[0], 1, ae_v_len(0, i - 1));
+            v = ae_v_dotproduct(cha->xyR[i], 1, xb->xR, 1, i);
             xb->xR[i] = xb->xR[i] - v;
          }
          xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
@@ -3240,7 +3240,7 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
          xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
          if (i > 0) {
             v = xb->xR[i];
-            ae_v_subd(&xb->xR[0], 1, &cha->xyR[i][0], 1, ae_v_len(0, i - 1), v);
+            ae_v_subd(xb->xR, 1, cha->xyR[i], 1, i, v);
          }
       }
    }
@@ -3256,20 +3256,20 @@ static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t 
    ae_int_t i;
    ae_complex v;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          v = xb->xC[i];
          xb->xC[i] = xb->xC[p->xZ[i]];
          xb->xC[p->xZ[i]] = v;
       }
    }
-   for (i = 1; i <= n - 1; i++) {
-      v = ae_v_cdotproduct(&lua->xyC[i][0], 1, "N", &xb->xC[0], 1, "N", ae_v_len(0, i - 1));
+   for (i = 1; i < n; i++) {
+      v = ae_v_cdotproduct(lua->xyC[i], 1, "N", xb->xC, 1, "N", i);
       xb->xC[i] = ae_c_sub(xb->xC[i], v);
    }
    xb->xC[n - 1] = ae_c_div(xb->xC[n - 1], lua->xyC[n - 1][n - 1]);
    for (i = n - 2; i >= 0; i--) {
-      v = ae_v_cdotproduct(&lua->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
+      v = ae_v_cdotproduct(&lua->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
       xb->xC[i] = ae_c_div(ae_c_sub(xb->xC[i], v), lua->xyC[i][i]);
    }
 }
@@ -3288,18 +3288,18 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
    if (isupper) {
 
    // Solve U'*y=b first.
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
          if (i < n - 1) {
             v = xb->xC[i];
-            ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", ae_v_len(i + 1, n - 1), v);
+            ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", n - i - 1, v);
          }
       }
 
    // Solve U*x=y then.
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
-            v = ae_v_cdotproduct(&cha->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", ae_v_len(i + 1, n - 1));
+            v = ae_v_cdotproduct(&cha->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
             xb->xC[i] = ae_c_sub(xb->xC[i], v);
          }
          xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
@@ -3307,9 +3307,9 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
    } else {
 
    // Solve L*y=b first
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          if (i > 0) {
-            v = ae_v_cdotproduct(&cha->xyC[i][0], 1, "N", &xb->xC[0], 1, "N", ae_v_len(0, i - 1));
+            v = ae_v_cdotproduct(cha->xyC[i], 1, "N", xb->xC, 1, "N", i);
             xb->xC[i] = ae_c_sub(xb->xC[i], v);
          }
          xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
@@ -3320,7 +3320,7 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
          xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
          if (i > 0) {
             v = xb->xC[i];
-            ae_v_csubc(&xb->xC[0], 1, &cha->xyC[i][0], 1, "Conj", ae_v_len(0, i - 1), v);
+            ae_v_csubc(xb->xC, 1, cha->xyC[i], 1, "Conj", i, v);
          }
       }
    }
@@ -3752,13 +3752,13 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
    sparsecopytosks(a, &a2, _state);
    if (!sparsecholeskyskyline(&a2, n, isupper, _state)) {
       rep->terminationtype = -3;
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          x->xR[i] = 0.0;
       }
       ae_frame_leave(_state);
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
    }
    if (isupper) {
@@ -3822,7 +3822,7 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
       return;
    }
    rcopyallocv(n, b, x, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       j = p.xZ[i];
       v = x->xR[i];
       x->xR[i] = x->xR[j];
@@ -3883,16 +3883,16 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
    ae_assert(isfinitevector(b, n, _state), "SparseSPDCholeskySolve: B contains infinities or NANs", _state);
    initsparsesolverreport(rep, _state);
    ae_vector_set_length(x, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (sparseget(a, i, i, _state) == 0.0) {
          rep->terminationtype = -3;
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             x->xR[i] = 0.0;
          }
          return;
       }
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
    }
    if (isupper) {
@@ -3950,16 +3950,16 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    sparsecopytocrs(a, &a2, _state);
    if (!sparselu(&a2, 0, &pivp, &pivq, _state)) {
       rep->terminationtype = -3;
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          x->xR[i] = 0.0;
       }
       ae_frame_leave(_state);
       return;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       j = pivp.xZ[i];
       v = x->xR[i];
       x->xR[i] = x->xR[j];
@@ -4018,25 +4018,25 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
    ae_assert(isfinitevector(b, n, _state), "SparseLUSolve: B contains infinities or NANs", _state);
    ae_assert(p->cnt >= n, "SparseLUSolve: length(P)<N", _state);
    ae_assert(q->cnt >= n, "SparseLUSolve: length(Q)<N", _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       ae_assert(p->xZ[i] >= i && p->xZ[i] < n, "SparseLUSolve: P is corrupted", _state);
       ae_assert(q->xZ[i] >= i && q->xZ[i] < n, "SparseLUSolve: Q is corrupted", _state);
    }
    initsparsesolverreport(rep, _state);
    ae_vector_set_length(x, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (a->didx.xZ[i] == a->uidx.xZ[i] || a->vals.xR[a->didx.xZ[i]] == 0.0) {
          rep->terminationtype = -3;
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             x->xR[i] = 0.0;
          }
          return;
       }
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = b->xR[i];
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       j = p->xZ[i];
       v = x->xR[i];
       x->xR[i] = x->xR[j];
@@ -5356,7 +5356,7 @@ void sparsesolverrequesttermination(const sparsesolverstate &state, const xparam
 // === LINCG Package ===
 // Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
-static double lincg_defaultprecision = 1.0E-6;
+static const double lincg_defaultprecision = 1.0E-6;
 static void lincg_clearrfields(lincgstate *state, ae_state *_state);
 static void lincg_updateitersdata(lincgstate *state, ae_state *_state);
 
@@ -5408,7 +5408,7 @@ void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
    ae_vector_set_length(&state->rx, state->n, _state);
    ae_vector_set_length(&state->startx, state->n, _state);
    ae_vector_set_length(&state->b, state->n, _state);
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->rx.xR[i] = _state->v_nan;
       state->startx.xR[i] = 0.0;
       state->b.xR[i] = 0.0;
@@ -5443,7 +5443,7 @@ void lincgsetstartingpoint(lincgstate *state, RVector *x, ae_state *_state) {
    ae_assert(!state->running, "LinCGSetStartingPoint: you can not change starting point because LinCGIteration() function is running", _state);
    ae_assert(state->n <= x->cnt, "LinCGSetStartingPoint: Length(X)<N", _state);
    ae_assert(isfinitevector(x, state->n, _state), "LinCGSetStartingPoint: X contains infinite or NaN values!", _state);
-   ae_v_move(&state->startx.xR[0], 1, &x->xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->startx.xR, 1, x->xR, 1, state->n);
 }
 
 // This function sets right part. By default, right part is zero.
@@ -5459,7 +5459,7 @@ void lincgsetb(lincgstate *state, RVector *b, ae_state *_state) {
    ae_assert(!state->running, "LinCGSetB: you can not set B, because function LinCGIteration is running!", _state);
    ae_assert(b->cnt >= state->n, "LinCGSetB: Length(B)<N", _state);
    ae_assert(isfinitevector(b, state->n, _state), "LinCGSetB: B contains infinite or NaN values!", _state);
-   ae_v_move(&state->b.xR[0], 1, &b->xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->b.xR, 1, b->xR, 1, state->n);
 }
 
 // This  function  changes  preconditioning  settings  of  LinCGSolveSparse()
@@ -5581,8 +5581,8 @@ bool lincgiteration(lincgstate *state, ae_state *_state) {
    lincg_updateitersdata(state, _state);
 
 // Start 0-th iteration
-   ae_v_move(&state->rx.xR[0], 1, &state->startx.xR[0], 1, ae_v_len(0, state->n - 1));
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->rx.xR, 1, state->startx.xR, 1, state->n);
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
@@ -5593,7 +5593,7 @@ lbl_0:
    bnorm = 0.0;
    state->r2 = 0.0;
    state->meritfunction = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->r.xR[i] = state->b.xR[i] - state->mv.xR[i];
       state->r2 = state->r2 + state->r.xR[i] * state->r.xR[i];
       state->meritfunction = state->meritfunction + state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
@@ -5605,7 +5605,7 @@ lbl_0:
    if (!state->xrep) {
       goto lbl_8;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 1;
@@ -5626,7 +5626,7 @@ lbl_8:
       return result;
    }
 // Calculate Z and P
-   ae_v_move(&state->x.xR[0], 1, &state->r.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->r.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needprec = true;
@@ -5634,7 +5634,7 @@ lbl_8:
    goto lbl_rcomm;
 lbl_2:
    state->needprec = false;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->z.xR[i] = state->pv.xR[i];
       state->p.xR[i] = state->z.xR[i];
    }
@@ -5648,7 +5648,7 @@ lbl_10:
    state->repiterationscount = state->repiterationscount + 1;
 
 // Calculate Alpha
-   ae_v_move(&state->x.xR[0], 1, &state->p.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
@@ -5670,7 +5670,7 @@ lbl_3:
       return result;
    }
    state->alpha = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->alpha = state->alpha + state->r.xR[i] * state->z.xR[i];
    }
    state->alpha = state->alpha / state->vmv;
@@ -5683,7 +5683,7 @@ lbl_3:
       return result;
    }
 // Next step toward solution
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->cx.xR[i] = state->rx.xR[i] + state->alpha * state->p.xR[i];
    }
 
@@ -5695,7 +5695,7 @@ lbl_3:
       goto lbl_12;
    }
 // Calculate R using recurrent formula
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->cr.xR[i] = state->r.xR[i] - state->alpha * state->mv.xR[i];
       state->x.xR[i] = state->cr.xR[i];
    }
@@ -5703,7 +5703,7 @@ lbl_3:
 lbl_12:
 
 // Calculate R using matrix-vector multiplication
-   ae_v_move(&state->x.xR[0], 1, &state->cx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
    state->needmv = true;
@@ -5711,7 +5711,7 @@ lbl_12:
    goto lbl_rcomm;
 lbl_4:
    state->needmv = false;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
       state->x.xR[i] = state->cr.xR[i];
    }
@@ -5719,13 +5719,13 @@ lbl_4:
 // Calculating merit function
 // Check emergency stopping criterion
    v = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       v = v + state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
    }
    if (v < state->meritfunction) {
       goto lbl_14;
    }
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       if (!ae_isfinite(state->rx.xR[i], _state)) {
          state->running = false;
          state->repterminationtype = -4;
@@ -5738,7 +5738,7 @@ lbl_4:
    if (!state->xrep) {
       goto lbl_16;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 5;
@@ -5753,13 +5753,13 @@ lbl_16:
 lbl_14:
    state->meritfunction = v;
 lbl_13:
-   ae_v_move(&state->rx.xR[0], 1, &state->cx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->rx.xR, 1, state->cx.xR, 1, state->n);
 
 // calculating RNorm
 //
 // NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
    state->r2 = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->r2 = state->r2 + state->cr.xR[i] * state->cr.xR[i];
    }
 
@@ -5767,7 +5767,7 @@ lbl_13:
    if (!state->xrep) {
       goto lbl_18;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    lincg_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 6;
@@ -5789,7 +5789,7 @@ lbl_18:
       return result;
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-      for (i = 0; i <= state->n - 1; i++) {
+      for (i = 0; i < state->n; i++) {
          if (!ae_isfinite(state->rx.xR[i], _state)) {
             state->running = false;
             state->repterminationtype = -4;
@@ -5804,7 +5804,7 @@ lbl_18:
       result = false;
       return result;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->cr.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
 
 // prepere of parameters for next iteration
    state->repnmv = state->repnmv + 1;
@@ -5814,11 +5814,11 @@ lbl_18:
    goto lbl_rcomm;
 lbl_7:
    state->needprec = false;
-   ae_v_move(&state->cz.xR[0], 1, &state->pv.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
    if (state->repiterationscount % state->itsbeforerestart != 0) {
       state->beta = 0.0;
       uvar = 0.0;
-      for (i = 0; i <= state->n - 1; i++) {
+      for (i = 0; i < state->n; i++) {
          state->beta = state->beta + state->cz.xR[i] * state->cr.xR[i];
          uvar = uvar + state->z.xR[i] * state->r.xR[i];
       }
@@ -5840,15 +5840,15 @@ lbl_7:
          result = false;
          return result;
       }
-      for (i = 0; i <= state->n - 1; i++) {
+      for (i = 0; i < state->n; i++) {
          state->p.xR[i] = state->cz.xR[i] + state->beta * state->p.xR[i];
       }
    } else {
-      ae_v_move(&state->p.xR[0], 1, &state->cz.xR[0], 1, ae_v_len(0, state->n - 1));
+      ae_v_move(state->p.xR, 1, state->cz.xR, 1, state->n);
    }
 
 // prepere data for next iteration
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
 
    // write (k+1)th iteration to (k )th iteration
       state->r.xR[i] = state->cr.xR[i];
@@ -5910,7 +5910,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
    if (state->prectype == 0) {
 
    // Default preconditioner - inverse of matrix diagonal
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          v = sparsegetdiagonal(a, i, _state);
          if (v > 0.0) {
             state->tmpd.xR[i] = 1 / ae_sqrt(v, _state);
@@ -5921,7 +5921,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
    } else {
 
    // No diagonal scaling
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          state->tmpd.xR[i] = 1.0;
       }
    }
@@ -5937,11 +5937,11 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       }
       if (state->needvmv) {
          sparsesmv(a, isupper, &state->x, &state->mv, _state);
-         vmv = ae_v_dotproduct(&state->x.xR[0], 1, &state->mv.xR[0], 1, ae_v_len(0, state->n - 1));
+         vmv = ae_v_dotproduct(state->x.xR, 1, state->mv.xR, 1, state->n);
          state->vmv = vmv;
       }
       if (state->needprec) {
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             state->pv.xR[i] = state->x.xR[i] * ae_sqr(state->tmpd.xR[i], _state);
          }
       }
@@ -5980,7 +5980,7 @@ void lincgresults(lincgstate *state, RVector *x, lincgreport *rep, ae_state *_st
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
    rep->terminationtype = state->repterminationtype;
@@ -6267,8 +6267,8 @@ void lincgsetxrep(const lincgstate &state, const bool needxrep, const xparams _x
 // === LINLSQR Package ===
 // Depends on: (LinAlg) SVD, NORMESTIMATOR
 namespace alglib_impl {
-static double linlsqr_atol = 1.0E-6;
-static double linlsqr_btol = 1.0E-6;
+static const double linlsqr_atol = 1.0E-6;
+static const double linlsqr_btol = 1.0E-6;
 static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state);
 
 // This function initializes linear LSQR Solver. This solver is used to solve
@@ -6351,10 +6351,10 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
    ae_vector_set_length(&state->mv, state->m + state->n, _state);
    ae_vector_set_length(&state->mtv, state->n, _state);
    ae_vector_set_length(&state->b, state->m, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       state->rx.xR[i] = _state->v_nan;
    }
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       state->b.xR[i] = 0.0;
    }
    ae_vector_set_length(&state->rstate.ia, 1 + 1, _state);
@@ -6377,7 +6377,7 @@ void linlsqrsetb(linlsqrstate *state, RVector *b, ae_state *_state) {
    ae_assert(state->m <= b->cnt, "LinLSQRSetB: Length(B)<M", _state);
    ae_assert(isfinitevector(b, state->m, _state), "LinLSQRSetB: B contains infinite or NaN values", _state);
    state->bnorm2 = 0.0;
-   for (i = 0; i <= state->m - 1; i++) {
+   for (i = 0; i < state->m; i++) {
       state->b.xR[i] = b->xR[i];
       state->bnorm2 = state->bnorm2 + b->xR[i] * b->xR[i];
    }
@@ -6494,7 +6494,7 @@ lbl_7:
    if (!state->nes.needmv) {
       goto lbl_9;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->nes.x.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
@@ -6502,13 +6502,13 @@ lbl_7:
    goto lbl_rcomm;
 lbl_0:
    state->needmv = false;
-   ae_v_move(&state->nes.mv.xR[0], 1, &state->mv.xR[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
    goto lbl_7;
 lbl_9:
    if (!state->nes.needmtv) {
       goto lbl_11;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->nes.x.xR[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
 
 // matrix-vector multiplication
    state->repnmv = state->repnmv + 1;
@@ -6518,7 +6518,7 @@ lbl_9:
    goto lbl_rcomm;
 lbl_1:
    state->needmtv = false;
-   ae_v_move(&state->nes.mtv.xR[0], 1, &state->mtv.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
    goto lbl_7;
 lbl_11:
    goto lbl_7;
@@ -6526,7 +6526,7 @@ lbl_8:
    normestimatorresults(&state->nes, &state->anorm, _state);
 
 // initialize .RX by zeros
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->rx.xR[i] = 0.0;
    }
 
@@ -6534,7 +6534,7 @@ lbl_8:
    if (!state->xrep) {
       goto lbl_13;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    linlsqr_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 2;
@@ -6579,7 +6579,7 @@ lbl_13:
       result = false;
       return result;
    }
-   for (i = 0; i <= summn - 1; i++) {
+   for (i = 0; i < summn; i++) {
       if (i < state->m) {
          state->ui.xR[i] = state->b.xR[i] / state->betai;
       } else {
@@ -6594,11 +6594,11 @@ lbl_13:
    goto lbl_rcomm;
 lbl_3:
    state->needmtv = false;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->ui.xR[state->m + i];
    }
    state->alphai = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->alphai = state->alphai + state->mtv.xR[i] * state->mtv.xR[i];
    }
    state->alphai = ae_sqrt(state->alphai, _state);
@@ -6610,13 +6610,13 @@ lbl_3:
       result = false;
       return result;
    }
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->vi.xR[i] = state->mtv.xR[i] / state->alphai;
       state->omegai.xR[i] = state->vi.xR[i];
    }
    state->phibari = state->betai;
    state->rhobari = state->alphai;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->d.xR[i] = 0.0;
    }
    state->dnorm = 0.0;
@@ -6640,7 +6640,7 @@ lbl_15:
 //        occurs). However, near-zero alpha and beta won't stop algorithm
 //        and, although no division by zero will happen, orthogonality
 //        in U and V will be lost.
-   ae_v_move(&state->x.xR[0], 1, &state->vi.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
@@ -6648,21 +6648,21 @@ lbl_15:
    goto lbl_rcomm;
 lbl_4:
    state->needmv = false;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
    }
    state->betaip1 = 0.0;
-   for (i = 0; i <= summn - 1; i++) {
+   for (i = 0; i < summn; i++) {
       state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
       state->betaip1 = state->betaip1 + state->uip1.xR[i] * state->uip1.xR[i];
    }
    if (state->betaip1 != 0.0) {
       state->betaip1 = ae_sqrt(state->betaip1, _state);
-      for (i = 0; i <= summn - 1; i++) {
+      for (i = 0; i < summn; i++) {
          state->uip1.xR[i] = state->uip1.xR[i] / state->betaip1;
       }
    }
-   ae_v_move(&state->x.xR[0], 1, &state->uip1.xR[0], 1, ae_v_len(0, state->m - 1));
+   ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
    state->needmtv = true;
@@ -6670,17 +6670,17 @@ lbl_4:
    goto lbl_rcomm;
 lbl_5:
    state->needmtv = false;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->uip1.xR[state->m + i];
    }
    state->alphaip1 = 0.0;
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
       state->alphaip1 = state->alphaip1 + state->vip1.xR[i] * state->vip1.xR[i];
    }
    if (state->alphaip1 != 0.0) {
       state->alphaip1 = ae_sqrt(state->alphaip1, _state);
-      for (i = 0; i <= state->n - 1; i++) {
+      for (i = 0; i < state->n; i++) {
          state->vip1.xR[i] = state->vip1.xR[i] / state->alphaip1;
       }
    }
@@ -6704,7 +6704,7 @@ lbl_5:
    state->r2 = ae_minreal(state->r2, state->phibarip1 * state->phibarip1, _state);
 
 // Update d and DNorm, check condition-related stopping criteria
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
       state->dnorm = state->dnorm + state->d.xR[i] * state->d.xR[i];
    }
@@ -6715,13 +6715,13 @@ lbl_5:
       return result;
    }
 // Update x, output report
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->rx.xR[i] = state->rx.xR[i] + state->phii / state->rhoi * state->omegai.xR[i];
    }
    if (!state->xrep) {
       goto lbl_17;
    }
-   ae_v_move(&state->x.xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    linlsqr_clearrfields(state, _state);
    state->xupdated = true;
    state->rstate.stage = 6;
@@ -6767,7 +6767,7 @@ lbl_17:
       return result;
    }
 // Update omega
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
    }
 
@@ -6776,9 +6776,9 @@ lbl_17:
 // v[i]   := v[i+1]
 // rho[i] := rho[i+1]
 // ...
-   ae_v_move(&state->ui.xR[0], 1, &state->uip1.xR[0], 1, ae_v_len(0, summn - 1));
-   ae_v_move(&state->vi.xR[0], 1, &state->vip1.xR[0], 1, ae_v_len(0, state->n - 1));
-   ae_v_move(&state->omegai.xR[0], 1, &state->omegaip1.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->ui.xR, 1, state->uip1.xR, 1, summn);
+   ae_v_move(state->vi.xR, 1, state->vip1.xR, 1, state->n);
+   ae_v_move(state->omegai.xR, 1, state->omegaip1.xR, 1, state->n);
    state->alphai = state->alphaip1;
    state->betai = state->betaip1;
    state->phibari = state->phibarip1;
@@ -6838,7 +6838,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
    if (state->prectype == 0) {
 
    // Default preconditioner - inverse of column norms
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          state->tmpd.xR[i] = 0.0;
       }
       t0 = 0;
@@ -6846,7 +6846,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v, _state)) {
          state->tmpd.xR[j] = state->tmpd.xR[j] + ae_sqr(v, _state);
       }
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
             state->tmpd.xR[i] = 1 / ae_sqrt(state->tmpd.xR[i], _state);
          } else {
@@ -6856,7 +6856,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
    } else {
 
    // No diagonal scaling
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          state->tmpd.xR[i] = 1.0;
       }
    }
@@ -6871,19 +6871,19 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
    linlsqrrestart(state, _state);
    while (linlsqriteration(state, _state)) {
       if (state->needmv) {
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
          }
          sparsemv(a, &state->tmpx, &state->mv, _state);
       }
       if (state->needmtv) {
          sparsemtv(a, &state->x, &state->mtv, _state);
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             state->mtv.xR[i] = state->tmpd.xR[i] * state->mtv.xR[i];
          }
       }
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       state->rx.xR[i] = state->tmpd.xR[i] * state->rx.xR[i];
    }
 }
@@ -6952,7 +6952,7 @@ void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_stat
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->xR[0], 1, &state->rx.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
    rep->terminationtype = state->repterminationtype;
@@ -7515,7 +7515,7 @@ bool nleqiteration(nleqstate *state, ae_state *_state) {
 lbl_0:
    state->needf = false;
    state->repnfunc = state->repnfunc + 1;
-   ae_v_move(&state->xbase.xR[0], 1, &state->x.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
    state->fprev = ae_maxrealnumber;
    if (!state->xrep) {
@@ -7549,7 +7549,7 @@ lbl_7:
 // at XBase
    nleq_clearrequestfields(state, _state);
    state->needfij = true;
-   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
@@ -7557,7 +7557,7 @@ lbl_2:
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
    rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0, _state);
-   ae_v_muld(&state->rightpart.xR[0], 1, ae_v_len(0, n - 1), -1);
+   ae_v_muld(state->rightpart.xR, 1, n, -1);
 
 // Inner cycle: find good lambda
 lbl_9:
@@ -7569,14 +7569,14 @@ lbl_9:
 // * Mu=||F|| - is damping parameter for nonlinear system
 // * Lambda   - is additional Levenberg-Marquardt parameter
 //              for better convergence when far away from minimum
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       state->candstep.xR[i] = 0.0;
    }
    fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf, _state);
 
 // Normalize step (it must be no more than StpMax)
    stepnorm = 0.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (state->candstep.xR[i] != 0.0) {
          stepnorm = 1.0;
          break;
@@ -7593,10 +7593,10 @@ lbl_9:
 // We can break this cycle on two occasions:
 // * step is so small that x+step == x (in floating point arithmetics)
 // * lambda is so large
-   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
-   ae_v_addd(&state->x.xR[0], 1, &state->candstep.xR[0], 1, ae_v_len(0, n - 1), stepnorm);
+   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+   ae_v_addd(state->x.xR, 1, state->candstep.xR, 1, n, stepnorm);
    b = true;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       if (state->x.xR[i] != state->xbase.xR[i]) {
          b = false;
          break;
@@ -7606,7 +7606,7 @@ lbl_9:
 
    // Step is too small, force zero step and break
       stepnorm = 0.0;
-      ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
       state->f = state->fbase;
       goto lbl_10;
    }
@@ -7627,7 +7627,7 @@ lbl_3:
 
    // Lambda is too large (near overflow), force zero step and break
       stepnorm = 0.0;
-      ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
       state->f = state->fbase;
       goto lbl_10;
    }
@@ -7638,7 +7638,7 @@ lbl_10:
 // * new position
 // * new function value
    state->fbase = state->f;
-   ae_v_addd(&state->xbase.xR[0], 1, &state->candstep.xR[0], 1, ae_v_len(0, n - 1), stepnorm);
+   ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
    state->repiterationscount = state->repiterationscount + 1;
 
 // Report new iteration
@@ -7648,7 +7648,7 @@ lbl_10:
    nleq_clearrequestfields(state, _state);
    state->xupdated = true;
    state->f = state->fbase;
-   ae_v_move(&state->x.xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
@@ -7734,7 +7734,7 @@ void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_st
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
    }
-   ae_v_move(&x->xR[0], 1, &state->xbase.xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nfunc = state->repnfunc;
    rep->njac = state->repnjac;
@@ -7759,7 +7759,7 @@ void nleqrestartfrom(nleqstate *state, RVector *x, ae_state *_state) {
 
    ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "NLEQRestartFrom: X contains infinite or NaN values!", _state);
-   ae_v_move(&state->x.xR[0], 1, &x->xR[0], 1, ae_v_len(0, state->n - 1));
+   ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
    ae_vector_set_length(&state->rstate.ia, 2 + 1, _state);
    ae_vector_set_length(&state->rstate.ba, 0 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 5 + 1, _state);

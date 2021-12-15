@@ -63,7 +63,7 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    }
 // convert input array to the more convinient format
    ae_vector_set_length(&buf, 2 * n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       buf.xR[2 * i + 0] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
@@ -77,7 +77,7 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    ftapplyplan(&plan, &buf, 0, 1, _state);
 
 // result
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xC[i].x = buf.xR[2 * i + 0];
       a->xC[i].y = buf.xR[2 * i + 1];
    }
@@ -113,11 +113,11 @@ void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
 //     invfft(x) = fft(x')'/N
 //
 // here x' means conj(x).
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xC[i].y = -a->xC[i].y;
    }
    fftc1d(a, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xC[i].x = a->xC[i].x / n;
       a->xC[i].y = -a->xC[i].y / n;
    }
@@ -187,7 +187,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    // even-size real FFT, use reduction to the complex task
       n2 = n / 2;
       ae_vector_set_length(&buf, n, _state);
-      ae_v_move(&buf.xR[0], 1, &a->xR[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(buf.xR, 1, a->xR, 1, n);
       ftcomplexfftplan(n2, 1, &plan, _state);
       ftapplyplan(&plan, &buf, 0, 1, _state);
       ae_vector_set_length(f, n, _state);
@@ -204,14 +204,14 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
          f->xC[i].x = 0.5 * f->xC[i].x;
          f->xC[i].y = 0.5 * f->xC[i].y;
       }
-      for (i = n2 + 1; i <= n - 1; i++) {
+      for (i = n2 + 1; i < n; i++) {
          f->xC[i] = ae_c_conj(f->xC[n - i], _state);
       }
    } else {
 
    // use complex FFT
       ae_vector_set_length(f, n, _state);
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          f->xC[i] = ae_complex_from_d(a->xR[i]);
       }
       fftc1d(f, n, _state);
@@ -263,7 +263,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
    ae_assert(f->cnt >= ae_ifloor((double)n / 2.0, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
    ae_assert(ae_isfinite(f->xC[0].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
-   for (i = 1; i <= ae_ifloor((double)n / 2.0, _state) - 1; i++) {
+   for (i = 1; i < ae_ifloor((double)n / 2.0, _state); i++) {
       ae_assert(ae_isfinite(f->xC[i].x, _state) && ae_isfinite(f->xC[i].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
    ae_assert(ae_isfinite(f->xC[ae_ifloor((double)n / 2.0, _state)].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
@@ -286,7 +286,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_vector_set_length(&h, n, _state);
    ae_vector_set_length(a, n, _state);
    h.xR[0] = f->xC[0].x;
-   for (i = 1; i <= ae_ifloor((double)n / 2.0, _state) - 1; i++) {
+   for (i = 1; i < ae_ifloor((double)n / 2.0, _state); i++) {
       h.xR[i] = f->xC[i].x - f->xC[i].y;
       h.xR[n - i] = f->xC[i].x + f->xC[i].y;
    }
@@ -297,7 +297,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
       h.xR[ae_ifloor((double)n / 2.0, _state) + 1] = f->xC[ae_ifloor((double)n / 2.0, _state)].x + f->xC[ae_ifloor((double)n / 2.0, _state)].y;
    }
    fftr1d(&h, n, &fh, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xR[i] = (fh.xC[i].x - fh.xC[i].y) / n;
    }
    ae_frame_leave(_state);
@@ -330,10 +330,10 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    }
 // even-size real FFT, use reduction to the complex task
    n2 = n / 2;
-   ae_v_move(&buf->xR[0], 1, &a->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(buf->xR, 1, a->xR, 1, n);
    ftapplyplan(plan, buf, 0, 1, _state);
    a->xR[0] = buf->xR[0] + buf->xR[1];
-   for (i = 1; i <= n2 - 1; i++) {
+   for (i = 1; i < n2; i++) {
       idx = 2 * (i % n2);
       hn.x = buf->xR[idx + 0];
       hn.y = buf->xR[idx + 1];
@@ -378,7 +378,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
 // Don't worry, it is really compact and efficient reduction :)
    n2 = n / 2;
    buf->xR[0] = a->xR[0];
-   for (i = 1; i <= n2 - 1; i++) {
+   for (i = 1; i < n2; i++) {
       x = a->xR[2 * i + 0];
       y = a->xR[2 * i + 1];
       buf->xR[i] = x - y;
@@ -388,7 +388,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    fftr1dinternaleven(buf, n, a, plan, _state);
    a->xR[0] = buf->xR[0] / n;
    t = 1.0 / n;
-   for (i = 1; i <= n2 - 1; i++) {
+   for (i = 1; i < n2; i++) {
       x = buf->xR[2 * i + 0];
       y = buf->xR[2 * i + 1];
       a->xR[i] = t * (x - y);
@@ -513,7 +513,7 @@ void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
    }
 // Reduce FHt to real FFT
    fftr1d(a, n, &fa, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xR[i] = fa.xC[i].x - fa.xC[i].y;
    }
    ae_frame_leave(_state);
@@ -545,7 +545,7 @@ void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
 //
 //     invfht(x) = fht(x)/N
    fhtr1d(a, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a->xR[i] = a->xR[i] / n;
    }
 }
@@ -657,26 +657,26 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
    p = ftbasefindsmooth(m, _state);
    ftcomplexfftplan(p, 1, &plan, _state);
    ae_vector_set_length(&buf, 2 * p, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       buf.xR[2 * i + 0] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
-   for (i = m; i <= p - 1; i++) {
+   for (i = m; i < p; i++) {
       buf.xR[2 * i + 0] = 0.0;
       buf.xR[2 * i + 1] = 0.0;
    }
    ae_vector_set_length(&buf2, 2 * p, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       buf2.xR[2 * i + 0] = b->xC[i].x;
       buf2.xR[2 * i + 1] = b->xC[i].y;
    }
-   for (i = n; i <= p - 1; i++) {
+   for (i = n; i < p; i++) {
       buf2.xR[2 * i + 0] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
    ftapplyplan(&plan, &buf, 0, 1, _state);
    ftapplyplan(&plan, &buf2, 0, 1, _state);
-   for (i = 0; i <= p - 1; i++) {
+   for (i = 0; i < p; i++) {
       c1.x = buf.xR[2 * i + 0];
       c1.y = buf.xR[2 * i + 1];
       c2.x = buf2.xR[2 * i + 0];
@@ -736,14 +736,14 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
-      for (i1 = 0; i1 <= m - 1; i1++) {
+      for (i1 = 0; i1 < m; i1++) {
          buf.xC[i1] = ae_complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_cadd(&buf.xC[0], 1, &r->xC[i1], 1, "N", ae_v_len(0, j2));
+         ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
       }
       convc1dcircular(s, m, &buf, m, c, _state);
@@ -801,14 +801,14 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&cbuf, m, _state);
-      for (i = 0; i <= m - 1; i++) {
+      for (i = 0; i < m; i++) {
          cbuf.xC[i] = ae_complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_cadd(&cbuf.xC[0], 1, &b->xC[i1], 1, "N", ae_v_len(0, j2));
+         ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
       }
       convc1dcircularinv(a, m, &cbuf, m, r, _state);
@@ -818,22 +818,22 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 // Task is normalized
    ftcomplexfftplan(m, 1, &plan, _state);
    ae_vector_set_length(&buf, 2 * m, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       buf.xR[2 * i + 0] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
    ae_vector_set_length(&buf2, 2 * m, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       buf2.xR[2 * i + 0] = b->xC[i].x;
       buf2.xR[2 * i + 1] = b->xC[i].y;
    }
-   for (i = n; i <= m - 1; i++) {
+   for (i = n; i < m; i++) {
       buf2.xR[2 * i + 0] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
    ftapplyplan(&plan, &buf, 0, 1, _state);
    ftapplyplan(&plan, &buf2, 0, 1, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       c1.x = buf.xR[2 * i + 0];
       c1.y = buf.xR[2 * i + 1];
       c2.x = buf2.xR[2 * i + 0];
@@ -845,7 +845,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ftapplyplan(&plan, &buf, 0, 1, _state);
    t = 1.0 / m;
    ae_vector_set_length(r, m, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       r->xC[i].x = t * buf.xR[2 * i + 0];
       r->xC[i].y = -t * buf.xR[2 * i + 1];
    }
@@ -927,13 +927,13 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!", _state);
    p = ftbasefindsmootheven(m, _state);
    ae_vector_set_length(&buf, p, _state);
-   ae_v_move(&buf.xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1));
-   for (i = m; i <= p - 1; i++) {
+   ae_v_move(buf.xR, 1, a->xR, 1, m);
+   for (i = m; i < p; i++) {
       buf.xR[i] = 0.0;
    }
    ae_vector_set_length(&buf2, p, _state);
-   ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-   for (i = n; i <= p - 1; i++) {
+   ae_v_move(buf2.xR, 1, b->xR, 1, n);
+   for (i = n; i < p; i++) {
       buf2.xR[i] = 0.0;
    }
    ae_vector_set_length(&buf3, p, _state);
@@ -942,7 +942,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    fftr1dinternaleven(&buf2, p, &buf3, &plan, _state);
    buf.xR[0] = buf.xR[0] / buf2.xR[0];
    buf.xR[1] = buf.xR[1] / buf2.xR[1];
-   for (i = 1; i <= p / 2 - 1; i++) {
+   for (i = 1; i < p / 2; i++) {
       c1.x = buf.xR[2 * i + 0];
       c1.y = buf.xR[2 * i + 1];
       c2.x = buf2.xR[2 * i + 0];
@@ -953,7 +953,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    }
    fftr1dinvinternaleven(&buf, p, &buf3, &plan, _state);
    ae_vector_set_length(r, m - n + 1, _state);
-   ae_v_move(&r->xR[0], 1, &buf.xR[0], 1, ae_v_len(0, m - n));
+   ae_v_move(r->xR, 1, buf.xR, 1, m - n + 1);
    ae_frame_leave(_state);
 }
 
@@ -992,14 +992,14 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
-      for (i1 = 0; i1 <= m - 1; i1++) {
+      for (i1 = 0; i1 < m; i1++) {
          buf.xR[i1] = 0.0;
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_add(&buf.xR[0], 1, &r->xR[i1], 1, ae_v_len(0, j2));
+         ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
       }
       convr1dcircular(s, m, &buf, m, c, _state);
@@ -1059,14 +1059,14 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
-      for (i = 0; i <= m - 1; i++) {
+      for (i = 0; i < m; i++) {
          buf.xR[i] = 0.0;
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_add(&buf.xR[0], 1, &b->xR[i1], 1, ae_v_len(0, j2));
+         ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
       }
       convr1dcircularinv(a, m, &buf, m, r, _state);
@@ -1078,10 +1078,10 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 
    // size is even, use fast even-size FFT
       ae_vector_set_length(&buf, m, _state);
-      ae_v_move(&buf.xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1));
+      ae_v_move(buf.xR, 1, a->xR, 1, m);
       ae_vector_set_length(&buf2, m, _state);
-      ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-      for (i = n; i <= m - 1; i++) {
+      ae_v_move(buf2.xR, 1, b->xR, 1, n);
+      for (i = n; i < m; i++) {
          buf2.xR[i] = 0.0;
       }
       ae_vector_set_length(&buf3, m, _state);
@@ -1090,7 +1090,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       fftr1dinternaleven(&buf2, m, &buf3, &plan, _state);
       buf.xR[0] = buf.xR[0] / buf2.xR[0];
       buf.xR[1] = buf.xR[1] / buf2.xR[1];
-      for (i = 1; i <= m / 2 - 1; i++) {
+      for (i = 1; i < m / 2; i++) {
          c1.x = buf.xR[2 * i + 0];
          c1.y = buf.xR[2 * i + 1];
          c2.x = buf2.xR[2 * i + 0];
@@ -1101,14 +1101,14 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       }
       fftr1dinvinternaleven(&buf, m, &buf3, &plan, _state);
       ae_vector_set_length(r, m, _state);
-      ae_v_move(&r->xR[0], 1, &buf.xR[0], 1, ae_v_len(0, m - 1));
+      ae_v_move(r->xR, 1, buf.xR, 1, m);
    } else {
 
    // odd-size, use general real FFT
       fftr1d(a, m, &cbuf, _state);
       ae_vector_set_length(&buf2, m, _state);
-      ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-      for (i = n; i <= m - 1; i++) {
+      ae_v_move(buf2.xR, 1, b->xR, 1, n);
+      for (i = n; i < m; i++) {
          buf2.xR[i] = 0.0;
       }
       fftr1d(&buf2, m, &cbuf2, _state);
@@ -1215,7 +1215,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       while (ptotal < n) {
          ptotal = ptotal * 2;
       }
-      while (ptotal <= m + n - 1) {
+      while (ptotal < m + n) {
          p = ptotal - n + 1;
          flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal, _state) + 8 * ptotal);
          if (flopcand < flopbest) {
@@ -1240,7 +1240,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       if (n == 1) {
          ae_vector_set_length(r, m, _state);
          v = b->xC[0];
-         ae_v_cmovec(&r->xC[0], 1, &a->xC[0], 1, "N", ae_v_len(0, m - 1), v);
+         ae_v_cmovec(r->xC, 1, a->xC, 1, "N", m, v);
          ae_frame_leave(_state);
          return;
       }
@@ -1250,30 +1250,30 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       // circular convolution
          ae_vector_set_length(r, m, _state);
          v = b->xC[0];
-         ae_v_cmovec(&r->xC[0], 1, &a->xC[0], 1, "N", ae_v_len(0, m - 1), v);
-         for (i = 1; i <= n - 1; i++) {
+         ae_v_cmovec(r->xC, 1, a->xC, 1, "N", m, v);
+         for (i = 1; i < n; i++) {
             v = b->xC[i];
             i1 = 0;
             i2 = i - 1;
             j1 = m - i;
             j2 = m - 1;
-            ae_v_caddc(&r->xC[i1], 1, &a->xC[j1], 1, "N", ae_v_len(i1, i2), v);
+            ae_v_caddc(&r->xC[i1], 1, &a->xC[j1], 1, "N", i2 - i1 + 1, v);
             i1 = i;
             i2 = m - 1;
             j1 = 0;
             j2 = m - i - 1;
-            ae_v_caddc(&r->xC[i1], 1, &a->xC[j1], 1, "N", ae_v_len(i1, i2), v);
+            ae_v_caddc(&r->xC[i1], 1, &a->xC[j1], 1, "N", i2 - i1 + 1, v);
          }
       } else {
 
       // non-circular convolution
          ae_vector_set_length(r, m + n - 1, _state);
-         for (i = 0; i <= m + n - 2; i++) {
+         for (i = 0; i < m + n - 1; i++) {
             r->xC[i] = ae_complex_from_i(0);
          }
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             v = b->xC[i];
-            ae_v_caddc(&r->xC[i], 1, &a->xC[0], 1, "N", ae_v_len(i, i + m - 1), v);
+            ae_v_caddc(&r->xC[i], 1, a->xC, 1, "N", m, v);
          }
       }
       ae_frame_leave(_state);
@@ -1293,22 +1293,22 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       // special code for circular convolution with smooth M
          ftcomplexfftplan(m, 1, &plan, _state);
          ae_vector_set_length(&buf, 2 * m, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             buf.xR[2 * i + 0] = a->xC[i].x;
             buf.xR[2 * i + 1] = a->xC[i].y;
          }
          ae_vector_set_length(&buf2, 2 * m, _state);
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             buf2.xR[2 * i + 0] = b->xC[i].x;
             buf2.xR[2 * i + 1] = b->xC[i].y;
          }
-         for (i = n; i <= m - 1; i++) {
+         for (i = n; i < m; i++) {
             buf2.xR[2 * i + 0] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1, _state);
          ftapplyplan(&plan, &buf2, 0, 1, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
             bx = buf2.xR[2 * i + 0];
@@ -1321,7 +1321,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftapplyplan(&plan, &buf, 0, 1, _state);
          t = 1.0 / m;
          ae_vector_set_length(r, m, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             r->xC[i].x = t * buf.xR[2 * i + 0];
             r->xC[i].y = -t * buf.xR[2 * i + 1];
          }
@@ -1336,26 +1336,26 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          p = ftbasefindsmooth(m + n - 1, _state);
          ftcomplexfftplan(p, 1, &plan, _state);
          ae_vector_set_length(&buf, 2 * p, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             buf.xR[2 * i + 0] = a->xC[i].x;
             buf.xR[2 * i + 1] = a->xC[i].y;
          }
-         for (i = m; i <= p - 1; i++) {
+         for (i = m; i < p; i++) {
             buf.xR[2 * i + 0] = 0.0;
             buf.xR[2 * i + 1] = 0.0;
          }
          ae_vector_set_length(&buf2, 2 * p, _state);
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             buf2.xR[2 * i + 0] = b->xC[i].x;
             buf2.xR[2 * i + 1] = b->xC[i].y;
          }
-         for (i = n; i <= p - 1; i++) {
+         for (i = n; i < p; i++) {
             buf2.xR[2 * i + 0] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1, _state);
          ftapplyplan(&plan, &buf2, 0, 1, _state);
-         for (i = 0; i <= p - 1; i++) {
+         for (i = 0; i < p; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
             bx = buf2.xR[2 * i + 0];
@@ -1371,11 +1371,11 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 
          // circular, add tail to head
             ae_vector_set_length(r, m, _state);
-            for (i = 0; i <= m - 1; i++) {
+            for (i = 0; i < m; i++) {
                r->xC[i].x = t * buf.xR[2 * i + 0];
                r->xC[i].y = -t * buf.xR[2 * i + 1];
             }
-            for (i = m; i <= m + n - 2; i++) {
+            for (i = m; i < m + n - 1; i++) {
                r->xC[i - m].x = r->xC[i - m].x + t * buf.xR[2 * i + 0];
                r->xC[i - m].y = r->xC[i - m].y - t * buf.xR[2 * i + 1];
             }
@@ -1383,7 +1383,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 
          // non-circular, just copy
             ae_vector_set_length(r, m + n - 1, _state);
-            for (i = 0; i <= m + n - 2; i++) {
+            for (i = 0; i < m + n - 1; i++) {
                r->xC[i].x = t * buf.xR[2 * i + 0];
                r->xC[i].y = -t * buf.xR[2 * i + 1];
             }
@@ -1406,20 +1406,20 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    // prepare R
       if (circular) {
          ae_vector_set_length(r, m, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             r->xC[i] = ae_complex_from_i(0);
          }
       } else {
          ae_vector_set_length(r, m + n - 1, _state);
-         for (i = 0; i <= m + n - 2; i++) {
+         for (i = 0; i < m + n - 1; i++) {
             r->xC[i] = ae_complex_from_i(0);
          }
       }
 
    // pre-calculated FFT(B)
       ae_vector_set_length(&bbuf, q + n - 1, _state);
-      ae_v_cmove(&bbuf.xC[0], 1, &b->xC[0], 1, "N", ae_v_len(0, n - 1));
-      for (j = n; j <= q + n - 2; j++) {
+      ae_v_cmove(bbuf.xC, 1, b->xC, 1, "N", n);
+      for (j = n; j < q + n - 1; j++) {
          bbuf.xC[j] = ae_complex_from_i(0);
       }
       fftc1d(&bbuf, q + n - 1, _state);
@@ -1429,18 +1429,18 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 
    // main overlap-add cycle
       i = 0;
-      while (i <= m - 1) {
+      while (i < m) {
          p = ae_minint(q, m - i, _state);
-         for (j = 0; j <= p - 1; j++) {
+         for (j = 0; j < p; j++) {
             buf.xR[2 * j + 0] = a->xC[i + j].x;
             buf.xR[2 * j + 1] = a->xC[i + j].y;
          }
-         for (j = p; j <= q + n - 2; j++) {
+         for (j = p; j < q + n - 1; j++) {
             buf.xR[2 * j + 0] = 0.0;
             buf.xR[2 * j + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1, _state);
-         for (j = 0; j <= q + n - 2; j++) {
+         for (j = 0; j < q + n - 1; j++) {
             ax = buf.xR[2 * j + 0];
             ay = buf.xR[2 * j + 1];
             bx = bbuf.xC[j].x;
@@ -1463,7 +1463,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             r->xC[i + j].x = r->xC[i + j].x + buf.xR[2 * j + 0] * t;
             r->xC[i + j].y = r->xC[i + j].y - buf.xR[2 * j + 1] * t;
          }
-         for (j = j2; j <= p + n - 2; j++) {
+         for (j = j2; j < p + n - 1; j++) {
             r->xC[j - j2].x = r->xC[j - j2].x + buf.xR[2 * j + 0] * t;
             r->xC[j - j2].y = r->xC[j - j2].y - buf.xR[2 * j + 1] * t;
          }
@@ -1573,7 +1573,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       while (ptotal < n) {
          ptotal = ptotal * 2;
       }
-      while (ptotal <= m + n - 1) {
+      while (ptotal < m + n) {
          p = ptotal - n + 1;
          flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal / 2, _state) + 1 * (ptotal / 2));
          if (flopcand < flopbest) {
@@ -1598,7 +1598,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (n == 1) {
          ae_vector_set_length(r, m, _state);
          v = b->xR[0];
-         ae_v_moved(&r->xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1), v);
+         ae_v_moved(r->xR, 1, a->xR, 1, m, v);
          ae_frame_leave(_state);
          return;
       }
@@ -1608,30 +1608,30 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       // circular convolution
          ae_vector_set_length(r, m, _state);
          v = b->xR[0];
-         ae_v_moved(&r->xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1), v);
-         for (i = 1; i <= n - 1; i++) {
+         ae_v_moved(r->xR, 1, a->xR, 1, m, v);
+         for (i = 1; i < n; i++) {
             v = b->xR[i];
             i1 = 0;
             i2 = i - 1;
             j1 = m - i;
             j2 = m - 1;
-            ae_v_addd(&r->xR[i1], 1, &a->xR[j1], 1, ae_v_len(i1, i2), v);
+            ae_v_addd(&r->xR[i1], 1, &a->xR[j1], 1, i2 - i1 + 1, v);
             i1 = i;
             i2 = m - 1;
             j1 = 0;
             j2 = m - i - 1;
-            ae_v_addd(&r->xR[i1], 1, &a->xR[j1], 1, ae_v_len(i1, i2), v);
+            ae_v_addd(&r->xR[i1], 1, &a->xR[j1], 1, i2 - i1 + 1, v);
          }
       } else {
 
       // non-circular convolution
          ae_vector_set_length(r, m + n - 1, _state);
-         for (i = 0; i <= m + n - 2; i++) {
+         for (i = 0; i < m + n - 1; i++) {
             r->xR[i] = 0.0;
          }
-         for (i = 0; i <= n - 1; i++) {
+         for (i = 0; i < n; i++) {
             v = b->xR[i];
-            ae_v_addd(&r->xR[i], 1, &a->xR[0], 1, ae_v_len(i, i + m - 1), v);
+            ae_v_addd(&r->xR[i], 1, a->xR, 1, m, v);
          }
       }
       ae_frame_leave(_state);
@@ -1653,10 +1653,10 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 
       // special code for circular convolution with smooth even M
          ae_vector_set_length(&buf, m, _state);
-         ae_v_move(&buf.xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1));
+         ae_v_move(buf.xR, 1, a->xR, 1, m);
          ae_vector_set_length(&buf2, m, _state);
-         ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-         for (i = n; i <= m - 1; i++) {
+         ae_v_move(buf2.xR, 1, b->xR, 1, n);
+         for (i = n; i < m; i++) {
             buf2.xR[i] = 0.0;
          }
          ae_vector_set_length(&buf3, m, _state);
@@ -1665,7 +1665,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          fftr1dinternaleven(&buf2, m, &buf3, &plan, _state);
          buf.xR[0] = buf.xR[0] * buf2.xR[0];
          buf.xR[1] = buf.xR[1] * buf2.xR[1];
-         for (i = 1; i <= m / 2 - 1; i++) {
+         for (i = 1; i < m / 2; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
             bx = buf2.xR[2 * i + 0];
@@ -1677,7 +1677,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          }
          fftr1dinvinternaleven(&buf, m, &buf3, &plan, _state);
          ae_vector_set_length(r, m, _state);
-         ae_v_move(&r->xR[0], 1, &buf.xR[0], 1, ae_v_len(0, m - 1));
+         ae_v_move(r->xR, 1, buf.xR, 1, m);
       } else {
 
       // M is non-smooth or non-even, general code (circular/non-circular):
@@ -1688,13 +1688,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       //   * for circular convolution we add array tail to its head
          p = ftbasefindsmootheven(m + n - 1, _state);
          ae_vector_set_length(&buf, p, _state);
-         ae_v_move(&buf.xR[0], 1, &a->xR[0], 1, ae_v_len(0, m - 1));
-         for (i = m; i <= p - 1; i++) {
+         ae_v_move(buf.xR, 1, a->xR, 1, m);
+         for (i = m; i < p; i++) {
             buf.xR[i] = 0.0;
          }
          ae_vector_set_length(&buf2, p, _state);
-         ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-         for (i = n; i <= p - 1; i++) {
+         ae_v_move(buf2.xR, 1, b->xR, 1, n);
+         for (i = n; i < p; i++) {
             buf2.xR[i] = 0.0;
          }
          ae_vector_set_length(&buf3, p, _state);
@@ -1703,7 +1703,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          fftr1dinternaleven(&buf2, p, &buf3, &plan, _state);
          buf.xR[0] = buf.xR[0] * buf2.xR[0];
          buf.xR[1] = buf.xR[1] * buf2.xR[1];
-         for (i = 1; i <= p / 2 - 1; i++) {
+         for (i = 1; i < p / 2; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
             bx = buf2.xR[2 * i + 0];
@@ -1718,15 +1718,15 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 
          // circular, add tail to head
             ae_vector_set_length(r, m, _state);
-            ae_v_move(&r->xR[0], 1, &buf.xR[0], 1, ae_v_len(0, m - 1));
+            ae_v_move(r->xR, 1, buf.xR, 1, m);
             if (n >= 2) {
-               ae_v_add(&r->xR[0], 1, &buf.xR[m], 1, ae_v_len(0, n - 2));
+               ae_v_add(r->xR, 1, &buf.xR[m], 1, n - 1);
             }
          } else {
 
          // non-circular, just copy
             ae_vector_set_length(r, m + n - 1, _state);
-            ae_v_move(&r->xR[0], 1, &buf.xR[0], 1, ae_v_len(0, m + n - 2));
+            ae_v_move(r->xR, 1, buf.xR, 1, m + n - 1);
          }
       }
       ae_frame_leave(_state);
@@ -1743,35 +1743,35 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    // prepare R
       if (circular) {
          ae_vector_set_length(r, m, _state);
-         for (i = 0; i <= m - 1; i++) {
+         for (i = 0; i < m; i++) {
             r->xR[i] = 0.0;
          }
       } else {
          ae_vector_set_length(r, m + n - 1, _state);
-         for (i = 0; i <= m + n - 2; i++) {
+         for (i = 0; i < m + n - 1; i++) {
             r->xR[i] = 0.0;
          }
       }
 
    // pre-calculated FFT(B)
-      ae_v_move(&buf2.xR[0], 1, &b->xR[0], 1, ae_v_len(0, n - 1));
-      for (j = n; j <= q + n - 2; j++) {
+      ae_v_move(buf2.xR, 1, b->xR, 1, n);
+      for (j = n; j < q + n - 1; j++) {
          buf2.xR[j] = 0.0;
       }
       fftr1dinternaleven(&buf2, q + n - 1, &buf3, &plan, _state);
 
    // main overlap-add cycle
       i = 0;
-      while (i <= m - 1) {
+      while (i < m) {
          p = ae_minint(q, m - i, _state);
-         ae_v_move(&buf.xR[0], 1, &a->xR[i], 1, ae_v_len(0, p - 1));
-         for (j = p; j <= q + n - 2; j++) {
+         ae_v_move(buf.xR, 1, &a->xR[i], 1, p);
+         for (j = p; j < q + n - 1; j++) {
             buf.xR[j] = 0.0;
          }
          fftr1dinternaleven(&buf, q + n - 1, &buf3, &plan, _state);
          buf.xR[0] = buf.xR[0] * buf2.xR[0];
          buf.xR[1] = buf.xR[1] * buf2.xR[1];
-         for (j = 1; j <= (q + n - 1) / 2 - 1; j++) {
+         for (j = 1; j < (q + n - 1) / 2; j++) {
             ax = buf.xR[2 * j + 0];
             ay = buf.xR[2 * j + 1];
             bx = buf2.xR[2 * j + 0];
@@ -1789,9 +1789,9 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             j1 = p + n - 2;
             j2 = j1 + 1;
          }
-         ae_v_add(&r->xR[i], 1, &buf.xR[0], 1, ae_v_len(i, i + j1));
+         ae_v_add(&r->xR[i], 1, buf.xR, 1, j1 + 1);
          if (p + n - 2 >= j2) {
-            ae_v_add(&r->xR[0], 1, &buf.xR[j2], 1, ae_v_len(0, p + n - 2 - j2));
+            ae_v_add(r->xR, 1, &buf.xR[j2], 1, p + n - 1 - j2);
          }
          i = i + p;
       }
@@ -1923,14 +1923,14 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       p.xC[m - 1 - i] = ae_c_conj(pattern->xC[i], _state);
    }
    convc1d(&p, m, signal, n, &b, _state);
    ae_vector_set_length(r, m + n - 1, _state);
-   ae_v_cmove(&r->xC[0], 1, &b.xC[m - 1], 1, "N", ae_v_len(0, n - 1));
+   ae_v_cmove(r->xC, 1, &b.xC[m - 1], 1, "N", n);
    if (m + n - 2 >= n) {
-      ae_v_cmove(&r->xC[n], 1, &b.xC[0], 1, "N", ae_v_len(n, m + n - 2));
+      ae_v_cmove(&r->xC[n], 1, b.xC, 1, "N", m - 1);
    }
    ae_frame_leave(_state);
 }
@@ -1976,14 +1976,14 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&b, m, _state);
-      for (i1 = 0; i1 <= m - 1; i1++) {
+      for (i1 = 0; i1 < m; i1++) {
          b.xC[i1] = ae_complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_cadd(&b.xC[0], 1, &pattern->xC[i1], 1, "N", ae_v_len(0, j2));
+         ae_v_cadd(b.xC, 1, &pattern->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
       }
       corrc1dcircular(signal, m, &b, m, c, _state);
@@ -1992,14 +1992,14 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    }
 // Task is normalized
    ae_vector_set_length(&p, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       p.xC[n - 1 - i] = ae_c_conj(pattern->xC[i], _state);
    }
    convc1dcircular(signal, m, &p, n, &b, _state);
    ae_vector_set_length(c, m, _state);
-   ae_v_cmove(&c->xC[0], 1, &b.xC[n - 1], 1, "N", ae_v_len(0, m - n));
-   if (m - n + 1 <= m - 1) {
-      ae_v_cmove(&c->xC[m - n + 1], 1, &b.xC[0], 1, "N", ae_v_len(m - n + 1, m - 1));
+   ae_v_cmove(c->xC, 1, &b.xC[n - 1], 1, "N", m - n + 1);
+   if (1 < n) {
+      ae_v_cmove(&c->xC[m - n + 1], 1, b.xC, 1, "N", n - 1);
    }
    ae_frame_leave(_state);
 }
@@ -2048,14 +2048,14 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 
    ae_assert(n > 0 && m > 0, "CorrR1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       p.xR[m - 1 - i] = pattern->xR[i];
    }
    convr1d(&p, m, signal, n, &b, _state);
    ae_vector_set_length(r, m + n - 1, _state);
-   ae_v_move(&r->xR[0], 1, &b.xR[m - 1], 1, ae_v_len(0, n - 1));
+   ae_v_move(r->xR, 1, &b.xR[m - 1], 1, n);
    if (m + n - 2 >= n) {
-      ae_v_move(&r->xR[n], 1, &b.xR[0], 1, ae_v_len(n, m + n - 2));
+      ae_v_move(&r->xR[n], 1, b.xR, 1, m - 1);
    }
    ae_frame_leave(_state);
 }
@@ -2101,14 +2101,14 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
       ae_vector_set_length(&b, m, _state);
-      for (i1 = 0; i1 <= m - 1; i1++) {
+      for (i1 = 0; i1 < m; i1++) {
          b.xR[i1] = 0.0;
       }
       i1 = 0;
       while (i1 < n) {
          i2 = ae_minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
-         ae_v_add(&b.xR[0], 1, &pattern->xR[i1], 1, ae_v_len(0, j2));
+         ae_v_add(b.xR, 1, &pattern->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
       }
       corrr1dcircular(signal, m, &b, m, c, _state);
@@ -2117,14 +2117,14 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    }
 // Task is normalized
    ae_vector_set_length(&p, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       p.xR[n - 1 - i] = pattern->xR[i];
    }
    convr1dcircular(signal, m, &p, n, &b, _state);
    ae_vector_set_length(c, m, _state);
-   ae_v_move(&c->xR[0], 1, &b.xR[n - 1], 1, ae_v_len(0, m - n));
-   if (m - n + 1 <= m - 1) {
-      ae_v_move(&c->xR[m - n + 1], 1, &b.xR[0], 1, ae_v_len(m - n + 1, m - 1));
+   ae_v_move(c->xR, 1, &b.xR[n - 1], 1, m - n + 1);
+   if (1 < n) {
+      ae_v_move(&c->xR[m - n + 1], 1, b.xR, 1, n - 1);
    }
    ae_frame_leave(_state);
 }

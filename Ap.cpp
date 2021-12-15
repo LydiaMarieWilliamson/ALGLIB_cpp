@@ -579,7 +579,7 @@ void *ae_align(void *ptr, size_t alignment) {
 static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_OS == AE_WINDOWS
-   for (;;) {
+   while (true) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
       union {
@@ -619,7 +619,7 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
 static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_OS == AE_WINDOWS
-   for (;;) {
+   while (true) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
       union {
@@ -1838,7 +1838,7 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    dst->cols = src->cols;
    dst->stride = src->stride;
    dst->datatype = src->datatype;
-   dst->x_ptr = &(src->xyR[0][0]);
+   dst->x_ptr = src->xyR[0];
    dst->last_action = ACT_NEW_LOCATION;
    dst->owner = OWN_CALLER;
 }
@@ -2413,7 +2413,7 @@ void _ae_init_lock_raw(_lock *p) {
 void _ae_acquire_lock_raw(_lock *p) {
 #if AE_OS == AE_POSIX
    ae_int_t cnt = 0;
-   for (;;) {
+   while (true) {
       if (pthread_mutex_trylock(&p->mutex) == 0)
          return;
       ae_spin_wait(AE_LOCK_CYCLES);
@@ -2427,7 +2427,7 @@ void _ae_acquire_lock_raw(_lock *p) {
 #   ifdef AE_SMP_DEBUGCOUNTERS
    InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_acquisitions);
 #   endif
-   for (;;) {
+   while (true) {
       if (InterlockedCompareExchange((LONG volatile *)p->p_lock, 1, 0) == 0)
          return;
       ae_spin_wait(AE_LOCK_CYCLES);
@@ -3140,7 +3140,7 @@ static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
    int c;
    if (cnt <= 0)
       return false; // Unexpected cnt.
-   for (;;) {
+   while (true) {
       c = stream->get();
       if (c < 0 || c > 255)
          return false; // Failure!
@@ -4198,7 +4198,7 @@ bool ae_c_eq_d(ae_complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
-   volatile double y2 = 0;
+   volatile double y2 = 0.0;
    return x1 == x2 && y1 == y2;
 }
 
@@ -4206,7 +4206,7 @@ bool ae_c_neq_d(ae_complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
-   volatile double y2 = 0;
+   volatile double y2 = 0.0;
    return x1 != x2 || y1 != y2;
 }
 
@@ -4265,7 +4265,7 @@ ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
 
 // Complex BLAS operations
 ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0, ry = 0;
+   double rx = 0.0, ry = 0.0;
    ae_int_t i;
    bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
    bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
@@ -4627,7 +4627,7 @@ void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex al
 
 // Real BLAS operations
 double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0;
+   double result = 0.0;
    ae_int_t i;
    if (stride0 != 1 || stride1 != 1) {
    // slow general code
@@ -4768,11 +4768,6 @@ void ae_v_muld(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
       for (i = 0; i < n; i++, vdst++)
          *vdst *= alpha;
    }
-}
-
-// Other functions
-ae_int_t ae_v_len(ae_int_t a, ae_int_t b) {
-   return b - a + 1;
 }
 
 #if 0
@@ -4955,7 +4950,7 @@ static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t
    pa1 = a + alglib_r_block;
    pb = x;
    for (i = 0; i < 16; i++) {
-      double v0 = 0, v1 = 0;
+      double v0 = 0.0, v1 = 0.0;
       for (k = 0; k < 4; k++) {
          v0 += pa0[0] * pb[0];
          v1 += pa1[0] * pb[0];
@@ -5321,7 +5316,7 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
       n8 = n / 8;
       ntrail2 = (n - 8 * n8) / 2;
       for (i = 0; i < m2; i++) {
-         double v0 = 0, v1 = 0;
+         double v0 = 0.0, v1 = 0.0;
 
       // 'a' points to the part of the matrix which
       // is not processed yet
@@ -5384,7 +5379,7 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
 
    // Last (odd) row is processed with less optimized code.
       if (m % 2 != 0) {
-         double v0 = 0;
+         double v0 = 0.0;
 
       // 'a' points to the part of the matrix which
       // is not processed yet
@@ -5513,7 +5508,7 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       parow += 4 * alglib_c_block;
    }
    if (m % 2) {
-      double v0 = 0, v1 = 0;
+      double v0 = 0.0, v1 = 0.0;
       double tx, ty;
       pa0 = parow;
       pb = x;
@@ -5570,7 +5565,7 @@ static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *
 
    parow = a;
    for (i = 0; i < m; i++) {
-      double v0 = 0, v1 = 0;
+      double v0 = 0.0, v1 = 0.0;
       pa = parow;
       pb = x;
       for (j = 0; j < n; j++) {
@@ -7194,7 +7189,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, y->xR, _state))
 // Original generic C implementation
    result = 0.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       result = result + x->xR[i] * y->xR[i];
    }
    return result;
@@ -7220,7 +7215,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, a->xyR[i], _state))
    result = 0.0;
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       result = result + x->xR[j] * a->xyR[i][j];
    }
    return result;
@@ -7246,7 +7241,7 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->xyR[ia], b->xyR[ib], _state))
    result = 0.0;
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       result = result + a->xyR[ia][j] * b->xyR[ib][j];
    }
    return result;
@@ -7271,7 +7266,7 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2, (n, x->xR, _state))
    result = 0.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       v = x->xR[i];
       result = result + v * v;
    }
@@ -7298,7 +7293,7 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->xR, y->xR, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       y->xR[j] = x->xR[j];
    }
 }
@@ -7321,7 +7316,7 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, x->xR, a->xyR[i], _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       a->xyR[i][j] = x->xR[j];
    }
 }
@@ -7344,7 +7339,7 @@ void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->xyR[i], x->xR, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       x->xR[j] = a->xyR[i][j];
    }
 }
@@ -7370,7 +7365,7 @@ void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_stat
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv, (n, a->xyR[i], b->xyR[k], _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       b->xyR[k][j] = a->xyR[i][j];
    }
 }
@@ -7393,7 +7388,7 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->xR, y->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       y->xR[i] = v * x->xR[i];
    }
 }
@@ -7417,7 +7412,7 @@ void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv, (n, v, x->xR, y->xyR[ridx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       y->xyR[ridx][i] = v * x->xR[i];
    }
 }
@@ -7439,7 +7434,7 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv, (n, x->xZ, y->xZ, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       y->xZ[j] = x->xZ[j];
    }
 }
@@ -7464,7 +7459,7 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1 * 8)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv, (n, x->xB, y->xB, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       y->xB[j] = x->xB[j];
    }
 }
@@ -7486,7 +7481,7 @@ void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, x->xR, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       x->xR[j] = v;
    }
 }
@@ -7509,7 +7504,7 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, a->xyR[i], _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       a->xyR[i][j] = v;
    }
 }
@@ -7531,7 +7526,7 @@ void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx, (n, v, x->xR + offsx, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       x->xR[offsx + j] = v;
    }
 }
@@ -7550,7 +7545,7 @@ static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state
    _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, pDest, _state));
 
    ae_int_t j;
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       pDest[j] = v;
    }
 }
@@ -7568,8 +7563,8 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
       return;
    }
 
-   for (i = 0; i <= m - 1; i++) {
-      for (j = 0; j <= n - 1; j++) {
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n; j++) {
          a->xyR[i][j] = v;
       }
    }
@@ -7592,7 +7587,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv, (n, v, x->xZ, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       x->xZ[j] = v;
    }
 }
@@ -7614,7 +7609,7 @@ void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1 * 8)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv, (n, v, x->xB, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       x->xB[j] = v;
    }
 }
@@ -7636,7 +7631,7 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = x->xR[i] * v;
    }
 }
@@ -7658,7 +7653,7 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xyR[rowidx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[rowidx][i] = x->xyR[rowidx][i] * v;
    }
 }
@@ -7680,7 +7675,7 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->xR + offsx, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[offsx + i] = x->xR[offsx + i] * v;
    }
 }
@@ -7703,7 +7698,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = x->xR[i] + alpha * y->xR[i];
    }
 }
@@ -7726,7 +7721,7 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xyR[rowidx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[rowidx][i] = x->xyR[rowidx][i] + alpha * y->xR[i];
    }
 }
@@ -7750,7 +7745,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridx], x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = x->xR[i] + alpha * y->xyR[ridx][i];
    }
 }
@@ -7775,7 +7770,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridxsrc], x->xyR[ridxdst], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[ridxdst][i] = x->xyR[ridxdst][i] + alpha * y->xyR[ridxsrc][i];
    }
 }
@@ -7800,7 +7795,7 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->xR + offsy, x->xR + offsx, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[offsx + i] = x->xR[offsx + i] + alpha * y->xR[offsy + i];
    }
 }
@@ -7822,7 +7817,7 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = x->xR[i] * y->xR[i];
    }
 }
@@ -7844,7 +7839,7 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xyR[rowidx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[rowidx][i] = x->xyR[rowidx][i] * y->xR[i];
    }
 }
@@ -7866,7 +7861,7 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xyR[rowidx], x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = x->xR[i] * y->xyR[rowidx][i];
    }
 }
@@ -7888,7 +7883,7 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = ae_maxreal(x->xR[i], y->xR[i], _state);
    }
 }
@@ -7910,7 +7905,7 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xyR[rowidx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[rowidx][i] = ae_maxreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
@@ -7932,7 +7927,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->xyR[rowidx], y->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       y->xR[i] = ae_maxreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
@@ -7954,7 +7949,7 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = ae_minreal(x->xR[i], y->xR[i], _state);
    }
 }
@@ -7976,7 +7971,7 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xyR[rowidx], _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xyR[rowidx][i] = ae_minreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
@@ -7998,7 +7993,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->xyR[rowidx], y->xR, _state))
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       y->xR[i] = ae_minreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
@@ -8026,7 +8021,7 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state) {
    if (n == 0)
       return 0.0;
    result = x->xR[0];
-   for (i = 1; i <= n - 1; i++) {
+   for (i = 1; i < n; i++) {
       v = x->xR[i];
       if (v > result) {
          result = v;
@@ -8057,7 +8052,7 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
          if (n == 0)
    return 0.0;
    result = x->xyR[rowidx][0];
-   for (i = 1; i <= n - 1; i++) {
+   for (i = 1; i < n; i++) {
       v = x->xyR[rowidx][i];
       if (v > result) {
          result = v;
@@ -8086,7 +8081,7 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xR, _state))
       result = 0.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       v = ae_fabs(x->xR[i], _state);
       if (v > result) {
          result = v;
@@ -8115,7 +8110,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xyR[rowidx], _state))
       result = 0.0;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       v = ae_fabs(x->xyR[rowidx][i], _state);
       if (v > result) {
          result = v;
@@ -8145,7 +8140,7 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx, (n, x->xR + offsx, y->xR + offsy, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       y->xR[offsy + j] = x->xR[offsx + j];
    }
 }
@@ -8171,7 +8166,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx, (n, x->xZ + offsx, y->xZ + offsy, _state))
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       y->xZ[offsy + j] = x->xZ[offsx + j];
    }
 }
@@ -8203,8 +8198,8 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 //       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
 //         at all. Initial values of Y are ignored (we do not  multiply  Y by
 //         zero, we just rewrite it by zeros)
-//       * if Beta<>0, then Y is replaced by Beta*Y
-//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//       * if Beta != 0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha != 0, but  Beta=0,  then  Y  is  replaced  by  A*x;
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
@@ -8216,7 +8211,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 // Properly premultiply Y by Beta.
 //
 // Quick exit for M=0, N=0 or Alpha=0.
-// After this block we have M>0, N>0, Alpha<>0.
+// After this block we have M>0, N>0, Alpha != 0.
    if (m <= 0) {
       return;
    }
@@ -8234,9 +8229,9 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
       if (n >= _ABLASF_KERNEL_SIZE2)
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->xR, y->xR, _state))
    // Generic C version: y += A*x
-      for (i = 0; i <= m - 1; i++) {
+      for (i = 0; i < m; i++) {
          v = 0.0;
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             v = v + a->xyR[i][j] * x->xR[j];
          }
          y->xR[i] = alpha * v + y->xR[i];
@@ -8248,9 +8243,9 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
       if (m >= _ABLASF_KERNEL_SIZE2)
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->xR, y->xR, _state))
    // Generic C version: y += A^T*x
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          v = alpha * x->xR[i];
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             y->xR[j] = y->xR[j] + v * a->xyR[i][j];
          }
       }
@@ -8291,8 +8286,8 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
 //         at all. Initial values of Y are ignored (we do not  multiply  Y by
 //         zero, we just rewrite it by zeros)
-//       * if Beta<>0, then Y is replaced by Beta*Y
-//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//       * if Beta != 0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha != 0, but  Beta=0,  then  Y  is  replaced  by  A*x;
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
@@ -8304,7 +8299,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 // Properly premultiply Y by Beta.
 //
 // Quick exit for M=0, N=0 or Alpha=0.
-// After this block we have M>0, N>0, Alpha<>0.
+// After this block we have M>0, N>0, Alpha != 0.
    if (m <= 0) {
       return;
    }
@@ -8322,9 +8317,9 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
       if (n >= _ABLASF_KERNEL_SIZE2)
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy, _state))
    // Generic C code: y += A*x
-      for (i = 0; i <= m - 1; i++) {
+      for (i = 0; i < m; i++) {
          v = 0.0;
-         for (j = 0; j <= n - 1; j++) {
+         for (j = 0; j < n; j++) {
             v = v + a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          y->xR[iy + i] = alpha * v + y->xR[iy + i];
@@ -8336,9 +8331,9 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
       if (m >= _ABLASF_KERNEL_SIZE2)
          _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy, _state))
    // Generic C code: y += A^T*x
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          v = alpha * x->xR[ix + i];
-         for (j = 0; j <= m - 1; j++) {
+         for (j = 0; j < m; j++) {
             y->xR[iy + j] = y->xR[iy + j] + v * a->xyR[ia + i][ja + j];
          }
       }
@@ -8368,9 +8363,9 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    if ((m <= 0 || n <= 0) || alpha == 0.0) {
       return;
    }
-   for (i = 0; i <= m - 1; i++) {
+   for (i = 0; i < m; i++) {
       s = alpha * u->xR[i];
-      for (j = 0; j <= n - 1; j++) {
+      for (j = 0; j < n; j++) {
          a->xyR[i][j] = a->xyR[i][j] + s * v->xR[j];
       }
    }
@@ -8414,7 +8409,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
    if (optype == 0 && isupper) {
       for (i = n - 1; i >= 0; i--) {
          v = x->xR[ix + i];
-         for (j = i + 1; j <= n - 1; j++) {
+         for (j = i + 1; j < n; j++) {
             v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
@@ -8425,9 +8420,9 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       return;
    }
    if (optype == 0 && !isupper) {
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
-         for (j = 0; j <= i - 1; j++) {
+         for (j = 0; j < i; j++) {
             v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
@@ -8438,7 +8433,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       return;
    }
    if (optype == 1 && isupper) {
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
          if (!isunit) {
             v = v / a->xyR[ia + i][ja + i];
@@ -8447,7 +8442,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
          if (v == 0) {
             continue;
          }
-         for (j = i + 1; j <= n - 1; j++) {
+         for (j = i + 1; j < n; j++) {
             x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
          }
       }
@@ -8463,7 +8458,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
          if (v == 0) {
             continue;
          }
-         for (j = 0; j <= i - 1; j++) {
+         for (j = 0; j < i; j++) {
             x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
          }
       }
@@ -8602,11 +8597,11 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
       return;
    }
 // Generic C code for generic propagate
-   for (k = 0; k <= offdiagsize - 1; k++) {
+   for (k = 0; k < offdiagsize; k++) {
       i = superrowidx->xZ[rbase + k];
       baseoffs = offss + (k + blocksize) * sstride;
       v = simdbuf->xR[i * simdwidth];
-      for (j = 0; j <= blocksize - 1; j++) {
+      for (j = 0; j < blocksize; j++) {
          v = v - rowstorage->xR[baseoffs + j] * x->xR[cols0 + j];
       }
       simdbuf->xR[i * simdwidth] = v;
@@ -8690,7 +8685,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    srccol1 = -1;
    srccol2 = -1;
    srccol3 = -1;
-   for (k = 0; k <= uwidth - 1; k++) {
+   for (k = 0; k < uwidth; k++) {
       targetcol = raw2smap->xZ[superrowidx->xZ[urbase + k]];
       if (targetcol == 0) {
          srccol0 = k;
@@ -8797,7 +8792,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
 // Run update
    if (urank == 1) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
@@ -8808,7 +8803,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       }
    }
    if (urank == 2) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
@@ -8820,7 +8815,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       }
    }
    if (urank == 3) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
@@ -8833,7 +8828,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       }
    }
    if (urank == 4) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
@@ -8926,7 +8921,7 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
    u33 = d3 * rowstorage->xR[offsu + 3 * 4 + 3];
    if (sheight == uheight) {
    // No row scatter, the most efficient code
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + k * 4;
          offsk = offsu + k * 4;
          uk0 = rowstorage->xR[offsk + 0];
@@ -8940,7 +8935,7 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
       }
    } else {
    // Row scatter is performed, less efficient code using double mapping to determine target row index
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * 4;
          uk0 = rowstorage->xR[offsk + 0];
@@ -9438,7 +9433,7 @@ void setglobalthreading(const xparams settings) {
 
 // Level 1 BLAS functions
 double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0;
+   double result = 0.0;
    ae_int_t i;
    if (stride0 != 1 || stride1 != 1) {
    //
@@ -9465,7 +9460,7 @@ double vdotproduct(const double *v1, const double *v2, ae_int_t N) {
 }
 
 complex vdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0, ry = 0;
+   double rx = 0.0, ry = 0.0;
    ae_int_t i;
    bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
    bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
@@ -10106,7 +10101,7 @@ static bool strimatch(const char *s1, const char *s2) {
 // Handle the special cases.
    if (s1 == NULL || s2 == NULL) return s1 == s2;
 // Compare.
-   else for (;;) {
+   else while (true) {
       int c1 = *s1++, c2 = *s2++;
       if (c1 == '\0' || c2 == '\0') return c1 == c2;
       else if (tolower(c1) != tolower(c2)) return false;
@@ -10147,7 +10142,7 @@ static void str_vector_create(const char *src, bool match_head_only, std::vector
    if (*src == ']')
       return;
    p_vec->push_back(src);
-   for (;;) {
+   while (true) {
       if (*src == 0)
          ThrowError("Incorrect initializer for vector");
       if (*src == ']') {
@@ -10179,7 +10174,7 @@ static void str_matrix_create(const char *src, std::vector < std::vector < const
    if (*src != '[')
       ThrowError("Incorrect initializer for matrix");
    src++;
-   for (;;) {
+   while (true) {
       p_mat->push_back(std::vector < const char *>());
       str_vector_create(src, false, &p_mat->back());
       if (p_mat->back().size() == 0 || p_mat->back().size() != (*p_mat)[0].size())

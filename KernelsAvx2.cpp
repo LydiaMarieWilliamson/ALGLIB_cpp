@@ -273,7 +273,7 @@ void rsetvx_avx2(const ae_int_t n, const double v, double *__restrict x, const a
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 4) {
       ae_int_t j;
-      for (j = 0; j <= n - 1; j++)
+      for (j = 0; j < n; j++)
          x[j] = v;
       return;
    }
@@ -350,7 +350,7 @@ void rmulvx_avx2(const ae_int_t n, const double v, double *__restrict x, const a
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 4) {
       ae_int_t i;
-      for (i = 0; i <= n - 1; i++)
+      for (i = 0; i < n; i++)
          x[i] *= v;
       return;
    }
@@ -429,7 +429,7 @@ void raddvx_avx2(const ae_int_t n, const double alpha, const double *__restrict 
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 4) {
       ae_int_t i;
-      for (i = 0; i <= n - 1; i++)
+      for (i = 0; i < n; i++)
          x[i] += alpha * y[i];
       return;
    }
@@ -542,7 +542,7 @@ double rmaxv_avx2(ae_int_t n, const Real *__restrict x, ae_state *__restrict _st
       if (n == 0)
          return 0.0;
       result = x[0];
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          double v = x[i];
          if (v > result)
             result = v;
@@ -586,7 +586,7 @@ double rmaxabsv_avx2(ae_int_t n, const Real *__restrict x, ae_state *__restrict 
       double result;
       ae_int_t i;
       result = 0;
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          double v = fabs(x[i]);
          if (v > result)
             result = v;
@@ -713,7 +713,7 @@ void icopyvx_avx2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__re
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 8) {
       ae_int_t j;
-      for (j = 0; j <= n - 1; j++)
+      for (j = 0; j < n; j++)
          y[j] = x[j];
       return;
    }
@@ -822,7 +822,7 @@ void rgemv_transposed_avx2(const ae_int_t m, const ae_int_t n, const double alph
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
@@ -966,7 +966,7 @@ void rgemvx_transposed_avx2_yaligned(const ae_int_t m, const ae_int_t n, const d
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
@@ -1315,7 +1315,7 @@ bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_t t
    __m256d u_1_0123 = _mm256_setzero_pd();
    __m256d u_2_0123 = _mm256_setzero_pd();
    __m256d u_3_0123 = _mm256_setzero_pd();
-   for (k = 0; k <= uwidth - 1; k++) {
+   for (k = 0; k < uwidth; k++) {
       targetcol = raw2smap[superrowidx[k]];
       if (targetcol == 0)
          u_0_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage + k * urowstride, v_rankmask));
@@ -1339,21 +1339,21 @@ bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_t t
 
 // Run update
    if (urank == 1) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
       }
    }
    if (urank == 2) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
       }
    }
    if (urank == 3) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1),
@@ -1361,7 +1361,7 @@ bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_t t
       }
    }
    if (urank == 4) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3)),
@@ -1398,7 +1398,7 @@ bool spchol_updatekernel4444_avx2(double *rowstorage, ae_int_t offss, ae_int_t s
 //
    if (sheight == uheight) {
    // No row scatter, the most efficient code
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          __m256d target;
 
          targetrow = offss + k * 4;
@@ -1413,7 +1413,7 @@ bool spchol_updatekernel4444_avx2(double *rowstorage, ae_int_t offss, ae_int_t s
       }
    } else {
    // Row scatter is performed, less efficient code using double mapping to determine target row index
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
 
          targetrow = offss + raw2smap[superrowidx[urbase + k]] * 4;

@@ -73,7 +73,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 // Initialize
    ae_vector_set_length(&d, n, _state);
    ae_vector_set_length(&e, n, _state);
-   for (i = 1; i <= n - 1; i++) {
+   for (i = 1; i < n; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
       if (beta->xR[i] <= 0.0) {
          *info = -2;
@@ -385,11 +385,11 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
    }
    ae_vector_set_length(&alpha, n, _state);
    ae_vector_set_length(&beta, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       alpha.xR[i] = 0.0;
    }
    beta.xR[0] = 2.0;
-   for (i = 1; i <= n - 1; i++) {
+   for (i = 1; i < n; i++) {
       beta.xR[i] = 1 / (4 - 1 / ae_sqr((double)i, _state));
    }
    gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w, _state);
@@ -399,7 +399,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -468,7 +468,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
       beta2 = ae_sqr(beta, _state);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
       b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2, _state));
-      for (i = 2; i <= n - 1; i++) {
+      for (i = 2; i < n; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
          b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i, _state));
       }
@@ -480,7 +480,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -540,7 +540,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    }
    b.xR[0] = ae_exp(t, _state);
    if (n > 1) {
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          a.xR[i] = 2 * i + alpha + 1;
          b.xR[i] = i * (i + alpha);
       }
@@ -552,7 +552,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
       if (x->xR[0] < 0.0) {
          *info = -4;
       }
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -598,12 +598,12 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
    }
    ae_vector_set_length(&a, n, _state);
    ae_vector_set_length(&b, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       a.xR[i] = 0.0;
    }
    b.xR[0] = ae_sqrt(4 * ae_atan(1.0, _state), _state);
    if (n > 1) {
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          b.xR[i] = 0.5 * i;
       }
    }
@@ -611,7 +611,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
 
 // test basic properties to detect errors
    if (*info > 0) {
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -784,16 +784,16 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // * A from 0..floor(3*n/2) to 0..2*n
 // * B from 0..ceil(3*n/2)  to 0..2*n
    ae_vector_set_length(&ta, ae_ifloor((double)(3 * n) / 2.0, _state) + 1, _state);
-   ae_v_move(&ta.xR[0], 1, &alpha->xR[0], 1, ae_v_len(0, ae_ifloor((double)(3 * n) / 2.0, _state)));
+   ae_v_move(ta.xR, 1, alpha->xR, 1, ae_ifloor((double)(3 * n) / 2.0, _state) + 1);
    ae_vector_set_length(alpha, 2 * n + 1, _state);
-   ae_v_move(&alpha->xR[0], 1, &ta.xR[0], 1, ae_v_len(0, ae_ifloor((double)(3 * n) / 2.0, _state)));
+   ae_v_move(alpha->xR, 1, ta.xR, 1, ae_ifloor((double)(3 * n) / 2.0, _state) + 1);
    for (i = ae_ifloor((double)(3 * n) / 2.0, _state) + 1; i <= 2 * n; i++) {
       alpha->xR[i] = 0.0;
    }
    ae_vector_set_length(&ta, ae_iceil((double)(3 * n) / 2.0, _state) + 1, _state);
-   ae_v_move(&ta.xR[0], 1, &beta->xR[0], 1, ae_v_len(0, ae_iceil((double)(3 * n) / 2.0, _state)));
+   ae_v_move(ta.xR, 1, beta->xR, 1, ae_iceil((double)(3 * n) / 2.0, _state) + 1);
    ae_vector_set_length(beta, 2 * n + 1, _state);
-   ae_v_move(&beta->xR[0], 1, &ta.xR[0], 1, ae_v_len(0, ae_iceil((double)(3 * n) / 2.0, _state)));
+   ae_v_move(beta->xR, 1, ta.xR, 1, ae_iceil((double)(3 * n) / 2.0, _state) + 1);
    for (i = ae_iceil((double)(3 * n) / 2.0, _state) + 1; i <= 2 * n; i++) {
       beta->xR[i] = 0.0;
    }
@@ -804,28 +804,28 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    ae_vector_set_length(&s, wlen, _state);
    ae_vector_set_length(&ta, wlen, _state);
    woffs = 1;
-   for (i = 0; i <= wlen - 1; i++) {
+   for (i = 0; i < wlen; i++) {
       t.xR[i] = 0.0;
       s.xR[i] = 0.0;
    }
 
 // Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
    t.xR[woffs + 0] = beta->xR[n + 1];
-   for (m = 0; m <= n - 2; m++) {
+   for (m = 0; m < n - 1; m++) {
       u = 0.0;
       for (k = (m + 1) / 2; k >= 0; k--) {
          l = m - k;
          u = u + (alpha->xR[k + n + 1] - alpha->xR[l]) * t.xR[woffs + k] + beta->xR[k + n + 1] * s.xR[woffs + k - 1] - beta->xR[l] * s.xR[woffs + k];
          s.xR[woffs + k] = u;
       }
-      ae_v_move(&ta.xR[0], 1, &t.xR[0], 1, ae_v_len(0, wlen - 1));
-      ae_v_move(&t.xR[0], 1, &s.xR[0], 1, ae_v_len(0, wlen - 1));
-      ae_v_move(&s.xR[0], 1, &ta.xR[0], 1, ae_v_len(0, wlen - 1));
+      ae_v_move(ta.xR, 1, t.xR, 1, wlen);
+      ae_v_move(t.xR, 1, s.xR, 1, wlen);
+      ae_v_move(s.xR, 1, ta.xR, 1, wlen);
    }
    for (j = n / 2; j >= 0; j--) {
       s.xR[woffs + j] = s.xR[woffs + j - 1];
    }
-   for (m = n - 1; m <= 2 * n - 3; m++) {
+   for (m = n - 1; m < 2 * n - 2; m++) {
       u = 0.0;
       for (k = m + 1 - n; k <= (m - 1) / 2; k++) {
          l = m - k;
@@ -840,9 +840,9 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
          k = (m + 1) / 2;
          beta->xR[k + n + 1] = s.xR[woffs + j] / s.xR[woffs + j + 1];
       }
-      ae_v_move(&ta.xR[0], 1, &t.xR[0], 1, ae_v_len(0, wlen - 1));
-      ae_v_move(&t.xR[0], 1, &s.xR[0], 1, ae_v_len(0, wlen - 1));
-      ae_v_move(&s.xR[0], 1, &ta.xR[0], 1, ae_v_len(0, wlen - 1));
+      ae_v_move(ta.xR, 1, t.xR, 1, wlen);
+      ae_v_move(t.xR, 1, s.xR, 1, wlen);
+      ae_v_move(s.xR, 1, ta.xR, 1, wlen);
    }
    alpha->xR[2 * n] = alpha->xR[n - 1] - beta->xR[2 * n] * s.xR[woffs + 0] / t.xR[woffs + 0];
 
@@ -855,7 +855,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       ae_frame_leave(_state);
       return;
    }
-   for (i = 0; i <= 2 * n - 1; i++) {
+   for (i = 0; i < 2 * n; i++) {
       if (x->xR[i] >= x->xR[i + 1]) {
          *info = -4;
       }
@@ -868,7 +868,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    for (i = 0; i <= 2 * n; i++) {
       wgauss->xR[i] = 0.0;
    }
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       wgauss->xR[2 * i + 1] = wgtmp.xR[i];
    }
    ae_frame_leave(_state);
@@ -978,7 +978,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    clen = ae_iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
    ae_vector_set_length(&a, clen, _state);
    ae_vector_set_length(&b, clen, _state);
-   for (i = 0; i <= clen - 1; i++) {
+   for (i = 0; i < clen; i++) {
       a.xR[i] = 0.0;
    }
    apb = alpha + beta;
@@ -995,7 +995,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       beta2 = ae_sqr(beta, _state);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
       b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2, _state));
-      for (i = 2; i <= clen - 1; i++) {
+      for (i = 2; i < clen; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
          b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i, _state));
       }
@@ -1007,7 +1007,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = 2;
       }
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -1065,11 +1065,11 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    blen = ae_iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
    ae_vector_set_length(&alpha, alen, _state);
    ae_vector_set_length(&beta, blen, _state);
-   for (k = 0; k <= alen - 1; k++) {
+   for (k = 0; k < alen; k++) {
       alpha.xR[k] = 0.0;
    }
    beta.xR[0] = 2.0;
-   for (k = 1; k <= blen - 1; k++) {
+   for (k = 1; k < blen; k++) {
       beta.xR[k] = 1 / (4 - 1 / ae_sqr((double)k, _state));
    }
    gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss, _state);
@@ -1079,7 +1079,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
          *info = -4;
       }
-      for (i = 0; i <= n - 2; i++) {
+      for (i = 0; i < n - 1; i++) {
          if (x->xR[i] >= x->xR[i + 1]) {
             *info = -4;
          }
@@ -1129,7 +1129,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    ae_vector_set_length(x, n, _state);
    ae_vector_set_length(wkronrod, n, _state);
    ae_vector_set_length(wgauss, n, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       x->xR[i] = 0.0;
       wkronrod->xR[i] = 0.0;
       wgauss->xR[i] = 0.0;
@@ -1455,7 +1455,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
 
 // reorder
    tagsort(x, n, &p1, &p2, _state);
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       tmp = wkronrod->xR[i];
       wkronrod->xR[i] = wkronrod->xR[p2.xZ[i]];
       wkronrod->xR[p2.xZ[i]] = tmp;
@@ -1517,7 +1517,7 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
-static ae_int_t autogk_maxsubintervals = 10000;
+static const ae_int_t autogk_maxsubintervals = 10000;
 static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state, ae_state *_state);
 static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state);
 static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state);
@@ -1995,7 +1995,7 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
       return result;
    }
    ae_vector_set_length(&state->wr, state->n, _state);
-   for (i = 0; i <= state->n - 1; i++) {
+   for (i = 0; i < state->n; i++) {
       if (i == 0) {
          state->wr.xR[i] = 0.5 * ae_fabs(state->qn.xR[1] - state->qn.xR[0], _state);
          continue;
@@ -2152,7 +2152,7 @@ lbl_14:
 // TODO: every 20 iterations recalculate errors/sums
    if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
       state->r = 0.0;
-      for (j = 0; j <= state->heapused - 1; j++) {
+      for (j = 0; j < state->heapused; j++) {
          state->r = state->r + state->heap.xyR[j][1];
       }
       result = false;
@@ -2250,7 +2250,7 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
    if (heapsize == 1) {
       return;
    }
-   for (i = 0; i <= heapwidth - 1; i++) {
+   for (i = 0; i < heapwidth; i++) {
       t = heap->xyR[heapsize - 1][i];
       heap->xyR[heapsize - 1][i] = heap->xyR[0][i];
       heap->xyR[0][i] = t;
@@ -2264,7 +2264,7 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
          }
       }
       if (heap->xyR[p][0] < heap->xyR[maxcp][0]) {
-         for (i = 0; i <= heapwidth - 1; i++) {
+         for (i = 0; i < heapwidth; i++) {
             t = heap->xyR[p][i];
             heap->xyR[p][i] = heap->xyR[maxcp][i];
             heap->xyR[maxcp][i] = t;
@@ -2289,7 +2289,7 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
    while (p != 0) {
       parent = (p - 1) / 2;
       if (heap->xyR[p][0] > heap->xyR[parent][0]) {
-         for (i = 0; i <= heapwidth - 1; i++) {
+         for (i = 0; i < heapwidth; i++) {
             t = heap->xyR[p][i];
             heap->xyR[p][i] = heap->xyR[parent][i];
             heap->xyR[parent][i] = t;
@@ -2309,12 +2309,12 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
    NewMatrix(tmp, 0, 0, DT_REAL, _state);
 
    ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
-   for (i = 0; i <= *heapsize - 1; i++) {
-      ae_v_move(&tmp.xyR[i][0], 1, &heap->xyR[i][0], 1, ae_v_len(0, heapwidth - 1));
+   for (i = 0; i < *heapsize; i++) {
+      ae_v_move(tmp.xyR[i], 1, heap->xyR[i], 1, heapwidth);
    }
    ae_matrix_set_length(heap, newheapsize, heapwidth, _state);
-   for (i = 0; i <= *heapsize - 1; i++) {
-      ae_v_move(&heap->xyR[i][0], 1, &tmp.xyR[i][0], 1, ae_v_len(0, heapwidth - 1));
+   for (i = 0; i < *heapsize; i++) {
+      ae_v_move(heap->xyR[i], 1, tmp.xyR[i], 1, heapwidth);
    }
    *heapsize = newheapsize;
    ae_frame_leave(_state);

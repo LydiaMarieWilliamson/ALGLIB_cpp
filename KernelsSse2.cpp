@@ -282,7 +282,7 @@ void rsetv_sse2(const ae_int_t n, const double v, Real *__restrict x, const ae_s
 void rsetvx_sse2(const ae_int_t n, const double v, Real *__restrict x, const ae_state *__restrict _state) {
    if (n <= 4) {
       ae_int_t j;
-      for (j = 0; j <= n - 1; j++)
+      for (j = 0; j < n; j++)
          x[j] = v;
       return;
    }
@@ -299,7 +299,7 @@ void isetv_sse2(const ae_int_t n, const ae_int_t v, ae_int_t *__restrict x, ae_s
    const ae_int_t even = (n * sizeof(ae_int_t)) - tail;
    __m128i *__restrict pDest = (__m128i *)x;
    const ae_int_t v2[2] = { v, v };
-   const __m128i sse2v = ((sizeof(v) == 4) ? _mm_set1_epi32((ae_int32_t)v) : _mm_loadu_si128((const __m128i *)(&v2[0])));
+   const __m128i sse2v = ((sizeof(v) == 4) ? _mm_set1_epi32((ae_int32_t)v) : _mm_loadu_si128((const __m128i *)v2));
    const ae_int_t nVec = even >> 4;
    ae_int_t i;
    for (i = 0; i < nVec; i++) {
@@ -340,7 +340,7 @@ void rmulv_sse2(const ae_int_t n, const double v, double *__restrict x, const ae
 void rmulvx_sse2(const ae_int_t n, const double v, double *__restrict x, const ae_state *__restrict _state) {
    if (n <= 4) {
       ae_int_t i;
-      for (i = 0; i <= n - 1; i++)
+      for (i = 0; i < n; i++)
          x[i] *= v;
       return;
    }
@@ -386,7 +386,7 @@ void raddvx_sse2_xaligned(const ae_int_t n, const double alpha, const double *__
 void raddvx_sse2(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x, ae_state *_state) {
    if (n <= 4) {
       ae_int_t i;
-      for (i = 0; i <= n - 1; i++)
+      for (i = 0; i < n; i++)
          x[i] += alpha * y[i];
       return;
    }
@@ -454,7 +454,7 @@ double rmaxv_sse2(ae_int_t n, const Real *__restrict x, ae_state *__restrict _st
       if (n == 0)
          return 0.0;
       result = x[0];
-      for (i = 1; i <= n - 1; i++) {
+      for (i = 1; i < n; i++) {
          double v = x[i];
          if (v > result)
             result = v;
@@ -484,7 +484,7 @@ double rmaxabsv_sse2(ae_int_t n, const Real *__restrict x, ae_state *__restrict 
       double result;
       ae_int_t i;
       result = 0;
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          double v = fabs(x[i]);
          if (v > result)
             result = v;
@@ -554,7 +554,7 @@ void icopyvx_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__re
    const ptrdiff_t unal = ((ptrdiff_t)x) & 15;
    if (n <= 8) {
       ae_int_t j;
-      for (j = 0; j <= n - 1; j++)
+      for (j = 0; j < n; j++)
          y[j] = x[j];
       return;
    }

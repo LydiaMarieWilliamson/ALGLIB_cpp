@@ -561,11 +561,11 @@ int main() {
          const char *s5 = "[1,7,2,1]";
          const char *s6 = "[7,7,7]";
          const int dps = 2;
-         const double v10 = 2, v11 = 3.5, v12 = -0.25, v10_mod = 9;
-         const double v20 = 5, v21 = 4, v22 = 3.126;
-         const double v30 = 6, v31 = 7, v32 = 3, v33 = -400, v30_mod = -6;
-         const double v40 = 9, v41 = 5, v42 = -12, v43 = -0.01;
-         const double v50 = 1, v51 = 7, v52 = 2, v53 = 1;
+         const double v10 = 2.0, v11 = 3.5, v12 = -0.25, v10_mod = 9.0;
+         const double v20 = 5.0, v21 = 4.0, v22 = 3.126;
+         const double v30 = 6.0, v31 = 7.0, v32 = 3.0, v33 = -400.0, v30_mod = -6.0;
+         const double v40 = 9.0, v41 = 5.0, v42 = -12.0, v43 = -0.01;
+         const double v50 = 1.0, v51 = 7.0, v52 = 2.0, v53 = 1.0;
 
          real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
@@ -590,8 +590,8 @@ int main() {
 
       // setcontent/getcontent
          double a0[] = { 2, 3.5, 1, 9.125, 2 };
-         double a0_mod = 7;
-         double a0_orig = 2;
+         double a0_mod = 7.0;
+         double a0_orig = 2.0;
          double *p6;
          real_1d_array arr_6;
          arr_6.setcontent(5, a0);
@@ -918,12 +918,12 @@ int main() {
          const char *s60 = "[[7,7],[7,7]]";
          const char *s61 = "[[7],[7],[7]]";
          const int dps = 2;
-         const double v10 = 2, v11 = 3.5, v12 = -0.25, v13 = 1, v14 = 2, v15 = 3, v10_mod = 9;
-         const double v20 = 5, v21 = 4, v22 = 3.126;
-         const double v30 = 6, v31 = 7, v32 = 3, v33 = -400, v34 = -3, v35 = -1, v30_mod = -6;
+         const double v10 = 2.0, v11 = 3.5, v12 = -0.25, v13 = 1.0, v14 = 2.0, v15 = 3.0, v10_mod = 9.0;
+         const double v20 = 5.0, v21 = 4.0, v22 = 3.126;
+         const double v30 = 6.0, v31 = 7.0, v32 = 3.0, v33 = -400.0, v34 = -3.0, v35 = -1.0, v30_mod = -6.0;
 #if 0
-         double v40 = 9, v41 = 5, v42 = -12, v43 = -0.01;
-         double v50 = 1, v51 = 7, v52 = 2, v53 = 1;
+         double v40 = 9.0, v41 = 5.0, v42 = -12.0, v43 = -0.01;
+         double v50 = 1.0, v51 = 7.0, v52 = 2.0, v53 = 1.0;
 #endif
          double r;
 
@@ -1657,8 +1657,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 #   else
 #      error Unable to determine OS, unexpected here
 #   endif
-      double last_progress = 0;
-      for (;;) {
+      double last_progress = 0.0;
+      while (true) {
          double new_progress = rbfpeekprogress(rbf);
          passed = passed && (new_progress >= last_progress);
          passed = passed && (new_progress <= 0.1); // we expect to terminate well before reaching 10%
@@ -1668,7 +1668,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             break;
          }
       }
-      for (;;) {
+      while (true) {
          double new_progress = rbfpeekprogress(rbf);
          passed = passed && ((new_progress <= 0.1) || (new_progress == 1.0)); // we expect to terminate well before reaching 10%
          if (async_rec.thread_finished)
@@ -1746,8 +1746,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             {
                real_1d_array x = "[0,0]";
                double epsg = 0.0000000001;
-               double epsf = 0;
-               double epsx = 0;
+               double epsf = 0.0;
+               double epsx = 0.0;
                double stpmax = 0.1;
                ae_int_t maxits = 0;
                mincgstate state;
@@ -1824,7 +1824,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          bool passed = true;
          alglib_impl::ae_uint64_t default_global_threading = _ae_get_global_threading();
          ae_int_t default_nworkers = getnworkers();
-         double time_default = 0, time_glob_ser = 0, time_glob_smp = 0, time_glob_ser_loc_ser = 0, time_glob_ser_loc_smp = 0, time_glob_smp_loc_ser = 0, time_glob_smp_loc_smp = 0, time_glob_smp_nw1 = 0;
+         double time_default = 0.0, time_glob_ser = 0.0, time_glob_smp = 0.0, time_glob_ser_loc_ser = 0.0, time_glob_ser_loc_smp = 0.0, time_glob_smp_loc_ser = 0.0, time_glob_smp_loc_smp = 0.0, time_glob_smp_nw1 = 0.0;
          ae_int_t n = 800, mintime = 2000, cnt, t0;
          try {
          // allocate temporary matrices

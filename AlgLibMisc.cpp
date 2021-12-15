@@ -17,10 +17,10 @@
 // === HQRND Package ===
 // Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
-static ae_int_t hqrnd_hqrndmax = 2147483561;
-static ae_int_t hqrnd_hqrndm1 = 2147483563;
-static ae_int_t hqrnd_hqrndm2 = 2147483399;
-static ae_int_t hqrnd_hqrndmagic = 1634357784;
+static const ae_int_t hqrnd_hqrndmax = 2147483561;
+static const ae_int_t hqrnd_hqrndm1 = 2147483563;
+static const ae_int_t hqrnd_hqrndm2 = 2147483399;
+static const ae_int_t hqrnd_hqrndmagic = 1634357784;
 static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state, ae_state *_state);
 
 // HQRNDState  initialization  with  random  values  which come from standard
@@ -150,8 +150,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
                continue;
             }
             result = a + maxcnt * b;
-         }
-         while (result < 0);
+         } while (result < 0);
       }
    } else {
 
@@ -163,8 +162,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
       mx = maxcnt - maxcnt % n;
       do {
          result = hqrnd_hqrndintegerbase(state, _state);
-      }
-      while (result >= mx);
+      } while (result >= mx);
       result = result % n;
    }
    return result;
@@ -205,7 +203,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x, ae_state *_state) {
 
    n2 = n / 2;
    rallocv(n, x, _state);
-   for (i = 0; i <= n2 - 1; i++) {
+   for (i = 0; i < n2; i++) {
       hqrndnormal2(state, &v1, &v2, _state);
       x->xR[2 * i + 0] = v1;
       x->xR[2 * i + 1] = v2;
@@ -234,8 +232,8 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x, ae_stat
 
    n2 = n / 2;
    ae_matrix_set_length(x, m, n, _state);
-   for (i = 0; i <= m - 1; i++) {
-      for (j = 0; j <= n2 - 1; j++) {
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n2; j++) {
          hqrndnormal2(state, &v1, &v2, _state);
          x->xyR[i][2 * j + 0] = v1;
          x->xyR[i][2 * j + 1] = v2;
@@ -262,8 +260,7 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
 
    do {
       hqrndnormal2(state, x, y, _state);
-   }
-   while (!(*x != 0.0 || *y != 0.0));
+   } while (!(*x != 0.0 || *y != 0.0));
    mx = ae_maxreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
    mn = ae_minreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
    v = mx * ae_sqrt(1 + ae_sqr(mn / mx, _state), _state);
@@ -287,7 +284,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
    *x1 = 0;
    *x2 = 0;
 
-   for (;;) {
+   while (true) {
       u = 2 * hqrnduniformr(state, _state) - 1;
       v = 2 * hqrnduniformr(state, _state) - 1;
       s = ae_sqr(u, _state) + ae_sqr(v, _state);
@@ -583,7 +580,7 @@ ae_int_t xdebugb1count(BVector *a, ae_state *_state) {
    ae_int_t result;
 
    result = 0;
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       if (a->xB[i]) {
          result = result + 1;
       }
@@ -601,7 +598,7 @@ ae_int_t xdebugb1count(BVector *a, ae_state *_state) {
 void xdebugb1not(BVector *a, ae_state *_state) {
    ae_int_t i;
 
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xB[i] = !a->xB[i];
    }
 }
@@ -621,11 +618,11 @@ void xdebugb1appendcopy(BVector *a, ae_state *_state) {
    NewVector(b, 0, DT_BOOL, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
-   for (i = 0; i <= b.cnt - 1; i++) {
+   for (i = 0; i < b.cnt; i++) {
       b.xB[i] = a->xB[i];
    }
    ae_vector_set_length(a, 2 * b.cnt, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xB[i] = b.xB[i % b.cnt];
    }
    ae_frame_leave(_state);
@@ -644,7 +641,7 @@ void xdebugb1outeven(ae_int_t n, BVector *a, ae_state *_state) {
    SetVector(a);
 
    ae_vector_set_length(a, n, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xB[i] = i % 2 == 0;
    }
 }
@@ -660,7 +657,7 @@ ae_int_t xdebugi1sum(ZVector *a, ae_state *_state) {
    ae_int_t result;
 
    result = 0;
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       result = result + a->xZ[i];
    }
    return result;
@@ -676,7 +673,7 @@ ae_int_t xdebugi1sum(ZVector *a, ae_state *_state) {
 void xdebugi1neg(ZVector *a, ae_state *_state) {
    ae_int_t i;
 
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xZ[i] = -a->xZ[i];
    }
 }
@@ -696,11 +693,11 @@ void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
    NewVector(b, 0, DT_INT, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
-   for (i = 0; i <= b.cnt - 1; i++) {
+   for (i = 0; i < b.cnt; i++) {
       b.xZ[i] = a->xZ[i];
    }
    ae_vector_set_length(a, 2 * b.cnt, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xZ[i] = b.xZ[i % b.cnt];
    }
    ae_frame_leave(_state);
@@ -721,7 +718,7 @@ void xdebugi1outeven(ae_int_t n, ZVector *a, ae_state *_state) {
    SetVector(a);
 
    ae_vector_set_length(a, n, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
          a->xZ[i] = i;
       } else {
@@ -741,7 +738,7 @@ double xdebugr1sum(RVector *a, ae_state *_state) {
    double result;
 
    result = 0.0;
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       result = result + a->xR[i];
    }
    return result;
@@ -757,7 +754,7 @@ double xdebugr1sum(RVector *a, ae_state *_state) {
 void xdebugr1neg(RVector *a, ae_state *_state) {
    ae_int_t i;
 
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xR[i] = -a->xR[i];
    }
 }
@@ -777,11 +774,11 @@ void xdebugr1appendcopy(RVector *a, ae_state *_state) {
    NewVector(b, 0, DT_REAL, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
-   for (i = 0; i <= b.cnt - 1; i++) {
+   for (i = 0; i < b.cnt; i++) {
       b.xR[i] = a->xR[i];
    }
    ae_vector_set_length(a, 2 * b.cnt, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xR[i] = b.xR[i % b.cnt];
    }
    ae_frame_leave(_state);
@@ -802,7 +799,7 @@ void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
    SetVector(a);
 
    ae_vector_set_length(a, n, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
          a->xR[i] = i * 0.25;
       } else {
@@ -822,7 +819,7 @@ ae_complex xdebugc1sum(CVector *a, ae_state *_state) {
    ae_complex result;
 
    result = ae_complex_from_i(0);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       result = ae_c_add(result, a->xC[i]);
    }
    return result;
@@ -838,7 +835,7 @@ ae_complex xdebugc1sum(CVector *a, ae_state *_state) {
 void xdebugc1neg(CVector *a, ae_state *_state) {
    ae_int_t i;
 
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xC[i] = ae_c_neg(a->xC[i]);
    }
 }
@@ -858,11 +855,11 @@ void xdebugc1appendcopy(CVector *a, ae_state *_state) {
    NewVector(b, 0, DT_COMPLEX, _state);
 
    ae_vector_set_length(&b, a->cnt, _state);
-   for (i = 0; i <= b.cnt - 1; i++) {
+   for (i = 0; i < b.cnt; i++) {
       b.xC[i] = a->xC[i];
    }
    ae_vector_set_length(a, 2 * b.cnt, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       a->xC[i] = b.xC[i % b.cnt];
    }
    ae_frame_leave(_state);
@@ -883,7 +880,7 @@ void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
    SetVector(a);
 
    ae_vector_set_length(a, n, _state);
-   for (i = 0; i <= a->cnt - 1; i++) {
+   for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
          a->xC[i].x = i * 0.250;
          a->xC[i].y = i * 0.125;
@@ -905,8 +902,8 @@ ae_int_t xdebugb2count(BMatrix *a, ae_state *_state) {
    ae_int_t result;
 
    result = 0;
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          if (a->xyB[i][j]) {
             result = result + 1;
          }
@@ -926,8 +923,8 @@ void xdebugb2not(BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyB[i][j] = !a->xyB[i][j];
       }
    }
@@ -949,14 +946,14 @@ void xdebugb2transpose(BMatrix *a, ae_state *_state) {
    NewMatrix(b, 0, 0, DT_BOOL, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          b.xyB[i][j] = a->xyB[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          a->xyB[j][i] = b.xyB[i][j];
       }
    }
@@ -977,8 +974,8 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyB[i][j] = ae_sin((double)(3 * i + 5 * j), _state) > 0.0;
       }
    }
@@ -996,8 +993,8 @@ ae_int_t xdebugi2sum(ZMatrix *a, ae_state *_state) {
    ae_int_t result;
 
    result = 0;
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          result = result + a->xyZ[i][j];
       }
    }
@@ -1015,8 +1012,8 @@ void xdebugi2neg(ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyZ[i][j] = -a->xyZ[i][j];
       }
    }
@@ -1038,14 +1035,14 @@ void xdebugi2transpose(ZMatrix *a, ae_state *_state) {
    NewMatrix(b, 0, 0, DT_INT, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          b.xyZ[i][j] = a->xyZ[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          a->xyZ[j][i] = b.xyZ[i][j];
       }
    }
@@ -1066,8 +1063,8 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyZ[i][j] = ae_sign(ae_sin((double)(3 * i + 5 * j), _state), _state);
       }
    }
@@ -1085,8 +1082,8 @@ double xdebugr2sum(RMatrix *a, ae_state *_state) {
    double result;
 
    result = 0.0;
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          result = result + a->xyR[i][j];
       }
    }
@@ -1104,8 +1101,8 @@ void xdebugr2neg(RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyR[i][j] = -a->xyR[i][j];
       }
    }
@@ -1127,14 +1124,14 @@ void xdebugr2transpose(RMatrix *a, ae_state *_state) {
    NewMatrix(b, 0, 0, DT_REAL, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          b.xyR[i][j] = a->xyR[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          a->xyR[j][i] = b.xyR[i][j];
       }
    }
@@ -1155,8 +1152,8 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyR[i][j] = ae_sin((double)(3 * i + 5 * j), _state);
       }
    }
@@ -1174,8 +1171,8 @@ ae_complex xdebugc2sum(CMatrix *a, ae_state *_state) {
    ae_complex result;
 
    result = ae_complex_from_i(0);
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          result = ae_c_add(result, a->xyC[i][j]);
       }
    }
@@ -1193,8 +1190,8 @@ void xdebugc2neg(CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyC[i][j] = ae_c_neg(a->xyC[i][j]);
       }
    }
@@ -1216,14 +1213,14 @@ void xdebugc2transpose(CMatrix *a, ae_state *_state) {
    NewMatrix(b, 0, 0, DT_COMPLEX, _state);
 
    ae_matrix_set_length(&b, a->rows, a->cols, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          b.xyC[i][j] = a->xyC[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows, _state);
-   for (i = 0; i <= b.rows - 1; i++) {
-      for (j = 0; j <= b.cols - 1; j++) {
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
          a->xyC[j][i] = b.xyC[i][j];
       }
    }
@@ -1244,8 +1241,8 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    SetMatrix(a);
 
    ae_matrix_set_length(a, m, n, _state);
-   for (i = 0; i <= a->rows - 1; i++) {
-      for (j = 0; j <= a->cols - 1; j++) {
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
          a->xyC[i][j].x = ae_sin((double)(3 * i + 5 * j), _state);
          a->xyC[i][j].y = ae_cos((double)(3 * i + 5 * j), _state);
       }
@@ -1270,8 +1267,8 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix 
    ae_assert(n >= b->cols, "Assertion failed", _state);
    ae_assert(n >= c->cols, "Assertion failed", _state);
    result = 0.0;
-   for (i = 0; i <= m - 1; i++) {
-      for (j = 0; j <= n - 1; j++) {
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n; j++) {
          if (c->xyB[i][j]) {
             result = result + a->xyR[i][j] * (1 + b->xyR[i][j]);
          }
@@ -1626,8 +1623,8 @@ double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const re
 // === NEARESTNEIGHBOR Package ===
 // Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
-static ae_int_t nearestneighbor_splitnodesize = 6;
-static ae_int_t nearestneighbor_kdtreefirstversion = 0;
+static const ae_int_t nearestneighbor_splitnodesize = 6;
+static const ae_int_t nearestneighbor_kdtreefirstversion = 0;
 static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, bool orderedbydist, ae_state *_state);
 static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, ae_int_t d, double s, ae_int_t *i3, ae_state *_state);
 static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesoffs, ae_int_t *splitsoffs, ae_int_t i1, ae_int_t i2, ae_int_t maxleafsize, ae_state *_state);
@@ -1689,7 +1686,7 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
    ae_assert(apservisfinitematrix(xy, n, nx + ny, _state), "KDTreeBuild: XY contains infinite or NaN values", _state);
    if (n > 0) {
       ae_vector_set_length(&tags, n, _state);
-      for (i = 0; i <= n - 1; i++) {
+      for (i = 0; i < n; i++) {
          tags.xZ[i] = 0;
       }
    }
@@ -1765,17 +1762,17 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    kdtreecreaterequestbuffer(kdt, &kdt->innerbuf, _state);
 
 // Initial fill
-   for (i = 0; i <= n - 1; i++) {
-      ae_v_move(&kdt->xy.xyR[i][0], 1, &xy->xyR[i][0], 1, ae_v_len(0, nx - 1));
-      ae_v_move(&kdt->xy.xyR[i][nx], 1, &xy->xyR[i][0], 1, ae_v_len(nx, 2 * nx + ny - 1));
+   for (i = 0; i < n; i++) {
+      ae_v_move(kdt->xy.xyR[i], 1, xy->xyR[i], 1, nx);
+      ae_v_move(&kdt->xy.xyR[i][nx], 1, xy->xyR[i], 1, nx + ny);
       kdt->tags.xZ[i] = tags->xZ[i];
    }
 
 // Determine bounding box
-   ae_v_move(&kdt->boxmin.xR[0], 1, &kdt->xy.xyR[0][0], 1, ae_v_len(0, nx - 1));
-   ae_v_move(&kdt->boxmax.xR[0], 1, &kdt->xy.xyR[0][0], 1, ae_v_len(0, nx - 1));
-   for (i = 1; i <= n - 1; i++) {
-      for (j = 0; j <= nx - 1; j++) {
+   ae_v_move(kdt->boxmin.xR, 1, kdt->xy.xyR[0], 1, nx);
+   ae_v_move(kdt->boxmax.xR, 1, kdt->xy.xyR[0], 1, nx);
+   for (i = 1; i < n; i++) {
+      for (j = 0; j < nx; j++) {
          kdt->boxmin.xR[j] = ae_minreal(kdt->boxmin.xR[j], kdt->xy.xyR[i][j], _state);
          kdt->boxmax.xR[j] = ae_maxreal(kdt->boxmax.xR[j], kdt->xy.xyR[i][j], _state);
       }
@@ -1784,8 +1781,8 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 // Generate tree
    nodesoffs = 0;
    splitsoffs = 0;
-   ae_v_move(&kdt->innerbuf.curboxmin.xR[0], 1, &kdt->boxmin.xR[0], 1, ae_v_len(0, nx - 1));
-   ae_v_move(&kdt->innerbuf.curboxmax.xR[0], 1, &kdt->boxmax.xR[0], 1, ae_v_len(0, nx - 1));
+   ae_v_move(kdt->innerbuf.curboxmin.xR, 1, kdt->boxmin.xR, 1, nx);
+   ae_v_move(kdt->innerbuf.curboxmax.xR, 1, kdt->boxmax.xR, 1, nx);
    nearestneighbor_kdtreegeneratetreerec(kdt, &nodesoffs, &splitsoffs, 0, n, 8, _state);
    ivectorresize(&kdt->nodes, nodesoffs, _state);
    rvectorresize(&kdt->splits, splitsoffs, _state);
@@ -2351,7 +2348,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
    nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
 
 // Quick exit for degenerate boxes
-   for (j = 0; j <= kdt->nx - 1; j++) {
+   for (j = 0; j < kdt->nx; j++) {
       if (boxmin->xR[j] > boxmax->xR[j]) {
          buf->kcur = 0;
          result = 0;
@@ -2360,7 +2357,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
    }
 
 // Prepare parameters
-   for (j = 0; j <= kdt->nx - 1; j++) {
+   for (j = 0; j < kdt->nx; j++) {
       buf->boxmin.xR[j] = boxmin->xR[j];
       buf->boxmax.xR[j] = boxmax->xR[j];
       buf->curboxmin.xR[j] = boxmin->xR[j];
@@ -2559,8 +2556,8 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x, ae
       ae_matrix_set_length(x, buf->kcur, kdt->nx, _state);
    }
    k = buf->kcur;
-   for (i = 0; i <= k - 1; i++) {
-      ae_v_move(&x->xyR[i][0], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, ae_v_len(0, kdt->nx - 1));
+   for (i = 0; i < k; i++) {
+      ae_v_move(x->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx);
    }
 }
 
@@ -2604,8 +2601,8 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy, 
       ae_matrix_set_length(xy, buf->kcur, kdt->nx + kdt->ny, _state);
    }
    k = buf->kcur;
-   for (i = 0; i <= k - 1; i++) {
-      ae_v_move(&xy->xyR[i][0], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, ae_v_len(0, kdt->nx + kdt->ny - 1));
+   for (i = 0; i < k; i++) {
+      ae_v_move(xy->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx + kdt->ny);
    }
 }
 
@@ -2654,7 +2651,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
       ae_vector_set_length(tags, buf->kcur, _state);
    }
    k = buf->kcur;
-   for (i = 0; i <= k - 1; i++) {
+   for (i = 0; i < k; i++) {
       tags->xZ[i] = kdt->tags.xZ[buf->idx.xZ[i]];
    }
 }
@@ -2709,17 +2706,17 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // Abs() call is used to handle cases with negative norms
 // (generated during KFN requests)
    if (kdt->normtype == 0) {
-      for (i = 0; i <= k - 1; i++) {
+      for (i = 0; i < k; i++) {
          r->xR[i] = ae_fabs(buf->r.xR[i], _state);
       }
    }
    if (kdt->normtype == 1) {
-      for (i = 0; i <= k - 1; i++) {
+      for (i = 0; i < k; i++) {
          r->xR[i] = ae_fabs(buf->r.xR[i], _state);
       }
    }
    if (kdt->normtype == 2) {
-      for (i = 0; i <= k - 1; i++) {
+      for (i = 0; i < k; i++) {
          r->xR[i] = ae_sqrt(ae_fabs(buf->r.xR[i], _state), _state);
       }
    }
@@ -2800,7 +2797,7 @@ void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state *_
 
    rvectorsetlengthatleast(boxmin, kdt->nx, _state);
    rvectorsetlengthatleast(boxmax, kdt->nx, _state);
-   for (i = 0; i <= kdt->nx - 1; i++) {
+   for (i = 0; i < kdt->nx; i++) {
       boxmin->xR[i] = kdt->boxmin.xR[i];
       boxmax->xR[i] = kdt->boxmax.xR[i];
    }
@@ -2870,8 +2867,8 @@ void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k, ae_
    ae_assert(offs >= 0, "KDTreeExploreLeaf: integrity error", _state);
    ae_assert(offs + (*k) - 1 < kdt->xy.rows, "KDTreeExploreLeaf: integrity error", _state);
    rmatrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny, _state);
-   for (i = 0; i <= *k - 1; i++) {
-      for (j = 0; j <= kdt->nx + kdt->ny - 1; j++) {
+   for (i = 0; i < *k; i++) {
+      for (j = 0; j < kdt->nx + kdt->ny; j++) {
          xy->xyR[i][j] = kdt->xy.xyR[offs + i][kdt->nx + j];
       }
    }
@@ -3132,7 +3129,7 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
 
       // XY[ILeft,..] must be at IRight.
       // Swap and advance IRight.
-         for (i = 0; i <= 2 * kdt->nx + kdt->ny - 1; i++) {
+         for (i = 0; i < 2 * kdt->nx + kdt->ny; i++) {
             v = kdt->xy.xyR[ileft][i];
             kdt->xy.xyR[ileft][i] = kdt->xy.xyR[iright][i];
             kdt->xy.xyR[iright][i] = v;
@@ -3201,7 +3198,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // In case bounding box has zero size, we enforce creation of the leaf node.
    d = 0;
    ds = kdt->innerbuf.curboxmax.xR[0] - kdt->innerbuf.curboxmin.xR[0];
-   for (i = 1; i <= nx - 1; i++) {
+   for (i = 1; i < nx; i++) {
       v = kdt->innerbuf.curboxmax.xR[i] - kdt->innerbuf.curboxmin.xR[i];
       if (v > ds) {
          ds = v;
@@ -3221,7 +3218,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // (MinV=MaxV) we enforce D-th dimension of bounding
 // box to become exactly zero and repeat tree construction.
    s = kdt->innerbuf.curboxmin.xR[d] + 0.5 * ds;
-   ae_v_move(&kdt->innerbuf.buf.xR[0], 1, &kdt->xy.xyR[i1][d], kdt->xy.stride, ae_v_len(0, i2 - i1 - 1));
+   ae_v_move(kdt->innerbuf.buf.xR, 1, &kdt->xy.xyR[i1][d], kdt->xy.stride, i2 - i1);
    n = i2 - i1;
    cntless = 0;
    cntgreater = 0;
@@ -3229,7 +3226,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    maxv = kdt->innerbuf.buf.xR[0];
    minidx = i1;
    maxidx = i1;
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       v = kdt->innerbuf.buf.xR[i];
       if (v < minv) {
          minv = v;
@@ -3274,7 +3271,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
       //    others - to the right bin
          s = minv;
          if (minidx != i1) {
-            for (i = 0; i <= 2 * nx + ny - 1; i++) {
+            for (i = 0; i < 2 * nx + ny; i++) {
                v = kdt->xy.xyR[minidx][i];
                kdt->xy.xyR[minidx][i] = kdt->xy.xyR[i1][i];
                kdt->xy.xyR[i1][i] = v;
@@ -3291,7 +3288,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
       //    others - to the left bin
          s = maxv;
          if (maxidx != i2 - 1) {
-            for (i = 0; i <= 2 * nx + ny - 1; i++) {
+            for (i = 0; i < 2 * nx + ny; i++) {
                v = kdt->xy.xyR[maxidx][i];
                kdt->xy.xyR[maxidx][i] = kdt->xy.xyR[i2 - 1][i];
                kdt->xy.xyR[i2 - 1][i] = v;
@@ -3362,23 +3359,23 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
    if (kdt->nodes.xZ[offs] > 0) {
       i1 = kdt->nodes.xZ[offs + 1];
       i2 = i1 + kdt->nodes.xZ[offs];
-      for (i = i1; i <= i2 - 1; i++) {
+      for (i = i1; i < i2; i++) {
 
       // Calculate distance
          ptdist = 0.0;
          nx = kdt->nx;
          if (kdt->normtype == 0) {
-            for (j = 0; j <= nx - 1; j++) {
+            for (j = 0; j < nx; j++) {
                ptdist = ae_maxreal(ptdist, ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state), _state);
             }
          }
          if (kdt->normtype == 1) {
-            for (j = 0; j <= nx - 1; j++) {
+            for (j = 0; j < nx; j++) {
                ptdist = ptdist + ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state);
             }
          }
          if (kdt->normtype == 2) {
-            for (j = 0; j <= nx - 1; j++) {
+            for (j = 0; j < nx; j++) {
                ptdist = ptdist + ae_sqr(kdt->xy.xyR[i][j] - buf->x.xR[j], _state);
             }
          }
@@ -3387,11 +3384,11 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             continue;
          }
       // We CAN'T process point if R-criterion isn't satisfied,
-      // i.e. (RNeeded<>0) AND (PtDist>R).
+      // i.e. (RNeeded != 0) AND (PtDist>R).
          if (buf->rneeded == 0 || ptdist <= buf->rneeded) {
 
          // R-criterion is satisfied, we must either:
-         // * replace worst point, if (KNeeded<>0) AND (KCur=KNeeded)
+         // * replace worst point, if (KNeeded != 0) AND (KCur=KNeeded)
          //   (or skip, if worst point is better)
          // * add point without replacement otherwise
             if (buf->kcur < buf->kneeded || buf->kneeded == 0) {
@@ -3536,7 +3533,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
 // Check that intersection of query box with bounding box is non-empty.
 // This check is performed once for Offs=0 (tree root).
    if (offs == 0) {
-      for (j = 0; j <= nx - 1; j++) {
+      for (j = 0; j < nx; j++) {
          if (buf->boxmin.xR[j] > buf->curboxmax.xR[j]) {
             return;
          }
@@ -3550,11 +3547,11 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
    if (kdt->nodes.xZ[offs] > 0) {
       i1 = kdt->nodes.xZ[offs + 1];
       i2 = i1 + kdt->nodes.xZ[offs];
-      for (i = i1; i <= i2 - 1; i++) {
+      for (i = i1; i < i2; i++) {
 
       // Check whether point is in box or not
          inbox = true;
-         for (j = 0; j <= nx - 1; j++) {
+         for (j = 0; j < nx; j++) {
             inbox = inbox && kdt->xy.xyR[i][j] >= buf->boxmin.xR[j];
             inbox = inbox && kdt->xy.xyR[i][j] <= buf->boxmax.xR[j];
          }
@@ -3610,7 +3607,7 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
 // calculate distance from point to current bounding box
    buf->curdist = 0.0;
    if (kdt->normtype == 0) {
-      for (i = 0; i <= kdt->nx - 1; i++) {
+      for (i = 0; i < kdt->nx; i++) {
          vx = x->xR[i];
          vmin = kdt->boxmin.xR[i];
          vmax = kdt->boxmax.xR[i];
@@ -3627,7 +3624,7 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
       }
    }
    if (kdt->normtype == 1) {
-      for (i = 0; i <= kdt->nx - 1; i++) {
+      for (i = 0; i < kdt->nx; i++) {
          vx = x->xR[i];
          vmin = kdt->boxmin.xR[i];
          vmax = kdt->boxmax.xR[i];
@@ -3644,7 +3641,7 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
       }
    }
    if (kdt->normtype == 2) {
-      for (i = 0; i <= kdt->nx - 1; i++) {
+      for (i = 0; i < kdt->nx; i++) {
          vx = x->xR[i];
          vmin = kdt->boxmin.xR[i];
          vmax = kdt->boxmax.xR[i];

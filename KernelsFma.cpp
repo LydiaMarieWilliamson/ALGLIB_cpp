@@ -195,7 +195,7 @@ void raddvx_fma(const ae_int_t n, const double alpha, const double *__restrict y
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 4) {
       ae_int_t i;
-      for (i = 0; i <= n - 1; i++)
+      for (i = 0; i < n; i++)
          x[i] += alpha * y[i];
       return;
    }
@@ -309,7 +309,7 @@ void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
@@ -449,7 +449,7 @@ void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const do
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
 
-   for (i = 0; i <= n - 1; i++) {
+   for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       const double v = alpha * x[i];
       const __m256d vV = _mm256_set1_pd(v);
@@ -626,7 +626,7 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
    __m256d u_1_0123 = _mm256_setzero_pd();
    __m256d u_2_0123 = _mm256_setzero_pd();
    __m256d u_3_0123 = _mm256_setzero_pd();
-   for (k = 0; k <= uwidth - 1; k++) {
+   for (k = 0; k < uwidth; k++) {
       targetcol = raw2smap[superrowidx[k]];
       if (targetcol == 0)
          u_0_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage + k * urowstride, v_rankmask));
@@ -650,21 +650,21 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
 
 // Run update
    if (urank == 1) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0, _mm256_load_pd(target_storage + targetrow)));
       }
    }
    if (urank == 2) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0, _mm256_load_pd(target_storage + targetrow))));
       }
    }
    if (urank == 3) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0,
@@ -672,7 +672,7 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
       }
    }
    if (urank == 4) {
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1,
@@ -724,7 +724,7 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
       }
    } else {
    // Row scatter is performed, less efficient code using double mapping to determine target row index
-      for (k = 0; k <= uheight - 1; k++) {
+      for (k = 0; k < uheight; k++) {
          __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
 
          targetrow = offss + raw2smap[superrowidx[urbase + k]] * 4;

@@ -771,9 +771,6 @@ void ae_v_sub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
 void ae_v_subd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
 void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha);
 
-// Other functions.
-ae_int_t ae_v_len(ae_int_t a, ae_int_t b);
-
 #if 0
 extern const double ae_machineepsilon, ae_maxrealnumber, ae_minrealnumber;
 extern const double ae_pi;

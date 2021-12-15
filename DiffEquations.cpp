@@ -17,9 +17,9 @@
 // === ODESOLVER Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-static double odesolver_odesolvermaxgrow = 3.0;
-static double odesolver_odesolvermaxshrink = 10.0;
-static double odesolver_odesolverguaranteeddecay = 0.9;
+static const double odesolver_odesolvermaxgrow = 3.0;
+static const double odesolver_odesolvermaxshrink = 10.0;
+static const double odesolver_odesolverguaranteeddecay = 0.9;
 static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
 
 // Cash-Karp adaptive ODE solver.
@@ -215,8 +215,8 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    ae_vector_set_length(&state->yn, n, _state);
    ae_vector_set_length(&state->yns, n, _state);
    xc = state->xg.xR[0];
-   ae_v_move(&state->ytbl.xyR[0][0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
-   for (j = 0; j <= n - 1; j++) {
+   ae_v_move(state->ytbl.xyR[0], 1, state->yc.xR, 1, n);
+   for (j = 0; j < n; j++) {
       state->escale.xR[j] = 0.0;
    }
    i = 1;
@@ -242,7 +242,7 @@ lbl_6:
 //
 // These maximums are initialized by zeros,
 // then updated every iterations.
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       state->escale.xR[j] = ae_maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
    }
 
@@ -255,8 +255,8 @@ lbl_6:
 // to the form where x[0] < x[1] < ... < x[n-1]. So X is
 // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
 // by dy/dt=xscale*f(y,xscale*t).
-   ae_v_move(&state->yn.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
-   ae_v_move(&state->yns.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->yn.xR, 1, state->yc.xR, 1, n);
+   ae_v_move(state->yns.xR, 1, state->yc.xR, 1, n);
    k = 0;
 lbl_8:
    if (k > 5) {
@@ -264,10 +264,10 @@ lbl_8:
    }
 // prepare data for the next update of YN/YNS
    state->x = state->xscale * (xc + state->rka.xR[k] * h);
-   ae_v_move(&state->y.xR[0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
-   for (j = 0; j <= k - 1; j++) {
+   ae_v_move(state->y.xR, 1, state->yc.xR, 1, n);
+   for (j = 0; j < k; j++) {
       v = state->rkb.xyR[k][j];
-      ae_v_addd(&state->y.xR[0], 1, &state->rkk.xyR[j][0], 1, ae_v_len(0, n - 1), v);
+      ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
    }
    state->needdy = true;
    state->rstate.stage = 0;
@@ -276,20 +276,20 @@ lbl_0:
    state->needdy = false;
    state->repnfev = state->repnfev + 1;
    v = h * state->xscale;
-   ae_v_moved(&state->rkk.xyR[k][0], 1, &state->dy.xR[0], 1, ae_v_len(0, n - 1), v);
+   ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
 
 // update YN/YNS
    v = state->rkc.xR[k];
-   ae_v_addd(&state->yn.xR[0], 1, &state->rkk.xyR[k][0], 1, ae_v_len(0, n - 1), v);
+   ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
    v = state->rkcs.xR[k];
-   ae_v_addd(&state->yns.xR[0], 1, &state->rkk.xyR[k][0], 1, ae_v_len(0, n - 1), v);
+   ae_v_addd(state->yns.xR, 1, state->rkk.xyR[k], 1, n, v);
    k = k + 1;
    goto lbl_8;
 lbl_10:
 
 // estimate error
    err = 0.0;
-   for (j = 0; j <= n - 1; j++) {
+   for (j = 0; j < n; j++) {
       if (!state->fraceps) {
 
       // absolute error is estimated
@@ -320,7 +320,7 @@ lbl_10:
    }
 // advance position
    xc = xc + h;
-   ae_v_move(&state->yc.xR[0], 1, &state->yn.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
 
 // update H
    h = h2;
@@ -333,7 +333,7 @@ lbl_10:
 lbl_7:
 
 // save result
-   ae_v_move(&state->ytbl.xyR[i][0], 1, &state->yc.xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
    i = i + 1;
    goto lbl_3;
 lbl_5:
@@ -371,7 +371,7 @@ lbl_rcomm:
 //     State   -   algorithm state (used by OdeSolverIteration).
 //
 // Outputs:
-//     M       -   number of tabulated values, M>=1
+//     M       -   number of tabulated values, M >= 1
 //     XTbl    -   array[0..M-1], values of X
 //     YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
 //     Rep     -   solver report:
@@ -398,10 +398,10 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
       rep->nfev = state->repnfev;
       ae_vector_set_length(xtbl, state->m, _state);
       v = state->xscale;
-      ae_v_moved(&xtbl->xR[0], 1, &state->xg.xR[0], 1, ae_v_len(0, state->m - 1), v);
+      ae_v_moved(xtbl->xR, 1, state->xg.xR, 1, state->m, v);
       ae_matrix_set_length(ytbl, state->m, state->n, _state);
-      for (i = 0; i <= state->m - 1; i++) {
-         ae_v_move(&ytbl->xyR[i][0], 1, &state->ytbl.xyR[i][0], 1, ae_v_len(0, state->n - 1));
+      for (i = 0; i < state->m; i++) {
+         ae_v_move(ytbl->xyR[i], 1, state->ytbl.xyR[i], 1, state->n);
       }
    } else {
       rep->nfev = 0;
@@ -436,9 +436,9 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       state->repnfev = 0;
       state->repterminationtype = 1;
       ae_matrix_set_length(&state->ytbl, 1, n, _state);
-      ae_v_move(&state->ytbl.xyR[0][0], 1, &y->xR[0], 1, ae_v_len(0, n - 1));
+      ae_v_move(state->ytbl.xyR[0], 1, y->xR, 1, n);
       ae_vector_set_length(&state->xg, m, _state);
-      ae_v_move(&state->xg.xR[0], 1, &x->xR[0], 1, ae_v_len(0, m - 1));
+      ae_v_move(state->xg.xR, 1, x->xR, 1, m);
       return;
    }
 // check again: correct order of X[]
@@ -446,7 +446,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       state->repterminationtype = -2;
       return;
    }
-   for (i = 1; i <= m - 1; i++) {
+   for (i = 1; i < m; i++) {
       if ((x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1]) || (x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1])) {
          state->repterminationtype = -2;
          return;
@@ -456,7 +456,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // auto-select H if necessary
    if (h == 0.0) {
       v = ae_fabs(x->xR[1] - x->xR[0], _state);
-      for (i = 2; i <= m - 1; i++) {
+      for (i = 2; i < m; i++) {
          v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
       }
       h = 0.001 * v;
@@ -468,15 +468,15 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    state->eps = ae_fabs(eps, _state);
    state->fraceps = eps < 0.0;
    ae_vector_set_length(&state->xg, m, _state);
-   ae_v_move(&state->xg.xR[0], 1, &x->xR[0], 1, ae_v_len(0, m - 1));
+   ae_v_move(state->xg.xR, 1, x->xR, 1, m);
    if (x->xR[1] > x->xR[0]) {
       state->xscale = 1.0;
    } else {
       state->xscale = -1.0;
-      ae_v_muld(&state->xg.xR[0], 1, ae_v_len(0, m - 1), -1);
+      ae_v_muld(state->xg.xR, 1, m, -1);
    }
    ae_vector_set_length(&state->yc, n, _state);
-   ae_v_move(&state->yc.xR[0], 1, &y->xR[0], 1, ae_v_len(0, n - 1));
+   ae_v_move(state->yc.xR, 1, y->xR, 1, n);
    state->solvertype = solvertype;
    state->repterminationtype = 0;
 
