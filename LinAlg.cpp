@@ -17342,7 +17342,7 @@ static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
          s = 1 / a->xyR[offs + j][offs + j];
          ae_v_muld(&a->xyR[offs + j][offs + j + 1], 1, n - j - 1, s);
       }
-      if (j < imin2(m - 1, n - 1)) {
+      if (j < imin2(m, n) - 1) {
          ae_v_move(tmp->xR, 1, &a->xyR[offs + j + 1][offs + j], a->stride, m - j - 1);
          ae_v_moveneg(&tmp->xR[m], 1, &a->xyR[offs + j][offs + j + 1], 1, n - j - 1);
          rmatrixrank1(m - j - 1, n - j - 1, a, offs + j + 1, offs + j + 1, tmp, 0, tmp, m);
@@ -17377,7 +17377,7 @@ static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
          s = ae_c_d_div(1, a->xyC[offs + j][offs + j]);
          ae_v_cmulc(&a->xyC[offs + j][offs + j + 1], 1, n - j - 1, s);
       }
-      if (j < imin2(m - 1, n - 1)) {
+      if (j < imin2(m, n) - 1) {
          ae_v_cmove(tmp->xC, 1, &a->xyC[offs + j + 1][offs + j], a->stride, "N", m - j - 1);
          ae_v_cmoveneg(&tmp->xC[m], 1, &a->xyC[offs + j][offs + j + 1], 1, "N", n - j - 1);
          cmatrixrank1(m - j - 1, n - j - 1, a, offs + j + 1, offs + j + 1, tmp, 0, tmp, m);

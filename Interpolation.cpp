@@ -19684,7 +19684,7 @@ static void spline2d_blockllstrsv(RMatrix *blockata, ae_int_t kx, ae_int_t ky, b
    if (!transu) {
    // Solve U*x=b
       for (blockidx = ky - 1; blockidx >= 0; blockidx--) {
-         for (blockidx1 = 1; blockidx1 <= imin2(ky - (blockidx + 1), blockbandwidth); blockidx1++) {
+         for (blockidx1 = 1; blockidx1 < ky - blockidx && blockidx1 <= blockbandwidth; blockidx1++) {
             celloffset = spline2d_getcelloffset(kx, ky, blockbandwidth, blockidx, blockidx + blockidx1);
             rmatrixgemv(kx, kx, -1.0, blockata, celloffset, 0, 0, b, (blockidx + blockidx1) * kx, 1.0, b, blockidx * kx);
          }
@@ -19696,7 +19696,7 @@ static void spline2d_blockllstrsv(RMatrix *blockata, ae_int_t kx, ae_int_t ky, b
       for (blockidx = 0; blockidx < ky; blockidx++) {
          celloffset = spline2d_getcelloffset(kx, ky, blockbandwidth, blockidx, blockidx);
          rmatrixtrsv(kx, blockata, celloffset, 0, true, false, 1, b, blockidx * kx);
-         for (blockidx1 = 1; blockidx1 <= imin2(ky - (blockidx + 1), blockbandwidth); blockidx1++) {
+         for (blockidx1 = 1; blockidx1 < ky - blockidx && blockidx1 <= blockbandwidth; blockidx1++) {
             celloffset = spline2d_getcelloffset(kx, ky, blockbandwidth, blockidx, blockidx + blockidx1);
             rmatrixgemv(kx, kx, -1.0, blockata, celloffset, 0, 1, b, blockidx * kx, 1.0, b, (blockidx + blockidx1) * kx);
          }
