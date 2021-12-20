@@ -377,7 +377,6 @@ void armijostate_copy(void *_dst, void *_src, bool make_automatic);
 void armijostate_free(void *_p, bool make_automatic);
 
 void linminnormalized(RVector *d, double *stp, ae_int_t n);
-
 void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info);
 bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage);
 void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, double stpmax, ae_int_t fmax, armijostate *state);

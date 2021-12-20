@@ -1542,7 +1542,6 @@ bool ae_force_hermitian(ae_matrix *a) {
 }
 
 //(@) ae_yield(), originally had external linkage, but isn't documented in the API or used elsewhere.
-
 // Make the calling thread relinquish the CPU.
 // The thread is moved to the end of the queue and some other thread gets to run.
 // NOTE:
@@ -2729,7 +2728,6 @@ ae_int_t FloorZ(double x) { return (ae_int_t)floor(x); }
 ae_int_t CeilZ(double x) { return (ae_int_t)ceil(x); }
 
 double rmin2(double x, double y) { return x > y ? y : x; }
-
 double rmax2(double x, double y) { return x > y ? x : y; }
 
 // Return max(x,y,z).
@@ -6135,6 +6133,7 @@ boolean_1d_array::boolean_1d_array(const char *s): ae_vector_wrapper(s, alglib_i
 std::string boolean_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&(operator()(0)), length()); }
 #endif
 boolean_1d_array::~boolean_1d_array() { }
+
 const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast < const boolean_1d_array &>(assign(rhs)); }
 const bool &boolean_1d_array::operator()(ae_int_t i) const { return This->xB[i]; }
 bool &boolean_1d_array::operator()(ae_int_t i) { return This->xB[i]; }

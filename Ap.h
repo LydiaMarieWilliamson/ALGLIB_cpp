@@ -493,7 +493,6 @@ struct ae_lock {
 // Static locks are allocated without using the frame and cannot be deallocated.
    bool is_static;
 };
-
 void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
 void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
@@ -587,7 +586,6 @@ struct ae_serializer {
    ae_stream_writer stream_writer;
    ae_stream_reader stream_reader;
 };
-
 void ae_serializer_init(ae_serializer *serializer);
 #define NewSerializer(Ser)	alglib_impl::ae_serializer Ser; alglib_impl::ae_serializer_init(&Ser)
 
