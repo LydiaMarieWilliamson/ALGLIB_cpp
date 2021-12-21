@@ -27,19 +27,13 @@ bool issue824_passed = true;
 //
 // Service datatypes
 //
-typedef struct {
+struct innerrec {
    alglib_impl::ae_complex cval;
    double rval;
    alglib_impl::ae_int_t ival;
    bool bval;
    alglib_impl::ae_vector i1val;
-} innerrec;
-
-typedef struct {
-   bool bval;
-   innerrec recval;
-   alglib_impl::ae_shared_pool pool;
-} seedrec;
+};
 
 void innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *p = (innerrec *)_p;
@@ -62,6 +56,12 @@ void innerrec_free(void *_p, bool make_automatic) {
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
+
+struct seedrec {
+   bool bval;
+   innerrec recval;
+   alglib_impl::ae_shared_pool pool;
+};
 
 void seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *p = (seedrec *)_p;

@@ -568,6 +568,5 @@ void icopyvx_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__re
    icopyvx_sse2_xaligned(n - nDone, x + nDone, y + nDone, _state);
 }
 
-// ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_SSE2_INTRINSICS
-#endif
+#endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_SSE2_INTRINSICS
 } // end of namespace alglib_impl

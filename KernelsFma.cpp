@@ -745,6 +745,5 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    return true;
 }
 
-// ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
-#endif
+#endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 } // end of namespace alglib_impl

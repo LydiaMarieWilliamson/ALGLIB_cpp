@@ -1248,8 +1248,6 @@ void vmul(complex *A, ae_int_t N, double Alpha);
 void vmul(complex *A, ae_int_t dA, ae_int_t N, complex Alpha);
 void vmul(complex *A, ae_int_t N, complex Alpha);
 
-ae_int_t vlen(ae_int_t n1, ae_int_t n2);
-
 // Vectors and Matrices.
 struct ae_vector_wrapper {
 // A new zero-sized vector of the given datatype.

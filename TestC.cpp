@@ -8,7 +8,7 @@
 using namespace alglib_impl;
 
 // === ablasf testing unit ===
-typedef struct {
+struct ablasfplayground {
    double v0;
    ae_vector x0;
    ae_vector x1;
@@ -19,7 +19,7 @@ typedef struct {
    ae_vector bx1;
    ae_matrix a0;
    ae_matrix a1;
-} ablasfplayground;
+};
 static void ablasfplayground_init(void *_p, ae_state *_state, bool make_automatic);
 static void ablasfplayground_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void ablasfplayground_free(void *_p, bool make_automatic);
@@ -7697,7 +7697,7 @@ static void testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector
 }
 
 // === sparse testing unit ===
-typedef struct {
+struct sparsegenerator {
    ae_int_t n;
    ae_int_t m;
    ae_int_t matkind;
@@ -7705,7 +7705,7 @@ typedef struct {
    ae_matrix bufa;
    hqrndstate rs;
    rcommstate rcs;
-} sparsegenerator;
+};
 static void sparsegenerator_init(void *_p, ae_state *_state, bool make_automatic);
 static void sparsegenerator_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void sparsegenerator_free(void *_p, bool make_automatic);
@@ -93439,7 +93439,7 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
 }
 
 // === alglibbasics testing unit ===
-typedef struct {
+struct rec1 {
    bool bfield;
    double rfield;
    ae_int_t ifield;
@@ -93452,16 +93452,16 @@ typedef struct {
    ae_matrix r2field;
    ae_matrix i2field;
    ae_matrix c2field;
-} rec1;
+};
 static void rec1_init(void *_p, ae_state *_state, bool make_automatic);
 static void rec1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void rec1_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct rec4serialization {
    ae_vector b;
    ae_vector i;
    ae_vector r;
-} rec4serialization;
+};
 static void rec4serialization_init(void *_p, ae_state *_state, bool make_automatic);
 static void rec4serialization_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void rec4serialization_free(void *_p, bool make_automatic);
@@ -93469,29 +93469,29 @@ static void rec4serializationalloc(ae_serializer *s, rec4serialization *v, ae_st
 static void rec4serializationserialize(ae_serializer *s, rec4serialization *v, ae_state *_state);
 static void rec4serializationunserialize(ae_serializer *s, rec4serialization *v, ae_state *_state);
 
-typedef struct {
+struct poolrec1 {
    ae_complex cval;
    double rval;
    ae_int_t ival;
    bool bval;
    ae_vector i1val;
-} poolrec1;
+};
 static void poolrec1_init(void *_p, ae_state *_state, bool make_automatic);
 static void poolrec1_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void poolrec1_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct poolrec2 {
    bool bval;
    poolrec1 recval;
    ae_shared_pool pool;
-} poolrec2;
+};
 static void poolrec2_init(void *_p, ae_state *_state, bool make_automatic);
 static void poolrec2_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void poolrec2_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct poolsummand {
    ae_int_t val;
-} poolsummand;
+};
 static void poolsummand_init(void *_p, ae_state *_state, bool make_automatic);
 static void poolsummand_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 static void poolsummand_free(void *_p, bool make_automatic);
@@ -95291,10 +95291,10 @@ CRITICAL_SECTION print_lock;
 void *tests_lock = NULL;
 void *print_lock = NULL;
 #endif
-typedef struct {
+struct _s_testrecord {
    const char *name;
    bool (*testfunc)(bool, ae_state *);
-} _s_testrecord;
+};
 int unittests_processed = 0;
 _s_testrecord unittests[] = {
    { "ablasf", testablasf },
@@ -95454,11 +95454,10 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 void *tester_function(void *T)
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-DWORD WINAPI tester_function(LPVOID T)
+DWORD WINAPI tester_function(LPVOID T) {
 #else
-void tester_function(void *T)
+void tester_function(void *T) {
 #endif
-{
    int idx;
    bool status;
    while (true) {
