@@ -46,15 +46,12 @@ namespace alglib_impl {
 void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(_state, &_frame_block);
    NewObj(fasttransformplan, plan, _state);
    NewVector(buf, 0, DT_REAL, _state);
-
    ae_assert(n > 0, "FFTC1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTC1D: Length(A)<N!", _state);
    ae_assert(isfinitecvector(a, n, _state), "FFTC1D: A contains infinite or NAN values!", _state);
-
 // Special case: N=1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
@@ -67,7 +64,6 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
       buf.xR[2 * i + 0] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
-
 // Generate plan and execute it.
 //
 // Plan is a combination of a successive factorizations of N and
@@ -75,7 +71,6 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
 // between subroutine calls and is much simpler.
    ftcomplexfftplan(n, 1, &plan, _state);
    ftapplyplan(&plan, &buf, 0, 1, _state);
-
 // result
    for (i = 0; i < n; i++) {
       a->xC[i].x = buf.xR[2 * i + 0];
@@ -103,11 +98,9 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
 // API: void fftc1dinv(complex_1d_array &a, const xparams _xparams = xdefault);
 void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-
    ae_assert(n > 0, "FFTC1DInv: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTC1DInv: Length(A)<N!", _state);
    ae_assert(isfinitecvector(a, n, _state), "FFTC1DInv: A contains infinite or NAN values!", _state);
-
 // Inverse DFT can be expressed in terms of the DFT as
 //
 //     invfft(x) = fft(x')'/N
@@ -151,16 +144,13 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    ae_complex hn;
    ae_complex hmnc;
    ae_complex v;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(f);
    NewVector(buf, 0, DT_REAL, _state);
    NewObj(fasttransformplan, plan, _state);
-
    ae_assert(n > 0, "FFTR1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTR1D: Length(A)<N!", _state);
    ae_assert(isfinitevector(a, n, _state), "FFTR1D: A contains infinite or NAN values!", _state);
-
 // Special cases:
 // * N=1, FFT is just identity transform.
 // * N=2, FFT is simple too
@@ -183,7 +173,6 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    }
 // Choose between odd-size and even-size FFTs
    if (n % 2 == 0) {
-
    // even-size real FFT, use reduction to the complex task
       n2 = n / 2;
       ae_vector_set_length(&buf, n, _state);
@@ -208,7 +197,6 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
          f->xC[i] = ae_c_conj(f->xC[n - i], _state);
       }
    } else {
-
    // use complex FFT
       ae_vector_set_length(f, n, _state);
       for (i = 0; i < n; i++) {
@@ -254,12 +242,10 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
 void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(a);
    NewVector(h, 0, DT_REAL, _state);
    NewVector(fh, 0, DT_COMPLEX, _state);
-
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
    ae_assert(f->cnt >= ae_ifloor((double)n / 2.0, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
    ae_assert(ae_isfinite(f->xC[0].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
@@ -314,9 +300,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    ae_complex hn;
    ae_complex hmnc;
    ae_complex v;
-
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DEvenInplace: incorrect N!", _state);
-
 // Special cases:
 // * N=2
 //
@@ -357,9 +341,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    double t;
    ae_int_t i;
    ae_int_t n2;
-
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DInvInternalEven: incorrect N!", _state);
-
 // Special cases:
 // * N=2
 //
@@ -499,12 +481,9 @@ namespace alglib_impl {
 void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(_state, &_frame_block);
    NewVector(fa, 0, DT_COMPLEX, _state);
-
    ae_assert(n > 0, "FHTR1D: incorrect N!", _state);
-
 // Special case: N=1, FHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
@@ -533,9 +512,7 @@ void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
 // API: void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
 void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-
    ae_assert(n > 0, "FHTR1DInv: incorrect N!", _state);
-
 // Special case: N=1, iFHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
@@ -601,11 +578,8 @@ namespace alglib_impl {
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = xdefault);
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state) {
-
    SetVector(r);
-
    ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer that B.
    if (m < n) {
@@ -646,13 +620,11 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
    ae_complex c2;
    ae_complex c3;
    double t;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(buf2, 0, DT_REAL, _state);
    NewObj(fasttransformplan, plan, _state);
-
    ae_assert((n > 0 && m > 0) && n <= m, "ConvC1DInv: incorrect N or M!", _state);
    p = ftbasefindsmooth(m, _state);
    ftcomplexfftplan(p, 1, &plan, _state);
@@ -725,13 +697,10 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(c);
    NewVector(buf, 0, DT_COMPLEX, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
@@ -787,16 +756,13 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ae_complex c2;
    ae_complex c3;
    double t;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(buf2, 0, DT_REAL, _state);
    NewVector(cbuf, 0, DT_COMPLEX, _state);
    NewObj(fasttransformplan, plan, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
@@ -872,11 +838,8 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 // API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = xdefault);
 void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state) {
-
    SetVector(r);
-
    ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer that B.
    if (m < n) {
@@ -916,14 +879,12 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(buf2, 0, DT_REAL, _state);
    NewVector(buf3, 0, DT_REAL, _state);
    NewObj(fasttransformplan, plan, _state);
-
    ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!", _state);
    p = ftbasefindsmootheven(m, _state);
    ae_vector_set_length(&buf, p, _state);
@@ -981,13 +942,10 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(c);
    NewVector(buf, 0, DT_REAL, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
@@ -1043,7 +1001,6 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    ae_complex c1;
    ae_complex c2;
    ae_complex c3;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
@@ -1052,9 +1009,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    NewVector(cbuf, 0, DT_COMPLEX, _state);
    NewVector(cbuf2, 0, DT_COMPLEX, _state);
    NewObj(fasttransformplan, plan, _state);
-
    ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
@@ -1075,7 +1030,6 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    }
 // Task is normalized
    if (m % 2 == 0) {
-
    // size is even, use fast even-size FFT
       ae_vector_set_length(&buf, m, _state);
       ae_v_move(buf.xR, 1, a->xR, 1, m);
@@ -1103,7 +1057,6 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       ae_vector_set_length(r, m, _state);
       ae_v_move(r->xR, 1, buf.xR, 1, m);
    } else {
-
    // odd-size, use general real FFT
       fftr1d(a, m, &cbuf, _state);
       ae_vector_set_length(&buf2, m, _state);
@@ -1162,20 +1115,16 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(bbuf, 0, DT_COMPLEX, _state);
    NewObj(fasttransformplan, plan, _state);
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(buf2, 0, DT_REAL, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
-
 // Auto-select
    if (alg == -1 || alg == -2) {
-
    // Initial candidate: straightforward implementation.
    //
    // If we want to use auto-fitted overlap-add,
@@ -1187,11 +1136,9 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       } else {
          flopbest = ae_maxrealnumber;
       }
-
    // Another candidate - generic FFT code
       if (alg == -1) {
          if (circular && ftbaseissmooth(m, _state)) {
-
          // special code for circular convolution of a sequence with a smooth length
             flopcand = 3 * ftbasegetflopestimate(m, _state) + 6 * m;
             if (flopcand < flopbest) {
@@ -1199,7 +1146,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
                flopbest = flopcand;
             }
          } else {
-
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmooth(m + n - 1, _state);
             flopcand = 3 * ftbasegetflopestimate(p, _state) + 6 * p;
@@ -1235,7 +1181,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //
 // Very simple code, no further comments needed.
    if (alg == 0) {
-
    // Special case: N=1
       if (n == 1) {
          ae_vector_set_length(r, m, _state);
@@ -1246,7 +1191,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
    // use straightforward formula
       if (circular) {
-
       // circular convolution
          ae_vector_set_length(r, m, _state);
          v = b->xC[0];
@@ -1265,7 +1209,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             ae_v_caddc(&r->xC[i1], 1, &a->xC[j1], 1, "N", i2 - i1 + 1, v);
          }
       } else {
-
       // non-circular convolution
          ae_vector_set_length(r, m + n - 1, _state);
          for (i = 0; i < m + n - 1; i++) {
@@ -1289,7 +1232,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 // IF convolution is non-circular, we use zero-padding + FFT.
    if (alg == 1) {
       if (circular && ftbaseissmooth(m, _state)) {
-
       // special code for circular convolution with smooth M
          ftcomplexfftplan(m, 1, &plan, _state);
          ae_vector_set_length(&buf, 2 * m, _state);
@@ -1326,7 +1268,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             r->xC[i].y = -t * buf.xR[2 * i + 1];
          }
       } else {
-
       // M is non-smooth, general code (circular/non-circular):
       // * first part is the same for circular and non-circular
       //   convolutions. zero padding, FFTs, inverse FFTs
@@ -1368,7 +1309,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftapplyplan(&plan, &buf, 0, 1, _state);
          t = 1.0 / p;
          if (circular) {
-
          // circular, add tail to head
             ae_vector_set_length(r, m, _state);
             for (i = 0; i < m; i++) {
@@ -1380,7 +1320,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
                r->xC[i - m].y = r->xC[i - m].y - t * buf.xR[2 * i + 1];
             }
          } else {
-
          // non-circular, just copy
             ae_vector_set_length(r, m + n - 1, _state);
             for (i = 0; i < m + n - 1; i++) {
@@ -1402,7 +1341,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 // circular.
    if (alg == 2) {
       ae_vector_set_length(&buf, 2 * (q + n - 1), _state);
-
    // prepare R
       if (circular) {
          ae_vector_set_length(r, m, _state);
@@ -1415,7 +1353,6 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             r->xC[i] = ae_complex_from_i(0);
          }
       }
-
    // pre-calculated FFT(B)
       ae_vector_set_length(&bbuf, q + n - 1, _state);
       ae_v_cmove(bbuf.xC, 1, b->xC, 1, "N", n);
@@ -1423,10 +1360,8 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          bbuf.xC[j] = ae_complex_from_i(0);
       }
       fftc1d(&bbuf, q + n - 1, _state);
-
    // prepare FFT plan for chunks of A
       ftcomplexfftplan(q + n - 1, 1, &plan, _state);
-
    // main overlap-add cycle
       i = 0;
       while (i < m) {
@@ -1516,24 +1451,20 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    double flopcand;
    double flopbest;
    ae_int_t algbest;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewObj(fasttransformplan, plan, _state);
    NewVector(buf, 0, DT_REAL, _state);
    NewVector(buf2, 0, DT_REAL, _state);
    NewVector(buf3, 0, DT_REAL, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
-
 // handle special cases
    if (ae_minint(m, n, _state) <= 2) {
       alg = 0;
    }
 // Auto-select
    if (alg < 0) {
-
    // Initial candidate: straightforward implementation.
    //
    // If we want to use auto-fitted overlap-add,
@@ -1545,11 +1476,9 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       } else {
          flopbest = ae_maxrealnumber;
       }
-
    // Another candidate - generic FFT code
       if (alg == -1) {
          if ((circular && ftbaseissmooth(m, _state)) && m % 2 == 0) {
-
          // special code for circular convolution of a sequence with a smooth length
             flopcand = 3 * ftbasegetflopestimate(m / 2, _state) + (double)(6 * m) / 2.0;
             if (flopcand < flopbest) {
@@ -1557,7 +1486,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
                flopbest = flopcand;
             }
          } else {
-
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmootheven(m + n - 1, _state);
             flopcand = 3 * ftbasegetflopestimate(p / 2, _state) + (double)(6 * p) / 2.0;
@@ -1593,7 +1521,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 //
 // Very simple code, no further comments needed.
    if (alg == 0) {
-
    // Special case: N=1
       if (n == 1) {
          ae_vector_set_length(r, m, _state);
@@ -1604,7 +1531,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
    // use straightforward formula
       if (circular) {
-
       // circular convolution
          ae_vector_set_length(r, m, _state);
          v = b->xR[0];
@@ -1623,7 +1549,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             ae_v_addd(&r->xR[i1], 1, &a->xR[j1], 1, i2 - i1 + 1, v);
          }
       } else {
-
       // non-circular convolution
          ae_vector_set_length(r, m + n - 1, _state);
          for (i = 0; i < m + n - 1; i++) {
@@ -1650,7 +1575,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    if (alg == 1) {
       ae_assert(m + n - 1 > 2, "ConvR1DX: internal error!", _state);
       if ((circular && ftbaseissmooth(m, _state)) && m % 2 == 0) {
-
       // special code for circular convolution with smooth even M
          ae_vector_set_length(&buf, m, _state);
          ae_v_move(buf.xR, 1, a->xR, 1, m);
@@ -1679,7 +1603,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          ae_vector_set_length(r, m, _state);
          ae_v_move(r->xR, 1, buf.xR, 1, m);
       } else {
-
       // M is non-smooth or non-even, general code (circular/non-circular):
       // * first part is the same for circular and non-circular
       //   convolutions. zero padding, FFTs, inverse FFTs
@@ -1715,7 +1638,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          }
          fftr1dinvinternaleven(&buf, p, &buf3, &plan, _state);
          if (circular) {
-
          // circular, add tail to head
             ae_vector_set_length(r, m, _state);
             ae_v_move(r->xR, 1, buf.xR, 1, m);
@@ -1723,7 +1645,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
                ae_v_add(r->xR, 1, &buf.xR[m], 1, n - 1);
             }
          } else {
-
          // non-circular, just copy
             ae_vector_set_length(r, m + n - 1, _state);
             ae_v_move(r->xR, 1, buf.xR, 1, m + n - 1);
@@ -1739,7 +1660,6 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       ae_vector_set_length(&buf2, q + n - 1, _state);
       ae_vector_set_length(&buf3, q + n - 1, _state);
       ftcomplexfftplan((q + n - 1) / 2, 1, &plan, _state);
-
    // prepare R
       if (circular) {
          ae_vector_set_length(r, m, _state);
@@ -1752,14 +1672,12 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             r->xR[i] = 0.0;
          }
       }
-
    // pre-calculated FFT(B)
       ae_v_move(buf2.xR, 1, b->xR, 1, n);
       for (j = n; j < q + n - 1; j++) {
          buf2.xR[j] = 0.0;
       }
       fftr1dinternaleven(&buf2, q + n - 1, &buf3, &plan, _state);
-
    // main overlap-add cycle
       i = 0;
       while (i < m) {
@@ -1915,12 +1833,10 @@ namespace alglib_impl {
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(p, 0, DT_COMPLEX, _state);
    NewVector(b, 0, DT_COMPLEX, _state);
-
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
    for (i = 0; i < m; i++) {
@@ -1964,14 +1880,11 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(c);
    NewVector(p, 0, DT_COMPLEX, _state);
    NewVector(b, 0, DT_COMPLEX, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {
@@ -2040,12 +1953,10 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(p, 0, DT_REAL, _state);
    NewVector(b, 0, DT_REAL, _state);
-
    ae_assert(n > 0 && m > 0, "CorrR1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
    for (i = 0; i < m; i++) {
@@ -2089,14 +2000,11 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    ae_int_t i2;
    ae_int_t i;
    ae_int_t j2;
-
    ae_frame_make(_state, &_frame_block);
    SetVector(c);
    NewVector(p, 0, DT_REAL, _state);
    NewVector(b, 0, DT_REAL, _state);
-
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
-
 // normalize task: make M >= N,
 // so A will be longer (at least - not shorter) that B.
    if (m < n) {

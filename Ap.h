@@ -38,7 +38,6 @@
 #endif
 
 // #define AE_USE_CPP
-
 // The CPU type.
 #define AE_OTHER_CPU	0
 #define AE_INTEL	1
@@ -265,7 +264,6 @@ struct ae_state {
    void *parent_task;
    void (*thread_exception_handler)(void *);
 };
-
 void ae_state_set_break_jump(ae_state *state, jmp_buf *buf);
 void ae_state_set_flags(ae_state *state, ae_uint64_t flags);
 
@@ -425,6 +423,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 // The X-interface.
 // The effective type for the owner field.
 enum { OWN_CALLER = false, OWN_AE = true };
+
 // The effective type for the last_action field.
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
@@ -632,14 +631,12 @@ struct ae_serializer {
    ae_stream_writer stream_writer;
    ae_stream_reader stream_reader;
 };
-
 void ae_serializer_init(ae_serializer *serializer);
 #define NewSerializer(Ser)	alglib_impl::ae_serializer Ser; alglib_impl::ae_serializer_init(&Ser)
 
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer);
-
 ae_int_t ae_get_endianness();
 
 #ifdef AE_USE_CPP_SERIALIZATION
@@ -675,7 +672,6 @@ bool ae_isnan_stateless(double x, ae_int_t endianness);
 bool ae_isinf_stateless(double x, ae_int_t endianness);
 bool ae_isposinf_stateless(double x, ae_int_t endianness);
 bool ae_isneginf_stateless(double x, ae_int_t endianness);
-
 bool ae_isfinite(double x, ae_state *state);
 bool ae_isnan(double x, ae_state *state);
 bool ae_isinf(double x, ae_state *state);
@@ -687,7 +683,6 @@ double ae_fabs(double x, ae_state *state);
 ae_int_t ae_iabs(ae_int_t x, ae_state *state);
 double ae_sqr(double x, ae_state *state);
 double ae_sqrt(double x, ae_state *state);
-
 ae_int_t ae_sign(double x, ae_state *state);
 ae_int_t ae_round(double x, ae_state *state);
 ae_int_t ae_trunc(double x, ae_state *state);
@@ -700,7 +695,6 @@ double ae_maxreal(double m1, double m2, ae_state *state);
 double ae_minreal(double m1, double m2, ae_state *state);
 double ae_randomreal(ae_state *state);
 ae_int_t ae_randominteger(ae_int_t maxv, ae_state *state);
-
 double ae_sin(double x, ae_state *state);
 double ae_cos(double x, ae_state *state);
 double ae_tan(double x, ae_state *state);
@@ -711,7 +705,6 @@ double ae_asin(double x, ae_state *state);
 double ae_acos(double x, ae_state *state);
 double ae_atan(double x, ae_state *state);
 double ae_atan2(double y, double x, ae_state *state);
-
 double ae_log(double x, ae_state *state);
 double ae_pow(double x, double y, ae_state *state);
 double ae_exp(double x, ae_state *state);
@@ -786,19 +779,16 @@ void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno
 const char *ae_get_last_error_file();
 int ae_get_last_error_line();
 const char *ae_get_last_error_xdesc();
-
 void ae_trace_file(const char *tags, const char *filename);
 void ae_trace_disable();
 bool ae_is_trace_enabled(const char *tag);
 void ae_trace(const char *printf_fmt, ...);
-
 bool ae_check_zeros(const void *ptr, ae_int_t n);
 void ae_touch_ptr(void *p);
 
 // Trace file descriptor (to be used by ALGLIB code which sends messages  to
 // trace log)
 extern FILE *alglib_trace_file;
-
 // debug functions (must be turned on by preprocessor definitions):
 // * flushconsole(), fluches console
 // * ae_debugrng(), returns random number generated with high-quality random numbers generator
@@ -927,7 +917,6 @@ bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, a
 #         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&x)
 #      endif
 #   endif
-
 // ABLASF kernels
 double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state);
@@ -970,14 +959,11 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state);
 double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state);
 void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state);
-
 void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state);
 void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
 void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state);
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
-
 bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-
 // Sparse supernodal Cholesky kernels
 ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
 void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state);
@@ -1105,17 +1091,20 @@ typedef alglib_impl::ae_int_t ae_int_t;
 #if 0
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 #endif
+
 extern const double fp_nan, fp_posinf, fp_neginf;
 extern const ae_int_t endianness;
-
 int sign(double x);
+
 double randomreal();
 ae_int_t randominteger(ae_int_t maxv);
+
 int round(double x);
 int trunc(double x);
 int ifloor(double x);
 int iceil(double x);
 double pi();
+
 double sqr(double x);
 int maxint(int m1, int m2);
 int minint(int m1, int m2);
@@ -1587,7 +1576,6 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
 // Trace log is saved to file "filename", which is opened in the append mode.
 // If no file with such name can be opened, tracing won't be performed (but no exception will be generated).
 void trace_file(std::string tags, std::string filename);
-
 // This function disables tracing.
 void trace_disable();
 } // end of namespace alglib

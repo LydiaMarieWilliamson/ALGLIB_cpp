@@ -1,18 +1,14 @@
 #define InAlgLib
-
 //
 // Must be defined before we include kernel header
 //
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
-
 #include "KernelsFma.h"
-
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_FMA_INTRINSICS
 double rdotv_fma(const ae_int_t n, const Real *__restrict x, const Real *__restrict y, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
    const __m256d *__restrict pX = (const __m256d *)(x);
@@ -76,7 +72,6 @@ double rdotv_fma(const ae_int_t n, const Real *__restrict x, const Real *__restr
 
 double rdotv2_fma(const ae_int_t n, const Real *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
    const __m256d *__restrict pX = (const __m256d *)(x);
@@ -140,7 +135,6 @@ double rdotv2_fma(const ae_int_t n, const Real *__restrict x, const ae_state *__
 
 void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t avx2len = n >> 2;
    const __m256d *__restrict pSrc = (const __m256d *)(y);
    __m256d *__restrict pDest = (__m256d *)x;
@@ -308,7 +302,6 @@ void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha
    ae_int_t j;
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
-
    for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)a->xyR[i];
       const double v = alpha * x[i];
@@ -425,7 +418,6 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
       }
       return;
    }
-
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (unal == 0) {
       rgemvx_straight_fma_xaligned(m, n, alpha, a, ia, ja, x, y, _state);
@@ -448,7 +440,6 @@ void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const do
    ae_int_t j;
    __m256d *__restrict pY = (__m256d *)y;
    const ae_int_t nVec = m >> 2;
-
    for (i = 0; i < n; i++) {
       const __m256d *__restrict pRow = (const __m256d *)(a->xyR[i + ia] + ja);
       const double v = alpha * x[i];
@@ -476,7 +467,6 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
       }
       return;
    }
-
    const ptrdiff_t unal = ((ptrdiff_t)y) & 31;
    if (unal == 0) {
       rgemvx_transposed_fma_yaligned(m, n, alpha, a, ia, ja, x, y, _state);
@@ -554,7 +544,6 @@ void ablasf_dotblkh_fma(const double *src_a, const double *src_b, ae_int_t round
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
    ae_int_t k;
-
    ae_assert(simdwidth == 4, "SPCHOL: unexpected stride in propagatefwd()", _state);
    if (sstride == 4) {
    // blocksize is either 3 or 4
@@ -602,7 +591,6 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
-
 // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
    if (twidth < 3 || twidth > 4) {
       return false;
@@ -619,7 +607,6 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
    double *update_storage = rowstorage + offsu;
    double *target_storage = rowstorage + offss;
    superrowidx += urbase;
-
 // Load head of the update matrix
    __m256d v_d0123 = _mm256_maskload_pd(diagd + offsd, v_rankmask);
    __m256d u_0_0123 = _mm256_setzero_pd();
@@ -637,7 +624,6 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
       if (targetcol == 3)
          u_3_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage + k * urowstride, v_rankmask));
    }
-
 // Transpose head
    __m256d u01_lo = _mm256_unpacklo_pd(u_0_0123, u_1_0123);
    __m256d u01_hi = _mm256_unpackhi_pd(u_0_0123, u_1_0123);
@@ -647,7 +633,6 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
    __m256d u_0123_1 = _mm256_permute2f128_pd(u01_hi, u23_hi, 0x20);
    __m256d u_0123_2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    __m256d u_0123_3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
-
 // Run update
    if (urank == 1) {
       for (k = 0; k < uheight; k++) {
@@ -688,7 +673,6 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    ae_int_t offsk;
    __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
    __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
-
 // Compute W = -D*transpose(U[0:3])
    v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd + offsd), _mm256_set1_pd(-1.0));
    v_negd_u0 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 0 * 4), v_negd);
@@ -703,7 +687,6 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    v_w1 = _mm256_permute2f128_pd(u01_hi, u23_hi, 0x20);
    v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
-
 //
 // Compute update S:= S + row_scatter(U*W)
 //
@@ -711,10 +694,8 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    // No row scatter, the most efficient code
       for (k = 0; k < uheight; k++) {
          __m256d target;
-
          targetrow = offss + k * 4;
          offsk = offsu + k * 4;
-
          target = _mm256_load_pd(rowstorage + targetrow);
          target = _mm256_fmadd_pd(_mm256_broadcast_sd(rowstorage + offsk + 0), v_w0, target);
          target = _mm256_fmadd_pd(_mm256_broadcast_sd(rowstorage + offsk + 1), v_w1, target);
@@ -726,10 +707,8 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    // Row scatter is performed, less efficient code using double mapping to determine target row index
       for (k = 0; k < uheight; k++) {
          __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
-
          targetrow = offss + raw2smap[superrowidx[urbase + k]] * 4;
          offsk = offsu + k * 4;
-
          target = _mm256_load_pd(rowstorage + targetrow);
          v_uk0 = _mm256_broadcast_sd(rowstorage + offsk + 0);
          v_uk1 = _mm256_broadcast_sd(rowstorage + offsk + 1);
@@ -744,6 +723,5 @@ bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sh
    }
    return true;
 }
-
 #endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 } // end of namespace alglib_impl

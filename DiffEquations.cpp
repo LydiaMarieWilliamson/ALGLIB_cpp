@@ -67,9 +67,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // API: void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
 // API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
-
    SetObj(odesolverstate, state);
-
    ae_assert(n >= 1, "ODESolverRKCK: N<1!", _state);
    ae_assert(m >= 1, "ODESolverRKCK: M<1!", _state);
    ae_assert(y->cnt >= n, "ODESolverRKCK: Length(Y)<N!", _state);
@@ -102,7 +100,6 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    double maxgrowpow;
    ae_int_t klimit;
    bool result;
-
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
 // anywhere from C++ to Python.
@@ -144,7 +141,6 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
       goto lbl_0;
    }
 // Routine body
-
 // prepare
    if (state->repterminationtype != 0) {
       result = false;
@@ -155,12 +151,10 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    h = state->h;
    maxgrowpow = ae_pow(odesolver_odesolvermaxgrow, 5.0, _state);
    state->repnfev = 0;
-
 // some preliminary checks for internal errors
 // after this we assume that H>0 and M>1
    ae_assert(state->h > 0.0, "ODESolver: internal error", _state);
    ae_assert(m > 1, "ODESolverIteration: internal error", _state);
-
 // choose solver
    if (state->solvertype != 0) {
       goto lbl_1;
@@ -206,7 +200,6 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    state->rkcs.xR[4] = 277.0 / 14336.0;
    state->rkcs.xR[5] = 1.0 / 4.0;
    ae_matrix_set_length(&state->rkk, 6, n, _state);
-
 // Main cycle consists of two iterations:
 // * outer where we travel from X[i-1] to X[i]
 // * inner where we travel inside [X[i-1],X[i]]
@@ -237,7 +230,6 @@ lbl_6:
    } else {
       gridpoint = false;
    }
-
 // Update error scale maximums
 //
 // These maximums are initialized by zeros,
@@ -245,7 +237,6 @@ lbl_6:
    for (j = 0; j < n; j++) {
       state->escale.xR[j] = ae_maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
    }
-
 // make one step:
 // 1. calculate all info needed to do step
 // 2. update errors scale maximums using values/derivatives
@@ -277,7 +268,6 @@ lbl_0:
    state->repnfev = state->repnfev + 1;
    v = h * state->xscale;
    ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
-
 // update YN/YNS
    v = state->rkc.xR[k];
    ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
@@ -286,16 +276,13 @@ lbl_0:
    k = k + 1;
    goto lbl_8;
 lbl_10:
-
 // estimate error
    err = 0.0;
    for (j = 0; j < n; j++) {
       if (!state->fraceps) {
-
       // absolute error is estimated
          err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state), _state);
       } else {
-
       // Relative error is estimated
          v = state->escale.xR[j];
          if (v == 0.0) {
@@ -304,7 +291,6 @@ lbl_10:
          err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
       }
    }
-
 // calculate new step, restart if necessary
    if (maxgrowpow * err <= state->eps) {
       h2 = odesolver_odesolvermaxgrow * h;
@@ -321,17 +307,14 @@ lbl_10:
 // advance position
    xc = xc + h;
    ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
-
 // update H
    h = h2;
-
 // break on grid point
    if (gridpoint) {
       goto lbl_7;
    }
    goto lbl_6;
 lbl_7:
-
 // save result
    ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
    i = i + 1;
@@ -343,7 +326,6 @@ lbl_5:
 lbl_1:
    result = false;
    return result;
-
 // Saving state
 lbl_rcomm:
    result = true;
@@ -386,12 +368,10 @@ lbl_rcomm:
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state) {
    double v;
    ae_int_t i;
-
    *m = 0;
    SetVector(xtbl);
    SetMatrix(ytbl);
    SetObj(odesolverreport, rep);
-
    rep->terminationtype = state->repterminationtype;
    if (rep->terminationtype > 0) {
       *m = state->m;
@@ -412,16 +392,13 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
 static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
    ae_int_t i;
    double v;
-
    SetObj(odesolverstate, state);
-
 // Prepare RComm
    ae_vector_set_length(&state->rstate.ia, 5 + 1, _state);
    ae_vector_set_length(&state->rstate.ba, 0 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 5 + 1, _state);
    state->rstate.stage = -1;
    state->needdy = false;
-
 // check parameters.
    if ((n <= 0 || m < 1) || eps == 0.0) {
       state->repterminationtype = -1;
@@ -452,7 +429,6 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
          return;
       }
    }
-
 // auto-select H if necessary
    if (h == 0.0) {
       v = ae_fabs(x->xR[1] - x->xR[0], _state);
@@ -479,7 +455,6 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    ae_v_move(state->yc.xR, 1, y->xR, 1, n);
    state->solvertype = solvertype;
    state->repterminationtype = 0;
-
 // Allocate arrays
    ae_vector_set_length(&state->y, n, _state);
    ae_vector_set_length(&state->dy, n, _state);
@@ -573,7 +548,6 @@ void odesolverreport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
-
 DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {

@@ -1,19 +1,14 @@
 #define InAlgLib
-
 //
 // Must be defined before we include kernel header
 //
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
-
 #include "KernelsSse2.h"
-
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_SSE2_INTRINSICS
-
 double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const ae_int_t unrollLen = (sse2len >> 3) << 3;
    const __m128d *__restrict pX = (const __m128d *)(x);
@@ -88,7 +83,6 @@ double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state) {
             break;
       }
    }
-
    const double *pComps = (const double *)&ans;
    double scalar = pComps[0] + pComps[1];
    const ae_int_t tail = sse2len << 1;
@@ -101,7 +95,6 @@ double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state) {
 
 double rdotv2_sse2(ae_int_t n, const Real *x, ae_state *_state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const ae_int_t unrollLen = (sse2len >> 3) << 3;
    const __m128d *__restrict pX = (const __m128d *)(x);
@@ -175,7 +168,6 @@ double rdotv2_sse2(ae_int_t n, const Real *x, ae_state *_state) {
             break;
       }
    }
-
    const double *pComps = (const double *)&ans;
    double scalar = pComps[0] + pComps[1];
    const ae_int_t tail = sse2len << 1;
@@ -192,7 +184,6 @@ void rcopyv_sse2(const ae_int_t n, const Real *__restrict x, Real *__restrict y,
    const ae_int_t tail = sse2len << 1;
    const __m128d *__restrict pSrc = (const __m128d *)(x);
    __m128d *__restrict pDest = (__m128d *)y;
-
    for (i = 0; i < sse2len; i++)
       pDest[i] = pSrc[i];
    if (n - tail)
@@ -201,7 +192,6 @@ void rcopyv_sse2(const ae_int_t n, const Real *__restrict x, Real *__restrict y,
 
 void rcopymulv_sse2(const ae_int_t n, const double v, const Real *__restrict x, Real *__restrict y, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(x);
    __m128d *__restrict pDest = (__m128d *)y;
@@ -266,7 +256,6 @@ void bcopyv_sse2(const ae_int_t n, const bool *__restrict x, bool *__restrict y,
 
 void rsetv_sse2(const ae_int_t n, const double v, Real *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    __m128d *__restrict pDest = (__m128d *)x;
    const __m128d sse2v = _mm_set1_pd(v);
@@ -324,7 +313,6 @@ void bsetv_sse2(const ae_int_t n, const bool v, bool *__restrict x, ae_state *__
 
 void rmulv_sse2(const ae_int_t n, const double v, double *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    __m128d *__restrict pDest = (__m128d *)x;
    const __m128d sse2v = _mm_set1_pd(v);
@@ -354,7 +342,6 @@ void rmulvx_sse2(const ae_int_t n, const double v, double *__restrict x, const a
 
 void raddv_sse2(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
    __m128d *__restrict pDest = (__m128d *)x;
@@ -371,7 +358,6 @@ void raddv_sse2(const ae_int_t n, const double alpha, const Real *__restrict y, 
 
 void raddvx_sse2_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x, ae_state *_state) {
    ae_int_t i;
-
    const ae_int_t vecLen = (n >> 1) << 1;
    const __m128d sse2alpha = _mm_set1_pd(alpha);
    __m128d *__restrict pDest = (__m128d *)x;
@@ -400,7 +386,6 @@ void raddvx_sse2(const ae_int_t n, const double alpha, const double *__restrict 
 
 void rmergemulv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restrict x, const ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
    __m128d *__restrict pDest = (__m128d *)x;
@@ -416,7 +401,6 @@ void rmergemulv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
 void rmergemaxv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restrict x, ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
    __m128d *__restrict pDest = (__m128d *)x;
@@ -431,7 +415,6 @@ void rmergemaxv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
 void rmergeminv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restrict x, ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(y);
    __m128d *__restrict pDest = (__m128d *)x;
@@ -446,7 +429,6 @@ void rmergeminv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
 
 double rmaxv_sse2(ae_int_t n, const Real *__restrict x, ae_state *__restrict _state) {
    ae_int_t i;
-
    const ae_int_t sse2len = n >> 1;
    const __m128d *__restrict pSrc = (const __m128d *)(x);
    if (n <= 4) {
@@ -508,7 +490,6 @@ double rmaxabsv_sse2(ae_int_t n, const Real *__restrict x, ae_state *__restrict 
 
 static void rcopyvx_sse2_xaligned(const ae_int_t n, const double *__restrict x, double *__restrict y, ae_state *_state) {
    ae_int_t i;
-
    const ae_int_t vecLen = (n >> 1) << 1;
    const __m128d *__restrict pSrc = (const __m128d *)x;
    for (i = 0; i < vecLen; i += 2) {
@@ -567,6 +548,5 @@ void icopyvx_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__re
    const ae_int_t nDone = offset / sizeof(ae_int_t);
    icopyvx_sse2_xaligned(n - nDone, x + nDone, y + nDone, _state);
 }
-
 #endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_SSE2_INTRINSICS
 } // end of namespace alglib_impl

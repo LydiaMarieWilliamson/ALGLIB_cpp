@@ -2,10 +2,8 @@
 #define OnceOnlyKernelsSse2_h
 
 #include "Ap.h"
-
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_SSE2_INTRINSICS
-
 double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state);
 double rdotv2_sse2(ae_int_t n, const Real *x, ae_state *_state);
 void rcopyv_sse2(const ae_int_t n, const Real *__restrict x, Real *__restrict y, ae_state *__restrict _state);
