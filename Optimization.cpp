@@ -5490,7 +5490,6 @@ void minlbfgsreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(minlbfgsstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
 // This structure stores optimization report:
@@ -47469,10 +47468,8 @@ void minasareport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(minasastate, DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 
-//
 DefClass(minasareport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype) DecVal(activeconstraints))
 
 void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams) {

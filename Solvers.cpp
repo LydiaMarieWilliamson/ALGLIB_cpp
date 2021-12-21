@@ -153,7 +153,6 @@ void polynomialsolverreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(polynomialsolverreport, DecVal(maxerr))
 
 void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep, const xparams _xparams) {
@@ -3366,10 +3365,8 @@ void densesolverlsreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(densesolverreport, DecVal(r1) DecVal(rinf))
 
-//
 DefClass(densesolverlsreport, DecVal(r2) DecVar(cx) DecVal(n) DecVal(k))
 
 void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams) {
@@ -6170,7 +6167,6 @@ namespace alglib {
 // Never try to access its fields directly!
 DefClass(lincgstate, )
 
-//
 DefClass(lincgreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype) DecVal(r2))
 
 void lincgcreate(const ae_int_t n, lincgstate &state, const xparams _xparams) {
@@ -7166,7 +7162,6 @@ namespace alglib {
 // You should use ALGLIB functions to work with this object.
 DefClass(linlsqrstate, )
 
-//
 DefClass(linlsqrreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams) {
@@ -7887,10 +7882,8 @@ void nleqreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(nleqstate, DecVal(needf) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(j) DecVar(x))
 
-//
 DefClass(nleqreport, DecVal(iterationscount) DecVal(nfunc) DecVal(njac) DecVal(terminationtype))
 
 void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams) {

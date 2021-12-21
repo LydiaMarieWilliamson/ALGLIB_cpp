@@ -572,10 +572,8 @@ void odesolverreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
 
-//
 DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {

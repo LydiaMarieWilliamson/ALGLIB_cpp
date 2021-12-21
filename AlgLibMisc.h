@@ -223,7 +223,6 @@ void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_i
 namespace alglib {
 DecClass(kdtreerequestbuffer, );
 
-// KD-tree object.
 DecClass(kdtree, );
 void kdtreeserialize(kdtree &obj, std::string &s_out);
 void kdtreeserialize(kdtree &obj, std::ostream &s_out);

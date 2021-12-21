@@ -7447,7 +7447,6 @@ namespace alglib {
 //         errors in prediction of posterior probabilities
 DefClass(modelerrors, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
-//
 DefClass(multilayerperceptron, )
 
 void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
@@ -17208,7 +17207,6 @@ void lrreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(linearmodel, )
 
 // LRReport structure contains additional information about linear model:
@@ -23146,7 +23144,6 @@ void mnlreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-//
 DefClass(logitmodel, )
 
 // MNLReport structure contains information about training process:
