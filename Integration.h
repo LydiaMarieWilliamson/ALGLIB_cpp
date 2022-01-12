@@ -44,18 +44,18 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 // Depends on: GQ
 namespace alglib_impl {
 void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
-void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
-void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
 void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
 void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps);
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
 } // end of namespace alglib_impl
 
 namespace alglib {
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps);
+void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
+void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 } // end of namespace alglib
 
 // === AUTOGK Package ===
@@ -119,8 +119,8 @@ void autogkstate_init(void *_p, bool make_automatic);
 void autogkstate_copy(void *_dst, void *_src, bool make_automatic);
 void autogkstate_free(void *_p, bool make_automatic);
 
-void autogksmooth(double a, double b, autogkstate *state);
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state);
+void autogksmooth(double a, double b, autogkstate *state);
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state);
 bool autogkiteration(autogkstate *state);
 void autogkresults(autogkstate *state, double *v, autogkreport *rep);
@@ -130,8 +130,8 @@ namespace alglib {
 DecClass(autogkreport, ae_int_t &terminationtype; ae_int_t &nfev; ae_int_t &nintervals;);
 DecClass(autogkstate, double &x; double &xminusa; double &bminusx; double &f;);
 
-void autogksmooth(const double a, const double b, autogkstate &state);
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state);
+void autogksmooth(const double a, const double b, autogkstate &state);
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state);
 bool autogkiteration(const autogkstate &state);
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL);

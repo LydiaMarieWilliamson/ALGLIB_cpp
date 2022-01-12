@@ -1209,6 +1209,24 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst) {
    }
 }
 
+// This function is used to calculate number of chunks (including partial,
+// non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
+// Assertion is thrown otherwise.
+//
+// Function result is equivalent to ceil(TaskSize/ChunkSize), but with guarantees
+// that rounding errors won't ruin results.
+// ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
+ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize) {
+   ae_int_t result;
+   ae_assert(tasksize >= 0, "chunkscount: tasksize < 0");
+   ae_assert(chunksize >= 1, "chunkscount: chunksize < 1");
+   result = tasksize / chunksize;
+   if (tasksize % chunksize != 0) {
+      result++;
+   }
+   return result;
+}
+
 // This function is used in parallel functions for recurrent division of large
 // task into two smaller tasks.
 //
@@ -1321,24 +1339,6 @@ ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_
       } else {
          i1 = mididx;
       }
-   }
-   return result;
-}
-
-// This function is used to calculate number of chunks (including partial,
-// non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
-// Assertion is thrown otherwise.
-//
-// Function result is equivalent to ceil(TaskSize/ChunkSize), but with guarantees
-// that rounding errors won't ruin results.
-// ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
-ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize) {
-   ae_int_t result;
-   ae_assert(tasksize >= 0, "chunkscount: tasksize < 0");
-   ae_assert(chunksize >= 1, "chunkscount: chunksize < 1");
-   result = tasksize / chunksize;
-   if (tasksize % chunksize != 0) {
-      result++;
    }
    return result;
 }
@@ -1717,23 +1717,8 @@ double rmaxabsv(ae_int_t n, RVector *x) {
 // Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetv(ae_int_t n, double v, RVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xR[j] = v;
-}
-
-// Sets X[OffsX:OffsX+N-1] to V
-//
-// Inputs:
-//     N       -   subvector length
-//     V       -   value to set
-//     X       -   array[N]
-//     OffsX   -   target offset
-//
-// Outputs:
-//     X       -   X[OffsX:OffsX+N-1] is replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
-   for (ae_int_t j = 0; j < n; j++) x->xR[offsx + j] = v;
+void bsetv(ae_int_t n, bool v, BVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xB[j] = v;
 }
 
 // Sets vector X[] to V
@@ -1760,8 +1745,23 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x) {
 // Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetv(ae_int_t n, bool v, BVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xB[j] = v;
+void rsetv(ae_int_t n, double v, RVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xR[j] = v;
+}
+
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// Inputs:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//     OffsX   -   target offset
+//
+// Outputs:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
+   for (ae_int_t j = 0; j < n; j++) x->xR[offsx + j] = v;
 }
 
 // Sets matrix A[] to V
@@ -1776,6 +1776,38 @@ void bsetv(ae_int_t n, bool v, BVector *x) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
    for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = v;
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bsetallocv(ae_int_t n, bool v, BVector *x) {
+   vectorsetlengthatleast(x, n);
+   bsetv(n, v, x);
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *x) {
+   vectorsetlengthatleast(x, n);
+   isetv(n, v, x);
 }
 
 // Sets vector X[] to V, reallocating X[] if too small
@@ -1821,7 +1853,7 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
 // Outputs:
 //     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rallocv(ae_int_t n, RVector *x) {
+void ballocv(ae_int_t n, BVector *x) {
    vectorsetlengthatleast(x, n);
 }
 
@@ -1835,7 +1867,7 @@ void rallocv(ae_int_t n, RVector *x) {
 // Outputs:
 //     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void ballocv(ae_int_t n, BVector *x) {
+void rallocv(ae_int_t n, RVector *x) {
    vectorsetlengthatleast(x, n);
 }
 
@@ -1852,38 +1884,6 @@ void ballocv(ae_int_t n, BVector *x) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rallocm(ae_int_t m, ae_int_t n, RMatrix *a) {
    matrixsetlengthatleast(a, m, n);
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void isetallocv(ae_int_t n, ae_int_t v, ZVector *x) {
-   vectorsetlengthatleast(x, n);
-   isetv(n, v, x);
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetallocv(ae_int_t n, bool v, BVector *x) {
-   vectorsetlengthatleast(x, n);
-   bsetv(n, v, x);
 }
 
 // Sets row I of A[,] to V
@@ -1928,8 +1928,22 @@ void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j) {
 //
 // NOTE: destination and source should NOT overlap
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyv(ae_int_t n, RVector *x, RVector *y) {
-   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
+void bcopyv(ae_int_t n, BVector *x, BVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+}
+
+// Copies vector X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   pre-allocated array[N]
+//
+// Outputs:
+//     Y       -   X copied to Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
 }
 
 // Copies vector X[] to Y[]
@@ -1944,8 +1958,26 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y) {
 //
 // NOTE: destination and source should NOT overlap
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyv(ae_int_t n, BVector *x, BVector *y) {
-   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+void rcopyv(ae_int_t n, RVector *x, RVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   pre-allocated array[N]
+//     OffsY   -   destination offset
+//
+// Outputs:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy) {
+   for (ae_int_t j = 0; j < n; j++) y->xZ[offsy + j] = x->xZ[offsx + j];
 }
 
 // Copies vector X[] to Y[], extended version
@@ -1964,6 +1996,36 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy) {
    for (ae_int_t j = 0; j < n; j++) y->xR[offsy + j] = x->xR[offsx + j];
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly pre-allocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
+   vectorsetlengthatleast(y, n);
+   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly pre-allocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
+   vectorsetlengthatleast(y, n);
+   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
 }
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
@@ -1997,68 +2059,6 @@ void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
    if (m == 0 || n == 0) return;
    matrixsetlengthatleast(y, imax2(m, y->rows), imax2(n, y->cols));
    for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) y->xyR[i][j] = x->xyR[i][j];
-}
-
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly pre-allocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
-   vectorsetlengthatleast(y, n);
-   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
-}
-
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly pre-allocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
-   vectorsetlengthatleast(y, n);
-   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
-}
-
-// Copies vector X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     Y       -   pre-allocated array[N]
-//
-// Outputs:
-//     Y       -   X copied to Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
-   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
-}
-
-// Copies vector X[] to Y[], extended version
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   pre-allocated array[N]
-//     OffsY   -   destination offset
-//
-// Outputs:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy) {
-   for (ae_int_t j = 0; j < n; j++) y->xZ[offsy + j] = x->xZ[offsx + j];
 }
 
 // Grows X, i.e. changes its size in such a way that:
@@ -5627,69 +5627,6 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
 
 // === TRLINSOLVE Package ===
 namespace alglib_impl {
-// Utility subroutine performing the "safe" solution of system of linear
-// equations with triangular coefficient matrices.
-//
-// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
-// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
-// represented by a floating-point number. The closer the system  gets  to  a
-// singular, the less s is. If the system is singular, s=0 and x contains the
-// non-trivial solution of equation A*x=0.
-//
-// The feature of an algorithm is that it could not cause an  overflow  or  a
-// division by zero regardless of the matrix used as the input.
-//
-// The algorithm can solve systems of equations with  upper/lower  triangular
-// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
-// (where A' is a transposed matrix A).
-//
-// Inputs:
-//     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
-//     N       -   size of matrix A.
-//     X       -   right-hand member of a system.
-//                 Array whose index ranges within [0..N-1].
-//     IsUpper -   matrix type. If it is True, the system matrix is the upper
-//                 triangular and is located in  the  corresponding  part  of
-//                 matrix A.
-//     Trans   -   problem type. If it is True, the problem to be  solved  is
-//                 A'*x=b, otherwise it is A*x=b.
-//     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
-//                 diagonal (the elements on the main diagonal are  not  used
-//                 in the calculation process), otherwise the matrix is considered
-//                 to be a general triangular matrix.
-//
-// Outputs:
-//     X       -   solution. Array whose index ranges within [0..N-1].
-//     S       -   scaling factor.
-//
-//   -- LAPACK auxiliary routine (version 3.0) --
-//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-//      Courant Institute, Argonne National Lab, and Rice University
-//      June 30, 1992
-void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit) {
-   ae_frame _frame_block;
-   bool normin;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   *s = 0;
-   NewVector(cnorm, 0, DT_REAL);
-   NewMatrix(a1, 0, 0, DT_REAL);
-   NewVector(x1, 0, DT_REAL);
-// From 0-based to 1-based
-   normin = false;
-   ae_matrix_set_length(&a1, n + 1, n + 1);
-   ae_vector_set_length(&x1, n + 1);
-   for (i = 1; i <= n; i++) {
-      ae_v_move(&a1.xyR[i][1], 1, a->xyR[i - 1], 1, n);
-   }
-   ae_v_move(&x1.xR[1], 1, x->xR, 1, n);
-// Solve 1-based
-   safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm);
-// From 1-based to 0-based
-   ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
-   ae_frame_leave();
-}
-
 // Obsolete 1-based subroutine.
 // See RMatrixTRSafeSolve for 0-based replacement.
 void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm) {
@@ -6201,6 +6138,69 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       v = 1 / tscal;
       ae_v_muld(&cnorm->xR[1], 1, n, v);
    }
+}
+
+// Utility subroutine performing the "safe" solution of system of linear
+// equations with triangular coefficient matrices.
+//
+// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
+// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
+// represented by a floating-point number. The closer the system  gets  to  a
+// singular, the less s is. If the system is singular, s=0 and x contains the
+// non-trivial solution of equation A*x=0.
+//
+// The feature of an algorithm is that it could not cause an  overflow  or  a
+// division by zero regardless of the matrix used as the input.
+//
+// The algorithm can solve systems of equations with  upper/lower  triangular
+// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
+// (where A' is a transposed matrix A).
+//
+// Inputs:
+//     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
+//     N       -   size of matrix A.
+//     X       -   right-hand member of a system.
+//                 Array whose index ranges within [0..N-1].
+//     IsUpper -   matrix type. If it is True, the system matrix is the upper
+//                 triangular and is located in  the  corresponding  part  of
+//                 matrix A.
+//     Trans   -   problem type. If it is True, the problem to be  solved  is
+//                 A'*x=b, otherwise it is A*x=b.
+//     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
+//                 diagonal (the elements on the main diagonal are  not  used
+//                 in the calculation process), otherwise the matrix is considered
+//                 to be a general triangular matrix.
+//
+// Outputs:
+//     X       -   solution. Array whose index ranges within [0..N-1].
+//     S       -   scaling factor.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      June 30, 1992
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit) {
+   ae_frame _frame_block;
+   bool normin;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   *s = 0;
+   NewVector(cnorm, 0, DT_REAL);
+   NewMatrix(a1, 0, 0, DT_REAL);
+   NewVector(x1, 0, DT_REAL);
+// From 0-based to 1-based
+   normin = false;
+   ae_matrix_set_length(&a1, n + 1, n + 1);
+   ae_vector_set_length(&x1, n + 1);
+   for (i = 1; i <= n; i++) {
+      ae_v_move(&a1.xyR[i][1], 1, a->xyR[i - 1], 1, n);
+   }
+   ae_v_move(&x1.xR[1], 1, x->xR, 1, n);
+// Solve 1-based
+   safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm);
+// From 1-based to 0-based
+   ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
@@ -7529,6 +7529,21 @@ double nucosm1(double x) {
 
 // === NTHEORY Package ===
 namespace alglib_impl {
+static bool ntheory_isprime(ae_int_t n) {
+   ae_int_t p;
+   bool result;
+   result = false;
+   p = 2;
+   while (p * p <= n) {
+      if (n % p == 0) {
+         return result;
+      }
+      p++;
+   }
+   result = true;
+   return result;
+}
+
 static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
    ae_int_t t;
    double ra;
@@ -7616,21 +7631,6 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n) {
       result = ntheory_modexp(t, b / 2, n);
       result = ntheory_modmul(result, a, n);
    }
-   return result;
-}
-
-static bool ntheory_isprime(ae_int_t n) {
-   ae_int_t p;
-   bool result;
-   result = false;
-   p = 2;
-   while (p * p <= n) {
-      if (n % p == 0) {
-         return result;
-      }
-      p++;
-   }
-   result = true;
    return result;
 }
 
@@ -8671,6 +8671,11 @@ static void ftbase_ftpushentry(ZMatrix *gridp, ae_int_t *rowptr, ae_int_t etype,
    planrow[ftbase_colparam2] = eparam2;
    planrow[ftbase_colparam3] = eparam3;
 }
+
+#if 0
+// Forward reference to an indirect recursive call. //(@) Already declared externally.
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
+#endif
 
 // Precompute the complex Bluestein's FFT and write the data to a vector.
 // The caller must ensure that the vector is large enough.

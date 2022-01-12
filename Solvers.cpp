@@ -156,70 +156,28 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 // Depends on: (AlgLibInternal) XBLAS
 // Depends on: (LinAlg) SVD, RCOND
 namespace alglib_impl {
-// Dense solver for A*x=b with N*N real matrix A and N*1 real vectorx  x  and
-// b. This is "slow-but-feature rich" version of the  linear  solver.  Faster
-// version is RMatrixSolveFast() function.
-//
-// Algorithm features:
-// * automatic detection of degenerate cases
-// * condition number estimation
-// * iterative refinement
-// * O(N^3) complexity
-//
-// IMPORTANT: ! this function is NOT the most efficient linear solver provided
-//            ! by ALGLIB. It estimates condition  number  of  linear  system
-//            ! and  performs  iterative   refinement,   which   results   in
-//            ! significant performance penalty  when  compared  with  "fast"
-//            ! version  which  just  performs  LU  decomposition  and  calls
-//            ! triangular solver.
-//            !
-//            ! This  performance  penalty  is  especially  visible  in   the
-//            ! multithreaded mode, because both condition number  estimation
-//            ! and   iterative    refinement   are   inherently   sequential
-//            ! calculations. It is also very significant on small matrices.
-//            !
-//            ! Thus, if you need high performance and if you are pretty sure
-//            ! that your system is well conditioned, we  strongly  recommend
-//            ! you to use faster solver, RMatrixSolveFast() function.
-//
-// Inputs:
-//     A       -   array[0..N-1,0..N-1], system matrix
-//     N       -   size of A
-//     B       -   array[0..N-1], right part
-//
-// Outputs:
-//     Info    -   return code:
-//                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N <= 0 was passed
-//                 *  1    task is solved (but matrix A may be ill-conditioned,
-//                         check R1/RInf parameters for condition numbers).
-//     Rep     -   additional report, following fields are set:
-//                 * rep.r1    condition number in 1-norm
-//                 * rep.rinf  condition number in inf-norm
-//     X       -   array[N], it contains:
-//                 * info > 0  => solution
-//                 * info = -3 => filled by zeros
+// Internal subroutine.
+// Returns maximum count of RFS iterations as function of:
+// 1. machine epsilon
+// 2. task size.
+// 3. condition number
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-// API: void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
-void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   *info = 0;
-   SetObj(densesolverreport, rep);
-   SetVector(x);
-   NewMatrix(bm, 0, 0, DT_REAL);
-   NewMatrix(xm, 0, 0, DT_REAL);
-   if (n <= 0) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   ae_matrix_set_length(&bm, n, 1);
-   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
-   rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm);
-   ae_vector_set_length(x, n);
-   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
+static ae_int_t directdensesolvers_densesolverrfsmax(ae_int_t n, double r1, double rinf) {
+   ae_int_t result;
+   result = 5;
+   return result;
+}
+
+// Internal subroutine.
+// Returns maximum count of RFS iterations as function of:
+// 1. machine epsilon
+// 2. task size.
+// 3. norm-2 condition number
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static ae_int_t directdensesolvers_densesolverrfsmaxv2(ae_int_t n, double r2) {
+   ae_int_t result;
+   result = directdensesolvers_densesolverrfsmax(n, 0.0, 0.0);
+   return result;
 }
 
 // Basic LU solver for PLU*x = y.
@@ -246,75 +204,123 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
    }
 }
 
-// Dense solver.
+// Basic LU solver for ScaleA*PLU*x = y.
 //
-// This  subroutine  solves  a  system  A*x=b,  where A is NxN non-denegerate
-// real matrix, x  and  b  are  vectors.  This is a "fast" version of  linear
-// solver which does NOT provide  any  additional  functions  like  condition
-// number estimation or iterative refinement.
-//
-// Algorithm features:
-// * efficient algorithm O(N^3) complexity
-// * no performance overhead from additional functionality
-//
-// If you need condition number estimation or iterative refinement, use  more
-// feature-rich version - RMatrixSolve().
-//
-// Inputs:
-//     A       -   array[0..N-1,0..N-1], system matrix
-//     N       -   size of A
-//     B       -   array[0..N-1], right part
-//
-// Outputs:
-//     Info    -   return code:
-//                 * -3    matrix is exactly singular (ill conditioned matrices
-//                         are not recognized).
-//                 * -1    N <= 0 was passed
-//                 *  1    task is solved
-//     B       -   array[N]:
-//                 * info > 0  => overwritten by solution
-//                 * info = -3 => filled by zeros
-// ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
-// API: void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
-void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info) {
-   ae_frame _frame_block;
+// This subroutine assumes that:
+// * L is well-scaled, and it is U which needs scaling by ScaleA.
+// * A=PLU is well-conditioned, so no zero divisions or overflow may occur
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *xb) {
    ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   DupMatrix(a);
-   *info = 0;
-   NewVector(p, 0, DT_INT);
-   if (n <= 0) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   rmatrixlu(a, n, n, &p);
+   complex v;
    for (i = 0; i < n; i++) {
-      if (a->xyR[i][i] == 0.0) {
-         for (j = 0; j < n; j++) {
-            b->xR[j] = 0.0;
-         }
-         *info = -3;
-         ae_frame_leave();
-         return;
+      if (p->xZ[i] != i) {
+         swapc(&xb->xC[i], &xb->xC[p->xZ[i]]);
       }
    }
-   directdensesolvers_rbasiclusolve(a, &p, n, b);
-   *info = 1;
-   ae_frame_leave();
+   for (i = 1; i < n; i++) {
+      v = ae_v_cdotproduct(lua->xyC[i], 1, "N", xb->xC, 1, "N", i);
+      xb->xC[i] = ae_c_sub(xb->xC[i], v);
+   }
+   xb->xC[n - 1] = ae_c_div(xb->xC[n - 1], lua->xyC[n - 1][n - 1]);
+   for (i = n - 2; i >= 0; i--) {
+      v = ae_v_cdotproduct(&lua->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
+      xb->xC[i] = ae_c_div(ae_c_sub(xb->xC[i], v), lua->xyC[i][i]);
+   }
 }
 
-// Internal subroutine.
-// Returns maximum count of RFS iterations as function of:
-// 1. machine epsilon
-// 2. task size.
-// 3. condition number
+// Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
+//
+// This subroutine assumes that:
+// * A*ScaleA is well scaled
+// * A is well-conditioned, so no zero divisions or overflow may occur
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static ae_int_t directdensesolvers_densesolverrfsmax(ae_int_t n, double r1, double rinf) {
-   ae_int_t result;
-   result = 5;
-   return result;
+static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *xb) {
+   ae_int_t i;
+   double v;
+// A = L*L' or A=U'*U
+   if (isupper) {
+   // Solve U'*y=b first.
+      for (i = 0; i < n; i++) {
+         xb->xR[i] /= cha->xyR[i][i];
+         if (i < n - 1) {
+            v = xb->xR[i];
+            ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, n - i - 1, v);
+         }
+      }
+   // Solve U*x=y then.
+      for (i = n - 1; i >= 0; i--) {
+         if (i < n - 1) {
+            v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
+            xb->xR[i] -= v;
+         }
+         xb->xR[i] /= cha->xyR[i][i];
+      }
+   } else {
+   // Solve L*y=b first
+      for (i = 0; i < n; i++) {
+         if (i > 0) {
+            v = ae_v_dotproduct(cha->xyR[i], 1, xb->xR, 1, i);
+            xb->xR[i] -= v;
+         }
+         xb->xR[i] /= cha->xyR[i][i];
+      }
+   // Solve L'*x=y then.
+      for (i = n - 1; i >= 0; i--) {
+         xb->xR[i] /= cha->xyR[i][i];
+         if (i > 0) {
+            v = xb->xR[i];
+            ae_v_subd(xb->xR, 1, cha->xyR[i], 1, i, v);
+         }
+      }
+   }
+}
+
+// Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
+//
+// This subroutine assumes that:
+// * A*ScaleA is well scaled
+// * A is well-conditioned, so no zero divisions or overflow may occur
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb) {
+   ae_int_t i;
+   complex v;
+// A = L*L' or A=U'*U
+   if (isupper) {
+   // Solve U'*y=b first.
+      for (i = 0; i < n; i++) {
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
+         if (i < n - 1) {
+            v = xb->xC[i];
+            ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", n - i - 1, v);
+         }
+      }
+   // Solve U*x=y then.
+      for (i = n - 1; i >= 0; i--) {
+         if (i < n - 1) {
+            v = ae_v_cdotproduct(&cha->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
+            xb->xC[i] = ae_c_sub(xb->xC[i], v);
+         }
+         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
+      }
+   } else {
+   // Solve L*y=b first
+      for (i = 0; i < n; i++) {
+         if (i > 0) {
+            v = ae_v_cdotproduct(cha->xyC[i], 1, "N", xb->xC, 1, "N", i);
+            xb->xC[i] = ae_c_sub(xb->xC[i], v);
+         }
+         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
+      }
+   // Solve L'*x=y then.
+      for (i = n - 1; i >= 0; i--) {
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
+         if (i > 0) {
+            v = xb->xC[i];
+            ae_v_csubc(xb->xC, 1, cha->xyC[i], 1, "Conj", i, v);
+         }
+      }
+   }
 }
 
 // Internal LU solver
@@ -423,6 +429,232 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
             ae_v_add(&x->xyR[0][k], x->stride, y.xR, 1, n);
          }
       }
+   }
+   ae_frame_leave();
+}
+
+// Internal LU solver
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t rfs;
+   ae_int_t nrfs;
+   complex v;
+   double verr;
+   bool smallerr;
+   bool terminatenexttime;
+   ae_frame_make(&_frame_block);
+   *info = 0;
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewVector(xc, 0, DT_COMPLEX);
+   NewVector(y, 0, DT_COMPLEX);
+   NewVector(bc, 0, DT_COMPLEX);
+   NewVector(xa, 0, DT_COMPLEX);
+   NewVector(xb, 0, DT_COMPLEX);
+   NewVector(tx, 0, DT_COMPLEX);
+   NewVector(tmpbuf, 0, DT_REAL);
+// prepare: check inputs, allocate space...
+   if (n <= 0 || m <= 0) {
+      *info = -1;
+      ae_frame_leave();
+      return;
+   }
+   for (i = 0; i < n; i++) {
+      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
+         *info = -1;
+         ae_frame_leave();
+         return;
+      }
+   }
+   ae_matrix_set_length(x, n, m);
+   ae_vector_set_length(&y, n);
+   ae_vector_set_length(&xc, n);
+   ae_vector_set_length(&bc, n);
+   ae_vector_set_length(&tx, n);
+   ae_vector_set_length(&xa, n + 1);
+   ae_vector_set_length(&xb, n + 1);
+   ae_vector_set_length(&tmpbuf, 2 * n + 2);
+// estimate condition number, test for near singularity
+   rep->r1 = cmatrixlurcond1(lua, n);
+   rep->rinf = cmatrixlurcondinf(lua, n);
+   if (rep->r1 < rcondthreshold() || rep->rinf < rcondthreshold()) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
+            x->xyC[i][j] = ae_complex_from_i(0);
+         }
+      }
+      rep->r1 = 0.0;
+      rep->rinf = 0.0;
+      *info = -3;
+      ae_frame_leave();
+      return;
+   }
+   *info = 1;
+// First phase: solve with TRSM()
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
+         x->xyC[i][j] = b->xyC[i][j];
+      }
+   }
+   for (i = 0; i < n; i++) {
+      if (p->xZ[i] != i) {
+         for (j = 0; j < m; j++) {
+            swapc(&x->xyC[i][j], &x->xyC[p->xZ[i]][j]);
+         }
+      }
+   }
+   cmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, x, 0, 0);
+   cmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, x, 0, 0);
+// solve
+   for (k = 0; k < m; k++) {
+      ae_v_cmove(bc.xC, 1, &b->xyC[0][k], b->stride, "N", n);
+      ae_v_cmove(xc.xC, 1, &x->xyC[0][k], x->stride, "N", n);
+   // Iterative refinement of xc:
+   // * calculate r = bc-A*xc using extra-precise dot product
+   // * solve A*y = r
+   // * update x:=x+r
+   //
+   // This cycle is executed until one of two things happens:
+   // 1. maximum number of iterations reached
+   // 2. last iteration decreased error to the lower limit
+      if (havea) {
+         nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf);
+         terminatenexttime = false;
+         for (rfs = 0; rfs < nrfs; rfs++) {
+            if (terminatenexttime) {
+               break;
+            }
+         // generate right part
+            smallerr = true;
+            ae_v_cmove(xb.xC, 1, xc.xC, 1, "N", n);
+            for (i = 0; i < n; i++) {
+               ae_v_cmove(xa.xC, 1, a->xyC[i], 1, "N", n);
+               xa.xC[n] = ae_complex_from_i(-1);
+               xb.xC[n] = bc.xC[i];
+               xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr);
+               y.xC[i] = ae_c_neg(v);
+               smallerr = smallerr && SmallC(v, 4.0 * verr);
+            }
+            if (smallerr) {
+               terminatenexttime = true;
+            }
+         // solve and update
+            directdensesolvers_cbasiclusolve(lua, p, n, &y);
+            ae_v_cadd(xc.xC, 1, y.xC, 1, "N", n);
+         }
+      }
+   // Store xc.
+   // Post-scale result.
+      ae_v_cmove(&x->xyC[0][k], x->stride, xc.xC, 1, "N", n);
+   }
+   ae_frame_leave();
+}
+
+// Internal Cholesky solver
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
+   ae_int_t i;
+   ae_int_t j;
+   *info = 0;
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+// prepare: check inputs, allocate space...
+   if (n <= 0 || m <= 0) {
+      *info = -1;
+      return;
+   }
+   ae_matrix_set_length(x, n, m);
+// estimate condition number, test for near singularity
+   rep->r1 = spdmatrixcholeskyrcond(cha, n, isupper);
+   rep->rinf = rep->r1;
+   if (rep->r1 < rcondthreshold()) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
+            x->xyR[i][j] = 0.0;
+         }
+      }
+      rep->r1 = 0.0;
+      rep->rinf = 0.0;
+      *info = -3;
+      return;
+   }
+   *info = 1;
+// Solve with TRSM()
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
+         x->xyR[i][j] = b->xyR[i][j];
+      }
+   }
+   if (isupper) {
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 1, x, 0, 0);
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0);
+   } else {
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0);
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 1, x, 0, 0);
+   }
+}
+
+// Internal Cholesky solver
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_frame_make(&_frame_block);
+   *info = 0;
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+   NewVector(xc, 0, DT_COMPLEX);
+   NewVector(y, 0, DT_COMPLEX);
+   NewVector(bc, 0, DT_COMPLEX);
+   NewVector(xa, 0, DT_COMPLEX);
+   NewVector(xb, 0, DT_COMPLEX);
+   NewVector(tx, 0, DT_COMPLEX);
+// prepare: check inputs, allocate space...
+   if (n <= 0 || m <= 0) {
+      *info = -1;
+      ae_frame_leave();
+      return;
+   }
+   ae_matrix_set_length(x, n, m);
+   ae_vector_set_length(&y, n);
+   ae_vector_set_length(&xc, n);
+   ae_vector_set_length(&bc, n);
+   ae_vector_set_length(&tx, n + 1);
+   ae_vector_set_length(&xa, n + 1);
+   ae_vector_set_length(&xb, n + 1);
+// estimate condition number, test for near singularity
+   rep->r1 = hpdmatrixcholeskyrcond(cha, n, isupper);
+   rep->rinf = rep->r1;
+   if (rep->r1 < rcondthreshold()) {
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < m; j++) {
+            x->xyC[i][j] = ae_complex_from_i(0);
+         }
+      }
+      rep->r1 = 0.0;
+      rep->rinf = 0.0;
+      *info = -3;
+      ae_frame_leave();
+      return;
+   }
+   *info = 1;
+// solve
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
+         x->xyC[i][j] = b->xyC[i][j];
+      }
+   }
+   if (isupper) {
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 2, x, 0, 0);
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0);
+   } else {
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0);
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 2, x, 0, 0);
    }
    ae_frame_leave();
 }
@@ -592,41 +824,36 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    ae_frame_leave();
 }
 
-// Dense solver.
-//
-// This  subroutine  solves  a  system  A*x=b,  where A is NxN non-denegerate
-// real matrix given by its LU decomposition, x and b are real vectors.  This
-// is "slow-but-robust" version of the linear LU-based solver. Faster version
-// is RMatrixLUSolveFast() function.
+// Dense solver for A*x=b with N*N real matrix A and N*1 real vectorx  x  and
+// b. This is "slow-but-feature rich" version of the  linear  solver.  Faster
+// version is RMatrixSolveFast() function.
 //
 // Algorithm features:
 // * automatic detection of degenerate cases
-// * O(N^2) complexity
 // * condition number estimation
-//
-// No iterative refinement  is provided because exact form of original matrix
-// is not known to subroutine. Use RMatrixSolve or RMatrixMixedSolve  if  you
-// need iterative refinement.
+// * iterative refinement
+// * O(N^3) complexity
 //
 // IMPORTANT: ! this function is NOT the most efficient linear solver provided
-//            ! by ALGLIB. It estimates condition  number  of  linear system,
-//            ! which results in 10-15x  performance  penalty  when  compared
-//            ! with "fast" version which just calls triangular solver.
+//            ! by ALGLIB. It estimates condition  number  of  linear  system
+//            ! and  performs  iterative   refinement,   which   results   in
+//            ! significant performance penalty  when  compared  with  "fast"
+//            ! version  which  just  performs  LU  decomposition  and  calls
+//            ! triangular solver.
 //            !
-//            ! This performance penalty is insignificant  when compared with
-//            ! cost of large LU decomposition.  However,  if you  call  this
-//            ! function many times for the same  left  side,  this  overhead
-//            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems.
+//            ! This  performance  penalty  is  especially  visible  in   the
+//            ! multithreaded mode, because both condition number  estimation
+//            ! and   iterative    refinement   are   inherently   sequential
+//            ! calculations. It is also very significant on small matrices.
 //            !
-//            ! In such cases we strongly recommend you to use faster solver,
-//            ! RMatrixLUSolveFast() function.
+//            ! Thus, if you need high performance and if you are pretty sure
+//            ! that your system is well conditioned, we  strongly  recommend
+//            ! you to use faster solver, RMatrixSolveFast() function.
 //
 // Inputs:
-//     LUA     -   array[N,N], LU decomposition, RMatrixLU result
-//     P       -   array[N], pivots array, RMatrixLU result
+//     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
-//     B       -   array[N], right part
+//     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     Info    -   return code:
@@ -641,8 +868,8 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
 //                 * info > 0  => solution
 //                 * info = -3 => filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-// API: void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
-void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
+// API: void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
+void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
    ae_frame _frame_block;
    ae_frame_make(&_frame_block);
    *info = 0;
@@ -657,7 +884,7 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
    }
    ae_matrix_set_length(&bm, n, 1);
    ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
-   rmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm);
+   rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave();
@@ -666,17 +893,19 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
 // Dense solver.
 //
 // This  subroutine  solves  a  system  A*x=b,  where A is NxN non-denegerate
-// real matrix given by its LU decomposition, x and b are real vectors.  This
-// is "fast-without-any-checks" version of the linear LU-based solver. Slower
-// but more robust version is RMatrixLUSolve() function.
+// real matrix, x  and  b  are  vectors.  This is a "fast" version of  linear
+// solver which does NOT provide  any  additional  functions  like  condition
+// number estimation or iterative refinement.
 //
 // Algorithm features:
-// * O(N^2) complexity
-// * fast algorithm without ANY additional checks, just triangular solver
+// * efficient algorithm O(N^3) complexity
+// * no performance overhead from additional functionality
+//
+// If you need condition number estimation or iterative refinement, use  more
+// feature-rich version - RMatrixSolve().
 //
 // Inputs:
-//     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
-//     P       -   array[0..N-1], pivots array, RMatrixLU result
+//     A       -   array[0..N-1,0..N-1], system matrix
 //     N       -   size of A
 //     B       -   array[0..N-1], right part
 //
@@ -684,33 +913,40 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
 //     Info    -   return code:
 //                 * -3    matrix is exactly singular (ill conditioned matrices
 //                         are not recognized).
-//                         X is filled by zeros in such cases.
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
 //                 * info > 0  => overwritten by solution
 //                 * info = -3 => filled by zeros
-// ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
-// API: void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
-void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info) {
+// ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
+// API: void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
+void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info) {
+   ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
+   ae_frame_make(&_frame_block);
+   DupMatrix(a);
    *info = 0;
+   NewVector(p, 0, DT_INT);
    if (n <= 0) {
       *info = -1;
+      ae_frame_leave();
       return;
    }
+   rmatrixlu(a, n, n, &p);
    for (i = 0; i < n; i++) {
-      if (lua->xyR[i][i] == 0.0) {
+      if (a->xyR[i][i] == 0.0) {
          for (j = 0; j < n; j++) {
             b->xR[j] = 0.0;
          }
          *info = -3;
+         ae_frame_leave();
          return;
       }
    }
-   directdensesolvers_rbasiclusolve(lua, p, n, b);
+   directdensesolvers_rbasiclusolve(a, &p, n, b);
    *info = 1;
+   ae_frame_leave();
 }
 
 // Dense solver.
@@ -850,6 +1086,173 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
 
 // Dense solver.
 //
+// This  subroutine  solves  a  system  A*x=b,  where A is NxN non-denegerate
+// real matrix given by its LU decomposition, x and b are real vectors.  This
+// is "slow-but-robust" version of the linear LU-based solver. Faster version
+// is RMatrixLUSolveFast() function.
+//
+// Algorithm features:
+// * automatic detection of degenerate cases
+// * O(N^2) complexity
+// * condition number estimation
+//
+// No iterative refinement  is provided because exact form of original matrix
+// is not known to subroutine. Use RMatrixSolve or RMatrixMixedSolve  if  you
+// need iterative refinement.
+//
+// IMPORTANT: ! this function is NOT the most efficient linear solver provided
+//            ! by ALGLIB. It estimates condition  number  of  linear system,
+//            ! which results in 10-15x  performance  penalty  when  compared
+//            ! with "fast" version which just calls triangular solver.
+//            !
+//            ! This performance penalty is insignificant  when compared with
+//            ! cost of large LU decomposition.  However,  if you  call  this
+//            ! function many times for the same  left  side,  this  overhead
+//            ! BECOMES significant. It  also  becomes significant for small-
+//            ! scale problems.
+//            !
+//            ! In such cases we strongly recommend you to use faster solver,
+//            ! RMatrixLUSolveFast() function.
+//
+// Inputs:
+//     LUA     -   array[N,N], LU decomposition, RMatrixLU result
+//     P       -   array[N], pivots array, RMatrixLU result
+//     N       -   size of A
+//     B       -   array[N], right part
+//
+// Outputs:
+//     Info    -   return code:
+//                 * -3    matrix is very badly conditioned or exactly singular.
+//                 * -1    N <= 0 was passed
+//                 *  1    task is solved (but matrix A may be ill-conditioned,
+//                         check R1/RInf parameters for condition numbers).
+//     Rep     -   additional report, following fields are set:
+//                 * rep.r1    condition number in 1-norm
+//                 * rep.rinf  condition number in inf-norm
+//     X       -   array[N], it contains:
+//                 * info > 0  => solution
+//                 * info = -3 => filled by zeros
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+// API: void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
+void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   *info = 0;
+   SetObj(densesolverreport, rep);
+   SetVector(x);
+   NewMatrix(bm, 0, 0, DT_REAL);
+   NewMatrix(xm, 0, 0, DT_REAL);
+   if (n <= 0) {
+      *info = -1;
+      ae_frame_leave();
+      return;
+   }
+   ae_matrix_set_length(&bm, n, 1);
+   ae_v_move(bm.xyR[0], bm.stride, b->xR, 1, n);
+   rmatrixlusolvem(lua, p, n, &bm, 1, info, rep, &xm);
+   ae_vector_set_length(x, n);
+   ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
+   ae_frame_leave();
+}
+
+// Dense solver.
+//
+// This  subroutine  solves  a  system  A*x=b,  where A is NxN non-denegerate
+// real matrix given by its LU decomposition, x and b are real vectors.  This
+// is "fast-without-any-checks" version of the linear LU-based solver. Slower
+// but more robust version is RMatrixLUSolve() function.
+//
+// Algorithm features:
+// * O(N^2) complexity
+// * fast algorithm without ANY additional checks, just triangular solver
+//
+// Inputs:
+//     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
+//     P       -   array[0..N-1], pivots array, RMatrixLU result
+//     N       -   size of A
+//     B       -   array[0..N-1], right part
+//
+// Outputs:
+//     Info    -   return code:
+//                 * -3    matrix is exactly singular (ill conditioned matrices
+//                         are not recognized).
+//                         X is filled by zeros in such cases.
+//                 * -1    N <= 0 was passed
+//                 *  1    task is solved
+//     B       -   array[N]:
+//                 * info > 0  => overwritten by solution
+//                 * info = -3 => filled by zeros
+// ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
+// API: void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
+void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info) {
+   ae_int_t i;
+   ae_int_t j;
+   *info = 0;
+   if (n <= 0) {
+      *info = -1;
+      return;
+   }
+   for (i = 0; i < n; i++) {
+      if (lua->xyR[i][i] == 0.0) {
+         for (j = 0; j < n; j++) {
+            b->xR[j] = 0.0;
+         }
+         *info = -3;
+         return;
+      }
+   }
+   directdensesolvers_rbasiclusolve(lua, p, n, b);
+   *info = 1;
+}
+
+// Dense solver.
+//
+// Similar to RMatrixMixedSolve() but  solves task with multiple right  parts
+// (where b and x are NxM matrices).
+//
+// Algorithm features:
+// * automatic detection of degenerate cases
+// * condition number estimation
+// * iterative refinement
+// * O(M*N^2) complexity
+//
+// Inputs:
+//     A       -   array[0..N-1,0..N-1], system matrix
+//     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
+//     P       -   array[0..N-1], pivots array, RMatrixLU result
+//     N       -   size of A
+//     B       -   array[0..N-1,0..M-1], right part
+//     M       -   right part size
+//
+// Outputs:
+//     Info    -   return code:
+//                 * -3    matrix is very badly conditioned or exactly singular.
+//                 * -1    N <= 0 was passed
+//                 *  1    task is solved (but matrix A may be ill-conditioned,
+//                         check R1/RInf parameters for condition numbers).
+//     Rep     -   additional report, following fields are set:
+//                 * rep.r1    condition number in 1-norm
+//                 * rep.rinf  condition number in inf-norm
+//     X       -   array[N,M], it contains:
+//                 * info > 0  => solution
+//                 * info = -3 => filled by zeros
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+// API: void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
+void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
+   *info = 0;
+   SetObj(densesolverreport, rep);
+   SetMatrix(x);
+// prepare: check inputs, allocate space...
+   if (n <= 0 || m <= 0) {
+      *info = -1;
+      return;
+   }
+// solve
+   directdensesolvers_rmatrixlusolveinternal(lua, p, n, a, true, b, m, info, rep, x);
+}
+
+// Dense solver.
+//
 // This  subroutine  solves  a  system  A*x=b,  where BOTH ORIGINAL A AND ITS
 // LU DECOMPOSITION ARE KNOWN. You can use it if for some  reasons  you  have
 // both A and its LU decomposition.
@@ -899,198 +1302,6 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
    rmatrixmixedsolvem(a, lua, p, n, &bm, 1, info, rep, &xm);
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
-   ae_frame_leave();
-}
-
-// Dense solver.
-//
-// Similar to RMatrixMixedSolve() but  solves task with multiple right  parts
-// (where b and x are NxM matrices).
-//
-// Algorithm features:
-// * automatic detection of degenerate cases
-// * condition number estimation
-// * iterative refinement
-// * O(M*N^2) complexity
-//
-// Inputs:
-//     A       -   array[0..N-1,0..N-1], system matrix
-//     LUA     -   array[0..N-1,0..N-1], LU decomposition, RMatrixLU result
-//     P       -   array[0..N-1], pivots array, RMatrixLU result
-//     N       -   size of A
-//     B       -   array[0..N-1,0..M-1], right part
-//     M       -   right part size
-//
-// Outputs:
-//     Info    -   return code:
-//                 * -3    matrix is very badly conditioned or exactly singular.
-//                 * -1    N <= 0 was passed
-//                 *  1    task is solved (but matrix A may be ill-conditioned,
-//                         check R1/RInf parameters for condition numbers).
-//     Rep     -   additional report, following fields are set:
-//                 * rep.r1    condition number in 1-norm
-//                 * rep.rinf  condition number in inf-norm
-//     X       -   array[N,M], it contains:
-//                 * info > 0  => solution
-//                 * info = -3 => filled by zeros
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-// API: void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
-void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   *info = 0;
-   SetObj(densesolverreport, rep);
-   SetMatrix(x);
-// prepare: check inputs, allocate space...
-   if (n <= 0 || m <= 0) {
-      *info = -1;
-      return;
-   }
-// solve
-   directdensesolvers_rmatrixlusolveinternal(lua, p, n, a, true, b, m, info, rep, x);
-}
-
-// Basic LU solver for ScaleA*PLU*x = y.
-//
-// This subroutine assumes that:
-// * L is well-scaled, and it is U which needs scaling by ScaleA.
-// * A=PLU is well-conditioned, so no zero divisions or overflow may occur
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *xb) {
-   ae_int_t i;
-   complex v;
-   for (i = 0; i < n; i++) {
-      if (p->xZ[i] != i) {
-         swapc(&xb->xC[i], &xb->xC[p->xZ[i]]);
-      }
-   }
-   for (i = 1; i < n; i++) {
-      v = ae_v_cdotproduct(lua->xyC[i], 1, "N", xb->xC, 1, "N", i);
-      xb->xC[i] = ae_c_sub(xb->xC[i], v);
-   }
-   xb->xC[n - 1] = ae_c_div(xb->xC[n - 1], lua->xyC[n - 1][n - 1]);
-   for (i = n - 2; i >= 0; i--) {
-      v = ae_v_cdotproduct(&lua->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
-      xb->xC[i] = ae_c_div(ae_c_sub(xb->xC[i], v), lua->xyC[i][i]);
-   }
-}
-
-// Internal LU solver
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t rfs;
-   ae_int_t nrfs;
-   complex v;
-   double verr;
-   bool smallerr;
-   bool terminatenexttime;
-   ae_frame_make(&_frame_block);
-   *info = 0;
-   SetObj(densesolverreport, rep);
-   SetMatrix(x);
-   NewVector(xc, 0, DT_COMPLEX);
-   NewVector(y, 0, DT_COMPLEX);
-   NewVector(bc, 0, DT_COMPLEX);
-   NewVector(xa, 0, DT_COMPLEX);
-   NewVector(xb, 0, DT_COMPLEX);
-   NewVector(tx, 0, DT_COMPLEX);
-   NewVector(tmpbuf, 0, DT_REAL);
-// prepare: check inputs, allocate space...
-   if (n <= 0 || m <= 0) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   for (i = 0; i < n; i++) {
-      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
-         *info = -1;
-         ae_frame_leave();
-         return;
-      }
-   }
-   ae_matrix_set_length(x, n, m);
-   ae_vector_set_length(&y, n);
-   ae_vector_set_length(&xc, n);
-   ae_vector_set_length(&bc, n);
-   ae_vector_set_length(&tx, n);
-   ae_vector_set_length(&xa, n + 1);
-   ae_vector_set_length(&xb, n + 1);
-   ae_vector_set_length(&tmpbuf, 2 * n + 2);
-// estimate condition number, test for near singularity
-   rep->r1 = cmatrixlurcond1(lua, n);
-   rep->rinf = cmatrixlurcondinf(lua, n);
-   if (rep->r1 < rcondthreshold() || rep->rinf < rcondthreshold()) {
-      for (i = 0; i < n; i++) {
-         for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
-         }
-      }
-      rep->r1 = 0.0;
-      rep->rinf = 0.0;
-      *info = -3;
-      ae_frame_leave();
-      return;
-   }
-   *info = 1;
-// First phase: solve with TRSM()
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < m; j++) {
-         x->xyC[i][j] = b->xyC[i][j];
-      }
-   }
-   for (i = 0; i < n; i++) {
-      if (p->xZ[i] != i) {
-         for (j = 0; j < m; j++) {
-            swapc(&x->xyC[i][j], &x->xyC[p->xZ[i]][j]);
-         }
-      }
-   }
-   cmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, x, 0, 0);
-   cmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, x, 0, 0);
-// solve
-   for (k = 0; k < m; k++) {
-      ae_v_cmove(bc.xC, 1, &b->xyC[0][k], b->stride, "N", n);
-      ae_v_cmove(xc.xC, 1, &x->xyC[0][k], x->stride, "N", n);
-   // Iterative refinement of xc:
-   // * calculate r = bc-A*xc using extra-precise dot product
-   // * solve A*y = r
-   // * update x:=x+r
-   //
-   // This cycle is executed until one of two things happens:
-   // 1. maximum number of iterations reached
-   // 2. last iteration decreased error to the lower limit
-      if (havea) {
-         nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf);
-         terminatenexttime = false;
-         for (rfs = 0; rfs < nrfs; rfs++) {
-            if (terminatenexttime) {
-               break;
-            }
-         // generate right part
-            smallerr = true;
-            ae_v_cmove(xb.xC, 1, xc.xC, 1, "N", n);
-            for (i = 0; i < n; i++) {
-               ae_v_cmove(xa.xC, 1, a->xyC[i], 1, "N", n);
-               xa.xC[n] = ae_complex_from_i(-1);
-               xb.xC[n] = bc.xC[i];
-               xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr);
-               y.xC[i] = ae_c_neg(v);
-               smallerr = smallerr && SmallC(v, 4.0 * verr);
-            }
-            if (smallerr) {
-               terminatenexttime = true;
-            }
-         // solve and update
-            directdensesolvers_cbasiclusolve(lua, p, n, &y);
-            ae_v_cadd(xc.xC, 1, y.xC, 1, "N", n);
-         }
-      }
-   // Store xc.
-   // Post-scale result.
-      ae_v_cmove(&x->xyC[0][k], x->stride, xc.xC, 1, "N", n);
-   }
    ae_frame_leave();
 }
 
@@ -1703,50 +1914,6 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
    ae_frame_leave();
 }
 
-// Internal Cholesky solver
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x) {
-   ae_int_t i;
-   ae_int_t j;
-   *info = 0;
-   SetObj(densesolverreport, rep);
-   SetMatrix(x);
-// prepare: check inputs, allocate space...
-   if (n <= 0 || m <= 0) {
-      *info = -1;
-      return;
-   }
-   ae_matrix_set_length(x, n, m);
-// estimate condition number, test for near singularity
-   rep->r1 = spdmatrixcholeskyrcond(cha, n, isupper);
-   rep->rinf = rep->r1;
-   if (rep->r1 < rcondthreshold()) {
-      for (i = 0; i < n; i++) {
-         for (j = 0; j < m; j++) {
-            x->xyR[i][j] = 0.0;
-         }
-      }
-      rep->r1 = 0.0;
-      rep->rinf = 0.0;
-      *info = -3;
-      return;
-   }
-   *info = 1;
-// Solve with TRSM()
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < m; j++) {
-         x->xyR[i][j] = b->xyR[i][j];
-      }
-   }
-   if (isupper) {
-      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 1, x, 0, 0);
-      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0);
-   } else {
-      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0);
-      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 1, x, 0, 0);
-   }
-}
-
 // Dense solver for A*X=B with N*N symmetric positive definite matrix A,  and
 // N*M vectors X and B. It is "slow-but-feature-rich" version of the solver.
 //
@@ -1972,53 +2139,6 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *
    ae_vector_set_length(x, n);
    ae_v_move(x->xR, 1, xm.xyR[0], xm.stride, n);
    ae_frame_leave();
-}
-
-// Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
-//
-// This subroutine assumes that:
-// * A*ScaleA is well scaled
-// * A is well-conditioned, so no zero divisions or overflow may occur
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *xb) {
-   ae_int_t i;
-   double v;
-// A = L*L' or A=U'*U
-   if (isupper) {
-   // Solve U'*y=b first.
-      for (i = 0; i < n; i++) {
-         xb->xR[i] /= cha->xyR[i][i];
-         if (i < n - 1) {
-            v = xb->xR[i];
-            ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, n - i - 1, v);
-         }
-      }
-   // Solve U*x=y then.
-      for (i = n - 1; i >= 0; i--) {
-         if (i < n - 1) {
-            v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
-            xb->xR[i] -= v;
-         }
-         xb->xR[i] /= cha->xyR[i][i];
-      }
-   } else {
-   // Solve L*y=b first
-      for (i = 0; i < n; i++) {
-         if (i > 0) {
-            v = ae_v_dotproduct(cha->xyR[i], 1, xb->xR, 1, i);
-            xb->xR[i] -= v;
-         }
-         xb->xR[i] /= cha->xyR[i][i];
-      }
-   // Solve L'*x=y then.
-      for (i = n - 1; i >= 0; i--) {
-         xb->xR[i] /= cha->xyR[i][i];
-         if (i > 0) {
-            v = xb->xR[i];
-            ae_v_subd(xb->xR, 1, cha->xyR[i], 1, i, v);
-         }
-      }
-   }
 }
 
 // Dense linear solver for A*x=b with N*N real  symmetric  positive  definite
@@ -2321,67 +2441,6 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector 
    directdensesolvers_spdbasiccholeskysolve(cha, n, isupper, b);
 }
 
-// Internal Cholesky solver
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   *info = 0;
-   SetObj(densesolverreport, rep);
-   SetMatrix(x);
-   NewVector(xc, 0, DT_COMPLEX);
-   NewVector(y, 0, DT_COMPLEX);
-   NewVector(bc, 0, DT_COMPLEX);
-   NewVector(xa, 0, DT_COMPLEX);
-   NewVector(xb, 0, DT_COMPLEX);
-   NewVector(tx, 0, DT_COMPLEX);
-// prepare: check inputs, allocate space...
-   if (n <= 0 || m <= 0) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   ae_matrix_set_length(x, n, m);
-   ae_vector_set_length(&y, n);
-   ae_vector_set_length(&xc, n);
-   ae_vector_set_length(&bc, n);
-   ae_vector_set_length(&tx, n + 1);
-   ae_vector_set_length(&xa, n + 1);
-   ae_vector_set_length(&xb, n + 1);
-// estimate condition number, test for near singularity
-   rep->r1 = hpdmatrixcholeskyrcond(cha, n, isupper);
-   rep->rinf = rep->r1;
-   if (rep->r1 < rcondthreshold()) {
-      for (i = 0; i < n; i++) {
-         for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
-         }
-      }
-      rep->r1 = 0.0;
-      rep->rinf = 0.0;
-      *info = -3;
-      ae_frame_leave();
-      return;
-   }
-   *info = 1;
-// solve
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < m; j++) {
-         x->xyC[i][j] = b->xyC[i][j];
-      }
-   }
-   if (isupper) {
-      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 2, x, 0, 0);
-      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0);
-   } else {
-      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0);
-      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 2, x, 0, 0);
-   }
-   ae_frame_leave();
-}
-
 // Dense solver for A*X=B, with N*N Hermitian positive definite matrix A  and
 // N*M  complex  matrices  X  and  B.  "Slow-but-feature-rich" version of the
 // solver.
@@ -2593,53 +2652,6 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
    ae_vector_set_length(x, n);
    ae_v_cmove(x->xC, 1, xm.xyC[0], xm.stride, "N", n);
    ae_frame_leave();
-}
-
-// Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
-//
-// This subroutine assumes that:
-// * A*ScaleA is well scaled
-// * A is well-conditioned, so no zero divisions or overflow may occur
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb) {
-   ae_int_t i;
-   complex v;
-// A = L*L' or A=U'*U
-   if (isupper) {
-   // Solve U'*y=b first.
-      for (i = 0; i < n; i++) {
-         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
-         if (i < n - 1) {
-            v = xb->xC[i];
-            ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", n - i - 1, v);
-         }
-      }
-   // Solve U*x=y then.
-      for (i = n - 1; i >= 0; i--) {
-         if (i < n - 1) {
-            v = ae_v_cdotproduct(&cha->xyC[i][i + 1], 1, "N", &xb->xC[i + 1], 1, "N", n - i - 1);
-            xb->xC[i] = ae_c_sub(xb->xC[i], v);
-         }
-         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
-      }
-   } else {
-   // Solve L*y=b first
-      for (i = 0; i < n; i++) {
-         if (i > 0) {
-            v = ae_v_cdotproduct(cha->xyC[i], 1, "N", xb->xC, 1, "N", i);
-            xb->xC[i] = ae_c_sub(xb->xC[i], v);
-         }
-         xb->xC[i] = ae_c_div(xb->xC[i], cha->xyC[i][i]);
-      }
-   // Solve L'*x=y then.
-      for (i = n - 1; i >= 0; i--) {
-         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
-         if (i > 0) {
-            v = xb->xC[i];
-            ae_v_csubc(xb->xC, 1, cha->xyC[i], 1, "Conj", i, v);
-         }
-      }
-   }
 }
 
 // Dense solver for A*x=b, with N*N Hermitian positive definite matrix A, and
@@ -2945,18 +2957,6 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
    directdensesolvers_hpdbasiccholeskysolve(cha, n, isupper, b);
 }
 
-// Internal subroutine.
-// Returns maximum count of RFS iterations as function of:
-// 1. machine epsilon
-// 2. task size.
-// 3. norm-2 condition number
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-static ae_int_t directdensesolvers_densesolverrfsmaxv2(ae_int_t n, double r2) {
-   ae_int_t result;
-   result = directdensesolvers_densesolverrfsmax(n, 0.0, 0.0);
-   return result;
-}
-
 // Dense solver.
 //
 // This subroutine finds solution of the linear system A*X=B with non-square,
@@ -3198,20 +3198,6 @@ namespace alglib {
 DefClass(densesolverreport, DecVal(r1) DecVal(rinf))
 DefClass(densesolverlsreport, DecVal(r2) DecVar(cx) DecVal(n) DecVal(k))
 
-void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rmatrixsolve(ConstT(ae_matrix, a), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
-   alglib_impl::ae_state_clear();
-}
-
-void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rmatrixsolvefast(ConstT(ae_matrix, a), n, ConstT(ae_vector, b), &info);
-   alglib_impl::ae_state_clear();
-}
-
 void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -3226,17 +3212,17 @@ void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_a
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
+void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rmatrixlusolve(ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
+   alglib_impl::rmatrixsolve(ConstT(ae_matrix, a), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
+void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rmatrixlusolvefast(ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info);
+   alglib_impl::rmatrixsolvefast(ConstT(ae_matrix, a), n, ConstT(ae_vector, b), &info);
    alglib_impl::ae_state_clear();
 }
 
@@ -3254,10 +3240,17 @@ void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, co
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
+void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rmatrixmixedsolve(ConstT(ae_matrix, a), ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
+   alglib_impl::rmatrixlusolve(ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
+   alglib_impl::ae_state_clear();
+}
+
+void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rmatrixlusolvefast(ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info);
    alglib_impl::ae_state_clear();
 }
 
@@ -3265,6 +3258,13 @@ void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const 
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixmixedsolvem(ConstT(ae_matrix, a), ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_matrix, b), m, &info, ConstT(densesolverreport, rep), ConstT(ae_matrix, x));
+   alglib_impl::ae_state_clear();
+}
+
+void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rmatrixmixedsolve(ConstT(ae_matrix, a), ConstT(ae_matrix, lua), ConstT(ae_vector, p), n, ConstT(ae_vector, b), &info, ConstT(densesolverreport, rep), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
 }
 
@@ -4216,6 +4216,12 @@ Pause:
    return true;
 }
 
+// Procedure for restart function LinCGIteration
+// ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
+void lincgrestart(lincgstate *state) {
+   state->PQ = -1;
+}
+
 // Procedure for solution of A*x=b with sparse A.
 //
 // Inputs:
@@ -4366,12 +4372,6 @@ void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq) {
 // API: void lincgsetxrep(const lincgstate &state, const bool needxrep);
 void lincgsetxrep(lincgstate *state, bool needxrep) {
    state->xrep = needxrep;
-}
-
-// Procedure for restart function LinCGIteration
-// ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-void lincgrestart(lincgstate *state) {
-   state->PQ = -1;
 }
 
 void lincgstate_init(void *_p, bool make_automatic) {
@@ -4554,38 +4554,6 @@ namespace alglib_impl {
 static const double linlsqr_atol = 1.0E-6;
 static const double linlsqr_btol = 1.0E-6;
 
-// This function initializes linear LSQR Solver. This solver is used to solve
-// non-symmetric (and, possibly, non-square) problems. Least squares solution
-// is returned for non-compatible systems.
-//
-// USAGE:
-// 1. User initializes algorithm state with LinLSQRCreate() call
-// 2. User tunes solver parameters with  LinLSQRSetCond() and other functions
-// 3. User  calls  LinLSQRSolveSparse()  function which takes algorithm state
-//    and SparseMatrix object.
-// 4. User calls LinLSQRResults() to get solution
-// 5. Optionally, user may call LinLSQRSolveSparse() again to  solve  another
-//    problem  with different matrix and/or right part without reinitializing
-//    LinLSQRState structure.
-//
-// Inputs:
-//     M       -   number of rows in A
-//     N       -   number of variables, N > 0
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
-//       allocated place as much as possible.
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
-void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state) {
-   SetObj(linlsqrstate, state);
-   ae_assert(m > 0, "LinLSQRCreate: M <= 0");
-   ae_assert(n > 0, "LinLSQRCreate: N <= 0");
-   linlsqrcreatebuf(m, n, state);
-}
-
 // This function initializes linear LSQR Solver.  It  provides  exactly  same
 // functionality as linlsqrcreate(), but reuses  previously  allocated  space
 // as much as possible.
@@ -4637,6 +4605,38 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
       state->b.xR[i] = 0.0;
    }
    state->PQ = -1;
+}
+
+// This function initializes linear LSQR Solver. This solver is used to solve
+// non-symmetric (and, possibly, non-square) problems. Least squares solution
+// is returned for non-compatible systems.
+//
+// USAGE:
+// 1. User initializes algorithm state with LinLSQRCreate() call
+// 2. User tunes solver parameters with  LinLSQRSetCond() and other functions
+// 3. User  calls  LinLSQRSolveSparse()  function which takes algorithm state
+//    and SparseMatrix object.
+// 4. User calls LinLSQRResults() to get solution
+// 5. Optionally, user may call LinLSQRSolveSparse() again to  solve  another
+//    problem  with different matrix and/or right part without reinitializing
+//    LinLSQRState structure.
+//
+// Inputs:
+//     M       -   number of rows in A
+//     N       -   number of variables, N > 0
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
+//       allocated place as much as possible.
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
+void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state) {
+   SetObj(linlsqrstate, state);
+   ae_assert(m > 0, "LinLSQRCreate: M <= 0");
+   ae_assert(n > 0, "LinLSQRCreate: N <= 0");
+   linlsqrcreatebuf(m, n, state);
 }
 
 // This function sets right part. By default, right part is zero.
@@ -4952,6 +4952,13 @@ Pause:
    return true;
 }
 
+// This function restarts LinLSQRIteration
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+void linlsqrrestart(linlsqrstate *state) {
+   state->PQ = -1;
+   state->repiterationscount = 0;
+}
+
 // Procedure for solution of A*x=b with sparse A.
 //
 // Inputs:
@@ -5117,13 +5124,6 @@ void linlsqrsetxrep(linlsqrstate *state, bool needxrep) {
    state->xrep = needxrep;
 }
 
-// This function restarts LinLSQRIteration
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-void linlsqrrestart(linlsqrstate *state) {
-   state->PQ = -1;
-   state->repiterationscount = 0;
-}
-
 // This function is used to peek into LSQR solver and get  current  iteration
 // counter. You can safely "peek" into the solver from another thread.
 //
@@ -5282,17 +5282,17 @@ namespace alglib {
 DefClass(linlsqrstate, )
 DefClass(linlsqrreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
-void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrcreate(m, n, ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-
 void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::linlsqrcreatebuf(m, n, ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrcreate(m, n, ConstT(linlsqrstate, state));
    alglib_impl::ae_state_clear();
 }
 
@@ -5365,6 +5365,88 @@ void linlsqrrequesttermination(const linlsqrstate &state) {
 // Depends on: (AlgLibInternal) LINMIN
 // Depends on: (LinAlg) FBLS
 namespace alglib_impl {
+// This function sets stopping conditions for the nonlinear solver
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     EpsF    - >= 0
+//                 The subroutine finishes  its work if on k+1-th iteration
+//                 the condition ||F|| <= EpsF is satisfied
+//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//                 iterations is unlimited.
+//
+// Passing EpsF=0 and MaxIts=0 simultaneously will lead to  automatic
+// stopping criterion selection (small EpsF).
+//
+// NOTES:
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
+void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits) {
+   ae_assert(isfinite(epsf), "NLEQSetCond: EpsF is not finite number!");
+   ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!");
+   ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!");
+   if (epsf == 0.0 && maxits == 0) {
+      epsf = 1.0E-6;
+   }
+   state->epsf = epsf;
+   state->maxits = maxits;
+}
+
+// This function turns on/off reporting.
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     NeedXRep-   whether iteration reports are needed or not
+//
+// If NeedXRep is True, algorithm will call rep() callback function if  it is
+// provided to NLEQSolve().
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetxrep(const nleqstate &state, const bool needxrep);
+void nleqsetxrep(nleqstate *state, bool needxrep) {
+   state->xrep = needxrep;
+}
+
+// This function sets maximum step length
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
+//                 want to limit step length.
+//
+// Use this subroutine when target function  contains  exp()  or  other  fast
+// growing functions, and algorithm makes  too  large  steps  which  lead  to
+// overflow. This function allows us to reject steps that are too large  (and
+// therefore expose us to the possible overflow) without actually calculating
+// function value at the x+stp*d.
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetstpmax(const nleqstate &state, const double stpmax);
+void nleqsetstpmax(nleqstate *state, double stpmax) {
+   ae_assert(isfinite(stpmax), "NLEQSetStpMax: StpMax is not finite!");
+   ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!");
+   state->stpmax = stpmax;
+}
+
+// This  subroutine  restarts  CG  algorithm from new point. All optimization
+// parameters are left unchanged.
+//
+// This  function  allows  to  solve multiple  optimization  problems  (which
+// must have same number of dimensions) without object reallocation penalty.
+//
+// Inputs:
+//     State   -   structure used for reverse communication previously
+//                 allocated with MinCGCreate call.
+//     X       -   new starting point.
+//     BndL    -   new lower bounds
+//     BndU    -   new upper bounds
+// ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
+// API: void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
+void nleqrestartfrom(nleqstate *state, RVector *x) {
+   ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!");
+   ae_assert(isfinitevector(x, state->n), "NLEQRestartFrom: X contains infinite or NaN values!");
+   ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
+   state->PQ = -1;
+}
+
 // LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
 // This algorithm solves a system of nonlinear equations
 //     F[0](x[0], ..., x[N-1])   = 0
@@ -5444,67 +5526,6 @@ void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state) {
    ae_vector_set_length(&state->rightpart, n);
    ae_vector_set_length(&state->candstep, n);
    nleqrestartfrom(state, x);
-}
-
-// This function sets stopping conditions for the nonlinear solver
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     EpsF    - >= 0
-//                 The subroutine finishes  its work if on k+1-th iteration
-//                 the condition ||F|| <= EpsF is satisfied
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
-//                 iterations is unlimited.
-//
-// Passing EpsF=0 and MaxIts=0 simultaneously will lead to  automatic
-// stopping criterion selection (small EpsF).
-//
-// NOTES:
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
-void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits) {
-   ae_assert(isfinite(epsf), "NLEQSetCond: EpsF is not finite number!");
-   ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!");
-   ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!");
-   if (epsf == 0.0 && maxits == 0) {
-      epsf = 1.0E-6;
-   }
-   state->epsf = epsf;
-   state->maxits = maxits;
-}
-
-// This function turns on/off reporting.
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     NeedXRep-   whether iteration reports are needed or not
-//
-// If NeedXRep is True, algorithm will call rep() callback function if  it is
-// provided to NLEQSolve().
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetxrep(const nleqstate &state, const bool needxrep);
-void nleqsetxrep(nleqstate *state, bool needxrep) {
-   state->xrep = needxrep;
-}
-
-// This function sets maximum step length
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
-//                 want to limit step length.
-//
-// Use this subroutine when target function  contains  exp()  or  other  fast
-// growing functions, and algorithm makes  too  large  steps  which  lead  to
-// overflow. This function allows us to reject steps that are too large  (and
-// therefore expose us to the possible overflow) without actually calculating
-// function value at the x+stp*d.
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetstpmax(const nleqstate &state, const double stpmax);
-void nleqsetstpmax(nleqstate *state, double stpmax) {
-   ae_assert(isfinite(stpmax), "NLEQSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!");
-   state->stpmax = stpmax;
 }
 
 // Increases lambda, returns False when there is a danger of overflow
@@ -5704,6 +5725,25 @@ Pause:
 
 // NLEQ solver results
 //
+// Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
+// to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
+// intended to be used in the inner cycles of performance critical algorithms
+// where array reallocation penalty is too large to be ignored.
+// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
+// API: void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
+void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep) {
+   if (x->cnt < state->n) {
+      ae_vector_set_length(x, state->n);
+   }
+   ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
+   rep->iterationscount = state->repiterationscount;
+   rep->nfunc = state->repnfunc;
+   rep->njac = state->repnjac;
+   rep->terminationtype = state->repterminationtype;
+}
+
+// NLEQ solver results
+//
 // Inputs:
 //     State   -   algorithm state.
 //
@@ -5728,46 +5768,6 @@ void nleqresults(nleqstate *state, RVector *x, nleqreport *rep) {
    SetVector(x);
    SetObj(nleqreport, rep);
    nleqresultsbuf(state, x, rep);
-}
-
-// NLEQ solver results
-//
-// Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
-// to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
-// intended to be used in the inner cycles of performance critical algorithms
-// where array reallocation penalty is too large to be ignored.
-// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
-// API: void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
-   ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
-   rep->iterationscount = state->repiterationscount;
-   rep->nfunc = state->repnfunc;
-   rep->njac = state->repnjac;
-   rep->terminationtype = state->repterminationtype;
-}
-
-// This  subroutine  restarts  CG  algorithm from new point. All optimization
-// parameters are left unchanged.
-//
-// This  function  allows  to  solve multiple  optimization  problems  (which
-// must have same number of dimensions) without object reallocation penalty.
-//
-// Inputs:
-//     State   -   structure used for reverse communication previously
-//                 allocated with MinCGCreate call.
-//     X       -   new starting point.
-//     BndL    -   new lower bounds
-//     BndU    -   new upper bounds
-// ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
-void nleqrestartfrom(nleqstate *state, RVector *x) {
-   ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!");
-   ae_assert(isfinitevector(x, state->n), "NLEQRestartFrom: X contains infinite or NaN values!");
-   ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
-   state->PQ = -1;
 }
 
 void nleqstate_init(void *_p, bool make_automatic) {
@@ -5841,22 +5841,6 @@ namespace alglib {
 DefClass(nleqstate, DecVal(needf) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(j) DecVar(x))
 DefClass(nleqreport, DecVal(iterationscount) DecVal(nfunc) DecVal(njac) DecVal(terminationtype))
 
-void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state) {
-   ae_int_t n = x.length();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
-   alglib_impl::ae_state_clear();
-}
-#endif
-
 void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -5877,6 +5861,29 @@ void nleqsetstpmax(const nleqstate &state, const double stpmax) {
    alglib_impl::nleqsetstpmax(ConstT(nleqstate, state), stpmax);
    alglib_impl::ae_state_clear();
 }
+
+void nleqrestartfrom(const nleqstate &state, const real_1d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqrestartfrom(ConstT(nleqstate, state), ConstT(ae_vector, x));
+   alglib_impl::ae_state_clear();
+}
+
+void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state) {
+   ae_int_t n = x.length();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
+   alglib_impl::ae_state_clear();
+}
+#endif
 
 bool nleqiteration(const nleqstate &state) {
    alglib_impl::ae_state_init();
@@ -5914,13 +5921,6 @@ void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &fu
    alglib_impl::ae_state_clear();
 }
 
-void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqresults(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
-   alglib_impl::ae_state_clear();
-}
-
 void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -5928,10 +5928,10 @@ void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
    alglib_impl::ae_state_clear();
 }
 
-void nleqrestartfrom(const nleqstate &state, const real_1d_array &x) {
+void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::nleqrestartfrom(ConstT(nleqstate, state), ConstT(ae_vector, x));
+   alglib_impl::nleqresults(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib

@@ -53,16 +53,16 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n);
 // === CONV Package ===
 // Depends on: FFT
 namespace alglib_impl {
+void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r);
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
 void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
 void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c);
 void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
+void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r);
 void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
 void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
 void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c);
 void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
-void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r);
-void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r);
 } // end of namespace alglib_impl
 
 namespace alglib {

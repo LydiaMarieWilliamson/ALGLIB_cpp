@@ -1048,6 +1048,8 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Simplified the ‟class” declaration macros, removing EndD and AndD.
 	Normalized the typecasts ― removing redundant typecasts, and normalized the layout of the others.
 	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
+	Toplogical re-sorting of routines to match the sorting for version 3.18.0.
+	Made inverfr{0,1,2}() static local in SpecialFunctions.cpp.
 </pre>
 </p>
 <p>
@@ -1192,6 +1194,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 39	4673 1.0x 7519 1.1x 8406 1.0x 7228 1.0x 1638957669 (61b08265) 74 // Minor fixes in Ap.{cpp,h} to better match 3.18.0.
 39	5465 0.9x 7875 1.0x 8406 0.9x 7258 1.0x 1639362698 (61b6b08a) 82 // Minor fixes in TestX.cpp.
 39	5319 1.0x 7813 1.0x 8133 1.0x 7428 1.0x 1639430716 (61b7ba3c) 79 // Removing the CPU initialization from Ap.{cpp,h}.
+39	5000 1.0x 6494 1.2x 8003 1.0x 6826 1.0x 1641872436 (61dcfc34) 82 // Re-sorting of routines to better match 3.18.0.
 </pre>
 </p>
 </div>

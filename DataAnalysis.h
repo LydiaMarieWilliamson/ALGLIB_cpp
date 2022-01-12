@@ -124,8 +124,10 @@ void mlpalloc(ae_serializer *s, multilayerperceptron *network);
 void mlpserialize(ae_serializer *s, multilayerperceptron *network);
 void mlpunserialize(ae_serializer *s, multilayerperceptron *network);
 
-ae_int_t mlpgradsplitcost();
-ae_int_t mlpgradsplitsize();
+void mlpproperties(multilayerperceptron *network, ae_int_t *nin, ae_int_t *nout, ae_int_t *wcount);
+bool mlpissoftmax(multilayerperceptron *network);
+void mlprandomize(multilayerperceptron *network);
+void mlprandomizefull(multilayerperceptron *network);
 void mlpcreate0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network);
 void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron *network);
 void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, multilayerperceptron *network);
@@ -138,26 +140,26 @@ void mlpcreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
 void mlpcreatec0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network);
 void mlpcreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron *network);
 void mlpcreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, multilayerperceptron *network);
-void mlpcopy(multilayerperceptron *network1, multilayerperceptron *network2);
-void mlpcopyshared(multilayerperceptron *network1, multilayerperceptron *network2);
-bool mlpsamearchitecture(multilayerperceptron *network1, multilayerperceptron *network2);
-void mlpcopytunableparameters(multilayerperceptron *network1, multilayerperceptron *network2);
-void mlpexporttunableparameters(multilayerperceptron *network, RVector *p, ae_int_t *pcount);
-void mlpimporttunableparameters(multilayerperceptron *network, RVector *p);
-void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen);
-void mlpunserializeold(RVector *ra, multilayerperceptron *network);
-void mlprandomize(multilayerperceptron *network);
-void mlprandomizefull(multilayerperceptron *network);
-void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize);
-void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize);
-void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize);
-void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize);
-void mlpproperties(multilayerperceptron *network, ae_int_t *nin, ae_int_t *nout, ae_int_t *wcount);
+void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double *d2f);
+void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *columnmeans, RVector *columnsigmas, RVector *neurons, RVector *dfdnet, RVector *x, RVector *y);
+void mlpprocess(multilayerperceptron *network, RVector *x, RVector *y);
+void mlpprocessi(multilayerperceptron *network, RVector *x, RVector *y);
+ae_int_t mlpgradsplitcost();
+ae_int_t mlpgradsplitsize();
 ae_int_t mlpntotal(multilayerperceptron *network);
+void mlpgrad(multilayerperceptron *network, RVector *x, RVector *desiredy, double *e, RVector *grad);
+void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, double *e, RVector *grad);
+void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, ae_shared_pool *gradbuf);
+void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad);
+void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize, double *e, RVector *grad);
+void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad);
+void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad);
+void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad);
+void mlphessiannbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h);
+void mlphessianbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h);
 ae_int_t mlpgetinputscount(multilayerperceptron *network);
 ae_int_t mlpgetoutputscount(multilayerperceptron *network);
 ae_int_t mlpgetweightscount(multilayerperceptron *network);
-bool mlpissoftmax(multilayerperceptron *network);
 ae_int_t mlpgetlayerscount(multilayerperceptron *network);
 ae_int_t mlpgetlayersize(multilayerperceptron *network, ae_int_t k);
 void mlpgetinputscaling(multilayerperceptron *network, ae_int_t i, double *mean, double *sigma);
@@ -168,9 +170,19 @@ void mlpsetinputscaling(multilayerperceptron *network, ae_int_t i, double mean, 
 void mlpsetoutputscaling(multilayerperceptron *network, ae_int_t i, double mean, double sigma);
 void mlpsetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_int_t fkind, double threshold);
 void mlpsetweight(multilayerperceptron *network, ae_int_t k0, ae_int_t i0, ae_int_t k1, ae_int_t i1, double w);
-void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double *d2f);
-void mlpprocess(multilayerperceptron *network, RVector *x, RVector *y);
-void mlpprocessi(multilayerperceptron *network, RVector *x, RVector *y);
+void mlpcopyshared(multilayerperceptron *network1, multilayerperceptron *network2);
+void mlpcopy(multilayerperceptron *network1, multilayerperceptron *network2);
+bool mlpsamearchitecture(multilayerperceptron *network1, multilayerperceptron *network2);
+void mlpcopytunableparameters(multilayerperceptron *network1, multilayerperceptron *network2);
+void mlpexporttunableparameters(multilayerperceptron *network, RVector *p, ae_int_t *pcount);
+void mlpimporttunableparameters(multilayerperceptron *network, RVector *p);
+void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen);
+void mlpunserializeold(RVector *ra, multilayerperceptron *network);
+void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize);
+void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize);
+void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize);
+void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize);
+void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep);
 double mlperror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints);
 double mlperrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t npoints);
 double mlperrorn(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize);
@@ -185,22 +197,10 @@ double mlpavgerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints)
 double mlpavgerrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t npoints);
 double mlpavgrelerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints);
 double mlpavgrelerrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t npoints);
-void mlpgrad(multilayerperceptron *network, RVector *x, RVector *desiredy, double *e, RVector *grad);
-void mlpgradn(multilayerperceptron *network, RVector *x, RVector *desiredy, double *e, RVector *grad);
-void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad);
-void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize, double *e, RVector *grad);
-void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad);
-void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize, double *e, RVector *grad);
-void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, ae_shared_pool *gradbuf);
-void mlpgradnbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad);
-void mlphessiannbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h);
-void mlphessianbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h);
-void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *columnmeans, RVector *columnsigmas, RVector *neurons, RVector *dfdnet, RVector *x, RVector *y);
 void mlpallerrorssubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, modelerrors *rep);
 void mlpallerrorssparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize, modelerrors *rep);
 double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize);
 double mlperrorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *subset, ae_int_t subsetsize);
-void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix *sparsexy, ae_int_t datasetsize, ae_int_t datasettype, ZVector *idx, ae_int_t subset0, ae_int_t subset1, ae_int_t subsettype, ae_shared_pool *buf, modelerrors *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -211,6 +211,10 @@ void mlpserialize(multilayerperceptron &obj, std::ostream &s_out);
 void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
 void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj);
 
+void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount);
+bool mlpissoftmax(const multilayerperceptron &network);
+void mlprandomize(const multilayerperceptron &network);
+void mlprandomizefull(const multilayerperceptron &network);
 void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
@@ -223,16 +227,21 @@ void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2,
 void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
-void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2);
-void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2);
-void mlprandomize(const multilayerperceptron &network);
-void mlprandomizefull(const multilayerperceptron &network);
-void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
-void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount);
+void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f);
+void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
+void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
+void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
+void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
+void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
+void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
+void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
+void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
 ae_int_t mlpgetinputscount(const multilayerperceptron &network);
 ae_int_t mlpgetoutputscount(const multilayerperceptron &network);
 ae_int_t mlpgetweightscount(const multilayerperceptron &network);
-bool mlpissoftmax(const multilayerperceptron &network);
 ae_int_t mlpgetlayerscount(const multilayerperceptron &network);
 ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k);
 void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
@@ -243,9 +252,9 @@ void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, c
 void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma);
 void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, const ae_int_t fkind, const double threshold);
 void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const double w);
-void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f);
-void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
-void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
+void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2);
+void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2);
+void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
 double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
@@ -260,15 +269,6 @@ double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy,
 double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
-void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
-void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
-void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
-void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
-void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
-void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
-void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
-void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
-void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
 void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
 void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
 double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
@@ -293,6 +293,7 @@ void mlpealloc(ae_serializer *s, mlpensemble *ensemble);
 void mlpeserialize(ae_serializer *s, mlpensemble *ensemble);
 void mlpeunserialize(ae_serializer *s, mlpensemble *ensemble);
 
+void mlpecreatefromnetwork(multilayerperceptron *network, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecreate0(ae_int_t nin, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
@@ -305,7 +306,6 @@ void mlpecreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, d
 void mlpecreatec0(ae_int_t nin, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ensemblesize, mlpensemble *ensemble);
-void mlpecreatefromnetwork(multilayerperceptron *network, ae_int_t ensemblesize, mlpensemble *ensemble);
 void mlpecopy(mlpensemble *ensemble1, mlpensemble *ensemble2);
 void mlperandomize(mlpensemble *ensemble);
 void mlpeproperties(mlpensemble *ensemble, ae_int_t *nin, ae_int_t *nout);
@@ -328,6 +328,7 @@ void mlpeserialize(mlpensemble &obj, std::ostream &s_out);
 void mlpeunserialize(const std::string &s_in, mlpensemble &obj);
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj);
 
+void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
@@ -340,7 +341,6 @@ void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2
 void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
-void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble);
 void mlperandomize(const mlpensemble &ensemble);
 void mlpeproperties(const mlpensemble &ensemble, ae_int_t &nin, ae_int_t &nout);
 bool mlpeissoftmax(const mlpensemble &ensemble);
@@ -419,6 +419,9 @@ void kmeansreport_init(void *_p, bool make_automatic);
 void kmeansreport_copy(void *_dst, void *_src, bool make_automatic);
 void kmeansreport_free(void *_p, bool make_automatic);
 
+void kmeansinitbuf(kmeansbuffers *buf);
+void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool);
+void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t initalgo, ae_int_t seed, ae_int_t maxits, ae_int_t restarts, bool kmeansdbgnoits, ae_int_t *info, ae_int_t *iterationscount, RMatrix *ccol, bool needccol, RMatrix *crow, bool needcrow, ZVector *xyc, double *energy, kmeansbuffers *buf);
 void clusterizercreate(clusterizerstate *s);
 void clusterizersetpoints(clusterizerstate *s, RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype);
 void clusterizersetdistances(clusterizerstate *s, RMatrix *d, ae_int_t npoints, bool isupper);
@@ -426,16 +429,13 @@ void clusterizersetahcalgo(clusterizerstate *s, ae_int_t algo);
 void clusterizersetkmeanslimits(clusterizerstate *s, ae_int_t restarts, ae_int_t maxits);
 void clusterizersetkmeansinit(clusterizerstate *s, ae_int_t initalgo);
 void clusterizersetseed(clusterizerstate *s, ae_int_t seed);
+void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d);
+void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d);
 void clusterizerrunahc(clusterizerstate *s, ahcreport *rep);
 void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep);
-void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d);
-void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d);
 void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector *cz);
 void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *cidx, ZVector *cz);
 void clusterizerseparatedbycorr(ahcreport *rep, double r, ae_int_t *k, ZVector *cidx, ZVector *cz);
-void kmeansinitbuf(kmeansbuffers *buf);
-void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, ae_int_t initalgo, ae_int_t seed, ae_int_t maxits, ae_int_t restarts, bool kmeansdbgnoits, ae_int_t *info, ae_int_t *iterationscount, RMatrix *ccol, bool needccol, RMatrix *crow, bool needcrow, ZVector *xyc, double *energy, kmeansbuffers *buf);
-void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -452,9 +452,9 @@ void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo);
 void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits);
 void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo);
 void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed);
+void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d);
 void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep);
 void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep);
-void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d);
 void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz);
 void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
 void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
@@ -583,6 +583,9 @@ struct decisionforest {
 void decisionforest_init(void *_p, bool make_automatic);
 void decisionforest_copy(void *_dst, void *_src, bool make_automatic);
 void decisionforest_free(void *_p, bool make_automatic);
+void dfalloc(ae_serializer *s, decisionforest *forest);
+void dfserialize(ae_serializer *s, decisionforest *forest);
+void dfunserialize(ae_serializer *s, decisionforest *forest);
 
 struct dfreport {
    double relclserror;
@@ -619,13 +622,8 @@ struct dfinternalbuffers {
 void dfinternalbuffers_init(void *_p, bool make_automatic);
 void dfinternalbuffers_copy(void *_dst, void *_src, bool make_automatic);
 void dfinternalbuffers_free(void *_p, bool make_automatic);
-void dfalloc(ae_serializer *s, decisionforest *forest);
-void dfserialize(ae_serializer *s, decisionforest *forest);
-void dfunserialize(ae_serializer *s, decisionforest *forest);
 
 void dfcreatebuffer(decisionforest *model, decisionforestbuffer *buf);
-void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, double r, ae_int_t *info, decisionforest *df, dfreport *rep);
-void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t nrndvars, double r, ae_int_t *info, decisionforest *df, dfreport *rep);
 void dfbuildercreate(decisionforestbuilder *s);
 void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses);
 void dfbuildersetrndvars(decisionforestbuilder *s, ae_int_t rndvars);
@@ -656,6 +654,8 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints);
 double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints);
 void dfcopy(decisionforest *df1, decisionforest *df2);
 void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t samplesize, ae_int_t nfeatures, ae_int_t flags, ae_int_t *info, decisionforest *df, dfreport *rep);
+void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, double r, ae_int_t *info, decisionforest *df, dfreport *rep);
+void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t ntrees, ae_int_t nrndvars, double r, ae_int_t *info, decisionforest *df, dfreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -669,8 +669,6 @@ void dfunserialize(const std::string &s_in, decisionforest &obj);
 void dfunserialize(const std::istream &s_in, decisionforest &obj);
 
 void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf);
-void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
-void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
 void dfbuildercreate(decisionforestbuilder &s);
 void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
 void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars);
@@ -698,6 +696,8 @@ double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t
 double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
+void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
 } // end of namespace alglib
 
 // === LINREG Package ===
@@ -727,16 +727,16 @@ void lrreport_init(void *_p, bool make_automatic);
 void lrreport_copy(void *_dst, void *_src, bool make_automatic);
 void lrreport_free(void *_p, bool make_automatic);
 
-void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
+double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
+double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
 void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
 void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
 void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
 void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars);
 void lrpack(RVector *v, ae_int_t nvars, linearmodel *lm);
 double lrprocess(linearmodel *lm, RVector *x);
-double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
-double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
-double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
 void lrcopy(linearmodel *lm1, linearmodel *lm2);
 void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, double *b, double *vara, double *varb, double *covab, double *corrab, double *p);
 void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b);
@@ -746,16 +746,16 @@ namespace alglib {
 DecClass(linearmodel, );
 DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
 
-void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
 void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
 double lrprocess(const linearmodel &lm, const real_1d_array &x);
-double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
 
 // === FILTERS Package ===
@@ -883,13 +883,13 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
 // === LDA Package ===
 // Depends on: (LinAlg) EVD, MATINV
 namespace alglib_impl {
-void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w);
 void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w);
+void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w);
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
 void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
+void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
 } // end of namespace alglib
 
 // === MCPD Package ===
@@ -1028,35 +1028,35 @@ void mnlreport_init(void *_p, bool make_automatic);
 void mnlreport_copy(void *_dst, void *_src, bool make_automatic);
 void mnlreport_free(void *_p, bool make_automatic);
 
-void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep);
 void mnlprocess(logitmodel *lm, RVector *x, RVector *y);
 void mnlprocessi(logitmodel *lm, RVector *x, RVector *y);
+void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep);
 void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses);
 void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm);
 void mnlcopy(logitmodel *lm1, logitmodel *lm2);
 double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
 double mnlrelclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
 double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
 double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
 double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize);
-ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(logitmodel, );
 DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
 
-void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
 void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
 void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
+void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
 void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses);
 void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm);
 double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize);
-ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
 
 // === KNN Package ===
@@ -1122,19 +1122,19 @@ void knnbuildercreate(knnbuilder *s);
 void knnbuildersetdatasetreg(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nout);
 void knnbuildersetdatasetcls(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses);
 void knnbuildersetnorm(knnbuilder *s, ae_int_t nrmtype);
+void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep);
 void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *model, knnreport *rep);
 void knnrewritekeps(knnmodel *model, ae_int_t k, double eps);
+void knntsprocess(knnmodel *model, knnbuffer *buf, RVector *x, RVector *y);
 void knnprocess(knnmodel *model, RVector *x, RVector *y);
 double knnprocess0(knnmodel *model, RVector *x);
 ae_int_t knnclassify(knnmodel *model, RVector *x);
 void knnprocessi(knnmodel *model, RVector *x, RVector *y);
-void knntsprocess(knnmodel *model, knnbuffer *buf, RVector *x, RVector *y);
 double knnrelclserror(knnmodel *model, RMatrix *xy, ae_int_t npoints);
 double knnavgce(knnmodel *model, RMatrix *xy, ae_int_t npoints);
 double knnrmserror(knnmodel *model, RMatrix *xy, ae_int_t npoints);
 double knnavgerror(knnmodel *model, RMatrix *xy, ae_int_t npoints);
 double knnavgrelerror(knnmodel *model, RMatrix *xy, ae_int_t npoints);
-void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1152,19 +1152,19 @@ void knnbuildercreate(knnbuilder &s);
 void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout);
 void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
 void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype);
+void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
 void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep);
 void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps);
+void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y);
 void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
 double knnprocess0(const knnmodel &model, const real_1d_array &x);
 ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x);
 void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
-void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y);
 double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
-void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
 } // end of namespace alglib
 
 // === MLPTRAIN Package ===
@@ -1273,13 +1273,13 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
 void mlpkfoldcvlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
 void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
 void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, ae_int_t foldscount, mlpreport *rep);
-void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s);
-void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s);
 void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints);
 void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints);
 void mlpsetdecay(mlptrainer *s, double decay);
 void mlpsetcond(mlptrainer *s, double wstep, ae_int_t maxits);
 void mlpsetalgobatch(mlptrainer *s);
+void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s);
+void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s);
 void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, mlpreport *rep);
 void mlpstarttraining(mlptrainer *s, multilayerperceptron *network, bool randomstart);
 bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network);
@@ -1300,13 +1300,13 @@ void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy,
 void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
 void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
 void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
-void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
-void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
 void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints);
 void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints);
 void mlpsetdecay(const mlptrainer &s, const double decay);
 void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
 void mlpsetalgobatch(const mlptrainer &s);
+void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
+void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
 void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
 void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart);
 bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network);

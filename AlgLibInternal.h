@@ -115,11 +115,11 @@ void copybooleanarray(BVector *src, BVector *dst);
 void copyintegerarray(ZVector *src, ZVector *dst);
 void copyrealarray(RVector *src, RVector *dst);
 void copyrealmatrix(RMatrix *src, RMatrix *dst);
+ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize);
 ae_int_t tiledsplit(ae_int_t tasksize, ae_int_t tilesize);
 ae_int_t splitlength(ae_int_t tasksize, ae_int_t chunksize);
 ae_int_t splitlengtheven(ae_int_t tasksize);
 ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector *b);
-ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize);
 double sparselevel2density();
 ae_int_t matrixtilesizea();
 ae_int_t matrixtilesizeb();
@@ -144,29 +144,29 @@ void rmulv(ae_int_t n, double v, RVector *x);
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx);
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
 double rmaxabsv(ae_int_t n, RVector *x);
+void bsetv(ae_int_t n, bool v, BVector *x);
+void isetv(ae_int_t n, ae_int_t v, ZVector *x);
 void rsetv(ae_int_t n, double v, RVector *x);
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
-void isetv(ae_int_t n, ae_int_t v, ZVector *x);
-void bsetv(ae_int_t n, bool v, BVector *x);
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a);
+void bsetallocv(ae_int_t n, bool v, BVector *x);
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *x);
 void rsetallocv(ae_int_t n, double v, RVector *x);
 void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a);
-void rallocv(ae_int_t n, RVector *x);
 void ballocv(ae_int_t n, BVector *x);
+void rallocv(ae_int_t n, RVector *x);
 void rallocm(ae_int_t m, ae_int_t n, RMatrix *a);
-void isetallocv(ae_int_t n, ae_int_t v, ZVector *x);
-void bsetallocv(ae_int_t n, bool v, BVector *x);
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i);
 void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j);
-void rcopyv(ae_int_t n, RVector *x, RVector *y);
 void bcopyv(ae_int_t n, BVector *x, BVector *y);
+void icopyv(ae_int_t n, ZVector *x, ZVector *y);
+void rcopyv(ae_int_t n, RVector *x, RVector *y);
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy);
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy);
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y);
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y);
 void rcopyallocv(ae_int_t n, RVector *x, RVector *y);
 void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y);
-void icopyallocv(ae_int_t n, ZVector *x, ZVector *y);
-void bcopyallocv(ae_int_t n, BVector *x, BVector *y);
-void icopyv(ae_int_t n, ZVector *x, ZVector *y);
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy);
 void igrowv(ae_int_t newn, ZVector *x);
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y);
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx);
@@ -308,8 +308,8 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf);
 
 // === TRLINSOLVE Package ===
 namespace alglib_impl {
-void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit);
 void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm);
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit);
 } // end of namespace alglib_impl
 
 // === SAFESOLVE Package ===
@@ -410,13 +410,13 @@ void fasttransformplan_init(void *_p, bool make_automatic);
 void fasttransformplan_copy(void *_dst, void *_src, bool make_automatic);
 void fasttransformplan_free(void *_p, bool make_automatic);
 
-void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
-void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa = 0, ae_int_t repcnt = 1);
+double ftbasegetflopestimate(ae_int_t n);
 void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2);
 bool ftbaseissmooth(ae_int_t n);
 ae_int_t ftbasefindsmooth(ae_int_t n);
 ae_int_t ftbasefindsmootheven(ae_int_t n);
-double ftbasegetflopestimate(ae_int_t n);
+void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa = 0, ae_int_t repcnt = 1);
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
 } // end of namespace alglib_impl
 
 // === HPCCORES Package ===

@@ -524,518 +524,6 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n) {
 namespace alglib_impl {
 // 1-dimensional complex convolution.
 //
-// For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
-// choose between three implementations: straightforward O(M*N)  formula  for
-// very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
-// significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
-// general FFT-based formula for cases where two previois algorithms are  too
-// slow.
-//
-// Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
-//
-// Inputs:
-//     A   -   array[0..M-1] - complex function to be transformed
-//     M   -   problem size
-//     B   -   array[0..N-1] - complex function to be transformed
-//     N   -   problem size
-//
-// Outputs:
-//     R   -   convolution: A*B. array[0..N+M-2].
-//
-// NOTE:
-//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
-// functions have non-zero values at negative T's, you  can  still  use  this
-// subroutine - just shift its result correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
-void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
-   SetVector(r);
-   ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer that B.
-   if (m < n) {
-      convc1d(b, n, a, m, r);
-      return;
-   }
-   convc1dx(a, m, b, n, false, -1, 0, r);
-}
-
-// 1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
-//
-// Algorithm has M*log(M)) complexity for any M (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-//     M   -   convolved signal length
-//     B   -   array[0..N-1] - response
-//     N   -   response length, N <= M
-//
-// Outputs:
-//     R   -   deconvolved signal. array[0..M-N].
-//
-// NOTE:
-//     deconvolution is unstable process and may result in division  by  zero
-// (if your response function is degenerate, i.e. has zero Fourier coefficient).
-//
-// NOTE:
-//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
-// functions have non-zero values at negative T's, you  can  still  use  this
-// subroutine - just shift its result correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
-void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t p;
-   complex c1;
-   complex c2;
-   complex c3;
-   double t;
-   ae_frame_make(&_frame_block);
-   SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0 && n <= m, "ConvC1DInv: incorrect N or M!");
-   p = ftbasefindsmooth(m);
-   ftcomplexfftplan(p, 1, &plan);
-   ae_vector_set_length(&buf, 2 * p);
-   for (i = 0; i < m; i++) {
-      buf.xR[2 * i] = a->xC[i].x;
-      buf.xR[2 * i + 1] = a->xC[i].y;
-   }
-   for (i = m; i < p; i++) {
-      buf.xR[2 * i] = 0.0;
-      buf.xR[2 * i + 1] = 0.0;
-   }
-   ae_vector_set_length(&buf2, 2 * p);
-   for (i = 0; i < n; i++) {
-      buf2.xR[2 * i] = b->xC[i].x;
-      buf2.xR[2 * i + 1] = b->xC[i].y;
-   }
-   for (i = n; i < p; i++) {
-      buf2.xR[2 * i] = 0.0;
-      buf2.xR[2 * i + 1] = 0.0;
-   }
-   ftapplyplan(&plan, &buf);
-   ftapplyplan(&plan, &buf2);
-   for (i = 0; i < p; i++) {
-      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
-      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
-      c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i] = c3.x;
-      buf.xR[2 * i + 1] = -c3.y;
-   }
-   ftapplyplan(&plan, &buf);
-   t = 1.0 / p;
-   ae_vector_set_length(r, m - n + 1);
-   for (i = 0; i <= m - n; i++) {
-      r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
-   }
-   ae_frame_leave();
-}
-
-// 1-dimensional circular complex convolution.
-//
-// For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
-// complexity for any M/N.
-//
-// IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
-// conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
-// signal,  periodic function, and another - R - is a response,  non-periodic
-// function with limited length.
-//
-// Inputs:
-//     S   -   array[0..M-1] - complex periodic signal
-//     M   -   problem size
-//     B   -   array[0..N-1] - complex non-periodic response
-//     N   -   problem size
-//
-// Outputs:
-//     R   -   convolution: A*B. array[0..M-1].
-//
-// NOTE:
-//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
-// negative T's, you can still use this subroutine - just  shift  its  result
-// correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c);
-void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c) {
-   ae_frame _frame_block;
-   ae_int_t i1;
-   ae_int_t i2;
-   ae_int_t j2;
-   ae_frame_make(&_frame_block);
-   SetVector(c);
-   NewVector(buf, 0, DT_COMPLEX);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
-   if (m < n) {
-      ae_vector_set_length(&buf, m);
-      for (i1 = 0; i1 < m; i1++) {
-         buf.xC[i1] = ae_complex_from_i(0);
-      }
-      i1 = 0;
-      while (i1 < n) {
-         i2 = imin2(i1 + m - 1, n - 1);
-         j2 = i2 - i1;
-         ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
-         i1 += m;
-      }
-      convc1dcircular(s, m, &buf, m, c);
-      ae_frame_leave();
-      return;
-   }
-   convc1dx(s, m, r, n, true, -1, 0, c);
-   ae_frame_leave();
-}
-
-// 1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
-//
-// Algorithm has M*log(M)) complexity for any M (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
-//     M   -   convolved signal length
-//     B   -   array[0..N-1] - non-periodic response
-//     N   -   response length
-//
-// Outputs:
-//     R   -   deconvolved signal. array[0..M-1].
-//
-// NOTE:
-//     deconvolution is unstable process and may result in division  by  zero
-// (if your response function is degenerate, i.e. has zero Fourier coefficient).
-//
-// NOTE:
-//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
-// negative T's, you can still use this subroutine - just  shift  its  result
-// correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
-void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t i1;
-   ae_int_t i2;
-   ae_int_t j2;
-   complex c1;
-   complex c2;
-   complex c3;
-   double t;
-   ae_frame_make(&_frame_block);
-   SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(cbuf, 0, DT_COMPLEX);
-   NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
-   if (m < n) {
-      ae_vector_set_length(&cbuf, m);
-      for (i = 0; i < m; i++) {
-         cbuf.xC[i] = ae_complex_from_i(0);
-      }
-      i1 = 0;
-      while (i1 < n) {
-         i2 = imin2(i1 + m - 1, n - 1);
-         j2 = i2 - i1;
-         ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
-         i1 += m;
-      }
-      convc1dcircularinv(a, m, &cbuf, m, r);
-      ae_frame_leave();
-      return;
-   }
-// Task is normalized
-   ftcomplexfftplan(m, 1, &plan);
-   ae_vector_set_length(&buf, 2 * m);
-   for (i = 0; i < m; i++) {
-      buf.xR[2 * i] = a->xC[i].x;
-      buf.xR[2 * i + 1] = a->xC[i].y;
-   }
-   ae_vector_set_length(&buf2, 2 * m);
-   for (i = 0; i < n; i++) {
-      buf2.xR[2 * i] = b->xC[i].x;
-      buf2.xR[2 * i + 1] = b->xC[i].y;
-   }
-   for (i = n; i < m; i++) {
-      buf2.xR[2 * i] = 0.0;
-      buf2.xR[2 * i + 1] = 0.0;
-   }
-   ftapplyplan(&plan, &buf);
-   ftapplyplan(&plan, &buf2);
-   for (i = 0; i < m; i++) {
-      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
-      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
-      c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i] = c3.x;
-      buf.xR[2 * i + 1] = -c3.y;
-   }
-   ftapplyplan(&plan, &buf);
-   t = 1.0 / m;
-   ae_vector_set_length(r, m);
-   for (i = 0; i < m; i++) {
-      r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
-   }
-   ae_frame_leave();
-}
-
-// 1-dimensional real convolution.
-//
-// Analogous to ConvC1D(), see ConvC1D() comments for more details.
-//
-// Inputs:
-//     A   -   array[0..M-1] - real function to be transformed
-//     M   -   problem size
-//     B   -   array[0..N-1] - real function to be transformed
-//     N   -   problem size
-//
-// Outputs:
-//     R   -   convolution: A*B. array[0..N+M-2].
-//
-// NOTE:
-//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
-// functions have non-zero values at negative T's, you  can  still  use  this
-// subroutine - just shift its result correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
-void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
-   SetVector(r);
-   ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer that B.
-   if (m < n) {
-      convr1d(b, n, a, m, r);
-      return;
-   }
-   convr1dx(a, m, b, n, false, -1, 0, r);
-}
-
-// 1-dimensional real deconvolution (inverse of ConvC1D()).
-//
-// Algorithm has M*log(M)) complexity for any M (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-//     M   -   convolved signal length
-//     B   -   array[0..N-1] - response
-//     N   -   response length, N <= M
-//
-// Outputs:
-//     R   -   deconvolved signal. array[0..M-N].
-//
-// NOTE:
-//     deconvolution is unstable process and may result in division  by  zero
-// (if your response function is degenerate, i.e. has zero Fourier coefficient).
-//
-// NOTE:
-//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
-// functions have non-zero values at negative T's, you  can  still  use  this
-// subroutine - just shift its result correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
-void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t p;
-   complex c1;
-   complex c2;
-   complex c3;
-   ae_frame_make(&_frame_block);
-   SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(buf3, 0, DT_REAL);
-   NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0 && n <= m, "ConvR1DInv: incorrect N or M!");
-   p = ftbasefindsmootheven(m);
-   ae_vector_set_length(&buf, p);
-   ae_v_move(buf.xR, 1, a->xR, 1, m);
-   for (i = m; i < p; i++) {
-      buf.xR[i] = 0.0;
-   }
-   ae_vector_set_length(&buf2, p);
-   ae_v_move(buf2.xR, 1, b->xR, 1, n);
-   for (i = n; i < p; i++) {
-      buf2.xR[i] = 0.0;
-   }
-   ae_vector_set_length(&buf3, p);
-   ftcomplexfftplan(p / 2, 1, &plan);
-   fftr1dinternaleven(&buf, p, &buf3, &plan);
-   fftr1dinternaleven(&buf2, p, &buf3, &plan);
-   buf.xR[0] /= buf2.xR[0];
-   buf.xR[1] /= buf2.xR[1];
-   for (i = 1; i < p / 2; i++) {
-      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
-      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
-      c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i] = c3.x;
-      buf.xR[2 * i + 1] = c3.y;
-   }
-   fftr1dinvinternaleven(&buf, p, &buf3, &plan);
-   ae_vector_set_length(r, m - n + 1);
-   ae_v_move(r->xR, 1, buf.xR, 1, m - n + 1);
-   ae_frame_leave();
-}
-
-// 1-dimensional circular real convolution.
-//
-// Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
-//
-// Inputs:
-//     S   -   array[0..M-1] - real signal
-//     M   -   problem size
-//     B   -   array[0..N-1] - real response
-//     N   -   problem size
-//
-// Outputs:
-//     R   -   convolution: A*B. array[0..M-1].
-//
-// NOTE:
-//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
-// negative T's, you can still use this subroutine - just  shift  its  result
-// correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c);
-void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c) {
-   ae_frame _frame_block;
-   ae_int_t i1;
-   ae_int_t i2;
-   ae_int_t j2;
-   ae_frame_make(&_frame_block);
-   SetVector(c);
-   NewVector(buf, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
-   if (m < n) {
-      ae_vector_set_length(&buf, m);
-      for (i1 = 0; i1 < m; i1++) {
-         buf.xR[i1] = 0.0;
-      }
-      i1 = 0;
-      while (i1 < n) {
-         i2 = imin2(i1 + m - 1, n - 1);
-         j2 = i2 - i1;
-         ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
-         i1 += m;
-      }
-      convr1dcircular(s, m, &buf, m, c);
-      ae_frame_leave();
-      return;
-   }
-// reduce to usual convolution
-   convr1dx(s, m, r, n, true, -1, 0, c);
-   ae_frame_leave();
-}
-
-// 1-dimensional complex deconvolution (inverse of ConvC1D()).
-//
-// Algorithm has M*log(M)) complexity for any M (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-//     M   -   convolved signal length
-//     B   -   array[0..N-1] - response
-//     N   -   response length
-//
-// Outputs:
-//     R   -   deconvolved signal. array[0..M-N].
-//
-// NOTE:
-//     deconvolution is unstable process and may result in division  by  zero
-// (if your response function is degenerate, i.e. has zero Fourier coefficient).
-//
-// NOTE:
-//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
-// negative T's, you can still use this subroutine - just  shift  its  result
-// correspondingly.
-// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
-void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t i1;
-   ae_int_t i2;
-   ae_int_t j2;
-   complex c1;
-   complex c2;
-   complex c3;
-   ae_frame_make(&_frame_block);
-   SetVector(r);
-   NewVector(buf, 0, DT_REAL);
-   NewVector(buf2, 0, DT_REAL);
-   NewVector(buf3, 0, DT_REAL);
-   NewVector(cbuf, 0, DT_COMPLEX);
-   NewVector(cbuf2, 0, DT_COMPLEX);
-   NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!");
-// normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
-   if (m < n) {
-      ae_vector_set_length(&buf, m);
-      for (i = 0; i < m; i++) {
-         buf.xR[i] = 0.0;
-      }
-      i1 = 0;
-      while (i1 < n) {
-         i2 = imin2(i1 + m - 1, n - 1);
-         j2 = i2 - i1;
-         ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
-         i1 += m;
-      }
-      convr1dcircularinv(a, m, &buf, m, r);
-      ae_frame_leave();
-      return;
-   }
-// Task is normalized
-   if (m % 2 == 0) {
-   // size is even, use fast even-size FFT
-      ae_vector_set_length(&buf, m);
-      ae_v_move(buf.xR, 1, a->xR, 1, m);
-      ae_vector_set_length(&buf2, m);
-      ae_v_move(buf2.xR, 1, b->xR, 1, n);
-      for (i = n; i < m; i++) {
-         buf2.xR[i] = 0.0;
-      }
-      ae_vector_set_length(&buf3, m);
-      ftcomplexfftplan(m / 2, 1, &plan);
-      fftr1dinternaleven(&buf, m, &buf3, &plan);
-      fftr1dinternaleven(&buf2, m, &buf3, &plan);
-      buf.xR[0] /= buf2.xR[0];
-      buf.xR[1] /= buf2.xR[1];
-      for (i = 1; i < m / 2; i++) {
-         c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
-         c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
-         c3 = ae_c_div(c1, c2);
-         buf.xR[2 * i] = c3.x;
-         buf.xR[2 * i + 1] = c3.y;
-      }
-      fftr1dinvinternaleven(&buf, m, &buf3, &plan);
-      ae_vector_set_length(r, m);
-      ae_v_move(r->xR, 1, buf.xR, 1, m);
-   } else {
-   // odd-size, use general real FFT
-      fftr1d(a, m, &cbuf);
-      ae_vector_set_length(&buf2, m);
-      ae_v_move(buf2.xR, 1, b->xR, 1, n);
-      for (i = n; i < m; i++) {
-         buf2.xR[i] = 0.0;
-      }
-      fftr1d(&buf2, m, &cbuf2);
-      for (i = 0; i <= FloorZ((double)m / 2.0); i++) {
-         cbuf.xC[i] = ae_c_div(cbuf.xC[i], cbuf2.xC[i]);
-      }
-      fftr1dinv(&cbuf, m, r);
-   }
-   ae_frame_leave();
-}
-
-// 1-dimensional complex convolution.
-//
 // Extended subroutine which allows to choose convolution algorithm.
 // Intended for internal use, ALGLIB users should call ConvC1D()/ConvC1DCircular().
 //
@@ -1368,6 +856,267 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    ae_frame_leave();
 }
 
+// 1-dimensional complex convolution.
+//
+// For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
+// choose between three implementations: straightforward O(M*N)  formula  for
+// very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
+// significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
+// general FFT-based formula for cases where two previois algorithms are  too
+// slow.
+//
+// Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
+//
+// Inputs:
+//     A   -   array[0..M-1] - complex function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// Outputs:
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
+void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
+   SetVector(r);
+   ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer that B.
+   if (m < n) {
+      convc1d(b, n, a, m, r);
+      return;
+   }
+   convc1dx(a, m, b, n, false, -1, 0, r);
+}
+
+// 1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// Inputs:
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N <= M
+//
+// Outputs:
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
+void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t p;
+   complex c1;
+   complex c2;
+   complex c3;
+   double t;
+   ae_frame_make(&_frame_block);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL);
+   NewVector(buf2, 0, DT_REAL);
+   NewObj(fasttransformplan, plan);
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvC1DInv: incorrect N or M!");
+   p = ftbasefindsmooth(m);
+   ftcomplexfftplan(p, 1, &plan);
+   ae_vector_set_length(&buf, 2 * p);
+   for (i = 0; i < m; i++) {
+      buf.xR[2 * i] = a->xC[i].x;
+      buf.xR[2 * i + 1] = a->xC[i].y;
+   }
+   for (i = m; i < p; i++) {
+      buf.xR[2 * i] = 0.0;
+      buf.xR[2 * i + 1] = 0.0;
+   }
+   ae_vector_set_length(&buf2, 2 * p);
+   for (i = 0; i < n; i++) {
+      buf2.xR[2 * i] = b->xC[i].x;
+      buf2.xR[2 * i + 1] = b->xC[i].y;
+   }
+   for (i = n; i < p; i++) {
+      buf2.xR[2 * i] = 0.0;
+      buf2.xR[2 * i + 1] = 0.0;
+   }
+   ftapplyplan(&plan, &buf);
+   ftapplyplan(&plan, &buf2);
+   for (i = 0; i < p; i++) {
+      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
+      c3 = ae_c_div(c1, c2);
+      buf.xR[2 * i] = c3.x;
+      buf.xR[2 * i + 1] = -c3.y;
+   }
+   ftapplyplan(&plan, &buf);
+   t = 1.0 / p;
+   ae_vector_set_length(r, m - n + 1);
+   for (i = 0; i <= m - n; i++) {
+      r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
+   }
+   ae_frame_leave();
+}
+
+// 1-dimensional circular complex convolution.
+//
+// For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
+// complexity for any M/N.
+//
+// IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
+// conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
+// signal,  periodic function, and another - R - is a response,  non-periodic
+// function with limited length.
+//
+// Inputs:
+//     S   -   array[0..M-1] - complex periodic signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex non-periodic response
+//     N   -   problem size
+//
+// Outputs:
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c);
+void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c) {
+   ae_frame _frame_block;
+   ae_int_t i1;
+   ae_int_t i2;
+   ae_int_t j2;
+   ae_frame_make(&_frame_block);
+   SetVector(c);
+   NewVector(buf, 0, DT_COMPLEX);
+   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer (at least - not shorter) that B.
+   if (m < n) {
+      ae_vector_set_length(&buf, m);
+      for (i1 = 0; i1 < m; i1++) {
+         buf.xC[i1] = ae_complex_from_i(0);
+      }
+      i1 = 0;
+      while (i1 < n) {
+         i2 = imin2(i1 + m - 1, n - 1);
+         j2 = i2 - i1;
+         ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
+         i1 += m;
+      }
+      convc1dcircular(s, m, &buf, m, c);
+      ae_frame_leave();
+      return;
+   }
+   convc1dx(s, m, r, n, true, -1, 0, c);
+   ae_frame_leave();
+}
+
+// 1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// Inputs:
+//     A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - non-periodic response
+//     N   -   response length
+//
+// Outputs:
+//     R   -   deconvolved signal. array[0..M-1].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
+void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t i1;
+   ae_int_t i2;
+   ae_int_t j2;
+   complex c1;
+   complex c2;
+   complex c3;
+   double t;
+   ae_frame_make(&_frame_block);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL);
+   NewVector(buf2, 0, DT_REAL);
+   NewVector(cbuf, 0, DT_COMPLEX);
+   NewObj(fasttransformplan, plan);
+   ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer (at least - not shorter) that B.
+   if (m < n) {
+      ae_vector_set_length(&cbuf, m);
+      for (i = 0; i < m; i++) {
+         cbuf.xC[i] = ae_complex_from_i(0);
+      }
+      i1 = 0;
+      while (i1 < n) {
+         i2 = imin2(i1 + m - 1, n - 1);
+         j2 = i2 - i1;
+         ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
+         i1 += m;
+      }
+      convc1dcircularinv(a, m, &cbuf, m, r);
+      ae_frame_leave();
+      return;
+   }
+// Task is normalized
+   ftcomplexfftplan(m, 1, &plan);
+   ae_vector_set_length(&buf, 2 * m);
+   for (i = 0; i < m; i++) {
+      buf.xR[2 * i] = a->xC[i].x;
+      buf.xR[2 * i + 1] = a->xC[i].y;
+   }
+   ae_vector_set_length(&buf2, 2 * m);
+   for (i = 0; i < n; i++) {
+      buf2.xR[2 * i] = b->xC[i].x;
+      buf2.xR[2 * i + 1] = b->xC[i].y;
+   }
+   for (i = n; i < m; i++) {
+      buf2.xR[2 * i] = 0.0;
+      buf2.xR[2 * i + 1] = 0.0;
+   }
+   ftapplyplan(&plan, &buf);
+   ftapplyplan(&plan, &buf2);
+   for (i = 0; i < m; i++) {
+      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
+      c3 = ae_c_div(c1, c2);
+      buf.xR[2 * i] = c3.x;
+      buf.xR[2 * i + 1] = -c3.y;
+   }
+   ftapplyplan(&plan, &buf);
+   t = 1.0 / m;
+   ae_vector_set_length(r, m);
+   for (i = 0; i < m; i++) {
+      r->xC[i] = ae_complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
+   }
+   ae_frame_leave();
+}
+
 // 1-dimensional real convolution.
 //
 // Extended subroutine which allows to choose convolution algorithm.
@@ -1673,6 +1422,257 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       ae_frame_leave();
       return;
+   }
+   ae_frame_leave();
+}
+
+// 1-dimensional real convolution.
+//
+// Analogous to ConvC1D(), see ConvC1D() comments for more details.
+//
+// Inputs:
+//     A   -   array[0..M-1] - real function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// Outputs:
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
+void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
+   SetVector(r);
+   ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer that B.
+   if (m < n) {
+      convr1d(b, n, a, m, r);
+      return;
+   }
+   convr1dx(a, m, b, n, false, -1, 0, r);
+}
+
+// 1-dimensional real deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// Inputs:
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N <= M
+//
+// Outputs:
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
+void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t p;
+   complex c1;
+   complex c2;
+   complex c3;
+   ae_frame_make(&_frame_block);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL);
+   NewVector(buf2, 0, DT_REAL);
+   NewVector(buf3, 0, DT_REAL);
+   NewObj(fasttransformplan, plan);
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvR1DInv: incorrect N or M!");
+   p = ftbasefindsmootheven(m);
+   ae_vector_set_length(&buf, p);
+   ae_v_move(buf.xR, 1, a->xR, 1, m);
+   for (i = m; i < p; i++) {
+      buf.xR[i] = 0.0;
+   }
+   ae_vector_set_length(&buf2, p);
+   ae_v_move(buf2.xR, 1, b->xR, 1, n);
+   for (i = n; i < p; i++) {
+      buf2.xR[i] = 0.0;
+   }
+   ae_vector_set_length(&buf3, p);
+   ftcomplexfftplan(p / 2, 1, &plan);
+   fftr1dinternaleven(&buf, p, &buf3, &plan);
+   fftr1dinternaleven(&buf2, p, &buf3, &plan);
+   buf.xR[0] /= buf2.xR[0];
+   buf.xR[1] /= buf2.xR[1];
+   for (i = 1; i < p / 2; i++) {
+      c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
+      c3 = ae_c_div(c1, c2);
+      buf.xR[2 * i] = c3.x;
+      buf.xR[2 * i + 1] = c3.y;
+   }
+   fftr1dinvinternaleven(&buf, p, &buf3, &plan);
+   ae_vector_set_length(r, m - n + 1);
+   ae_v_move(r->xR, 1, buf.xR, 1, m - n + 1);
+   ae_frame_leave();
+}
+
+// 1-dimensional circular real convolution.
+//
+// Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
+//
+// Inputs:
+//     S   -   array[0..M-1] - real signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - real response
+//     N   -   problem size
+//
+// Outputs:
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c);
+void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c) {
+   ae_frame _frame_block;
+   ae_int_t i1;
+   ae_int_t i2;
+   ae_int_t j2;
+   ae_frame_make(&_frame_block);
+   SetVector(c);
+   NewVector(buf, 0, DT_REAL);
+   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer (at least - not shorter) that B.
+   if (m < n) {
+      ae_vector_set_length(&buf, m);
+      for (i1 = 0; i1 < m; i1++) {
+         buf.xR[i1] = 0.0;
+      }
+      i1 = 0;
+      while (i1 < n) {
+         i2 = imin2(i1 + m - 1, n - 1);
+         j2 = i2 - i1;
+         ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
+         i1 += m;
+      }
+      convr1dcircular(s, m, &buf, m, c);
+      ae_frame_leave();
+      return;
+   }
+// reduce to usual convolution
+   convr1dx(s, m, r, n, true, -1, 0, c);
+   ae_frame_leave();
+}
+
+// 1-dimensional complex deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// Inputs:
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length
+//
+// Outputs:
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+// ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
+// API: void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
+void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t i1;
+   ae_int_t i2;
+   ae_int_t j2;
+   complex c1;
+   complex c2;
+   complex c3;
+   ae_frame_make(&_frame_block);
+   SetVector(r);
+   NewVector(buf, 0, DT_REAL);
+   NewVector(buf2, 0, DT_REAL);
+   NewVector(buf3, 0, DT_REAL);
+   NewVector(cbuf, 0, DT_COMPLEX);
+   NewVector(cbuf2, 0, DT_COMPLEX);
+   NewObj(fasttransformplan, plan);
+   ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!");
+// normalize task: make M >= N,
+// so A will be longer (at least - not shorter) that B.
+   if (m < n) {
+      ae_vector_set_length(&buf, m);
+      for (i = 0; i < m; i++) {
+         buf.xR[i] = 0.0;
+      }
+      i1 = 0;
+      while (i1 < n) {
+         i2 = imin2(i1 + m - 1, n - 1);
+         j2 = i2 - i1;
+         ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
+         i1 += m;
+      }
+      convr1dcircularinv(a, m, &buf, m, r);
+      ae_frame_leave();
+      return;
+   }
+// Task is normalized
+   if (m % 2 == 0) {
+   // size is even, use fast even-size FFT
+      ae_vector_set_length(&buf, m);
+      ae_v_move(buf.xR, 1, a->xR, 1, m);
+      ae_vector_set_length(&buf2, m);
+      ae_v_move(buf2.xR, 1, b->xR, 1, n);
+      for (i = n; i < m; i++) {
+         buf2.xR[i] = 0.0;
+      }
+      ae_vector_set_length(&buf3, m);
+      ftcomplexfftplan(m / 2, 1, &plan);
+      fftr1dinternaleven(&buf, m, &buf3, &plan);
+      fftr1dinternaleven(&buf2, m, &buf3, &plan);
+      buf.xR[0] /= buf2.xR[0];
+      buf.xR[1] /= buf2.xR[1];
+      for (i = 1; i < m / 2; i++) {
+         c1 = ae_complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+         c2 = ae_complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
+         c3 = ae_c_div(c1, c2);
+         buf.xR[2 * i] = c3.x;
+         buf.xR[2 * i + 1] = c3.y;
+      }
+      fftr1dinvinternaleven(&buf, m, &buf3, &plan);
+      ae_vector_set_length(r, m);
+      ae_v_move(r->xR, 1, buf.xR, 1, m);
+   } else {
+   // odd-size, use general real FFT
+      fftr1d(a, m, &cbuf);
+      ae_vector_set_length(&buf2, m);
+      ae_v_move(buf2.xR, 1, b->xR, 1, n);
+      for (i = n; i < m; i++) {
+         buf2.xR[i] = 0.0;
+      }
+      fftr1d(&buf2, m, &cbuf2);
+      for (i = 0; i <= FloorZ((double)m / 2.0); i++) {
+         cbuf.xC[i] = ae_c_div(cbuf.xC[i], cbuf2.xC[i]);
+      }
+      fftr1dinv(&cbuf, m, r);
    }
    ae_frame_leave();
 }

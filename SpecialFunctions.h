@@ -32,9 +32,9 @@ double lngamma(const double x, double &sgngam);
 namespace alglib_impl {
 double errorfunction(double x);
 double errorfunctionc(double x);
+double normaldistribution(double x);
 double normalpdf(double x);
 double normalcdf(double x);
-double normaldistribution(double x);
 double invnormalcdf(double y0);
 double invnormaldistribution(double y0);
 double inverf(double e);
@@ -45,9 +45,9 @@ double bivariatenormalcdf(double x, double y, double rho);
 namespace alglib {
 double errorfunction(const double x);
 double errorfunctionc(const double x);
+double normaldistribution(const double x);
 double normalpdf(const double x);
 double normalcdf(const double x);
-double normaldistribution(const double x);
 double invnormalcdf(const double y0);
 double invnormaldistribution(const double y0);
 double inverf(const double e);

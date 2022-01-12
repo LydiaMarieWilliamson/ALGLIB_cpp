@@ -389,6 +389,12 @@ double errorfunctionc(double x) {
    else return x < 0.0 ? 2.0 : 0.0;
 }
 
+// Same as normalcdf(), obsolete name.
+// API: double normaldistribution(const double x);
+double normaldistribution(double x) {
+   return normalcdf(x);
+}
+
 // Normal distribution PDF
 //
 // Returns Gaussian probability density function:
@@ -441,13 +447,7 @@ double normalcdf(double x) {
    else return x < 0.0 ? 0.0 : +1.0;
 }
 
-// Same as normalcdf(), obsolete name.
-// API: double normaldistribution(const double x);
-double normaldistribution(double x) {
-   return normalcdf(x);
-}
-
-double inverfr0(double y) {
+static double inverfr0(double y) {
    const double s2pi = 2.50662827463100050242;
    double yy = y * y;
    const double p11 = -59.9633501014107895267, p09 = +98.0010754185999661536;
@@ -460,7 +460,7 @@ double inverfr0(double y) {
    return (y + p / q) * s2pi;
 }
 
-double inverfr1(double z) {
+static double inverfr1(double z) {
    const double p0 = +4.05544892305962419923, p1 = +31.5251094599893866154, p2 = +57.1628192246421288162;
    const double p3 = +44.0805073893200834700, p4 = +14.6849561928858024014, p5 = +2.18663306850790267539;
    const double p6 = -1.40256079171354495875 * 0.1, p7 = -3.50424626827848203418 * 0.01, p8 = -8.57456785154685413611 * 0.0001;
@@ -472,7 +472,7 @@ double inverfr1(double z) {
    return p / q;
 }
 
-double inverfr2(double z) {
+static double inverfr2(double z) {
    const double p0 = 3.23774891776946035970, p1 = 6.91522889068984211695, p2 = 3.93881025292474443415;
    const double p3 = 1.33303460815807542389, p4 = 2.01485389549179081538 * 0.1, p5 = 1.23716634817820021358 * 0.01;
    const double p6 = 3.01581553508235416007 * 0.0001, p7 = 2.65806974686737550832 * 0.000001, p8 = 6.23974539184983293730 * 0.000000001;
@@ -733,6 +733,14 @@ double errorfunctionc(const double x) {
    return D;
 }
 
+double normaldistribution(const double x) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::normaldistribution(x);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
 double normalpdf(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -745,14 +753,6 @@ double normalcdf(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
    double D = alglib_impl::normalcdf(x);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-double normaldistribution(const double x) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::normaldistribution(x);
    alglib_impl::ae_state_clear();
    return D;
 }
@@ -4705,6 +4705,24 @@ static void bessel_besselasympt0(double w, double *pzero, double *qzero) {
    *qzero = qp / qq;
 }
 
+static void bessel_besselasympt1(double w, double *pzero, double *qzero) {
+   double ww = w * w;
+   const double pp02 = -1611.616644324610116477412898, pp04 = -109824.0554345934672737413139, pp06 = -1523529.351181137383255105722;
+   const double pp08 = -6603373.248364939109255245434, pp10 = -9942246.505077641195658377899, pp12 = -4435757.816794127857114720794;
+   double pp = pp12 + ww * (pp10 + ww * (pp08 + ww * (pp06 + ww * (pp04 + ww * pp02))));
+   const double pq02 = -1455.009440190496182453565068, pq04 = -107263.8599110382011903063867, pq06 = -1511809.506634160881644546358;
+   const double pq08 = -6585339.479723087072826915069, pq10 = -9934124.389934585658967556309, pq12 = -4435757.816794127856828016962;
+   double pq = pq12 + ww * (pq10 + ww * (pq08 + ww * (pq06 + ww * (pq04 + ww * (pq02 + ww)))));
+   const double qp01 = 35.26513384663603218592175580, qp03 = 1706.375429020768002061283546, qp05 = 18494.26287322386679652009819;
+   const double qp07 = 66178.83658127083517939992166, qp09 = 85145.16067533570196555001171, qp11 = 33220.91340985722351859704442;
+   double qp = w * (qp11 + ww * (qp09 + ww * (qp07 + ww * (qp05 + ww * (qp03 + ww * qp01)))));
+   const double qq02 = 863.8367769604990967475517183, qq04 = 37890.22974577220264142952256, qq06 = 400294.4358226697511708610813;
+   const double qq08 = 1419460.669603720892855755253, qq10 = 1819458.042243997298924553839, qq12 = 708712.8194102874357377502472;
+   double qq = qq12 + ww * (qq10 + ww * (qq08 + ww * (qq06 + ww * (qq04 + ww * (qq02 + ww)))));
+   *pzero = pp / pq;
+   *qzero = qp / qq;
+}
+
 // Bessel function of order zero
 //
 // Returns Bessel function of order zero of the argument.
@@ -4751,24 +4769,6 @@ double besselj0(double x) {
    const double q04 = 30246356167094626.98627330784, q02 = 5428918384092285160.200195092, q00 = 493378725179413356211.3278438;
    double q1 = q00 + xsq * (q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq)))))));
    return p1 / q1;
-}
-
-static void bessel_besselasympt1(double w, double *pzero, double *qzero) {
-   double ww = w * w;
-   const double pp02 = -1611.616644324610116477412898, pp04 = -109824.0554345934672737413139, pp06 = -1523529.351181137383255105722;
-   const double pp08 = -6603373.248364939109255245434, pp10 = -9942246.505077641195658377899, pp12 = -4435757.816794127857114720794;
-   double pp = pp12 + ww * (pp10 + ww * (pp08 + ww * (pp06 + ww * (pp04 + ww * pp02))));
-   const double pq02 = -1455.009440190496182453565068, pq04 = -107263.8599110382011903063867, pq06 = -1511809.506634160881644546358;
-   const double pq08 = -6585339.479723087072826915069, pq10 = -9934124.389934585658967556309, pq12 = -4435757.816794127856828016962;
-   double pq = pq12 + ww * (pq10 + ww * (pq08 + ww * (pq06 + ww * (pq04 + ww * (pq02 + ww)))));
-   const double qp01 = 35.26513384663603218592175580, qp03 = 1706.375429020768002061283546, qp05 = 18494.26287322386679652009819;
-   const double qp07 = 66178.83658127083517939992166, qp09 = 85145.16067533570196555001171, qp11 = 33220.91340985722351859704442;
-   double qp = w * (qp11 + ww * (qp09 + ww * (qp07 + ww * (qp05 + ww * (qp03 + ww * qp01)))));
-   const double qq02 = 863.8367769604990967475517183, qq04 = 37890.22974577220264142952256, qq06 = 400294.4358226697511708610813;
-   const double qq08 = 1419460.669603720892855755253, qq10 = 1819458.042243997298924553839, qq12 = 708712.8194102874357377502472;
-   double qq = qq12 + ww * (qq10 + ww * (qq08 + ww * (qq06 + ww * (qq04 + ww * (qq02 + ww)))));
-   *pzero = pp / pq;
-   *qzero = qp / qq;
 }
 
 // Bessel function of order one

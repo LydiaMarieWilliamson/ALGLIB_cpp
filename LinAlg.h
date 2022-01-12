@@ -19,13 +19,15 @@
 // === ABLAS Package ===
 // Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
-ae_int_t ablassplitlength(RMatrix *a, ae_int_t n);
-ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n);
-ae_int_t gemmparallelsize();
 ae_int_t ablasblocksize(RMatrix *a);
 ae_int_t ablascomplexblocksize(CMatrix *a);
 ae_int_t ablasmicroblocksize();
+ae_int_t ablassplitlength(RMatrix *a, ae_int_t n);
+ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n);
+ae_int_t gemmparallelsize();
 void generatereflection(RVector *x, ae_int_t n, double *tau);
+void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv);
+void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
 void applyreflectionfromtheleft(RMatrix *c, double tau, RVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *work);
 void applyreflectionfromtheright(RMatrix *c, double tau, RVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *work);
 void rmatrixtranspose(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb);
@@ -35,15 +37,15 @@ void rvectorcopy(ae_int_t n, RVector *a, ae_int_t ia, RVector *b, ae_int_t ib);
 void rmatrixcopy(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb);
 void cmatrixcopy(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CMatrix *b, ae_int_t ib, ae_int_t jb);
 void rmatrixgencopy(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, double beta, RMatrix *b, ae_int_t ib, ae_int_t jb);
-void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv);
 void rmatrixrank1(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv);
 void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv);
-void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
 void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy);
 void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy);
 void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
 double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, RVector *tmp);
 void rmatrixtrsv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix);
+void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
+void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2);
 void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2);
 void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2);
@@ -51,12 +53,12 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
 void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 void cmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
-void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 void rowwisegramschmidt(RMatrix *q, ae_int_t m, ae_int_t n, RVector *x, RVector *qx, bool needqx);
 } // end of namespace alglib_impl
 
 namespace alglib {
+void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv);
+void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper);
@@ -64,15 +66,15 @@ void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, co
 void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
-void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv);
 void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv);
 void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv);
-void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, real_1d_array &y, const ae_int_t iy);
 void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy);
 void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp);
 void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix);
+void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc);
+void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
@@ -80,8 +82,6 @@ void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array 
 void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
-void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc);
-void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 } // end of namespace alglib
 
 // === ORTFAC Package ===
@@ -89,6 +89,7 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: ABLAS
 namespace alglib_impl {
+void rmatrixlqbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau);
 void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau);
@@ -101,12 +102,11 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q);
 void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l);
 void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l);
-void rmatrixlqbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau);
 void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup);
-void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int_t qcolumns, RMatrix *q);
 void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose);
-void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_int_t ptrows, RMatrix *pt);
+void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int_t qcolumns, RMatrix *q);
 void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose);
+void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_int_t ptrows, RMatrix *pt);
 void rmatrixbdunpackdiagonals(RMatrix *b, ae_int_t m, ae_int_t n, bool *isupper, RVector *d, RVector *e);
 void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau);
 void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q);
@@ -131,10 +131,10 @@ void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_
 void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l);
 void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l);
 void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup);
-void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
-void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt);
+void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
+void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt);
 void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e);
 void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau);
 void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q);
@@ -150,37 +150,37 @@ void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool is
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: ABLAS
 namespace alglib_impl {
-void rmatrixrndorthogonal(ae_int_t n, RMatrix *a);
-void rmatrixrndcond(ae_int_t n, double c, RMatrix *a);
-void cmatrixrndorthogonal(ae_int_t n, CMatrix *a);
-void cmatrixrndcond(ae_int_t n, double c, CMatrix *a);
-void smatrixrndcond(ae_int_t n, double c, RMatrix *a);
-void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a);
-void hmatrixrndcond(ae_int_t n, double c, CMatrix *a);
-void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a);
 void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n);
-void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n);
 void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n);
+void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n);
 void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n);
+void rmatrixrndorthogonal(ae_int_t n, RMatrix *a);
+void cmatrixrndorthogonal(ae_int_t n, CMatrix *a);
+void rmatrixrndcond(ae_int_t n, double c, RMatrix *a);
+void cmatrixrndcond(ae_int_t n, double c, CMatrix *a);
 void smatrixrndmultiply(RMatrix *a, ae_int_t n);
 void hmatrixrndmultiply(CMatrix *a, ae_int_t n);
+void smatrixrndcond(ae_int_t n, double c, RMatrix *a);
+void hmatrixrndcond(ae_int_t n, double c, CMatrix *a);
+void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a);
+void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a);
 } // end of namespace alglib_impl
 
 namespace alglib {
-void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a);
-void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
-void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a);
-void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
-void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
-void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
-void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
-void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n);
-void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
+void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
+void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a);
+void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a);
+void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
+void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void smatrixrndmultiply(real_2d_array &a, const ae_int_t n);
 void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
+void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
+void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
+void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
+void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 } // end of namespace alglib
 
 // === SPARSE Package ===
@@ -213,19 +213,22 @@ void sparsebuffers_init(void *_p, bool make_automatic);
 void sparsebuffers_copy(void *_dst, void *_src, bool make_automatic);
 void sparsebuffers_free(void *_p, bool make_automatic);
 
-void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s);
+void sparseinitduidx(sparsematrix *s);
 void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s);
-void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s);
+void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s);
 void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s);
-void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s);
+void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s);
 void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s);
-void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s);
+void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s);
 void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s);
-void sparsecopy(sparsematrix *s0, sparsematrix *s1);
+void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s);
 void sparsecopybuf(sparsematrix *s0, sparsematrix *s1);
+void sparsecopy(sparsematrix *s0, sparsematrix *s1);
 void sparseswap(sparsematrix *s0, sparsematrix *s1);
-void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
+bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
+void sparseresizematrix(sparsematrix *s);
 void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
+void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
 double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j);
 bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j);
 double sparsegetdiagonal(sparsematrix *s, ae_int_t i);
@@ -241,30 +244,27 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
 void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b);
 void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x, RVector *y);
 void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x);
-void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b);
 void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b);
-void sparseresizematrix(sparsematrix *s);
-void sparseinitduidx(sparsematrix *s);
+void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b);
 double sparsegetaveragelengthofchain(sparsematrix *s);
 bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, ae_int_t *j, double *v);
-bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
 void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow);
 void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVector *vals, ae_int_t *nzcnt);
 void sparsetransposesks(sparsematrix *s);
 void sparsetransposecrs(sparsematrix *s);
 void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1);
 void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1);
-void sparseconvertto(sparsematrix *s0, ae_int_t fmt);
-void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1);
 void sparseconverttohash(sparsematrix *s);
-void sparsecopytohash(sparsematrix *s0, sparsematrix *s1);
-void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1);
 void sparseconverttocrs(sparsematrix *s);
-void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1);
-void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1);
 void sparseconverttosks(sparsematrix *s);
-void sparsecopytosks(sparsematrix *s0, sparsematrix *s1);
+void sparseconvertto(sparsematrix *s0, ae_int_t fmt);
+void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1);
+void sparsecopytohash(sparsematrix *s0, sparsematrix *s1);
+void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1);
+void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1);
 void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1);
+void sparsecopytosks(sparsematrix *s0, sparsematrix *s1);
+void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1);
 void sparsecreatecrsinplace(sparsematrix *s);
 ae_int_t sparsegetmatrixtype(sparsematrix *s);
 bool sparseishash(sparsematrix *s);
@@ -281,21 +281,23 @@ namespace alglib {
 DecClass(sparsematrix, );
 DecClass(sparsebuffers, );
 
-void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s);
-void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s);
 void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s);
 void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s);
-void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s);
+void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s);
+void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s);
 void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s);
-void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s);
+void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s);
 void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s);
-void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s);
+void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s);
 void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s);
-void sparsecopy(const sparsematrix &s0, sparsematrix &s1);
+void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s);
 void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1);
+void sparsecopy(const sparsematrix &s0, sparsematrix &s1);
 void sparseswap(const sparsematrix &s0, const sparsematrix &s1);
-void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
+bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
+void sparseresizematrix(const sparsematrix &s);
 void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
+void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i);
@@ -311,28 +313,26 @@ void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, 
 void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y);
 void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x);
-void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b);
 void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b);
-void sparseresizematrix(const sparsematrix &s);
+void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b);
 bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v);
-bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow);
 void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt);
 void sparsetransposesks(const sparsematrix &s);
 void sparsetransposecrs(const sparsematrix &s);
 void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1);
-void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt);
-void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1);
 void sparseconverttohash(const sparsematrix &s);
-void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1);
-void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparseconverttocrs(const sparsematrix &s);
-void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1);
-void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparseconverttosks(const sparsematrix &s);
-void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1);
+void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt);
+void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1);
+void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1);
+void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1);
+void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1);
+void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1);
+void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1);
 ae_int_t sparsegetmatrixtype(const sparsematrix &s);
 bool sparseishash(const sparsematrix &s);
 bool sparseiscrs(const sparsematrix &s);
@@ -348,9 +348,9 @@ ae_int_t sparsegetlowercount(const sparsematrix &s);
 // Depends on: (AlgLibInternal) BLAS, ROTATIONS
 // Depends on: ABLAS
 namespace alglib_impl {
+void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info);
 void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info);
 bool upperhessenbergschurdecomposition(RMatrix *h, ae_int_t n, RMatrix *s);
-void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info);
 } // end of namespace alglib_impl
 
 // === EVD Package ===
@@ -403,11 +403,22 @@ void eigsubspacereport_init(void *_p, bool make_automatic);
 void eigsubspacereport_copy(void *_dst, void *_src, bool make_automatic);
 void eigsubspacereport_free(void *_p, bool make_automatic);
 
-void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state);
-void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state);
+bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr);
+bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z);
+bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double a, double b, ae_int_t *m, RMatrix *z);
+bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_t i1, ae_int_t i2, RMatrix *z);
+bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, RMatrix *z);
+bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z);
+bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, RMatrix *z);
+bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z);
+bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, RMatrix *z);
+bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z);
 void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits);
+void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state);
+void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state);
 void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart);
 void eigsubspaceoocstart(eigsubspacestate *state, ae_int_t mtype);
+bool eigsubspaceiteration(eigsubspacestate *state);
 bool eigsubspaceooccontinue(eigsubspacestate *state);
 void eigsubspaceoocgetrequestinfo(eigsubspacestate *state, ae_int_t *requesttype, ae_int_t *requestsize);
 void eigsubspaceoocgetrequestdata(eigsubspacestate *state, RMatrix *x);
@@ -415,26 +426,25 @@ void eigsubspaceoocsendresult(eigsubspacestate *state, RMatrix *ax);
 void eigsubspaceoocstop(eigsubspacestate *state, RVector *w, RMatrix *z, eigsubspacereport *rep);
 void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, RVector *w, RMatrix *z, eigsubspacereport *rep);
 void eigsubspacesolvesparses(eigsubspacestate *state, sparsematrix *a, bool isupper, RVector *w, RMatrix *z, eigsubspacereport *rep);
-bool eigsubspaceiteration(eigsubspacestate *state);
-bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, RMatrix *z);
-bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, RMatrix *z);
-bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, RMatrix *z);
-bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z);
-bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z);
-bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z);
-bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z);
-bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double a, double b, ae_int_t *m, RMatrix *z);
-bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_t i1, ae_int_t i2, RMatrix *z);
-bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(eigsubspacestate, );
 DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 
-void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state);
-void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state);
+bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr);
+bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z);
+bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z);
+bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z);
+bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z);
+bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
+bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z);
+bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
+bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z);
+bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
 void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits);
+void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state);
+void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state);
 void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart);
 void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype);
 bool eigsubspaceooccontinue(const eigsubspacestate &state);
@@ -444,16 +454,6 @@ void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array
 void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
-bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z);
-bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z);
-bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z);
-bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
-bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
-bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
-bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z);
-bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z);
-bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z);
-bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr);
 } // end of namespace alglib
 
 // === DLU Package ===
@@ -705,14 +705,19 @@ void sparsedecompositionanalysis_init(void *_p, bool make_automatic);
 void sparsedecompositionanalysis_copy(void *_dst, void *_src, bool make_automatic);
 void sparsedecompositionanalysis_free(void *_p, bool make_automatic);
 
+void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
+void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
+void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
+void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
+bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper);
 bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper);
-void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *u);
-void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *fix);
 void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVector *u, RVector *bufr);
+void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *u);
 void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector *fix, RVector *bufr);
+void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *fix);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q);
 bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper);
 bool sparsecholesky(sparsematrix *a, bool isupper);
@@ -721,11 +726,6 @@ bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_
 void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
 bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupper, sparsematrix *a, RVector *d, ZVector *p);
 void sparsecholeskyreload(sparsedecompositionanalysis *analysis, sparsematrix *a, bool isupper);
-void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
-void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
-void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
-void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
-bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -735,10 +735,10 @@ void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_
 void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper);
-void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u);
-void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix);
 void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr);
+void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u);
 void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr);
+void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix);
 bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q);
 bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper);
 bool sparsecholesky(const sparsematrix &a, const bool isupper);
@@ -905,9 +905,9 @@ void normestimatorstate_free(void *_p, bool make_automatic);
 void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits, normestimatorstate *state);
 void normestimatorsetseed(normestimatorstate *state, ae_int_t seedval);
 bool normestimatoriteration(normestimatorstate *state);
+void normestimatorrestart(normestimatorstate *state);
 void normestimatorestimatesparse(normestimatorstate *state, sparsematrix *a);
 void normestimatorresults(normestimatorstate *state, double *nrm);
-void normestimatorrestart(normestimatorstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -995,21 +995,21 @@ bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s);
 // === SPDGEVD Package ===
 // Depends on: EVD, MATINV
 namespace alglib_impl {
-bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr);
+bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z);
 } // end of namespace alglib_impl
 
 namespace alglib {
-bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr);
+bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 } // end of namespace alglib
 
 // === MATDET Package ===
 // Depends on: TRFAC
 namespace alglib_impl {
 double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n);
-double rmatrixdet(RMatrix *a, ae_int_t n);
 complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n);
+double rmatrixdet(RMatrix *a, ae_int_t n);
 complex cmatrixdet(CMatrix *a, ae_int_t n);
 double spdmatrixcholeskydet(RMatrix *a, ae_int_t n);
 double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper);
@@ -1018,10 +1018,10 @@ double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper);
 namespace alglib {
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots);
-double rmatrixdet(const real_2d_array &a, const ae_int_t n);
-double rmatrixdet(const real_2d_array &a);
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots);
+double rmatrixdet(const real_2d_array &a, const ae_int_t n);
+double rmatrixdet(const real_2d_array &a);
 complex cmatrixdet(const complex_2d_array &a, const ae_int_t n);
 complex cmatrixdet(const complex_2d_array &a);
 double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n);

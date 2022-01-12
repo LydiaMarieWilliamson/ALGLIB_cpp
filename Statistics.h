@@ -29,10 +29,12 @@ double samplekurtosis(RVector *x, ae_int_t n);
 void sampleadev(RVector *x, ae_int_t n, double *adev);
 void samplemedian(RVector *x, ae_int_t n, double *median);
 void samplepercentile(RVector *x, ae_int_t n, double p, double *v);
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
 double cov2(RVector *x, RVector *y, ae_int_t n);
 double pearsoncorr2(RVector *x, RVector *y, ae_int_t n);
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n);
 double spearmancorr2(RVector *x, RVector *y, ae_int_t n);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n);
 double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n);
 void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
 void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
@@ -40,8 +42,6 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
 void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
 void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
-void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
-void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -61,13 +61,17 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median);
 void samplemedian(const real_1d_array &x, double &median);
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v);
 void samplepercentile(const real_1d_array &x, const double p, double &v);
+void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+void rankdata(const real_2d_array &xy);
+void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+void rankdatacentered(const real_2d_array &xy);
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 double cov2(const real_1d_array &x, const real_1d_array &y);
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y);
-double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
+double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 void covm(const real_2d_array &x, real_2d_array &c);
@@ -81,10 +85,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
-void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-void rankdata(const real_2d_array &xy);
-void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-void rankdatacentered(const real_2d_array &xy);
 } // end of namespace alglib
 
 // === CORRELATIONTESTS Package ===

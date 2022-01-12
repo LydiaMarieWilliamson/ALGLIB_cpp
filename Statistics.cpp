@@ -389,6 +389,192 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    ae_frame_leave();
 }
 
+// Basecase code for RankData(), performs actual work on subset of data using
+// temporary buffer passed as parameter.
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Buf0    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//     Buf1    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
+   ae_int_t i;
+   ae_assert(i1 >= i0, "RankDataBasecase: internal error");
+   if (buf1->ra0.cnt < nfeatures) {
+      ae_vector_set_length(&buf1->ra0, nfeatures);
+   }
+   for (i = i0; i < i1; i++) {
+      ae_v_move(buf1->ra0.xR, 1, xy->xyR[i], 1, nfeatures);
+      rankx(&buf1->ra0, nfeatures, iscentered, buf0);
+      ae_v_move(xy->xyR[i], 1, buf1->ra0.xR, 1, nfeatures);
+   }
+}
+
+// Recurrent code for RankData(), splits problem into  subproblems  or  calls
+// basecase code (depending on problem complexity).
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Pool    -   shared pool which holds temporary buffers
+//                 (APBuffers structure)
+//     BasecaseCost-minimum cost of the problem which will be split
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
+   ae_frame _frame_block;
+   double problemcost;
+   ae_int_t im;
+   ae_frame_make(&_frame_block);
+   RefObj(apbuffers, buf0);
+   RefObj(apbuffers, buf1);
+   ae_assert(i1 >= i0, "RankDataRec: internal error");
+// Try to activate parallelism
+// Parallelism was tried if: i1 - i0 >= 4 && (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures) >= smpactivationlevel()
+// Recursively split problem, if it is too large
+   problemcost = (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures);
+   if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
+      im = (i1 + i0) / 2;
+      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
+      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
+      ae_frame_leave();
+      return;
+   }
+// Retrieve buffers from pool, call serial code, return buffers to pool
+   ae_shared_pool_retrieve(pool, &_buf0);
+   ae_shared_pool_retrieve(pool, &_buf1);
+   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
+   ae_shared_pool_recycle(pool, &_buf0);
+   ae_shared_pool_recycle(pool, &_buf1);
+   ae_frame_leave();
+}
+
+// This function replaces data in XY by their ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * ranking starts from 0, ends at NFeatures-1
+// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// Outputs:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+// API: void rankdata(const real_2d_array &xy);
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
+   ae_frame _frame_block;
+   ae_int_t basecasecost;
+   ae_frame_make(&_frame_block);
+   NewObj(apbuffers, buf0);
+   NewObj(apbuffers, buf1);
+   NewObj(ae_shared_pool, pool);
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
+// Basecase cost is a maximum cost of basecase problems.
+// Problems harded than that cost will be split.
+//
+// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+// which is proportional, but NOT equal to number of FLOPs required
+// to solve problem.
+//
+// Try to use serial code for basecase problems, no SMP functionality, no shared pools.
+   basecasecost = 10000;
+   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
+      ae_frame_leave();
+      return;
+   }
+// Parallel code
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost);
+   ae_frame_leave();
+}
+
+// This function replaces data in XY by their CENTERED ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * centered ranks are just usual ranks, but centered in such way  that  sum
+//   of within-row values is equal to 0.0.
+// * centering is performed by subtracting mean from each row, i.e. it changes
+//   mean value, but does NOT change higher moments
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// Outputs:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+// API: void rankdatacentered(const real_2d_array &xy);
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
+   ae_frame _frame_block;
+   ae_int_t basecasecost;
+   ae_frame_make(&_frame_block);
+   NewObj(apbuffers, buf0);
+   NewObj(apbuffers, buf1);
+   NewObj(ae_shared_pool, pool);
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
+// Basecase cost is a maximum cost of basecase problems.
+// Problems harded than that cost will be split.
+//
+// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+// which is proportional, but NOT equal to number of FLOPs required
+// to solve problem.
+//
+// Try to use serial code, no SMP functionality, no shared pools.
+   basecasecost = 10000;
+   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
+      ae_frame_leave();
+      return;
+   }
+// Parallel code
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost);
+   ae_frame_leave();
+}
+
 // 2-sample covariance
 //
 // Inputs:
@@ -548,15 +734,6 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    return result;
 }
 
-// Obsolete function, we recommend to use PearsonCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n) {
-   double result;
-   result = pearsoncorr2(x, y, n);
-   return result;
-}
-
 // Spearman's rank correlation coefficient
 //
 // Inputs:
@@ -594,6 +771,15 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
    rankx(y, n, false, &buf);
    result = pearsoncorr2(x, y, n);
    ae_frame_leave();
+   return result;
+}
+
+// Obsolete function, we recommend to use PearsonCorr2().
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n) {
+   double result;
+   result = pearsoncorr2(x, y, n);
    return result;
 }
 
@@ -1266,192 +1452,6 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    }
    ae_frame_leave();
 }
-
-// Basecase code for RankData(), performs actual work on subset of data using
-// temporary buffer passed as parameter.
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Buf0    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//     Buf1    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
-   ae_int_t i;
-   ae_assert(i1 >= i0, "RankDataBasecase: internal error");
-   if (buf1->ra0.cnt < nfeatures) {
-      ae_vector_set_length(&buf1->ra0, nfeatures);
-   }
-   for (i = i0; i < i1; i++) {
-      ae_v_move(buf1->ra0.xR, 1, xy->xyR[i], 1, nfeatures);
-      rankx(&buf1->ra0, nfeatures, iscentered, buf0);
-      ae_v_move(xy->xyR[i], 1, buf1->ra0.xR, 1, nfeatures);
-   }
-}
-
-// Recurrent code for RankData(), splits problem into  subproblems  or  calls
-// basecase code (depending on problem complexity).
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Pool    -   shared pool which holds temporary buffers
-//                 (APBuffers structure)
-//     BasecaseCost-minimum cost of the problem which will be split
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
-   ae_frame _frame_block;
-   double problemcost;
-   ae_int_t im;
-   ae_frame_make(&_frame_block);
-   RefObj(apbuffers, buf0);
-   RefObj(apbuffers, buf1);
-   ae_assert(i1 >= i0, "RankDataRec: internal error");
-// Try to activate parallelism
-// Parallelism was activated if: i1 - i0 >= 4 && (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures) >= smpactivationlevel()
-// Recursively split problem, if it is too large
-   problemcost = (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures);
-   if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
-      im = (i1 + i0) / 2;
-      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
-      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
-      ae_frame_leave();
-      return;
-   }
-// Retrieve buffers from pool, call serial code, return buffers to pool
-   ae_shared_pool_retrieve(pool, &_buf0);
-   ae_shared_pool_retrieve(pool, &_buf1);
-   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
-   ae_shared_pool_recycle(pool, &_buf0);
-   ae_shared_pool_recycle(pool, &_buf1);
-   ae_frame_leave();
-}
-
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdata(const real_2d_array &xy);
-void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
-   ae_frame _frame_block;
-   ae_int_t basecasecost;
-   ae_frame_make(&_frame_block);
-   NewObj(apbuffers, buf0);
-   NewObj(apbuffers, buf1);
-   NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints < 0");
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
-// Basecase cost is a maximum cost of basecase problems.
-// Problems harded than that cost will be split.
-//
-// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-// which is proportional, but NOT equal to number of FLOPs required
-// to solve problem.
-//
-// Try to use serial code for basecase problems, no SMP functionality, no shared pools.
-   basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
-      ae_frame_leave();
-      return;
-   }
-// Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost);
-   ae_frame_leave();
-}
-
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e. it changes
-//   mean value, but does NOT change higher moments
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdatacentered(const real_2d_array &xy);
-void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
-   ae_frame _frame_block;
-   ae_int_t basecasecost;
-   ae_frame_make(&_frame_block);
-   NewObj(apbuffers, buf0);
-   NewObj(apbuffers, buf1);
-   NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints < 0");
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
-// Basecase cost is a maximum cost of basecase problems.
-// Problems harded than that cost will be split.
-//
-// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-// which is proportional, but NOT equal to number of FLOPs required
-// to solve problem.
-//
-// Try to use serial code, no SMP functionality, no shared pools.
-   basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
-      ae_frame_leave();
-      return;
-   }
-// Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost);
-   ae_frame_leave();
-}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1591,6 +1591,40 @@ void samplepercentile(const real_1d_array &x, const double p, double &v) {
 }
 #endif
 
+void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void rankdata(const real_2d_array &xy) {
+   ae_int_t npoints = xy.rows();
+   ae_int_t nfeatures = xy.cols();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
+}
+#endif
+
+void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void rankdatacentered(const real_2d_array &xy) {
+   ae_int_t npoints = xy.rows();
+   ae_int_t nfeatures = xy.cols();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
+}
+#endif
+
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1629,14 +1663,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
 }
 #endif
 
-double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1655,6 +1681,14 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
    return D;
 }
 #endif
+
+double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
+   return D;
+}
 
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1768,40 +1802,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
-   alglib_impl::ae_state_clear();
-}
-#endif
-
-void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void rankdata(const real_2d_array &xy) {
-   ae_int_t npoints = xy.rows();
-   ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
-   alglib_impl::ae_state_clear();
-}
-#endif
-
-void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void rankdatacentered(const real_2d_array &xy) {
-   ae_int_t npoints = xy.rows();
-   ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
    alglib_impl::ae_state_clear();
 }
 #endif

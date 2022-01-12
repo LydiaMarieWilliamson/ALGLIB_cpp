@@ -57,16 +57,16 @@ void densesolverlsreport_init(void *_p, bool make_automatic);
 void densesolverlsreport_copy(void *_dst, void *_src, bool make_automatic);
 void densesolverlsreport_free(void *_p, bool make_automatic);
 
-void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
-void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info);
 void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x);
 void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info);
-void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
-void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info);
+void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info);
 void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
 void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info);
-void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info);
 void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
 void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x);
 void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info);
 void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
@@ -100,16 +100,16 @@ namespace alglib {
 DecClass(densesolverreport, double &r1; double &rinf;);
 DecClass(densesolverlsreport, double &r2; real_2d_array cx; ae_int_t &n; ae_int_t &k;);
 
-void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
-void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
-void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
-void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
+void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
+void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
-void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
+void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
+void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
+void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
@@ -232,12 +232,12 @@ void lincgsetprecunit(lincgstate *state);
 void lincgsetprecdiag(lincgstate *state);
 void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits);
 bool lincgiteration(lincgstate *state);
+void lincgrestart(lincgstate *state);
 void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector *b);
 void lincgresults(lincgstate *state, RVector *x, lincgreport *rep);
 void lincgsetrestartfreq(lincgstate *state, ae_int_t srf);
 void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq);
 void lincgsetxrep(lincgstate *state, bool needxrep);
-void lincgrestart(lincgstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -328,18 +328,18 @@ void linlsqrreport_init(void *_p, bool make_automatic);
 void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic);
 void linlsqrreport_free(void *_p, bool make_automatic);
 
-void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state);
 void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state);
+void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state);
 void linlsqrsetb(linlsqrstate *state, RVector *b);
 void linlsqrsetprecunit(linlsqrstate *state);
 void linlsqrsetprecdiag(linlsqrstate *state);
 void linlsqrsetlambdai(linlsqrstate *state, double lambdai);
 bool linlsqriteration(linlsqrstate *state);
+void linlsqrrestart(linlsqrstate *state);
 void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b);
 void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits);
 void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep);
 void linlsqrsetxrep(linlsqrstate *state, bool needxrep);
-void linlsqrrestart(linlsqrstate *state);
 ae_int_t linlsqrpeekiterationscount(linlsqrstate *s);
 void linlsqrrequesttermination(linlsqrstate *state);
 } // end of namespace alglib_impl
@@ -348,8 +348,8 @@ namespace alglib {
 DecClass(linlsqrstate, );
 DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
-void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
 void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
+void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
 void linlsqrsetprecunit(const linlsqrstate &state);
 void linlsqrsetprecdiag(const linlsqrstate &state);
 void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
@@ -405,30 +405,30 @@ void nleqreport_init(void *_p, bool make_automatic);
 void nleqreport_copy(void *_dst, void *_src, bool make_automatic);
 void nleqreport_free(void *_p, bool make_automatic);
 
-void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state);
 void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits);
 void nleqsetxrep(nleqstate *state, bool needxrep);
 void nleqsetstpmax(nleqstate *state, double stpmax);
-bool nleqiteration(nleqstate *state);
-void nleqresults(nleqstate *state, RVector *x, nleqreport *rep);
-void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep);
 void nleqrestartfrom(nleqstate *state, RVector *x);
+void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state);
+bool nleqiteration(nleqstate *state);
+void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep);
+void nleqresults(nleqstate *state, RVector *x, nleqreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
 
-void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
-void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
 void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
 void nleqsetxrep(const nleqstate &state, const bool needxrep);
 void nleqsetstpmax(const nleqstate &state, const double stpmax);
+void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
+void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
+void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
 bool nleqiteration(const nleqstate &state);
 void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
-void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
+void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 } // end of namespace alglib
 
 #endif // OnceOnly

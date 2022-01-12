@@ -823,143 +823,6 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    ae_frame_leave();
 }
 
-// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
-// quadrature with N points.
-//
-// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
-// used depending on machine precision and number of nodes.
-//
-// Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//
-// Outputs:
-//     Info        -   error code:
-//                     * -4    an  error   was   detected   when  calculating
-//                             weights/nodes.  N  is  too  large   to  obtain
-//                             weights/nodes  with  high   enough   accuracy.
-//                             Try  to   use   multiple   precision  version.
-//                     * -3    internal eigenproblem solver hasn't converged
-//                     * -1    incorrect N was passed
-//                     * +1    OK
-//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
-//                     ascending order.
-//     WKronrod    -   array[0..N-1] - Kronrod weights
-//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-//                     corresponding to extended Kronrod nodes).
-// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
-// API: void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
-   double eps;
-   *info = 0;
-   SetVector(x);
-   SetVector(wkronrod);
-   SetVector(wgauss);
-   if (machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
-      *info = 1;
-      gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
-   } else {
-      gkqlegendrecalc(n, info, x, wkronrod, wgauss);
-   }
-}
-
-// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
-// quadrature on [-1,1] with weight function
-//
-//     W(x)=power(1-x,Alpha)*power(1+x,Beta).
-//
-// Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//     Alpha       -   power-law coefficient, Alpha > -1
-//     Beta        -   power-law coefficient, Beta > -1
-//
-// Outputs:
-//     Info        -   error code:
-//                     * -5    no real and positive Gauss-Kronrod formula can
-//                             be created for such a weight function  with  a
-//                             given number of nodes.
-//                     * -4    an  error  was   detected   when   calculating
-//                             weights/nodes. Alpha or  Beta  are  too  close
-//                             to -1 to obtain weights/nodes with high enough
-//                             accuracy, or, may be, N is too large.  Try  to
-//                             use multiple precision version.
-//                     * -3    internal eigenproblem solver hasn't converged
-//                     * -1    incorrect N was passed
-//                     * +1    OK
-//                     * +2    OK, but quadrature rule have exterior  nodes,
-//                             x[0] < -1 or x[n-1] > +1
-//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
-//                     ascending order.
-//     WKronrod    -   array[0..N-1] - Kronrod weights
-//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-//                     corresponding to extended Kronrod nodes).
-// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
-// API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
-   ae_frame _frame_block;
-   ae_int_t clen;
-   double alpha2;
-   double beta2;
-   double apb;
-   double t;
-   ae_int_t i;
-   double s;
-   ae_frame_make(&_frame_block);
-   *info = 0;
-   SetVector(x);
-   SetVector(wkronrod);
-   SetVector(wgauss);
-   NewVector(a, 0, DT_REAL);
-   NewVector(b, 0, DT_REAL);
-   if (n % 2 != 1 || n < 3) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   if (alpha <= -1.0 || beta <= -1.0) {
-      *info = -1;
-      ae_frame_leave();
-      return;
-   }
-   clen = CeilZ((double)(3 * (n / 2)) / 2.0) + 1;
-   ae_vector_set_length(&a, clen);
-   ae_vector_set_length(&b, clen);
-   for (i = 0; i < clen; i++) {
-      a.xR[i] = 0.0;
-   }
-   apb = alpha + beta;
-   a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
-   if (t > log(maxrealnumber)) {
-      *info = -4;
-      ae_frame_leave();
-      return;
-   }
-   b.xR[0] = exp(t);
-   if (clen > 1) {
-      alpha2 = sqr(alpha);
-      beta2 = sqr(beta);
-      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
-      for (i = 2; i < clen; i++) {
-         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
-      }
-   }
-   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss);
-// test basic properties to detect errors
-   if (*info > 0) {
-      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
-         *info = 2;
-      }
-      for (i = 0; i < n - 1; i++) {
-         if (x->xR[i] >= x->xR[i + 1]) {
-            *info = -4;
-         }
-      }
-   }
-   ae_frame_leave();
-}
-
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
 //
 // Reduction to tridiagonal eigenproblem is used.
@@ -1395,6 +1258,143 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    }
    ae_frame_leave();
 }
+
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
+// quadrature with N points.
+//
+// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
+// used depending on machine precision and number of nodes.
+//
+// Inputs:
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
+//
+// Outputs:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
+// API: void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
+   double eps;
+   *info = 0;
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   if (machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
+      *info = 1;
+      gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
+   } else {
+      gkqlegendrecalc(n, info, x, wkronrod, wgauss);
+   }
+}
+
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
+// quadrature on [-1,1] with weight function
+//
+//     W(x)=power(1-x,Alpha)*power(1+x,Beta).
+//
+// Inputs:
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
+//     Alpha       -   power-law coefficient, Alpha > -1
+//     Beta        -   power-law coefficient, Beta > -1
+//
+// Outputs:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//                     * +2    OK, but quadrature rule have exterior  nodes,
+//                             x[0] < -1 or x[n-1] > +1
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
+// API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
+   ae_frame _frame_block;
+   ae_int_t clen;
+   double alpha2;
+   double beta2;
+   double apb;
+   double t;
+   ae_int_t i;
+   double s;
+   ae_frame_make(&_frame_block);
+   *info = 0;
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   NewVector(a, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
+   if (n % 2 != 1 || n < 3) {
+      *info = -1;
+      ae_frame_leave();
+      return;
+   }
+   if (alpha <= -1.0 || beta <= -1.0) {
+      *info = -1;
+      ae_frame_leave();
+      return;
+   }
+   clen = CeilZ((double)(3 * (n / 2)) / 2.0) + 1;
+   ae_vector_set_length(&a, clen);
+   ae_vector_set_length(&b, clen);
+   for (i = 0; i < clen; i++) {
+      a.xR[i] = 0.0;
+   }
+   apb = alpha + beta;
+   a.xR[0] = (beta - alpha) / (apb + 2);
+   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
+   if (t > log(maxrealnumber)) {
+      *info = -4;
+      ae_frame_leave();
+      return;
+   }
+   b.xR[0] = exp(t);
+   if (clen > 1) {
+      alpha2 = sqr(alpha);
+      beta2 = sqr(beta);
+      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
+      for (i = 2; i < clen; i++) {
+         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
+      }
+   }
+   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss);
+// test basic properties to detect errors
+   if (*info > 0) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
+         *info = 2;
+      }
+      for (i = 0; i < n - 1; i++) {
+         if (x->xR[i] >= x->xR[i + 1]) {
+            *info = -4;
+         }
+      }
+   }
+   ae_frame_leave();
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1402,20 +1402,6 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::gkqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
-   alglib_impl::ae_state_clear();
-}
-
-void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
-   alglib_impl::ae_state_clear();
-}
-
-void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
    alglib_impl::ae_state_clear();
 }
 
@@ -1432,41 +1418,26 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
    alglib_impl::gkqlegendretbl(n, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &eps);
    alglib_impl::ae_state_clear();
 }
+
+void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
+}
+
+void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
+}
 } // end of namespace alglib
 
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
 static const ae_int_t autogk_maxsubintervals = 10000;
-
-// Integration of a smooth function F(x) on a finite interval [a,b].
-//
-// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-// is calculated with accuracy close to the machine precision.
-//
-// Algorithm works well only with smooth integrands.  It  may  be  used  with
-// continuous non-smooth integrands, but with  less  performance.
-//
-// It should never be used with integrands which have integrable singularities
-// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
-// cases.
-//
-// Inputs:
-//     A, B    -   interval boundaries (A < B, A = B or A > B)
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// SEE ALSO
-//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
-// ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
-// API: void autogksmooth(const double a, const double b, autogkstate &state);
-void autogksmooth(double a, double b, autogkstate *state) {
-   SetObj(autogkstate, state);
-   ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!");
-   ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!");
-   autogksmoothw(a, b, 0.0, state);
-}
 
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
@@ -1497,6 +1468,35 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
    state->b = b;
    state->xwidth = xwidth;
    state->PQ = -1;
+}
+
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// Algorithm works well only with smooth integrands.  It  may  be  used  with
+// continuous non-smooth integrands, but with  less  performance.
+//
+// It should never be used with integrands which have integrable singularities
+// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
+// cases.
+//
+// Inputs:
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
+// ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
+// API: void autogksmooth(const double a, const double b, autogkstate &state);
+void autogksmooth(double a, double b, autogkstate *state) {
+   SetObj(autogkstate, state);
+   ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!");
+   ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!");
+   autogksmoothw(a, b, 0.0, state);
 }
 
 // Integration on a finite interval [A,B].
@@ -2131,17 +2131,17 @@ DefClass(autogkreport, DecVal(terminationtype) DecVal(nfev) DecVal(nintervals))
 // * autogkresults() to get results
 DefClass(autogkstate, DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
 
-void autogksmooth(const double a, const double b, autogkstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state));
-   alglib_impl::ae_state_clear();
-}
-
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::autogksmoothw(a, b, xwidth, ConstT(autogkstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void autogksmooth(const double a, const double b, autogkstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state));
    alglib_impl::ae_state_clear();
 }
 
