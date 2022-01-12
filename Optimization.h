@@ -226,11 +226,11 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
 void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n, ae_int_t k, precbuflowrank *buf, ae_state *_state);
 void applylowrankpreconditioner(RVector *s, precbuflowrank *buf, ae_state *_state);
 void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, ae_int_t k, bool checksmoothness, ae_state *_state);
+void smoothnessmonitorfinalizelinesearch(smoothnessmonitor *monitor, ae_state *_state);
 void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RVector *fi, RMatrix *jac, ae_state *_state);
 void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *x, double f0, RVector *j0, ae_state *_state);
 void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, double stp, RVector *x, RVector *fi, RMatrix *jac, ae_state *_state);
 void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *d, double stp, RVector *x, double f0, RVector *j0, ae_state *_state);
-void smoothnessmonitorfinalizelinesearch(smoothnessmonitor *monitor, ae_state *_state);
 void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale, ae_state *_state);
 bool smoothnessmonitorprobe(smoothnessmonitor *monitor, ae_state *_state);
 void smoothnessmonitortraceprobingresults(smoothnessmonitor *monitor, ae_state *_state);
@@ -318,13 +318,14 @@ void minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minlbfgsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minlbfgsreport_free(void *_p, bool make_automatic);
 
-void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae_state *_state);
-void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state, ae_state *_state);
 void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
 void minlbfgssetxrep(minlbfgsstate *state, bool needxrep, ae_state *_state);
 void minlbfgssetstpmax(minlbfgsstate *state, double stpmax, ae_state *_state);
 void minlbfgssetscale(minlbfgsstate *state, RVector *s, ae_state *_state);
+void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x, ae_state *_state);
 void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double diffstep, minlbfgsstate *state, ae_state *_state);
+void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae_state *_state);
+void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state, ae_state *_state);
 void minlbfgssetprecdefault(minlbfgsstate *state, ae_state *_state);
 void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state);
 void minlbfgssetprecdiag(minlbfgsstate *state, RVector *d, ae_state *_state);
@@ -337,9 +338,8 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state *_state);
 void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state);
 void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state);
-void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state);
 void minlbfgsresultsbuf(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state);
-void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x, ae_state *_state);
+void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state);
 void minlbfgsrequesttermination(minlbfgsstate *state, ae_state *_state);
 } // end of namespace alglib_impl
 
@@ -347,14 +347,15 @@ namespace alglib {
 DecClass(minlbfgsstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 DecClass(minlbfgsreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
-void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams = xdefault);
-void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams = xdefault);
-void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams = xdefault);
-void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams = xdefault);
 void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
 void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xparams _xparams = xdefault);
 void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xparams _xparams = xdefault);
 void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
+void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams = xdefault);
+void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams = xdefault);
+void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams = xdefault);
+void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams = xdefault);
 void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams = xdefault);
 void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams = xdefault);
 void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, const xparams _xparams = xdefault);
@@ -368,9 +369,8 @@ void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xpara
 void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams = xdefault);
 void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams = xdefault);
 void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams = xdefault);
-void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams = xdefault);
 void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams = xdefault);
-void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams = xdefault);
 void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
@@ -568,20 +568,20 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
 void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae_state *_state);
 bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state);
 void sasexploredirection(sactiveset *state, RVector *d, double *stpmax, ae_int_t *cidx, double *vval, ae_state *_state);
+void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state);
 ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, double cval, ae_state *_state);
 void sasimmediateactivation(sactiveset *state, ae_int_t cidx, double cval, ae_state *_state);
+void sasrebuildbasis(sactiveset *state, ae_state *_state);
 void sasconstraineddescent(sactiveset *state, RVector *g, RVector *d, ae_state *_state);
 void sasconstraineddescentprec(sactiveset *state, RVector *g, RVector *d, ae_state *_state);
 void sasconstraineddirection(sactiveset *state, RVector *d, ae_state *_state);
 void sasconstraineddirectionprec(sactiveset *state, RVector *d, ae_state *_state);
-void sascorrection(sactiveset *state, RVector *x, double *penalty, ae_state *_state);
 double sasactivelcpenalty1(sactiveset *state, RVector *x, ae_state *_state);
+void sascorrection(sactiveset *state, RVector *x, double *penalty, ae_state *_state);
 double sasscaledconstrainednorm(sactiveset *state, RVector *d, ae_state *_state);
 void sasstopoptimization(sactiveset *state, ae_state *_state);
 void sasreactivateconstraints(sactiveset *state, RVector *gc, ae_state *_state);
 void sasreactivateconstraintsprec(sactiveset *state, RVector *gc, ae_state *_state);
-void sasrebuildbasis(sactiveset *state, ae_state *_state);
-void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === QQPSOLVER Package ===
@@ -841,8 +841,6 @@ void minbleicreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minbleicreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minbleicreport_free(void *_p, bool make_automatic);
 
-void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_state);
-void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state);
 void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minbleicsetcond(minbleicstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
@@ -853,15 +851,17 @@ void minbleicsetprecscale(minbleicstate *state, ae_state *_state);
 void minbleicsetxrep(minbleicstate *state, bool needxrep, ae_state *_state);
 void minbleicsetdrep(minbleicstate *state, bool needdrep, ae_state *_state);
 void minbleicsetstpmax(minbleicstate *state, double stpmax, ae_state *_state);
+void minbleicrestartfrom(minbleicstate *state, RVector *x, ae_state *_state);
+void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_state);
+void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state);
 bool minbleiciteration(minbleicstate *state, ae_state *_state);
 void minbleicoptguardgradient(minbleicstate *state, double teststep, ae_state *_state);
 void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *_state);
 void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state *_state);
 void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state);
 void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state);
-void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state);
 void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state);
-void minbleicrestartfrom(minbleicstate *state, RVector *x, ae_state *_state);
+void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state);
 void minbleicrequesttermination(minbleicstate *state, ae_state *_state);
 void minbleicemergencytermination(minbleicstate *state, ae_state *_state);
 } // end of namespace alglib_impl
@@ -870,10 +870,6 @@ namespace alglib {
 DecClass(minbleicstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 DecClass(minbleicreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varidx; ae_int_t &terminationtype; double &debugeqerr; double &debugfs; double &debugff; double &debugdx; ae_int_t &debugfeasqpits; ae_int_t &debugfeasgpaits; ae_int_t &inneriterationscount; ae_int_t &outeriterationscount;);
 
-void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams = xdefault);
-void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams = xdefault);
-void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams = xdefault);
-void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams = xdefault);
 void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
@@ -884,6 +880,11 @@ void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, con
 void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams = xdefault);
 void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xparams _xparams = xdefault);
 void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xparams _xparams = xdefault);
+void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams = xdefault);
+void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams = xdefault);
+void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams = xdefault);
+void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams = xdefault);
 bool minbleiciteration(const minbleicstate &state, const xparams _xparams = xdefault);
 void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
@@ -893,9 +894,8 @@ void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xpara
 void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams = xdefault);
 void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams = xdefault);
 void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams = xdefault);
-void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams = xdefault);
 void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams = xdefault);
-void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams = xdefault);
 void minbleicrequesttermination(const minbleicstate &state, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
@@ -1070,12 +1070,12 @@ void vipmstate_init(void *_p, ae_state *_state, bool make_automatic);
 void vipmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void vipmstate_free(void *_p, bool make_automatic);
 
-void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_state *_state);
-void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t nmain, ae_int_t n, ae_state *_state);
-void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_state *_state);
 void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *sparseh, ae_int_t hkind, bool isupper, RVector *c, ae_state *_state);
 void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *cl, RVector *cu, ae_state *_state);
 void vipmsetcond(vipmstate *state, double epsp, double epsd, double epsgap, ae_state *_state);
+void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_state *_state);
+void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t nmain, ae_int_t n, ae_state *_state);
+void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, ae_state *_state);
 void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state);
 } // end of namespace alglib_impl
 
@@ -1159,46 +1159,51 @@ void minqpreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minqpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minqpreport_free(void *_p, bool make_automatic);
 
-void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state);
-void minqpsetlinearterm(minqpstate *state, RVector *b, ae_state *_state);
-void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper, ae_state *_state);
-void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isupper, ae_state *_state);
-void minqpsetstartingpoint(minqpstate *state, RVector *x, ae_state *_state);
-void minqpsetorigin(minqpstate *state, RVector *xorigin, ae_state *_state);
-void minqpsetscale(minqpstate *state, RVector *s, ae_state *_state);
-void minqpsetscaleautodiag(minqpstate *state, ae_state *_state);
 void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
 void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t itscnt, ae_state *_state);
 void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state);
 void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state);
 void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxouterits, bool usenewton, ae_state *_state);
+void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state);
+void minqpsetlineartermfast(minqpstate *state, RVector *b, ae_state *_state);
+void minqpsetlinearterm(minqpstate *state, RVector *b, ae_state *_state);
+void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, double s, ae_state *_state);
+void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper, ae_state *_state);
+void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isupper, ae_state *_state);
+void minqpsetstartingpointfast(minqpstate *state, RVector *x, ae_state *_state);
+void minqpsetstartingpoint(minqpstate *state, RVector *x, ae_state *_state);
+void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state);
+void minqpsetorigin(minqpstate *state, RVector *xorigin, ae_state *_state);
+void minqpsetscale(minqpstate *state, RVector *s, ae_state *_state);
+void minqpsetscaleautodiag(minqpstate *state, ae_state *_state);
 void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minqpsetbcall(minqpstate *state, double bndl, double bndu, ae_state *_state);
 void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu, ae_state *_state);
-void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek, RMatrix *densec, ZVector *densect, ae_int_t densek, ae_state *_state);
 void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect, ae_int_t densek, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek, ae_state *_state);
+void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
+void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse, RMatrix *densea, ae_int_t kdense, RVector *al, RVector *au, ae_state *_state);
 void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state);
 void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state);
-void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse, RMatrix *densea, ae_int_t kdense, RVector *al, RVector *au, ae_state *_state);
 void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au, ae_state *_state);
 void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au, ae_state *_state);
 void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, double au, ae_state *_state);
 void minqpoptimize(minqpstate *state, ae_state *_state);
-void minqpresults(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state);
 void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state);
-void minqpsetlineartermfast(minqpstate *state, RVector *b, ae_state *_state);
-void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, double s, ae_state *_state);
+void minqpresults(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state);
 void minqprewritediagonal(minqpstate *state, RVector *s, ae_state *_state);
-void minqpsetstartingpointfast(minqpstate *state, RVector *x, ae_state *_state);
-void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(minqpstate, );
 DecClass(minqpreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nmv; ae_int_t &ncholesky; ae_int_t &terminationtype; real_1d_array lagbc; real_1d_array laglc;);
 
+void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
+void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams = xdefault);
+void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams = xdefault);
+void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams = xdefault);
+void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams = xdefault);
 void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams = xdefault);
 void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const xparams _xparams = xdefault);
 void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper, const xparams _xparams = xdefault);
@@ -1208,29 +1213,24 @@ void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, cons
 void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const xparams _xparams = xdefault);
 void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
 void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams = xdefault);
-void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
-void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams = xdefault);
-void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams = xdefault);
-void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams = xdefault);
-void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams = xdefault);
 void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu, const xparams _xparams = xdefault);
 void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams = xdefault);
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
 void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
 void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const xparams _xparams = xdefault);
 void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const xparams _xparams = xdefault);
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
+void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams = xdefault);
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams = xdefault);
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams = xdefault);
 void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams = xdefault);
-void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams = xdefault);
 void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams = xdefault);
 void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams = xdefault);
 void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams = xdefault);
 void minqpoptimize(const minqpstate &state, const xparams _xparams = xdefault);
-void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams = xdefault);
 void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams = xdefault);
+void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === MINLM Package ===
@@ -1368,9 +1368,6 @@ void minlmreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minlmreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minlmreport_free(void *_p, bool make_automatic);
 
-void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
-void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstate *state, ae_state *_state);
-void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state);
 void minlmsetcond(minlmstate *state, double epsx, ae_int_t maxits, ae_state *_state);
 void minlmsetxrep(minlmstate *state, bool needxrep, ae_state *_state);
 void minlmsetstpmax(minlmstate *state, double stpmax, ae_state *_state);
@@ -1378,28 +1375,25 @@ void minlmsetscale(minlmstate *state, RVector *s, ae_state *_state);
 void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minlmsetacctype(minlmstate *state, ae_int_t acctype, ae_state *_state);
+void minlmrestartfrom(minlmstate *state, RVector *x, ae_state *_state);
+void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
+void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstate *state, ae_state *_state);
+void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state);
+void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
+void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
+void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
 bool minlmiteration(minlmstate *state, ae_state *_state);
 void minlmoptguardgradient(minlmstate *state, double teststep, ae_state *_state);
 void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_state);
-void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state);
 void minlmresultsbuf(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state);
-void minlmrestartfrom(minlmstate *state, RVector *x, ae_state *_state);
+void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state);
 void minlmrequesttermination(minlmstate *state, ae_state *_state);
-void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
-void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
-void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(minlmstate, bool &needf; bool &needfg; bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
 DecClass(minlmreport, ae_int_t &iterationscount; ae_int_t &terminationtype; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
 
-void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
 void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
 void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _xparams = xdefault);
 void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams _xparams = xdefault);
@@ -1408,6 +1402,19 @@ void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
 void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xparams _xparams = xdefault);
+void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
+void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
 bool minlmiteration(const minlmstate &state, const xparams _xparams = xdefault);
 void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
@@ -1416,16 +1423,9 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
 void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minlmoptguardgradient(const minlmstate &state, const double teststep, const xparams _xparams = xdefault);
 void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams = xdefault);
-void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams = xdefault);
 void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams = xdefault);
-void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams = xdefault);
 void minlmrequesttermination(const minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
-void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === MINCG Package ===
@@ -1514,51 +1514,52 @@ void mincgreport_init(void *_p, ae_state *_state, bool make_automatic);
 void mincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void mincgreport_free(void *_p, bool make_automatic);
 
-void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state);
-void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae_state *_state);
 void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
 void mincgsetscale(mincgstate *state, RVector *s, ae_state *_state);
 void mincgsetxrep(mincgstate *state, bool needxrep, ae_state *_state);
 void mincgsetdrep(mincgstate *state, bool needdrep, ae_state *_state);
 void mincgsetcgtype(mincgstate *state, ae_int_t cgtype, ae_state *_state);
 void mincgsetstpmax(mincgstate *state, double stpmax, ae_state *_state);
-void mincgsuggeststep(mincgstate *state, double stp, ae_state *_state);
-double mincglastgoodstep(mincgstate *state, ae_state *_state);
 void mincgsetprecdefault(mincgstate *state, ae_state *_state);
+void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state);
 void mincgsetprecdiag(mincgstate *state, RVector *d, ae_state *_state);
 void mincgsetprecscale(mincgstate *state, ae_state *_state);
+void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix *v, ae_int_t vcnt, ae_state *_state);
+void mincgsetprecvarpart(mincgstate *state, RVector *d2, ae_state *_state);
+void mincgsuggeststep(mincgstate *state, double stp, ae_state *_state);
+double mincglastgoodstep(mincgstate *state, ae_state *_state);
+void mincgrestartfrom(mincgstate *state, RVector *x, ae_state *_state);
+void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state);
+void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae_state *_state);
 bool mincgiteration(mincgstate *state, ae_state *_state);
 void mincgoptguardgradient(mincgstate *state, double teststep, ae_state *_state);
 void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state);
 void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_state);
 void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state);
 void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state);
-void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state);
 void mincgresultsbuf(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state);
-void mincgrestartfrom(mincgstate *state, RVector *x, ae_state *_state);
+void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state);
 void mincgrequesttermination(mincgstate *state, ae_state *_state);
-void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state);
-void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix *v, ae_int_t vcnt, ae_state *_state);
-void mincgsetprecvarpart(mincgstate *state, RVector *d2, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(mincgstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 DecClass(mincgreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
-void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams = xdefault);
-void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams = xdefault);
-void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams = xdefault);
-void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams = xdefault);
 void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
 void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
 void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _xparams = xdefault);
 void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparams _xparams = xdefault);
 void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams _xparams = xdefault);
-void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams = xdefault);
 void mincgsetprecdefault(const mincgstate &state, const xparams _xparams = xdefault);
 void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xparams _xparams = xdefault);
 void mincgsetprecscale(const mincgstate &state, const xparams _xparams = xdefault);
+void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams = xdefault);
+void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams = xdefault);
+void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams = xdefault);
+void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams = xdefault);
+void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams = xdefault);
 bool mincgiteration(const mincgstate &state, const xparams _xparams = xdefault);
 void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
@@ -1568,9 +1569,8 @@ void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams = x
 void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams = xdefault);
 void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams = xdefault);
 void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams = xdefault);
-void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams = xdefault);
 void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams = xdefault);
-void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams = xdefault);
 void mincgrequesttermination(const mincgstate &state, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
@@ -1979,7 +1979,6 @@ void minlpreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minlpreport_free(void *_p, bool make_automatic);
 
-void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state);
 void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state);
 void minlpsetalgoipm(minlpstate *state, double eps, ae_state *_state);
 void minlpsetcost(minlpstate *state, RVector *c, ae_state *_state);
@@ -1987,21 +1986,21 @@ void minlpsetscale(minlpstate *state, RVector *s, ae_state *_state);
 void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minlpsetbcall(minlpstate *state, double bndl, double bndu, ae_state *_state);
 void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu, ae_state *_state);
-void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state *_state);
 void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state);
 void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state);
-void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_state *_state);
+void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state *_state);
+void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state);
 void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au, ae_state *_state);
+void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_state *_state);
 void minlpoptimize(minlpstate *state, ae_state *_state);
-void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state);
 void minlpresultsbuf(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state);
+void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(minlpstate, );
 DecClass(minlpreport, double &f; real_1d_array lagbc; real_1d_array laglc; real_1d_array y; integer_1d_array stats; double &primalerror; double &dualerror; double &slackerror; ae_int_t &iterationscount; ae_int_t &terminationtype;);
 
-void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams = xdefault);
 void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams = xdefault);
 void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams = xdefault);
 void minlpsetalgoipm(const minlpstate &state, const xparams _xparams = xdefault);
@@ -2010,16 +2009,17 @@ void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparam
 void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu, const xparams _xparams = xdefault);
 void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams = xdefault);
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams = xdefault);
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams = xdefault);
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams = xdefault);
 void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams = xdefault);
-void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams = xdefault);
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams = xdefault);
+void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams = xdefault);
 void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams = xdefault);
+void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams = xdefault);
 void minlpoptimize(const minlpstate &state, const xparams _xparams = xdefault);
-void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams = xdefault);
 void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams = xdefault);
+void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === NLCSLP Package ===
@@ -2292,8 +2292,6 @@ void minnlcreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minnlcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minnlcreport_free(void *_p, bool make_automatic);
 
-void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state);
-void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state);
 void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_state);
@@ -2308,29 +2306,27 @@ void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state 
 void minnlcsetalgoslp(minnlcstate *state, ae_state *_state);
 void minnlcsetalgosqp(minnlcstate *state, ae_state *_state);
 void minnlcsetxrep(minnlcstate *state, bool needxrep, ae_state *_state);
+void minnlcrestartfrom(minnlcstate *state, RVector *x, ae_state *_state);
+void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state);
+void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state);
+void minnlcequalitypenaltyfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
+void minnlcinequalitypenaltyfunction(double alpha, double stabilizingpoint, double *f, double *df, double *d2f, ae_state *_state);
+void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
 bool minnlciteration(minnlcstate *state, ae_state *_state);
 void minnlcoptguardgradient(minnlcstate *state, double teststep, ae_state *_state);
 void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_state);
 void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_state);
 void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state);
 void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state);
-void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state);
 void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state);
+void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state);
 void minnlcrequesttermination(minnlcstate *state, ae_state *_state);
-void minnlcrestartfrom(minnlcstate *state, RVector *x, ae_state *_state);
-void minnlcequalitypenaltyfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
-void minnlcinequalitypenaltyfunction(double alpha, double stabilizingpoint, double *f, double *df, double *d2f, ae_state *_state);
-void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *d2f, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(minnlcstate, bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 DecClass(minnlcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype; double &bcerr; ae_int_t &bcidx; double &lcerr; ae_int_t &lcidx; double &nlcerr; ae_int_t &nlcidx; ae_int_t &dbgphase0its;);
 
-void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams = xdefault);
-void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams = xdefault);
-void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams = xdefault);
-void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams = xdefault);
 void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
@@ -2346,6 +2342,11 @@ void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t
 void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams = xdefault);
 void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams = xdefault);
 void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams _xparams = xdefault);
+void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams = xdefault);
+void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams = xdefault);
+void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams = xdefault);
+void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams = xdefault);
 bool minnlciteration(const minnlcstate &state, const xparams _xparams = xdefault);
 void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
@@ -2355,10 +2356,9 @@ void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams =
 void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams = xdefault);
 void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams = xdefault);
 void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams = xdefault);
-void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams = xdefault);
 void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams = xdefault);
+void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams = xdefault);
 void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams = xdefault);
-void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === MINNS Package ===
@@ -2493,8 +2493,6 @@ void minnsreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minnsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minnsreport_free(void *_p, bool make_automatic);
 
-void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state);
-void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
 void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state);
 void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_state);
@@ -2502,21 +2500,19 @@ void minnssetcond(minnsstate *state, double epsx, ae_int_t maxits, ae_state *_st
 void minnssetscale(minnsstate *state, RVector *s, ae_state *_state);
 void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state *_state);
 void minnssetxrep(minnsstate *state, bool needxrep, ae_state *_state);
+void minnsrestartfrom(minnsstate *state, RVector *x, ae_state *_state);
+void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state);
+void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
 void minnsrequesttermination(minnsstate *state, ae_state *_state);
 bool minnsiteration(minnsstate *state, ae_state *_state);
-void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state);
 void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state);
-void minnsrestartfrom(minnsstate *state, RVector *x, ae_state *_state);
+void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(minnsstate, bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 DecClass(minnsreport, ae_int_t &iterationscount; ae_int_t &nfev; double &cerr; double &lcerr; double &nlcerr; ae_int_t &terminationtype; ae_int_t &varidx; ae_int_t &funcidx;);
 
-void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams = xdefault);
-void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams = xdefault);
-void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams = xdefault);
-void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams = xdefault);
 void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = xdefault);
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = xdefault);
@@ -2525,13 +2521,17 @@ void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t max
 void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
 void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams = xdefault);
 void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _xparams = xdefault);
+void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams = xdefault);
+void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams = xdefault);
+void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams = xdefault);
+void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams = xdefault);
 void minnsrequesttermination(const minnsstate &state, const xparams _xparams = xdefault);
 bool minnsiteration(const minnsstate &state, const xparams _xparams = xdefault);
 void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams = xdefault);
 void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams = xdefault);
-void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === MINCOMP Package ===
@@ -2601,15 +2601,15 @@ void minlbfgssetdefaultpreconditioner(minlbfgsstate *state, ae_state *_state);
 void minlbfgssetcholeskypreconditioner(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state);
 void minbleicsetbarrierwidth(minbleicstate *state, double mu, ae_state *_state);
 void minbleicsetbarrierdecay(minbleicstate *state, double mudecay, ae_state *_state);
-void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasastate *state, ae_state *_state);
 void minasasetcond(minasastate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
 void minasasetxrep(minasastate *state, bool needxrep, ae_state *_state);
 void minasasetalgorithm(minasastate *state, ae_int_t algotype, ae_state *_state);
 void minasasetstpmax(minasastate *state, double stpmax, ae_state *_state);
-bool minasaiteration(minasastate *state, ae_state *_state);
-void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
-void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
 void minasarestartfrom(minasastate *state, RVector *x, RVector *bndl, RVector *bndu, ae_state *_state);
+void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasastate *state, ae_state *_state);
+bool minasaiteration(minasastate *state, ae_state *_state);
+void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
+void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2620,17 +2620,17 @@ void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams 
 void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams = xdefault);
 void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const xparams _xparams = xdefault);
 void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, const xparams _xparams = xdefault);
-void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams = xdefault);
-void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams = xdefault);
 void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
 void minasasetxrep(const minasastate &state, const bool needxrep, const xparams _xparams = xdefault);
 void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const xparams _xparams = xdefault);
 void minasasetstpmax(const minasastate &state, const double stpmax, const xparams _xparams = xdefault);
+void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
+void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams = xdefault);
+void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams = xdefault);
 bool minasaiteration(const minasastate &state, const xparams _xparams = xdefault);
 void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams = xdefault);
 void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams = xdefault);
-void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
+void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams = xdefault);
 } // end of namespace alglib
 
 // === MINBC Package ===
@@ -2722,8 +2722,6 @@ void minbcreport_init(void *_p, ae_state *_state, bool make_automatic);
 void minbcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void minbcreport_free(void *_p, bool make_automatic);
 
-void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state);
-void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state);
 void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu, ae_state *_state);
 void minbcsetcond(minbcstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state);
 void minbcsetscale(minbcstate *state, RVector *s, ae_state *_state);
@@ -2732,15 +2730,17 @@ void minbcsetprecdiag(minbcstate *state, RVector *d, ae_state *_state);
 void minbcsetprecscale(minbcstate *state, ae_state *_state);
 void minbcsetxrep(minbcstate *state, bool needxrep, ae_state *_state);
 void minbcsetstpmax(minbcstate *state, double stpmax, ae_state *_state);
+void minbcrestartfrom(minbcstate *state, RVector *x, ae_state *_state);
+void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state);
+void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state);
 bool minbciteration(minbcstate *state, ae_state *_state);
 void minbcoptguardgradient(minbcstate *state, double teststep, ae_state *_state);
 void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state);
 void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_state);
 void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state);
 void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state);
-void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state);
 void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state);
-void minbcrestartfrom(minbcstate *state, RVector *x, ae_state *_state);
+void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state);
 void minbcrequesttermination(minbcstate *state, ae_state *_state);
 } // end of namespace alglib_impl
 
@@ -2748,10 +2748,6 @@ namespace alglib {
 DecClass(minbcstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 DecClass(minbcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varidx; ae_int_t &terminationtype;);
 
-void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams = xdefault);
-void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams = xdefault);
-void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams = xdefault);
-void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams = xdefault);
 void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams = xdefault);
 void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams = xdefault);
 void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparams _xparams = xdefault);
@@ -2760,6 +2756,11 @@ void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xpa
 void minbcsetprecscale(const minbcstate &state, const xparams _xparams = xdefault);
 void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _xparams = xdefault);
 void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams _xparams = xdefault);
+void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams = xdefault);
+void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams = xdefault);
+void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams = xdefault);
+void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams = xdefault);
 bool minbciteration(const minbcstate &state, const xparams _xparams = xdefault);
 void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
 void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
@@ -2769,9 +2770,8 @@ void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams = x
 void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams = xdefault);
 void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams = xdefault);
 void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams = xdefault);
-void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams = xdefault);
 void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams = xdefault);
-void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
+void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams = xdefault);
 void minbcrequesttermination(const minbcstate &state, const xparams _xparams = xdefault);
 } // end of namespace alglib
 

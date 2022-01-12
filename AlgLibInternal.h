@@ -111,17 +111,17 @@ void setlengthzero(RVector *x, ae_int_t n, ae_state *_state);
 void bvectorsetlengthatleast(BVector *x, ae_int_t n, ae_state *_state);
 void ivectorsetlengthatleast(ZVector *x, ae_int_t n, ae_state *_state);
 void rvectorsetlengthatleast(RVector *x, ae_int_t n, ae_state *_state);
-void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void bmatrixsetlengthatleast(BMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
+void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void bvectorgrowto(BVector *x, ae_int_t n, ae_state *_state);
 void ivectorgrowto(ZVector *x, ae_int_t n, ae_state *_state);
+void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state);
 void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols, ae_state *_state);
 void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows, ae_state *_state);
-void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state);
 void ivectorresize(ZVector *x, ae_int_t n, ae_state *_state);
 void rvectorresize(RVector *x, ae_int_t n, ae_state *_state);
-void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
+void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void ivectorappend(ZVector *x, ae_int_t v, ae_state *_state);
 bool isfinitevector(RVector *x, ae_int_t n, ae_state *_state);
 bool isfinitecvector(CVector *z, ae_int_t n, ae_state *_state);
@@ -139,12 +139,11 @@ double randomnormal(ae_state *_state);
 void randomunit(ae_int_t n, RVector *x, ae_state *_state);
 void swapi(ae_int_t *v0, ae_int_t *v1, ae_state *_state);
 void swapr(double *v0, double *v1, ae_state *_state);
-void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols, ae_state *_state);
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows, ae_state *_state);
+void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols, ae_state *_state);
 void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth, ae_state *_state);
-void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
-double maxreal3(double v0, double v1, double v2, ae_state *_state);
+void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
 void inc(ae_int_t *v, ae_state *_state);
 void dec(ae_int_t *v, ae_state *_state);
 void threadunsafeinc(ae_int_t *v, ae_state *_state);
@@ -158,6 +157,7 @@ ae_int_t imin2(ae_int_t i0, ae_int_t i1, ae_state *_state);
 ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
 ae_int_t imax2(ae_int_t i0, ae_int_t i1, ae_state *_state);
 ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
+double maxreal3(double v0, double v1, double v2, ae_state *_state);
 double rmax3(double r0, double r1, double r2, ae_state *_state);
 double rmaxabs3(double r0, double r1, double r2, ae_state *_state);
 double boundval(double x, double b1, double b2, ae_state *_state);
@@ -184,16 +184,16 @@ void copyrealmatrix(RMatrix *src, RMatrix *dst, ae_state *_state);
 void unsetintegerarray(ZVector *a, ae_state *_state);
 void unsetrealarray(RVector *a, ae_state *_state);
 void unsetrealmatrix(RMatrix *a, ae_state *_state);
-void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
-ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector *b, ae_state *_state);
-void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
 ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize, ae_state *_state);
+void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
+void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
+void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
+ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector *b, ae_state *_state);
 double sparselevel2density(ae_state *_state);
 ae_int_t matrixtilesizea(ae_state *_state);
 ae_int_t matrixtilesizeb(ae_state *_state);
 double smpactivationlevel(ae_state *_state);
 double spawnlevel(ae_state *_state);
-void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
 void tracevectorautoprec(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
 void tracerowautoprec(RMatrix *a, ae_int_t i, ae_int_t j0, ae_int_t j1, ae_state *_state);
 void tracevectorunscaledunshiftedautoprec(RVector *x, ae_int_t n, RVector *scl, bool applyscl, RVector *sft, bool applysft, ae_state *_state);
@@ -234,38 +234,36 @@ double rmaxv(ae_int_t n, RVector *x, ae_state *_state);
 double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state);
 double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
 double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
+void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state);
+void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
 void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state);
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
-void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
-void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state);
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
 #endif // defined ALGLIB_NO_FAST_KERNELS
+void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state);
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
 void rsetallocv(ae_int_t n, double v, RVector *x, ae_state *_state);
 void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
-void rallocv(ae_int_t n, RVector *x, ae_state *_state);
-void iallocv(ae_int_t n, ZVector *x, ae_state *_state);
 void ballocv(ae_int_t n, BVector *x, ae_state *_state);
+void iallocv(ae_int_t n, ZVector *x, ae_state *_state);
+void rallocv(ae_int_t n, RVector *x, ae_state *_state);
 void rallocm(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state);
-void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
-void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
 void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state);
 #endif // defined ALGLIB_NO_FAST_KERNELS
 void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
-void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
+void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
+void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state);
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state);
 #endif // defined ALGLIB_NO_FAST_KERNELS
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
 void rcopyallocv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state);
 void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_state);
-void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
-void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
-#ifdef ALGLIB_NO_FAST_KERNELS
-void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state);
-#endif // defined ALGLIB_NO_FAST_KERNELS
 void igrowv(ae_int_t newn, ZVector *x, ae_state *_state);
 void rgrowv(ae_int_t newn, RVector *x, ae_state *_state);
 #ifdef ALGLIB_NO_FAST_KERNELS
@@ -287,21 +285,21 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
 #endif // defined ALGLIB_NO_FAST_KERNELS
 bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double ralpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
-bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
 bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
-bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
+bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
+bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
-bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
-bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
+bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
+bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===
@@ -327,21 +325,21 @@ void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RV
 // === ABLASMKL Package ===
 namespace alglib_impl {
 bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
-bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
 bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state);
-bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy, ae_state *_state);
+bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state);
 bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy, ae_state *_state);
+bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy, ae_state *_state);
 bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
 bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
+bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
 bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
 bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
-bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
+bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
+bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool spdmatrixcholeskymkl(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool *cholresult, ae_state *_state);
 bool rmatrixplumkl(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state);
 bool rmatrixbdmkl(RMatrix *a, ae_int_t m, ae_int_t n, RVector *d, RVector *e, RVector *tauq, RVector *taup, ae_state *_state);
@@ -349,8 +347,8 @@ bool rmatrixbdmultiplybymkl(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, 
 bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau, ae_state *_state);
 bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q, ae_state *_state);
 bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e, ae_state *_state);
-bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q, ae_state *_state);
 bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e, ae_state *_state);
+bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q, ae_state *_state);
 bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q, ae_state *_state);
 bool rmatrixbdsvdmkl(RVector *d, RVector *e, ae_int_t n, bool isupper, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, bool *svdresult, ae_state *_state);
 bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info, ae_state *_state);
@@ -376,14 +374,14 @@ ae_int_t getlptestserializationcode(ae_state *_state);
 // === TSORT Package ===
 // Depends on: APSERV
 namespace alglib_impl {
-void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state);
-void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state);
 void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n, ae_state *_state);
 void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n, ae_state *_state);
 void tagsortfast(RVector *a, RVector *bufa, ae_int_t n, ae_state *_state);
 void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t offset, ae_int_t n, ae_state *_state);
 void tagsortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state);
 void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state);
+void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state);
+void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state);
 void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb, ae_state *_state);
 void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb, ae_state *_state);
 void tagheappopi(RVector *a, ZVector *b, ae_int_t *n, ae_state *_state);
@@ -422,8 +420,8 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf, ae_state *_state);
 
 // === TRLINSOLVE Package ===
 namespace alglib_impl {
-void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state);
 void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm, ae_state *_state);
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === SAFESOLVE Package ===
@@ -523,13 +521,13 @@ void fasttransformplan_init(void *_p, ae_state *_state, bool make_automatic);
 void fasttransformplan_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void fasttransformplan_free(void *_p, bool make_automatic);
 
-void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state);
-void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt, ae_state *_state);
+double ftbasegetflopestimate(ae_int_t n, ae_state *_state);
 void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
 bool ftbaseissmooth(ae_int_t n, ae_state *_state);
 ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state);
 ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state);
-double ftbasegetflopestimate(ae_int_t n, ae_state *_state);
+void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt, ae_state *_state);
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === HPCCORES Package ===

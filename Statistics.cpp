@@ -18,11 +18,6 @@
 // Depends on: (AlgLibInternal) BASICSTATOPS
 // Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
-static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state);
-bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state);
-static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state);
-bool _trypexec_basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state);
-
 // Calculation of the distribution moments: mean, variance, skewness, kurtosis.
 //
 // Inputs:
@@ -407,6 +402,192 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
    ae_frame_leave(_state);
 }
 
+// Basecase code for RankData(), performs actual work on subset of data using
+// temporary buffer passed as parameter.
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Buf0    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//     Buf1    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state) {
+   ae_int_t i;
+   ae_assert(i1 >= i0, "RankDataBasecase: internal error", _state);
+   if (buf1->ra0.cnt < nfeatures) {
+      ae_vector_set_length(&buf1->ra0, nfeatures, _state);
+   }
+   for (i = i0; i < i1; i++) {
+      ae_v_move(buf1->ra0.xR, 1, xy->xyR[i], 1, nfeatures);
+      rankx(&buf1->ra0, nfeatures, iscentered, buf0, _state);
+      ae_v_move(xy->xyR[i], 1, buf1->ra0.xR, 1, nfeatures);
+   }
+}
+
+// Recurrent code for RankData(), splits problem into  subproblems  or  calls
+// basecase code (depending on problem complexity).
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Pool    -   shared pool which holds temporary buffers
+//                 (APBuffers structure)
+//     BasecaseCost-minimum cost of the problem which will be split
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
+   ae_frame _frame_block;
+   double problemcost;
+   ae_int_t im;
+   ae_frame_make(_state, &_frame_block);
+   RefObj(apbuffers, buf0, _state);
+   RefObj(apbuffers, buf1, _state);
+   ae_assert(i1 >= i0, "RankDataRec: internal error", _state);
+// Try to activate parallelism
+// Parallelism was tried if: i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state) >= smpactivationlevel(_state)
+// Recursively split problem, if it is too large
+   problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state);
+   if (i1 - i0 >= 2 && problemcost > spawnlevel(_state)) {
+      im = (i1 + i0) / 2;
+      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost, _state);
+      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost, _state);
+      ae_frame_leave(_state);
+      return;
+   }
+// Retrieve buffers from pool, call serial code, return buffers to pool
+   ae_shared_pool_retrieve(pool, &_buf0, _state);
+   ae_shared_pool_retrieve(pool, &_buf1, _state);
+   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1, _state);
+   ae_shared_pool_recycle(pool, &_buf0, _state);
+   ae_shared_pool_recycle(pool, &_buf1, _state);
+   ae_frame_leave(_state);
+}
+
+// This function replaces data in XY by their ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * ranking starts from 0, ends at NFeatures-1
+// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// Outputs:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
+// API: void rankdata(real_2d_array &xy, const xparams _xparams = xdefault);
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t basecasecost;
+   ae_frame_make(_state, &_frame_block);
+   NewObj(apbuffers, buf0, _state);
+   NewObj(apbuffers, buf1, _state);
+   NewObj(ae_shared_pool, pool, _state);
+   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
+// Basecase cost is a maximum cost of basecase problems.
+// Problems harded than that cost will be split.
+//
+// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+// which is proportional, but NOT equal to number of FLOPs required
+// to solve problem.
+//
+// Try to use serial code for basecase problems, no SMP functionality, no shared pools.
+   basecasecost = 10000;
+   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1, _state);
+      ae_frame_leave(_state);
+      return;
+   }
+// Parallel code
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost, _state);
+   ae_frame_leave(_state);
+}
+
+// This function replaces data in XY by their CENTERED ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * centered ranks are just usual ranks, but centered in such way  that  sum
+//   of within-row values is equal to 0.0.
+// * centering is performed by subtracting mean from each row, i.e it changes
+//   mean value, but does NOT change higher moments
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// Outputs:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
+// API: void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t basecasecost;
+   ae_frame_make(_state, &_frame_block);
+   NewObj(apbuffers, buf0, _state);
+   NewObj(apbuffers, buf1, _state);
+   NewObj(ae_shared_pool, pool, _state);
+   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
+// Basecase cost is a maximum cost of basecase problems.
+// Problems harded than that cost will be split.
+//
+// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+// which is proportional, but NOT equal to number of FLOPs required
+// to solve problem.
+//
+// Try to use serial code, no SMP functionality, no shared pools.
+   basecasecost = 10000;
+   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1, _state);
+      ae_frame_leave(_state);
+      return;
+   }
+// Parallel code
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost, _state);
+   ae_frame_leave(_state);
+}
+
 // 2-sample covariance
 //
 // Inputs:
@@ -605,6 +786,24 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    rankx(y, n, false, &buf, _state);
    result = pearsoncorr2(x, y, n, _state);
    ae_frame_leave(_state);
+   return result;
+}
+
+// Obsolete function, we recommend to use PearsonCorr2().
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+   double result;
+   result = pearsoncorr2(x, y, n, _state);
+   return result;
+}
+
+// Obsolete function, we recommend to use SpearmanCorr2().
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
+double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+   double result;
+   result = spearmancorr2(x, y, n, _state);
    return result;
 }
 
@@ -1268,235 +1467,6 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    }
    ae_frame_leave(_state);
 }
-
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
-// API: void rankdata(real_2d_array &xy, const xparams _xparams = xdefault);
-void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t basecasecost;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(apbuffers, buf0, _state);
-   NewObj(apbuffers, buf1, _state);
-   NewObj(ae_shared_pool, pool, _state);
-   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
-// Basecase cost is a maximum cost of basecase problems.
-// Problems harded than that cost will be split.
-//
-// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-// which is proportional, but NOT equal to number of FLOPs required
-// to solve problem.
-//
-// Try to use serial code for basecase problems, no SMP functionality, no shared pools.
-   basecasecost = 10000;
-   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1, _state);
-      ae_frame_leave(_state);
-      return;
-   }
-// Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost, _state);
-   ae_frame_leave(_state);
-}
-
-// Serial stub for GPL edition.
-bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
-   return false;
-}
-
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
-//   mean value, but does NOT change higher moments
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
-// API: void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
-void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t basecasecost;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(apbuffers, buf0, _state);
-   NewObj(apbuffers, buf1, _state);
-   NewObj(ae_shared_pool, pool, _state);
-   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
-// Basecase cost is a maximum cost of basecase problems.
-// Problems harded than that cost will be split.
-//
-// Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-// which is proportional, but NOT equal to number of FLOPs required
-// to solve problem.
-//
-// Try to use serial code, no SMP functionality, no shared pools.
-   basecasecost = 10000;
-   if (rmul3((double)npoints, (double)nfeatures, logbase2((double)nfeatures, _state), _state) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1, _state);
-      ae_frame_leave(_state);
-      return;
-   }
-// Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost, _state);
-   ae_frame_leave(_state);
-}
-
-// Serial stub for GPL edition.
-bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
-   return false;
-}
-
-// Obsolete function, we recommend to use PearsonCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
-   double result;
-   result = pearsoncorr2(x, y, n, _state);
-   return result;
-}
-
-// Obsolete function, we recommend to use SpearmanCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
-   double result;
-   result = spearmancorr2(x, y, n, _state);
-   return result;
-}
-
-// Recurrent code for RankData(), splits problem into  subproblems  or  calls
-// basecase code (depending on problem complexity).
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Pool    -   shared pool which holds temporary buffers
-//                 (APBuffers structure)
-//     BasecaseCost-minimum cost of the problem which will be split
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
-   ae_frame _frame_block;
-   double problemcost;
-   ae_int_t im;
-   ae_frame_make(_state, &_frame_block);
-   RefObj(apbuffers, buf0, _state);
-   RefObj(apbuffers, buf1, _state);
-   ae_assert(i1 >= i0, "RankDataRec: internal error", _state);
-// Try to activate parallelism
-   if (i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state) >= smpactivationlevel(_state)) {
-      if (_trypexec_basestat_rankdatarec(xy, i0, i1, nfeatures, iscentered, pool, basecasecost, _state)) {
-         ae_frame_leave(_state);
-         return;
-      }
-   }
-// Recursively split problem, if it is too large
-   problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures, _state), _state);
-   if (i1 - i0 >= 2 && problemcost > spawnlevel(_state)) {
-      im = (i1 + i0) / 2;
-      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost, _state);
-      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost, _state);
-      ae_frame_leave(_state);
-      return;
-   }
-// Retrieve buffers from pool, call serial code, return buffers to pool
-   ae_shared_pool_retrieve(pool, &_buf0, _state);
-   ae_shared_pool_retrieve(pool, &_buf1, _state);
-   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1, _state);
-   ae_shared_pool_recycle(pool, &_buf0, _state);
-   ae_shared_pool_recycle(pool, &_buf1, _state);
-   ae_frame_leave(_state);
-}
-
-// Serial stub for GPL edition.
-bool _trypexec_basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
-   return false;
-}
-
-// Basecase code for RankData(), performs actual work on subset of data using
-// temporary buffer passed as parameter.
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Buf0    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//     Buf1    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state) {
-   ae_int_t i;
-   ae_assert(i1 >= i0, "RankDataBasecase: internal error", _state);
-   if (buf1->ra0.cnt < nfeatures) {
-      ae_vector_set_length(&buf1->ra0, nfeatures, _state);
-   }
-   for (i = i0; i < i1; i++) {
-      ae_v_move(buf1->ra0.xR, 1, xy->xyR[i], 1, nfeatures);
-      rankx(&buf1->ra0, nfeatures, iscentered, buf0, _state);
-      ae_v_move(xy->xyR[i], 1, buf1->ra0.xR, 1, nfeatures);
-   }
-}
-
-// Serial stub for GPL edition.
-bool _trypexec_basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state) {
-   return false;
-}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1668,6 +1638,48 @@ void samplepercentile(const real_1d_array &x, const double p, double &v, const x
 }
 #endif
 
+void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+#if !defined AE_NO_EXCEPTIONS
+void rankdata(real_2d_array &xy, const xparams _xparams) {
+   ae_int_t npoints = xy.rows();
+   ae_int_t nfeatures = xy.cols();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+#endif
+
+void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+#if !defined AE_NO_EXCEPTIONS
+void rankdatacentered(real_2d_array &xy, const xparams _xparams) {
+   ae_int_t npoints = xy.rows();
+   ae_int_t nfeatures = xy.cols();
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+#endif
+
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
@@ -1736,6 +1748,26 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xpara
    return D;
 }
 #endif
+
+double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return D;
+}
+
+double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, 0.0)
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+   return D;
+}
 
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
@@ -1868,81 +1900,12 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
-
-void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-#if !defined AE_NO_EXCEPTIONS
-void rankdata(real_2d_array &xy, const xparams _xparams) {
-   ae_int_t npoints = xy.rows();
-   ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-#endif
-
-void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-#if !defined AE_NO_EXCEPTIONS
-void rankdatacentered(real_2d_array &xy, const xparams _xparams) {
-   ae_int_t npoints = xy.rows();
-   ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-#endif
-
-double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return D;
-}
-
-double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return D;
-}
 } // end of namespace alglib
 
 // === CORRELATIONTESTS Package ===
 // Depends on: (SpecialFunctions) STUDENTTDISTR
 // Depends on: BASESTAT
 namespace alglib_impl {
-static double correlationtests_spearmantail5(double s, ae_state *_state);
-static double correlationtests_spearmantail6(double s, ae_state *_state);
-static double correlationtests_spearmantail7(double s, ae_state *_state);
-static double correlationtests_spearmantail8(double s, ae_state *_state);
-static double correlationtests_spearmantail9(double s, ae_state *_state);
-static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_state);
-
 // Pearson's correlation coefficient significance test
 //
 // This test checks hypotheses about whether X  and  Y  are  samples  of  two
@@ -2007,77 +1970,6 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
    *bothtails = 2 * ae_minreal(p, 1 - p, _state);
    *lefttail = p;
    *righttail = 1 - p;
-}
-
-// Spearman's rank correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5.
-//
-// The test is non-parametric and doesn't require distributions X and Y to be
-// normal.
-//
-// Inputs:
-//     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
-   double t;
-   double p;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-// Special case
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// General case
-   if (r >= 1.0) {
-      t = 1.0E10;
-   } else {
-      if (r <= -1.0) {
-         t = -1.0E10;
-      } else {
-         t = r * ae_sqrt((n - 2) / (1 - ae_sqr(r, _state)), _state);
-      }
-   }
-   if (t < 0.0) {
-      p = correlationtests_spearmantail(t, n, _state);
-      *bothtails = 2 * p;
-      *lefttail = p;
-      *righttail = 1 - p;
-   } else {
-      p = correlationtests_spearmantail(-t, n, _state);
-      *bothtails = 2 * p;
-      *lefttail = 1 - p;
-      *righttail = p;
-   }
 }
 
 // Tail(S, 5)
@@ -2469,6 +2361,76 @@ static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_sta
    result = studenttdistribution(n - 2, t, _state);
    return result;
 }
+// Spearman's rank correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5.
+//
+// The test is non-parametric and doesn't require distributions X and Y to be
+// normal.
+//
+// Inputs:
+//     R   -   Spearman's rank correlation coefficient for X and Y
+//     N   -   number of elements in samples, N >= 5.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+   double t;
+   double p;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+// Special case
+   if (n < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// General case
+   if (r >= 1.0) {
+      t = 1.0E10;
+   } else {
+      if (r <= -1.0) {
+         t = -1.0E10;
+      } else {
+         t = r * ae_sqrt((n - 2) / (1 - ae_sqr(r, _state)), _state);
+      }
+   }
+   if (t < 0.0) {
+      p = correlationtests_spearmantail(t, n, _state);
+      *bothtails = 2 * p;
+      *lefttail = p;
+      *righttail = 1 - p;
+   } else {
+      p = correlationtests_spearmantail(-t, n, _state);
+      *bothtails = 2 * p;
+      *lefttail = 1 - p;
+      *righttail = p;
+   }
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2493,323 +2455,12 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 
 // === JARQUEBERA Package ===
 namespace alglib_impl {
-static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae_state *_state);
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state);
-static double jarquebera_jbtbl5(double s, ae_state *_state);
-static double jarquebera_jbtbl6(double s, ae_state *_state);
-static double jarquebera_jbtbl7(double s, ae_state *_state);
-static double jarquebera_jbtbl8(double s, ae_state *_state);
-static double jarquebera_jbtbl9(double s, ae_state *_state);
-static double jarquebera_jbtbl10(double s, ae_state *_state);
-static double jarquebera_jbtbl11(double s, ae_state *_state);
-static double jarquebera_jbtbl12(double s, ae_state *_state);
-static double jarquebera_jbtbl13(double s, ae_state *_state);
-static double jarquebera_jbtbl14(double s, ae_state *_state);
-static double jarquebera_jbtbl15(double s, ae_state *_state);
-static double jarquebera_jbtbl16(double s, ae_state *_state);
-static double jarquebera_jbtbl17(double s, ae_state *_state);
-static double jarquebera_jbtbl18(double s, ae_state *_state);
-static double jarquebera_jbtbl19(double s, ae_state *_state);
-static double jarquebera_jbtbl20(double s, ae_state *_state);
-static double jarquebera_jbtbl30(double s, ae_state *_state);
-static double jarquebera_jbtbl50(double s, ae_state *_state);
-static double jarquebera_jbtbl65(double s, ae_state *_state);
-static double jarquebera_jbtbl100(double s, ae_state *_state);
-static double jarquebera_jbtbl130(double s, ae_state *_state);
-static double jarquebera_jbtbl200(double s, ae_state *_state);
-static double jarquebera_jbtbl301(double s, ae_state *_state);
-static double jarquebera_jbtbl501(double s, ae_state *_state);
-static double jarquebera_jbtbl701(double s, ae_state *_state);
-static double jarquebera_jbtbl1401(double s, ae_state *_state);
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state);
-
-// Jarque-Bera test
-//
-// This test checks hypotheses about the fact that a  given  sample  X  is  a
-// sample of normal random variable.
-//
-// Requirements:
-//     * the number of elements in the sample is not less than 5.
-//
-// Inputs:
-//     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//
-// Outputs:
-//     P           -   p-value for the test
-//
-// Accuracy of the approximation used (5 <= N <= 1951):
-//
-// p-value          relative error (5 <= N <= 1951)
-// [1, 0.1]            < 1%
-// [0.1, 0.01]         < 2%
-// [0.01, 0.001]       < 6%
-// [0.001, 0]          wasn't measured
-//
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
-// from table values.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
-void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
-   double s;
-   *p = 0;
-// N is too small
-   if (n < 5) {
-      *p = 1.0;
-      return;
-   }
-// N is large enough
-   jarquebera_jarqueberastatistic(x, n, &s, _state);
-   *p = jarquebera_jarqueberaapprox(n, s, _state);
-}
-
-static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   double v1;
-   double v2;
-   double stddev;
-   double mean;
-   double variance;
-   double skewness;
-   double kurtosis;
-   *s = 0;
-   mean = 0.0;
-   variance = 0.0;
-   skewness = 0.0;
-   kurtosis = 0.0;
-   stddev = 0.0;
-   ae_assert(n > 1, "Assertion failed", _state);
-// Mean
-   for (i = 0; i < n; i++) {
-      mean = mean + x->xR[i];
-   }
-   mean = mean / n;
-// Variance (using corrected two-pass algorithm)
-   if (n != 1) {
-      v1 = 0.0;
-      for (i = 0; i < n; i++) {
-         v1 = v1 + ae_sqr(x->xR[i] - mean, _state);
-      }
-      v2 = 0.0;
-      for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - mean);
-      }
-      v2 = ae_sqr(v2, _state) / n;
-      variance = (v1 - v2) / (n - 1);
-      if (variance < 0.0) {
-         variance = 0.0;
-      }
-      stddev = ae_sqrt(variance, _state);
-   }
-// Skewness and kurtosis
-   if (stddev != 0.0) {
-      for (i = 0; i < n; i++) {
-         v = (x->xR[i] - mean) / stddev;
-         v2 = ae_sqr(v, _state);
-         skewness = skewness + v2 * v;
-         kurtosis = kurtosis + ae_sqr(v2, _state);
-      }
-      skewness = skewness / n;
-      kurtosis = kurtosis / n - 3;
-   }
-// Statistic
-   *s = (double)n / 6.0 *(ae_sqr(skewness, _state) + ae_sqr(kurtosis, _state) / 4);
-}
-
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state) {
-   ae_frame _frame_block;
-   double t1;
-   double t2;
-   double t3;
+static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
-   double f1;
-   double f2;
-   double f3;
-   double f12;
-   double f23;
-   double x;
-   double result;
-   ae_frame_make(_state, &_frame_block);
-   NewVector(vx, 0, DT_REAL, _state);
-   NewVector(vy, 0, DT_REAL, _state);
-   NewMatrix(ctbl, 0, 0, DT_REAL, _state);
-   result = 1.0;
-   x = s;
-   if (n < 5) {
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 5..20 are tabulated
-   if (n >= 5 && n <= 20) {
-      if (n == 5) {
-         result = ae_exp(jarquebera_jbtbl5(x, _state), _state);
-      }
-      if (n == 6) {
-         result = ae_exp(jarquebera_jbtbl6(x, _state), _state);
-      }
-      if (n == 7) {
-         result = ae_exp(jarquebera_jbtbl7(x, _state), _state);
-      }
-      if (n == 8) {
-         result = ae_exp(jarquebera_jbtbl8(x, _state), _state);
-      }
-      if (n == 9) {
-         result = ae_exp(jarquebera_jbtbl9(x, _state), _state);
-      }
-      if (n == 10) {
-         result = ae_exp(jarquebera_jbtbl10(x, _state), _state);
-      }
-      if (n == 11) {
-         result = ae_exp(jarquebera_jbtbl11(x, _state), _state);
-      }
-      if (n == 12) {
-         result = ae_exp(jarquebera_jbtbl12(x, _state), _state);
-      }
-      if (n == 13) {
-         result = ae_exp(jarquebera_jbtbl13(x, _state), _state);
-      }
-      if (n == 14) {
-         result = ae_exp(jarquebera_jbtbl14(x, _state), _state);
-      }
-      if (n == 15) {
-         result = ae_exp(jarquebera_jbtbl15(x, _state), _state);
-      }
-      if (n == 16) {
-         result = ae_exp(jarquebera_jbtbl16(x, _state), _state);
-      }
-      if (n == 17) {
-         result = ae_exp(jarquebera_jbtbl17(x, _state), _state);
-      }
-      if (n == 18) {
-         result = ae_exp(jarquebera_jbtbl18(x, _state), _state);
-      }
-      if (n == 19) {
-         result = ae_exp(jarquebera_jbtbl19(x, _state), _state);
-      }
-      if (n == 20) {
-         result = ae_exp(jarquebera_jbtbl20(x, _state), _state);
-      }
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 20, 30, 50 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 20 && n <= 50) {
-      t1 = -1.0 / 20.0;
-      t2 = -1.0 / 30.0;
-      t3 = -1.0 / 50.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl20(x, _state);
-      f2 = jarquebera_jbtbl30(x, _state);
-      f3 = jarquebera_jbtbl50(x, _state);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 50, 65, 100 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 50 && n <= 100) {
-      t1 = -1.0 / 50.0;
-      t2 = -1.0 / 65.0;
-      t3 = -1.0 / 100.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl50(x, _state);
-      f2 = jarquebera_jbtbl65(x, _state);
-      f3 = jarquebera_jbtbl100(x, _state);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 100, 130, 200 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 100 && n <= 200) {
-      t1 = -1.0 / 100.0;
-      t2 = -1.0 / 130.0;
-      t3 = -1.0 / 200.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl100(x, _state);
-      f2 = jarquebera_jbtbl130(x, _state);
-      f3 = jarquebera_jbtbl200(x, _state);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 200, 301, 501 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 200 && n <= 501) {
-      t1 = -1.0 / 200.0;
-      t2 = -1.0 / 301.0;
-      t3 = -1.0 / 501.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl200(x, _state);
-      f2 = jarquebera_jbtbl301(x, _state);
-      f3 = jarquebera_jbtbl501(x, _state);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-// N = 501, 701, 1401 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 501 && n <= 1401) {
-      t1 = -1.0 / 501.0;
-      t2 = -1.0 / 701.0;
-      t3 = -1.0 / 1401.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl501(x, _state);
-      f2 = jarquebera_jbtbl701(x, _state);
-      f3 = jarquebera_jbtbl1401(x, _state);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-// Asymptotic expansion
-   if (n > 1401) {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * ae_sqrt(1401.0 / n, _state);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = ae_exp(result, _state);
-      ae_frame_leave(_state);
-      return result;
-   }
-   ae_frame_leave(_state);
-   return result;
+   *r = *r + c * (*tj);
+   t = 2 * x * (*tj1) - (*tj);
+   *tj = *tj1;
+   *tj1 = t;
 }
 
 static double jarquebera_jbtbl5(double s, ae_state *_state) {
@@ -4400,12 +4051,293 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
    return result;
 }
 
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
+static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   double v1;
+   double v2;
+   double stddev;
+   double mean;
+   double variance;
+   double skewness;
+   double kurtosis;
+   *s = 0;
+   mean = 0.0;
+   variance = 0.0;
+   skewness = 0.0;
+   kurtosis = 0.0;
+   stddev = 0.0;
+   ae_assert(n > 1, "Assertion failed", _state);
+// Mean
+   for (i = 0; i < n; i++) {
+      mean = mean + x->xR[i];
+   }
+   mean = mean / n;
+// Variance (using corrected two-pass algorithm)
+   if (n != 1) {
+      v1 = 0.0;
+      for (i = 0; i < n; i++) {
+         v1 = v1 + ae_sqr(x->xR[i] - mean, _state);
+      }
+      v2 = 0.0;
+      for (i = 0; i < n; i++) {
+         v2 = v2 + (x->xR[i] - mean);
+      }
+      v2 = ae_sqr(v2, _state) / n;
+      variance = (v1 - v2) / (n - 1);
+      if (variance < 0.0) {
+         variance = 0.0;
+      }
+      stddev = ae_sqrt(variance, _state);
+   }
+// Skewness and kurtosis
+   if (stddev != 0.0) {
+      for (i = 0; i < n; i++) {
+         v = (x->xR[i] - mean) / stddev;
+         v2 = ae_sqr(v, _state);
+         skewness = skewness + v2 * v;
+         kurtosis = kurtosis + ae_sqr(v2, _state);
+      }
+      skewness = skewness / n;
+      kurtosis = kurtosis / n - 3;
+   }
+// Statistic
+   *s = (double)n / 6.0 *(ae_sqr(skewness, _state) + ae_sqr(kurtosis, _state) / 4);
+}
+
+static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state) {
+   ae_frame _frame_block;
+   double t1;
+   double t2;
+   double t3;
    double t;
-   *r = *r + c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
-   *tj = *tj1;
-   *tj1 = t;
+   double f1;
+   double f2;
+   double f3;
+   double f12;
+   double f23;
+   double x;
+   double result;
+   ae_frame_make(_state, &_frame_block);
+   NewVector(vx, 0, DT_REAL, _state);
+   NewVector(vy, 0, DT_REAL, _state);
+   NewMatrix(ctbl, 0, 0, DT_REAL, _state);
+   result = 1.0;
+   x = s;
+   if (n < 5) {
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 5..20 are tabulated
+   if (n >= 5 && n <= 20) {
+      if (n == 5) {
+         result = ae_exp(jarquebera_jbtbl5(x, _state), _state);
+      }
+      if (n == 6) {
+         result = ae_exp(jarquebera_jbtbl6(x, _state), _state);
+      }
+      if (n == 7) {
+         result = ae_exp(jarquebera_jbtbl7(x, _state), _state);
+      }
+      if (n == 8) {
+         result = ae_exp(jarquebera_jbtbl8(x, _state), _state);
+      }
+      if (n == 9) {
+         result = ae_exp(jarquebera_jbtbl9(x, _state), _state);
+      }
+      if (n == 10) {
+         result = ae_exp(jarquebera_jbtbl10(x, _state), _state);
+      }
+      if (n == 11) {
+         result = ae_exp(jarquebera_jbtbl11(x, _state), _state);
+      }
+      if (n == 12) {
+         result = ae_exp(jarquebera_jbtbl12(x, _state), _state);
+      }
+      if (n == 13) {
+         result = ae_exp(jarquebera_jbtbl13(x, _state), _state);
+      }
+      if (n == 14) {
+         result = ae_exp(jarquebera_jbtbl14(x, _state), _state);
+      }
+      if (n == 15) {
+         result = ae_exp(jarquebera_jbtbl15(x, _state), _state);
+      }
+      if (n == 16) {
+         result = ae_exp(jarquebera_jbtbl16(x, _state), _state);
+      }
+      if (n == 17) {
+         result = ae_exp(jarquebera_jbtbl17(x, _state), _state);
+      }
+      if (n == 18) {
+         result = ae_exp(jarquebera_jbtbl18(x, _state), _state);
+      }
+      if (n == 19) {
+         result = ae_exp(jarquebera_jbtbl19(x, _state), _state);
+      }
+      if (n == 20) {
+         result = ae_exp(jarquebera_jbtbl20(x, _state), _state);
+      }
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 20, 30, 50 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 20 && n <= 50) {
+      t1 = -1.0 / 20.0;
+      t2 = -1.0 / 30.0;
+      t3 = -1.0 / 50.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl20(x, _state);
+      f2 = jarquebera_jbtbl30(x, _state);
+      f3 = jarquebera_jbtbl50(x, _state);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 50, 65, 100 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 50 && n <= 100) {
+      t1 = -1.0 / 50.0;
+      t2 = -1.0 / 65.0;
+      t3 = -1.0 / 100.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl50(x, _state);
+      f2 = jarquebera_jbtbl65(x, _state);
+      f3 = jarquebera_jbtbl100(x, _state);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 100, 130, 200 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 100 && n <= 200) {
+      t1 = -1.0 / 100.0;
+      t2 = -1.0 / 130.0;
+      t3 = -1.0 / 200.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl100(x, _state);
+      f2 = jarquebera_jbtbl130(x, _state);
+      f3 = jarquebera_jbtbl200(x, _state);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 200, 301, 501 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 200 && n <= 501) {
+      t1 = -1.0 / 200.0;
+      t2 = -1.0 / 301.0;
+      t3 = -1.0 / 501.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl200(x, _state);
+      f2 = jarquebera_jbtbl301(x, _state);
+      f3 = jarquebera_jbtbl501(x, _state);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+// N = 501, 701, 1401 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 501 && n <= 1401) {
+      t1 = -1.0 / 501.0;
+      t2 = -1.0 / 701.0;
+      t3 = -1.0 / 1401.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl501(x, _state);
+      f2 = jarquebera_jbtbl701(x, _state);
+      f3 = jarquebera_jbtbl1401(x, _state);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+// Asymptotic expansion
+   if (n > 1401) {
+      result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * ae_sqrt(1401.0 / n, _state);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = ae_exp(result, _state);
+      ae_frame_leave(_state);
+      return result;
+   }
+   ae_frame_leave(_state);
+   return result;
+}
+
+// Jarque-Bera test
+//
+// This test checks hypotheses about the fact that a  given  sample  X  is  a
+// sample of normal random variable.
+//
+// Requirements:
+//     * the number of elements in the sample is not less than 5.
+//
+// Inputs:
+//     X   -   sample. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N >= 5
+//
+// Outputs:
+//     P           -   p-value for the test
+//
+// Accuracy of the approximation used (5 <= N <= 1951):
+//
+// p-value          relative error (5 <= N <= 1951)
+// [1, 0.1]            < 1%
+// [0.1, 0.01]         < 2%
+// [0.01, 0.001]       < 6%
+// [0.001, 0]          wasn't measured
+//
+// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// from table values.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
+void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
+   double s;
+   *p = 0;
+// N is too small
+   if (n < 5) {
+      *p = 1.0;
+      return;
+   }
+// N is large enough
+   jarquebera_jarqueberastatistic(x, n, &s, _state);
+   *p = jarquebera_jarqueberaapprox(n, s, _state);
 }
 } // end of namespace alglib_impl
 
@@ -4607,231 +4539,6 @@ void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const doubl
 // === WSR Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state);
-static double wsr_w5(double s, ae_state *_state);
-static double wsr_w6(double s, ae_state *_state);
-static double wsr_w7(double s, ae_state *_state);
-static double wsr_w8(double s, ae_state *_state);
-static double wsr_w9(double s, ae_state *_state);
-static double wsr_w10(double s, ae_state *_state);
-static double wsr_w11(double s, ae_state *_state);
-static double wsr_w12(double s, ae_state *_state);
-static double wsr_w13(double s, ae_state *_state);
-static double wsr_w14(double s, ae_state *_state);
-static double wsr_w15(double s, ae_state *_state);
-static double wsr_w16(double s, ae_state *_state);
-static double wsr_w17(double s, ae_state *_state);
-static double wsr_w18(double s, ae_state *_state);
-static double wsr_w19(double s, ae_state *_state);
-static double wsr_w20(double s, ae_state *_state);
-static double wsr_w21(double s, ae_state *_state);
-static double wsr_w22(double s, ae_state *_state);
-static double wsr_w23(double s, ae_state *_state);
-static double wsr_w24(double s, ae_state *_state);
-static double wsr_w25(double s, ae_state *_state);
-static double wsr_w26(double s, ae_state *_state);
-static double wsr_w27(double s, ae_state *_state);
-static double wsr_w28(double s, ae_state *_state);
-static double wsr_w29(double s, ae_state *_state);
-static double wsr_w30(double s, ae_state *_state);
-static double wsr_w40(double s, ae_state *_state);
-static double wsr_w60(double s, ae_state *_state);
-static double wsr_w120(double s, ae_state *_state);
-static double wsr_w200(double s, ae_state *_state);
-static double wsr_wsigma(double s, ae_int_t n, ae_state *_state);
-
-// Wilcoxon signed-rank test
-//
-// This test checks three hypotheses about the median  of  the  given sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis  -  the  median  is  less than or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
-//       the test could not be applied to nominal variables).
-//     * the distribution should be continuous and symmetric relative to  its
-//       median.
-//     * number of distinct values in the X array should be greater than 4
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with two decimal places in interval [0.0001, 1].
-//
-// "Two decimal places" does not sound very impressive, but in  practice  the
-// relative error of less than 1% is enough to make a decision.
-//
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
-// API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t t;
-   double tmp;
-   ae_int_t tmpi;
-   ae_int_t ns;
-   double w;
-   double p;
-   double mp;
-   double s;
-   double sigma;
-   double mu;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(x, _state);
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   NewVector(r, 0, DT_REAL, _state);
-   NewVector(c, 0, DT_INT, _state);
-// Prepare
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      ae_frame_leave(_state);
-      return;
-   }
-   ns = 0;
-   for (i = 0; i < n; i++) {
-      if (x->xR[i] == e) {
-         continue;
-      }
-      x->xR[ns] = x->xR[i];
-      ns = ns + 1;
-   }
-   if (ns < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      ae_frame_leave(_state);
-      return;
-   }
-   ae_vector_set_length(&r, ns - 1 + 1, _state);
-   ae_vector_set_length(&c, ns - 1 + 1, _state);
-   for (i = 0; i < ns; i++) {
-      r.xR[i] = ae_fabs(x->xR[i] - e, _state);
-      c.xZ[i] = i;
-   }
-// sort {R, C}
-   if (ns != 1) {
-      i = 2;
-      do {
-         t = i;
-         while (t != 1) {
-            k = t / 2;
-            if (r.xR[k - 1] >= r.xR[t - 1]) {
-               t = 1;
-            } else {
-               tmp = r.xR[k - 1];
-               r.xR[k - 1] = r.xR[t - 1];
-               r.xR[t - 1] = tmp;
-               tmpi = c.xZ[k - 1];
-               c.xZ[k - 1] = c.xZ[t - 1];
-               c.xZ[t - 1] = tmpi;
-               t = k;
-            }
-         }
-         i = i + 1;
-      } while (i <= ns);
-      i = ns - 1;
-      do {
-         tmp = r.xR[i];
-         r.xR[i] = r.xR[0];
-         r.xR[0] = tmp;
-         tmpi = c.xZ[i];
-         c.xZ[i] = c.xZ[0];
-         c.xZ[0] = tmpi;
-         t = 1;
-         while (t != 0) {
-            k = 2 * t;
-            if (k > i) {
-               t = 0;
-            } else {
-               if (k < i) {
-                  if (r.xR[k] > r.xR[k - 1]) {
-                     k = k + 1;
-                  }
-               }
-               if (r.xR[t - 1] >= r.xR[k - 1]) {
-                  t = 0;
-               } else {
-                  tmp = r.xR[k - 1];
-                  r.xR[k - 1] = r.xR[t - 1];
-                  r.xR[t - 1] = tmp;
-                  tmpi = c.xZ[k - 1];
-                  c.xZ[k - 1] = c.xZ[t - 1];
-                  c.xZ[t - 1] = tmpi;
-                  t = k;
-               }
-            }
-         }
-         i = i - 1;
-      } while (i >= 1);
-   }
-// compute tied ranks
-   i = 0;
-   while (i < ns) {
-      j = i + 1;
-      while (j < ns) {
-         if (r.xR[j] != r.xR[i]) {
-            break;
-         }
-         j = j + 1;
-      }
-      for (k = i; k < j; k++) {
-         r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
-      }
-      i = j;
-   }
-// Compute W+
-   w = 0.0;
-   for (i = 0; i < ns; i++) {
-      if (x->xR[c.xZ[i]] > e) {
-         w = w + r.xR[i];
-      }
-   }
-// Result
-   mu = rmul2((double)ns, (double)(ns + 1), _state) / 4;
-   sigma = ae_sqrt(mu * (2 * ns + 1) / 6, _state);
-   s = (w - mu) / sigma;
-   if (s <= 0.0) {
-      p = ae_exp(wsr_wsigma(-(w - mu) / sigma, ns, _state), _state);
-      mp = 1 - ae_exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state), _state);
-   } else {
-      mp = ae_exp(wsr_wsigma((w - mu) / sigma, ns, _state), _state);
-      p = 1 - ae_exp(wsr_wsigma((w + 1 - mu) / sigma, ns, _state), _state);
-   }
-   *lefttail = ae_maxreal(p, 1.0E-4, _state);
-   *righttail = ae_maxreal(mp, 1.0E-4, _state);
-   *bothtails = 2 * ae_minreal(*lefttail, *righttail, _state);
-   ae_frame_leave(_state);
-}
-
 // Sequential Chebyshev interpolation.
 static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
@@ -9335,163 +9042,31 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
    }
    return result;
 }
-} // end of namespace alglib_impl
 
-namespace alglib {
-void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-} // end of namespace alglib
-
-// === MANNWHITNEYU Package ===
-// Depends on: (AlgLibMisc) HQRND
-namespace alglib_impl {
-static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state);
-static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n, ae_state *_state);
-static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2, ae_state *_state);
-static double mannwhitneyu_utbln5n5(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n6(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n7(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n8(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n9(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n16(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n17(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n18(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n19(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n20(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n21(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n22(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n23(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n24(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n25(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n26(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n27(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n28(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n29(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln5n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n6(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n7(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n8(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n9(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln6n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n7(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n8(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n9(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln7n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n8(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n9(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln8n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n9(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln9n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n10(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln10n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n11(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln11n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n12(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln12n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln13n13(double s, ae_state *_state);
-static double mannwhitneyu_utbln13n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln13n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln13n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln13n100(double s, ae_state *_state);
-static double mannwhitneyu_utbln14n14(double s, ae_state *_state);
-static double mannwhitneyu_utbln14n15(double s, ae_state *_state);
-static double mannwhitneyu_utbln14n30(double s, ae_state *_state);
-static double mannwhitneyu_utbln14n100(double s, ae_state *_state);
-static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *_state);
-
-// Mann-Whitney U-test
+// Wilcoxon signed-rank test
 //
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous distributions of the same shape  and  same  median  or  whether
-// their medians are different.
-//
+// This test checks three hypotheses about the median  of  the  given sample.
 // The following tests are performed:
-//     * two-tailed test (null hypothesis - the medians are equal)
-//     * left-tailed test (null hypothesis - the median of the  first  sample
-//       is greater than or equal to the median of the second sample)
-//     * right-tailed test (null hypothesis - the median of the first  sample
-//       is less than or equal to the median of the second sample).
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis  -  the  median  is  less than or
+//       equal to the given value)
 //
 // Requirements:
-//     * the samples are independent
-//     * X and Y are continuous distributions (or discrete distributions well-
-//       approximating continuous distributions)
-//     * distributions of X and Y have the  same  shape.  The  only  possible
-//       difference is their position (i.e. the value of the median)
-//     * the number of elements in each sample is not less than 5
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
 //       the test could not be applied to nominal variables).
+//     * the distribution should be continuous and symmetric relative to  its
+//       median.
+//     * number of distinct values in the X array should be greater than 4
 //
-// The test is non-parametric and doesn't require distributions to be normal.
+// The test is non-parametric and doesn't require distribution X to be normal
 //
 // Inputs:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   size of the sample. M >= 5
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
 //
 // Outputs:
 //     BothTails   -   p-value for two-tailed test.
@@ -9505,29 +9080,16 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //                     the null hypothesis is rejected.
 //
 // To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
+// calculate p-values with two decimal places in interval [0.0001, 1].
+//
+// "Two decimal places" does not sound very impressive, but in  practice  the
+// relative error of less than 1% is enough to make a decision.
+//
 // There is no approximation outside the [0.0001, 1] interval. Therefore,  if
 // the significance level outlies this interval, the test returns 0.0001.
-//
-// Relative precision of approximation of p-value:
-//
-// N          M          Max.err.   Rms.err.
-// 5..10      N..10      1.4e-02    6.0e-04
-// 5..10      N..100     2.2e-02    5.3e-06
-// 10..15     N..15      1.0e-02    3.2e-04
-// 10..15     N..100     1.0e-02    2.2e-05
-// 15..100    N..100     6.1e-03    2.7e-06
-//
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
-// account characteristics of asymptotic approximation used, precision should
-// not be sharply different from the values for interval [5, 100].
-//
-// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
-//       P's outside of this interval are enforced to these bounds. Say,  you
-//       may quite often get P equal to exactly 0.25 or 0.0001.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -9536,38 +9098,47 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    double tmp;
    ae_int_t tmpi;
    ae_int_t ns;
-   double u;
+   double w;
    double p;
    double mp;
    double s;
    double sigma;
    double mu;
-   ae_int_t tiecount;
    ae_frame_make(_state, &_frame_block);
+   DupVector(x, _state);
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
    NewVector(r, 0, DT_REAL, _state);
    NewVector(c, 0, DT_INT, _state);
-   NewVector(tiesize, 0, DT_INT, _state);
 // Prepare
-   if (n <= 4 || m <= 4) {
+   if (n < 5) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
       ae_frame_leave(_state);
       return;
    }
-   ns = n + m;
+   ns = 0;
+   for (i = 0; i < n; i++) {
+      if (x->xR[i] == e) {
+         continue;
+      }
+      x->xR[ns] = x->xR[i];
+      ns = ns + 1;
+   }
+   if (ns < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      ae_frame_leave(_state);
+      return;
+   }
    ae_vector_set_length(&r, ns - 1 + 1, _state);
    ae_vector_set_length(&c, ns - 1 + 1, _state);
-   for (i = 0; i < n; i++) {
-      r.xR[i] = x->xR[i];
-      c.xZ[i] = 0;
-   }
-   for (i = 0; i < m; i++) {
-      r.xR[n + i] = y->xR[i];
-      c.xZ[n + i] = 1;
+   for (i = 0; i < ns; i++) {
+      r.xR[i] = ae_fabs(x->xR[i] - e, _state);
+      c.xZ[i] = i;
    }
 // sort {R, C}
    if (ns != 1) {
@@ -9627,8 +9198,6 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    }
 // compute tied ranks
    i = 0;
-   tiecount = 0;
-   ae_vector_set_length(&tiesize, ns - 1 + 1, _state);
    while (i < ns) {
       j = i + 1;
       while (j < ns) {
@@ -9640,39 +9209,47 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       for (k = i; k < j; k++) {
          r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
       }
-      tiesize.xZ[tiecount] = j - i;
-      tiecount = tiecount + 1;
       i = j;
    }
-// Compute U
-   u = 0.0;
+// Compute W+
+   w = 0.0;
    for (i = 0; i < ns; i++) {
-      if (c.xZ[i] == 0) {
-         u = u + r.xR[i];
+      if (x->xR[c.xZ[i]] > e) {
+         w = w + r.xR[i];
       }
    }
-   u = rmul2((double)n, (double)m, _state) + rmul2((double)n, (double)(n + 1), _state) * 0.5 - u;
 // Result
-   mu = rmul2((double)n, (double)m, _state) / 2;
-   tmp = ns * (ae_sqr((double)ns, _state) - 1) / 12;
-   for (i = 0; i < tiecount; i++) {
-      tmp = tmp - tiesize.xZ[i] * (ae_sqr((double)tiesize.xZ[i], _state) - 1) / 12;
-   }
-   sigma = ae_sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp, _state);
-   s = (u - mu) / sigma;
+   mu = rmul2((double)ns, (double)(ns + 1), _state) / 4;
+   sigma = ae_sqrt(mu * (2 * ns + 1) / 6, _state);
+   s = (w - mu) / sigma;
    if (s <= 0.0) {
-      p = ae_exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state), _state);
-      mp = 1 - ae_exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state), _state);
+      p = ae_exp(wsr_wsigma(-(w - mu) / sigma, ns, _state), _state);
+      mp = 1 - ae_exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state), _state);
    } else {
-      mp = ae_exp(mannwhitneyu_usigma((u - mu) / sigma, n, m, _state), _state);
-      p = 1 - ae_exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m, _state), _state);
+      mp = ae_exp(wsr_wsigma((w - mu) / sigma, ns, _state), _state);
+      p = 1 - ae_exp(wsr_wsigma((w + 1 - mu) / sigma, ns, _state), _state);
    }
-   *lefttail = boundval(ae_maxreal(mp, 1.0E-4, _state), 0.0001, 0.2500, _state);
-   *righttail = boundval(ae_maxreal(p, 1.0E-4, _state), 0.0001, 0.2500, _state);
+   *lefttail = ae_maxreal(p, 1.0E-4, _state);
+   *righttail = ae_maxreal(mp, 1.0E-4, _state);
    *bothtails = 2 * ae_minreal(*lefttail, *righttail, _state);
    ae_frame_leave(_state);
 }
+} // end of namespace alglib_impl
 
+namespace alglib {
+void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail, &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+} // end of namespace alglib
+
+// === MANNWHITNEYU Package ===
+// Depends on: (AlgLibMisc) HQRND
+namespace alglib_impl {
 // Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
@@ -9680,129 +9257,6 @@ static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, doub
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
    *tj1 = t;
-}
-
-// Three-point polynomial interpolation.
-static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n, ae_state *_state) {
-   double t1;
-   double t2;
-   double t3;
-   double t;
-   double p12;
-   double p23;
-   double result;
-   t1 = 1.0 / 15.0;
-   t2 = 1.0 / 30.0;
-   t3 = 1.0 / 100.0;
-   t = 1.0 / n;
-   p12 = ((t - t2) * p1 + (t1 - t) * p2) / (t1 - t2);
-   p23 = ((t - t3) * p2 + (t2 - t) * p3) / (t2 - t3);
-   result = ((t - t3) * p12 + (t1 - t) * p23) / (t1 - t3);
-   return result;
-}
-
-// Tail(0, N1, N2)
-static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(0.75, N1, N2)
-static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(1.5, N1, N2)
-static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(2.25, N1, N2)
-static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(3.0, N1, N2)
-static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(3.33, N1, N2)
-static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(3.66, N1, N2)
-static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
-}
-
-// Tail(4.0, N1, N2)
-static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2, ae_state *_state) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
-   return result;
 }
 
 // Tail(S, 5, 5)
@@ -12676,6 +12130,129 @@ static double mannwhitneyu_utbln14n100(double s, ae_state *_state) {
    return result;
 }
 
+// Three-point polynomial interpolation.
+static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n, ae_state *_state) {
+   double t1;
+   double t2;
+   double t3;
+   double t;
+   double p12;
+   double p23;
+   double result;
+   t1 = 1.0 / 15.0;
+   t2 = 1.0 / 30.0;
+   t3 = 1.0 / 100.0;
+   t = 1.0 / n;
+   p12 = ((t - t2) * p1 + (t1 - t) * p2) / (t1 - t2);
+   p23 = ((t - t3) * p2 + (t2 - t) * p3) / (t2 - t3);
+   result = ((t - t3) * p12 + (t1 - t) * p23) / (t1 - t3);
+   return result;
+}
+
+// Tail(0, N1, N2)
+static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(0.75, N1, N2)
+static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(1.5, N1, N2)
+static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(2.25, N1, N2)
+static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(3.0, N1, N2)
+static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(3.33, N1, N2)
+static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(3.66, N1, N2)
+static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
+// Tail(4.0, N1, N2)
+static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2, _state);
+   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2, _state);
+   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2, _state);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   return result;
+}
+
 // Tail(S, N1, N2)
 static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *_state) {
    double f0;
@@ -13071,6 +12648,217 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
       result = f3;
    }
    return result;
+}
+
+// Mann-Whitney U-test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous distributions of the same shape  and  same  median  or  whether
+// their medians are different.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the medians are equal)
+//     * left-tailed test (null hypothesis - the median of the  first  sample
+//       is greater than or equal to the median of the second sample)
+//     * right-tailed test (null hypothesis - the median of the first  sample
+//       is less than or equal to the median of the second sample).
+//
+// Requirements:
+//     * the samples are independent
+//     * X and Y are continuous distributions (or discrete distributions well-
+//       approximating continuous distributions)
+//     * distributions of X and Y have the  same  shape.  The  only  possible
+//       difference is their position (i.e. the value of the median)
+//     * the number of elements in each sample is not less than 5
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distributions to be normal.
+//
+// Inputs:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N >= 5
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   size of the sample. M >= 5
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+// Relative precision of approximation of p-value:
+//
+// N          M          Max.err.   Rms.err.
+// 5..10      N..10      1.4e-02    6.0e-04
+// 5..10      N..100     2.2e-02    5.3e-06
+// 10..15     N..15      1.0e-02    3.2e-04
+// 10..15     N..100     1.0e-02    2.2e-05
+// 15..100    N..100     6.1e-03    2.7e-06
+//
+// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// account characteristics of asymptotic approximation used, precision should
+// not be sharply different from the values for interval [5, 100].
+//
+// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
+//       P's outside of this interval are enforced to these bounds. Say,  you
+//       may quite often get P equal to exactly 0.25 or 0.0001.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t t;
+   double tmp;
+   ae_int_t tmpi;
+   ae_int_t ns;
+   double u;
+   double p;
+   double mp;
+   double s;
+   double sigma;
+   double mu;
+   ae_int_t tiecount;
+   ae_frame_make(_state, &_frame_block);
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   NewVector(r, 0, DT_REAL, _state);
+   NewVector(c, 0, DT_INT, _state);
+   NewVector(tiesize, 0, DT_INT, _state);
+// Prepare
+   if (n <= 4 || m <= 4) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      ae_frame_leave(_state);
+      return;
+   }
+   ns = n + m;
+   ae_vector_set_length(&r, ns - 1 + 1, _state);
+   ae_vector_set_length(&c, ns - 1 + 1, _state);
+   for (i = 0; i < n; i++) {
+      r.xR[i] = x->xR[i];
+      c.xZ[i] = 0;
+   }
+   for (i = 0; i < m; i++) {
+      r.xR[n + i] = y->xR[i];
+      c.xZ[n + i] = 1;
+   }
+// sort {R, C}
+   if (ns != 1) {
+      i = 2;
+      do {
+         t = i;
+         while (t != 1) {
+            k = t / 2;
+            if (r.xR[k - 1] >= r.xR[t - 1]) {
+               t = 1;
+            } else {
+               tmp = r.xR[k - 1];
+               r.xR[k - 1] = r.xR[t - 1];
+               r.xR[t - 1] = tmp;
+               tmpi = c.xZ[k - 1];
+               c.xZ[k - 1] = c.xZ[t - 1];
+               c.xZ[t - 1] = tmpi;
+               t = k;
+            }
+         }
+         i = i + 1;
+      } while (i <= ns);
+      i = ns - 1;
+      do {
+         tmp = r.xR[i];
+         r.xR[i] = r.xR[0];
+         r.xR[0] = tmp;
+         tmpi = c.xZ[i];
+         c.xZ[i] = c.xZ[0];
+         c.xZ[0] = tmpi;
+         t = 1;
+         while (t != 0) {
+            k = 2 * t;
+            if (k > i) {
+               t = 0;
+            } else {
+               if (k < i) {
+                  if (r.xR[k] > r.xR[k - 1]) {
+                     k = k + 1;
+                  }
+               }
+               if (r.xR[t - 1] >= r.xR[k - 1]) {
+                  t = 0;
+               } else {
+                  tmp = r.xR[k - 1];
+                  r.xR[k - 1] = r.xR[t - 1];
+                  r.xR[t - 1] = tmp;
+                  tmpi = c.xZ[k - 1];
+                  c.xZ[k - 1] = c.xZ[t - 1];
+                  c.xZ[t - 1] = tmpi;
+                  t = k;
+               }
+            }
+         }
+         i = i - 1;
+      } while (i >= 1);
+   }
+// compute tied ranks
+   i = 0;
+   tiecount = 0;
+   ae_vector_set_length(&tiesize, ns - 1 + 1, _state);
+   while (i < ns) {
+      j = i + 1;
+      while (j < ns) {
+         if (r.xR[j] != r.xR[i]) {
+            break;
+         }
+         j = j + 1;
+      }
+      for (k = i; k < j; k++) {
+         r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
+      }
+      tiesize.xZ[tiecount] = j - i;
+      tiecount = tiecount + 1;
+      i = j;
+   }
+// Compute U
+   u = 0.0;
+   for (i = 0; i < ns; i++) {
+      if (c.xZ[i] == 0) {
+         u = u + r.xR[i];
+      }
+   }
+   u = rmul2((double)n, (double)m, _state) + rmul2((double)n, (double)(n + 1), _state) * 0.5 - u;
+// Result
+   mu = rmul2((double)n, (double)m, _state) / 2;
+   tmp = ns * (ae_sqr((double)ns, _state) - 1) / 12;
+   for (i = 0; i < tiecount; i++) {
+      tmp = tmp - tiesize.xZ[i] * (ae_sqr((double)tiesize.xZ[i], _state) - 1) / 12;
+   }
+   sigma = ae_sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp, _state);
+   s = (u - mu) / sigma;
+   if (s <= 0.0) {
+      p = ae_exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state), _state);
+      mp = 1 - ae_exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state), _state);
+   } else {
+      mp = ae_exp(mannwhitneyu_usigma((u - mu) / sigma, n, m, _state), _state);
+      p = 1 - ae_exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m, _state), _state);
+   }
+   *lefttail = boundval(ae_maxreal(mp, 1.0E-4, _state), 0.0001, 0.2500, _state);
+   *righttail = boundval(ae_maxreal(p, 1.0E-4, _state), 0.0001, 0.2500, _state);
+   *bothtails = 2 * ae_minreal(*lefttail, *righttail, _state);
+   ae_frame_leave(_state);
 }
 } // end of namespace alglib_impl
 

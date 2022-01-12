@@ -316,7 +316,7 @@ void rvectorsetlengthatleast(RVector *x, ae_int_t n, ae_state *_state) {
 
 // If Cols(X)<N or Rows(X)<M, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
+void bmatrixsetlengthatleast(BMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
    if (m > 0 && n > 0) {
       if (x->rows < m || x->cols < n) {
          ae_matrix_set_length(x, m, n, _state);
@@ -326,7 +326,7 @@ void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_stat
 
 // If Cols(X)<N or Rows(X)<M, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void bmatrixsetlengthatleast(BMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
+void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
    if (m > 0 && n > 0) {
       if (x->rows < m || x->cols < n) {
          ae_matrix_set_length(x, m, n, _state);
@@ -395,6 +395,39 @@ void ivectorgrowto(ZVector *x, ae_int_t n, ae_state *_state) {
          x->xZ[i] = oldx.xZ[i];
       } else {
          x->xZ[i] = 0;
+      }
+   }
+   ae_frame_leave(_state);
+}
+
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) new size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t n2;
+   ae_frame_make(_state, &_frame_block);
+   NewVector(oldx, 0, DT_REAL, _state);
+// Enough place
+   if (x->cnt >= n) {
+      ae_frame_leave(_state);
+      return;
+   }
+// Choose new size
+   n = ae_maxint(n, ae_round(1.8 * x->cnt + 1, _state), _state);
+// Grow
+   n2 = x->cnt;
+   ae_swap_vectors(x, &oldx);
+   ae_vector_set_length(x, n, _state);
+   for (i = 0; i < n; i++) {
+      if (i < n2) {
+         x->xR[i] = oldx.xR[i];
+      } else {
+         x->xR[i] = 0.0;
       }
    }
    ae_frame_leave(_state);
@@ -478,39 +511,6 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows, ae_state *_stat
    ae_frame_leave(_state);
 }
 
-// Grows X, i.e. changes its size in such a way that:
-// a) contents is preserved
-// b) new size is at least N
-// c) new size can be larger than N, so subsequent grow() calls can return
-//    without reallocation
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t n2;
-   ae_frame_make(_state, &_frame_block);
-   NewVector(oldx, 0, DT_REAL, _state);
-// Enough place
-   if (x->cnt >= n) {
-      ae_frame_leave(_state);
-      return;
-   }
-// Choose new size
-   n = ae_maxint(n, ae_round(1.8 * x->cnt + 1, _state), _state);
-// Grow
-   n2 = x->cnt;
-   ae_swap_vectors(x, &oldx);
-   ae_vector_set_length(x, n, _state);
-   for (i = 0; i < n; i++) {
-      if (i < n2) {
-         x->xR[i] = oldx.xR[i];
-      } else {
-         x->xR[i] = 0.0;
-      }
-   }
-   ae_frame_leave(_state);
-}
-
 // Resizes X and:
 // * preserves old contents of X
 // * fills new elements by zeros
@@ -561,34 +561,6 @@ void rvectorresize(RVector *x, ae_int_t n, ae_state *_state) {
 // * preserves old contents of X
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t m2;
-   ae_int_t n2;
-   ae_frame_make(_state, &_frame_block);
-   NewMatrix(oldx, 0, 0, DT_REAL, _state);
-   m2 = x->rows;
-   n2 = x->cols;
-   ae_swap_matrices(x, &oldx);
-   ae_matrix_set_length(x, m, n, _state);
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-         if (i < m2 && j < n2) {
-            x->xyR[i][j] = oldx.xyR[i][j];
-         } else {
-            x->xyR[i][j] = 0.0;
-         }
-      }
-   }
-   ae_frame_leave(_state);
-}
-
-// Resizes X and:
-// * preserves old contents of X
-// * fills new elements by zeros
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -607,6 +579,34 @@ void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
             x->xyZ[i][j] = oldx.xyZ[i][j];
          } else {
             x->xyZ[i][j] = 0;
+         }
+      }
+   }
+   ae_frame_leave(_state);
+}
+
+// Resizes X and:
+// * preserves old contents of X
+// * fills new elements by zeros
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t m2;
+   ae_int_t n2;
+   ae_frame_make(_state, &_frame_block);
+   NewMatrix(oldx, 0, 0, DT_REAL, _state);
+   m2 = x->rows;
+   n2 = x->cols;
+   ae_swap_matrices(x, &oldx);
+   ae_matrix_set_length(x, m, n, _state);
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n; j++) {
+         if (i < m2 && j < n2) {
+            x->xyR[i][j] = oldx.xyR[i][j];
+         } else {
+            x->xyR[i][j] = 0.0;
          }
       }
    }
@@ -1028,24 +1028,6 @@ void swapr(double *v0, double *v1, ae_state *_state) {
    *v1 = v;
 }
 
-// This function is used to swap two rows of the matrix; if NCols<0, automatically
-// determined from the matrix size.
-void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols, ae_state *_state) {
-   ae_int_t j;
-   double v;
-   if (i0 == i1) {
-      return;
-   }
-   if (ncols < 0) {
-      ncols = a->cols;
-   }
-   for (j = 0; j < ncols; j++) {
-      v = a->xyR[i0][j];
-      a->xyR[i0][j] = a->xyR[i1][j];
-      a->xyR[i1][j] = v;
-   }
-}
-
 // This function is used to swap two cols of the matrix; if NRows<0, automatically
 // determined from the matrix size.
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows, ae_state *_state) {
@@ -1061,6 +1043,24 @@ void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows, ae_state *_s
       v = a->xyR[i][j0];
       a->xyR[i][j0] = a->xyR[i][j1];
       a->xyR[i][j1] = v;
+   }
+}
+
+// This function is used to swap two rows of the matrix; if NCols<0, automatically
+// determined from the matrix size.
+void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols, ae_state *_state) {
+   ae_int_t j;
+   double v;
+   if (i0 == i1) {
+      return;
+   }
+   if (ncols < 0) {
+      ncols = a->cols;
+   }
+   for (j = 0; j < ncols; j++) {
+      v = a->xyR[i0][j];
+      a->xyR[i0][j] = a->xyR[i1][j];
+      a->xyR[i1][j] = v;
    }
 }
 
@@ -1084,17 +1084,6 @@ void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth, ae_s
 }
 
 // This function is used to swap two elements of the vector
-void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state) {
-   double v;
-   if (i0 == i1) {
-      return;
-   }
-   v = a->xR[i0];
-   a->xR[i0] = a->xR[i1];
-   a->xR[i1] = v;
-}
-
-// This function is used to swap two elements of the vector
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state) {
    ae_int_t v;
    if (i0 == i1) {
@@ -1105,17 +1094,15 @@ void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state) {
    a->xZ[i1] = v;
 }
 
-// This function is used to return maximum of three real values
-double maxreal3(double v0, double v1, double v2, ae_state *_state) {
-   double result;
-   result = v0;
-   if (result < v1) {
-      result = v1;
+// This function is used to swap two elements of the vector
+void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state) {
+   double v;
+   if (i0 == i1) {
+      return;
    }
-   if (result < v2) {
-      result = v2;
-   }
-   return result;
+   v = a->xR[i0];
+   a->xR[i0] = a->xR[i1];
+   a->xR[i1] = v;
 }
 
 // This function is used to increment value of integer variable
@@ -1237,6 +1224,19 @@ ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state) {
    }
    if (i2 > result) {
       result = i2;
+   }
+   return result;
+}
+
+// This function is used to return maximum of three real values
+double maxreal3(double v0, double v1, double v2, ae_state *_state) {
+   double result;
+   result = v0;
+   if (result < v1) {
+      result = v1;
+   }
+   if (result < v2) {
+      result = v2;
    }
    return result;
 }
@@ -1575,6 +1575,24 @@ void unsetrealmatrix(RMatrix *a, ae_state *_state) {
    SetMatrix(a);
 }
 
+// This function is used to calculate number of chunks (including partial,
+// non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
+// Assertion is thrown otherwise.
+//
+// Function result is equivalent to Ceil(TaskSize/ChunkSize), but with guarantees
+// that rounding errors won't ruin results.
+// ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
+ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize, ae_state *_state) {
+   ae_int_t result;
+   ae_assert(tasksize >= 0, "ChunksCount: TaskSize<0", _state);
+   ae_assert(chunksize >= 1, "ChunksCount: ChunkSize<1", _state);
+   result = tasksize / chunksize;
+   if (tasksize % chunksize != 0) {
+      result = result + 1;
+   }
+   return result;
+}
+
 // This function is used in parallel functions for recurrent division of large
 // task into two smaller tasks.
 //
@@ -1599,6 +1617,68 @@ void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t 
    ae_assert(*task1 >= 1, "TiledSplit: internal error", _state);
    ae_assert(*task0 % tilesize == 0, "TiledSplit: internal error", _state);
    ae_assert(*task0 >= (*task1), "TiledSplit: internal error", _state);
+}
+
+// --- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD ---
+//
+// This function is used in parallel functions for recurrent division of large
+// task into two smaller tasks.
+//
+// It has following properties:
+// * it works only for TaskSize >= 2 and ChunkSize >= 2
+//   (assertion is thrown otherwise)
+// * Task0+Task1=TaskSize, Task0>0, Task1>0
+// * Task0 and Task1 are close to each other
+// * in case TaskSize>ChunkSize, Task0 is always divisible by ChunkSize
+// ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
+void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
+   *task0 = 0;
+   *task1 = 0;
+   ae_assert(chunksize >= 2, "SplitLength: ChunkSize<2", _state);
+   ae_assert(tasksize >= 2, "SplitLength: TaskSize<2", _state);
+   *task0 = tasksize / 2;
+   if (*task0 > chunksize && *task0 % chunksize != 0) {
+      *task0 = *task0 - *task0 % chunksize;
+   }
+   *task1 = tasksize - (*task0);
+   ae_assert(*task0 >= 1, "SplitLength: internal error", _state);
+   ae_assert(*task1 >= 1, "SplitLength: internal error", _state);
+}
+
+// This function is used in parallel functions for recurrent division of large
+// task into two smaller tasks.
+//
+// It has following properties:
+// * it works only for TaskSize >= 2 (assertion is thrown otherwise)
+// * for TaskSize=2, it returns Task0=1, Task1=1
+// * in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
+// * in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
+//   and both Task0 and Task1 are even, Task0 >= Task1
+// ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
+void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
+   *task0 = 0;
+   *task1 = 0;
+   ae_assert(tasksize >= 2, "SplitLengthEven: TaskSize<2", _state);
+   if (tasksize == 2) {
+      *task0 = 1;
+      *task1 = 1;
+      return;
+   }
+   if (tasksize % 2 == 0) {
+   // Even division
+      *task0 = tasksize / 2;
+      *task1 = tasksize / 2;
+      if (*task0 % 2 != 0) {
+         *task0 = *task0 + 1;
+         *task1 = *task1 - 1;
+      }
+   } else {
+   // Odd task size, split trailing odd part from it.
+      *task0 = tasksize - 1;
+      *task1 = 1;
+   }
+   ae_assert(*task0 >= 1, "SplitLengthEven: internal error", _state);
+   ae_assert(*task1 >= 1, "SplitLengthEven: internal error", _state);
 }
 
 // This function searches integer array. Elements in this array are actually
@@ -1644,60 +1724,6 @@ ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_
       } else {
          i1 = mididx;
       }
-   }
-   return result;
-}
-
-// This function is used in parallel functions for recurrent division of large
-// task into two smaller tasks.
-//
-// It has following properties:
-// * it works only for TaskSize >= 2 (assertion is thrown otherwise)
-// * for TaskSize=2, it returns Task0=1, Task1=1
-// * in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
-// * in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
-//   and both Task0 and Task1 are even, Task0 >= Task1
-// ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
-void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
-   *task0 = 0;
-   *task1 = 0;
-   ae_assert(tasksize >= 2, "SplitLengthEven: TaskSize<2", _state);
-   if (tasksize == 2) {
-      *task0 = 1;
-      *task1 = 1;
-      return;
-   }
-   if (tasksize % 2 == 0) {
-   // Even division
-      *task0 = tasksize / 2;
-      *task1 = tasksize / 2;
-      if (*task0 % 2 != 0) {
-         *task0 = *task0 + 1;
-         *task1 = *task1 - 1;
-      }
-   } else {
-   // Odd task size, split trailing odd part from it.
-      *task0 = tasksize - 1;
-      *task1 = 1;
-   }
-   ae_assert(*task0 >= 1, "SplitLengthEven: internal error", _state);
-   ae_assert(*task1 >= 1, "SplitLengthEven: internal error", _state);
-}
-
-// This function is used to calculate number of chunks (including partial,
-// non-complete chunks) in some set. It expects that ChunkSize >= 1, TaskSize >= 0.
-// Assertion is thrown otherwise.
-//
-// Function result is equivalent to Ceil(TaskSize/ChunkSize), but with guarantees
-// that rounding errors won't ruin results.
-// ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
-ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize, ae_state *_state) {
-   ae_int_t result;
-   ae_assert(tasksize >= 0, "ChunksCount: TaskSize<0", _state);
-   ae_assert(chunksize >= 1, "ChunksCount: ChunkSize<1", _state);
-   result = tasksize / chunksize;
-   if (tasksize % chunksize != 0) {
-      result = result + 1;
    }
    return result;
 }
@@ -1761,32 +1787,6 @@ double spawnlevel(ae_state *_state) {
    nn = (double)(2 * matrixtilesizea(_state));
    result = 0.95 * 2 * nn * nn * nn;
    return result;
-}
-
-// --- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD ---
-//
-// This function is used in parallel functions for recurrent division of large
-// task into two smaller tasks.
-//
-// It has following properties:
-// * it works only for TaskSize >= 2 and ChunkSize >= 2
-//   (assertion is thrown otherwise)
-// * Task0+Task1=TaskSize, Task0>0, Task1>0
-// * Task0 and Task1 are close to each other
-// * in case TaskSize>ChunkSize, Task0 is always divisible by ChunkSize
-// ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
-void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state) {
-   *task0 = 0;
-   *task1 = 0;
-   ae_assert(chunksize >= 2, "SplitLength: ChunkSize<2", _state);
-   ae_assert(tasksize >= 2, "SplitLength: TaskSize<2", _state);
-   *task0 = tasksize / 2;
-   if (*task0 > chunksize && *task0 % chunksize != 0) {
-      *task0 = *task0 - *task0 % chunksize;
-   }
-   *task1 = tasksize - (*task0);
-   ae_assert(*task0 >= 1, "SplitLength: internal error", _state);
-   ae_assert(*task1 >= 1, "SplitLength: internal error", _state);
 }
 
 // Outputs vector A[I0,I1-1] to trace log using either:
@@ -2188,8 +2188,6 @@ void scomplexarray_free(void *_p, bool make_automatic) {
 // === ABLASF Package ===
 namespace alglib_impl {
 #ifdef ALGLIB_NO_FAST_KERNELS
-static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-
 // Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
 // Inputs:
@@ -2706,27 +2704,10 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
 // Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
+void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
    ae_int_t j;
    for (j = 0; j < n; j++) {
-      x->xR[j] = v;
-   }
-}
-
-// Sets X[OffsX:OffsX+N-1] to V
-//
-// Inputs:
-//     N       -   subvector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// Outputs:
-//     X       -   X[OffsX:OffsX+N-1] is replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
-   ae_int_t j;
-   for (j = 0; j < n; j++) {
-      x->xR[offsx + j] = v;
+      x->xB[j] = v;
    }
 }
 
@@ -2757,10 +2738,27 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 // Outputs:
 //     X       -   leading N elements are replaced by V
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
+void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state) {
    ae_int_t j;
    for (j = 0; j < n; j++) {
-      x->xB[j] = v;
+      x->xR[j] = v;
+   }
+}
+
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// Inputs:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// Outputs:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xR[offsx + j] = v;
    }
 }
 
@@ -2784,6 +2782,42 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) {
    }
 }
 #endif // defined ALGLIB_NO_FAST_KERNELS
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly preallocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
+   if (x->cnt < n) {
+      ae_vector_set_length(x, n, _state);
+   }
+   bsetv(n, v, x, _state);
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly preallocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
+   if (x->cnt < n) {
+      ae_vector_set_length(x, n, _state);
+   }
+   isetv(n, v, x, _state);
+}
 
 // Sets vector X[] to V, reallocating X[] if too small
 //
@@ -2832,7 +2866,7 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state) 
 // Outputs:
 //     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
+void ballocv(ae_int_t n, BVector *x, ae_state *_state) {
    if (x->cnt < n) {
       ae_vector_set_length(x, n, _state);
    }
@@ -2864,7 +2898,7 @@ void iallocv(ae_int_t n, ZVector *x, ae_state *_state) {
 // Outputs:
 //     X       -   length(X) >= N
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void ballocv(ae_int_t n, BVector *x, ae_state *_state) {
+void rallocv(ae_int_t n, RVector *x, ae_state *_state) {
    if (x->cnt < n) {
       ae_vector_set_length(x, n, _state);
    }
@@ -2885,42 +2919,6 @@ void rallocm(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    if (a->rows < m || a->cols < n) {
       ae_matrix_set_length(a, m, n, _state);
    }
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly preallocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void isetallocv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
-   if (x->cnt < n) {
-      ae_vector_set_length(x, n, _state);
-   }
-   isetv(n, v, x, _state);
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly preallocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetallocv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
-   if (x->cnt < n) {
-      ae_vector_set_length(x, n, _state);
-   }
-   bsetv(n, v, x, _state);
 }
 
 #ifdef ALGLIB_NO_FAST_KERNELS
@@ -2975,10 +2973,27 @@ void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j, ae_state *_state) {
 //
 // NOTE: destination and source should NOT overlap
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
+void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
    ae_int_t j;
    for (j = 0; j < n; j++) {
-      y->xR[j] = x->xR[j];
+      y->xB[j] = x->xB[j];
+   }
+}
+
+// Copies vector X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   preallocated array[N]
+//
+// Outputs:
+//     Y       -   X copied to Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xZ[j] = x->xZ[j];
    }
 }
 
@@ -2995,10 +3010,31 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 //
 // NOTE: destination and source should NOT overlap
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
+void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t j;
    for (j = 0; j < n; j++) {
-      y->xB[j] = x->xB[j];
+      y->xR[j] = x->xR[j];
+   }
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// Outputs:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xZ[offsy + j] = x->xZ[offsx + j];
    }
 }
 
@@ -3023,6 +3059,40 @@ void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy,
    }
 }
 #endif // defined ALGLIB_NO_FAST_KERNELS
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly preallocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
+   if (y->cnt < n) {
+      ae_vector_set_length(y, n, _state);
+   }
+   bcopyv(n, x, y, _state);
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly preallocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
+   if (y->cnt < n) {
+      ae_vector_set_length(y, n, _state);
+   }
+   icopyv(n, x, y, _state);
+}
 
 // Copies vector X[] to Y[], resizing Y[] if needed.
 //
@@ -3087,80 +3157,6 @@ void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y, ae_state *_stat
    }
    rcopym(m, n, x, y, _state);
 }
-
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly preallocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyallocv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
-   if (y->cnt < n) {
-      ae_vector_set_length(y, n, _state);
-   }
-   icopyv(n, x, y, _state);
-}
-
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly preallocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyallocv(ae_int_t n, BVector *x, BVector *y, ae_state *_state) {
-   if (y->cnt < n) {
-      ae_vector_set_length(y, n, _state);
-   }
-   bcopyv(n, x, y, _state);
-}
-
-#ifdef ALGLIB_NO_FAST_KERNELS
-// Copies vector X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     Y       -   preallocated array[N]
-//
-// Outputs:
-//     Y       -   X copied to Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state) {
-   ae_int_t j;
-   for (j = 0; j < n; j++) {
-      y->xZ[j] = x->xZ[j];
-   }
-}
-
-// Copies vector X[] to Y[], extended version
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   preallocated array[N]
-//     OffsY   -   destination offset
-//
-// Outputs:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state) {
-   ae_int_t j;
-   for (j = 0; j < n; j++) {
-      y->xZ[offsy + j] = x->xZ[offsx + j];
-   }
-}
-#endif // defined ALGLIB_NO_FAST_KERNELS
 
 // Grows X, i.e. changes its size in such a way that:
 // a) contents is preserved
@@ -3656,18 +3652,6 @@ bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, d
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixrank1f(m, n, a, ia, ja, u, iu, v, iv);
-#endif
-}
-
-// Fast kernel
-// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
@@ -3680,13 +3664,25 @@ bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja,
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
+bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_cmatrixrank1f(m, n, a, ia, ja, u, iu, v, iv);
+#endif
+}
+
+// Fast kernel
+// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
+bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_ABLAS
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
 }
 
@@ -3716,25 +3712,13 @@ bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
+bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// Fast kernel
-// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixherkf(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+   return _ialglib_i_cmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
 }
 
@@ -3752,6 +3736,18 @@ bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia,
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
+bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_ABLAS
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixherkf(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+#endif
+}
+
+// Fast kernel
+// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
@@ -3760,375 +3756,6 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 #else
    return _ialglib_i_cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
 #endif
-}
-
-// CMatrixGEMM kernel, basecase code for CMatrixGEMM.
-//
-// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-// * C is MxN general matrix
-// * op1(A) is MxK matrix
-// * op2(B) is KxN matrix
-// * "op" may be identity transformation, transposition, conjugate transposition
-//
-// Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
-//   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-// * if both Beta and Alpha are zero, C is filled by zeros.
-//
-// IMPORTANT:
-//
-// This function does NOT preallocate output matrix C, it MUST be preallocated
-// by caller prior to calling this function. In case C does not have  enough
-// space to store result, exception will be generated.
-//
-// Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     OpTypeA -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//                 * 2 - conjugate transposition
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     OpTypeB -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//                 * 2 - conjugate transposition
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_complex v;
-   ae_complex v00;
-   ae_complex v01;
-   ae_complex v10;
-   ae_complex v11;
-   double v00x;
-   double v00y;
-   double v01x;
-   double v01y;
-   double v10x;
-   double v10y;
-   double v11x;
-   double v11y;
-   double a0x;
-   double a0y;
-   double a1x;
-   double a1y;
-   double b0x;
-   double b0y;
-   double b1x;
-   double b1y;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// Try optimized code
-   if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state)) {
-      return;
-   }
-// if K=0 or Alpha=0, then C=Beta*C
-   if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
-      if (ae_c_neq_d(beta, 1.0)) {
-         if (ae_c_neq_d(beta, 0.0)) {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
-               }
-            }
-         } else {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyC[ic + i][jc + j] = ae_complex_from_i(0);
-               }
-            }
-         }
-      }
-      return;
-   }
-// This phase is not really necessary, but compiler complains
-// about "possibly uninitialized variables"
-   a0x = 0.0;
-   a0y = 0.0;
-   a1x = 0.0;
-   a1y = 0.0;
-   b0x = 0.0;
-   b0y = 0.0;
-   b1x = 0.0;
-   b1y = 0.0;
-// General case
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 2 <= m && j + 2 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            v00x = 0.0;
-            v00y = 0.0;
-            v01x = 0.0;
-            v01y = 0.0;
-            v10x = 0.0;
-            v10y = 0.0;
-            v11x = 0.0;
-            v11y = 0.0;
-            if (optypea == 0) {
-               idxa0 = ia + i + 0;
-               idxa1 = ia + i + 1;
-               offsa = ja;
-            } else {
-               idxa0 = ja + i + 0;
-               idxa1 = ja + i + 1;
-               offsa = ia;
-            }
-            if (optypeb == 0) {
-               idxb0 = jb + j + 0;
-               idxb1 = jb + j + 1;
-               offsb = ib;
-            } else {
-               idxb0 = ib + j + 0;
-               idxb1 = ib + j + 1;
-               offsb = jb;
-            }
-            for (t = 0; t < k; t++) {
-               if (optypea == 0) {
-                  a0x = a->xyC[idxa0][offsa].x;
-                  a0y = a->xyC[idxa0][offsa].y;
-                  a1x = a->xyC[idxa1][offsa].x;
-                  a1y = a->xyC[idxa1][offsa].y;
-               }
-               if (optypea == 1) {
-                  a0x = a->xyC[offsa][idxa0].x;
-                  a0y = a->xyC[offsa][idxa0].y;
-                  a1x = a->xyC[offsa][idxa1].x;
-                  a1y = a->xyC[offsa][idxa1].y;
-               }
-               if (optypea == 2) {
-                  a0x = a->xyC[offsa][idxa0].x;
-                  a0y = -a->xyC[offsa][idxa0].y;
-                  a1x = a->xyC[offsa][idxa1].x;
-                  a1y = -a->xyC[offsa][idxa1].y;
-               }
-               if (optypeb == 0) {
-                  b0x = b->xyC[offsb][idxb0].x;
-                  b0y = b->xyC[offsb][idxb0].y;
-                  b1x = b->xyC[offsb][idxb1].x;
-                  b1y = b->xyC[offsb][idxb1].y;
-               }
-               if (optypeb == 1) {
-                  b0x = b->xyC[idxb0][offsb].x;
-                  b0y = b->xyC[idxb0][offsb].y;
-                  b1x = b->xyC[idxb1][offsb].x;
-                  b1y = b->xyC[idxb1][offsb].y;
-               }
-               if (optypeb == 2) {
-                  b0x = b->xyC[idxb0][offsb].x;
-                  b0y = -b->xyC[idxb0][offsb].y;
-                  b1x = b->xyC[idxb1][offsb].x;
-                  b1y = -b->xyC[idxb1][offsb].y;
-               }
-               v00x = v00x + a0x * b0x - a0y * b0y;
-               v00y = v00y + a0x * b0y + a0y * b0x;
-               v01x = v01x + a0x * b1x - a0y * b1y;
-               v01y = v01y + a0x * b1y + a0y * b1x;
-               v10x = v10x + a1x * b0x - a1y * b0y;
-               v10y = v10y + a1x * b0y + a1y * b0x;
-               v11x = v11x + a1x * b1x - a1y * b1y;
-               v11y = v11y + a1x * b1y + a1y * b1x;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
-            }
-            v00.x = v00x;
-            v00.y = v00y;
-            v10.x = v10x;
-            v10.y = v10y;
-            v01.x = v01x;
-            v01.y = v01y;
-            v11.x = v11x;
-            v11.y = v11y;
-            if (ae_c_eq_d(beta, 0.0)) {
-               c->xyC[ic + i + 0][jc + j + 0] = ae_c_mul(alpha, v00);
-               c->xyC[ic + i + 0][jc + j + 1] = ae_c_mul(alpha, v01);
-               c->xyC[ic + i + 1][jc + j + 0] = ae_c_mul(alpha, v10);
-               c->xyC[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
-            } else {
-               c->xyC[ic + i + 0][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 0]), ae_c_mul(alpha, v00));
-               c->xyC[ic + i + 0][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 1]), ae_c_mul(alpha, v01));
-               c->xyC[ic + i + 1][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 0]), ae_c_mul(alpha, v10));
-               c->xyC[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = ae_minint(i + 1, m - 1, _state);
-            j0 = j;
-            j1 = ae_minint(j + 1, n - 1, _state);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
-                     v = ae_complex_from_i(0);
-                  } else {
-                     v = ae_complex_from_d(0.0);
-                     if (optypea == 0 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 0 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 0 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                     if (optypea == 1 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 1 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 1 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                     if (optypea == 2 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 2 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 2 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                  }
-                  if (ae_c_eq_d(beta, 0.0)) {
-                     c->xyC[ic + ik][jc + jk] = ae_c_mul(alpha, v);
-                  } else {
-                     c->xyC[ic + ik][jc + jk] = ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
-                  }
-               }
-            }
-         }
-         j = j + 2;
-      }
-      i = i + 2;
-   }
-}
-
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM.
-//
-// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-// * C is MxN general matrix
-// * op1(A) is MxK matrix
-// * op2(B) is KxN matrix
-// * "op" may be identity transformation, transposition
-//
-// Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
-//   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-// * if both Beta and Alpha are zero, C is filled by zeros.
-//
-// IMPORTANT:
-//
-// This function does NOT preallocate output matrix C, it MUST be preallocated
-// by caller prior to calling this function. In case C does not have  enough
-// space to store result, exception will be generated.
-//
-// Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     OpTypeA -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     OpTypeB -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// Try optimized code
-   if (ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state)) {
-      return;
-   }
-// if K=0 or Alpha=0, then C=Beta*C
-   if (k == 0 || alpha == 0.0) {
-      if (beta != 1.0) {
-         if (beta != 0.0) {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j];
-               }
-            }
-         } else {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyR[ic + i][jc + j] = 0.0;
-               }
-            }
-         }
-      }
-      return;
-   }
-// Call specialized code.
-//
-// NOTE: specialized code was moved to separate function because of strange
-//       issues with instructions cache on some systems; Having too long
-//       functions significantly slows down internal loop of the algorithm.
-   if (optypea == 0 && optypeb == 0) {
-      rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
-   }
-   if (optypea == 0 && optypeb != 0) {
-      rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
-   }
-   if (optypea != 0 && optypeb == 0) {
-      rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
-   }
-   if (optypea != 0 && optypeb != 0) {
-      rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
-   }
 }
 
 // RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
@@ -4947,6 +4574,375 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
    return result;
 }
 #endif // defined ALGLIB_NO_FAST_KERNELS
+
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM.
+//
+// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
+// * C is MxN general matrix
+// * op1(A) is MxK matrix
+// * op2(B) is KxN matrix
+// * "op" may be identity transformation, transposition
+//
+// Additional info:
+// * multiplication result replaces C. If Beta=0, C elements are not used in
+//   calculations (not multiplied by zero - just not referenced)
+// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if both Beta and Alpha are zero, C is filled by zeros.
+//
+// IMPORTANT:
+//
+// This function does NOT preallocate output matrix C, it MUST be preallocated
+// by caller prior to calling this function. In case C does not have  enough
+// space to store result, exception will be generated.
+//
+// Inputs:
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     OpTypeA -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     OpTypeB -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+// if matrix size is zero
+   if (m == 0 || n == 0) {
+      return;
+   }
+// Try optimized code
+   if (ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state)) {
+      return;
+   }
+// if K=0 or Alpha=0, then C=Beta*C
+   if (k == 0 || alpha == 0.0) {
+      if (beta != 1.0) {
+         if (beta != 0.0) {
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j];
+               }
+            }
+         } else {
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  c->xyR[ic + i][jc + j] = 0.0;
+               }
+            }
+         }
+      }
+      return;
+   }
+// Call specialized code.
+//
+// NOTE: specialized code was moved to separate function because of strange
+//       issues with instructions cache on some systems; Having too long
+//       functions significantly slows down internal loop of the algorithm.
+   if (optypea == 0 && optypeb == 0) {
+      rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
+   }
+   if (optypea == 0 && optypeb != 0) {
+      rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
+   }
+   if (optypea != 0 && optypeb == 0) {
+      rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
+   }
+   if (optypea != 0 && optypeb != 0) {
+      rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
+   }
+}
+
+// CMatrixGEMM kernel, basecase code for CMatrixGEMM.
+//
+// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
+// * C is MxN general matrix
+// * op1(A) is MxK matrix
+// * op2(B) is KxN matrix
+// * "op" may be identity transformation, transposition, conjugate transposition
+//
+// Additional info:
+// * multiplication result replaces C. If Beta=0, C elements are not used in
+//   calculations (not multiplied by zero - just not referenced)
+// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if both Beta and Alpha are zero, C is filled by zeros.
+//
+// IMPORTANT:
+//
+// This function does NOT preallocate output matrix C, it MUST be preallocated
+// by caller prior to calling this function. In case C does not have  enough
+// space to store result, exception will be generated.
+//
+// Inputs:
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     OpTypeA -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//                 * 2 - conjugate transposition
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     OpTypeB -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//                 * 2 - conjugate transposition
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_complex v;
+   ae_complex v00;
+   ae_complex v01;
+   ae_complex v10;
+   ae_complex v11;
+   double v00x;
+   double v00y;
+   double v01x;
+   double v01y;
+   double v10x;
+   double v10y;
+   double v11x;
+   double v11y;
+   double a0x;
+   double a0y;
+   double a1x;
+   double a1y;
+   double b0x;
+   double b0y;
+   double b1x;
+   double b1y;
+   ae_int_t idxa0;
+   ae_int_t idxa1;
+   ae_int_t idxb0;
+   ae_int_t idxb1;
+   ae_int_t i0;
+   ae_int_t i1;
+   ae_int_t ik;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t jk;
+   ae_int_t t;
+   ae_int_t offsa;
+   ae_int_t offsb;
+// if matrix size is zero
+   if (m == 0 || n == 0) {
+      return;
+   }
+// Try optimized code
+   if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state)) {
+      return;
+   }
+// if K=0 or Alpha=0, then C=Beta*C
+   if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
+      if (ae_c_neq_d(beta, 1.0)) {
+         if (ae_c_neq_d(beta, 0.0)) {
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
+               }
+            }
+         } else {
+            for (i = 0; i < m; i++) {
+               for (j = 0; j < n; j++) {
+                  c->xyC[ic + i][jc + j] = ae_complex_from_i(0);
+               }
+            }
+         }
+      }
+      return;
+   }
+// This phase is not really necessary, but compiler complains
+// about "possibly uninitialized variables"
+   a0x = 0.0;
+   a0y = 0.0;
+   a1x = 0.0;
+   a1y = 0.0;
+   b0x = 0.0;
+   b0y = 0.0;
+   b1x = 0.0;
+   b1y = 0.0;
+// General case
+   i = 0;
+   while (i < m) {
+      j = 0;
+      while (j < n) {
+      // Choose between specialized 4x4 code and general code
+         if (i + 2 <= m && j + 2 <= n) {
+         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+         //
+         // This submatrix is calculated as sum of K rank-1 products,
+         // with operands cached in local variables in order to speed
+         // up operations with arrays.
+            v00x = 0.0;
+            v00y = 0.0;
+            v01x = 0.0;
+            v01y = 0.0;
+            v10x = 0.0;
+            v10y = 0.0;
+            v11x = 0.0;
+            v11y = 0.0;
+            if (optypea == 0) {
+               idxa0 = ia + i + 0;
+               idxa1 = ia + i + 1;
+               offsa = ja;
+            } else {
+               idxa0 = ja + i + 0;
+               idxa1 = ja + i + 1;
+               offsa = ia;
+            }
+            if (optypeb == 0) {
+               idxb0 = jb + j + 0;
+               idxb1 = jb + j + 1;
+               offsb = ib;
+            } else {
+               idxb0 = ib + j + 0;
+               idxb1 = ib + j + 1;
+               offsb = jb;
+            }
+            for (t = 0; t < k; t++) {
+               if (optypea == 0) {
+                  a0x = a->xyC[idxa0][offsa].x;
+                  a0y = a->xyC[idxa0][offsa].y;
+                  a1x = a->xyC[idxa1][offsa].x;
+                  a1y = a->xyC[idxa1][offsa].y;
+               }
+               if (optypea == 1) {
+                  a0x = a->xyC[offsa][idxa0].x;
+                  a0y = a->xyC[offsa][idxa0].y;
+                  a1x = a->xyC[offsa][idxa1].x;
+                  a1y = a->xyC[offsa][idxa1].y;
+               }
+               if (optypea == 2) {
+                  a0x = a->xyC[offsa][idxa0].x;
+                  a0y = -a->xyC[offsa][idxa0].y;
+                  a1x = a->xyC[offsa][idxa1].x;
+                  a1y = -a->xyC[offsa][idxa1].y;
+               }
+               if (optypeb == 0) {
+                  b0x = b->xyC[offsb][idxb0].x;
+                  b0y = b->xyC[offsb][idxb0].y;
+                  b1x = b->xyC[offsb][idxb1].x;
+                  b1y = b->xyC[offsb][idxb1].y;
+               }
+               if (optypeb == 1) {
+                  b0x = b->xyC[idxb0][offsb].x;
+                  b0y = b->xyC[idxb0][offsb].y;
+                  b1x = b->xyC[idxb1][offsb].x;
+                  b1y = b->xyC[idxb1][offsb].y;
+               }
+               if (optypeb == 2) {
+                  b0x = b->xyC[idxb0][offsb].x;
+                  b0y = -b->xyC[idxb0][offsb].y;
+                  b1x = b->xyC[idxb1][offsb].x;
+                  b1y = -b->xyC[idxb1][offsb].y;
+               }
+               v00x = v00x + a0x * b0x - a0y * b0y;
+               v00y = v00y + a0x * b0y + a0y * b0x;
+               v01x = v01x + a0x * b1x - a0y * b1y;
+               v01y = v01y + a0x * b1y + a0y * b1x;
+               v10x = v10x + a1x * b0x - a1y * b0y;
+               v10y = v10y + a1x * b0y + a1y * b0x;
+               v11x = v11x + a1x * b1x - a1y * b1y;
+               v11y = v11y + a1x * b1y + a1y * b1x;
+               offsa = offsa + 1;
+               offsb = offsb + 1;
+            }
+            v00.x = v00x;
+            v00.y = v00y;
+            v10.x = v10x;
+            v10.y = v10y;
+            v01.x = v01x;
+            v01.y = v01y;
+            v11.x = v11x;
+            v11.y = v11y;
+            if (ae_c_eq_d(beta, 0.0)) {
+               c->xyC[ic + i + 0][jc + j + 0] = ae_c_mul(alpha, v00);
+               c->xyC[ic + i + 0][jc + j + 1] = ae_c_mul(alpha, v01);
+               c->xyC[ic + i + 1][jc + j + 0] = ae_c_mul(alpha, v10);
+               c->xyC[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
+            } else {
+               c->xyC[ic + i + 0][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 0]), ae_c_mul(alpha, v00));
+               c->xyC[ic + i + 0][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 1]), ae_c_mul(alpha, v01));
+               c->xyC[ic + i + 1][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 0]), ae_c_mul(alpha, v10));
+               c->xyC[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
+            }
+         } else {
+         // Determine submatrix [I0..I1]x[J0..J1] to process
+            i0 = i;
+            i1 = ae_minint(i + 1, m - 1, _state);
+            j0 = j;
+            j1 = ae_minint(j + 1, n - 1, _state);
+         // Process submatrix
+            for (ik = i0; ik <= i1; ik++) {
+               for (jk = j0; jk <= j1; jk++) {
+                  if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
+                     v = ae_complex_from_i(0);
+                  } else {
+                     v = ae_complex_from_d(0.0);
+                     if (optypea == 0 && optypeb == 0) {
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
+                     }
+                     if (optypea == 0 && optypeb == 1) {
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k);
+                     }
+                     if (optypea == 0 && optypeb == 2) {
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
+                     }
+                     if (optypea == 1 && optypeb == 0) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
+                     }
+                     if (optypea == 1 && optypeb == 1) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k);
+                     }
+                     if (optypea == 1 && optypeb == 2) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
+                     }
+                     if (optypea == 2 && optypeb == 0) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k);
+                     }
+                     if (optypea == 2 && optypeb == 1) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k);
+                     }
+                     if (optypea == 2 && optypeb == 2) {
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k);
+                     }
+                  }
+                  if (ae_c_eq_d(beta, 0.0)) {
+                     c->xyC[ic + ik][jc + jk] = ae_c_mul(alpha, v);
+                  } else {
+                     c->xyC[ic + ik][jc + jk] = ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
+                  }
+               }
+            }
+         }
+         j = j + 2;
+      }
+      i = i + 2;
+   }
+}
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===
@@ -5363,18 +5359,6 @@ bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja,
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
-#endif
-}
-
-// MKL-based kernel
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
 bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
@@ -5387,13 +5371,13 @@ bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t j
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy, ae_state *_state) {
+bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
+   return _ialglib_i_cmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
 #endif
 }
 
@@ -5406,6 +5390,18 @@ bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, 
    return result;
 #else
    return _ialglib_i_rmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
 #endif
 }
 
@@ -5430,6 +5426,18 @@ bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupp
    return result;
 #else
    return _ialglib_i_rmatrixtrsvmkl(n, a, ia, ja, isupper, isunit, optype, x, ix);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 01.10.2017 by Sergey Bochkanov
+bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixsymvmkl(n, alpha, a, ia, ja, isupper, x, ix, beta, y, iy);
 #endif
 }
 
@@ -5470,18 +5478,6 @@ bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a
 }
 
 // MKL-based kernel
-// ALGLIB Routine: Copyright 01.10.2017 by Sergey Bochkanov
-bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixsymvmkl(n, alpha, a, ia, ja, isupper, x, ix, beta, y, iy);
-#endif
-}
-
-// MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
 bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -5490,30 +5486,6 @@ bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatri
    return result;
 #else
    return _ialglib_i_cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-#endif
-}
-
-// MKL-based kernel
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// MKL-based kernel
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
 }
 
@@ -5531,6 +5503,18 @@ bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
 bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
@@ -5538,6 +5522,18 @@ bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int
    return result;
 #else
    return _ialglib_i_rmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
 }
 
@@ -5647,20 +5643,6 @@ bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d
 
 // MKL-based kernel.
 //
-// NOTE: Q must be preallocated N*N array
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_smatrixtdunpackqmkl(a, n, isupper, tau, q);
-#endif
-}
-
-// MKL-based kernel.
-//
 // NOTE: Tau, D, E must be preallocated arrays;
 //       length(E)=length(Tau)=N-1 (or larger)
 //       length(D)=N (or larger)
@@ -5672,6 +5654,20 @@ bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d
    return result;
 #else
    return _ialglib_i_hmatrixtdmkl(a, n, isupper, tau, d, e);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Q must be preallocated N*N array
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_smatrixtdunpackqmkl(a, n, isupper, tau, q);
 #endif
 }
 
@@ -5856,110 +5852,366 @@ ae_int_t getlptestserializationcode(ae_state *_state) {
 // === TSORT Package ===
 // Depends on: APSERV
 namespace alglib_impl {
-static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
-static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state);
-static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2, ae_state *_state);
-
-// This function sorts array of real keys by ascending.
-//
-// Its results are:
-// * sorted array A
-// * permutation tables P1, P2
-//
-// Algorithm outputs permutation tables using two formats:
-// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
-//   value which was moved there from J-th position.
-// * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
-//   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
-//
-// Inputs:
-//     A       -   unsorted array
-//     N       -   array size
-//
-// Outputs:
-//     A       -   sorted array
-//     P1, P2  -   permutation tables, array[N]
-//
-// NOTES:
-//     this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_frame_make(_state, &_frame_block);
-   SetVector(p1);
-   SetVector(p2);
-   NewObj(apbuffers, buf, _state);
-   tagsortbuf(a, n, p1, p2, &buf, _state);
-   ae_frame_leave(_state);
+// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
+static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t cntless;
+   ae_int_t cnteq;
+   ae_int_t cntgreater;
+   double tmpr;
+   ae_int_t tmpi;
+   double v0;
+   double v1;
+   double v2;
+   double vp;
+// Fast exit
+   if (i2 <= i1) {
+      return;
+   }
+// Non-recursive sort for small arrays
+   if (i2 - i1 <= 16) {
+      for (j = i1 + 1; j <= i2; j++) {
+      // Search elements [I1..J-1] for place to insert Jth element.
+      //
+      // This code stops immediately if we can leave A[J] at J-th position
+      // (all elements have same value of A[J] larger than any of them)
+         tmpr = a->xR[j];
+         tmpi = j;
+         for (k = j - 1; k >= i1; k--) {
+            if (a->xR[k] <= tmpr) {
+               break;
+            }
+            tmpi = k;
+         }
+         k = tmpi;
+      // Insert Jth element into Kth position
+         if (k != j) {
+            tmpr = a->xR[j];
+            tmpi = b->xZ[j];
+            for (i = j - 1; i >= k; i--) {
+               a->xR[i + 1] = a->xR[i];
+               b->xZ[i + 1] = b->xZ[i];
+            }
+            a->xR[k] = tmpr;
+            b->xZ[k] = tmpi;
+         }
+      }
+      return;
+   }
+// Quicksort: choose pivot
+// Here we assume that I2-I1 >= 2
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
+   }
+   if (v1 > v2) {
+      tmpr = v2;
+      v2 = v1;
+      v1 = tmpr;
+   }
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
+   }
+   vp = v1;
+// now pass through A/B and:
+// * move elements that are LESS than VP to the left of A/B
+// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+// * move elements from the left of BufA/BufB to the end of A/B
+   cntless = 0;
+   cnteq = 0;
+   cntgreater = 0;
+   for (i = i1; i <= i2; i++) {
+      v0 = a->xR[i];
+      if (v0 < vp) {
+      // LESS
+         k = i1 + cntless;
+         if (i != k) {
+            a->xR[k] = v0;
+            b->xZ[k] = b->xZ[i];
+         }
+         cntless = cntless + 1;
+         continue;
+      }
+      if (v0 == vp) {
+      // EQUAL
+         k = i2 - cnteq;
+         bufa->xR[k] = v0;
+         bufb->xZ[k] = b->xZ[i];
+         cnteq = cnteq + 1;
+         continue;
+      }
+   // GREATER
+      k = i1 + cntgreater;
+      bufa->xR[k] = v0;
+      bufb->xZ[k] = b->xZ[i];
+      cntgreater = cntgreater + 1;
+   }
+   for (i = 0; i < cnteq; i++) {
+      j = i1 + cntless + cnteq - 1 - i;
+      k = i2 + i - (cnteq - 1);
+      a->xR[j] = bufa->xR[k];
+      b->xZ[j] = bufb->xZ[k];
+   }
+   for (i = 0; i < cntgreater; i++) {
+      j = i1 + cntless + cnteq + i;
+      k = i1 + i;
+      a->xR[j] = bufa->xR[k];
+      b->xZ[j] = bufb->xZ[k];
+   }
+// Sort left and right parts of the array (ignoring middle part)
+   tsort_tagsortfastirec(a, b, bufa, bufb, i1, i1 + cntless - 1, _state);
+   tsort_tagsortfastirec(a, b, bufa, bufb, i1 + cntless + cnteq, i2, _state);
 }
 
-// Buffered variant of TagSort, which accepts preallocated output arrays as
-// well as special structure for buffered allocations. If arrays are too
-// short, they are reallocated. If they are large enough, no memory
-// allocation is done.
-//
-// It is intended to be used in the performance-critical parts of code, where
-// additional allocations can lead to severe performance degradation
-// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state) {
+// Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
+static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state) {
    ae_int_t i;
-   ae_int_t lv;
-   ae_int_t lp;
-   ae_int_t rv;
-   ae_int_t rp;
-// Special cases
-   if (n <= 0) {
+   ae_int_t j;
+   ae_int_t k;
+   double tmpr;
+   double tmpr2;
+   ae_int_t tmpi;
+   ae_int_t cntless;
+   ae_int_t cnteq;
+   ae_int_t cntgreater;
+   double v0;
+   double v1;
+   double v2;
+   double vp;
+// Fast exit
+   if (i2 <= i1) {
       return;
    }
-   if (n == 1) {
-      ivectorsetlengthatleast(p1, 1, _state);
-      ivectorsetlengthatleast(p2, 1, _state);
-      p1->xZ[0] = 0;
-      p2->xZ[0] = 0;
+// Non-recursive sort for small arrays
+   if (i2 - i1 <= 16) {
+      for (j = i1 + 1; j <= i2; j++) {
+      // Search elements [I1..J-1] for place to insert Jth element.
+      //
+      // This code stops immediatly if we can leave A[J] at J-th position
+      // (all elements have same value of A[J] larger than any of them)
+         tmpr = a->xR[j];
+         tmpi = j;
+         for (k = j - 1; k >= i1; k--) {
+            if (a->xR[k] <= tmpr) {
+               break;
+            }
+            tmpi = k;
+         }
+         k = tmpi;
+      // Insert Jth element into Kth position
+         if (k != j) {
+            tmpr = a->xR[j];
+            tmpr2 = b->xR[j];
+            for (i = j - 1; i >= k; i--) {
+               a->xR[i + 1] = a->xR[i];
+               b->xR[i + 1] = b->xR[i];
+            }
+            a->xR[k] = tmpr;
+            b->xR[k] = tmpr2;
+         }
+      }
       return;
    }
-// General case, N>1: prepare permutations table P1
-   ivectorsetlengthatleast(p1, n, _state);
-   for (i = 0; i < n; i++) {
-      p1->xZ[i] = i;
+// Quicksort: choose pivot
+// Here we assume that I2-I1 >= 16
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
    }
-// General case, N>1: sort, update P1
-   rvectorsetlengthatleast(&buf->ra0, n, _state);
-   ivectorsetlengthatleast(&buf->ia0, n, _state);
-   tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n, _state);
-// General case, N>1: fill permutations table P2
-//
-// To fill P2 we maintain two arrays:
-// * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
-// * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
-//
-// At each step we making permutation of two items:
-//   Left, which is given by position/value pair LP/LV
-//   and Right, which is given by RP/RV
-// and updating PV[] and VP[] correspondingly.
-   ivectorsetlengthatleast(&buf->ia0, n, _state);
-   ivectorsetlengthatleast(&buf->ia1, n, _state);
-   ivectorsetlengthatleast(p2, n, _state);
-   for (i = 0; i < n; i++) {
-      buf->ia0.xZ[i] = i;
-      buf->ia1.xZ[i] = i;
+   if (v1 > v2) {
+      tmpr = v2;
+      v2 = v1;
+      v1 = tmpr;
    }
-   for (i = 0; i < n; i++) {
-   // calculate LP, LV, RP, RV
-      lp = i;
-      lv = buf->ia1.xZ[lp];
-      rv = p1->xZ[i];
-      rp = buf->ia0.xZ[rv];
-   // Fill P2
-      p2->xZ[i] = rp;
-   // update PV and VP
-      buf->ia1.xZ[lp] = rv;
-      buf->ia1.xZ[rp] = lv;
-      buf->ia0.xZ[lv] = rp;
-      buf->ia0.xZ[rv] = lp;
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
    }
+   vp = v1;
+// now pass through A/B and:
+// * move elements that are LESS than VP to the left of A/B
+// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+// * move elements from the left of BufA/BufB to the end of A/B
+   cntless = 0;
+   cnteq = 0;
+   cntgreater = 0;
+   for (i = i1; i <= i2; i++) {
+      v0 = a->xR[i];
+      if (v0 < vp) {
+      // LESS
+         k = i1 + cntless;
+         if (i != k) {
+            a->xR[k] = v0;
+            b->xR[k] = b->xR[i];
+         }
+         cntless = cntless + 1;
+         continue;
+      }
+      if (v0 == vp) {
+      // EQUAL
+         k = i2 - cnteq;
+         bufa->xR[k] = v0;
+         bufb->xR[k] = b->xR[i];
+         cnteq = cnteq + 1;
+         continue;
+      }
+   // GREATER
+      k = i1 + cntgreater;
+      bufa->xR[k] = v0;
+      bufb->xR[k] = b->xR[i];
+      cntgreater = cntgreater + 1;
+   }
+   for (i = 0; i < cnteq; i++) {
+      j = i1 + cntless + cnteq - 1 - i;
+      k = i2 + i - (cnteq - 1);
+      a->xR[j] = bufa->xR[k];
+      b->xR[j] = bufb->xR[k];
+   }
+   for (i = 0; i < cntgreater; i++) {
+      j = i1 + cntless + cnteq + i;
+      k = i1 + i;
+      a->xR[j] = bufa->xR[k];
+      b->xR[j] = bufb->xR[k];
+   }
+// Sort left and right parts of the array (ignoring middle part)
+   tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i1 + cntless - 1, _state);
+   tsort_tagsortfastrrec(a, b, bufa, bufb, i1 + cntless + cnteq, i2, _state);
+}
+
+// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
+static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2, ae_state *_state) {
+   ae_int_t cntless;
+   ae_int_t cnteq;
+   ae_int_t cntgreater;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   double tmpr;
+   ae_int_t tmpi;
+   double v0;
+   double v1;
+   double v2;
+   double vp;
+// Fast exit
+   if (i2 <= i1) {
+      return;
+   }
+// Non-recursive sort for small arrays
+   if (i2 - i1 <= 16) {
+      for (j = i1 + 1; j <= i2; j++) {
+      // Search elements [I1..J-1] for place to insert Jth element.
+      //
+      // This code stops immediatly if we can leave A[J] at J-th position
+      // (all elements have same value of A[J] larger than any of them)
+         tmpr = a->xR[j];
+         tmpi = j;
+         for (k = j - 1; k >= i1; k--) {
+            if (a->xR[k] <= tmpr) {
+               break;
+            }
+            tmpi = k;
+         }
+         k = tmpi;
+      // Insert Jth element into Kth position
+         if (k != j) {
+            tmpr = a->xR[j];
+            for (i = j - 1; i >= k; i--) {
+               a->xR[i + 1] = a->xR[i];
+            }
+            a->xR[k] = tmpr;
+         }
+      }
+      return;
+   }
+// Quicksort: choose pivot
+// Here we assume that I2-I1 >= 16
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
+   }
+   if (v1 > v2) {
+      tmpr = v2;
+      v2 = v1;
+      v1 = tmpr;
+   }
+   if (v0 > v1) {
+      tmpr = v1;
+      v1 = v0;
+      v0 = tmpr;
+   }
+   vp = v1;
+// now pass through A/B and:
+// * move elements that are LESS than VP to the left of A/B
+// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+// * move elements from the left of BufA/BufB to the end of A/B
+   cntless = 0;
+   cnteq = 0;
+   cntgreater = 0;
+   for (i = i1; i <= i2; i++) {
+      v0 = a->xR[i];
+      if (v0 < vp) {
+      // LESS
+         k = i1 + cntless;
+         if (i != k) {
+            a->xR[k] = v0;
+         }
+         cntless = cntless + 1;
+         continue;
+      }
+      if (v0 == vp) {
+      // EQUAL
+         k = i2 - cnteq;
+         bufa->xR[k] = v0;
+         cnteq = cnteq + 1;
+         continue;
+      }
+   // GREATER
+      k = i1 + cntgreater;
+      bufa->xR[k] = v0;
+      cntgreater = cntgreater + 1;
+   }
+   for (i = 0; i < cnteq; i++) {
+      j = i1 + cntless + cnteq - 1 - i;
+      k = i2 + i - (cnteq - 1);
+      a->xR[j] = bufa->xR[k];
+   }
+   for (i = 0; i < cntgreater; i++) {
+      j = i1 + cntless + cnteq + i;
+      k = i1 + i;
+      a->xR[j] = bufa->xR[k];
+   }
+// Sort left and right parts of the array (ignoring middle part)
+   tsort_tagsortfastrec(a, bufa, i1, i1 + cntless - 1, _state);
+   tsort_tagsortfastrec(a, bufa, i1 + cntless + cnteq, i2, _state);
 }
 
 // Same as TagSort, but optimized for real keys and integer labels.
@@ -6357,6 +6609,108 @@ void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state) {
    }
 }
 
+// Buffered variant of TagSort, which accepts preallocated output arrays as
+// well as special structure for buffered allocations. If arrays are too
+// short, they are reallocated. If they are large enough, no memory
+// allocation is done.
+//
+// It is intended to be used in the performance-critical parts of code, where
+// additional allocations can lead to severe performance degradation
+// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
+void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t lv;
+   ae_int_t lp;
+   ae_int_t rv;
+   ae_int_t rp;
+// Special cases
+   if (n <= 0) {
+      return;
+   }
+   if (n == 1) {
+      ivectorsetlengthatleast(p1, 1, _state);
+      ivectorsetlengthatleast(p2, 1, _state);
+      p1->xZ[0] = 0;
+      p2->xZ[0] = 0;
+      return;
+   }
+// General case, N>1: prepare permutations table P1
+   ivectorsetlengthatleast(p1, n, _state);
+   for (i = 0; i < n; i++) {
+      p1->xZ[i] = i;
+   }
+// General case, N>1: sort, update P1
+   rvectorsetlengthatleast(&buf->ra0, n, _state);
+   ivectorsetlengthatleast(&buf->ia0, n, _state);
+   tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n, _state);
+// General case, N>1: fill permutations table P2
+//
+// To fill P2 we maintain two arrays:
+// * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
+// * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
+//
+// At each step we making permutation of two items:
+//   Left, which is given by position/value pair LP/LV
+//   and Right, which is given by RP/RV
+// and updating PV[] and VP[] correspondingly.
+   ivectorsetlengthatleast(&buf->ia0, n, _state);
+   ivectorsetlengthatleast(&buf->ia1, n, _state);
+   ivectorsetlengthatleast(p2, n, _state);
+   for (i = 0; i < n; i++) {
+      buf->ia0.xZ[i] = i;
+      buf->ia1.xZ[i] = i;
+   }
+   for (i = 0; i < n; i++) {
+   // calculate LP, LV, RP, RV
+      lp = i;
+      lv = buf->ia1.xZ[lp];
+      rv = p1->xZ[i];
+      rp = buf->ia0.xZ[rv];
+   // Fill P2
+      p2->xZ[i] = rp;
+   // update PV and VP
+      buf->ia1.xZ[lp] = rv;
+      buf->ia1.xZ[rp] = lv;
+      buf->ia0.xZ[lv] = rp;
+      buf->ia0.xZ[rv] = lp;
+   }
+}
+
+// This function sorts array of real keys by ascending.
+//
+// Its results are:
+// * sorted array A
+// * permutation tables P1, P2
+//
+// Algorithm outputs permutation tables using two formats:
+// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
+//   value which was moved there from J-th position.
+// * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
+//   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
+//
+// Inputs:
+//     A       -   unsorted array
+//     N       -   array size
+//
+// Outputs:
+//     A       -   sorted array
+//     P1, P2  -   permutation tables, array[N]
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
+void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_frame_make(_state, &_frame_block);
+   SetVector(p1);
+   SetVector(p2);
+   NewObj(apbuffers, buf, _state);
+   tagsortbuf(a, n, p1, p2, &buf, _state);
+   ae_frame_leave(_state);
+}
+
 // Heap operations: adds element to the heap
 //
 // Parameters:
@@ -6581,368 +6935,6 @@ ae_int_t upperbound(RVector *a, ae_int_t n, double t, ae_state *_state) {
    }
    result = first;
    return result;
-}
-
-// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
-// applies same permutations to B.
-// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t cntless;
-   ae_int_t cnteq;
-   ae_int_t cntgreater;
-   double tmpr;
-   ae_int_t tmpi;
-   double v0;
-   double v1;
-   double v2;
-   double vp;
-// Fast exit
-   if (i2 <= i1) {
-      return;
-   }
-// Non-recursive sort for small arrays
-   if (i2 - i1 <= 16) {
-      for (j = i1 + 1; j <= i2; j++) {
-      // Search elements [I1..J-1] for place to insert Jth element.
-      //
-      // This code stops immediately if we can leave A[J] at J-th position
-      // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->xR[j];
-         tmpi = j;
-         for (k = j - 1; k >= i1; k--) {
-            if (a->xR[k] <= tmpr) {
-               break;
-            }
-            tmpi = k;
-         }
-         k = tmpi;
-      // Insert Jth element into Kth position
-         if (k != j) {
-            tmpr = a->xR[j];
-            tmpi = b->xZ[j];
-            for (i = j - 1; i >= k; i--) {
-               a->xR[i + 1] = a->xR[i];
-               b->xZ[i + 1] = b->xZ[i];
-            }
-            a->xR[k] = tmpr;
-            b->xZ[k] = tmpi;
-         }
-      }
-      return;
-   }
-// Quicksort: choose pivot
-// Here we assume that I2-I1 >= 2
-   v0 = a->xR[i1];
-   v1 = a->xR[i1 + (i2 - i1) / 2];
-   v2 = a->xR[i2];
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   if (v1 > v2) {
-      tmpr = v2;
-      v2 = v1;
-      v1 = tmpr;
-   }
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   vp = v1;
-// now pass through A/B and:
-// * move elements that are LESS than VP to the left of A/B
-// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-// * move elements from the left of BufA/BufB to the end of A/B
-   cntless = 0;
-   cnteq = 0;
-   cntgreater = 0;
-   for (i = i1; i <= i2; i++) {
-      v0 = a->xR[i];
-      if (v0 < vp) {
-      // LESS
-         k = i1 + cntless;
-         if (i != k) {
-            a->xR[k] = v0;
-            b->xZ[k] = b->xZ[i];
-         }
-         cntless = cntless + 1;
-         continue;
-      }
-      if (v0 == vp) {
-      // EQUAL
-         k = i2 - cnteq;
-         bufa->xR[k] = v0;
-         bufb->xZ[k] = b->xZ[i];
-         cnteq = cnteq + 1;
-         continue;
-      }
-   // GREATER
-      k = i1 + cntgreater;
-      bufa->xR[k] = v0;
-      bufb->xZ[k] = b->xZ[i];
-      cntgreater = cntgreater + 1;
-   }
-   for (i = 0; i < cnteq; i++) {
-      j = i1 + cntless + cnteq - 1 - i;
-      k = i2 + i - (cnteq - 1);
-      a->xR[j] = bufa->xR[k];
-      b->xZ[j] = bufb->xZ[k];
-   }
-   for (i = 0; i < cntgreater; i++) {
-      j = i1 + cntless + cnteq + i;
-      k = i1 + i;
-      a->xR[j] = bufa->xR[k];
-      b->xZ[j] = bufb->xZ[k];
-   }
-// Sort left and right parts of the array (ignoring middle part)
-   tsort_tagsortfastirec(a, b, bufa, bufb, i1, i1 + cntless - 1, _state);
-   tsort_tagsortfastirec(a, b, bufa, bufb, i1 + cntless + cnteq, i2, _state);
-}
-
-// Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
-// applies same permutations to B.
-// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   double tmpr;
-   double tmpr2;
-   ae_int_t tmpi;
-   ae_int_t cntless;
-   ae_int_t cnteq;
-   ae_int_t cntgreater;
-   double v0;
-   double v1;
-   double v2;
-   double vp;
-// Fast exit
-   if (i2 <= i1) {
-      return;
-   }
-// Non-recursive sort for small arrays
-   if (i2 - i1 <= 16) {
-      for (j = i1 + 1; j <= i2; j++) {
-      // Search elements [I1..J-1] for place to insert Jth element.
-      //
-      // This code stops immediatly if we can leave A[J] at J-th position
-      // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->xR[j];
-         tmpi = j;
-         for (k = j - 1; k >= i1; k--) {
-            if (a->xR[k] <= tmpr) {
-               break;
-            }
-            tmpi = k;
-         }
-         k = tmpi;
-      // Insert Jth element into Kth position
-         if (k != j) {
-            tmpr = a->xR[j];
-            tmpr2 = b->xR[j];
-            for (i = j - 1; i >= k; i--) {
-               a->xR[i + 1] = a->xR[i];
-               b->xR[i + 1] = b->xR[i];
-            }
-            a->xR[k] = tmpr;
-            b->xR[k] = tmpr2;
-         }
-      }
-      return;
-   }
-// Quicksort: choose pivot
-// Here we assume that I2-I1 >= 16
-   v0 = a->xR[i1];
-   v1 = a->xR[i1 + (i2 - i1) / 2];
-   v2 = a->xR[i2];
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   if (v1 > v2) {
-      tmpr = v2;
-      v2 = v1;
-      v1 = tmpr;
-   }
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   vp = v1;
-// now pass through A/B and:
-// * move elements that are LESS than VP to the left of A/B
-// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-// * move elements from the left of BufA/BufB to the end of A/B
-   cntless = 0;
-   cnteq = 0;
-   cntgreater = 0;
-   for (i = i1; i <= i2; i++) {
-      v0 = a->xR[i];
-      if (v0 < vp) {
-      // LESS
-         k = i1 + cntless;
-         if (i != k) {
-            a->xR[k] = v0;
-            b->xR[k] = b->xR[i];
-         }
-         cntless = cntless + 1;
-         continue;
-      }
-      if (v0 == vp) {
-      // EQUAL
-         k = i2 - cnteq;
-         bufa->xR[k] = v0;
-         bufb->xR[k] = b->xR[i];
-         cnteq = cnteq + 1;
-         continue;
-      }
-   // GREATER
-      k = i1 + cntgreater;
-      bufa->xR[k] = v0;
-      bufb->xR[k] = b->xR[i];
-      cntgreater = cntgreater + 1;
-   }
-   for (i = 0; i < cnteq; i++) {
-      j = i1 + cntless + cnteq - 1 - i;
-      k = i2 + i - (cnteq - 1);
-      a->xR[j] = bufa->xR[k];
-      b->xR[j] = bufb->xR[k];
-   }
-   for (i = 0; i < cntgreater; i++) {
-      j = i1 + cntless + cnteq + i;
-      k = i1 + i;
-      a->xR[j] = bufa->xR[k];
-      b->xR[j] = bufb->xR[k];
-   }
-// Sort left and right parts of the array (ignoring middle part)
-   tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i1 + cntless - 1, _state);
-   tsort_tagsortfastrrec(a, b, bufa, bufb, i1 + cntless + cnteq, i2, _state);
-}
-
-// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
-// applies same permutations to B.
-// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2, ae_state *_state) {
-   ae_int_t cntless;
-   ae_int_t cnteq;
-   ae_int_t cntgreater;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   double tmpr;
-   ae_int_t tmpi;
-   double v0;
-   double v1;
-   double v2;
-   double vp;
-// Fast exit
-   if (i2 <= i1) {
-      return;
-   }
-// Non-recursive sort for small arrays
-   if (i2 - i1 <= 16) {
-      for (j = i1 + 1; j <= i2; j++) {
-      // Search elements [I1..J-1] for place to insert Jth element.
-      //
-      // This code stops immediatly if we can leave A[J] at J-th position
-      // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->xR[j];
-         tmpi = j;
-         for (k = j - 1; k >= i1; k--) {
-            if (a->xR[k] <= tmpr) {
-               break;
-            }
-            tmpi = k;
-         }
-         k = tmpi;
-      // Insert Jth element into Kth position
-         if (k != j) {
-            tmpr = a->xR[j];
-            for (i = j - 1; i >= k; i--) {
-               a->xR[i + 1] = a->xR[i];
-            }
-            a->xR[k] = tmpr;
-         }
-      }
-      return;
-   }
-// Quicksort: choose pivot
-// Here we assume that I2-I1 >= 16
-   v0 = a->xR[i1];
-   v1 = a->xR[i1 + (i2 - i1) / 2];
-   v2 = a->xR[i2];
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   if (v1 > v2) {
-      tmpr = v2;
-      v2 = v1;
-      v1 = tmpr;
-   }
-   if (v0 > v1) {
-      tmpr = v1;
-      v1 = v0;
-      v0 = tmpr;
-   }
-   vp = v1;
-// now pass through A/B and:
-// * move elements that are LESS than VP to the left of A/B
-// * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-// * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-// * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-// * move elements from the left of BufA/BufB to the end of A/B
-   cntless = 0;
-   cnteq = 0;
-   cntgreater = 0;
-   for (i = i1; i <= i2; i++) {
-      v0 = a->xR[i];
-      if (v0 < vp) {
-      // LESS
-         k = i1 + cntless;
-         if (i != k) {
-            a->xR[k] = v0;
-         }
-         cntless = cntless + 1;
-         continue;
-      }
-      if (v0 == vp) {
-      // EQUAL
-         k = i2 - cnteq;
-         bufa->xR[k] = v0;
-         cnteq = cnteq + 1;
-         continue;
-      }
-   // GREATER
-      k = i1 + cntgreater;
-      bufa->xR[k] = v0;
-      cntgreater = cntgreater + 1;
-   }
-   for (i = 0; i < cnteq; i++) {
-      j = i1 + cntless + cnteq - 1 - i;
-      k = i2 + i - (cnteq - 1);
-      a->xR[j] = bufa->xR[k];
-   }
-   for (i = 0; i < cntgreater; i++) {
-      j = i1 + cntless + cnteq + i;
-      k = i1 + i;
-      a->xR[j] = bufa->xR[k];
-   }
-// Sort left and right parts of the array (ignoring middle part)
-   tsort_tagsortfastrec(a, bufa, i1, i1 + cntless - 1, _state);
-   tsort_tagsortfastrec(a, bufa, i1 + cntless + cnteq, i2, _state);
 }
 } // end of namespace alglib_impl
 
@@ -7609,69 +7601,6 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf, ae_state *_state) {
 
 // === TRLINSOLVE Package ===
 namespace alglib_impl {
-// Utility subroutine performing the "safe" solution of system of linear
-// equations with triangular coefficient matrices.
-//
-// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
-// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
-// represented by a floating-point number. The closer the system  gets  to  a
-// singular, the less s is. If the system is singular, s=0 and x contains the
-// non-trivial solution of equation A*x=0.
-//
-// The feature of an algorithm is that it could not cause an  overflow  or  a
-// division by zero regardless of the matrix used as the input.
-//
-// The algorithm can solve systems of equations with  upper/lower  triangular
-// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
-// (where A' is a transposed matrix A).
-//
-// Inputs:
-//     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
-//     N       -   size of matrix A.
-//     X       -   right-hand member of a system.
-//                 Array whose index ranges within [0..N-1].
-//     IsUpper -   matrix type. If it is True, the system matrix is the upper
-//                 triangular and is located in  the  corresponding  part  of
-//                 matrix A.
-//     Trans   -   problem type. If it is True, the problem to be  solved  is
-//                 A'*x=b, otherwise it is A*x=b.
-//     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
-//                 diagonal (the elements on the main diagonal are  not  used
-//                 in the calculation process), otherwise the matrix is considered
-//                 to be a general triangular matrix.
-//
-// Outputs:
-//     X       -   solution. Array whose index ranges within [0..N-1].
-//     S       -   scaling factor.
-//
-//   -- LAPACK auxiliary routine (version 3.0) --
-//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-//      Courant Institute, Argonne National Lab, and Rice University
-//      June 30, 1992
-void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state) {
-   ae_frame _frame_block;
-   bool normin;
-   ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
-   *s = 0;
-   NewVector(cnorm, 0, DT_REAL, _state);
-   NewMatrix(a1, 0, 0, DT_REAL, _state);
-   NewVector(x1, 0, DT_REAL, _state);
-// From 0-based to 1-based
-   normin = false;
-   ae_matrix_set_length(&a1, n + 1, n + 1, _state);
-   ae_vector_set_length(&x1, n + 1, _state);
-   for (i = 1; i <= n; i++) {
-      ae_v_move(&a1.xyR[i][1], 1, a->xyR[i - 1], 1, n);
-   }
-   ae_v_move(&x1.xR[1], 1, x->xR, 1, n);
-// Solve 1-based
-   safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm, _state);
-// From 1-based to 0-based
-   ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
-   ae_frame_leave(_state);
-}
-
 // Obsolete 1-based subroutine.
 // See RMatrixTRSafeSolve for 0-based replacement.
 void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm, ae_state *_state) {
@@ -8184,11 +8113,118 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       ae_v_muld(&cnorm->xR[1], 1, n, v);
    }
 }
+
+// Utility subroutine performing the "safe" solution of system of linear
+// equations with triangular coefficient matrices.
+//
+// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
+// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
+// represented by a floating-point number. The closer the system  gets  to  a
+// singular, the less s is. If the system is singular, s=0 and x contains the
+// non-trivial solution of equation A*x=0.
+//
+// The feature of an algorithm is that it could not cause an  overflow  or  a
+// division by zero regardless of the matrix used as the input.
+//
+// The algorithm can solve systems of equations with  upper/lower  triangular
+// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
+// (where A' is a transposed matrix A).
+//
+// Inputs:
+//     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
+//     N       -   size of matrix A.
+//     X       -   right-hand member of a system.
+//                 Array whose index ranges within [0..N-1].
+//     IsUpper -   matrix type. If it is True, the system matrix is the upper
+//                 triangular and is located in  the  corresponding  part  of
+//                 matrix A.
+//     Trans   -   problem type. If it is True, the problem to be  solved  is
+//                 A'*x=b, otherwise it is A*x=b.
+//     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
+//                 diagonal (the elements on the main diagonal are  not  used
+//                 in the calculation process), otherwise the matrix is considered
+//                 to be a general triangular matrix.
+//
+// Outputs:
+//     X       -   solution. Array whose index ranges within [0..N-1].
+//     S       -   scaling factor.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      June 30, 1992
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, ae_state *_state) {
+   ae_frame _frame_block;
+   bool normin;
+   ae_int_t i;
+   ae_frame_make(_state, &_frame_block);
+   *s = 0;
+   NewVector(cnorm, 0, DT_REAL, _state);
+   NewMatrix(a1, 0, 0, DT_REAL, _state);
+   NewVector(x1, 0, DT_REAL, _state);
+// From 0-based to 1-based
+   normin = false;
+   ae_matrix_set_length(&a1, n + 1, n + 1, _state);
+   ae_vector_set_length(&x1, n + 1, _state);
+   for (i = 1; i <= n; i++) {
+      ae_v_move(&a1.xyR[i][1], 1, a->xyR[i - 1], 1, n);
+   }
+   ae_v_move(&x1.xR[1], 1, x->xR, 1, n);
+// Solve 1-based
+   safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm, _state);
+// From 1-based to 0-based
+   ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
+   ae_frame_leave(_state);
+}
 } // end of namespace alglib_impl
 
 // === SAFESOLVE Package ===
 namespace alglib_impl {
-static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x, ae_state *_state);
+// complex basic solver-updater for reduced linear system
+//
+//     alpha*x[i] = beta
+//
+// solves this equation and updates it in overlfow-safe manner (keeping track
+// of relative growth of solution).
+//
+// Parameters:
+//     Alpha   -   alpha
+//     Beta    -   beta
+//     LnMax   -   precomputed Ln(MaxRealNumber)
+//     BNorm   -   inf-norm of b (right part of original system)
+//     MaxGrowth-  maximum growth of norm(x) relative to norm(b)
+//     XNorm   -   inf-norm of other components of X (which are already processed)
+//                 it is updated by CBasicSolveAndUpdate.
+//     X       -   solution
+// ALGLIB Routine: Copyright 26.01.2009 by Sergey Bochkanov
+static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x, ae_state *_state) {
+   double v;
+   bool result;
+   x->x = 0;
+   x->y = 0;
+   result = false;
+   if (ae_c_eq_d(alpha, 0.0)) {
+      return result;
+   }
+   if (ae_c_neq_d(beta, 0.0)) {
+   // alpha*x[i]=beta
+      v = ae_log(ae_c_abs(beta, _state), _state) - ae_log(ae_c_abs(alpha, _state), _state);
+      if (v > lnmax) {
+         return result;
+      }
+      *x = ae_c_div(beta, alpha);
+   } else {
+   // alpha*x[i]=0
+      *x = ae_complex_from_i(0);
+   }
+// update NrmX, test growth limit
+   *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x, _state), _state);
+   if (*xnorm > maxgrowth * bnorm) {
+      return result;
+   }
+   result = true;
+   return result;
+}
 
 // Real implementation of CMatrixScaledTRSafeSolve
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
@@ -8541,58 +8577,131 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
    ae_frame_leave(_state);
    return result;
 }
-
-// complex basic solver-updater for reduced linear system
-//
-//     alpha*x[i] = beta
-//
-// solves this equation and updates it in overlfow-safe manner (keeping track
-// of relative growth of solution).
-//
-// Parameters:
-//     Alpha   -   alpha
-//     Beta    -   beta
-//     LnMax   -   precomputed Ln(MaxRealNumber)
-//     BNorm   -   inf-norm of b (right part of original system)
-//     MaxGrowth-  maximum growth of norm(x) relative to norm(b)
-//     XNorm   -   inf-norm of other components of X (which are already processed)
-//                 it is updated by CBasicSolveAndUpdate.
-//     X       -   solution
-// ALGLIB Routine: Copyright 26.01.2009 by Sergey Bochkanov
-static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x, ae_state *_state) {
-   double v;
-   bool result;
-   x->x = 0;
-   x->y = 0;
-   result = false;
-   if (ae_c_eq_d(alpha, 0.0)) {
-      return result;
-   }
-   if (ae_c_neq_d(beta, 0.0)) {
-   // alpha*x[i]=beta
-      v = ae_log(ae_c_abs(beta, _state), _state) - ae_log(ae_c_abs(alpha, _state), _state);
-      if (v > lnmax) {
-         return result;
-      }
-      *x = ae_c_div(beta, alpha);
-   } else {
-   // alpha*x[i]=0
-      *x = ae_complex_from_i(0);
-   }
-// update NrmX, test growth limit
-   *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x, _state), _state);
-   if (*xnorm > maxgrowth * bnorm) {
-      return result;
-   }
-   result = true;
-   return result;
-}
 } // end of namespace alglib_impl
 
 // === XBLAS Package ===
 namespace alglib_impl {
-static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr, ae_state *_state);
-static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state);
+// Fast Pow
+// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
+static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state) {
+   double result;
+   result = 0.0;
+   if (n > 0) {
+      if (n % 2 == 0) {
+         result = ae_sqr(xblas_xfastpow(r, n / 2, _state), _state);
+      } else {
+         result = r * xblas_xfastpow(r, n - 1, _state);
+      }
+      return result;
+   }
+   if (n == 0) {
+      result = 1.0;
+   }
+   if (n < 0) {
+      result = xblas_xfastpow(1 / r, -n, _state);
+   }
+   return result;
+}
+
+// Internal subroutine for extra-precise calculation of SUM(w[i]).
+//
+// Inputs:
+//     W   -   array[0..N-1], values to be added
+//             W is modified during calculations.
+//     MX  -   max(W[i])
+//     N   -   array size
+//
+// Outputs:
+//     R   -   SUM(w[i])
+//     RErr-   error estimate for R
+// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
+static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t ks;
+   double v;
+   double s;
+   double ln2;
+   double chunk;
+   double invchunk;
+   bool allzeros;
+   *r = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
+// * N is too large to use integer arithmetics
+   if (n == 0) {
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
+   }
+   if (mx == 0.0) {
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
+   }
+   ae_assert(n < 536870912, "XDot: N is too large!", _state);
+// Prepare
+   ln2 = ae_log(2.0, _state);
+   *rerr = mx * ae_machineepsilon;
+// 1. find S such that 0.5 <= S*MX<1
+// 2. multiply W by S, so task is normalized in some sense
+// 3. S:=1/S so we can obtain original vector multiplying by S
+   k = ae_round(ae_log(mx, _state) / ln2, _state);
+   s = xblas_xfastpow(2.0, -k, _state);
+   if (!ae_isfinite(s, _state)) {
+   // Overflow or underflow during evaluation of S; fallback low-precision code
+      *r = 0.0;
+      *rerr = mx * ae_machineepsilon;
+      for (i = 0; i < n; i++) {
+         *r = *r + w->xR[i];
+      }
+      return;
+   }
+   while (s * mx >= 1.0) {
+      s = 0.5 * s;
+   }
+   while (s * mx < 0.5) {
+      s = 2 * s;
+   }
+   ae_v_muld(w->xR, 1, n, s);
+   s = 1 / s;
+// find Chunk=2^M such that N*Chunk<2^29
+//
+// we have chosen upper limit (2^29) with enough space left
+// to tolerate possible problems with rounding and N's close
+// to the limit, so we don't want to be very strict here.
+   k = ae_trunc(ae_log(536870912.0 / n, _state) / ln2, _state);
+   chunk = xblas_xfastpow(2.0, k, _state);
+   if (chunk < 2.0) {
+      chunk = 2.0;
+   }
+   invchunk = 1 / chunk;
+// calculate result
+   *r = 0.0;
+   ae_v_muld(w->xR, 1, n, chunk);
+   while (true) {
+      s = s * invchunk;
+      allzeros = true;
+      ks = 0;
+      for (i = 0; i < n; i++) {
+         v = w->xR[i];
+         k = ae_trunc(v, _state);
+         if (v != (double)k) {
+            allzeros = false;
+         }
+         w->xR[i] = chunk * (v - k);
+         ks = ks + k;
+      }
+      *r = *r + s * ks;
+      v = ae_fabs(*r, _state);
+      if (allzeros || s * n + mx == mx) {
+         break;
+      }
+   }
+// correct error
+   *rerr = ae_maxreal(*rerr, ae_fabs(*r, _state) * ae_machineepsilon, _state);
+}
 
 // More precise dot-product. Absolute error of  subroutine  result  is  about
 // 1 ulp of max(MX,V), where:
@@ -8710,128 +8819,6 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, dou
       *rerr = ae_maxreal(rerrx, rerry, _state) * ae_sqrt(1 + ae_sqr(ae_minreal(rerrx, rerry, _state) / ae_maxreal(rerrx, rerry, _state), _state), _state);
    }
 }
-
-// Internal subroutine for extra-precise calculation of SUM(w[i]).
-//
-// Inputs:
-//     W   -   array[0..N-1], values to be added
-//             W is modified during calculations.
-//     MX  -   max(W[i])
-//     N   -   array size
-//
-// Outputs:
-//     R   -   SUM(w[i])
-//     RErr-   error estimate for R
-// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t k;
-   ae_int_t ks;
-   double v;
-   double s;
-   double ln2;
-   double chunk;
-   double invchunk;
-   bool allzeros;
-   *r = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
-// * N is too large to use integer arithmetics
-   if (n == 0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   if (mx == 0.0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   ae_assert(n < 536870912, "XDot: N is too large!", _state);
-// Prepare
-   ln2 = ae_log(2.0, _state);
-   *rerr = mx * ae_machineepsilon;
-// 1. find S such that 0.5 <= S*MX<1
-// 2. multiply W by S, so task is normalized in some sense
-// 3. S:=1/S so we can obtain original vector multiplying by S
-   k = ae_round(ae_log(mx, _state) / ln2, _state);
-   s = xblas_xfastpow(2.0, -k, _state);
-   if (!ae_isfinite(s, _state)) {
-   // Overflow or underflow during evaluation of S; fallback low-precision code
-      *r = 0.0;
-      *rerr = mx * ae_machineepsilon;
-      for (i = 0; i < n; i++) {
-         *r = *r + w->xR[i];
-      }
-      return;
-   }
-   while (s * mx >= 1.0) {
-      s = 0.5 * s;
-   }
-   while (s * mx < 0.5) {
-      s = 2 * s;
-   }
-   ae_v_muld(w->xR, 1, n, s);
-   s = 1 / s;
-// find Chunk=2^M such that N*Chunk<2^29
-//
-// we have chosen upper limit (2^29) with enough space left
-// to tolerate possible problems with rounding and N's close
-// to the limit, so we don't want to be very strict here.
-   k = ae_trunc(ae_log(536870912.0 / n, _state) / ln2, _state);
-   chunk = xblas_xfastpow(2.0, k, _state);
-   if (chunk < 2.0) {
-      chunk = 2.0;
-   }
-   invchunk = 1 / chunk;
-// calculate result
-   *r = 0.0;
-   ae_v_muld(w->xR, 1, n, chunk);
-   while (true) {
-      s = s * invchunk;
-      allzeros = true;
-      ks = 0;
-      for (i = 0; i < n; i++) {
-         v = w->xR[i];
-         k = ae_trunc(v, _state);
-         if (v != (double)k) {
-            allzeros = false;
-         }
-         w->xR[i] = chunk * (v - k);
-         ks = ks + k;
-      }
-      *r = *r + s * ks;
-      v = ae_fabs(*r, _state);
-      if (allzeros || s * n + mx == mx) {
-         break;
-      }
-   }
-// correct error
-   *rerr = ae_maxreal(*rerr, ae_fabs(*r, _state) * ae_machineepsilon, _state);
-}
-
-// Fast Pow
-// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state) {
-   double result;
-   result = 0.0;
-   if (n > 0) {
-      if (n % 2 == 0) {
-         result = ae_sqr(xblas_xfastpow(r, n / 2, _state), _state);
-      } else {
-         result = r * xblas_xfastpow(r, n - 1, _state);
-      }
-      return result;
-   }
-   if (n == 0) {
-      result = 1.0;
-   }
-   if (n < 0) {
-      result = xblas_xfastpow(1 / r, -n, _state);
-   }
-   return result;
-}
 } // end of namespace alglib_impl
 
 // === LINMIN Package ===
@@ -8842,7 +8829,6 @@ static const ae_int_t linmin_maxfev = 20;
 static const double linmin_stpmin = 1.0E-50;
 static const double linmin_defstpmax = 1.0E+50;
 static const double linmin_armijofactor = 1.3;
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info, ae_state *_state);
 
 // Normalizes direction/step pair: makes |D|=1, scales Stp.
 // If |D|=0, it returns, leavind D/Stp unchanged.
@@ -8867,6 +8853,178 @@ void linminnormalized(RVector *d, double *stp, ae_int_t n, ae_state *_state) {
    s = 1 / ae_sqrt(s, _state);
    ae_v_muld(d->xR, 1, n, s);
    *stp = *stp / s;
+}
+
+static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info, ae_state *_state) {
+   bool bound;
+   double gamma;
+   double p;
+   double q;
+   double r;
+   double s;
+   double sgnd;
+   double stpc;
+   double stpf;
+   double stpq;
+   double theta;
+   *info = 0;
+//     CHECK THE INPUT PARAMETERS FOR ERRORS.
+   if (((*brackt && (*stp <= ae_minreal(*stx, *sty, _state) || *stp >= ae_maxreal(*stx, *sty, _state))) || *dx * (*stp - (*stx)) >= 0.0) || stmax < stmin) {
+      return;
+   }
+//     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
+   sgnd = dp * (*dx / ae_fabs(*dx, _state));
+//     FIRST CASE. A HIGHER FUNCTION VALUE.
+//     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
+//     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
+//     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
+   if (fp > *fx) {
+      *info = 1;
+      bound = true;
+      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+      s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
+      gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state);
+      if (*stp < *stx) {
+         gamma = -gamma;
+      }
+      p = gamma - (*dx) + theta;
+      q = gamma - (*dx) + gamma + dp;
+      r = p / q;
+      stpc = *stx + r * (*stp - (*stx));
+      stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
+      if (ae_fabs(stpc - (*stx), _state) < ae_fabs(stpq - (*stx), _state)) {
+         stpf = stpc;
+      } else {
+         stpf = stpc + (stpq - stpc) / 2;
+      }
+      *brackt = true;
+   } else {
+      if (sgnd < 0.0) {
+      //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
+      //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
+      //     STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
+      //     THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
+         *info = 2;
+         bound = false;
+         theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+         s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
+         gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state);
+         if (*stp > *stx) {
+            gamma = -gamma;
+         }
+         p = gamma - dp + theta;
+         q = gamma - dp + gamma + (*dx);
+         r = p / q;
+         stpc = *stp + r * (*stx - (*stp));
+         stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+         if (ae_fabs(stpc - (*stp), _state) > ae_fabs(stpq - (*stp), _state)) {
+            stpf = stpc;
+         } else {
+            stpf = stpq;
+         }
+         *brackt = true;
+      } else {
+         if (ae_fabs(dp, _state) < ae_fabs(*dx, _state)) {
+         //     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
+         //     THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
+         //     IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
+         //     IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
+         //     EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
+         //     COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
+         //     CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
+            *info = 3;
+            bound = true;
+            theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+            s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
+         //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
+         //        TO INFINITY IN THE DIRECTION OF THE STEP.
+            gamma = s * ae_sqrt(ae_maxreal(0.0, ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state), _state);
+            if (*stp > *stx) {
+               gamma = -gamma;
+            }
+            p = gamma - dp + theta;
+            q = gamma + (*dx - dp) + gamma;
+            r = p / q;
+            if (r < 0.0 && gamma != 0.0) {
+               stpc = *stp + r * (*stx - (*stp));
+            } else {
+               if (*stp > *stx) {
+                  stpc = stmax;
+               } else {
+                  stpc = stmin;
+               }
+            }
+            stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+            if (*brackt) {
+               if (ae_fabs(*stp - stpc, _state) < ae_fabs(*stp - stpq, _state)) {
+                  stpf = stpc;
+               } else {
+                  stpf = stpq;
+               }
+            } else {
+               if (ae_fabs(*stp - stpc, _state) > ae_fabs(*stp - stpq, _state)) {
+                  stpf = stpc;
+               } else {
+                  stpf = stpq;
+               }
+            }
+         } else {
+         //     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
+         //     NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
+         //     IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
+            *info = 4;
+            bound = false;
+            if (*brackt) {
+               theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
+               s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dy, _state), ae_fabs(dp, _state), _state), _state);
+               gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dy / s * (dp / s), _state);
+               if (*stp > *sty) {
+                  gamma = -gamma;
+               }
+               p = gamma - dp + theta;
+               q = gamma - dp + gamma + (*dy);
+               r = p / q;
+               stpc = *stp + r * (*sty - (*stp));
+               stpf = stpc;
+            } else {
+               if (*stp > *stx) {
+                  stpf = stmax;
+               } else {
+                  stpf = stmin;
+               }
+            }
+         }
+      }
+   }
+//     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
+//     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
+   if (fp > *fx) {
+      *sty = *stp;
+      *fy = fp;
+      *dy = dp;
+   } else {
+      if (sgnd < 0.0) {
+         *sty = *stx;
+         *fy = *fx;
+         *dy = *dx;
+      }
+      *stx = *stp;
+      *fx = fp;
+      *dx = dp;
+   }
+//     COMPUTE THE NEW STEP AND SAFEGUARD IT.
+   stpf = ae_minreal(stmax, stpf, _state);
+   stpf = ae_maxreal(stmin, stpf, _state);
+   *stp = stpf;
+   if (*brackt && bound) {
+      if (*sty > *stx) {
+         *stp = ae_minreal(*stx + 0.66 * (*sty - (*stx)), *stp, _state);
+      } else {
+         *stp = ae_maxreal(*stx + 0.66 * (*sty - (*stx)), *stp, _state);
+      }
+   }
 }
 
 // THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
@@ -9411,178 +9569,6 @@ void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f, a
    *f = state->fcur;
 }
 
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info, ae_state *_state) {
-   bool bound;
-   double gamma;
-   double p;
-   double q;
-   double r;
-   double s;
-   double sgnd;
-   double stpc;
-   double stpf;
-   double stpq;
-   double theta;
-   *info = 0;
-//     CHECK THE INPUT PARAMETERS FOR ERRORS.
-   if (((*brackt && (*stp <= ae_minreal(*stx, *sty, _state) || *stp >= ae_maxreal(*stx, *sty, _state))) || *dx * (*stp - (*stx)) >= 0.0) || stmax < stmin) {
-      return;
-   }
-//     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
-   sgnd = dp * (*dx / ae_fabs(*dx, _state));
-//     FIRST CASE. A HIGHER FUNCTION VALUE.
-//     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
-//     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
-//     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
-   if (fp > *fx) {
-      *info = 1;
-      bound = true;
-      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-      s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
-      gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state);
-      if (*stp < *stx) {
-         gamma = -gamma;
-      }
-      p = gamma - (*dx) + theta;
-      q = gamma - (*dx) + gamma + dp;
-      r = p / q;
-      stpc = *stx + r * (*stp - (*stx));
-      stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
-      if (ae_fabs(stpc - (*stx), _state) < ae_fabs(stpq - (*stx), _state)) {
-         stpf = stpc;
-      } else {
-         stpf = stpc + (stpq - stpc) / 2;
-      }
-      *brackt = true;
-   } else {
-      if (sgnd < 0.0) {
-      //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
-      //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
-      //     STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
-      //     THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
-         *info = 2;
-         bound = false;
-         theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-         s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
-         gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state);
-         if (*stp > *stx) {
-            gamma = -gamma;
-         }
-         p = gamma - dp + theta;
-         q = gamma - dp + gamma + (*dx);
-         r = p / q;
-         stpc = *stp + r * (*stx - (*stp));
-         stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-         if (ae_fabs(stpc - (*stp), _state) > ae_fabs(stpq - (*stp), _state)) {
-            stpf = stpc;
-         } else {
-            stpf = stpq;
-         }
-         *brackt = true;
-      } else {
-         if (ae_fabs(dp, _state) < ae_fabs(*dx, _state)) {
-         //     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
-         //     THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
-         //     IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
-         //     IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
-         //     EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
-         //     COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
-         //     CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
-            *info = 3;
-            bound = true;
-            theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-            s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
-         //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
-         //        TO INFINITY IN THE DIRECTION OF THE STEP.
-            gamma = s * ae_sqrt(ae_maxreal(0.0, ae_sqr(theta / s, _state) - *dx / s * (dp / s), _state), _state);
-            if (*stp > *stx) {
-               gamma = -gamma;
-            }
-            p = gamma - dp + theta;
-            q = gamma + (*dx - dp) + gamma;
-            r = p / q;
-            if (r < 0.0 && gamma != 0.0) {
-               stpc = *stp + r * (*stx - (*stp));
-            } else {
-               if (*stp > *stx) {
-                  stpc = stmax;
-               } else {
-                  stpc = stmin;
-               }
-            }
-            stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-            if (*brackt) {
-               if (ae_fabs(*stp - stpc, _state) < ae_fabs(*stp - stpq, _state)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            } else {
-               if (ae_fabs(*stp - stpc, _state) > ae_fabs(*stp - stpq, _state)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            }
-         } else {
-         //     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
-         //     NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
-         //     IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
-            *info = 4;
-            bound = false;
-            if (*brackt) {
-               theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
-               s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dy, _state), ae_fabs(dp, _state), _state), _state);
-               gamma = s * ae_sqrt(ae_sqr(theta / s, _state) - *dy / s * (dp / s), _state);
-               if (*stp > *sty) {
-                  gamma = -gamma;
-               }
-               p = gamma - dp + theta;
-               q = gamma - dp + gamma + (*dy);
-               r = p / q;
-               stpc = *stp + r * (*sty - (*stp));
-               stpf = stpc;
-            } else {
-               if (*stp > *stx) {
-                  stpf = stmax;
-               } else {
-                  stpf = stmin;
-               }
-            }
-         }
-      }
-   }
-//     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
-//     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
-   if (fp > *fx) {
-      *sty = *stp;
-      *fy = fp;
-      *dy = dp;
-   } else {
-      if (sgnd < 0.0) {
-         *sty = *stx;
-         *fy = *fx;
-         *dy = *dx;
-      }
-      *stx = *stp;
-      *fx = fp;
-      *dx = dp;
-   }
-//     COMPUTE THE NEW STEP AND SAFEGUARD IT.
-   stpf = ae_minreal(stmax, stpf, _state);
-   stpf = ae_maxreal(stmin, stpf, _state);
-   *stp = stpf;
-   if (*brackt && bound) {
-      if (*sty > *stx) {
-         *stp = ae_minreal(*stx + 0.66 * (*sty - (*stx)), *stp, _state);
-      } else {
-         *stp = ae_maxreal(*stx + 0.66 * (*sty - (*stx)), *stp, _state);
-      }
-   }
-}
-
 void linminstate_init(void *_p, ae_state *_state, bool make_automatic) {
    linminstate *p = (linminstate *)_p;
    ae_touch_ptr((void *)p);
@@ -9739,106 +9725,6 @@ double nucosm1(double x, ae_state *_state) {
 
 // === NTHEORY Package ===
 namespace alglib_impl {
-static bool ntheory_isprime(ae_int_t n, ae_state *_state);
-static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
-static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_state);
-
-void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot, ae_state *_state) {
-   ae_int_t candroot;
-   ae_int_t phin;
-   ae_int_t q;
-   ae_int_t f;
-   bool allnonone;
-   ae_int_t x;
-   ae_int_t lastx;
-   ae_int_t y;
-   ae_int_t lasty;
-   ae_int_t a;
-   ae_int_t b;
-   ae_int_t t;
-   ae_int_t n2;
-   *proot = 0;
-   *invproot = 0;
-   ae_assert(n >= 3, "FindPrimitiveRootAndInverse: N<3", _state);
-   *proot = 0;
-   *invproot = 0;
-// check that N is prime
-   ae_assert(ntheory_isprime(n, _state), "FindPrimitiveRoot: N is not prime", _state);
-// Because N is prime, Euler totient function is equal to N-1
-   phin = n - 1;
-// Test different values of PRoot - from 2 to N-1.
-// One of these values MUST be primitive root.
-//
-// For testing we use algorithm from Wiki (Primitive root modulo n):
-// * compute phi(N)
-// * determine the different prime factors of phi(N), say p1, ..., pk
-// * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i=1..k
-//   using a fast algorithm for modular exponentiation.
-// * a number m for which these k results are all different from 1 is a
-//   primitive root.
-   for (candroot = 2; candroot < n; candroot++) {
-   // We have current candidate root in CandRoot.
-   //
-   // Scan different prime factors of PhiN. Here:
-   // * F is a current candidate factor
-   // * Q is a current quotient - amount which was left after dividing PhiN
-   //   by all previous factors
-   //
-   // For each factor, perform test mentioned above.
-      q = phin;
-      f = 2;
-      allnonone = true;
-      while (q > 1) {
-         if (q % f == 0) {
-            t = ntheory_modexp(candroot, phin / f, n, _state);
-            if (t == 1) {
-               allnonone = false;
-               break;
-            }
-            while (q % f == 0) {
-               q = q / f;
-            }
-         }
-         f = f + 1;
-      }
-      if (allnonone) {
-         *proot = candroot;
-         break;
-      }
-   }
-   ae_assert(*proot >= 2, "FindPrimitiveRoot: internal error (root not found)", _state);
-// Use extended Euclidean algorithm to find multiplicative inverse of primitive root
-   x = 0;
-   lastx = 1;
-   y = 1;
-   lasty = 0;
-   a = *proot;
-   b = n;
-   while (b != 0) {
-      q = a / b;
-      t = a % b;
-      a = b;
-      b = t;
-      t = lastx - q * x;
-      lastx = x;
-      x = t;
-      t = lasty - q * y;
-      lasty = y;
-      y = t;
-   }
-   while (lastx < 0) {
-      lastx = lastx + n;
-   }
-   *invproot = lastx;
-// Check that it is safe to perform multiplication modulo N.
-// Check results for consistency.
-   n2 = (n - 1) * (n - 1);
-   ae_assert(n2 / (n - 1) == n - 1, "FindPrimitiveRoot: internal error", _state);
-   ae_assert(*proot * (*invproot) / (*proot) == (*invproot), "FindPrimitiveRoot: internal error", _state);
-   ae_assert(*proot * (*invproot) / (*invproot) == (*proot), "FindPrimitiveRoot: internal error", _state);
-   ae_assert(*proot * (*invproot) % n == 1, "FindPrimitiveRoot: internal error", _state);
-}
-
 static bool ntheory_isprime(ae_int_t n, ae_state *_state) {
    ae_int_t p;
    bool result;
@@ -9943,6 +9829,102 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n, ae_state *_st
    }
    return result;
 }
+
+void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot, ae_state *_state) {
+   ae_int_t candroot;
+   ae_int_t phin;
+   ae_int_t q;
+   ae_int_t f;
+   bool allnonone;
+   ae_int_t x;
+   ae_int_t lastx;
+   ae_int_t y;
+   ae_int_t lasty;
+   ae_int_t a;
+   ae_int_t b;
+   ae_int_t t;
+   ae_int_t n2;
+   *proot = 0;
+   *invproot = 0;
+   ae_assert(n >= 3, "FindPrimitiveRootAndInverse: N<3", _state);
+   *proot = 0;
+   *invproot = 0;
+// check that N is prime
+   ae_assert(ntheory_isprime(n, _state), "FindPrimitiveRoot: N is not prime", _state);
+// Because N is prime, Euler totient function is equal to N-1
+   phin = n - 1;
+// Test different values of PRoot - from 2 to N-1.
+// One of these values MUST be primitive root.
+//
+// For testing we use algorithm from Wiki (Primitive root modulo n):
+// * compute phi(N)
+// * determine the different prime factors of phi(N), say p1, ..., pk
+// * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i=1..k
+//   using a fast algorithm for modular exponentiation.
+// * a number m for which these k results are all different from 1 is a
+//   primitive root.
+   for (candroot = 2; candroot < n; candroot++) {
+   // We have current candidate root in CandRoot.
+   //
+   // Scan different prime factors of PhiN. Here:
+   // * F is a current candidate factor
+   // * Q is a current quotient - amount which was left after dividing PhiN
+   //   by all previous factors
+   //
+   // For each factor, perform test mentioned above.
+      q = phin;
+      f = 2;
+      allnonone = true;
+      while (q > 1) {
+         if (q % f == 0) {
+            t = ntheory_modexp(candroot, phin / f, n, _state);
+            if (t == 1) {
+               allnonone = false;
+               break;
+            }
+            while (q % f == 0) {
+               q = q / f;
+            }
+         }
+         f = f + 1;
+      }
+      if (allnonone) {
+         *proot = candroot;
+         break;
+      }
+   }
+   ae_assert(*proot >= 2, "FindPrimitiveRoot: internal error (root not found)", _state);
+// Use extended Euclidean algorithm to find multiplicative inverse of primitive root
+   x = 0;
+   lastx = 1;
+   y = 1;
+   lasty = 0;
+   a = *proot;
+   b = n;
+   while (b != 0) {
+      q = a / b;
+      t = a % b;
+      a = b;
+      b = t;
+      t = lastx - q * x;
+      lastx = x;
+      x = t;
+      t = lasty - q * y;
+      lasty = y;
+      y = t;
+   }
+   while (lastx < 0) {
+      lastx = lastx + n;
+   }
+   *invproot = lastx;
+// Check that it is safe to perform multiplication modulo N.
+// Check results for consistency.
+   n2 = (n - 1) * (n - 1);
+   ae_assert(n2 / (n - 1) == n - 1, "FindPrimitiveRoot: internal error", _state);
+   ae_assert(*proot * (*invproot) / (*proot) == (*invproot), "FindPrimitiveRoot: internal error", _state);
+   ae_assert(*proot * (*invproot) / (*invproot) == (*proot), "FindPrimitiveRoot: internal error", _state);
+   ae_assert(*proot * (*invproot) % n == 1, "FindPrimitiveRoot: internal error", _state);
+}
 } // end of namespace alglib_impl
 
 // === FTBASE Package ===
@@ -9975,727 +9957,22 @@ static const ae_int_t ftbase_raderthreshold = 19;
 static const ae_int_t ftbase_ftbasecodeletrecommended = 5;
 static const double ftbase_ftbaseinefficiencyfactor = 1.3;
 static const ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
-static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize, ae_state *_state);
-static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state);
-static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_state *_state);
-static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_state *_state);
-static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3, ae_state *_state);
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state);
-static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector *buf, ae_state *_state);
-static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
-static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, ae_state *_state);
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs, ae_state *_state);
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state);
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state);
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state);
-static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state);
-static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state);
-static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2, ae_state *_state);
-static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf, ae_state *_state);
-static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state);
-#if 0
-static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state);
-#endif
-static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best, ae_state *_state);
 
-// This subroutine generates FFT plan for K complex FFT's with length N each.
+// Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
 //
 // Inputs:
-//     N           -   FFT length (in complex numbers), N >= 1
-//     K           -   number of repetitions, K >= 1
+//     N       -   task size, N>0
 //
-// Outputs:
-//     Plan        -   plan
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t rowptr;
-   ae_int_t bluesteinsize;
-   ae_int_t precrptr;
-   ae_int_t preciptr;
-   ae_int_t precrsize;
-   ae_int_t precisize;
-   ae_frame_make(_state, &_frame_block);
-   SetObj(fasttransformplan, plan);
-   NewObj(srealarray, bluesteinbuf, _state);
-// Initial check for parameters
-   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
-   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
-// Determine required sizes of precomputed real and integer
-// buffers. This stage of code is highly dependent on internals
-// of FTComplexFFTPlanRec() and must be kept synchronized with
-// possible changes in internals of plan generation function.
+// Result:
+//     cost in UNITs, rounded down to nearest integer
 //
-// Buffer size is determined as follows:
-// * N is factorized
-// * we factor out anything which is less or equal to MaxRadix
-// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-//   real entries to store precomputed Quantities for Bluestein's
-//   transformation
-// * prime factor F <= RaderThreshold does NOT require
-//   precomputed storage
-   precrsize = 0;
-   precisize = 0;
-   ftbase_ftdeterminespacerequirements(n, &precrsize, &precisize, _state);
-   if (precrsize > 0) {
-      ae_vector_set_length(&plan->precr, precrsize, _state);
-   }
-   if (precisize > 0) {
-      ae_vector_set_length(&plan->preci, precisize, _state);
-   }
-// Generate plan
-   rowptr = 0;
-   precrptr = 0;
-   preciptr = 0;
-   bluesteinsize = 1;
-   ae_vector_set_length(&plan->buffer, 2 * n * k, _state);
-   ftbase_ftcomplexfftplanrec(n, k, true, true, &rowptr, &bluesteinsize, &precrptr, &preciptr, plan, _state);
-   ae_vector_set_length(&bluesteinbuf.val, bluesteinsize, _state);
-   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), srealarray_init, srealarray_copy, srealarray_free, _state);
-// Check that actual amount of precomputed space used by transformation
-// plan is EXACTLY equal to amount of space allocated by us.
-   ae_assert(precrptr == precrsize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)", _state);
-   ae_assert(preciptr == precisize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)", _state);
-   ae_frame_leave(_state);
-}
-
-// This subroutine applies transformation plan to input/output array A.
-//
-// Inputs:
-//     Plan        -   transformation plan
-//     A           -   array, must be large enough for plan to work
-//     OffsA       -   offset of the subarray to process
-//     RepCnt      -   repetition count (transformation is repeatedly applied
-//                     to subsequent subarrays)
-//
-// Outputs:
-//     Plan        -   plan (temporary buffers can be modified, plan itself
-//                     is unchanged and can be reused)
-//     A           -   transformed array
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt, ae_state *_state) {
-   ae_int_t plansize;
-   ae_int_t i;
-   plansize = plan->entries.xyZ[0][ftbase_coloperandscnt] * plan->entries.xyZ[0][ftbase_coloperandsize] * plan->entries.xyZ[0][ftbase_colmicrovectorsize];
-   for (i = 0; i < repcnt; i++) {
-      ftbase_ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, &plan->buffer, 1, _state);
-   }
-}
-
-// Returns good factorization N=N1*N2.
-//
-// Usually N1 <= N2 (but not always - small N's may be exception).
-// if N1 != 1 then N2 != 1.
-//
-// Factorization is chosen depending on task type and codelets we have.
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2, ae_state *_state) {
-   ae_int_t j;
-   *n1 = 0;
-   *n2 = 0;
-   *n1 = 0;
-   *n2 = 0;
-// try to find good codelet
-   if (*n1 * (*n2) != n) {
-      for (j = ftbase_ftbasecodeletrecommended; j >= 2; j--) {
-         if (n % j == 0) {
-            *n1 = j;
-            *n2 = n / j;
-            break;
-         }
-      }
-   }
-// try to factorize N
-   if (*n1 * (*n2) != n) {
-      for (j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) {
-         if (n % j == 0) {
-            *n1 = j;
-            *n2 = n / j;
-            break;
-         }
-      }
-   }
-// looks like N is prime :(
-   if (*n1 * (*n2) != n) {
-      *n1 = 1;
-      *n2 = n;
-   }
-// normalize
-   if (*n2 == 1 && *n1 != 1) {
-      *n2 = *n1;
-      *n1 = 1;
-   }
-}
-
-// Is number smooth?
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-bool ftbaseissmooth(ae_int_t n, ae_state *_state) {
-   ae_int_t i;
-   bool result;
-   for (i = 2; i <= ftbase_ftbasemaxsmoothfactor; i++) {
-      while (n % i == 0) {
-         n = n / i;
-      }
-   }
-   result = n == 1;
-   return result;
-}
-
-// Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
-// than or equal to max(N,2)
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state) {
-   ae_int_t best;
+// NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
+// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
+static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state) {
    ae_int_t result;
-   best = 2;
-   while (best < n) {
-      best = 2 * best;
-   }
-   ftbase_ftbasefindsmoothrec(n, 1, 2, &best, _state);
-   result = best;
+   ae_assert(n > 0, "FTOptimisticEstimate: N <= 0", _state);
+   result = ae_ifloor(1.0E-5 * 5 * n * ae_log((double)n, _state) / ae_log(2.0, _state), _state);
    return result;
-}
-
-// Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
-// greater than or equal to max(N,2)
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state) {
-   ae_int_t best;
-   ae_int_t result;
-   best = 2;
-   while (best < n) {
-      best = 2 * best;
-   }
-   ftbase_ftbasefindsmoothrec(n, 2, 2, &best, _state);
-   result = best;
-   return result;
-}
-
-// Returns estimate of FLOP count for the FFT.
-//
-// It is only an estimate based on operations count for the PERFECT FFT
-// and relative inefficiency of the algorithm actually used.
-//
-// N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-double ftbasegetflopestimate(ae_int_t n, ae_state *_state) {
-   double result;
-   result = ftbase_ftbaseinefficiencyfactor * (4 * n * ae_log((double)n, _state) / ae_log(2.0, _state) - 6 * n + 8);
-   return result;
-}
-
-// This function returns EXACT estimate of the space requirements for N-point
-// FFT. Internals of this function are highly dependent on details of different
-// FFTs employed by this unit, so every time algorithm is changed this function
-// has to be rewritten.
-//
-// Inputs:
-//     N           -   transform length
-//     PrecRSize   -   must be set to zero
-//     PrecISize   -   must be set to zero
-//
-// Outputs:
-//     PrecRSize   -   number of real temporaries required for transformation
-//     PrecISize   -   number of integer temporaries required for transformation
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize, ae_state *_state) {
-   ae_int_t ncur;
-   ae_int_t f;
-   ae_int_t i;
-// Determine required sizes of precomputed real and integer
-// buffers. This stage of code is highly dependent on internals
-// of FTComplexFFTPlanRec() and must be kept synchronized with
-// possible changes in internals of plan generation function.
-//
-// Buffer size is determined as follows:
-// * N is factorized
-// * we factor out anything which is less or equal to MaxRadix
-// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-//   real entries to store precomputed Quantities for Bluestein's
-//   transformation
-// * prime factor F <= RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
-//   precomputed storage
-   ncur = n;
-   for (i = 2; i <= ftbase_maxradix; i++) {
-      while (ncur % i == 0) {
-         ncur = ncur / i;
-      }
-   }
-   f = 2;
-   while (f <= ncur) {
-      while (ncur % f == 0) {
-         if (f > ftbase_raderthreshold) {
-            *precrsize = *precrsize + 4 * ftbasefindsmooth(2 * f - 1, _state);
-         } else {
-            *precrsize = *precrsize + 2 * (f - 1);
-            ftbase_ftdeterminespacerequirements(f - 1, precrsize, precisize, _state);
-         }
-         ncur = ncur / f;
-      }
-      f = f + 1;
-   }
-}
-
-// Recurrent function called by FTComplexFFTPlan() and other functions. It
-// recursively builds transformation plan
-//
-// Inputs:
-//     N           -   FFT length (in complex numbers), N >= 1
-//     K           -   number of repetitions, K >= 1
-//     ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
-//                     plan header/footer.
-//     TopmostPlan -   if True, plan generator assumes that it is topmost plan:
-//                     * it may use global buffer for transpositions
-//                     and there is no other plan which executes in parallel
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     BluesteinSize-  amount of storage (in real numbers) required for Bluestein buffer
-//     PrecRPtr    -   pointer to unused part of precomputed real buffer (Plan.PrecR):
-//                     * when this function stores some data to precomputed buffer,
-//                       it advances pointer.
-//                     * it is responsibility of the function to assert that
-//                       Plan.PrecR has enough space to store data before actually
-//                       writing to buffer.
-//                     * it is responsibility of the caller to allocate enough
-//                       space before calling this function
-//     PrecIPtr    -   pointer to unused part of precomputed integer buffer (Plan.PrecI):
-//                     * when this function stores some data to precomputed buffer,
-//                       it advances pointer.
-//                     * it is responsibility of the function to assert that
-//                       Plan.PrecR has enough space to store data before actually
-//                       writing to buffer.
-//                     * it is responsibility of the caller to allocate enough
-//                       space before calling this function
-//     Plan        -   plan (generated so far)
-//
-// Outputs:
-//     RowPtr      -   updated pointer (advanced by number of entries generated
-//                     by function)
-//     BluesteinSize-  updated amount
-//                     (may be increased, but may never be decreased)
-//
-// NOTE: in case TopmostPlan is True, ChildPlan is also must be True.
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t m;
-   ae_int_t n1;
-   ae_int_t n2;
-   ae_int_t gq;
-   ae_int_t giq;
-   ae_int_t row0;
-   ae_int_t row1;
-   ae_int_t row2;
-   ae_int_t row3;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(srealarray, localbuf, _state);
-   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
-   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
-   ae_assert(!topmostplan || childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan", _state);
-// Try to generate "topmost" plan
-   if (topmostplan && n > ftbase_recursivethreshold) {
-      ftbase_ftfactorize(n, false, &n1, &n2, _state);
-      if (n1 * n2 == 0) {
-      // Handle prime-factor FFT with Bluestein's FFT.
-      // Determine size of Bluestein's buffer.
-         m = ftbasefindsmooth(2 * n - 1, _state);
-         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize, _state);
-      // Generate plan
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-         ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0, _state);
-         row0 = *rowptr;
-         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
-         ftbase_ftcomplexfftplanrec(m, 1, true, true, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-         row1 = *rowptr;
-         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
-         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-      // Fill precomputed buffer
-         ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr, _state);
-      // Update pointer to the precomputed area
-         *precrptr = *precrptr + 4 * m;
-      } else {
-      // Handle composite FFT with recursive Cooley-Tukey which
-      // uses global buffer instead of local one.
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-         row0 = *rowptr;
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n2, n1, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
-         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
-         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
-         row2 = *rowptr;
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n1, n2, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
-         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-         row1 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
-         row3 = *rowptr;
-         ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-         plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
-      }
-      ae_frame_leave(_state);
-      return;
-   }
-// Prepare "non-topmost" plan:
-// * calculate factorization
-// * use local (shared) buffer
-// * update buffer size - ANY plan will need at least
-//   2*N temporaries, additional requirements can be
-//   applied later
-   ftbase_ftfactorize(n, false, &n1, &n2, _state);
-// Handle FFT's with N1*N2=0: either small-N or prime-factor
-   if (n1 * n2 == 0) {
-      if (n <= ftbase_maxradix) {
-      // Small-N FFT
-         if (childplan) {
-            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-         }
-         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexcodeletfft, k, n, 2, 0, _state);
-         if (childplan) {
-            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-         }
-         ae_frame_leave(_state);
-         return;
-      }
-      if (n <= ftbase_raderthreshold) {
-      // Handle prime-factor FFT's with Rader's FFT
-         m = n - 1;
-         if (childplan) {
-            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-         }
-         findprimitiverootandinverse(n, &gq, &giq, _state);
-         ftbase_ftpushentry4(plan, rowptr, ftbase_opradersfft, k, n, 2, 2, gq, giq, *precrptr, _state);
-         ftbase_ftprecomputeradersfft(n, gq, giq, &plan->precr, *precrptr, _state);
-         *precrptr = *precrptr + 2 * (n - 1);
-         row0 = *rowptr;
-         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
-         ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-         row1 = *rowptr;
-         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
-         if (childplan) {
-            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-         }
-      } else {
-      // Handle prime-factor FFT's with Bluestein's FFT
-         m = ftbasefindsmooth(2 * n - 1, _state);
-         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize, _state);
-         if (childplan) {
-            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-         }
-         ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0, _state);
-         ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr, _state);
-         *precrptr = *precrptr + 4 * m;
-         row0 = *rowptr;
-         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
-         ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-         row1 = *rowptr;
-         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
-         if (childplan) {
-            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-         }
-      }
-      ae_frame_leave(_state);
-      return;
-   }
-// Handle Cooley-Tukey FFT with small N1
-   if (n1 <= ftbase_maxradix) {
-   // Specialized transformation for small N1:
-   // * N2 short inplace FFT's, each N1-point, with integrated twiddle factors
-   // * N1 long FFT's
-   // * final transposition
-      if (childplan) {
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-      }
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexcodelettwfft, k, n1, 2 * n2, 0, _state);
-      ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-      if (childplan) {
-         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-      }
-      ae_frame_leave(_state);
-      return;
-   }
-// Handle general Cooley-Tukey FFT, either "flat" or "recursive"
-   if (n <= ftbase_recursivethreshold) {
-   // General code for large N1/N2, "flat" version without explicit recurrence
-   // (nested subplans are inserted directly into the body of the plan)
-      if (childplan) {
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-      }
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-      ftbase_ftcomplexfftplanrec(n1, k * n2, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
-      ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-      if (childplan) {
-         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-      }
-   } else {
-   // General code for large N1/N2, "recursive" version - nested subplans
-   // are separated from the plan body.
-   //
-   // Generate parent plan.
-      if (childplan) {
-         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
-      }
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-      row0 = *rowptr;
-      ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n2, n1, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
-      row2 = *rowptr;
-      ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n1, n2, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
-      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
-      if (childplan) {
-         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
-      }
-   // Generate child subplans, insert refence to parent plans
-      row1 = *rowptr;
-      ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-      plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
-      row3 = *rowptr;
-      ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
-      plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
-   }
-   ae_frame_leave(_state);
-}
-
-// This function pushes one more entry to the plan. It resizes Entries matrix
-// if needed.
-//
-// Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
-//
-// Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-//
-// NOTE: Param1 is set to -1.
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_state *_state) {
-   ftbase_ftpushentry2(plan, rowptr, etype, eopcnt, eopsize, emcvsize, eparam0, -1, _state);
-}
-
-// Same as FTPushEntry(), but sets Param0 AND Param1.
-// This function pushes one more entry to the plan. It resized Entries matrix
-// if needed.
-//
-// Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
-//     EParam1     -   parameter 1
-//
-// Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_state *_state) {
-   if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1, _state), ftbase_colscnt, _state);
-   }
-   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
-   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.xyZ[*rowptr][ftbase_colparam2] = 0;
-   plan->entries.xyZ[*rowptr][ftbase_colparam3] = 0;
-   *rowptr = *rowptr + 1;
-}
-
-// Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
-// This function pushes one more entry to the plan. It resized Entries matrix
-// if needed.
-//
-// Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
-//     EParam1     -   parameter 1
-//     EParam2     -   parameter 2
-//     EParam3     -   parameter 3
-//
-// Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3, ae_state *_state) {
-   if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1, _state), ftbase_colscnt, _state);
-   }
-   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
-   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.xyZ[*rowptr][ftbase_colparam2] = eparam2;
-   plan->entries.xyZ[*rowptr][ftbase_colparam3] = eparam3;
-   *rowptr = *rowptr + 1;
-}
-
-// This subroutine applies subplan to input/output array A.
-//
-// Inputs:
-//     Plan        -   transformation plan
-//     SubPlan     -   subplan index
-//     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     Buf         -   temporary buffer whose length is equal to plan length
-//                     (without taking into account RepCnt) or larger.
-//     OffsBuf     -   offset in the buffer array
-//     RepCnt      -   repetition count (transformation is repeatedly applied
-//                     to subsequent subarrays)
-//
-// Outputs:
-//     Plan        -   plan (temporary buffers can be modified, plan itself
-//                     is unchanged and can be reused)
-//     A           -   transformed array
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t rowidx;
-   ae_int_t i;
-   ae_int_t n1;
-   ae_int_t n2;
-   ae_int_t operation;
-   ae_int_t operandscnt;
-   ae_int_t operandsize;
-   ae_int_t microvectorsize;
-   ae_int_t param0;
-   ae_int_t param1;
-   ae_int_t parentsize;
-   ae_int_t childsize;
-   ae_int_t chunksize;
-   ae_int_t lastchunksize;
-   ae_frame_make(_state, &_frame_block);
-   RefObj(srealarray, bufa, _state);
-   RefObj(srealarray, bufb, _state);
-   RefObj(srealarray, bufc, _state);
-   RefObj(srealarray, bufd, _state);
-   ae_assert(plan->entries.xyZ[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header", _state);
-   rowidx = subplan + 1;
-   while (plan->entries.xyZ[rowidx][ftbase_coltype] != ftbase_opend) {
-      operation = plan->entries.xyZ[rowidx][ftbase_coltype];
-      operandscnt = repcnt * plan->entries.xyZ[rowidx][ftbase_coloperandscnt];
-      operandsize = plan->entries.xyZ[rowidx][ftbase_coloperandsize];
-      microvectorsize = plan->entries.xyZ[rowidx][ftbase_colmicrovectorsize];
-      param0 = plan->entries.xyZ[rowidx][ftbase_colparam0];
-      param1 = plan->entries.xyZ[rowidx][ftbase_colparam1];
-      touchint(&param1, _state);
-   // Process "jump" operation
-      if (operation == ftbase_opjmp) {
-         rowidx = rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0];
-         continue;
-      }
-   // Process "parallel call" operation:
-   // * we perform initial check for consistency between parent and child plans
-   // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
-   //   several parallel tasks
-      if (operation == ftbase_opparallelcall) {
-         parentsize = operandsize * microvectorsize;
-         childsize = plan->entries.xyZ[rowidx + param0][ftbase_coloperandscnt] * plan->entries.xyZ[rowidx + param0][ftbase_coloperandsize] * plan->entries.xyZ[rowidx + param0][ftbase_colmicrovectorsize];
-         ae_assert(plan->entries.xyZ[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header", _state);
-         ae_assert(parentsize == childsize, "FTApplySubPlan: incorrect child subplan header", _state);
-         chunksize = ae_maxint(ftbase_recursivethreshold / childsize, 1, _state);
-         lastchunksize = operandscnt % chunksize;
-         if (lastchunksize == 0) {
-            lastchunksize = chunksize;
-         }
-         i = 0;
-         while (i < operandscnt) {
-            chunksize = ae_minint(chunksize, operandscnt - i, _state);
-            ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize, _state);
-            i = i + chunksize;
-         }
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process "reference complex FFT" operation
-      if (operation == ftbase_opcomplexreffft) {
-         ftbase_ftapplycomplexreffft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, buf, _state);
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process "codelet FFT" operation
-      if (operation == ftbase_opcomplexcodeletfft) {
-         ftbase_ftapplycomplexcodeletfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process "integrated codelet FFT" operation
-      if (operation == ftbase_opcomplexcodelettwfft) {
-         ftbase_ftapplycomplexcodelettwfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process Bluestein's FFT operation
-      if (operation == ftbase_opbluesteinsfft) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize != 2 for Bluesteins FFT", _state);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufa, _state);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb, _state);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc, _state);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufd, _state);
-         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam2], rowidx + plan->entries.xyZ[rowidx][ftbase_colparam1], &bufa->val, &bufb->val, &bufc->val, &bufd->val, _state);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufa, _state);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb, _state);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc, _state);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufd, _state);
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process Rader's FFT
-      if (operation == ftbase_opradersfft) {
-         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam1], plan->entries.xyZ[rowidx][ftbase_colparam2], plan->entries.xyZ[rowidx][ftbase_colparam3], buf, _state);
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process "complex twiddle factors" operation
-      if (operation == ftbase_opcomplexfftfactors) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1", _state);
-         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
-         n2 = operandsize / n1;
-         for (i = 0; i < operandscnt; i++) {
-            ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2, _state);
-         }
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Process "complex transposition" operation
-      if (operation == ftbase_opcomplextranspose) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1", _state);
-         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
-         n2 = operandsize / n1;
-         for (i = 0; i < operandscnt; i++) {
-            ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf, _state);
-         }
-         rowidx = rowidx + 1;
-         continue;
-      }
-   // Error
-      ae_assert(false, "FTApplySubPlan: unexpected plan type", _state);
-   }
-   ae_frame_leave(_state);
 }
 
 // This subroutine applies complex reference FFT to input/output array A.
@@ -11552,379 +10829,6 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_
    }
 }
 
-// This subroutine precomputes data for complex Bluestein's  FFT  and  writes
-// them to array PrecR[] at specified offset. It  is  responsibility  of  the
-// caller to make sure that PrecR[] is large enough.
-//
-// Inputs:
-//     N           -   original size of the transform
-//     M           -   size of the "padded" Bluestein's transform
-//     PrecR       -   preallocated array
-//     Offs        -   offset
-//
-// Outputs:
-//     PrecR       -   data at Offs:Offs+4*M-1 are modified:
-//                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
-//                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
-//                     Other parts of PrecR are unchanged.
-//
-// NOTE: this function performs internal M-point FFT. It allocates temporary
-//       plan which is destroyed after leaving this function.
-// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   double bx;
-   double by;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(fasttransformplan, plan, _state);
-// Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
-   for (i = 0; i < 2 * m; i++) {
-      precr->xR[offs + i] = 0.0;
-   }
-   for (i = 0; i < n; i++) {
-      bx = ae_cos(ae_pi / n * i * i, _state);
-      by = ae_sin(ae_pi / n * i * i, _state);
-      precr->xR[offs + 2 * i + 0] = bx;
-      precr->xR[offs + 2 * i + 1] = by;
-      precr->xR[offs + 2 * ((m - i) % m) + 0] = bx;
-      precr->xR[offs + 2 * ((m - i) % m) + 1] = by;
-   }
-// Precomputed FFT
-   ftcomplexfftplan(m, 1, &plan, _state);
-   for (i = 0; i < 2 * m; i++) {
-      precr->xR[offs + 2 * m + i] = precr->xR[offs + i];
-   }
-   ftbase_ftapplysubplan(&plan, 0, precr, offs + 2 * m, 0, &plan.buffer, 1, _state);
-   ae_frame_leave(_state);
-}
-
-// This subroutine applies complex Bluestein's FFT to input/output array A.
-//
-// Inputs:
-//     Plan        -   transformation plan
-//     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     OperandsCnt -   number of repeated operands (length N each)
-//     N           -   original data length (measured in complex numbers)
-//     M           -   padded data length (measured in complex numbers)
-//     PrecOffs    -   offset of the precomputed data for the plan
-//     SubPlan     -   position of the length-M FFT subplan which is used by
-//                     transformation
-//     BufA        -   temporary buffer, at least 2*M elements
-//     BufB        -   temporary buffer, at least 2*M elements
-//     BufC        -   temporary buffer, at least 2*M elements
-//     BufD        -   temporary buffer, at least 2*M elements
-//
-// Outputs:
-//     A           -   transformed array
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state) {
-   ae_int_t op;
-   ae_int_t i;
-   double x;
-   double y;
-   double bx;
-   double by;
-   double ax;
-   double ay;
-   double rx;
-   double ry;
-   ae_int_t p0;
-   ae_int_t p1;
-   ae_int_t p2;
-   for (op = 0; op < operandscnt; op++) {
-   // Multiply A by conj(Z), store to buffer.
-   // Pad A by zeros.
-   //
-   // NOTE: Z[k]=exp(i*pi*k^2/N)
-      p0 = abase + aoffset + op * 2 * n;
-      p1 = precoffs;
-      for (i = 0; i < n; i++) {
-         x = a->xR[p0 + 0];
-         y = a->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
-         by = -plan->precr.xR[p1 + 1];
-         bufa->xR[2 * i + 0] = x * bx - y * by;
-         bufa->xR[2 * i + 1] = x * by + y * bx;
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-      }
-      for (i = 2 * n; i < 2 * m; i++) {
-         bufa->xR[i] = 0.0;
-      }
-   // Perform convolution of A and Z (using precomputed
-   // FFT of Z stored in Plan structure).
-      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
-      p0 = 0;
-      p1 = precoffs + 2 * m;
-      for (i = 0; i < m; i++) {
-         ax = bufa->xR[p0 + 0];
-         ay = bufa->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
-         by = plan->precr.xR[p1 + 1];
-         bufa->xR[p0 + 0] = ax * bx - ay * by;
-         bufa->xR[p0 + 1] = -(ax * by + ay * bx);
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-      }
-      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
-   // Post processing:
-   //     A:=conj(Z)*conj(A)/M
-   // Here conj(A)/M corresponds to last stage of inverse DFT,
-   // and conj(Z) comes from Bluestein's FFT algorithm.
-      p0 = precoffs;
-      p1 = 0;
-      p2 = abase + aoffset + op * 2 * n;
-      for (i = 0; i < n; i++) {
-         bx = plan->precr.xR[p0 + 0];
-         by = plan->precr.xR[p0 + 1];
-         rx = bufa->xR[p1 + 0] / m;
-         ry = -bufa->xR[p1 + 1] / m;
-         a->xR[p2 + 0] = rx * bx - ry * (-by);
-         a->xR[p2 + 1] = rx * (-by) + ry * bx;
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-         p2 = p2 + 2;
-      }
-   }
-}
-
-// This subroutine precomputes data for complex Rader's FFT and  writes  them
-// to array PrecR[] at specified offset. It  is  responsibility of the caller
-// to make sure that PrecR[] is large enough.
-//
-// Inputs:
-//     N           -   original size of the transform (before reduction to N-1)
-//     RQ          -   primitive root modulo N
-//     RIQ         -   inverse of primitive root modulo N
-//     PrecR       -   preallocated array
-//     Offs        -   offset
-//
-// Outputs:
-//     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
-//                     other parts of PrecR are unchanged.
-//
-// NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
-//       plan which is destroyed after leaving this function.
-// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t q;
-   ae_int_t kiq;
-   double v;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(fasttransformplan, plan, _state);
-// Fill PrecR with Rader factors, perform FFT
-   kiq = 1;
-   for (q = 0; q < n - 1; q++) {
-      v = -2 * ae_pi * kiq / n;
-      precr->xR[offs + 2 * q + 0] = ae_cos(v, _state);
-      precr->xR[offs + 2 * q + 1] = ae_sin(v, _state);
-      kiq = kiq * riq % n;
-   }
-   ftcomplexfftplan(n - 1, 1, &plan, _state);
-   ftbase_ftapplysubplan(&plan, 0, precr, offs, 0, &plan.buffer, 1, _state);
-   ae_frame_leave(_state);
-}
-
-// This subroutine applies complex Rader's FFT to input/output array A.
-//
-// Inputs:
-//     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     OperandsCnt -   number of repeated operands (length N each)
-//     N           -   original data length (measured in complex numbers)
-//     SubPlan     -   position of the (N-1)-point FFT subplan which is used
-//                     by transformation
-//     RQ          -   primitive root modulo N
-//     RIQ         -   inverse of primitive root modulo N
-//     PrecOffs    -   offset of the precomputed data for the plan
-//     Buf         -   temporary array
-//
-// Outputs:
-//     A           -   transformed array
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state) {
-   ae_int_t opidx;
-   ae_int_t i;
-   ae_int_t q;
-   ae_int_t kq;
-   ae_int_t kiq;
-   double x0;
-   double y0;
-   ae_int_t p0;
-   ae_int_t p1;
-   double ax;
-   double ay;
-   double bx;
-   double by;
-   double rx;
-   double ry;
-   ae_assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1", _state);
-// Process operands
-   for (opidx = 0; opidx < operandscnt; opidx++) {
-   // fill QA
-      kq = 1;
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      rx = a->xR[p0 + 0];
-      ry = a->xR[p0 + 1];
-      x0 = rx;
-      y0 = ry;
-      for (q = 0; q < n - 1; q++) {
-         ax = a->xR[p0 + 2 * kq + 0];
-         ay = a->xR[p0 + 2 * kq + 1];
-         buf->xR[p1 + 0] = ax;
-         buf->xR[p1 + 1] = ay;
-         rx = rx + ax;
-         ry = ry + ay;
-         kq = kq * rq % n;
-         p1 = p1 + 2;
-      }
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      for (q = 0; q < n - 1; q++) {
-         a->xR[p0] = buf->xR[p1];
-         a->xR[p0 + 1] = buf->xR[p1 + 1];
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-      }
-   // Convolution
-      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _state);
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = precoffs;
-      for (i = 0; i < n - 1; i++) {
-         ax = a->xR[p0 + 0];
-         ay = a->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
-         by = plan->precr.xR[p1 + 1];
-         a->xR[p0 + 0] = ax * bx - ay * by;
-         a->xR[p0 + 1] = -(ax * by + ay * bx);
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-      }
-      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _state);
-      p0 = abase + aoffset + opidx * n * 2;
-      for (i = 0; i < n - 1; i++) {
-         a->xR[p0 + 0] = a->xR[p0 + 0] / (n - 1);
-         a->xR[p0 + 1] = -a->xR[p0 + 1] / (n - 1);
-         p0 = p0 + 2;
-      }
-   // Result
-      buf->xR[aoffset + opidx * n * 2 + 0] = rx;
-      buf->xR[aoffset + opidx * n * 2 + 1] = ry;
-      kiq = 1;
-      p0 = aoffset + opidx * n * 2;
-      p1 = abase + aoffset + opidx * n * 2;
-      for (q = 0; q < n - 1; q++) {
-         buf->xR[p0 + 2 * kiq + 0] = x0 + a->xR[p1 + 0];
-         buf->xR[p0 + 2 * kiq + 1] = y0 + a->xR[p1 + 1];
-         kiq = kiq * riq % n;
-         p1 = p1 + 2;
-      }
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      for (q = 0; q < n; q++) {
-         a->xR[p0] = buf->xR[p1];
-         a->xR[p0 + 1] = buf->xR[p1 + 1];
-         p0 = p0 + 2;
-         p1 = p1 + 2;
-      }
-   }
-}
-
-// Factorizes task size N into product of two smaller sizes N1 and N2
-//
-// Inputs:
-//     N       -   task size, N>0
-//     IsRoot  -   whether taks is root task (first one in a sequence)
-//
-// Outputs:
-//     N1, N2  -   such numbers that:
-//                 * for prime N:                  N1=N2=0
-//                 * for composite N <= MaxRadix:    N1=N2=0
-//                 * for composite N>MaxRadix:     1 <= N1 <= N2, N1*N2=N
-// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
-static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state) {
-   ae_int_t j;
-   ae_int_t k;
-   *n1 = 0;
-   *n2 = 0;
-   ae_assert(n > 0, "FTFactorize: N <= 0", _state);
-   *n1 = 0;
-   *n2 = 0;
-// Small N
-   if (n <= ftbase_maxradix) {
-      return;
-   }
-// Large N, recursive split
-   if (n > ftbase_recursivethreshold) {
-      k = ae_iceil(ae_sqrt((double)n, _state), _state) + 1;
-      ae_assert(k * k >= n, "FTFactorize: internal error during recursive factorization", _state);
-      for (j = k; j >= 2; j--) {
-         if (n % j == 0) {
-            *n1 = ae_minint(n / j, j, _state);
-            *n2 = ae_maxint(n / j, j, _state);
-            return;
-         }
-      }
-   }
-// N>MaxRadix, try to find good codelet
-   for (j = ftbase_maxradix; j >= 2; j--) {
-      if (n % j == 0) {
-         *n1 = j;
-         *n2 = n / j;
-         break;
-      }
-   }
-// In case no good codelet was found,
-// try to factorize N into product of ANY primes.
-   if (*n1 * (*n2) != n) {
-      for (j = 2; j < n; j++) {
-         if (n % j == 0) {
-            *n1 = j;
-            *n2 = n / j;
-            break;
-         }
-         if (j * j > n) {
-            break;
-         }
-      }
-   }
-// normalize
-   if (*n1 > (*n2)) {
-      j = *n1;
-      *n1 = *n2;
-      *n2 = j;
-   }
-}
-
-// Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
-//
-// Inputs:
-//     N       -   task size, N>0
-//
-// Result:
-//     cost in UNITs, rounded down to nearest integer
-//
-// NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
-// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
-static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state) {
-   ae_int_t result;
-   ae_assert(n > 0, "FTOptimisticEstimate: N <= 0", _state);
-   result = ae_ifloor(1.0E-5 * 5 * n * ae_log((double)n, _state) / ae_log(2.0, _state), _state);
-   return result;
-}
-
 // Twiddle factors calculation
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2, ae_state *_state) {
@@ -12064,12 +10968,72 @@ static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t
    }
 }
 
-// Linear transpose: transpose complex matrix stored in 1-dimensional array
+// Returns estimate of FLOP count for the FFT.
+//
+// It is only an estimate based on operations count for the PERFECT FFT
+// and relative inefficiency of the algorithm actually used.
+//
+// N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf, ae_state *_state) {
-   ftbase_ffticltrec(a, astart, n, buf, 0, m, m, n, _state);
-   ae_v_move(&a->xR[astart], 1, buf->xR, 1, 2 * m * n);
+double ftbasegetflopestimate(ae_int_t n, ae_state *_state) {
+   double result;
+   result = ftbase_ftbaseinefficiencyfactor * (4 * n * ae_log((double)n, _state) / ae_log(2.0, _state) - 6 * n + 8);
+   return result;
 }
+
+#if 0
+// Recurrent subroutine for a (non-existent) InternalRealLinTranspose
+//
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t idx1;
+   ae_int_t idx2;
+   ae_int_t m1;
+   ae_int_t n1;
+   if (m == 0 || n == 0) {
+      return;
+   }
+   if (ae_maxint(m, n, _state) <= 8) {
+      for (i = 0; i < m; i++) {
+         idx1 = bstart + i;
+         idx2 = astart + i * astride;
+         for (j = 0; j < n; j++) {
+            b->xR[idx1] = a->xR[idx2];
+            idx1 = idx1 + bstride;
+            idx2 = idx2 + 1;
+         }
+      }
+      return;
+   }
+   if (n > m) {
+   // New partition:
+   //
+   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
+   //                                  ( B2 )
+      n1 = n / 2;
+      if (n - n1 >= 8 && n1 % 8 != 0) {
+         n1 = n1 + (8 - n1 % 8);
+      }
+      ae_assert(n - n1 > 0, "Assertion failed", _state);
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n1, _state);
+      ftbase_fftirltrec(a, astart + n1, astride, b, bstart + n1 * bstride, bstride, m, n - n1, _state);
+   } else {
+   // New partition:
+   //
+   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
+   //                     ( A2 )
+      m1 = m / 2;
+      if (m - m1 >= 8 && m1 % 8 != 0) {
+         m1 = m1 + (8 - m1 % 8);
+      }
+      ae_assert(m - m1 > 0, "Assertion failed", _state);
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m1, n, _state);
+      ftbase_fftirltrec(a, astart + m1 * astride, astride, b, bstart + m1, bstride, m - m1, n, _state);
+   }
+}
+#endif
 
 // Recurrent subroutine for a InternalComplexLinTranspose
 //
@@ -12132,59 +11096,137 @@ static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVe
    }
 }
 
-#if 0
-// Recurrent subroutine for a (non-existent) InternalRealLinTranspose
-//
+// Linear transpose: transpose complex matrix stored in 1-dimensional array
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n, ae_state *_state) {
-   ae_int_t i;
+static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf, ae_state *_state) {
+   ftbase_ffticltrec(a, astart, n, buf, 0, m, m, n, _state);
+   ae_v_move(&a->xR[astart], 1, buf->xR, 1, 2 * m * n);
+}
+
+// Factorizes task size N into product of two smaller sizes N1 and N2
+//
+// Inputs:
+//     N       -   task size, N>0
+//     IsRoot  -   whether taks is root task (first one in a sequence)
+//
+// Outputs:
+//     N1, N2  -   such numbers that:
+//                 * for prime N:                  N1=N2=0
+//                 * for composite N <= MaxRadix:    N1=N2=0
+//                 * for composite N>MaxRadix:     1 <= N1 <= N2, N1*N2=N
+// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
+static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2, ae_state *_state) {
    ae_int_t j;
-   ae_int_t idx1;
-   ae_int_t idx2;
-   ae_int_t m1;
-   ae_int_t n1;
-   if (m == 0 || n == 0) {
+   ae_int_t k;
+   *n1 = 0;
+   *n2 = 0;
+   ae_assert(n > 0, "FTFactorize: N <= 0", _state);
+   *n1 = 0;
+   *n2 = 0;
+// Small N
+   if (n <= ftbase_maxradix) {
       return;
    }
-   if (ae_maxint(m, n, _state) <= 8) {
-      for (i = 0; i < m; i++) {
-         idx1 = bstart + i;
-         idx2 = astart + i * astride;
-         for (j = 0; j < n; j++) {
-            b->xR[idx1] = a->xR[idx2];
-            idx1 = idx1 + bstride;
-            idx2 = idx2 + 1;
+// Large N, recursive split
+   if (n > ftbase_recursivethreshold) {
+      k = ae_iceil(ae_sqrt((double)n, _state), _state) + 1;
+      ae_assert(k * k >= n, "FTFactorize: internal error during recursive factorization", _state);
+      for (j = k; j >= 2; j--) {
+         if (n % j == 0) {
+            *n1 = ae_minint(n / j, j, _state);
+            *n2 = ae_maxint(n / j, j, _state);
+            return;
          }
       }
-      return;
    }
-   if (n > m) {
-   // New partition:
-   //
-   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
-   //                                  ( B2 )
-      n1 = n / 2;
-      if (n - n1 >= 8 && n1 % 8 != 0) {
-         n1 = n1 + (8 - n1 % 8);
+// N>MaxRadix, try to find good codelet
+   for (j = ftbase_maxradix; j >= 2; j--) {
+      if (n % j == 0) {
+         *n1 = j;
+         *n2 = n / j;
+         break;
       }
-      ae_assert(n - n1 > 0, "Assertion failed", _state);
-      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n1, _state);
-      ftbase_fftirltrec(a, astart + n1, astride, b, bstart + n1 * bstride, bstride, m, n - n1, _state);
-   } else {
-   // New partition:
-   //
-   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
-   //                     ( A2 )
-      m1 = m / 2;
-      if (m - m1 >= 8 && m1 % 8 != 0) {
-         m1 = m1 + (8 - m1 % 8);
+   }
+// In case no good codelet was found,
+// try to factorize N into product of ANY primes.
+   if (*n1 * (*n2) != n) {
+      for (j = 2; j < n; j++) {
+         if (n % j == 0) {
+            *n1 = j;
+            *n2 = n / j;
+            break;
+         }
+         if (j * j > n) {
+            break;
+         }
       }
-      ae_assert(m - m1 > 0, "Assertion failed", _state);
-      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m1, n, _state);
-      ftbase_fftirltrec(a, astart + m1 * astride, astride, b, bstart + m1, bstride, m - m1, n, _state);
+   }
+// normalize
+   if (*n1 > (*n2)) {
+      j = *n1;
+      *n1 = *n2;
+      *n2 = j;
    }
 }
-#endif
+
+// Returns good factorization N=N1*N2.
+//
+// Usually N1 <= N2 (but not always - small N's may be exception).
+// if N1 != 1 then N2 != 1.
+//
+// Factorization is chosen depending on task type and codelets we have.
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2, ae_state *_state) {
+   ae_int_t j;
+   *n1 = 0;
+   *n2 = 0;
+   *n1 = 0;
+   *n2 = 0;
+// try to find good codelet
+   if (*n1 * (*n2) != n) {
+      for (j = ftbase_ftbasecodeletrecommended; j >= 2; j--) {
+         if (n % j == 0) {
+            *n1 = j;
+            *n2 = n / j;
+            break;
+         }
+      }
+   }
+// try to factorize N
+   if (*n1 * (*n2) != n) {
+      for (j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) {
+         if (n % j == 0) {
+            *n1 = j;
+            *n2 = n / j;
+            break;
+         }
+      }
+   }
+// looks like N is prime :(
+   if (*n1 * (*n2) != n) {
+      *n1 = 1;
+      *n2 = n;
+   }
+// normalize
+   if (*n2 == 1 && *n1 != 1) {
+      *n2 = *n1;
+      *n1 = 1;
+   }
+}
+
+// Is number smooth?
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+bool ftbaseissmooth(ae_int_t n, ae_state *_state) {
+   ae_int_t i;
+   bool result;
+   for (i = 2; i <= ftbase_ftbasemaxsmoothfactor; i++) {
+      while (n % i == 0) {
+         n = n / i;
+      }
+   }
+   result = n == 1;
+   return result;
+}
 
 // recurrent subroutine for FFTFindSmoothRec
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
@@ -12203,6 +11245,932 @@ static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t least
    if (leastfactor <= 5) {
       ftbase_ftbasefindsmoothrec(n, seed * 5, 5, best, _state);
    }
+}
+
+// Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
+// than or equal to max(N,2)
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state) {
+   ae_int_t best;
+   ae_int_t result;
+   best = 2;
+   while (best < n) {
+      best = 2 * best;
+   }
+   ftbase_ftbasefindsmoothrec(n, 1, 2, &best, _state);
+   result = best;
+   return result;
+}
+
+// Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
+// greater than or equal to max(N,2)
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state) {
+   ae_int_t best;
+   ae_int_t result;
+   best = 2;
+   while (best < n) {
+      best = 2 * best;
+   }
+   ftbase_ftbasefindsmoothrec(n, 2, 2, &best, _state);
+   result = best;
+   return result;
+}
+
+// This function returns EXACT estimate of the space requirements for N-point
+// FFT. Internals of this function are highly dependent on details of different
+// FFTs employed by this unit, so every time algorithm is changed this function
+// has to be rewritten.
+//
+// Inputs:
+//     N           -   transform length
+//     PrecRSize   -   must be set to zero
+//     PrecISize   -   must be set to zero
+//
+// Outputs:
+//     PrecRSize   -   number of real temporaries required for transformation
+//     PrecISize   -   number of integer temporaries required for transformation
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize, ae_state *_state) {
+   ae_int_t ncur;
+   ae_int_t f;
+   ae_int_t i;
+// Determine required sizes of precomputed real and integer
+// buffers. This stage of code is highly dependent on internals
+// of FTComplexFFTPlanRec() and must be kept synchronized with
+// possible changes in internals of plan generation function.
+//
+// Buffer size is determined as follows:
+// * N is factorized
+// * we factor out anything which is less or equal to MaxRadix
+// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+//   real entries to store precomputed Quantities for Bluestein's
+//   transformation
+// * prime factor F <= RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
+//   precomputed storage
+   ncur = n;
+   for (i = 2; i <= ftbase_maxradix; i++) {
+      while (ncur % i == 0) {
+         ncur = ncur / i;
+      }
+   }
+   f = 2;
+   while (f <= ncur) {
+      while (ncur % f == 0) {
+         if (f > ftbase_raderthreshold) {
+            *precrsize = *precrsize + 4 * ftbasefindsmooth(2 * f - 1, _state);
+         } else {
+            *precrsize = *precrsize + 2 * (f - 1);
+            ftbase_ftdeterminespacerequirements(f - 1, precrsize, precisize, _state);
+         }
+         ncur = ncur / f;
+      }
+      f = f + 1;
+   }
+}
+
+// Forward reference to an indirect recursive call.
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state);
+
+// This subroutine applies complex Bluestein's FFT to input/output array A.
+//
+// Inputs:
+//     Plan        -   transformation plan
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     M           -   padded data length (measured in complex numbers)
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     SubPlan     -   position of the length-M FFT subplan which is used by
+//                     transformation
+//     BufA        -   temporary buffer, at least 2*M elements
+//     BufB        -   temporary buffer, at least 2*M elements
+//     BufC        -   temporary buffer, at least 2*M elements
+//     BufD        -   temporary buffer, at least 2*M elements
+//
+// Outputs:
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd, ae_state *_state) {
+   ae_int_t op;
+   ae_int_t i;
+   double x;
+   double y;
+   double bx;
+   double by;
+   double ax;
+   double ay;
+   double rx;
+   double ry;
+   ae_int_t p0;
+   ae_int_t p1;
+   ae_int_t p2;
+   for (op = 0; op < operandscnt; op++) {
+   // Multiply A by conj(Z), store to buffer.
+   // Pad A by zeros.
+   //
+   // NOTE: Z[k]=exp(i*pi*k^2/N)
+      p0 = abase + aoffset + op * 2 * n;
+      p1 = precoffs;
+      for (i = 0; i < n; i++) {
+         x = a->xR[p0 + 0];
+         y = a->xR[p0 + 1];
+         bx = plan->precr.xR[p1 + 0];
+         by = -plan->precr.xR[p1 + 1];
+         bufa->xR[2 * i + 0] = x * bx - y * by;
+         bufa->xR[2 * i + 1] = x * by + y * bx;
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+      }
+      for (i = 2 * n; i < 2 * m; i++) {
+         bufa->xR[i] = 0.0;
+      }
+   // Perform convolution of A and Z (using precomputed
+   // FFT of Z stored in Plan structure).
+      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
+      p0 = 0;
+      p1 = precoffs + 2 * m;
+      for (i = 0; i < m; i++) {
+         ax = bufa->xR[p0 + 0];
+         ay = bufa->xR[p0 + 1];
+         bx = plan->precr.xR[p1 + 0];
+         by = plan->precr.xR[p1 + 1];
+         bufa->xR[p0 + 0] = ax * bx - ay * by;
+         bufa->xR[p0 + 1] = -(ax * by + ay * bx);
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+      }
+      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
+   // Post processing:
+   //     A:=conj(Z)*conj(A)/M
+   // Here conj(A)/M corresponds to last stage of inverse DFT,
+   // and conj(Z) comes from Bluestein's FFT algorithm.
+      p0 = precoffs;
+      p1 = 0;
+      p2 = abase + aoffset + op * 2 * n;
+      for (i = 0; i < n; i++) {
+         bx = plan->precr.xR[p0 + 0];
+         by = plan->precr.xR[p0 + 1];
+         rx = bufa->xR[p1 + 0] / m;
+         ry = -bufa->xR[p1 + 1] / m;
+         a->xR[p2 + 0] = rx * bx - ry * (-by);
+         a->xR[p2 + 1] = rx * (-by) + ry * bx;
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+         p2 = p2 + 2;
+      }
+   }
+}
+
+// This subroutine applies complex Rader's FFT to input/output array A.
+//
+// Inputs:
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     SubPlan     -   position of the (N-1)-point FFT subplan which is used
+//                     by transformation
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     Buf         -   temporary array
+//
+// Outputs:
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf, ae_state *_state) {
+   ae_int_t opidx;
+   ae_int_t i;
+   ae_int_t q;
+   ae_int_t kq;
+   ae_int_t kiq;
+   double x0;
+   double y0;
+   ae_int_t p0;
+   ae_int_t p1;
+   double ax;
+   double ay;
+   double bx;
+   double by;
+   double rx;
+   double ry;
+   ae_assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1", _state);
+// Process operands
+   for (opidx = 0; opidx < operandscnt; opidx++) {
+   // fill QA
+      kq = 1;
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      rx = a->xR[p0 + 0];
+      ry = a->xR[p0 + 1];
+      x0 = rx;
+      y0 = ry;
+      for (q = 0; q < n - 1; q++) {
+         ax = a->xR[p0 + 2 * kq + 0];
+         ay = a->xR[p0 + 2 * kq + 1];
+         buf->xR[p1 + 0] = ax;
+         buf->xR[p1 + 1] = ay;
+         rx = rx + ax;
+         ry = ry + ay;
+         kq = kq * rq % n;
+         p1 = p1 + 2;
+      }
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      for (q = 0; q < n - 1; q++) {
+         a->xR[p0] = buf->xR[p1];
+         a->xR[p0 + 1] = buf->xR[p1 + 1];
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+      }
+   // Convolution
+      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _state);
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = precoffs;
+      for (i = 0; i < n - 1; i++) {
+         ax = a->xR[p0 + 0];
+         ay = a->xR[p0 + 1];
+         bx = plan->precr.xR[p1 + 0];
+         by = plan->precr.xR[p1 + 1];
+         a->xR[p0 + 0] = ax * bx - ay * by;
+         a->xR[p0 + 1] = -(ax * by + ay * bx);
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+      }
+      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _state);
+      p0 = abase + aoffset + opidx * n * 2;
+      for (i = 0; i < n - 1; i++) {
+         a->xR[p0 + 0] = a->xR[p0 + 0] / (n - 1);
+         a->xR[p0 + 1] = -a->xR[p0 + 1] / (n - 1);
+         p0 = p0 + 2;
+      }
+   // Result
+      buf->xR[aoffset + opidx * n * 2 + 0] = rx;
+      buf->xR[aoffset + opidx * n * 2 + 1] = ry;
+      kiq = 1;
+      p0 = aoffset + opidx * n * 2;
+      p1 = abase + aoffset + opidx * n * 2;
+      for (q = 0; q < n - 1; q++) {
+         buf->xR[p0 + 2 * kiq + 0] = x0 + a->xR[p1 + 0];
+         buf->xR[p0 + 2 * kiq + 1] = y0 + a->xR[p1 + 1];
+         kiq = kiq * riq % n;
+         p1 = p1 + 2;
+      }
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      for (q = 0; q < n; q++) {
+         a->xR[p0] = buf->xR[p1];
+         a->xR[p0 + 1] = buf->xR[p1 + 1];
+         p0 = p0 + 2;
+         p1 = p1 + 2;
+      }
+   }
+}
+
+// This subroutine applies subplan to input/output array A.
+//
+// Inputs:
+//     Plan        -   transformation plan
+//     SubPlan     -   subplan index
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     Buf         -   temporary buffer whose length is equal to plan length
+//                     (without taking into account RepCnt) or larger.
+//     OffsBuf     -   offset in the buffer array
+//     RepCnt      -   repetition count (transformation is repeatedly applied
+//                     to subsequent subarrays)
+//
+// Outputs:
+//     Plan        -   plan (temporary buffers can be modified, plan itself
+//                     is unchanged and can be reused)
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t rowidx;
+   ae_int_t i;
+   ae_int_t n1;
+   ae_int_t n2;
+   ae_int_t operation;
+   ae_int_t operandscnt;
+   ae_int_t operandsize;
+   ae_int_t microvectorsize;
+   ae_int_t param0;
+   ae_int_t param1;
+   ae_int_t parentsize;
+   ae_int_t childsize;
+   ae_int_t chunksize;
+   ae_int_t lastchunksize;
+   ae_frame_make(_state, &_frame_block);
+   RefObj(srealarray, bufa, _state);
+   RefObj(srealarray, bufb, _state);
+   RefObj(srealarray, bufc, _state);
+   RefObj(srealarray, bufd, _state);
+   ae_assert(plan->entries.xyZ[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header", _state);
+   rowidx = subplan + 1;
+   while (plan->entries.xyZ[rowidx][ftbase_coltype] != ftbase_opend) {
+      operation = plan->entries.xyZ[rowidx][ftbase_coltype];
+      operandscnt = repcnt * plan->entries.xyZ[rowidx][ftbase_coloperandscnt];
+      operandsize = plan->entries.xyZ[rowidx][ftbase_coloperandsize];
+      microvectorsize = plan->entries.xyZ[rowidx][ftbase_colmicrovectorsize];
+      param0 = plan->entries.xyZ[rowidx][ftbase_colparam0];
+      param1 = plan->entries.xyZ[rowidx][ftbase_colparam1];
+      touchint(&param1, _state);
+   // Process "jump" operation
+      if (operation == ftbase_opjmp) {
+         rowidx = rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0];
+         continue;
+      }
+   // Process "parallel call" operation:
+   // * we perform initial check for consistency between parent and child plans
+   // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
+   //   several parallel tasks
+      if (operation == ftbase_opparallelcall) {
+         parentsize = operandsize * microvectorsize;
+         childsize = plan->entries.xyZ[rowidx + param0][ftbase_coloperandscnt] * plan->entries.xyZ[rowidx + param0][ftbase_coloperandsize] * plan->entries.xyZ[rowidx + param0][ftbase_colmicrovectorsize];
+         ae_assert(plan->entries.xyZ[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header", _state);
+         ae_assert(parentsize == childsize, "FTApplySubPlan: incorrect child subplan header", _state);
+         chunksize = ae_maxint(ftbase_recursivethreshold / childsize, 1, _state);
+         lastchunksize = operandscnt % chunksize;
+         if (lastchunksize == 0) {
+            lastchunksize = chunksize;
+         }
+         i = 0;
+         while (i < operandscnt) {
+            chunksize = ae_minint(chunksize, operandscnt - i, _state);
+            ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize, _state);
+            i = i + chunksize;
+         }
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process "reference complex FFT" operation
+      if (operation == ftbase_opcomplexreffft) {
+         ftbase_ftapplycomplexreffft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, buf, _state);
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process "codelet FFT" operation
+      if (operation == ftbase_opcomplexcodeletfft) {
+         ftbase_ftapplycomplexcodeletfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process "integrated codelet FFT" operation
+      if (operation == ftbase_opcomplexcodelettwfft) {
+         ftbase_ftapplycomplexcodelettwfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process Bluestein's FFT operation
+      if (operation == ftbase_opbluesteinsfft) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize != 2 for Bluesteins FFT", _state);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufa, _state);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb, _state);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc, _state);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufd, _state);
+         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam2], rowidx + plan->entries.xyZ[rowidx][ftbase_colparam1], &bufa->val, &bufb->val, &bufc->val, &bufd->val, _state);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufa, _state);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb, _state);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc, _state);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufd, _state);
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process Rader's FFT
+      if (operation == ftbase_opradersfft) {
+         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam1], plan->entries.xyZ[rowidx][ftbase_colparam2], plan->entries.xyZ[rowidx][ftbase_colparam3], buf, _state);
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process "complex twiddle factors" operation
+      if (operation == ftbase_opcomplexfftfactors) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1", _state);
+         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
+         n2 = operandsize / n1;
+         for (i = 0; i < operandscnt; i++) {
+            ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2, _state);
+         }
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Process "complex transposition" operation
+      if (operation == ftbase_opcomplextranspose) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1", _state);
+         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
+         n2 = operandsize / n1;
+         for (i = 0; i < operandscnt; i++) {
+            ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf, _state);
+         }
+         rowidx = rowidx + 1;
+         continue;
+      }
+   // Error
+      ae_assert(false, "FTApplySubPlan: unexpected plan type", _state);
+   }
+   ae_frame_leave(_state);
+}
+
+// This subroutine applies transformation plan to input/output array A.
+//
+// Inputs:
+//     Plan        -   transformation plan
+//     A           -   array, must be large enough for plan to work
+//     OffsA       -   offset of the subarray to process
+//     RepCnt      -   repetition count (transformation is repeatedly applied
+//                     to subsequent subarrays)
+//
+// Outputs:
+//     Plan        -   plan (temporary buffers can be modified, plan itself
+//                     is unchanged and can be reused)
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt, ae_state *_state) {
+   ae_int_t plansize;
+   ae_int_t i;
+   plansize = plan->entries.xyZ[0][ftbase_coloperandscnt] * plan->entries.xyZ[0][ftbase_coloperandsize] * plan->entries.xyZ[0][ftbase_colmicrovectorsize];
+   for (i = 0; i < repcnt; i++) {
+      ftbase_ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, &plan->buffer, 1, _state);
+   }
+}
+
+// Same as FTPushEntry(), but sets Param0 AND Param1.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
+//
+// Inputs:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
+//
+// Outputs:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_state *_state) {
+   if (*rowptr >= plan->entries.rows) {
+      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1, _state), ftbase_colscnt, _state);
+   }
+   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.xyZ[*rowptr][ftbase_colparam2] = 0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam3] = 0;
+   *rowptr = *rowptr + 1;
+}
+
+// Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
+//
+// Inputs:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
+//     EParam2     -   parameter 2
+//     EParam3     -   parameter 3
+//
+// Outputs:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3, ae_state *_state) {
+   if (*rowptr >= plan->entries.rows) {
+      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1, _state), ftbase_colscnt, _state);
+   }
+   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.xyZ[*rowptr][ftbase_colparam2] = eparam2;
+   plan->entries.xyZ[*rowptr][ftbase_colparam3] = eparam3;
+   *rowptr = *rowptr + 1;
+}
+
+// This function pushes one more entry to the plan. It resizes Entries matrix
+// if needed.
+//
+// Inputs:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//
+// Outputs:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+//
+// NOTE: Param1 is set to -1.
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_state *_state) {
+   ftbase_ftpushentry2(plan, rowptr, etype, eopcnt, eopsize, emcvsize, eparam0, -1, _state);
+}
+
+#if 0
+// Forward reference to an indirect recursive call. //(@) Already declared externally.
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state);
+#endif
+
+// This subroutine precomputes data for complex Bluestein's  FFT  and  writes
+// them to array PrecR[] at specified offset. It  is  responsibility  of  the
+// caller to make sure that PrecR[] is large enough.
+//
+// Inputs:
+//     N           -   original size of the transform
+//     M           -   size of the "padded" Bluestein's transform
+//     PrecR       -   preallocated array
+//     Offs        -   offset
+//
+// Outputs:
+//     PrecR       -   data at Offs:Offs+4*M-1 are modified:
+//                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
+//                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
+//                     Other parts of PrecR are unchanged.
+//
+// NOTE: this function performs internal M-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
+static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   double bx;
+   double by;
+   ae_frame_make(_state, &_frame_block);
+   NewObj(fasttransformplan, plan, _state);
+// Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
+   for (i = 0; i < 2 * m; i++) {
+      precr->xR[offs + i] = 0.0;
+   }
+   for (i = 0; i < n; i++) {
+      bx = ae_cos(ae_pi / n * i * i, _state);
+      by = ae_sin(ae_pi / n * i * i, _state);
+      precr->xR[offs + 2 * i + 0] = bx;
+      precr->xR[offs + 2 * i + 1] = by;
+      precr->xR[offs + 2 * ((m - i) % m) + 0] = bx;
+      precr->xR[offs + 2 * ((m - i) % m) + 1] = by;
+   }
+// Precomputed FFT
+   ftcomplexfftplan(m, 1, &plan, _state);
+   for (i = 0; i < 2 * m; i++) {
+      precr->xR[offs + 2 * m + i] = precr->xR[offs + i];
+   }
+   ftbase_ftapplysubplan(&plan, 0, precr, offs + 2 * m, 0, &plan.buffer, 1, _state);
+   ae_frame_leave(_state);
+}
+
+// This subroutine precomputes data for complex Rader's FFT and  writes  them
+// to array PrecR[] at specified offset. It  is  responsibility of the caller
+// to make sure that PrecR[] is large enough.
+//
+// Inputs:
+//     N           -   original size of the transform (before reduction to N-1)
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecR       -   preallocated array
+//     Offs        -   offset
+//
+// Outputs:
+//     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
+//                     other parts of PrecR are unchanged.
+//
+// NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
+static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t q;
+   ae_int_t kiq;
+   double v;
+   ae_frame_make(_state, &_frame_block);
+   NewObj(fasttransformplan, plan, _state);
+// Fill PrecR with Rader factors, perform FFT
+   kiq = 1;
+   for (q = 0; q < n - 1; q++) {
+      v = -2 * ae_pi * kiq / n;
+      precr->xR[offs + 2 * q + 0] = ae_cos(v, _state);
+      precr->xR[offs + 2 * q + 1] = ae_sin(v, _state);
+      kiq = kiq * riq % n;
+   }
+   ftcomplexfftplan(n - 1, 1, &plan, _state);
+   ftbase_ftapplysubplan(&plan, 0, precr, offs, 0, &plan.buffer, 1, _state);
+   ae_frame_leave(_state);
+}
+
+// Recurrent function called by FTComplexFFTPlan() and other functions. It
+// recursively builds transformation plan
+//
+// Inputs:
+//     N           -   FFT length (in complex numbers), N >= 1
+//     K           -   number of repetitions, K >= 1
+//     ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
+//                     plan header/footer.
+//     TopmostPlan -   if True, plan generator assumes that it is topmost plan:
+//                     * it may use global buffer for transpositions
+//                     and there is no other plan which executes in parallel
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     BluesteinSize-  amount of storage (in real numbers) required for Bluestein buffer
+//     PrecRPtr    -   pointer to unused part of precomputed real buffer (Plan.PrecR):
+//                     * when this function stores some data to precomputed buffer,
+//                       it advances pointer.
+//                     * it is responsibility of the function to assert that
+//                       Plan.PrecR has enough space to store data before actually
+//                       writing to buffer.
+//                     * it is responsibility of the caller to allocate enough
+//                       space before calling this function
+//     PrecIPtr    -   pointer to unused part of precomputed integer buffer (Plan.PrecI):
+//                     * when this function stores some data to precomputed buffer,
+//                       it advances pointer.
+//                     * it is responsibility of the function to assert that
+//                       Plan.PrecR has enough space to store data before actually
+//                       writing to buffer.
+//                     * it is responsibility of the caller to allocate enough
+//                       space before calling this function
+//     Plan        -   plan (generated so far)
+//
+// Outputs:
+//     RowPtr      -   updated pointer (advanced by number of entries generated
+//                     by function)
+//     BluesteinSize-  updated amount
+//                     (may be increased, but may never be decreased)
+//
+// NOTE: in case TopmostPlan is True, ChildPlan is also must be True.
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t m;
+   ae_int_t n1;
+   ae_int_t n2;
+   ae_int_t gq;
+   ae_int_t giq;
+   ae_int_t row0;
+   ae_int_t row1;
+   ae_int_t row2;
+   ae_int_t row3;
+   ae_frame_make(_state, &_frame_block);
+   NewObj(srealarray, localbuf, _state);
+   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
+   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
+   ae_assert(!topmostplan || childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan", _state);
+// Try to generate "topmost" plan
+   if (topmostplan && n > ftbase_recursivethreshold) {
+      ftbase_ftfactorize(n, false, &n1, &n2, _state);
+      if (n1 * n2 == 0) {
+      // Handle prime-factor FFT with Bluestein's FFT.
+      // Determine size of Bluestein's buffer.
+         m = ftbasefindsmooth(2 * n - 1, _state);
+         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize, _state);
+      // Generate plan
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+         ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0, _state);
+         row0 = *rowptr;
+         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
+         ftbase_ftcomplexfftplanrec(m, 1, true, true, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+         row1 = *rowptr;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
+         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+      // Fill precomputed buffer
+         ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr, _state);
+      // Update pointer to the precomputed area
+         *precrptr = *precrptr + 4 * m;
+      } else {
+      // Handle composite FFT with recursive Cooley-Tukey which
+      // uses global buffer instead of local one.
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+         row0 = *rowptr;
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n2, n1, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
+         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
+         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
+         row2 = *rowptr;
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n1, n2, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
+         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+         row1 = *rowptr;
+         ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
+         row3 = *rowptr;
+         ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+         plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
+      }
+      ae_frame_leave(_state);
+      return;
+   }
+// Prepare "non-topmost" plan:
+// * calculate factorization
+// * use local (shared) buffer
+// * update buffer size - ANY plan will need at least
+//   2*N temporaries, additional requirements can be
+//   applied later
+   ftbase_ftfactorize(n, false, &n1, &n2, _state);
+// Handle FFT's with N1*N2=0: either small-N or prime-factor
+   if (n1 * n2 == 0) {
+      if (n <= ftbase_maxradix) {
+      // Small-N FFT
+         if (childplan) {
+            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+         }
+         ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexcodeletfft, k, n, 2, 0, _state);
+         if (childplan) {
+            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+         }
+         ae_frame_leave(_state);
+         return;
+      }
+      if (n <= ftbase_raderthreshold) {
+      // Handle prime-factor FFT's with Rader's FFT
+         m = n - 1;
+         if (childplan) {
+            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+         }
+         findprimitiverootandinverse(n, &gq, &giq, _state);
+         ftbase_ftpushentry4(plan, rowptr, ftbase_opradersfft, k, n, 2, 2, gq, giq, *precrptr, _state);
+         ftbase_ftprecomputeradersfft(n, gq, giq, &plan->precr, *precrptr, _state);
+         *precrptr = *precrptr + 2 * (n - 1);
+         row0 = *rowptr;
+         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
+         ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+         row1 = *rowptr;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
+         if (childplan) {
+            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+         }
+      } else {
+      // Handle prime-factor FFT's with Bluestein's FFT
+         m = ftbasefindsmooth(2 * n - 1, _state);
+         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize, _state);
+         if (childplan) {
+            ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+         }
+         ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0, _state);
+         ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr, _state);
+         *precrptr = *precrptr + 4 * m;
+         row0 = *rowptr;
+         ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0, _state);
+         ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+         row1 = *rowptr;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
+         if (childplan) {
+            ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+         }
+      }
+      ae_frame_leave(_state);
+      return;
+   }
+// Handle Cooley-Tukey FFT with small N1
+   if (n1 <= ftbase_maxradix) {
+   // Specialized transformation for small N1:
+   // * N2 short inplace FFT's, each N1-point, with integrated twiddle factors
+   // * N1 long FFT's
+   // * final transposition
+      if (childplan) {
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+      }
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexcodelettwfft, k, n1, 2 * n2, 0, _state);
+      ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+      if (childplan) {
+         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+      }
+      ae_frame_leave(_state);
+      return;
+   }
+// Handle general Cooley-Tukey FFT, either "flat" or "recursive"
+   if (n <= ftbase_recursivethreshold) {
+   // General code for large N1/N2, "flat" version without explicit recurrence
+   // (nested subplans are inserted directly into the body of the plan)
+      if (childplan) {
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+      }
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+      ftbase_ftcomplexfftplanrec(n1, k * n2, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
+      ftbase_ftcomplexfftplanrec(n2, k * n1, false, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+      if (childplan) {
+         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+      }
+   } else {
+   // General code for large N1/N2, "recursive" version - nested subplans
+   // are separated from the plan body.
+   //
+   // Generate parent plan.
+      if (childplan) {
+         ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
+      }
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+      row0 = *rowptr;
+      ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n2, n1, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplexfftfactors, k, n, 2, n1, _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n2, _state);
+      row2 = *rowptr;
+      ftbase_ftpushentry2(plan, rowptr, ftbase_opparallelcall, k * n1, n2, 2, 0, ftbase_ftoptimisticestimate(n, _state), _state);
+      ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
+      if (childplan) {
+         ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
+      }
+   // Generate child subplans, insert refence to parent plans
+      row1 = *rowptr;
+      ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+      plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
+      row3 = *rowptr;
+      ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
+      plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
+   }
+   ae_frame_leave(_state);
+}
+
+// This subroutine generates FFT plan for K complex FFT's with length N each.
+//
+// Inputs:
+//     N           -   FFT length (in complex numbers), N >= 1
+//     K           -   number of repetitions, K >= 1
+//
+// Outputs:
+//     Plan        -   plan
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t rowptr;
+   ae_int_t bluesteinsize;
+   ae_int_t precrptr;
+   ae_int_t preciptr;
+   ae_int_t precrsize;
+   ae_int_t precisize;
+   ae_frame_make(_state, &_frame_block);
+   SetObj(fasttransformplan, plan);
+   NewObj(srealarray, bluesteinbuf, _state);
+// Initial check for parameters
+   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0", _state);
+   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0", _state);
+// Determine required sizes of precomputed real and integer
+// buffers. This stage of code is highly dependent on internals
+// of FTComplexFFTPlanRec() and must be kept synchronized with
+// possible changes in internals of plan generation function.
+//
+// Buffer size is determined as follows:
+// * N is factorized
+// * we factor out anything which is less or equal to MaxRadix
+// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+//   real entries to store precomputed Quantities for Bluestein's
+//   transformation
+// * prime factor F <= RaderThreshold does NOT require
+//   precomputed storage
+   precrsize = 0;
+   precisize = 0;
+   ftbase_ftdeterminespacerequirements(n, &precrsize, &precisize, _state);
+   if (precrsize > 0) {
+      ae_vector_set_length(&plan->precr, precrsize, _state);
+   }
+   if (precisize > 0) {
+      ae_vector_set_length(&plan->preci, precisize, _state);
+   }
+// Generate plan
+   rowptr = 0;
+   precrptr = 0;
+   preciptr = 0;
+   bluesteinsize = 1;
+   ae_vector_set_length(&plan->buffer, 2 * n * k, _state);
+   ftbase_ftcomplexfftplanrec(n, k, true, true, &rowptr, &bluesteinsize, &precrptr, &preciptr, plan, _state);
+   ae_vector_set_length(&bluesteinbuf.val, bluesteinsize, _state);
+   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), srealarray_init, srealarray_copy, srealarray_free, _state);
+// Check that actual amount of precomputed space used by transformation
+// plan is EXACTLY equal to amount of space allocated by us.
+   ae_assert(precrptr == precrsize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)", _state);
+   ae_assert(preciptr == precisize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)", _state);
+   ae_frame_leave(_state);
 }
 
 void fasttransformplan_init(void *_p, ae_state *_state, bool make_automatic) {
@@ -12238,8 +12206,29 @@ void fasttransformplan_free(void *_p, bool make_automatic) {
 
 // === HPCCORES Package ===
 namespace alglib_impl {
-static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state);
-static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state);
+// Stub function.
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
+#endif
+}
+
+// Stub function.
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
+#endif
+}
 
 // Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
 // You  have to call this function  before  calling  HPCChunkedGradient() for
@@ -12338,30 +12327,6 @@ bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmea
    return result;
 #else
    return _ialglib_i_hpcchunkedprocess(weights, structinfo, columnmeans, columnsigmas, xy, cstart, csize, batch4buf, hpcbuf);
-#endif
-}
-
-// Stub function.
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
-#endif
-}
-
-// Stub function.
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad, ae_state *_state) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
 #endif
 }
 

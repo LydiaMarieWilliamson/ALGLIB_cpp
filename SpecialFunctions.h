@@ -35,9 +35,9 @@ double errorfunctionc(double x, ae_state *_state);
 double normaldistribution(double x, ae_state *_state);
 double normalpdf(double x, ae_state *_state);
 double normalcdf(double x, ae_state *_state);
-double inverf(double e, ae_state *_state);
-double invnormaldistribution(double y0, ae_state *_state);
 double invnormalcdf(double y0, ae_state *_state);
+double invnormaldistribution(double y0, ae_state *_state);
+double inverf(double e, ae_state *_state);
 double bivariatenormalpdf(double x, double y, double rho, ae_state *_state);
 double bivariatenormalcdf(double x, double y, double rho, ae_state *_state);
 } // end of namespace alglib_impl
@@ -48,9 +48,9 @@ double errorfunctionc(const double x, const xparams _xparams = xdefault);
 double normaldistribution(const double x, const xparams _xparams = xdefault);
 double normalpdf(const double x, const xparams _xparams = xdefault);
 double normalcdf(const double x, const xparams _xparams = xdefault);
-double inverf(const double e, const xparams _xparams = xdefault);
-double invnormaldistribution(const double y0, const xparams _xparams = xdefault);
 double invnormalcdf(const double y0, const xparams _xparams = xdefault);
+double invnormaldistribution(const double y0, const xparams _xparams = xdefault);
+double inverf(const double e, const xparams _xparams = xdefault);
 double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
 double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
 } // end of namespace alglib
@@ -312,16 +312,16 @@ void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xpa
 
 // === ELLIPTIC Package ===
 namespace alglib_impl {
-double ellipticintegralk(double m, ae_state *_state);
 double ellipticintegralkhighprecision(double m1, ae_state *_state);
+double ellipticintegralk(double m, ae_state *_state);
 double incompleteellipticintegralk(double phi, double m, ae_state *_state);
 double ellipticintegrale(double m, ae_state *_state);
 double incompleteellipticintegrale(double phi, double m, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-double ellipticintegralk(const double m, const xparams _xparams = xdefault);
 double ellipticintegralkhighprecision(const double m1, const xparams _xparams = xdefault);
+double ellipticintegralk(const double m, const xparams _xparams = xdefault);
 double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = xdefault);
 double ellipticintegrale(const double m, const xparams _xparams = xdefault);
 double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = xdefault);

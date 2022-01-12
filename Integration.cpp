@@ -838,143 +838,6 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    ae_frame_leave(_state);
 }
 
-// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
-// quadrature with N points.
-//
-// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
-// used depending on machine precision and number of nodes.
-//
-// Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//
-// Outputs:
-//     Info        -   error code:
-//                     * -4    an  error   was   detected   when  calculating
-//                             weights/nodes.  N  is  too  large   to  obtain
-//                             weights/nodes  with  high   enough   accuracy.
-//                             Try  to   use   multiple   precision  version.
-//                     * -3    internal eigenproblem solver hasn't converged
-//                     * -1    incorrect N was passed
-//                     * +1    OK
-//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
-//                     ascending order.
-//     WKronrod    -   array[0..N-1] - Kronrod weights
-//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-//                     corresponding to extended Kronrod nodes).
-// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
-// API: void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
-void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
-   double eps;
-   *info = 0;
-   SetVector(x);
-   SetVector(wkronrod);
-   SetVector(wgauss);
-   if (ae_machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
-      *info = 1;
-      gkqlegendretbl(n, x, wkronrod, wgauss, &eps, _state);
-   } else {
-      gkqlegendrecalc(n, info, x, wkronrod, wgauss, _state);
-   }
-}
-
-// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
-// quadrature on [-1,1] with weight function
-//
-//     W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
-//
-// Inputs:
-//     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//     Alpha       -   power-law coefficient, Alpha>-1
-//     Beta        -   power-law coefficient, Beta>-1
-//
-// Outputs:
-//     Info        -   error code:
-//                     * -5    no real and positive Gauss-Kronrod formula can
-//                             be created for such a weight function  with  a
-//                             given number of nodes.
-//                     * -4    an  error  was   detected   when   calculating
-//                             weights/nodes. Alpha or  Beta  are  too  close
-//                             to -1 to obtain weights/nodes with high enough
-//                             accuracy, or, may be, N is too large.  Try  to
-//                             use multiple precision version.
-//                     * -3    internal eigenproblem solver hasn't converged
-//                     * -1    incorrect N was passed
-//                     * +1    OK
-//                     * +2    OK, but quadrature rule have exterior  nodes,
-//                             x[0]<-1 or x[n-1]>+1
-//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
-//                     ascending order.
-//     WKronrod    -   array[0..N-1] - Kronrod weights
-//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-//                     corresponding to extended Kronrod nodes).
-// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
-// API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
-void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t clen;
-   double alpha2;
-   double beta2;
-   double apb;
-   double t;
-   ae_int_t i;
-   double s;
-   ae_frame_make(_state, &_frame_block);
-   *info = 0;
-   SetVector(x);
-   SetVector(wkronrod);
-   SetVector(wgauss);
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(b, 0, DT_REAL, _state);
-   if (n % 2 != 1 || n < 3) {
-      *info = -1;
-      ae_frame_leave(_state);
-      return;
-   }
-   if (alpha <= -1.0 || beta <= -1.0) {
-      *info = -1;
-      ae_frame_leave(_state);
-      return;
-   }
-   clen = ae_iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
-   ae_vector_set_length(&a, clen, _state);
-   ae_vector_set_length(&b, clen, _state);
-   for (i = 0; i < clen; i++) {
-      a.xR[i] = 0.0;
-   }
-   apb = alpha + beta;
-   a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
-   if (t > ae_log(ae_maxrealnumber, _state)) {
-      *info = -4;
-      ae_frame_leave(_state);
-      return;
-   }
-   b.xR[0] = ae_exp(t, _state);
-   if (clen > 1) {
-      alpha2 = ae_sqr(alpha, _state);
-      beta2 = ae_sqr(beta, _state);
-      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2, _state));
-      for (i = 2; i < clen; i++) {
-         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i, _state));
-      }
-   }
-   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss, _state);
-// test basic properties to detect errors
-   if (*info > 0) {
-      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
-         *info = 2;
-      }
-      for (i = 0; i < n - 1; i++) {
-         if (x->xR[i] >= x->xR[i + 1]) {
-            *info = -4;
-         }
-      }
-   }
-   ae_frame_leave(_state);
-}
-
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
 //
 // Reduction to tridiagonal eigenproblem is used.
@@ -1415,6 +1278,143 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    }
    ae_frame_leave(_state);
 }
+
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
+// quadrature with N points.
+//
+// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
+// used depending on machine precision and number of nodes.
+//
+// Inputs:
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
+//
+// Outputs:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
+// API: void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+   double eps;
+   *info = 0;
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   if (ae_machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
+      *info = 1;
+      gkqlegendretbl(n, x, wkronrod, wgauss, &eps, _state);
+   } else {
+      gkqlegendrecalc(n, info, x, wkronrod, wgauss, _state);
+   }
+}
+
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
+// quadrature on [-1,1] with weight function
+//
+//     W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
+//
+// Inputs:
+//     N           -   number of Kronrod nodes, must be odd number, >= 3.
+//     Alpha       -   power-law coefficient, Alpha>-1
+//     Beta        -   power-law coefficient, Beta>-1
+//
+// Outputs:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//                     * +2    OK, but quadrature rule have exterior  nodes,
+//                             x[0]<-1 or x[n-1]>+1
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+// ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
+// API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = xdefault);
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t clen;
+   double alpha2;
+   double beta2;
+   double apb;
+   double t;
+   ae_int_t i;
+   double s;
+   ae_frame_make(_state, &_frame_block);
+   *info = 0;
+   SetVector(x);
+   SetVector(wkronrod);
+   SetVector(wgauss);
+   NewVector(a, 0, DT_REAL, _state);
+   NewVector(b, 0, DT_REAL, _state);
+   if (n % 2 != 1 || n < 3) {
+      *info = -1;
+      ae_frame_leave(_state);
+      return;
+   }
+   if (alpha <= -1.0 || beta <= -1.0) {
+      *info = -1;
+      ae_frame_leave(_state);
+      return;
+   }
+   clen = ae_iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
+   ae_vector_set_length(&a, clen, _state);
+   ae_vector_set_length(&b, clen, _state);
+   for (i = 0; i < clen; i++) {
+      a.xR[i] = 0.0;
+   }
+   apb = alpha + beta;
+   a.xR[0] = (beta - alpha) / (apb + 2);
+   t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
+   if (t > ae_log(ae_maxrealnumber, _state)) {
+      *info = -4;
+      ae_frame_leave(_state);
+      return;
+   }
+   b.xR[0] = ae_exp(t, _state);
+   if (clen > 1) {
+      alpha2 = ae_sqr(alpha, _state);
+      beta2 = ae_sqr(beta, _state);
+      a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2, _state));
+      for (i = 2; i < clen; i++) {
+         a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i, _state));
+      }
+   }
+   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss, _state);
+// test basic properties to detect errors
+   if (*info > 0) {
+      if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
+         *info = 2;
+      }
+      for (i = 0; i < n - 1; i++) {
+         if (x->xR[i] >= x->xR[i + 1]) {
+            *info = -4;
+         }
+      }
+   }
+   ae_frame_leave(_state);
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1424,24 +1424,6 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::gkqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
-void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
@@ -1462,46 +1444,30 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
    alglib_impl::gkqlegendretbl(n, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
+
+void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
 } // end of namespace alglib
 
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
 static const ae_int_t autogk_maxsubintervals = 10000;
-static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state, ae_state *_state);
-static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state);
-static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state);
-static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state);
-static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state);
-
-// Integration of a smooth function F(x) on a finite interval [a,b].
-//
-// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-// is calculated with accuracy close to the machine precision.
-//
-// Algorithm works well only with smooth integrands.  It  may  be  used  with
-// continuous non-smooth integrands, but with  less  performance.
-//
-// It should never be used with integrands which have integrable singularities
-// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
-// cases.
-//
-// Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// SEE ALSO
-//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
-// ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
-// API: void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams = xdefault);
-void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
-   SetObj(autogkstate, state);
-   ae_assert(ae_isfinite(a, _state), "AutoGKSmooth: A is not finite!", _state);
-   ae_assert(ae_isfinite(b, _state), "AutoGKSmooth: B is not finite!", _state);
-   autogksmoothw(a, b, 0.0, state, _state);
-}
 
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
@@ -1534,6 +1500,35 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
    state->needf = false;
    ae_vector_set_length(&state->rstate.ra, 10 + 1, _state);
    state->rstate.stage = -1;
+}
+
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// Algorithm works well only with smooth integrands.  It  may  be  used  with
+// continuous non-smooth integrands, but with  less  performance.
+//
+// It should never be used with integrands which have integrable singularities
+// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
+// cases.
+//
+// Inputs:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
+// ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
+// API: void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams = xdefault);
+void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
+   SetObj(autogkstate, state);
+   ae_assert(ae_isfinite(a, _state), "AutoGKSmooth: A is not finite!", _state);
+   ae_assert(ae_isfinite(b, _state), "AutoGKSmooth: B is not finite!", _state);
+   autogksmoothw(a, b, 0.0, state, _state);
 }
 
 // Integration on a finite interval [A,B].
@@ -1581,259 +1576,6 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
    state->rstate.stage = -1;
 }
 
-// This function provides a reverse communication interface, which is not documented or recommended for use.
-// Instead, it is recommended that you use the better-documented API function autogkintegrate() listed below.
-// ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
-// API: bool autogkiteration(const autogkstate &state, const xparams _xparams = xdefault);
-// API: void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
-bool autogkiteration(autogkstate *state, ae_state *_state) {
-   double s;
-   double tmp;
-   double eps;
-   double a;
-   double b;
-   double x;
-   double t;
-   double alpha;
-   double beta;
-   double v1;
-   double v2;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      s = state->rstate.ra.xR[0];
-      tmp = state->rstate.ra.xR[1];
-      eps = state->rstate.ra.xR[2];
-      a = state->rstate.ra.xR[3];
-      b = state->rstate.ra.xR[4];
-      x = state->rstate.ra.xR[5];
-      t = state->rstate.ra.xR[6];
-      alpha = state->rstate.ra.xR[7];
-      beta = state->rstate.ra.xR[8];
-      v1 = state->rstate.ra.xR[9];
-      v2 = state->rstate.ra.xR[10];
-   } else {
-      s = 359;
-      tmp = -58;
-      eps = -919;
-      a = -909;
-      b = 81;
-      x = 255;
-      t = 74;
-      alpha = -788;
-      beta = 809;
-      v1 = 205;
-      v2 = -838;
-   }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-// Routine body
-   eps = 0.0;
-   a = state->a;
-   b = state->b;
-   alpha = state->alpha;
-   beta = state->beta;
-   state->terminationtype = -1;
-   state->nfev = 0;
-   state->nintervals = 0;
-// smooth function  at a finite interval
-   if (state->wrappermode != 0) {
-      goto lbl_3;
-   }
-// special case
-   if (a == b) {
-      state->terminationtype = 1;
-      state->v = 0.0;
-      result = false;
-      return result;
-   }
-// general case
-   autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate, _state);
-lbl_5:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
-      goto lbl_6;
-   }
-   x = state->internalstate.x;
-   state->x = x;
-   state->xminusa = x - a;
-   state->bminusx = b - x;
-   state->needf = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needf = false;
-   state->nfev = state->nfev + 1;
-   state->internalstate.f = state->f;
-   goto lbl_5;
-lbl_6:
-   state->v = state->internalstate.r;
-   state->terminationtype = state->internalstate.info;
-   state->nintervals = state->internalstate.heapused;
-   result = false;
-   return result;
-lbl_3:
-// function with power-law singularities at the ends of a finite interval
-   if (state->wrappermode != 1) {
-      goto lbl_7;
-   }
-// test coefficients
-   if (alpha <= -1.0 || beta <= -1.0) {
-      state->terminationtype = -1;
-      state->v = 0.0;
-      result = false;
-      return result;
-   }
-// special cases
-   if (a == b) {
-      state->terminationtype = 1;
-      state->v = 0.0;
-      result = false;
-      return result;
-   }
-// reduction to general form
-   if (a < b) {
-      s = 1.0;
-   } else {
-      s = -1.0;
-      tmp = a;
-      a = b;
-      b = tmp;
-      tmp = alpha;
-      alpha = beta;
-      beta = tmp;
-   }
-   alpha = ae_minreal(alpha, 0.0, _state);
-   beta = ae_minreal(beta, 0.0, _state);
-// first, integrate left half of [a,b]:
-//     integral(f(x)dx, a, (b+a)/2) =
-//     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + alpha, _state), eps, state->xwidth, &state->internalstate, _state);
-lbl_9:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
-      goto lbl_10;
-   }
-// Fill State.X, State.XMinusA, State.BMinusX.
-// Latter two are filled correctly even if B<A.
-   x = state->internalstate.x;
-   t = ae_pow(x, 1 / (1 + alpha), _state);
-   state->x = a + t;
-   if (s > 0.0) {
-      state->xminusa = t;
-      state->bminusx = b - (a + t);
-   } else {
-      state->xminusa = a + t - b;
-      state->bminusx = -t;
-   }
-   state->needf = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needf = false;
-   if (alpha != 0.0) {
-      state->internalstate.f = state->f * ae_pow(x, -alpha / (1 + alpha), _state) / (1 + alpha);
-   } else {
-      state->internalstate.f = state->f;
-   }
-   state->nfev = state->nfev + 1;
-   goto lbl_9;
-lbl_10:
-   v1 = state->internalstate.r;
-   state->nintervals = state->nintervals + state->internalstate.heapused;
-// then, integrate right half of [a,b]:
-//     integral(f(x)dx, (b+a)/2, b) =
-//     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + beta, _state), eps, state->xwidth, &state->internalstate, _state);
-lbl_11:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
-      goto lbl_12;
-   }
-// Fill State.X, State.XMinusA, State.BMinusX.
-// Latter two are filled correctly (X-A, B-X) even if B<A.
-   x = state->internalstate.x;
-   t = ae_pow(x, 1 / (1 + beta), _state);
-   state->x = b - t;
-   if (s > 0.0) {
-      state->xminusa = b - t - a;
-      state->bminusx = t;
-   } else {
-      state->xminusa = -t;
-      state->bminusx = a - (b - t);
-   }
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needf = false;
-   if (beta != 0.0) {
-      state->internalstate.f = state->f * ae_pow(x, -beta / (1 + beta), _state) / (1 + beta);
-   } else {
-      state->internalstate.f = state->f;
-   }
-   state->nfev = state->nfev + 1;
-   goto lbl_11;
-lbl_12:
-   v2 = state->internalstate.r;
-   state->nintervals = state->nintervals + state->internalstate.heapused;
-// final result
-   state->v = s * (v1 + v2);
-   state->terminationtype = 1;
-   result = false;
-   return result;
-lbl_7:
-   result = false;
-   return result;
-// Saving state
-lbl_rcomm:
-   result = true;
-   state->rstate.ra.xR[0] = s;
-   state->rstate.ra.xR[1] = tmp;
-   state->rstate.ra.xR[2] = eps;
-   state->rstate.ra.xR[3] = a;
-   state->rstate.ra.xR[4] = b;
-   state->rstate.ra.xR[5] = x;
-   state->rstate.ra.xR[6] = t;
-   state->rstate.ra.xR[7] = alpha;
-   state->rstate.ra.xR[8] = beta;
-   state->rstate.ra.xR[9] = v1;
-   state->rstate.ra.xR[10] = v2;
-   return result;
-}
-
-// Adaptive integration results
-//
-// Called after AutoGKIteration returned False.
-//
-// Inputs:
-//     State   -   algorithm state (used by AutoGKIteration).
-//
-// Outputs:
-//     V       -   integral(f(x)dx,a,b)
-//     Rep     -   optimization report (see AutoGKReport description)
-// ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
-// API: void autogkresults(const autogkstate &state, double &v, autogkreport &rep, const xparams _xparams = xdefault);
-void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state) {
-   *v = 0;
-   SetObj(autogkreport, rep);
-   *v = state->v;
-   rep->terminationtype = state->terminationtype;
-   rep->nfev = state->nfev;
-   rep->nintervals = state->nintervals;
-}
-
 // Internal AutoGK subroutine
 // eps<0   - error
 // eps=0   - automatic eps selection
@@ -1850,6 +1592,81 @@ static void autogk_autogkinternalprepare(double a, double b, double eps, double 
    ae_vector_set_length(&state->rstate.ia, 3 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 8 + 1, _state);
    state->rstate.stage = -1;
+}
+
+static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t p;
+   double t;
+   ae_int_t maxcp;
+   if (heapsize == 1) {
+      return;
+   }
+   for (i = 0; i < heapwidth; i++) {
+      t = heap->xyR[heapsize - 1][i];
+      heap->xyR[heapsize - 1][i] = heap->xyR[0][i];
+      heap->xyR[0][i] = t;
+   }
+   p = 0;
+   while (2 * p + 1 < heapsize - 1) {
+      maxcp = 2 * p + 1;
+      if (2 * p + 2 < heapsize - 1) {
+         if (heap->xyR[2 * p + 2][0] > heap->xyR[2 * p + 1][0]) {
+            maxcp = 2 * p + 2;
+         }
+      }
+      if (heap->xyR[p][0] < heap->xyR[maxcp][0]) {
+         for (i = 0; i < heapwidth; i++) {
+            t = heap->xyR[p][i];
+            heap->xyR[p][i] = heap->xyR[maxcp][i];
+            heap->xyR[maxcp][i] = t;
+         }
+         p = maxcp;
+      } else {
+         break;
+      }
+   }
+}
+
+static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
+   ae_int_t i;
+   ae_int_t p;
+   double t;
+   ae_int_t parent;
+   if (heapsize == 0) {
+      return;
+   }
+   p = heapsize;
+   while (p != 0) {
+      parent = (p - 1) / 2;
+      if (heap->xyR[p][0] > heap->xyR[parent][0]) {
+         for (i = 0; i < heapwidth; i++) {
+            t = heap->xyR[p][i];
+            heap->xyR[p][i] = heap->xyR[parent][i];
+            heap->xyR[parent][i] = t;
+         }
+         p = parent;
+      } else {
+         break;
+      }
+   }
+}
+
+static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(_state, &_frame_block);
+   NewMatrix(tmp, 0, 0, DT_REAL, _state);
+   ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
+   for (i = 0; i < *heapsize; i++) {
+      ae_v_move(tmp.xyR[i], 1, heap->xyR[i], 1, heapwidth);
+   }
+   ae_matrix_set_length(heap, newheapsize, heapwidth, _state);
+   for (i = 0; i < *heapsize; i++) {
+      ae_v_move(heap->xyR[i], 1, tmp.xyR[i], 1, heapwidth);
+   }
+   *heapsize = newheapsize;
+   ae_frame_leave(_state);
 }
 
 // Internal AutoGK subroutine
@@ -2164,79 +1981,257 @@ lbl_rcomm:
    return result;
 }
 
-static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t p;
+// This function provides a reverse communication interface, which is not documented or recommended for use.
+// Instead, it is recommended that you use the better-documented API function autogkintegrate() listed below.
+// ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
+// API: bool autogkiteration(const autogkstate &state, const xparams _xparams = xdefault);
+// API: void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
+bool autogkiteration(autogkstate *state, ae_state *_state) {
+   double s;
+   double tmp;
+   double eps;
+   double a;
+   double b;
+   double x;
    double t;
-   ae_int_t maxcp;
-   if (heapsize == 1) {
-      return;
+   double alpha;
+   double beta;
+   double v1;
+   double v2;
+   bool result;
+// Reverse communication preparations
+// I know it looks ugly, but it works the same way
+// anywhere from C++ to Python.
+//
+// This code initializes locals by:
+// * random values determined during code
+//   generation - on first subroutine call
+// * values from previous call - on subsequent calls
+   if (state->rstate.stage >= 0) {
+      s = state->rstate.ra.xR[0];
+      tmp = state->rstate.ra.xR[1];
+      eps = state->rstate.ra.xR[2];
+      a = state->rstate.ra.xR[3];
+      b = state->rstate.ra.xR[4];
+      x = state->rstate.ra.xR[5];
+      t = state->rstate.ra.xR[6];
+      alpha = state->rstate.ra.xR[7];
+      beta = state->rstate.ra.xR[8];
+      v1 = state->rstate.ra.xR[9];
+      v2 = state->rstate.ra.xR[10];
+   } else {
+      s = 359;
+      tmp = -58;
+      eps = -919;
+      a = -909;
+      b = 81;
+      x = 255;
+      t = 74;
+      alpha = -788;
+      beta = 809;
+      v1 = 205;
+      v2 = -838;
    }
-   for (i = 0; i < heapwidth; i++) {
-      t = heap->xyR[heapsize - 1][i];
-      heap->xyR[heapsize - 1][i] = heap->xyR[0][i];
-      heap->xyR[0][i] = t;
+   if (state->rstate.stage == 0) {
+      goto lbl_0;
    }
-   p = 0;
-   while (2 * p + 1 < heapsize - 1) {
-      maxcp = 2 * p + 1;
-      if (2 * p + 2 < heapsize - 1) {
-         if (heap->xyR[2 * p + 2][0] > heap->xyR[2 * p + 1][0]) {
-            maxcp = 2 * p + 2;
-         }
-      }
-      if (heap->xyR[p][0] < heap->xyR[maxcp][0]) {
-         for (i = 0; i < heapwidth; i++) {
-            t = heap->xyR[p][i];
-            heap->xyR[p][i] = heap->xyR[maxcp][i];
-            heap->xyR[maxcp][i] = t;
-         }
-         p = maxcp;
-      } else {
-         break;
-      }
+   if (state->rstate.stage == 1) {
+      goto lbl_1;
    }
+   if (state->rstate.stage == 2) {
+      goto lbl_2;
+   }
+// Routine body
+   eps = 0.0;
+   a = state->a;
+   b = state->b;
+   alpha = state->alpha;
+   beta = state->beta;
+   state->terminationtype = -1;
+   state->nfev = 0;
+   state->nintervals = 0;
+// smooth function  at a finite interval
+   if (state->wrappermode != 0) {
+      goto lbl_3;
+   }
+// special case
+   if (a == b) {
+      state->terminationtype = 1;
+      state->v = 0.0;
+      result = false;
+      return result;
+   }
+// general case
+   autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate, _state);
+lbl_5:
+   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+      goto lbl_6;
+   }
+   x = state->internalstate.x;
+   state->x = x;
+   state->xminusa = x - a;
+   state->bminusx = b - x;
+   state->needf = true;
+   state->rstate.stage = 0;
+   goto lbl_rcomm;
+lbl_0:
+   state->needf = false;
+   state->nfev = state->nfev + 1;
+   state->internalstate.f = state->f;
+   goto lbl_5;
+lbl_6:
+   state->v = state->internalstate.r;
+   state->terminationtype = state->internalstate.info;
+   state->nintervals = state->internalstate.heapused;
+   result = false;
+   return result;
+lbl_3:
+// function with power-law singularities at the ends of a finite interval
+   if (state->wrappermode != 1) {
+      goto lbl_7;
+   }
+// test coefficients
+   if (alpha <= -1.0 || beta <= -1.0) {
+      state->terminationtype = -1;
+      state->v = 0.0;
+      result = false;
+      return result;
+   }
+// special cases
+   if (a == b) {
+      state->terminationtype = 1;
+      state->v = 0.0;
+      result = false;
+      return result;
+   }
+// reduction to general form
+   if (a < b) {
+      s = 1.0;
+   } else {
+      s = -1.0;
+      tmp = a;
+      a = b;
+      b = tmp;
+      tmp = alpha;
+      alpha = beta;
+      beta = tmp;
+   }
+   alpha = ae_minreal(alpha, 0.0, _state);
+   beta = ae_minreal(beta, 0.0, _state);
+// first, integrate left half of [a,b]:
+//     integral(f(x)dx, a, (b+a)/2) =
+//     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
+   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + alpha, _state), eps, state->xwidth, &state->internalstate, _state);
+lbl_9:
+   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+      goto lbl_10;
+   }
+// Fill State.X, State.XMinusA, State.BMinusX.
+// Latter two are filled correctly even if B<A.
+   x = state->internalstate.x;
+   t = ae_pow(x, 1 / (1 + alpha), _state);
+   state->x = a + t;
+   if (s > 0.0) {
+      state->xminusa = t;
+      state->bminusx = b - (a + t);
+   } else {
+      state->xminusa = a + t - b;
+      state->bminusx = -t;
+   }
+   state->needf = true;
+   state->rstate.stage = 1;
+   goto lbl_rcomm;
+lbl_1:
+   state->needf = false;
+   if (alpha != 0.0) {
+      state->internalstate.f = state->f * ae_pow(x, -alpha / (1 + alpha), _state) / (1 + alpha);
+   } else {
+      state->internalstate.f = state->f;
+   }
+   state->nfev = state->nfev + 1;
+   goto lbl_9;
+lbl_10:
+   v1 = state->internalstate.r;
+   state->nintervals = state->nintervals + state->internalstate.heapused;
+// then, integrate right half of [a,b]:
+//     integral(f(x)dx, (b+a)/2, b) =
+//     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
+   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + beta, _state), eps, state->xwidth, &state->internalstate, _state);
+lbl_11:
+   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+      goto lbl_12;
+   }
+// Fill State.X, State.XMinusA, State.BMinusX.
+// Latter two are filled correctly (X-A, B-X) even if B<A.
+   x = state->internalstate.x;
+   t = ae_pow(x, 1 / (1 + beta), _state);
+   state->x = b - t;
+   if (s > 0.0) {
+      state->xminusa = b - t - a;
+      state->bminusx = t;
+   } else {
+      state->xminusa = -t;
+      state->bminusx = a - (b - t);
+   }
+   state->needf = true;
+   state->rstate.stage = 2;
+   goto lbl_rcomm;
+lbl_2:
+   state->needf = false;
+   if (beta != 0.0) {
+      state->internalstate.f = state->f * ae_pow(x, -beta / (1 + beta), _state) / (1 + beta);
+   } else {
+      state->internalstate.f = state->f;
+   }
+   state->nfev = state->nfev + 1;
+   goto lbl_11;
+lbl_12:
+   v2 = state->internalstate.r;
+   state->nintervals = state->nintervals + state->internalstate.heapused;
+// final result
+   state->v = s * (v1 + v2);
+   state->terminationtype = 1;
+   result = false;
+   return result;
+lbl_7:
+   result = false;
+   return result;
+// Saving state
+lbl_rcomm:
+   result = true;
+   state->rstate.ra.xR[0] = s;
+   state->rstate.ra.xR[1] = tmp;
+   state->rstate.ra.xR[2] = eps;
+   state->rstate.ra.xR[3] = a;
+   state->rstate.ra.xR[4] = b;
+   state->rstate.ra.xR[5] = x;
+   state->rstate.ra.xR[6] = t;
+   state->rstate.ra.xR[7] = alpha;
+   state->rstate.ra.xR[8] = beta;
+   state->rstate.ra.xR[9] = v1;
+   state->rstate.ra.xR[10] = v2;
+   return result;
 }
 
-static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t p;
-   double t;
-   ae_int_t parent;
-   if (heapsize == 0) {
-      return;
-   }
-   p = heapsize;
-   while (p != 0) {
-      parent = (p - 1) / 2;
-      if (heap->xyR[p][0] > heap->xyR[parent][0]) {
-         for (i = 0; i < heapwidth; i++) {
-            t = heap->xyR[p][i];
-            heap->xyR[p][i] = heap->xyR[parent][i];
-            heap->xyR[parent][i] = t;
-         }
-         p = parent;
-      } else {
-         break;
-      }
-   }
-}
-
-static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
-   NewMatrix(tmp, 0, 0, DT_REAL, _state);
-   ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
-   for (i = 0; i < *heapsize; i++) {
-      ae_v_move(tmp.xyR[i], 1, heap->xyR[i], 1, heapwidth);
-   }
-   ae_matrix_set_length(heap, newheapsize, heapwidth, _state);
-   for (i = 0; i < *heapsize; i++) {
-      ae_v_move(heap->xyR[i], 1, tmp.xyR[i], 1, heapwidth);
-   }
-   *heapsize = newheapsize;
-   ae_frame_leave(_state);
+// Adaptive integration results
+//
+// Called after AutoGKIteration returned False.
+//
+// Inputs:
+//     State   -   algorithm state (used by AutoGKIteration).
+//
+// Outputs:
+//     V       -   integral(f(x)dx,a,b)
+//     Rep     -   optimization report (see AutoGKReport description)
+// ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
+// API: void autogkresults(const autogkstate &state, double &v, autogkreport &rep, const xparams _xparams = xdefault);
+void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state) {
+   *v = 0;
+   SetObj(autogkreport, rep);
+   *v = state->v;
+   rep->terminationtype = state->terminationtype;
+   rep->nfev = state->nfev;
+   rep->nintervals = state->nintervals;
 }
 
 void autogkreport_init(void *_p, ae_state *_state, bool make_automatic) {
@@ -2362,21 +2357,21 @@ DefClass(autogkreport, DecVal(terminationtype) DecVal(nfev) DecVal(nintervals))
 // * autogkresults() to get results
 DefClass(autogkstate, DecVal(needf) DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
 
-void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-}
-
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
    alglib_impl::autogksmoothw(a, b, xwidth, ConstT(autogkstate, state), &_alglib_env_state);
+   alglib_impl::ae_state_clear(&_alglib_env_state);
+}
+
+void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams) {
+   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   TryCatch(_alglib_env_state, )
+   if (_xparams.flags != 0x0)
+      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 

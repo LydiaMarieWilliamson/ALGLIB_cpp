@@ -20,7 +20,78 @@ namespace alglib_impl {
 static const double odesolver_odesolvermaxgrow = 3.0;
 static const double odesolver_odesolvermaxshrink = 10.0;
 static const double odesolver_odesolverguaranteeddecay = 0.9;
-static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
+
+// Internal initialization subroutine
+static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
+   ae_int_t i;
+   double v;
+   SetObj(odesolverstate, state);
+// Prepare RComm
+   ae_vector_set_length(&state->rstate.ia, 5 + 1, _state);
+   ae_vector_set_length(&state->rstate.ba, 0 + 1, _state);
+   ae_vector_set_length(&state->rstate.ra, 5 + 1, _state);
+   state->rstate.stage = -1;
+   state->needdy = false;
+// check parameters.
+   if ((n <= 0 || m < 1) || eps == 0.0) {
+      state->repterminationtype = -1;
+      return;
+   }
+   if (h < 0.0) {
+      h = -h;
+   }
+// quick exit if necessary.
+// after this block we assume that M>1
+   if (m == 1) {
+      state->repnfev = 0;
+      state->repterminationtype = 1;
+      ae_matrix_set_length(&state->ytbl, 1, n, _state);
+      ae_v_move(state->ytbl.xyR[0], 1, y->xR, 1, n);
+      ae_vector_set_length(&state->xg, m, _state);
+      ae_v_move(state->xg.xR, 1, x->xR, 1, m);
+      return;
+   }
+// check again: correct order of X[]
+   if (x->xR[1] == x->xR[0]) {
+      state->repterminationtype = -2;
+      return;
+   }
+   for (i = 1; i < m; i++) {
+      if ((x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1]) || (x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1])) {
+         state->repterminationtype = -2;
+         return;
+      }
+   }
+// auto-select H if necessary
+   if (h == 0.0) {
+      v = ae_fabs(x->xR[1] - x->xR[0], _state);
+      for (i = 2; i < m; i++) {
+         v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
+      }
+      h = 0.001 * v;
+   }
+// store parameters
+   state->n = n;
+   state->m = m;
+   state->h = h;
+   state->eps = ae_fabs(eps, _state);
+   state->fraceps = eps < 0.0;
+   ae_vector_set_length(&state->xg, m, _state);
+   ae_v_move(state->xg.xR, 1, x->xR, 1, m);
+   if (x->xR[1] > x->xR[0]) {
+      state->xscale = 1.0;
+   } else {
+      state->xscale = -1.0;
+      ae_v_muld(state->xg.xR, 1, m, -1);
+   }
+   ae_vector_set_length(&state->yc, n, _state);
+   ae_v_move(state->yc.xR, 1, y->xR, 1, n);
+   state->solvertype = solvertype;
+   state->repterminationtype = 0;
+// Allocate arrays
+   ae_vector_set_length(&state->y, n, _state);
+   ae_vector_set_length(&state->dy, n, _state);
+}
 
 // Cash-Karp adaptive ODE solver.
 //
@@ -386,78 +457,6 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
    } else {
       rep->nfev = 0;
    }
-}
-
-// Internal initialization subroutine
-static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
-   ae_int_t i;
-   double v;
-   SetObj(odesolverstate, state);
-// Prepare RComm
-   ae_vector_set_length(&state->rstate.ia, 5 + 1, _state);
-   ae_vector_set_length(&state->rstate.ba, 0 + 1, _state);
-   ae_vector_set_length(&state->rstate.ra, 5 + 1, _state);
-   state->rstate.stage = -1;
-   state->needdy = false;
-// check parameters.
-   if ((n <= 0 || m < 1) || eps == 0.0) {
-      state->repterminationtype = -1;
-      return;
-   }
-   if (h < 0.0) {
-      h = -h;
-   }
-// quick exit if necessary.
-// after this block we assume that M>1
-   if (m == 1) {
-      state->repnfev = 0;
-      state->repterminationtype = 1;
-      ae_matrix_set_length(&state->ytbl, 1, n, _state);
-      ae_v_move(state->ytbl.xyR[0], 1, y->xR, 1, n);
-      ae_vector_set_length(&state->xg, m, _state);
-      ae_v_move(state->xg.xR, 1, x->xR, 1, m);
-      return;
-   }
-// check again: correct order of X[]
-   if (x->xR[1] == x->xR[0]) {
-      state->repterminationtype = -2;
-      return;
-   }
-   for (i = 1; i < m; i++) {
-      if ((x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1]) || (x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1])) {
-         state->repterminationtype = -2;
-         return;
-      }
-   }
-// auto-select H if necessary
-   if (h == 0.0) {
-      v = ae_fabs(x->xR[1] - x->xR[0], _state);
-      for (i = 2; i < m; i++) {
-         v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
-      }
-      h = 0.001 * v;
-   }
-// store parameters
-   state->n = n;
-   state->m = m;
-   state->h = h;
-   state->eps = ae_fabs(eps, _state);
-   state->fraceps = eps < 0.0;
-   ae_vector_set_length(&state->xg, m, _state);
-   ae_v_move(state->xg.xR, 1, x->xR, 1, m);
-   if (x->xR[1] > x->xR[0]) {
-      state->xscale = 1.0;
-   } else {
-      state->xscale = -1.0;
-      ae_v_muld(state->xg.xR, 1, m, -1);
-   }
-   ae_vector_set_length(&state->yc, n, _state);
-   ae_v_move(state->yc.xR, 1, y->xR, 1, n);
-   state->solvertype = solvertype;
-   state->repterminationtype = 0;
-// Allocate arrays
-   ae_vector_set_length(&state->y, n, _state);
-   ae_vector_set_length(&state->dy, n, _state);
 }
 
 void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
