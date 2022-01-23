@@ -331,6 +331,18 @@ A6.2. Test Stages
 	―	set_error_flag(), ae_get_last_error_file(), ae_get_last_error_line(), ae_get_last_error_xdesc() from Ap.{cpp,h}
 	−	sef_file, sef_line, sef_xdesc from Ap.cpp
 	―	Eliminate the ae_get_last_error_*() functions and replace them by the corresponding sef_* variables.
+39	Remove all comments on, references to and support for tracing/logging added in 3.16:
+	―	Ap.{cpp,h}:
+			ae_trace_file(), ae_trace_disable(), ae_is_trace_enabled(), ae_trace()
+	―	AlgLibInternal.{cpp,h}:
+			tracevectorautoprec(), tracevectorunscaledunshiftedautoprec(), tracerownrm1autoprec(),
+			tracevectore6(), tracevectore615(), tracerownrm1e6()
+	―	Optimization.{cpp,h}:
+		3.15: The *trace* routines were stubs and were removed.
+		3.16: The *trace* routines, dotrace*, doprobing were activated for the IPM, SLP and SQP solvers.
+		3.17: The tracegamma vector and extendeddebug and dotimers flags & members and rep*time members are also removed.
+	―	Optimization.cpp, Manual.htm:
+			TRACING * SOLVER comments
 
 A6.3. Test Results
 ──────────────────
@@ -355,6 +367,7 @@ A6.3. Test Results
 39	7874 1.0x 12049 1.0x 10104 1.1x 9367 1.0x 1639516272 (61b90870) 82 // Corrected.
 39	7463 0.8x 11629 1.0x 11769 1.0x 8752 1.0x 1641874215 (61dd0327) 87 // Re-sorted the routines.
 39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
+39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -411,19 +424,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7937
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12196
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
+* RGEMM-SEQ-16   (MFLOPS)   6410
+* RGEMM-MTN-16              0.9x
+* RGEMM-SEQ-32   (MFLOPS)  10310
+* RGEMM-MTN-32              1.1x
+* RGEMM-SEQ-64   (MFLOPS)  10313
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9544
+* RGEMM-SEQ-1024 (MFLOPS)   9539
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1642926906
+SEED: 1642933377
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -523,4 +536,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 85 seconds
+Done in 83 seconds

@@ -27362,31 +27362,6 @@ using namespace alglib;
 //                   value (can be different in different ALGLIB versions)
 //                 * default value is zero
 //                 Algorithm stops when relative error is less than Eps.
-//
-// ==== TRACING DSS SOLVER ====
-//
-// DSS solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'DSS'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'DSS.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'DSS'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;DSS,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -27415,31 +27390,6 @@ using namespace alglib;
 //                 * default value is zero
 //                 Algorithm  stops  when  primal  error  AND  dual error AND
 //                 duality gap are less than Eps.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;IPM,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -28806,51 +28756,6 @@ using namespace alglib;
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
-// ==== TRACING SLP SOLVER ====
-//
-// SLP solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'SLP'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-//                   It also prints OptGuard  integrity  checker  report when
-//                   nonsmoothness of target/constraints is suspected.
-// * 'SLP.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'SLP'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'SLP.PROBING' - to let algorithm insert additional function  evaluations
-//                   before line search  in  order  to  build  human-readable
-//                   chart of the raw  Lagrangian  (~40  additional  function
-//                   evaluations is performed for  each  line  search).  This
-//                   symbol also implicitly defines 'SLP'. Definition of this
-//                   symbol also automatically activates OptGuard  smoothness
-//                   monitor.
-// * 'OPTGUARD'    - for report of smoothness/continuity violations in target
-//                   and/or constraints. This kind of reporting is   included
-//                   in 'SLP', but it comes with lots of additional info.  If
-//                   you  need  just  smoothness  monitoring,   specify  this
-//                   setting.
-//
-//                   NOTE: this tag merely directs  OptGuard  output  to  log
-//                         file. Even if you specify it, you  still  have  to
-//                         configure OptGuard  by calling minnlcoptguard...()
-//                         family of functions.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related   overhead.  Specifying  'SLP.PROBING'  adds   even  larger
-// overhead due to additional function evaluations being performed.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;SLP,SLP.PROBING,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 02.04.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -28905,47 +28810,8 @@ using namespace alglib;
 // per step, and it is not enough for OptGuard to detect nonsmoothness.
 //
 // So, if you suspect that your problem is  nonsmooth  and  if  you  want  to
-// confirm or deny it, we recommend you to either:
-// * use AUL or SLP solvers, which can detect nonsmoothness of the problem
-// * or, alternatively, activate 'SQP.PROBING' trace  tag  that  will  insert
-//   additional  function  evaluations (~40  per  line  step) that will  help
-//   OptGuard integrity checker to study properties of your problem
-//
-// ==== TRACING SQP SOLVER ====
-//
-// SQP solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'SQP'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-//                   It also prints OptGuard  integrity  checker  report when
-//                   nonsmoothness of target/constraints is suspected.
-// * 'SQP.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'SQP'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'SQP.PROBING' - to let algorithm insert additional function  evaluations
-//                   before line search  in  order  to  build  human-readable
-//                   chart of the raw  Lagrangian  (~40  additional  function
-//                   evaluations is performed for  each  line  search).  This
-//                   symbol  also  implicitly  defines  'SQP'  and  activates
-//                   OptGuard integrity checker which detects continuity  and
-//                   smoothness violations. An OptGuard log is printed at the
-//                   end of the file.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related   overhead.  Specifying  'SQP.PROBING'  adds   even  larger
-// overhead due to additional function evaluations being performed.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;SQP,SQP.PROBING,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
+// confirm or deny it, we recommend you to use AUL or SLP solvers,  which can
+// detect nonsmoothness of the problem.
 // ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -30323,37 +30189,6 @@ using namespace alglib;
 // * penalty coefficient for  linear  constraints  is  chosen  automatically;
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
-//
-// ==== TRACING AGS SOLVER ====
-//
-// AGS solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'AGS'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'AGS.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'AGS'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'AGS.DETAILED.SAMPLE'-
-//                   for output of points being visited ,  search  directions
-//                   and gradient sample. May take a LOT of  space ,  do  not
-//                   use it on problems with more that several tens of vars.
-//                   This  symbol   also    implicitly   defines   'AGS'  and
-//                   'AGS.DETAILED'.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;AGS,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -31648,31 +31483,6 @@ using namespace alglib;
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;IPM,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
@@ -31844,31 +31654,6 @@ using namespace alglib;
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// &gt;
-// &gt; alglib::trace_file(&quot;IPM,PREC.F6&quot;, &quot;path/to/trace.log&quot;)
-// &gt;
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>

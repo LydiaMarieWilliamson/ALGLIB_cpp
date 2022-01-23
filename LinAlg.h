@@ -603,7 +603,6 @@ void amdllmatrix_free(void *_p, bool make_automatic);
 
 struct amdbuffer {
    ae_int_t n;
-   bool extendeddebug;
    bool checkexactdegrees;
    ae_vector iseliminated;
    ae_vector issupernode;
@@ -654,9 +653,6 @@ struct spcholanalysis {
    double modparam1;
    double modparam2;
    double modparam3;
-   bool extendeddebug;
-   bool dotrace;
-   bool dotracesupernodalstructure;
    ae_int_t nsuper;
    ae_vector parentsupernode;
    ae_vector supercolrange;

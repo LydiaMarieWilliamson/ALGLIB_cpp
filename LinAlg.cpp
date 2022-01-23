@@ -21077,11 +21077,6 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
          amdordering_knssubtract1(&buf->seta, lpi, &buf->setp, _state);
          amdordering_knssubtract1(&buf->sete, lpi, &buf->ep, _state);
          amdordering_knsaddnewelement(&buf->sete, lpi, p, _state);
-         if (buf->extendeddebug) {
-            ae_assert(amdordering_knscountnotkth(&buf->seta, lpi, &buf->setsuper, lpi, _state) == amdordering_knscountkth(&buf->seta, lpi, _state), "AMD: integrity check 454F failed", _state);
-            ae_assert(amdordering_knscountandkth(&buf->seta, lpi, &buf->setsuper, lpi, _state) == 0, "AMD: integrity check kl5nv failed", _state);
-            ae_assert(amdordering_nscountandkth(&buf->lp, &buf->setsuper, lpi, _state) == amdordering_knscountkth(&buf->setsuper, lpi, _state), "AMD: integrity check 8463 failed", _state);
-         }
          cntq = amdordering_nscount(&buf->setq, _state);
          cntsuperi = amdordering_knscountkth(&buf->setsuper, lpi, _state);
          cntainoti = amdordering_knscountkth(&buf->seta, lpi, _state);
@@ -21198,11 +21193,6 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf, ae_state *_state) {
                   if (!amdordering_nsequal(&buf->adji, &buf->adjj, _state)) {
                      continue;
                   }
-                  if (buf->extendeddebug) {
-                     ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, lpi, _state) >= 1 && (!buf->checkexactdegrees || amdordering_vtxgetexact(&buf->vertexdegrees, lpi, _state) >= 1), "AMD: integrity check &GBFF1 failed", _state);
-                     ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, lpj, _state) >= 1 && (!buf->checkexactdegrees || amdordering_vtxgetexact(&buf->vertexdegrees, lpj, _state) >= 1), "AMD: integrity check &GBFF2 failed", _state);
-                     ae_assert(amdordering_knscountandkth(&buf->setsuper, lpi, &buf->setsuper, lpj, _state) == 0, "AMD: integrity check &GBFF3 failed", _state);
-                  }
                   nj = amdordering_knscountkth(&buf->setsuper, lpj, _state);
                   amdordering_knsaddkthdistinct(&buf->setsuper, lpi, &buf->setsuper, lpj, _state);
                   amdordering_knsclearkthreclaim(&buf->setsuper, lpj, _state);
@@ -21248,9 +21238,6 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf, ae_state *_state) {
 // Result:
 //     number of successfully ordered rows/cols;
 //     N for AMDType=0, 0<Result <= N for AMDType=1
-//
-// NOTE: defining 'DEBUG.SLOW' trace tag will  activate  extra-slow  (roughly
-//       N^3 ops) integrity checks, in addition to cheap O(1) ones.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf, ae_state *_state) {
    ae_int_t i;
@@ -21259,7 +21246,6 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
    ae_int_t p;
    ae_int_t setprealloc;
    ae_int_t inithashbucketsize;
-   bool extendeddebug;
    ae_int_t nodesize;
    ae_int_t cnt0;
    ae_int_t cnt1;
@@ -21270,11 +21256,9 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
    ae_assert(amdtype == 0 || amdtype == 1, "GenerateAMDPermutationX: unexpected ordering type", _state);
    setprealloc = 3;
    inithashbucketsize = 16;
-   extendeddebug = ae_is_trace_enabled("DEBUG.SLOW") && n <= 100;
    result = n;
    buf->n = n;
-   buf->checkexactdegrees = extendeddebug;
-   buf->extendeddebug = extendeddebug;
+   buf->checkexactdegrees = false;
    amdordering_mtxinit(n, &buf->mtxl, _state);
    amdordering_knsinitfroma(a, n, &buf->seta, _state);
    amdordering_knsinit(n, n, setprealloc, &buf->setsuper, _state);
@@ -21296,21 +21280,6 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
    bsetallocv(n, true, &buf->issupernode, _state);
    bsetallocv(n, false, &buf->iseliminated, _state);
    isetallocv(n, -1, &buf->arrwe, _state);
-   if (extendeddebug) {
-      ae_matrix_set_length(&buf->dbga, n, n, _state);
-      for (i = 0; i < n; i++) {
-         for (j = 0; j < n; j++) {
-            if ((j <= i && sparseexists(a, i, j, _state)) || (j >= i && sparseexists(a, j, i, _state))) {
-               buf->dbga.xyR[i][j] = 0.1 / n * (ae_sin(i + 0.17, _state) + ae_cos(ae_sqrt(j + 0.65, _state), _state));
-            } else {
-               buf->dbga.xyR[i][j] = 0.0;
-            }
-         }
-      }
-      for (i = 0; i < n; i++) {
-         buf->dbga.xyR[i][i] = 1.0;
-      }
-   }
    tau = 0;
    if (amdtype == 1) {
       meand = 0.0;
@@ -21351,28 +21320,6 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
          amdordering_vtxremovevertex(&buf->vertexdegrees, j, _state);
       }
       amdordering_amddetectsupernodes(buf, _state);
-      if (extendeddebug) {
-         ae_assert(buf->checkexactdegrees, "AMD: extended debug needs exact degrees", _state);
-         for (i = k; i < k + nodesize; i++) {
-            if (buf->columnswaps.xZ[i] != i) {
-               swaprows(&buf->dbga, i, buf->columnswaps.xZ[i], n, _state);
-               swapcols(&buf->dbga, i, buf->columnswaps.xZ[i], n, _state);
-            }
-         }
-         for (i = 0; i < nodesize; i++) {
-            rmatrixgemm(n - k - i, n - k - i, k + i, -1.0, &buf->dbga, k + i, 0, 0, &buf->dbga, 0, k + i, 0, 1.0, &buf->dbga, k + i, k + i, _state);
-         }
-         cnt0 = amdordering_nscount(&buf->lp, _state);
-         cnt1 = 0;
-         for (i = k + 1; i < n; i++) {
-            if (buf->dbga.xyR[i][k] != 0.0) {
-               inc(&cnt1, _state);
-            }
-         }
-         ae_assert(cnt0 + nodesize - 1 == cnt1, "AMD: integrity check 7344 failed", _state);
-         ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p, _state) >= amdordering_vtxgetexact(&buf->vertexdegrees, p, _state), "AMD: integrity check for ApproxD failed", _state);
-         ae_assert(amdordering_vtxgetexact(&buf->vertexdegrees, p, _state) == cnt0, "AMD: integrity check for ExactD failed", _state);
-      }
       ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p, _state) >= amdordering_nscount(&buf->lp, _state), "AMD: integrity check 7956 failed", _state);
       ae_assert((amdordering_knscountkth(&buf->sete, p, _state) > 2 || amdordering_nscount(&buf->setq, _state) > 0) || amdordering_vtxgetapprox(&buf->vertexdegrees, p, _state) == amdordering_nscount(&buf->lp, _state), "AMD: integrity check 7295 failed", _state);
       amdordering_knsstartenumeration(&buf->sete, p, _state);
@@ -21414,9 +21361,6 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
 // Outputs:
 //     Perm        -   array[N], maps original indexes I to permuted indexes
 //     InvPerm     -   array[N], maps permuted indexes I to original indexes
-//
-// NOTE: definite 'DEBUG.SLOW' trace tag will  activate  extra-slow  (roughly
-//       N^3 ops) integrity checks, in addition to cheap O(1) ones.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf, ae_state *_state) {
    ae_int_t r;
@@ -21580,7 +21524,6 @@ void amdbuffer_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
    amdbuffer *dst = (amdbuffer *)_dst;
    amdbuffer *src = (amdbuffer *)_src;
    dst->n = src->n;
-   dst->extendeddebug = src->extendeddebug;
    dst->checkexactdegrees = src->checkexactdegrees;
    ae_vector_copy(&dst->iseliminated, &src->iseliminated, _state, make_automatic);
    ae_vector_copy(&dst->issupernode, &src->issupernode, _state, make_automatic);
@@ -22173,10 +22116,6 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
    ae_assert(tparentnodeofsupernode->cnt >= n + 1, "CreateSupernodalStructure: input buffer tParentNodeOfSupernode is too short", _state);
    ae_assert(tfakenonzeros->cnt >= n + 1, "CreateSupernodalStructure: input buffer tFakeNonzeros is too short", _state);
    ae_assert(tflagarray->cnt >= n + 1, "CreateSupernodalStructure: input buffer tFlagArray is too short", _state);
-// Trace
-   if (analysis->dotracesupernodalstructure) {
-      ae_trace("==== GENERATING SUPERNODAL STRUCTURE ====\n");
-   }
 // Convert etree from per-column parent array to per-column children list
    spchol_fromparenttochildren(parent, n, tchildrenr, tchildreni, ttmp0, _state);
 // Analyze supernodal structure:
@@ -22207,15 +22146,6 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
       offdiagcnt = rlast - rfirst;
       colcount = 1;
       nsuper = nsuper + 1;
-      if (analysis->dotracesupernodalstructure) {
-         ae_trace("> incoming column %0d\n", (int)columnidx);
-         ae_trace("offdiagnnz = %0d\n", (int)(rlast - rfirst));
-         ae_trace("children   = [ ");
-         for (i = tchildrenr->xZ[columnidx]; i < tchildrenr->xZ[columnidx + 1]; i++) {
-            ae_trace("S%0d ", (int)node2supernode->xZ[tchildreni->xZ[i]]);
-         }
-         ae_trace("]\n");
-      }
    // Decide whether to merge column with previous supernode or not
       childcolcount = 0;
       childoffdiagcnt = 0;
@@ -22259,19 +22189,6 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
          tfakenonzeros->xZ[nsuper - 2] = fakezerosinnewsupernode;
          tparentnodeofsupernode->xZ[nsuper - 2] = parent->xZ[columnidx];
          nsuper = nsuper - 1;
-      // Trace
-         if (analysis->dotracesupernodalstructure) {
-            ae_trace("> merged with supernode S%0d", (int)(nsuper - 1));
-            if (mergeinefficiency != 0.0) {
-               ae_trace(" (%2.0f%% inefficiency)", 100.0 * mergeinefficiency);
-            }
-            ae_trace("\n*\n");
-         }
-      } else {
-      // Trace
-         if (analysis->dotracesupernodalstructure) {
-            ae_trace("> standalone node S%0d created\n*\n", (int)(nsuper - 1));
-         }
       }
    }
    analysis->nsuper = nsuper;
@@ -22415,114 +22332,6 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
          tflagarray->xB[analysis->ladjplus.xZ[i]] = true;
       }
       analysis->ladjplusr.xZ[sidx + 1] = rlast;
-   }
-// Analyze statistics for trace output
-   if (analysis->dotrace) {
-      ae_trace("==== ANALYZING SUPERNODAL DEPENDENCIES ====\n");
-      dbgrank1nodes = 0;
-      dbgrank2nodes = 0;
-      dbgrank3nodes = 0;
-      dbgrank4nodes = 0;
-      dbgbignodes = 0;
-      dbgtotalflop = 0.0;
-      dbgnoscatterflop = 0.0;
-      dbgnorowscatterflop = 0.0;
-      dbgnocolscatterflop = 0.0;
-      dbgrank1flop = 0.0;
-      dbgrank4plusflop = 0.0;
-      dbg444flop = 0.0;
-      dbgxx4flop = 0.0;
-      dbgcholeskyflop = 0.0;
-      dbgcholesky4flop = 0.0;
-      isetv(analysis->nsuper, 0, ttmp0, _state);
-      for (sidx = 0; sidx < analysis->nsuper; sidx++) {
-      // Node sizes
-         if (analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx] == 1) {
-            inc(&dbgrank1nodes, _state);
-         }
-         if (analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx] == 2) {
-            inc(&dbgrank2nodes, _state);
-         }
-         if (analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx] == 3) {
-            inc(&dbgrank3nodes, _state);
-         }
-         if (analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx] == 4) {
-            inc(&dbgrank4nodes, _state);
-         }
-         if (analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx] > 4) {
-            inc(&dbgbignodes, _state);
-         }
-      // FLOP counts
-         twidth = analysis->supercolrange.xZ[sidx + 1] - analysis->supercolrange.xZ[sidx];
-         theight = twidth + (analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx]);
-         for (i = analysis->ladjplusr.xZ[sidx]; i < analysis->ladjplusr.xZ[sidx + 1]; i++) {
-            uidx = analysis->ladjplus.xZ[i];
-         // Determine update width, height, rank
-            wrkrow = ttmp0->xZ[uidx];
-            offdiagrow = wrkrow;
-            lastrow = analysis->superrowridx.xZ[uidx + 1] - analysis->superrowridx.xZ[uidx];
-            while (offdiagrow < lastrow && analysis->superrowidx.xZ[analysis->superrowridx.xZ[uidx] + offdiagrow] < analysis->supercolrange.xZ[sidx + 1]) {
-               offdiagrow = offdiagrow + 1;
-            }
-            uwidth = offdiagrow - wrkrow;
-            uheight = lastrow - wrkrow;
-            urank = analysis->supercolrange.xZ[uidx + 1] - analysis->supercolrange.xZ[uidx];
-            ttmp0->xZ[uidx] = offdiagrow;
-         // Compute update FLOP cost
-            uflop = rmul3((double)uwidth, (double)uheight, (double)urank, _state);
-            dbgtotalflop = dbgtotalflop + uflop;
-            if (uheight == theight && uwidth == twidth) {
-               dbgnoscatterflop = dbgnoscatterflop + uflop;
-            }
-            if (uheight == theight) {
-               dbgnorowscatterflop = dbgnorowscatterflop + uflop;
-            }
-            if (uwidth == twidth) {
-               dbgnocolscatterflop = dbgnocolscatterflop + uflop;
-            }
-            if (urank == 1) {
-               dbgrank1flop = dbgrank1flop + uflop;
-            }
-            if (urank >= 4) {
-               dbgrank4plusflop = dbgrank4plusflop + uflop;
-            }
-            if ((urank == 4 && uwidth == 4) && twidth == 4) {
-               dbg444flop = dbg444flop + uflop;
-            }
-            if (twidth == 4) {
-               dbgxx4flop = dbgxx4flop + uflop;
-            }
-         }
-         uflop = 0.0;
-         for (i = 0; i < twidth; i++) {
-            uflop = uflop + (theight - i) * i + (theight - i);
-         }
-         dbgtotalflop = dbgtotalflop + uflop;
-         dbgcholeskyflop = dbgcholeskyflop + uflop;
-         if (twidth == 4) {
-            dbgcholesky4flop = dbgcholesky4flop + uflop;
-         }
-      }
-   // Output
-      ae_trace("> node size statistics:\n");
-      ae_trace("rank1        = %6d\n", (int)dbgrank1nodes);
-      ae_trace("rank2        = %6d\n", (int)dbgrank2nodes);
-      ae_trace("rank3        = %6d\n", (int)dbgrank3nodes);
-      ae_trace("rank4        = %6d\n", (int)dbgrank4nodes);
-      ae_trace("big nodes    = %6d\n", (int)dbgbignodes);
-      ae_trace("> Total FLOP count (fused multiply-adds):\n");
-      ae_trace("total        = %8.2f MFLOP\n", 1.0E-6 * dbgtotalflop);
-      ae_trace("> FLOP counts for updates:\n");
-      ae_trace("no-sctr      = %8.2f MFLOP    (no row scatter, no col scatter, best case)\n", 1.0E-6 * dbgnoscatterflop);
-      ae_trace("M4*44->N4    = %8.2f MFLOP    (no col scatter, big blocks, good case)\n", 1.0E-6 * dbg444flop);
-      ae_trace("no-row-sctr  = %8.2f MFLOP    (no row scatter, good case for col-wise storage)\n", 1.0E-6 * dbgnorowscatterflop);
-      ae_trace("no-col-sctr  = %8.2f MFLOP    (no col scatter, good case for row-wise storage)\n", 1.0E-6 * dbgnocolscatterflop);
-      ae_trace("XX*XX->N4    = %8.2f MFLOP\n", 1.0E-6 * dbgxx4flop);
-      ae_trace("rank1        = %8.2f MFLOP\n", 1.0E-6 * dbgrank1flop);
-      ae_trace("rank4+       = %8.2f MFLOP\n", 1.0E-6 * dbgrank4plusflop);
-      ae_trace("> FLOP counts for Cholesky:\n");
-      ae_trace("cholesky     = %8.2f MFLOP\n", 1.0E-6 * dbgcholeskyflop);
-      ae_trace("cholesky4    = %8.2f MFLOP\n", 1.0E-6 * dbgcholesky4flop);
    }
 }
 
@@ -23680,10 +23489,6 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
 // * one with indexes stored at SuperRowIdx[OffdiagRow:LastRow);
 //   these indexes are ones that intersect with range of rows occupied by
 //   offdiagonal block of the supernode SIdx
-   if (analysis->extendeddebug) {
-      ae_assert(analysis->superrowidx.xZ[urbase + wrkrow] >= cols0, "SPCholFactorize: integrity check 6378 failed", _state);
-      ae_assert(analysis->superrowidx.xZ[urbase + wrkrow] < cols1, "SPCholFactorize: integrity check 6729 failed", _state);
-   }
    offdiagrow = wrkrow;
    lastrow = urlast - urbase;
    while (offdiagrow < lastrow && analysis->superrowidx.xZ[offdiagrow + urbase] < cols1) {
@@ -23692,13 +23497,6 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
    uwidth = offdiagrow - wrkrow;
    uheight = lastrow - wrkrow;
    result = offdiagrow;
-   if (analysis->extendeddebug) {
-   // Extended integrity check (if requested)
-      ae_assert(wrkrow < offdiagrow && analysis->superrowidx.xZ[wrkrow + urbase] >= cols0, "SPCholFactorize: integrity check failed (44trg6)", _state);
-      for (i = wrkrow; i < lastrow; i++) {
-         ae_assert(raw2smap->xZ[analysis->superrowidx.xZ[i + urbase]] >= 0, "SPCholFactorize: integrity check failed (43t63)", _state);
-      }
-   }
 // Handle special cases
    if (trowstride == 4) {
    // Target is stride-4 column, try several kernels that may work with tWidth=3 and tWidth=4
@@ -24065,13 +23863,6 @@ ae_int_t spsymmgetmaxfastkernel(ae_state *_state) {
 // This function fails if and only if the matrix A is symbolically degenerate
 // i.e. has diagonal element which is exactly zero. In  such  case  False  is
 // returned.
-//
-// NOTE: defining 'SCHOLESKY' trace tag will activate tracing.
-//       defining 'SCHOLESKY.SS' trace tag will activate detailed tracing  of
-//       the supernodal structure.
-//
-// NOTE: defining 'DEBUG.SLOW' trace tag will  activate  extra-slow  (roughly
-//       N^3 ops) integrity checks, in addition to cheap O(1) ones.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis, ae_state *_state) {
    ae_int_t n;
@@ -24096,9 +23887,6 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
    analysis->n = n;
    analysis->unitd = facttype == 0;
    analysis->permtype = permtype;
-   analysis->extendeddebug = ae_is_trace_enabled("DEBUG.SLOW") && n <= 100;
-   analysis->dotrace = ae_is_trace_enabled("SCHOLESKY");
-   analysis->dotracesupernodalstructure = analysis->dotrace && ae_is_trace_enabled("SCHOLESKY.SS");
    analysis->istopologicalordering = permtype == -1 || permtype == 1;
    analysis->applypermutationtooutput = permtype == -1;
    analysis->modtype = 0;
@@ -24114,41 +23902,9 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
    ivectorsetlengthatleast(&analysis->tmp3, n + 1, _state);
    ivectorsetlengthatleast(&analysis->tmp4, n + 1, _state);
    bvectorsetlengthatleast(&analysis->flagarray, n + 1, _state);
-// Initial trace message
-   if (analysis->dotrace) {
-      ae_trace("\n\n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("//  SPARSE CHOLESKY ANALYSIS STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   // Analyze row statistics
-      ae_trace("==== ANALYZING ROW STATISTICS ====\n");
-      ae_trace("row size is:\n");
-      isetv(n, 1, &analysis->tmp0, _state);
-      for (i = 0; i < n; i++) {
-         for (jj = a->ridx.xZ[i]; jj < a->didx.xZ[i]; jj++) {
-            j = a->idx.xZ[jj];
-            analysis->tmp0.xZ[i] = analysis->tmp0.xZ[i] + 1;
-            analysis->tmp0.xZ[j] = analysis->tmp0.xZ[j] + 1;
-         }
-      }
-      k = 1;
-      while (k <= n) {
-         j = 0;
-         for (i = 0; i < n; i++) {
-            if (analysis->tmp0.xZ[i] >= k && analysis->tmp0.xZ[i] < 2 * k) {
-               j = j + 1;
-            }
-         }
-         ae_trace("* [%6d..%6d) elements: %6d rows\n", (int)k, (int)(2 * k), (int)j);
-         k = k * 2;
-      }
-   }
 // Initial integrity check - diagonal MUST be symbolically nonzero
    for (i = 0; i < n; i++) {
       if (a->didx.xZ[i] == a->uidx.xZ[i]) {
-         if (analysis->dotrace) {
-            ae_trace("> the matrix diagonal is symbolically zero, stopping");
-         }
          result = false;
          return result;
       }
@@ -24203,9 +23959,6 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
             analysis->invfillinperm.xZ[i] = i;
          }
          sparsecopybuf(a, &analysis->tmpa, _state);
-         if (analysis->dotrace) {
-            ae_trace("> multiround AMD, tail=%0d\n", (int)residual);
-         }
          while (residual > 0) {
          // Generate partial fill-in reducing permutation (leading Residual-Tail columns are
          // properly ordered, the rest is unordered).
@@ -24227,14 +23980,8 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
             if (tail > 0) {
                sparsesymmpermtblbuf(&analysis->tmpa, false, &analysis->tmpperm, &analysis->tmpa2, _state);
                spchol_partialcholeskypattern(&analysis->tmpa2, residual - tail, tail, &analysis->tmpa, &analysis->tmpparent, &analysis->tmp0, &analysis->tmp1, &analysis->tmp2, &analysis->flagarray, &analysis->tmpbottomt, &analysis->tmpupdatet, &analysis->tmpupdate, &analysis->tmpnewtailt, _state);
-               if (analysis->extendeddebug) {
-                  spchol_slowdebugchecks(a, &analysis->fillinperm, n, tail, &analysis->tmpa, _state);
-               }
             }
             residual = tail;
-            if (analysis->dotrace) {
-               ae_trace("> multiround AMD, tail=%0d\n", (int)residual);
-            }
          }
          permready = true;
       }
@@ -24450,9 +24197,6 @@ bool spsymmfactorize(spcholanalysis *analysis, ae_state *_state) {
       blocksize = cols1 - cols0;
       offss = analysis->rowoffsets.xZ[sidx];
    // Prepare mapping of raw (range 0...N-1) indexes into internal (range 0...BlockSize+OffdiagSize-1) ones
-      if (analysis->extendeddebug) {
-         isetv(n, -1, &analysis->raw2smap, _state);
-      }
       for (i = cols0; i < cols1; i++) {
          analysis->raw2smap.xZ[i] = i - cols0;
       }
@@ -24736,9 +24480,6 @@ void spcholanalysis_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
    dst->modparam1 = src->modparam1;
    dst->modparam2 = src->modparam2;
    dst->modparam3 = src->modparam3;
-   dst->extendeddebug = src->extendeddebug;
-   dst->dotrace = src->dotrace;
-   dst->dotracesupernodalstructure = src->dotracesupernodalstructure;
    dst->nsuper = src->nsuper;
    ae_vector_copy(&dst->parentsupernode, &src->parentsupernode, _state, make_automatic);
    ae_vector_copy(&dst->supercolrange, &src->supercolrange, _state, make_automatic);

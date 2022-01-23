@@ -193,13 +193,6 @@ ae_int_t matrixtilesizea(ae_state *_state);
 ae_int_t matrixtilesizeb(ae_state *_state);
 double smpactivationlevel(ae_state *_state);
 double spawnlevel(ae_state *_state);
-void tracevectorautoprec(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
-void tracerowautoprec(RMatrix *a, ae_int_t i, ae_int_t j0, ae_int_t j1, ae_state *_state);
-void tracevectorunscaledunshiftedautoprec(RVector *x, ae_int_t n, RVector *scl, bool applyscl, RVector *sft, bool applysft, ae_state *_state);
-void tracerownrm1autoprec(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1, ae_state *_state);
-void tracevectore6(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
-void tracevectore615(RVector *a, ae_int_t i0, ae_int_t i1, bool usee15, ae_state *_state);
-void tracerownrm1e6(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===

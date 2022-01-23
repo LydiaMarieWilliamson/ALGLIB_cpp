@@ -24,7 +24,6 @@ void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, c
       printf("[ALGLIB] %s:%d\n", filename, lineno);
       printf("[ALGLIB] %s\n", xdesc);
       fflush(stdout);
-      if (alglib_trace_file != NULL) fflush(alglib_trace_file);
       abort();
 #endif
    }

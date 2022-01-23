@@ -385,25 +385,6 @@ __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits 
 __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
 #endif
 
-// Trace-related declarations:
-// alglib_trace_type    -   trace output type
-// alglib_trace_file    -   file descriptor (to be used by ALGLIB code which
-//                          sends messages to trace log
-// alglib_fclose_trace  -   whether we have to call fclose() when disabling or
-//                          changing trace output
-// alglib_trace_tags    -   string buffer used to store tags + two additional
-//                          characters (leading and trailing commas) + null
-//                          terminator
-#define ALGLIB_TRACE_NONE 0
-#define ALGLIB_TRACE_FILE 1
-#define ALGLIB_TRACE_TAGS_LEN 2048
-#define ALGLIB_TRACE_BUFFER_LEN (ALGLIB_TRACE_TAGS_LEN+2+1)
-
-static ae_int_t alglib_trace_type = ALGLIB_TRACE_NONE;
-FILE *alglib_trace_file = NULL;
-static bool alglib_fclose_trace = false;
-static char alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
-
 // Standard function wrappers for better GLIBC portability
 #if defined X_FOR_LINUX
 __asm__(".symver exp,exp@GLIBC_2.2.5");
@@ -490,8 +471,6 @@ void ae_clean_up_before_breaking(ae_state *state) {
 // called prior to handling error and clearing state.
 static void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
    if (state != NULL) {
-      if (alglib_trace_type != ALGLIB_TRACE_NONE)
-         ae_trace("---!!! CRITICAL ERROR !!!--- exception with message '%s' was generated\n", msg != NULL ? msg : "");
       ae_clean_up_before_breaking(state);
       state->last_error = error_type;
       state->error_msg = msg;
@@ -4631,81 +4610,6 @@ void ae_v_muld(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
 const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
 const double pi = 3.1415926535897932384626433832795;
 #endif
-
-// Activates tracing to file
-//
-// IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
-//            threads will result in undefined  behavior.  Calling  it  when
-//            some thread calls ALGLIB functions  may  result  in  undefined
-//            behavior.
-void ae_trace_file(const char *tags, const char *filename) {
-// clean up previous call
-   if (alglib_fclose_trace) {
-      if (alglib_trace_file != NULL)
-         fclose(alglib_trace_file);
-      alglib_trace_file = NULL;
-      alglib_fclose_trace = false;
-   }
-// store ",tags," to buffer. Leading and trailing commas allow us
-// to perform checks for various tags by simply calling strstr().
-   memset(alglib_trace_tags, 0, ALGLIB_TRACE_BUFFER_LEN);
-   strcat(alglib_trace_tags, ",");
-   strncat(alglib_trace_tags, tags, ALGLIB_TRACE_TAGS_LEN);
-   strcat(alglib_trace_tags, ",");
-   for (int i = 0; alglib_trace_tags[i] != 0; i++)
-      alglib_trace_tags[i] = tolower(alglib_trace_tags[i]);
-// set up trace
-   alglib_trace_type = ALGLIB_TRACE_FILE;
-   alglib_trace_file = fopen(filename, "ab");
-   alglib_fclose_trace = true;
-}
-
-// Disables tracing
-void ae_trace_disable() {
-   alglib_trace_type = ALGLIB_TRACE_NONE;
-   if (alglib_fclose_trace)
-      fclose(alglib_trace_file);
-   alglib_trace_file = NULL;
-   alglib_fclose_trace = false;
-}
-
-// Checks whether specific kind of tracing is enabled
-bool ae_is_trace_enabled(const char *tag) {
-   char buf[ALGLIB_TRACE_BUFFER_LEN];
-// check global trace status
-   if (alglib_trace_type == ALGLIB_TRACE_NONE || alglib_trace_file == NULL)
-      return false;
-// copy tag to buffer, lowercase it
-   memset(buf, 0, ALGLIB_TRACE_BUFFER_LEN);
-   strcat(buf, ",");
-   strncat(buf, tag, ALGLIB_TRACE_TAGS_LEN);
-   strcat(buf, "?");
-   for (int i = 0; buf[i] != 0; i++)
-      buf[i] = tolower(buf[i]);
-// contains tag (followed by comma, which means exact match)
-   buf[strlen(buf) - 1] = ',';
-   if (strstr(alglib_trace_tags, buf) != NULL)
-      return true;
-// contains tag (followed by dot, which means match with child)
-   buf[strlen(buf) - 1] = '.';
-   if (strstr(alglib_trace_tags, buf) != NULL)
-      return true;
-// nothing
-   return false;
-}
-
-void ae_trace(const char *printf_fmt, ...) {
-// check global trace status
-   if (alglib_trace_type == ALGLIB_TRACE_FILE && alglib_trace_file != NULL) {
-      va_list args;
-   // fprintf()
-      va_start(args, printf_fmt);
-      vfprintf(alglib_trace_file, printf_fmt, args);
-      va_end(args);
-   // flush output
-      fflush(alglib_trace_file);
-   }
-}
 
 // RComm functions
 void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
@@ -11007,13 +10911,4 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
       }
 }
 #endif
-
-// Trace functions
-void trace_file(std::string tags, std::string filename) {
-   alglib_impl::ae_trace_file(tags.c_str(), filename.c_str());
-}
-
-void trace_disable() {
-   alglib_impl::ae_trace_disable();
-}
 } // end of namespace alglib

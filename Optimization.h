@@ -233,8 +233,6 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
 void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVector *invs, RVector *d, double stp, RVector *x, double f0, RVector *j0, ae_state *_state);
 void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale, ae_state *_state);
 bool smoothnessmonitorprobe(smoothnessmonitor *monitor, ae_state *_state);
-void smoothnessmonitortraceprobingresults(smoothnessmonitor *monitor, ae_state *_state);
-void smoothnessmonitortracestatus(smoothnessmonitor *monitor, bool callersuggeststrace, ae_state *_state);
 void smoothnessmonitorexportreport(smoothnessmonitor *monitor, optguardreport *rep, ae_state *_state);
 bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, bool hasboxconstraints, double teststep, ae_state *_state);
 } // end of namespace alglib_impl
@@ -1016,8 +1014,6 @@ struct vipmstate {
    ae_vector haspq;
    ae_int_t repiterationscount;
    ae_int_t repncholesky;
-   bool dotrace;
-   bool dodetailedtrace;
    ae_int_t factorizationtype;
    bool factorizationpoweredup;
    bool factorizationpresent;
@@ -1695,7 +1691,6 @@ struct minsqpstate {
    ae_vector dummylagmult;
    ae_matrix abslagmemory;
    ae_vector fscales;
-   ae_vector tracegamma;
    minsqpsubsolver subsolver;
    minsqptmpmerit tmpmerit;
    ae_int_t repsimplexiterations;
@@ -1867,24 +1862,12 @@ struct dualsimplexstate {
    ae_int_t repiterationscount1;
    ae_int_t repiterationscount2;
    ae_int_t repiterationscount3;
-   ae_int_t repphase1time;
-   ae_int_t repphase2time;
-   ae_int_t repphase3time;
-   ae_int_t repdualpricingtime;
-   ae_int_t repdualbtrantime;
-   ae_int_t repdualpivotrowtime;
-   ae_int_t repdualratiotesttime;
-   ae_int_t repdualftrantime;
-   ae_int_t repdualupdatesteptime;
    double repfillpivotrow;
    ae_int_t repfillpivotrowcnt;
    double repfillrhor;
    ae_int_t repfillrhorcnt;
    double repfilldensemu;
    ae_int_t repfilldensemucnt;
-   bool dotrace;
-   bool dodetailedtrace;
-   bool dotimers;
    ae_vector btrantmp0;
    ae_vector btrantmp1;
    ae_vector btrantmp2;

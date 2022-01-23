@@ -775,16 +775,9 @@ extern const double pi;
 #endif
 
 // Debugging and tracing functions
-void ae_trace_file(const char *tags, const char *filename);
-void ae_trace_disable();
-bool ae_is_trace_enabled(const char *tag);
-void ae_trace(const char *printf_fmt, ...);
 bool ae_check_zeros(const void *ptr, ae_int_t n);
 void ae_touch_ptr(void *p);
 
-// Trace file descriptor (to be used by ALGLIB code which sends messages  to
-// trace log)
-extern FILE *alglib_trace_file;
 // debug functions (must be turned on by preprocessor definitions):
 // * flushconsole(), fluches console
 // * ae_debugrng(), returns random number generated with high-quality random numbers generator
@@ -1557,22 +1550,6 @@ extern const int CSV_DEFAULT, CSV_SKIP_HEADERS;
 // *	The field contents are not recognized by atof() - the field value is replaced by 0.0.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out);
 #endif
-
-// Activate trace output, with the trace log being saved to file (appended to the end).
-// Tracing allows us to study the behavior of ALGLIB solvers and to debug their failures:
-// *	tracing is limited by one/several ALGLIB parts specified by means of trace tags,
-//	like "SLP" (for SLP solver) or "OPTGUARD" (OptGuard integrity checker).
-// *	some ALGLIB solvers support hierarchies of trace tags which activate different kinds of tracing.
-//	Say, "SLP" defines some basic tracing, but "SLP.PROBING" defines more detailed and costly tracing.
-// *	generally, "TRACETAG.SUBTAG" also implicitly activates logging which is activated by "TRACETAG"
-// *	you may define multiple trace tags by separating them with commas, like "SLP,OPTGUARD,SLP.PROBING"
-// *	trace tags are case-insensitive
-// *	spaces/tabs are NOT allowed in the tags string
-// Trace log is saved to file "filename", which is opened in the append mode.
-// If no file with such name can be opened, tracing won't be performed (but no exception will be generated).
-void trace_file(std::string tags, std::string filename);
-// This function disables tracing.
-void trace_disable();
 } // end of namespace alglib
 
 #endif // OnceOnly

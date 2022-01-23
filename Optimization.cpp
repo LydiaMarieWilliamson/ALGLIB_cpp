@@ -3057,243 +3057,6 @@ lbl_rcomm:
    return result;
 }
 
-// This function prints probing results to trace log.
-//
-// Tracing is performed using fixed width for all columns, so you  may  print
-// a header before printing trace - and reasonably expect that its width will
-// match that of the trace. This function promises that it wont change  trace
-// output format without introducing breaking changes into its signature.
-//
-// NOTE: this function ALWAYS tries to print results; it is caller's responsibility
-//       to decide whether he needs tracing or not.
-// ALGLIB: Copyright 10.10.2019 by Sergey Bochkanov
-void smoothnessmonitortraceprobingresults(smoothnessmonitor *monitor, ae_state *_state) {
-   ae_int_t i;
-   ae_int_t j;
-   double steplen;
-// Compute slopes
-   for (i = 0; i < monitor->probingnstepsstored - 1; i++) {
-      for (j = 0; j < monitor->probingnvalues; j++) {
-         steplen = (monitor->probingsteps.xR[i + 1] - monitor->probingsteps.xR[i] + 100 * machineepsilon) * (monitor->probingstepscale + machineepsilon);
-         monitor->probingslopes.xyR[i][j] = (monitor->probingvalues.xyR[i + 1][j] - monitor->probingvalues.xyR[i][j]) / steplen;
-      }
-   }
-   if (monitor->probingnstepsstored >= 1) {
-      for (j = 0; j < monitor->probingnvalues; j++) {
-         monitor->probingslopes.xyR[monitor->probingnstepsstored - 1][j] = monitor->probingslopes.xyR[maxint(monitor->probingnstepsstored - 2, 0, _state)][j];
-      }
-   }
-// Print to trace log
-   ae_trace("*** ----------");
-   for (j = 0; j < monitor->probingnvalues; j++) {
-      ae_trace("-------------------------");
-   }
-   ae_trace("\n");
-   for (i = 0; i < monitor->probingnstepsstored; i++) {
-      ae_trace("*** | %0.4f |", monitor->probingsteps.xR[i]);
-      for (j = 0; j < monitor->probingnvalues; j++) {
-         ae_trace(" %11.3e %10.2e |", monitor->probingvalues.xyR[i][j] - monitor->probingvalues.xyR[0][j], monitor->probingslopes.xyR[i][j]);
-      }
-      ae_trace("\n");
-   }
-   ae_trace("*** ----------");
-   for (j = 0; j < monitor->probingnvalues; j++) {
-      ae_trace("-------------------------");
-   }
-   ae_trace("\n");
-}
-
-// This subroutine tells monitor to output trace info.
-//
-// If CallerSuggestsTrace=True, monitor  ALWAYS  prints  trace,  even  if  no
-// suspicions were raised during optimization. If  CallerSuggestsTrace=False,
-// the monitor will print trace only if:
-// * trace was requested by trace tag 'OPTGUARD' AND suspicious  points  were
-//   found during optimization
-// * trace was requested by trace tag 'OPTGUARD.ALWAYS' - always
-// ALGLIB: Copyright 11.10.2019 by Sergey Bochkanov
-void smoothnessmonitortracestatus(smoothnessmonitor *monitor, bool callersuggeststrace, ae_state *_state) {
-   bool needreport;
-   bool needxdreport;
-   bool suspicionsraised;
-   ae_int_t i;
-   double slope;
-// Do we need trace report?
-   suspicionsraised = (monitor->rep.nonc0suspected || monitor->rep.nonc1suspected) || monitor->rep.badgradsuspected;
-   needreport = false;
-   needreport = needreport || callersuggeststrace;
-   needreport = needreport || ae_is_trace_enabled("OPTGUARD.ALWAYS");
-   needreport = needreport || (ae_is_trace_enabled("OPTGUARD") && suspicionsraised);
-   if (!needreport) {
-      return;
-   }
-   needxdreport = needreport && ae_is_trace_enabled("OPTIMIZERS.X");
-//
-   ae_trace("\n");
-   ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   ae_trace("// OPTGUARD INTEGRITY CHECKER REPORT // \n");
-   ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   if (!suspicionsraised) {
-      ae_trace("> no discontinuity/nonsmoothness/bad-gradient suspicions were raised during optimization\n");
-      return;
-   }
-   if (monitor->rep.nonc0suspected) {
-      ae_trace("> [WARNING] suspected discontinuity (aka C0-discontinuity)\n");
-   }
-   if (monitor->rep.nonc1suspected) {
-      ae_trace("> [WARNING] suspected nonsmoothness (aka C1-discontinuity)\n");
-   }
-   ae_trace("> printing out test reports...\n");
-   if (monitor->rep.nonc0suspected && monitor->rep.nonc0test0positive) {
-      ae_trace("> printing out discontinuity test #0 report:\n");
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** | Test #0 for discontinuity was triggered  (this test |\n");
-      ae_trace("*** | analyzes changes in function values). See below for |\n");
-      ae_trace("*** | detailed info:                                      |\n");
-      ae_trace("*** | * function index:       %10d", (int)monitor->nonc0lngrep.fidx);
-      if (monitor->nonc0lngrep.fidx == 0) {
-         ae_trace(" (target)         |\n");
-      } else {
-         ae_trace(" (constraint)     |\n");
-      }
-      ae_trace("*** | * F() Lipschitz const:  %10.2e                  |\n", monitor->rep.nonc0lipschitzc);
-      ae_trace("*** | Printing out log of suspicious line search XK+Stp*D |\n");
-      ae_trace("*** | Look for abrupt changes in slope.                   |\n");
-      if (!needxdreport) {
-         ae_trace("*** | NOTE: XK and D are  not printed  by default. If you |\n");
-         ae_trace("*** |       need them, add trace tag OPTIMIZERS.X         |\n");
-      }
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** |  step along D   |     delta F     |      slope      |\n");
-      ae_trace("*** ------------------------------------------------------|\n");
-      for (i = 0; i < monitor->nonc0lngrep.cnt; i++) {
-         slope = monitor->nonc0lngrep.f.xR[minint(i + 1, monitor->nonc0lngrep.cnt - 1, _state)] - monitor->nonc0lngrep.f.xR[i];
-         slope = slope / (1.0e-15 + monitor->nonc0lngrep.stp.xR[minint(i + 1, monitor->nonc0lngrep.cnt - 1, _state)] - monitor->nonc0lngrep.stp.xR[i]);
-         ae_trace("*** |  %13.5e  |  %13.5e  |   %11.3e   |", monitor->nonc0lngrep.stp.xR[i], monitor->nonc0lngrep.f.xR[i] - monitor->nonc0lngrep.f.xR[0], slope);
-         if (i >= monitor->nonc0lngrep.stpidxa && i <= monitor->nonc0lngrep.stpidxb) {
-            ae_trace(" <---");
-         }
-         ae_trace("\n");
-      }
-      ae_trace("*** ------------------------------------------------------|\n");
-      if (needxdreport) {
-         ae_trace("*** > printing raw variables\n");
-         ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
-         ae_trace("*** XK = ");
-         tracevectorautoprec(&monitor->nonc0lngrep.x0, 0, monitor->n, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorautoprec(&monitor->nonc0lngrep.d, 0, monitor->n, _state);
-         ae_trace("\n");
-      }
-   }
-   if (monitor->rep.nonc1suspected && monitor->rep.nonc1test0positive) {
-      ae_trace("> printing out nonsmoothness test #0 report:\n");
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** | Test #0 for nonsmoothness was triggered  (this test |\n");
-      ae_trace("*** | analyzes changes in  function  values  and  ignores |\n");
-      ae_trace("*** | gradient info). See below for detailed info:        |\n");
-      ae_trace("*** | * function index:         %10d", (int)monitor->nonc1test0lngrep.fidx);
-      if (monitor->nonc1test0lngrep.fidx == 0) {
-         ae_trace(" (target)       |\n");
-      } else {
-         ae_trace(" (constraint)   |\n");
-      }
-      ae_trace("*** | * dF/dX Lipschitz const:  %10.2e                |\n", monitor->rep.nonc1lipschitzc);
-      ae_trace("*** | Printing out log of suspicious line search XK+Stp*D |\n");
-      ae_trace("*** | Look for abrupt changes in slope.                   |\n");
-      if (!needxdreport) {
-         ae_trace("*** | NOTE: XK and D are  not printed  by default. If you |\n");
-         ae_trace("*** |       need them, add trace tag OPTIMIZERS.X         |\n");
-      }
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** |  step along D   |     delta F     |      slope      |\n");
-      ae_trace("*** ------------------------------------------------------|\n");
-      for (i = 0; i < monitor->nonc1test0lngrep.cnt; i++) {
-         slope = monitor->nonc1test0lngrep.f.xR[minint(i + 1, monitor->nonc1test0lngrep.cnt - 1, _state)] - monitor->nonc1test0lngrep.f.xR[i];
-         slope = slope / (1.0e-15 + monitor->nonc1test0lngrep.stp.xR[minint(i + 1, monitor->nonc1test0lngrep.cnt - 1, _state)] - monitor->nonc1test0lngrep.stp.xR[i]);
-         ae_trace("*** |  %13.5e  |  %13.5e  |   %11.3e   |", monitor->nonc1test0lngrep.stp.xR[i], monitor->nonc1test0lngrep.f.xR[i] - monitor->nonc1test0lngrep.f.xR[0], slope);
-         if (i >= monitor->nonc1test0lngrep.stpidxa && i <= monitor->nonc1test0lngrep.stpidxb) {
-            ae_trace(" <---");
-         }
-         ae_trace("\n");
-      }
-      ae_trace("*** ------------------------------------------------------|\n");
-      if (needxdreport) {
-         ae_trace("*** > printing raw variables\n");
-         ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
-         ae_trace("*** XK = ");
-         tracevectorautoprec(&monitor->nonc1test0lngrep.x0, 0, monitor->n, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorautoprec(&monitor->nonc1test0lngrep.d, 0, monitor->n, _state);
-         ae_trace("\n");
-      }
-   }
-   if (monitor->rep.nonc1suspected && monitor->rep.nonc1test1positive) {
-      ae_trace("> printing out nonsmoothness test #1 report:\n");
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** | Test #1 for nonsmoothness was triggered  (this test |\n");
-      ae_trace("*** | analyzes changes in gradient components). See below |\n");
-      ae_trace("*** | for detailed info:                                  |\n");
-      ae_trace("*** | * function index:         %10d", (int)monitor->nonc1test1lngrep.fidx);
-      if (monitor->nonc1test1lngrep.fidx == 0) {
-         ae_trace(" (target)       |\n");
-      } else {
-         ae_trace(" (constraint)   |\n");
-      }
-      ae_trace("*** | * variable index I:       %10d                |\n", (int)monitor->nonc1test1lngrep.vidx);
-      ae_trace("*** | * dF/dX Lipschitz const:  %10.2e                |\n", monitor->rep.nonc1lipschitzc);
-      ae_trace("*** | Printing out log of suspicious line search XK+Stp*D |\n");
-      ae_trace("*** | Look for abrupt changes in slope.                   |\n");
-      if (!needxdreport) {
-         ae_trace("*** | NOTE: XK and D are  not printed  by default. If you |\n");
-         ae_trace("*** |       need them, add trace tag OPTIMIZERS.X         |\n");
-      }
-      ae_trace("*** -------------------------------------------------------\n");
-      ae_trace("*** |  step along D   |     delta Gi    |      slope      |\n");
-      ae_trace("*** ------------------------------------------------------|\n");
-      for (i = 0; i < monitor->nonc1test1lngrep.cnt; i++) {
-         slope = monitor->nonc1test1lngrep.g.xR[minint(i + 1, monitor->nonc1test1lngrep.cnt - 1, _state)] - monitor->nonc1test1lngrep.g.xR[i];
-         slope = slope / (1.0e-15 + monitor->nonc1test1lngrep.stp.xR[minint(i + 1, monitor->nonc1test1lngrep.cnt - 1, _state)] - monitor->nonc1test1lngrep.stp.xR[i]);
-         ae_trace("*** |  %13.5e  |  %13.5e  |   %11.3e   |", monitor->nonc1test1lngrep.stp.xR[i], monitor->nonc1test1lngrep.g.xR[i] - monitor->nonc1test1lngrep.g.xR[0], slope);
-         if (i >= monitor->nonc1test1lngrep.stpidxa && i <= monitor->nonc1test1lngrep.stpidxb) {
-            ae_trace(" <---");
-         }
-         ae_trace("\n");
-      }
-      ae_trace("*** ------------------------------------------------------|\n");
-      if (needxdreport) {
-         ae_trace("*** > printing raw variables\n");
-         ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
-         ae_trace("\n");
-         ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
-         ae_trace("*** XK = ");
-         tracevectorautoprec(&monitor->nonc1test1lngrep.x0, 0, monitor->n, _state);
-         ae_trace("\n");
-         ae_trace("*** D  = ");
-         tracevectorautoprec(&monitor->nonc1test1lngrep.d, 0, monitor->n, _state);
-         ae_trace("\n");
-      }
-   }
-}
-
 // This subroutine exports report to user-readable representation (all arrays
 // are forced to have exactly same size as needed; unused arrays are  set  to
 // zero length).
@@ -16357,9 +16120,6 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
 // Reports
    state->repiterationscount = 0;
    state->repncholesky = 0;
-// Trace
-   state->dotrace = false;
-   state->dodetailedtrace = false;
 // Scale and origin
    rvectorsetlengthatleast(&state->scl, n, _state);
    rvectorsetlengthatleast(&state->invscl, n, _state);
@@ -17099,55 +16859,10 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
       }
       spsymmdiagerr(&state->ldltanalysis, &sumsq, &errsq, _state);
       if (ae_sqrt(errsq / (1 + sumsq), _state) > ae_sqrt(machineepsilon, _state)) {
-         if (state->dotrace) {
-            ae_trace("LDLT-diag-err= %0.3e (diagonal reproduction error)\n", sqrt(errsq / (1 + sumsq)));
-         }
          result = false;
          return result;
       }
       state->factorizationpresent = true;
-   // Trace
-      if (state->dotrace) {
-         spsymmextract(&state->ldltanalysis, &state->factsparsekkt, &state->factsparsediagd, &state->factsparsekktpivp, _state);
-         ae_trace("--- sparse KKT factorization report ----------------------------------------------------------------\n");
-         ae_trace("> diagonal terms D and E\n");
-         if (alpha0 != 0.0) {
-            v = ae_fabs(d->xR[0], _state);
-            vv = ae_fabs(d->xR[0], _state);
-            for (i = 1; i < n; i++) {
-               v = minreal(v, ae_fabs(d->xR[i], _state), _state);
-               vv = maxreal(vv, ae_fabs(d->xR[i], _state), _state);
-            }
-            ae_trace("diagD        = %0.3e (min) ... %0.3e (max)\n", v, vv);
-         }
-         if (m > 0 && beta0 != 0.0) {
-            v = ae_fabs(e->xR[0], _state);
-            vv = ae_fabs(e->xR[0], _state);
-            for (i = 1; i < m; i++) {
-               v = minreal(v, ae_fabs(e->xR[i], _state), _state);
-               vv = maxreal(vv, ae_fabs(e->xR[i], _state), _state);
-            }
-            ae_trace("diagE        = %0.3e (min) ... %0.3e (max)\n", v, vv);
-         }
-         ae_trace("> LDLT factorization of entire KKT matrix\n");
-         v = ae_fabs(state->factsparsediagd.xR[0], _state);
-         vv = ae_fabs(state->factsparsediagd.xR[0], _state);
-         for (i = 0; i < n + m; i++) {
-            v = maxreal(v, ae_fabs(state->factsparsediagd.xR[i], _state), _state);
-            vv = minreal(vv, ae_fabs(state->factsparsediagd.xR[i], _state), _state);
-         }
-         ae_trace("|D|          = %0.3e (min) ... %0.3e (max)\n", vv, v);
-         v = 0.0;
-         for (i = 0; i < n + m; i++) {
-            k0 = state->factsparsekkt.ridx.xZ[i];
-            k1 = state->factsparsekkt.didx.xZ[i];
-            for (k = k0; k <= k1; k++) {
-               v = maxreal(v, ae_fabs(state->factsparsekkt.vals.xR[k], _state), _state);
-            }
-         }
-         ae_trace("max(|L|)     = %0.3e\n", v);
-         ae_trace("diag-err     = %0.3e (diagonal reproduction error)\n", sqrt(errsq / (1 + sumsq)));
-      }
    }
 // Done, integrity control
    ae_assert(state->factorizationpresent, "VIPMFactorize: integrity check failed", _state);
@@ -17494,10 +17209,6 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
          state->current.p.xR[i] = state->current.p.xR[i] * v;
          state->current.q.xR[i] = state->current.q.xR[i] * v;
       }
-   }
-// Almost done
-   if (state->dotrace) {
-      ae_trace("> initial point was generated\n");
    }
 }
 
@@ -18087,10 +17798,6 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    badres = 1.01;
    verybadres = 1.0E3;
    result = true;
-// Initial solver report
-   if (state->dotrace) {
-      ae_trace("--- detailed KKT solver report ---------------------------------------------------------------------\n");
-   }
 // Solve KKT system with right-hand sides coming from primal, dual
 // and complementary slackness conditions. Analyze solution,
 // terminate immediately if primal/dual residuals are way too high.
@@ -18101,12 +17808,6 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    vrhscmpl2 = vipmsolver_rhscompl2(&state->rhs, n, m, _state);
    vrhspriminf = vipmsolver_rhsprimalinf(&state->rhs, n, m, _state);
    vrhsdualinf = vipmsolver_rhsdualinf(&state->rhs, n, m, _state);
-   if (state->dotrace) {
-      ae_trace("> primal/dual/complementarity right-hand-side\n");
-      ae_trace("rhs-prim     = %0.3e (2-norm)\n", sqrt(vrhsprim2));
-      ae_trace("rhs-dual     = %0.3e (2-norm)\n", sqrt(vrhsdual2));
-      ae_trace("rhs-cmpl     = %0.3e (2-norm)\n", sqrt(vrhscmpl2));
-   }
    vipmsolver_solvekktsystem(state, &state->rhs, vdresult, _state);
    vipmsolver_rhssubtract(state, &state->rhs, v0, vdresult, reg, _state);
    vresprim2 = vipmsolver_rhsprimal2(&state->rhs, n, m, _state);
@@ -18114,27 +17815,14 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    vrescmpl2 = vipmsolver_rhscompl2(&state->rhs, n, m, _state);
    vrespriminf = vipmsolver_rhsprimalinf(&state->rhs, n, m, _state);
    vresdualinf = vipmsolver_rhsdualinf(&state->rhs, n, m, _state);
-   if (state->dotrace) {
-      ae_trace("> primal/dual/complementarity residuals compared with RHS\n");
-      ae_trace("res/rhs prim = %0.3e\n", sqrt(vresprim2 / coalesce(vrhsprim2, 1.0, _state)));
-      ae_trace("res/rhs dual = %0.3e\n", sqrt(vresdual2 / coalesce(vrhsdual2, 1.0, _state)));
-      ae_trace("res/rhs cmpl = %0.3e\n", sqrt(vrescmpl2 / coalesce(vrhscmpl2, 1.0, _state)));
-      ae_trace("res/rhs all  = %0.3e\n", sqrt((vresprim2 + vresdual2 + vrescmpl2) / coalesce(vrhsprim2 + vrhsdual2 + vrhscmpl2, 1.0, _state)));
-   }
    primaldestabilized = vrhspriminf <= state->epsp && vrespriminf >= maxreal(verybadres * vrhspriminf, state->epsp, _state);
    dualdestabilized = vrhsdualinf <= state->epsd && vresdualinf >= maxreal(verybadres * vrhsdualinf, state->epsd, _state);
    residualgrowth = ae_sqrt((vresprim2 + vresdual2 + vrescmpl2) / coalesce(vrhsprim2 + vrhsdual2 + vrhscmpl2, 1.0, _state), _state);
    if (((primaldestabilized || dualdestabilized) && residualgrowth > 0.01 * ae_sqrt(machineepsilon, _state)) && !isdampepslarge) {
-      if (state->dotrace) {
-         ae_trace("> primal/dual residual growth is too high, signaling presence of numerical errors\n");
-      }
       result = false;
       return result;
    }
    if (residualgrowth > badres) {
-      if (state->dotrace) {
-         ae_trace("> total residual is too high, signaling presence of numerical errors\n");
-      }
       result = false;
       return result;
    }
@@ -18435,112 +18123,6 @@ static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
    return result;
 }
 
-// Evaluate progress so far, outputs trace data, if requested to do so.
-// ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, double sigma, double alphap, double alphad, ae_state *_state) {
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t i;
-   double v;
-   double errp2;
-   double errd2;
-   double errpinf;
-   double errdinf;
-   double errgap;
-   n = state->n;
-   m = state->mdense + state->msparse;
-   if (!state->dotrace) {
-      return;
-   }
-// Print high-level information
-   vipmsolver_computeerrors(state, &errp2, &errd2, &errpinf, &errdinf, &errgap, _state);
-   ae_trace("--- step report ------------------------------------------------------------------------------------\n");
-   ae_trace("> step information\n");
-   ae_trace("mu_init = %0.3e    (at the beginning)\n", mu);
-   ae_trace("mu_aff  = %0.3e    (by affine scaling step)\n", muaff);
-   ae_trace("sigma   = %0.3e    (centering parameter)\n", sigma);
-   ae_trace("alphaP  = %0.3e    (primal step)\n", alphap);
-   ae_trace("alphaD  = %0.3e    (dual   step)\n", alphad);
-   ae_trace("mu_cur  = %0.3e    (after the step)\n", vipmsolver_varscomputemu(&state->current, _state));
-   ae_trace("> errors\n");
-   ae_trace("errP    = %0.3e    (primal infeasibility, inf-norm)\n", errpinf);
-   ae_trace("errD    = %0.3e    (dual infeasibility,   inf-norm)\n", errdinf);
-   ae_trace("errGap  = %0.3e    (complementarity gap)\n", errgap);
-   ae_trace("> current point information (inf-norm)\n");
-   ae_trace("|X|=%8.1e,  |G|=%8.1e,  |T|=%8.1e,  |W|=%8.1e,  |P|=%8.1e\n", rmaxabsv(n, &state->current.x, _state), rmaxabsv(n, &state->current.g, _state), rmaxabsv(n, &state->current.t, _state), rmaxabsv(m, &state->current.w, _state), rmaxabsv(m, &state->current.p, _state));
-   ae_trace("|Y|=%8.1e,  |Z|=%8.1e,  |S|=%8.1e,  |V|=%8.1e,  |Q|=%8.1e\n", rmaxabsv(m, &state->current.y, _state), rmaxabsv(n, &state->current.z, _state), rmaxabsv(n, &state->current.s, _state), rmaxabsv(m, &state->current.v, _state), rmaxabsv(m, &state->current.q, _state));
-// Print variable stats, if required
-   if (state->dotrace) {
-      ae_trace("--- variable statistics ----------------------------------------------------------------------------\n");
-      ae_trace("> smallest values for nonnegative vars\n");
-      ae_trace("primal:       minG=%8.1e  minT=%8.1e  minW=%8.1e  minP=%8.1e\n", vipmsolver_minnz(&state->current.g, n, _state), vipmsolver_minnz(&state->current.t, n, _state), vipmsolver_minnz(&state->current.w, m, _state), vipmsolver_minnz(&state->current.p, m, _state));
-      ae_trace("dual:         minZ=%8.1e  minS=%8.1e  minV=%8.1e  minQ=%8.1e\n", vipmsolver_minnz(&state->current.z, n, _state), vipmsolver_minnz(&state->current.s, n, _state), vipmsolver_minnz(&state->current.v, m, _state), vipmsolver_minnz(&state->current.q, m, _state));
-      ae_trace("> min and max complementary slackness\n");
-      ae_trace("min:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", vipmsolver_minprodnz(&state->current.g, &state->current.z, n, _state), vipmsolver_minprodnz(&state->current.t, &state->current.s, n, _state), vipmsolver_minprodnz(&state->current.w, &state->current.v, m, _state), vipmsolver_minprodnz(&state->current.p, &state->current.q, m, _state));
-      ae_trace("max:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", vipmsolver_maxprodnz(&state->current.g, &state->current.z, n, _state), vipmsolver_maxprodnz(&state->current.t, &state->current.s, n, _state), vipmsolver_maxprodnz(&state->current.w, &state->current.v, m, _state), vipmsolver_maxprodnz(&state->current.p, &state->current.q, m, _state));
-   }
-// Detailed output (all variables values, not suited for high-dimensional problems)
-   if (state->dodetailedtrace) {
-      vipmsolver_vipmmultiply(state, &state->current.x, &state->current.y, &state->tmphx, &state->tmpax, &state->tmpaty, _state);
-      rsetallocv(n, 0.0, &state->tmplaggrad, _state);
-      for (i = 0; i < n; i++) {
-         if (!state->isfrozen.xB[i]) {
-            v = state->tmphx.xR[i] + state->c.xR[i] - state->tmpaty.xR[i];
-            if (state->hasgz.xB[i]) {
-               v = v - state->current.z.xR[i];
-            }
-            if (state->hasts.xB[i]) {
-               v = v + state->current.s.xR[i];
-            }
-            state->tmplaggrad.xR[i] = v;
-         }
-      }
-      ae_trace("--- printing raw data (prior to applying variable scales and shifting by XOrigin) ------------------\n");
-      ae_trace("X (raw)         = ");
-      tracevectorunscaledunshiftedautoprec(&state->current.x, n, &state->scl, true, &state->xorigin, true, _state);
-      ae_trace("\n");
-      ae_trace("--- printing scaled data (after applying variable scales and shifting by XOrigin) ------------------\n");
-      ae_trace("> reporting X, Lagrangian gradient\n");
-      ae_trace("Xnew            = ");
-      tracevectorautoprec(&state->current.x, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("Lag-grad        = ");
-      tracevectorautoprec(&state->tmplaggrad, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("--- printing new point -----------------------------------------------------------------------------\n");
-      ae_trace("> primal slacks and dual multipliers for box constraints\n");
-      ae_trace("G (L prim slck) = ");
-      tracevectorautoprec(&state->current.g, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("Z (L dual mult) = ");
-      tracevectorautoprec(&state->current.z, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("T (U prim slck) = ");
-      tracevectorautoprec(&state->current.t, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("S (U dual mult) = ");
-      tracevectorautoprec(&state->current.s, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("> primal slacks and dual multipliers for linear constraints, B/R stand for B <= Ax <= B+R\n");
-      ae_trace("Y (lag mult)    = ");
-      tracevectorautoprec(&state->current.y, 0, m, _state);
-      ae_trace("\n");
-      ae_trace("W (B prim slck) = ");
-      tracevectorautoprec(&state->current.w, 0, m, _state);
-      ae_trace("\n");
-      ae_trace("V (B dual mult) = ");
-      tracevectorautoprec(&state->current.v, 0, m, _state);
-      ae_trace("\n");
-      ae_trace("P (R prim slck) = ");
-      tracevectorautoprec(&state->current.p, 0, m, _state);
-      ae_trace("\n");
-      ae_trace("Q (R dual mult) = ");
-      tracevectorautoprec(&state->current.q, 0, m, _state);
-      ae_trace("\n");
-   }
-   ae_trace("\n");
-}
-
 // Solve QP problem.
 //
 // Inputs:
@@ -18613,8 +18195,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    *terminationtype = 0;
    n = state->n;
    m = state->mdense + state->msparse;
-   state->dotrace = ae_is_trace_enabled("IPM");
-   state->dodetailedtrace = state->dotrace && ae_is_trace_enabled("IPM.DETAILED");
 // Prepare outputs
    rsetallocv(n, 0.0, xs, _state);
    rsetallocv(n, 0.0, lagbc, _state);
@@ -18625,13 +18205,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 //   and unbounded instances, so we should check for primal stagnation a few iters
 //   before checking for dual stagnation)
    ae_assert(vipmsolver_primalstagnationlen < vipmsolver_dualstagnationlen, "VIPM: critical integrity failure - incorrect configuration parameters", _state);
-// Trace output (if needed)
-   if (state->dotrace) {
-      ae_trace("\n\n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("// IPM SOLVER STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   }
 // Prepare regularization coefficients:
 // * RegEps - one that is applied to initial (5N+5M)x(5N+5M) KKT system. This one has to be
 //   small because it perturbs solution returned by the algorithm. Essential in order to
@@ -18663,7 +18236,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    bestegap = maxrealnumber;
    besteprimal = maxrealnumber;
    bestedual = maxrealnumber;
-   vipmsolver_traceprogress(state, 0.0, 0.0, 0.0, 0.0, 0.0, _state);
    y0nrm = 0.0;
    y0nrm = maxreal(y0nrm, rmaxabsv(m, &state->current.y, _state), _state);
    y0nrm = maxreal(y0nrm, rmaxabsv(m, &state->current.v, _state), _state);
@@ -18679,16 +18251,8 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    errd2 = maxrealnumber;
    for (iteridx = 0; iteridx < vipmsolver_maxipmits; iteridx++) {
       vipmsolver_varsinitfrom(&state->x0, &state->current, _state);
-   // Trace beginning
-      if (state->dotrace) {
-         ae_trace("==== PREDICTOR-CORRECTOR STEP %2d ====\n", (int)iteridx);
-      }
    // Check regularization status, terminate if overregularized
       if (dampeps >= maxdampeps) {
-         if (state->dotrace) {
-            ae_trace("> tried to increase regularization parameter, but it is too large\n");
-            ae_trace("> it is likely that stopping conditions are too stringent, stopping at the best point found so far\n");
-         }
          *terminationtype = 7;
          break;
       }
@@ -18699,10 +18263,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       // KKT factorization failed.
       // Increase regularization parameter and skip this iteration.
          dampeps = 10 * dampeps;
-         if (state->dotrace) {
-            ae_trace("> LDLT factorization failed due to rounding errors\n");
-            ae_trace("> increasing damping coefficient to %0.2e, skipping iteration\n", dampeps);
-         }
          continue;
       }
    // Compute Mu
@@ -18713,10 +18273,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
          dampeps = 10 * dampeps;
-         if (state->dotrace) {
-            ae_trace("> affine scaling step failed to decrease residual due to rounding errors\n");
-            ae_trace("> increasing damping coefficient to %0.2e, skipping iteration\n", dampeps);
-         }
          continue;
       }
       vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltaaff, vipmsolver_steplengthdecay, &alphaaffp, &alphaaffd, _state);
@@ -18732,10 +18288,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
          dampeps = 10 * dampeps;
-         if (state->dotrace) {
-            ae_trace("> corrector step failed to decrease residual due to rounding errors\n");
-            ae_trace("> increasing damping coefficient to %0.2e, skipping iteration\n", dampeps);
-         }
          continue;
       }
       vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltacorr, vipmsolver_steplengthdecay, &alphap, &alphad, _state);
@@ -18743,16 +18295,11 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
          dampeps = 10 * dampeps;
-         if (state->dotrace) {
-            ae_trace("> step length is too short, suspecting rounding errors\n");
-            ae_trace("> increasing damping coefficient to %0.2e, skipping iteration\n", dampeps);
-         }
          continue;
       }
    // Perform a step
       vipmsolver_runintegritychecks(state, &state->current, &state->deltacorr, alphap, alphad, _state);
       vipmsolver_vipmperformstep(state, alphap, alphad, _state);
-      vipmsolver_traceprogress(state, mu, muaff, sigma, alphap, alphad, _state);
    // Check for excessive bounds (one that are so large that they are both irrelevant
    // and destabilizing due to their magnitude)
       if (dropbigbounds && iteridx >= vipmsolver_minitersbeforedroppingbounds) {
@@ -18812,12 +18359,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
                   inc(&droppedbounds, _state);
                }
             }
-         // Trace output
-            if (droppedbounds > 0) {
-               if (state->dotrace) {
-                  ae_trace("[NOTICE] detected %0d irrelevant constraints with huge bounds, X converged to values well below them, dropping...\n", (int)droppedbounds);
-               }
-            }
          }
       }
    // Check stopping criteria
@@ -18841,17 +18382,11 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          bestedual = edual;
       }
       if (bestiteridx > 0 && iteridx > bestiteridx + vipmsolver_minitersbeforeeworststagnation) {
-         if (state->dotrace) {
-            ae_trace("> worst of primal/dual/gap errors stagnated for %0d its, stopping at the best point found so far\n", (int)vipmsolver_minitersbeforeeworststagnation);
-         }
          break;
       }
       if (((egap <= state->epsgap && errp2 >= vipmsolver_stagnationdelta * preverrp2) && errpinf >= vipmsolver_primalinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
          inc(&primalstagnationcnt, _state);
          if (primalstagnationcnt >= vipmsolver_primalstagnationlen) {
-            if (state->dotrace) {
-               ae_trace("> primal error stagnated for %0d its, stopping at the best point found so far\n", (int)vipmsolver_primalstagnationlen);
-            }
             break;
          }
       } else {
@@ -18860,25 +18395,16 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       if (((egap <= state->epsgap && errd2 >= vipmsolver_stagnationdelta * preverrd2) && errdinf >= vipmsolver_dualinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
          inc(&dualstagnationcnt, _state);
          if (dualstagnationcnt >= vipmsolver_dualstagnationlen) {
-            if (state->dotrace) {
-               ae_trace("> dual error stagnated for %0d its, stopping at the best point found so far\n", (int)vipmsolver_dualstagnationlen);
-            }
             break;
          }
       } else {
          dualstagnationcnt = 0;
       }
       if (mu <= mustop && iteridx >= vipmsolver_itersfortoostringentcond) {
-         if (state->dotrace) {
-            ae_trace("> stopping conditions are too stringent, stopping at the best point found so far\n");
-         }
          *terminationtype = 7;
          break;
       }
       if ((egap <= state->epsgap && eprimal <= state->epsp) && edual <= state->epsd) {
-         if (state->dotrace) {
-            ae_trace("> stopping criteria are met\n");
-         }
          *terminationtype = 1;
          loadbest = false;
          break;
@@ -18891,9 +18417,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.w, _state), _state);
       bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
       if (rmaxabsv(m, &state->current.y, _state) >= bady && iteridx >= vipmsolver_minitersbeforeinfeasible) {
-         if (state->dotrace) {
-            ae_trace("> |Y| increased beyond %0.1e, stopping at the best point found so far\n", bady);
-         }
          break;
       }
    }
@@ -18902,9 +18425,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    // Load best point
    //
    // NOTE: TouchReal() is used to avoid spurious compiler warnings about 'set but unused'
-      if (state->dotrace) {
-         ae_trace("> the best point so far is one from iteration %0d\n", (int)bestiteridx);
-      }
       vipmsolver_varsinitfrom(&state->current, &state->best, _state);
       touchreal(&besteprimal, _state);
       touchreal(&bestedual, _state);
@@ -18919,21 +18439,12 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
       if (*terminationtype > 0 && rmaxabsv(m, &state->current.y, _state) >= bady) {
          *terminationtype = -2;
-         if (state->dotrace) {
-            ae_trace("> |Y| increased beyond %0.1e, declaring infeasibility/unboundedness\n", bady);
-         }
       }
       if (*terminationtype > 0 && besteprimal >= vipmsolver_primalinfeasible1) {
          *terminationtype = -2;
-         if (state->dotrace) {
-            ae_trace("> primal error at the best point is too high, declaring infeasibility/unboundedness\n");
-         }
       }
       if (*terminationtype > 0 && bestedual >= vipmsolver_dualinfeasible1) {
          *terminationtype = -2;
-         if (state->dotrace) {
-            ae_trace("> dual error at the best point is too high, declaring infeasibility/unboundedness\n");
-         }
       }
    }
 // Output
@@ -19195,8 +18706,6 @@ void vipmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
    ae_vector_copy(&dst->haspq, &src->haspq, _state, make_automatic);
    dst->repiterationscount = src->repiterationscount;
    dst->repncholesky = src->repncholesky;
-   dst->dotrace = src->dotrace;
-   dst->dodetailedtrace = src->dodetailedtrace;
    dst->factorizationtype = src->factorizationtype;
    dst->factorizationpoweredup = src->factorizationpoweredup;
    dst->factorizationpresent = src->factorizationpresent;
@@ -19578,31 +19087,6 @@ void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t i
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("IPM,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams);
 void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
@@ -19672,31 +19156,6 @@ void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("IPM,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams);
 void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
@@ -28149,9 +27608,6 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    double stepklagval;
    double stepknlagval;
    bool hessianupdateperformed;
-   bool dotrace;
-   bool doprobing;
-   bool dotracexd;
    double stp;
    bool result;
 // Reverse communication preparations
@@ -28172,9 +27628,6 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
       i = meritstate->rmeritphasestate.ia.xZ[6];
       j = meritstate->rmeritphasestate.ia.xZ[7];
       hessianupdateperformed = meritstate->rmeritphasestate.ba.xB[0];
-      dotrace = meritstate->rmeritphasestate.ba.xB[1];
-      doprobing = meritstate->rmeritphasestate.ba.xB[2];
-      dotracexd = meritstate->rmeritphasestate.ba.xB[3];
       v = meritstate->rmeritphasestate.ra.xR[0];
       vv = meritstate->rmeritphasestate.ra.xR[1];
       mx = meritstate->rmeritphasestate.ra.xR[2];
@@ -28195,9 +27648,6 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
       i = -413;
       j = -461;
       hessianupdateperformed = true;
-      dotrace = true;
-      doprobing = false;
-      dotracexd = false;
       v = 306;
       vv = -1011;
       mx = 951;
@@ -28228,14 +27678,7 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   dotrace = ae_is_trace_enabled("SQP");
-   dotracexd = dotrace && ae_is_trace_enabled("SQP.DETAILED");
-   doprobing = ae_is_trace_enabled("SQP.PROBING");
    ae_assert(meritstate->lagmult.cnt >= nec + nic + nlec + nlic, "MeritPhaseIteration: integrity check failed", _state);
-// Report iteration beginning
-   if (dotrace) {
-      ae_trace("\n--- quadratic step ---------------------------------------------------------------------------------\n");
-   }
 // Default decision is to continue algorithm
    meritstate->status = 1;
    meritstate->increasebigc = false;
@@ -28243,14 +27686,8 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
 // Determine step direction using initial quadratic model.
 // Update penalties vector with current Lagrange multipliers.
    if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->d, &meritstate->lagmult, &j, _state)) {
-      if (dotrace) {
-         ae_trace("> [WARNING] QP subproblem failed with TerminationType=%0d\n", (int)j);
-      }
       result = false;
       return result;
-   }
-   if (dotrace) {
-      ae_trace("> QP subproblem solved with TerminationType=%0d\n", (int)j);
    }
    for (i = 0; i < nec + nic + nlec + nlic; i++) {
       meritstate->penalties.xR[i] = maxreal(meritstate->penalties.xR[i], ae_fabs(meritstate->lagmult.xR[i], _state), _state);
@@ -28274,9 +27711,6 @@ lbl_0:
    // Failed to retrieve func/Jac, infinities detected
       state->repterminationtype = -8;
       meritstate->status = 0;
-      if (dotrace) {
-         ae_trace("[ERROR] infinities in target/constraints are detected\n");
-      }
       result = false;
       return result;
    }
@@ -28289,9 +27723,6 @@ lbl_0:
 // * use original model of the target
 // * extrapolate model of nonlinear constraints at StepKX+D back to origin
 //
-   if (dotrace) {
-      ae_trace("> preparing second-order correction\n");
-   }
    meritstate->stepkfic.xR[0] = meritstate->stepkfi.xR[0];
    for (j = 0; j < n; j++) {
       meritstate->stepkjc.xyR[0][j] = meritstate->stepkj.xyR[0][j];
@@ -28305,14 +27736,8 @@ lbl_0:
       meritstate->stepkfic.xR[i] = meritstate->stepkfin.xR[i] - v;
    }
    if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfic, &meritstate->stepkjc, &meritstate->dx, &meritstate->dummylagmult, &j, _state)) {
-      if (dotrace) {
-         ae_trace("> [WARNING] second-order QP subproblem failed\n");
-      }
       result = false;
       return result;
-   }
-   if (dotrace) {
-      ae_trace("> second-order QP subproblem solved with TerminationType=%0d\n", (int)j);
    }
    for (i = 0; i < n; i++) {
       meritstate->d.xR[i] = meritstate->dx.xR[i];
@@ -28339,9 +27764,6 @@ lbl_1:
    // Failed to retrieve func/Jac, infinities detected
       state->repterminationtype = -8;
       meritstate->status = 0;
-      if (dotrace) {
-         ae_trace("[ERROR] infinities in target/constraints are detected\n");
-      }
       result = false;
       return result;
    }
@@ -28376,9 +27798,6 @@ lbl_4:
    // User requested termination, break before we move to new point
       state->repterminationtype = 8;
       meritstate->status = 0;
-      if (dotrace) {
-         ae_trace("> user requested termination\n");
-      }
       result = false;
       return result;
    }
@@ -28419,15 +27838,10 @@ lbl_4:
          meritstate->increasebigc = meritstate->increasebigc || ae_fabs(v, _state) > vv;
       }
    }
-// Trace
-   if (!dotrace) {
-      goto lbl_8;
-   }
+   goto lbl_8;
 // Perform agressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
-   if (!doprobing) {
-      goto lbl_10;
-   }
+   goto lbl_10;
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad, _state);
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, _state);
 lbl_12:
@@ -28458,13 +27872,6 @@ lbl_2:
    goto lbl_12;
 lbl_13:
    smoothnessmonitorfinalizelinesearch(smonitor, _state);
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |   probing search direction suggested by QP subproblem    |\n");
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |  Step  | Lagrangian (unaugmentd)|    Target  function    |\n");
-   ae_trace("*** |along  D|     must be smooth     |     must be smooth     |\n");
-   ae_trace("*** |        | function   |    slope  | function   |    slope  |\n");
-   smoothnessmonitortraceprobingresults(smonitor, _state);
 lbl_10:
 // Update debug curvature information - TraceGamma[]
    v = 0.0;
@@ -28481,7 +27888,6 @@ lbl_10:
          for (j = 0; j < n; j++) {
             vv = vv + (meritstate->stepkjn.xyR[i][j] - meritstate->stepkj.xyR[i][j]) * (meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j]);
          }
-         state->tracegamma.xR[i] = maxreal(state->tracegamma.xR[i], ae_fabs(vv / (v + 100 * n * machineepsilon * machineepsilon), _state), _state);
       }
    }
 // Output other information
@@ -28489,42 +27895,18 @@ lbl_10:
    for (i = 0; i < n; i++) {
       mx = maxreal(mx, ae_fabs(meritstate->d.xR[i], _state) / state->trustrad, _state);
    }
-   if (localstp > 0.0) {
-      ae_trace("> nonzero linear step was performed\n");
-   } else {
-      ae_trace("> zero linear step was performed\n");
-   }
-   ae_trace("max(|Di|)/TrustRad = %0.6f\n", mx);
-   ae_trace("stp = %0.6f\n", localstp);
-   if (dotracexd) {
-      ae_trace("X0 (scaled) = ");
-      tracevectorautoprec(&meritstate->stepkx, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("D  (scaled) = ");
-      tracevectorautoprec(&meritstate->d, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("X1 (scaled) = ");
-      tracevectorautoprec(&meritstate->stepkxn, 0, n, _state);
-      ae_trace("\n");
-   }
-   ae_trace("meritF:         %14.6e -> %14.6e (delta=%11.3e)\n", f0, f1, f1 - f0);
-   ae_trace("scaled-targetF: %14.6e -> %14.6e (delta=%11.3e)\n", meritstate->stepkfi.xR[0], meritstate->stepkfin.xR[0], meritstate->stepkfin.xR[0] - meritstate->stepkfi.xR[0]);
-   ae_trace("> evaluating possible Hessian update\n");
    v = 0.0;
    for (i = 0; i < n; i++) {
       v = v + (meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * (meritstate->stepknlaggrad.xR[i] - meritstate->stepklaggrad.xR[i]);
    }
-   ae_trace("(Sk,Yk)     = %0.3e\n", v);
    v = 0.0;
    for (i = 0; i < n; i++) {
       v = v + sqr(meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i], _state);
    }
-   ae_trace("(Sk,Sk)     = %0.3e\n", v);
    v = 0.0;
    for (i = 0; i < n; i++) {
       v = v + sqr(meritstate->stepknlaggrad.xR[i] - meritstate->stepklaggrad.xR[i], _state);
    }
-   ae_trace("(Yk,Yk)     = %0.3e\n", v);
    v = 0.0;
    for (i = 0; i < n; i++) {
       v = v + sqr(meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i], _state) * state->subsolver.h.xyR[i][i];
@@ -28532,39 +27914,19 @@ lbl_10:
          v = v + 2 * (meritstate->stepkxn.xR[i] - meritstate->stepkx.xR[i]) * state->subsolver.h.xyR[i][j] * (meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j]);
       }
    }
-   ae_trace("Sk*Bk*Sk    = %0.3e\n", v);
    v = state->subsolver.h.xyR[0][0];
    for (i = 0; i < n; i++) {
       v = minreal(v, state->subsolver.h.xyR[i][i], _state);
    }
-   ae_trace("mindiag(Bk) = %0.3e\n", v);
    v = state->subsolver.h.xyR[0][0];
    for (i = 0; i < n; i++) {
       v = maxreal(v, state->subsolver.h.xyR[i][i], _state);
    }
-   ae_trace("maxdiag(Bk) = %0.3e\n", v);
 lbl_8:
 // Perform Hessian update
    hessianupdateperformed = false;
    if (localstp > 0.0) {
       hessianupdateperformed = nlcsqp_qpsubproblemupdatehessian(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepklaggrad, &meritstate->stepkxn, &meritstate->stepknlaggrad, _state);
-   }
-   if (dotrace) {
-      if (hessianupdateperformed) {
-         ae_trace("> Hessian updated\n");
-         v = state->subsolver.h.xyR[0][0];
-         for (i = 0; i < n; i++) {
-            v = minreal(v, state->subsolver.h.xyR[i][i], _state);
-         }
-         ae_trace("mindiag(Bk) = %0.3e\n", v);
-         v = state->subsolver.h.xyR[0][0];
-         for (i = 0; i < n; i++) {
-            v = maxreal(v, state->subsolver.h.xyR[i][i], _state);
-         }
-         ae_trace("maxdiag(Bk) = %0.3e\n", v);
-      } else {
-         ae_trace("> skipping Hessian update\n");
-      }
    }
 // Move to new point
    stp = localstp;
@@ -28598,9 +27960,6 @@ lbl_rcomm:
    meritstate->rmeritphasestate.ia.xZ[6] = i;
    meritstate->rmeritphasestate.ia.xZ[7] = j;
    meritstate->rmeritphasestate.ba.xB[0] = hessianupdateperformed;
-   meritstate->rmeritphasestate.ba.xB[1] = dotrace;
-   meritstate->rmeritphasestate.ba.xB[2] = doprobing;
-   meritstate->rmeritphasestate.ba.xB[3] = dotracexd;
    meritstate->rmeritphasestate.ra.xR[0] = v;
    meritstate->rmeritphasestate.ra.xR[1] = vv;
    meritstate->rmeritphasestate.ra.xR[2] = mx;
@@ -28681,7 +28040,6 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    rmatrixsetlengthatleast(&state->step0j, 1 + nlec + nlic, n, _state);
    rmatrixsetlengthatleast(&state->stepkj, 1 + nlec + nlic, n, _state);
    rvectorsetlengthatleast(&state->fscales, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->tracegamma, 1 + nlec + nlic, _state);
    rvectorsetlengthatleast(&state->dummylagmult, nec + nic + nlec + nlic, _state);
    bvectorsetlengthatleast(&state->hasbndl, n, _state);
    bvectorsetlengthatleast(&state->hasbndu, n, _state);
@@ -28791,8 +28149,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    double prevtrustrad;
    ae_int_t subiterationidx;
    bool trustradstagnated;
-   bool dotrace;
-   bool dodetailedtrace;
    bool increasebigc;
    bool result;
 // Reverse communication preparations
@@ -28815,8 +28171,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
       status = state->rstate.ia.xZ[8];
       subiterationidx = state->rstate.ia.xZ[9];
       trustradstagnated = state->rstate.ba.xB[0];
-      dotrace = state->rstate.ba.xB[1];
-      dodetailedtrace = state->rstate.ba.xB[2];
       increasebigc = state->rstate.ba.xB[3];
       v = state->rstate.ra.xR[0];
       vv = state->rstate.ra.xR[1];
@@ -28837,8 +28191,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
       status = 809;
       subiterationidx = 205;
       trustradstagnated = false;
-      dotrace = true;
-      dodetailedtrace = false;
       increasebigc = true;
       v = -541;
       vv = -698;
@@ -28864,8 +28216,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   dotrace = ae_is_trace_enabled("SQP");
-   dodetailedtrace = dotrace && ae_is_trace_enabled("SQP.DETAILED");
 // Prepare rcomm interface
    state->needfij = false;
    state->xupdated = false;
@@ -28881,7 +28231,6 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    state->trustrad = nlcsqp_inittrustrad;
    for (i = 0; i <= nlec + nlic; i++) {
       state->fscales.xR[i] = 1.0;
-      state->tracegamma.xR[i] = 0.0;
    }
    state->haslagmult = false;
 // Avoid spurious warnings about possibly uninitialized vars
@@ -28913,13 +28262,6 @@ lbl_1:
    state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
-// Trace output (if needed)
-   if (dotrace) {
-      ae_trace("\n\n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("//  SQP SOLVER STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   }
 // Perform outer (NLC) iterations
    state->bigc = 500.0;
    nlcsqp_initqpsubsolver(state, &state->subsolver, _state);
@@ -28961,53 +28303,7 @@ lbl_3:
             state->stepkj.xyR[i][j] = state->stepkj.xyR[i][j] * multiplyby;
          }
          state->fscales.xR[i] = setscaleto;
-         state->tracegamma.xR[i] = state->tracegamma.xR[i] * multiplyby;
       }
-   }
-// Trace output (if needed)
-   if (dotrace) {
-      ae_trace("\n==== OUTER ITERATION %5d STARTED ====\n", (int)state->repiterationscount);
-      if (dodetailedtrace) {
-         ae_trace("> printing raw data (prior to applying variable and function scales)\n");
-         ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, true, &state->s, false, _state);
-         ae_trace("\n");
-         ae_trace("> printing scaled data (after applying variable and function scales)\n");
-         ae_trace("X (scaled)    = ");
-         tracevectorautoprec(&state->step0x, 0, n, _state);
-         ae_trace("\n");
-         ae_trace("FScales       = ");
-         tracevectorautoprec(&state->fscales, 0, 1 + nlec + nlic, _state);
-         ae_trace("\n");
-         ae_trace("GammaScl      = ");
-         tracevectorautoprec(&state->tracegamma, 0, 1 + nlec + nlic, _state);
-         ae_trace("\n");
-         ae_trace("Fi (scaled)   = ");
-         tracevectorautoprec(&state->stepkfi, 0, 1 + nlec + nlic, _state);
-         ae_trace("\n");
-         ae_trace("|Ji| (scaled) = ");
-         tracerownrm1autoprec(&state->stepkj, 0, 1 + nlec + nlic, 0, n, _state);
-         ae_trace("\n");
-      }
-      mx = 0.0;
-      for (i = 1; i <= nlec; i++) {
-         mx = maxreal(mx, ae_fabs(state->stepkfi.xR[i], _state), _state);
-      }
-      for (i = nlec + 1; i <= nlec + nlic; i++) {
-         mx = maxreal(mx, state->stepkfi.xR[i], _state);
-      }
-      ae_trace("trustRad      = %0.3e\n", state->trustrad);
-      ae_trace("lin.violation = %0.3e    (scaled violation of linear constraints)\n", state->replcerr);
-      ae_trace("nlc.violation = %0.3e    (scaled violation of nonlinear constraints)\n", mx);
-      ae_trace("gamma0        = %0.3e    (Hessian 2-norm estimate for target)\n", state->tracegamma.xR[0]);
-      j = 0;
-      for (i = 0; i <= nlec + nlic; i++) {
-         if (state->tracegamma.xR[i] > state->tracegamma.xR[j]) {
-            j = i;
-         }
-      }
-      ae_trace("gammaMax      = %0.3e    (maximum over Hessian 2-norm estimates for target/constraints)\n", state->tracegamma.xR[j]);
-      ae_trace("arg(gammaMax) = %0d             (function index; 0 for target, >0 for nonlinear constraints)\n", (int)j);
    }
 // PHASE 2
 //
@@ -29078,26 +28374,6 @@ lbl_6:
       state->trustradstagnationcnt = 0;
       trustradstagnated = true;
    }
-// Trace
-   if (dotrace) {
-      ae_trace("\n--- outer iteration ends ---------------------------------------------------------------------------\n");
-      ae_trace("deltaMax    = %0.3f (ratio of step length to trust radius)\n", deltamax);
-      ae_trace("newTrustRad = %0.3e", state->trustrad);
-      if (!trustradstagnated) {
-         if (state->trustrad > prevtrustrad) {
-            ae_trace(", trust radius increased");
-         }
-         if (state->trustrad < prevtrustrad) {
-            ae_trace(", trust radius decreased");
-         }
-      } else {
-         ae_trace(", trust radius forcibly decreased due to stagnation for %0d iterations", (int)nlcsqp_trustradstagnationlimit);
-      }
-      ae_trace("\n");
-      if (increasebigc) {
-         ae_trace("BigC        = %0.3e (short step was performed, but some constraints are still infeasible - increasing)\n", state->bigc);
-      }
-   }
 // Advance outer iteration counter, test stopping criteria
    inc(&state->repiterationscount, _state);
    if (ae_fabs(state->stepkfi.xR[0] - state->step0fi.xR[0], _state) <= nlcsqp_stagnationepsf * ae_fabs(state->step0fi.xR[0], _state)) {
@@ -29107,28 +28383,18 @@ lbl_6:
    }
    if (state->trustrad <= state->epsx) {
       state->repterminationtype = 2;
-      if (dotrace) {
-         ae_trace("> stopping condition met: trust radius is smaller than %0.3e\n", state->epsx);
-      }
       goto lbl_4;
    }
    if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
       state->repterminationtype = 5;
-      if (dotrace) {
-         ae_trace("> stopping condition met: %0d iterations performed\n", (int)state->repiterationscount);
-      }
       goto lbl_4;
    }
    if (state->fstagnationcnt >= nlcsqp_fstagnationlimit) {
       state->repterminationtype = 7;
-      if (dotrace) {
-         ae_trace("> stopping criteria are too stringent: F stagnated for %0d its, stopping\n", (int)state->fstagnationcnt);
-      }
       goto lbl_4;
    }
    goto lbl_3;
 lbl_4:
-   smoothnessmonitortracestatus(smonitor, dotrace, _state);
    result = false;
    return result;
 // Saving state
@@ -29145,8 +28411,6 @@ lbl_rcomm:
    state->rstate.ia.xZ[8] = status;
    state->rstate.ia.xZ[9] = subiterationidx;
    state->rstate.ba.xB[0] = trustradstagnated;
-   state->rstate.ba.xB[1] = dotrace;
-   state->rstate.ba.xB[2] = dodetailedtrace;
    state->rstate.ba.xB[3] = increasebigc;
    state->rstate.ra.xR[0] = v;
    state->rstate.ra.xR[1] = vv;
@@ -29391,7 +28655,6 @@ void minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    ae_vector_init(&p->dummylagmult, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->abslagmemory, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fscales, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->tracegamma, 0, DT_REAL, _state, make_automatic);
    minsqpsubsolver_init(&p->subsolver, _state, make_automatic);
    minsqptmpmerit_init(&p->tmpmerit, _state, make_automatic);
    rcommstate_init(&p->rstate, _state, make_automatic);
@@ -29438,7 +28701,6 @@ void minsqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
    ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, _state, make_automatic);
    ae_matrix_copy(&dst->abslagmemory, &src->abslagmemory, _state, make_automatic);
    ae_vector_copy(&dst->fscales, &src->fscales, _state, make_automatic);
-   ae_vector_copy(&dst->tracegamma, &src->tracegamma, _state, make_automatic);
    minsqpsubsolver_copy(&dst->subsolver, &src->subsolver, _state, make_automatic);
    minsqptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, _state, make_automatic);
    dst->repsimplexiterations = src->repsimplexiterations;
@@ -29482,7 +28744,6 @@ void minsqpstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->dummylagmult, make_automatic);
    ae_matrix_free(&p->abslagmemory, make_automatic);
    ae_vector_free(&p->fscales, make_automatic);
-   ae_vector_free(&p->tracegamma, make_automatic);
    minsqpsubsolver_free(&p->subsolver, make_automatic);
    minsqptmpmerit_free(&p->tmpmerit, make_automatic);
    rcommstate_free(&p->rstate, make_automatic);
@@ -30880,9 +30141,6 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
    ae_assert(m > 0, "PricingStep: M <= 0", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // Pricing
    if (settings->pricing == 0) {
    // "Most infeasible" pricing
@@ -30930,15 +30188,6 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
                continue;
             }
          }
-      }
-   // Trace/profile
-      if (state->dotrace) {
-         ae_trace("> pricing: most infeasible variable removed\n");
-         ae_trace("P           = %12d (R=%0d)\n", (int)*p, (int)*r);
-         ae_trace("Delta       = %12.3e\n", *delta);
-      }
-      if (state->dotimers) {
-         state->repdualpricingtime = state->repdualpricingtime + (tickcount() - t0);
       }
    // Done
       return;
@@ -30992,16 +30241,6 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
                continue;
             }
          }
-      }
-   // Trace/profile
-      if (state->dotrace) {
-         ae_trace("> dual steepest edge pricing: leaving variable found\n");
-         ae_trace("P           = %12d  (variable index)\n", (int)*p);
-         ae_trace("R           = %12d  (variable index in basis)\n", (int)*r);
-         ae_trace("Delta       = %12.3e  (primal infeasibility removed)\n", *delta);
-      }
-      if (state->dotimers) {
-         state->repdualpricingtime = state->repdualpricingtime + (tickcount() - t0);
       }
    // Done
       return;
@@ -31073,9 +30312,6 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
    ae_assert(m > 0, "BTranStep: M <= 0", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // BTran
    rvectorsetlengthatleast(&state->btrantmp0, m, _state);
    rvectorsetlengthatleast(&state->btrantmp1, m, _state);
@@ -31087,10 +30323,6 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
    reviseddualsimplex_dvalloc(rhor, m, _state);
    reviseddualsimplex_basissolvet(&state->basis, &state->btrantmp0, &rhor->dense, &state->btrantmp1, _state);
    reviseddualsimplex_dvdensetosparse(rhor, _state);
-// Timers
-   if (state->dotimers) {
-      state->repdualbtrantime = state->repdualbtrantime + (tickcount() - t0);
-   }
 }
 
 // Initializes vector, sets all internal arrays to length  N  and  zero-fills
@@ -31169,9 +30401,6 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
    ae_assert(m > 0, "BTranStep: M <= 0", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // Determine operation counts for columnwise and rowwise approaches
    avgrowwise = rhor->k * ((double)state->at.ridx.xZ[nx] / m);
    avgcolwise = ns * ((double)state->at.ridx.xZ[nx] / nx);
@@ -31226,14 +30455,6 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
       alphar->k = alphark;
       reviseddualsimplex_dvsparsetodense(alphar, _state);
    }
-// Timers and tracing
-   if (state->dodetailedtrace) {
-      reviseddualsimplex_updateavgcounter(rhor->k / coalesce((double)rhor->n, 1.0, _state), &state->repfillrhor, &state->repfillrhorcnt, _state);
-      reviseddualsimplex_updateavgcounter(alphar->k / coalesce((double)alphar->n, 1.0, _state), &state->repfillpivotrow, &state->repfillpivotrowcnt, _state);
-   }
-   if (state->dotimers) {
-      state->repdualpivotrowtime = state->repdualpivotrowtime + (tickcount() - t0);
-   }
 }
 
 // This function performs FTran step
@@ -31259,9 +30480,6 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
    ae_assert(m > 0, "BTranStep: M <= 0", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // FTran
    rvectorsetlengthatleast(&state->ftrantmp0, m, _state);
    for (i = 0; i < m; i++) {
@@ -31276,10 +30494,6 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
    ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "FTran: unexpected Settings.Pricing", _state);
    if (settings->pricing == 1) {
       reviseddualsimplex_basissolve(&state->basis, &rhor->dense, tau, &state->ftrantmp1, _state);
-   }
-// Timers
-   if (state->dotimers) {
-      state->repdualftrantime = state->repdualftrantime + (tickcount() - t0);
    }
 }
 
@@ -31329,9 +30543,6 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
    ae_assert(s->state == reviseddualsimplex_ssvalid, "RatioTest: invalid X", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // Clear output
    *q = -1;
    *alpharpiv = 0.0;
@@ -31360,14 +30571,6 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          *q = nj;
          *thetad = 0.0;
          *alpharpiv = alphar->vals.xR[j];
-         if (state->dotrace) {
-            ae_trace("> ratio test: quick exit, found free nonbasic variable\n");
-            ae_trace("Q           = %12d  (variable selected)\n", (int)*q);
-            ae_trace("ThetaD      = %12.3e  (dual step length)\n", *thetad);
-         }
-         if (state->dotimers) {
-            state->repdualratiotesttime = state->repdualratiotesttime + (tickcount() - t0);
-         }
          return;
       }
    // Handle lower/upper/range constraints
@@ -31409,16 +30612,6 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          }
       }
       reviseddualsimplex_shifting(state, s, alphar, delta, *q, *alpharpiv, thetad, settings, _state);
-   // Trace
-      if (state->dotrace) {
-         ae_trace("> dual ratio test:\n");
-         ae_trace("|E|         = %12d  (eligible set size)\n", (int)originaleligiblecnt);
-         ae_trace("Q           = %12d  (variable selected)\n", (int)*q);
-         ae_trace("ThetaD      = %12.3e  (dual step length)\n", *thetad);
-      }
-      if (state->dotimers) {
-         state->repdualratiotesttime = state->repdualratiotesttime + (tickcount() - t0);
-      }
    // Done
       return;
    }
@@ -31427,9 +30620,6 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       adelta = ae_fabs(delta, _state);
    // Quick exit
       if (eligiblecnt == 0) {
-         if (state->dotrace) {
-            ae_trace("> ratio test: quick exit, no eligible variables\n");
-         }
          return;
       }
    // BFRT
@@ -31477,17 +30667,6 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       ae_assert(*q >= 0, "RatioTest: unexpected failure", _state);
       *thetad = s->d.xR[*q] / (*alpharpiv);
       reviseddualsimplex_shifting(state, s, alphar, delta, *q, *alpharpiv, thetad, settings, _state);
-   // Trace
-      if (state->dotrace) {
-         ae_trace("> dual bounds flipping ratio test:\n");
-         ae_trace("|E|         = %12d  (eligible set size)\n", (int)originaleligiblecnt);
-         ae_trace("Q           = %12d  (variable selected)\n", (int)*q);
-         ae_trace("ThetaD      = %12.3e  (dual step length)\n", *thetad);
-         ae_trace("Flips       = %12d  (possible bound flips)\n", (int)state->possibleflipscnt);
-      }
-      if (state->dotimers) {
-         state->repdualratiotesttime = state->repdualratiotesttime + (tickcount() - t0);
-      }
    // Done
       return;
    }
@@ -31845,9 +31024,6 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    ae_assert(alphapiv != 0.0, "UpdateStep: AlphaPiv=0", _state);
 // Timers
    t0 = 0;
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
 // Prepare
    dir = sign(delta, _state);
    alpharlen = alphar->k;
@@ -31935,15 +31111,6 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    reviseddualsimplex_basisupdatetrf(&state->basis, &state->at, p, q, alphaq, alphaqim, r, tau, settings, _state);
 // Update cached variables
    reviseddualsimplex_cacheboundinfo(s, r, q, settings, _state);
-// Tracing and timers
-   if (state->dodetailedtrace) {
-      if (state->basis.trftype == 3) {
-         reviseddualsimplex_updateavgcounter(reviseddualsimplex_sparsityof(&state->basis.densemu, state->basis.trfage * m, _state), &state->repfilldensemu, &state->repfilldensemucnt, _state);
-      }
-   }
-   if (state->dotimers) {
-      state->repdualupdatesteptime = state->repdualupdatesteptime + (tickcount() - t0);
-   }
 }
 
 // This function performs several checks for accumulation of errors during
@@ -32107,23 +31274,10 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
    *info = 0;
    rvectorsetlengthatleast(&state->tmp0, m, _state);
    while (true) {
-   // Iteration report
-      if (state->dotrace) {
-         i = state->repiterationscount2;
-         if (isphase1) {
-            i = state->repiterationscount1;
-         }
-         ae_trace("==== ITERATION %5d STARTED ====\n", (int)i);
-         if (state->dodetailedtrace) {
-         }
-      }
    // Pricing
       reviseddualsimplex_pricingstep(state, s, isphase1, &p, &r, &delta, settings, _state);
       if (delta == 0.0) {
       // Solved! Feasible and bounded!
-         if (state->dotrace) {
-            ae_trace("> pricing: feasible point found\n");
-         }
          reviseddualsimplex_recombinebasicnonbasicx(s, &state->basis, _state);
          *info = 1;
          return;
@@ -32138,9 +31292,6 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
       // Do we have fresh factorization and state? If not,
       // refresh them prior to declaring that we have no solution.
          if (state->basis.trfage > 0 && forcedrestarts < reviseddualsimplex_maxforcedrestarts) {
-            if (state->dotrace) {
-               ae_trace("> ratio test: failed, basis is old (age=%0d), forcing restart (%0d of %0d)\n", (int)state->basis.trfage, (int)forcedrestarts, (int)(reviseddualsimplex_maxforcedrestarts - 1));
-            }
             reviseddualsimplex_basisfreshtrf(&state->basis, &state->at, settings, _state);
             reviseddualsimplex_subproblemhandlexnupdate(state, s, _state);
             reviseddualsimplex_offloadbasiccomponents(s, &state->basis, settings, _state);
@@ -32148,9 +31299,6 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
             continue;
          }
       // Dual unbounded, primal infeasible
-         if (state->dotrace) {
-            ae_trace("> ratio test: failed, results are accepted\n");
-         }
          reviseddualsimplex_recombinebasicnonbasicx(s, &state->basis, _state);
          *info = -3;
          return;
@@ -32165,9 +31313,6 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
       alphaqpiv = state->alphaq.xR[r];
    // Check numerical accuracy, trigger refactorization if needed
       if (reviseddualsimplex_refactorizationrequired(state, s, q, alpharpiv, r, alphaqpiv, _state)) {
-         if (state->dotrace) {
-            ae_trace("> refactorization test: numerical errors are too large, forcing refactorization and restart\n");
-         }
          reviseddualsimplex_basisfreshtrf(&state->basis, &state->at, settings, _state);
          reviseddualsimplex_subproblemhandlexnupdate(state, s, _state);
          reviseddualsimplex_offloadbasiccomponents(s, &state->basis, settings, _state);
@@ -32281,13 +31426,6 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
    *info = 1;
    rvectorsetlengthatleast(&state->tmp0, m, _state);
    while (true) {
-   // Iteration report
-      if (state->dotrace) {
-         i = state->repiterationscount3;
-         ae_trace("==== ITERATION %5d STARTED ====\n", (int)i);
-         if (state->dodetailedtrace) {
-         }
-      }
    // Primal simplex pricing step: we implement the very basic version
    // of the pricing step because it is expected that primal simplex method
    // is used just to apply quick correction after removal of the perturbation.
@@ -32354,17 +31492,9 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
       }
       if (vmax <= settings->dtolabs) {
       // Solved: primal and dual feasible!
-         if (state->dotrace) {
-            ae_trace("> primal pricing: feasible point found\n");
-         }
          return;
       }
       ae_assert(q >= 0, "SolveSubproblemPrimal: integrity check failed", _state);
-      if (state->dotrace) {
-         ae_trace("> primal pricing: found entering variable\n");
-         ae_trace("Q           = %12d  (variable selected)\n", (int)q);
-         ae_trace("|D|         = %12.3e  (dual infeasibility)\n", vmax);
-      }
    // FTran and textbook ratio test (again, we expect primal phase to terminate quickly)
    //
    // NOTE: AlphaQim is filled by intermediate FTran result which is useful
@@ -32422,16 +31552,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
       if (p < 0 && !haslim) {
       // Primal unbounded
          *info = -4;
-         if (state->dotrace) {
-            ae_trace("> primal ratio test: dual infeasible, primal unbounded\n");
-         }
          return;
-      }
-      if (state->dotrace) {
-         ae_trace("> primal ratio test: found leaving variable\n");
-         ae_trace("P           = %12d  (variable index)\n", (int)p);
-         ae_trace("R           = %12d  (variable index in basis)\n", (int)r);
-         ae_trace("ThetaP      = %12.3e  (primal step length)\n", thetap);
       }
    // Update step
       if (p >= 0 && (!haslim || thetap < lim)) {
@@ -32502,49 +31623,21 @@ static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplex
    ae_assert(state->primary.state == reviseddualsimplex_ssvalid, "InvokePhase1: invalid primary X", _state);
    ae_assert(m > 0, "InvokePhase1: M <= 0", _state);
 // Is it dual feasible from the very beginning (or maybe after initial DFC)?
-   if (state->dotrace) {
-      ae_trace("> performing initial dual feasibility correction...\n");
-   }
    dualerr = reviseddualsimplex_initialdualfeasibilitycorrection(state, &state->primary, settings, _state);
-   if (state->dotrace) {
-      ae_trace("> initial dual feasibility correction done\ndualErr = %0.3e\n", dualerr);
-   }
    if (dualerr <= settings->dtolabs) {
-      if (state->dotrace) {
-         ae_trace("> solution is dual feasible, phase 1 is done\n");
-      }
       state->repterminationtype = 1;
       return;
    }
-   if (state->dotrace) {
-      ae_trace("> solution is not dual feasible, proceeding to full-scale phase 1\n");
-      ae_trace("\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("*   PHASE 1 OF DUAL SIMPLEX SOLVER                                                                 *\n");
-      ae_trace("****************************************************************************************************\n");
-   }
 // Solve phase #1 subproblem
    reviseddualsimplex_subprobleminitphase1(&state->primary, &state->basis, &state->phase1, _state);
-   if (state->dotrace) {
-      ae_trace("> performing phase 1 dual feasibility correction...\n");
-   }
    dualerr = reviseddualsimplex_initialdualfeasibilitycorrection(state, &state->phase1, settings, _state);
-   if (state->dotrace) {
-      ae_trace("> phase 1 dual feasibility correction done\ndualErr = %0.3e\n", dualerr);
-   }
    reviseddualsimplex_solvesubproblemdual(state, &state->phase1, true, settings, &state->repterminationtype, _state);
    ae_assert(state->repterminationtype > 0, "DualSimplexSolver: unexpected failure of phase #1", _state);
    state->repterminationtype = 1;
 // Setup initial basis for phase #2 using solution of phase #1
-   if (state->dotrace) {
-      ae_trace("> setting up phase 2 initial solution\n");
-   }
    reviseddualsimplex_subprobleminferinitialxn(state, &state->primary, _state);
    dualerr = reviseddualsimplex_initialdualfeasibilitycorrection(state, &state->primary, settings, _state);
    if (dualerr > settings->dtolabs) {
-      if (state->dotrace) {
-         ae_trace("> initial dual feasibility correction failed! terminating...\n");
-      }
       state->repterminationtype = -4;
       return;
    }
@@ -32799,10 +31892,6 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    t0 = 0;
 // Handle case when M=0; after this block we assume that M>0.
    if (m == 0) {
-   // Trace
-      if (state->dotrace) {
-         ae_trace("> box-only LP problem, quick solution\n");
-      }
    // Solve
       reviseddualsimplex_solveboxonly(state, _state);
       ae_frame_leave(_state);
@@ -32812,9 +31901,6 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    for (j = 0; j < nx; j++) {
       if (state->primary.bndt.xZ[j] == reviseddualsimplex_ccinfeasible) {
       // Set error flag and generate some point to return
-         if (state->dotrace) {
-            ae_trace("[WARNING] infeasible box constraint (or range constraint with AL>AU) found, terminating\n");
-         }
          state->repterminationtype = -3;
          reviseddualsimplex_setzeroxystats(state, _state);
          ae_frame_leave(_state);
@@ -32843,42 +31929,18 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
       reviseddualsimplex_subproblemhandlexnupdate(state, &state->primary, _state);
    }
    ae_assert(state->primary.state == reviseddualsimplex_ssvalid, "DSS: integrity check failed (init)", _state);
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
    reviseddualsimplex_invokephase1(state, settings, _state);
-   if (state->dotimers) {
-      state->repphase1time = tickcount() - t0;
-   }
    if (state->repterminationtype <= 0) {
    // Primal unbounded, dual infeasible
       ae_assert(state->repterminationtype == -4, "DSS: integrity check for InvokePhase1() result failed", _state);
-      if (state->dotrace) {
-         ae_trace("> the problem is dual infeasible, primal unbounded\n> done\n");
-      }
       reviseddualsimplex_setxydstats(state, &state->primary, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats, _state);
       ae_frame_leave(_state);
       return;
    }
-   if (state->dotrace) {
-      ae_trace("\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("*   PHASE 2 OF DUAL SIMPLEX SOLVER                                                                 *\n");
-      ae_trace("****************************************************************************************************\n");
-   }
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
    reviseddualsimplex_solvesubproblemdual(state, &state->primary, false, settings, &state->repterminationtype, _state);
-   if (state->dotimers) {
-      state->repphase2time = tickcount() - t0;
-   }
    if (state->repterminationtype <= 0) {
    // Primal infeasible
       ae_assert(state->repterminationtype == -3, "DSS: integrity check for SolveSubproblemDual() result failed", _state);
-      if (state->dotrace) {
-         ae_trace("> the problem is primal infeasible\n> done\n");
-      }
       reviseddualsimplex_setxydstats(state, &state->primary, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats, _state);
       ae_frame_leave(_state);
       return;
@@ -32886,15 +31948,6 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
 // Remove perturbation from the cost vector,
 // then use primal simplex to enforce dual feasibility
 // after removal of the perturbation (if necessary).
-   if (state->dotrace) {
-      ae_trace("\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("*   PHASE 3 OF DUAL SIMPLEX SOLVER (perturbation removed from cost vector)                         *\n");
-      ae_trace("****************************************************************************************************\n");
-   }
-   if (state->dotimers) {
-      t0 = tickcount();
-   }
    reviseddualsimplex_subprobleminitphase3(&state->primary, &state->phase3, _state);
    for (i = 0; i < nx; i++) {
       state->phase3.effc.xR[i] = state->primary.rawc.xR[i];
@@ -32902,15 +31955,9 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    ae_assert(state->phase3.state >= reviseddualsimplex_ssvalidxn, "DSS: integrity check failed (remove perturbation)", _state);
    reviseddualsimplex_subproblemhandlexnupdate(state, &state->phase3, _state);
    reviseddualsimplex_solvesubproblemprimal(state, &state->phase3, settings, &state->repterminationtype, _state);
-   if (state->dotimers) {
-      state->repphase3time = tickcount() - t0;
-   }
    if (state->repterminationtype <= 0) {
    // Dual infeasible, primal unbounded
       ae_assert(state->repterminationtype == -4, "DSS: integrity check for SolveSubproblemPrimal() result failed", _state);
-      if (state->dotrace) {
-         ae_trace("> the problem is primal unbounded\n> done\n");
-      }
       reviseddualsimplex_setxydstats(state, &state->phase3, &state->basis, &state->xydsbuf, &state->repx, &state->replagbc, &state->replaglc, &state->repstats, _state);
       ae_frame_leave(_state);
       return;
@@ -33155,9 +32202,6 @@ void dssinit(ae_int_t n, dualsimplexstate *s, ae_state *_state) {
       s->repx.xR[i] = 0.0;
       s->repstats.xZ[i] = 1;
    }
-   s->dotrace = false;
-   s->dodetailedtrace = false;
-   s->dotimers = false;
 }
 
 // This function specifies LP problem
@@ -33444,25 +32488,12 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings, ae_stat
    ae_int_t ttotal;
    nx = state->primary.ns + state->primary.m;
    ttotal = 0;
-// Trace settings
-   state->dotrace = ae_is_trace_enabled("DSS");
-   state->dodetailedtrace = state->dotrace && ae_is_trace_enabled("DSS.DETAILED");
-   state->dotimers = ae_is_trace_enabled("TIMERS.DSS");
 // Init report fields
    state->repiterationscount = 0;
    state->repiterationscount1 = 0;
    state->repiterationscount2 = 0;
    state->repiterationscount3 = 0;
    state->repterminationtype = 1;
-   state->repphase1time = 0;
-   state->repphase2time = 0;
-   state->repphase3time = 0;
-   state->repdualpricingtime = 0;
-   state->repdualbtrantime = 0;
-   state->repdualpivotrowtime = 0;
-   state->repdualratiotesttime = 0;
-   state->repdualftrantime = 0;
-   state->repdualupdatesteptime = 0;
    state->repfillpivotrow = 0.0;
    state->repfillpivotrowcnt = 0;
    state->repfillrhor = 0.0;
@@ -33470,158 +32501,8 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings, ae_stat
    state->repfilldensemu = 0.0;
    state->repfilldensemucnt = 0;
    reviseddualsimplex_basisclearstats(&state->basis, _state);
-// Setup timer (if needed)
-   if (state->dotimers) {
-      ttotal = tickcount();
-   }
-// Trace output (if needed)
-   if (state->dotrace || state->dotimers) {
-      ae_trace("\n\n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("//  DUAL SIMPLEX SOLVER STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("> problem size:\n");
-      ae_trace("N         = %12d (variables)\n", (int)state->primary.ns);
-      ae_trace("M         = %12d (constraints)\n", (int)state->primary.m);
-   }
-   if (state->dotrace) {
-      ae_trace("> variable stats:\n");
-      if (state->dodetailedtrace) {
-      }
-      cnt1 = 0;
-      cnt2 = 0;
-      cntfx = 0;
-      cntfr = 0;
-      cntif = 0;
-      for (i = 0; i < state->primary.ns; i++) {
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_cclower || state->primary.bndt.xZ[i] == reviseddualsimplex_ccupper) {
-            inc(&cnt1, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccrange) {
-            inc(&cnt2, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccfixed) {
-            inc(&cntfx, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccfree) {
-            inc(&cntfr, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccinfeasible) {
-            inc(&cntif, _state);
-         }
-      }
-      ae_trace("UBnd/LBnd   = %12d\n", (int)cnt1);
-      ae_trace("Range       = %12d\n", (int)cnt2);
-      ae_trace("Fixed       = %12d\n", (int)cntfx);
-      ae_trace("Free        = %12d\n", (int)cntfr);
-      ae_trace("Infeas      = %12d\n", (int)cntif);
-      ae_trace("> constraint stats:\n");
-      if (state->dodetailedtrace) {
-      }
-      cnt1 = 0;
-      cnt2 = 0;
-      cntfx = 0;
-      cntfr = 0;
-      cntif = 0;
-      for (i = state->primary.ns - 1; i < nx; i++) {
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_cclower || state->primary.bndt.xZ[i] == reviseddualsimplex_ccupper) {
-            inc(&cnt1, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccrange) {
-            inc(&cnt2, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccfixed) {
-            inc(&cntfx, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccfree) {
-            inc(&cntfr, _state);
-         }
-         if (state->primary.bndt.xZ[i] == reviseddualsimplex_ccinfeasible) {
-            inc(&cntif, _state);
-         }
-      }
-      ae_trace("ubnd/lbnd   = %12d\n", (int)cnt1);
-      ae_trace("range       = %12d\n", (int)cnt2);
-      ae_trace("fixed       = %12d\n", (int)cntfx);
-      ae_trace("free        = %12d\n", (int)cntfr);
-      ae_trace("infeas      = %12d\n", (int)cntif);
-      v = 0.0;
-      for (i = 0; i < state->primary.ns; i++) {
-         if (ae_isfinite(state->primary.bndl.xR[i], _state)) {
-            v = maxreal(v, ae_fabs(state->primary.bndl.xR[i], _state), _state);
-         }
-      }
-      ae_trace("|BndL|      = %0.3e\n", v);
-      v = 0.0;
-      for (i = 0; i < state->primary.ns; i++) {
-         if (ae_isfinite(state->primary.bndu.xR[i], _state)) {
-            v = maxreal(v, ae_fabs(state->primary.bndu.xR[i], _state), _state);
-         }
-      }
-      ae_trace("|BndU|      = %0.3e\n", v);
-      v = 0.0;
-      for (i = state->primary.ns; i < nx; i++) {
-         if (ae_isfinite(state->primary.bndl.xR[i], _state)) {
-            v = maxreal(v, ae_fabs(state->primary.bndl.xR[i], _state), _state);
-         }
-      }
-      ae_trace("|AL|        = %0.3e\n", v);
-      v = 0.0;
-      for (i = state->primary.ns; i < nx; i++) {
-         if (ae_isfinite(state->primary.bndu.xR[i], _state)) {
-            v = maxreal(v, ae_fabs(state->primary.bndu.xR[i], _state), _state);
-         }
-      }
-      ae_trace("|AU|        = %0.3e\n", v);
-   }
 // Call actual workhorse function
    reviseddualsimplex_dssoptimizewrk(state, settings, _state);
-// Print reports
-   if (state->dotrace) {
-      ae_trace("\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("*   PRINTING ITERATION STATISTICS                                                                  *\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("> iteration counts:\n");
-      ae_trace("Phase 1     = %12d\n", (int)state->repiterationscount1);
-      ae_trace("Phase 2     = %12d\n", (int)state->repiterationscount2);
-      ae_trace("Phase 3     = %12d\n", (int)state->repiterationscount3);
-      ae_trace("> factorization statistics:\n");
-      ae_trace("FactCnt     = %12d (LU factorizations)\n", (int)state->basis.statfact);
-      ae_trace("UpdtCnt     = %12d (LU updates)\n", (int)state->basis.statupdt);
-      ae_trace("RefactPeriod= %12.1f (average refactorization interval)\n", (state->basis.statfact + state->basis.statupdt) / coalesce((double)state->basis.statfact, 1.0, _state));
-      ae_trace("LU-NZR      = %12.1f (average LU nonzeros per row)\n", state->basis.statoffdiag / (coalesce((double)state->m, 1.0, _state) * coalesce((double)(state->basis.statfact + state->basis.statupdt), 1.0, _state)));
-      ae_trace("> sparsity counters (average fill factors):\n");
-      if (state->dodetailedtrace) {
-         ae_trace("RhoR        = %12.4f (BTran result)\n", state->repfillrhor / coalesce((double)state->repfillrhorcnt, 1.0, _state));
-         ae_trace("AlphaR      = %12.4f (pivot row)\n", state->repfillpivotrow / coalesce((double)state->repfillpivotrowcnt, 1.0, _state));
-         if (state->basis.trftype == 3) {
-            ae_trace("Mu          = %12.4f (Forest-Tomlin factor)\n", state->repfilldensemu / coalesce((double)state->repfilldensemucnt, 1.0, _state));
-         }
-      } else {
-         ae_trace("...skipped, need DUALSIMPLEX.DETAILED trace tag\n");
-      }
-   }
-   if (state->dotimers) {
-      ttotal = tickcount() - ttotal;
-      ae_trace("\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("*   PRINTING DUAL SIMPLEX TIMERS                                                                   *\n");
-      ae_trace("****************************************************************************************************\n");
-      ae_trace("> total time:\n");
-      ae_trace("Time        = %12d ms\n", (int)ttotal);
-      ae_trace("> time by phase:\n");
-      ae_trace("Phase 1     = %12d ms\n", (int)state->repphase1time);
-      ae_trace("Phase 2     = %12d ms\n", (int)state->repphase2time);
-      ae_trace("Phase 3     = %12d ms\n", (int)state->repphase3time);
-      ae_trace("> time by step (dual phases 1 and 2):\n");
-      ae_trace("Pricing     = %12d ms\n", (int)state->repdualpricingtime);
-      ae_trace("BTran       = %12d ms\n", (int)state->repdualbtrantime);
-      ae_trace("PivotRow    = %12d ms\n", (int)state->repdualpivotrowtime);
-      ae_trace("RatioTest   = %12d ms\n", (int)state->repdualratiotesttime);
-      ae_trace("FTran       = %12d ms\n", (int)state->repdualftrantime);
-      ae_trace("Update      = %12d ms\n", (int)state->repdualupdatesteptime);
-   }
 }
 
 void dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic) {
@@ -33906,24 +32787,12 @@ void dualsimplexstate_copy(void *_dst, void *_src, ae_state *_state, bool make_a
    dst->repiterationscount1 = src->repiterationscount1;
    dst->repiterationscount2 = src->repiterationscount2;
    dst->repiterationscount3 = src->repiterationscount3;
-   dst->repphase1time = src->repphase1time;
-   dst->repphase2time = src->repphase2time;
-   dst->repphase3time = src->repphase3time;
-   dst->repdualpricingtime = src->repdualpricingtime;
-   dst->repdualbtrantime = src->repdualbtrantime;
-   dst->repdualpivotrowtime = src->repdualpivotrowtime;
-   dst->repdualratiotesttime = src->repdualratiotesttime;
-   dst->repdualftrantime = src->repdualftrantime;
-   dst->repdualupdatesteptime = src->repdualupdatesteptime;
    dst->repfillpivotrow = src->repfillpivotrow;
    dst->repfillpivotrowcnt = src->repfillpivotrowcnt;
    dst->repfillrhor = src->repfillrhor;
    dst->repfillrhorcnt = src->repfillrhorcnt;
    dst->repfilldensemu = src->repfilldensemu;
    dst->repfilldensemucnt = src->repfilldensemucnt;
-   dst->dotrace = src->dotrace;
-   dst->dodetailedtrace = src->dodetailedtrace;
-   dst->dotimers = src->dotimers;
    ae_vector_copy(&dst->btrantmp0, &src->btrantmp0, _state, make_automatic);
    ae_vector_copy(&dst->btrantmp1, &src->btrantmp1, _state, make_automatic);
    ae_vector_copy(&dst->btrantmp2, &src->btrantmp2, _state, make_automatic);
@@ -34007,31 +32876,6 @@ static const ae_int_t minlp_alllogicalsbasis = 0;
 //                   value (can be different in different ALGLIB versions)
 //                 * default value is zero
 //                 Algorithm stops when relative error is less than Eps.
-//
-// ==== TRACING DSS SOLVER ====
-//
-// DSS solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'DSS'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'DSS.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'DSS'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("DSS,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
 // API: void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams);
 void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
@@ -34064,31 +32908,6 @@ void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
 //                 * default value is zero
 //                 Algorithm  stops  when  primal  error  AND  dual error AND
 //                 duality gap are less than Eps.
-//
-// ==== TRACING IPM SOLVER ====
-//
-// IPM solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'IPM'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'IPM.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'IPM'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("IPM,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
 // API: void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams);
 // API: void minlpsetalgoipm(const minlpstate &state, const xparams _xparams);
@@ -36220,9 +35039,6 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    double nu;
    double localstp;
    double mu;
-   bool dotrace;
-   bool doprobing;
-   bool dotracexd;
    bool result;
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -36242,9 +35058,6 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       innerk = state13->rphase13state.ia.xZ[6];
       i = state13->rphase13state.ia.xZ[7];
       j = state13->rphase13state.ia.xZ[8];
-      dotrace = state13->rphase13state.ba.xB[0];
-      doprobing = state13->rphase13state.ba.xB[1];
-      dotracexd = state13->rphase13state.ba.xB[2];
       v = state13->rphase13state.ra.xR[0];
       mx = state13->rphase13state.ra.xR[1];
       f0 = state13->rphase13state.ra.xR[2];
@@ -36262,9 +35075,6 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       innerk = 922;
       i = -154;
       j = 306;
-      dotrace = true;
-      doprobing = true;
-      dotracexd = true;
       v = 88;
       mx = -861;
       f0 = -678;
@@ -36293,50 +35103,27 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
    innerk = 1;
-   dotrace = ae_is_trace_enabled("SLP");
-   dotracexd = dotrace && ae_is_trace_enabled("SLP.DETAILED");
-   doprobing = ae_is_trace_enabled("SLP.PROBING");
    ae_assert(lagmult->cnt >= nec + nic + nlec + nlic, "Phase13Iteration: integrity check failed", _state);
-// Report iteration beginning
-   if (dotrace) {
-      if (state13->usecorrection) {
-         ae_trace("\n--- linear step with second-order correction -------------------------------------------------------\n");
-      } else {
-         ae_trace("\n--- linear step without second-order correction ----------------------------------------------------\n");
-      }
-   }
 // Default decision is to continue algorithm
    *status = 1;
    *stp = 0.0;
 // Determine step direction using linearized model with no conjugacy terms
    nlcslp_lpsubproblemrestart(state, &state->subsolver, _state);
    if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state13->d, lagmult, _state)) {
-      if (dotrace) {
-         ae_trace("> [WARNING] initial phase #1 LP subproblem failed\n");
-      }
    // Increase failures counter.
    // Stop after too many subsequent failures
       inc(&state->lpfailurecnt, _state);
       if (state->lpfailurecnt >= nlcslp_lpfailureslimit) {
          state->repterminationtype = 7;
          *status = 0;
-         if (dotrace) {
-            ae_trace("> stopping condition met: too many phase #1 LP failures\n");
-         }
          result = false;
          return result;
       }
    // Can not solve LP subproblem, decrease trust radius
       state->trustrad = 0.5 * state->trustrad;
-      if (dotrace) {
-         ae_trace("> trust radius was decreased to %0.4e\n", state->trustrad);
-      }
       if (state->trustrad < state->epsx) {
          state->repterminationtype = 2;
          *status = 0;
-         if (dotrace) {
-            ae_trace("> stopping condition met: trust radius is smaller than %0.3e\n", state->epsx);
-         }
       } else {
          *status = -1;
       }
@@ -36369,9 +35156,6 @@ lbl_0:
    // Failed to retrieve func/Jac, infinities detected
       state->repterminationtype = -8;
       *status = 0;
-      if (dotrace) {
-         ae_trace("[ERROR] infinities in target/constraints are detected\n");
-      }
       result = false;
       return result;
    }
@@ -36398,12 +35182,6 @@ lbl_0:
    if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, &state13->stepkxc, &state13->stepkfic, &state13->stepkjc, innerk, &state13->dx, &state13->dummylagmult, _state)) {
    // Second LP subproblem failed.
    // Noncritical failure, can be ignored,
-      if (dotrace) {
-         ae_trace("> [WARNING] second phase #1 LP subproblem failed\n");
-      }
-      if (dotrace) {
-         ae_trace("> using step without second order correction\n");
-      }
    } else {
    // Set D to new direction
       for (i = 0; i < n; i++) {
@@ -36440,9 +35218,6 @@ lbl_1:
    // Failed to retrieve func/Jac, infinities detected
       state->repterminationtype = -8;
       *status = 0;
-      if (dotrace) {
-         ae_trace("[ERROR] infinities in target/constraints are detected\n");
-      }
       result = false;
       return result;
    }
@@ -36476,19 +35251,11 @@ lbl_7:
    // User requested termination, break before we move to new point
       state->repterminationtype = 8;
       *status = 0;
-      if (dotrace) {
-         ae_trace("> user requested termination\n");
-      }
       result = false;
       return result;
    }
-// Trace
-   if (!dotrace) {
-      goto lbl_8;
-   }
-   if (!doprobing) {
-      goto lbl_10;
-   }
+   goto lbl_8;
+   goto lbl_10;
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad, _state);
 lbl_12:
    if (!smoothnessmonitorprobe(smonitor, _state)) {
@@ -36516,38 +35283,11 @@ lbl_2:
    smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
    goto lbl_12;
 lbl_13:
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |   probing search direction suggested by LP subproblem    |\n");
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |  Step  | Lagrangian (unaugmentd)|    Target  function    |\n");
-   ae_trace("*** |along  D|     must be smooth     |     must be smooth     |\n");
-   ae_trace("*** |        | function   |    slope  | function   |    slope  |\n");
-   smoothnessmonitortraceprobingresults(smonitor, _state);
 lbl_10:
    mx = 0.0;
    for (i = 0; i < n; i++) {
       mx = maxreal(mx, ae_fabs(state13->d.xR[i], _state) / state->trustrad, _state);
    }
-   if (localstp > 0.0) {
-      ae_trace("> nonzero linear step was performed\n");
-   } else {
-      ae_trace("> zero linear step was performed\n");
-   }
-   ae_trace("max(|Di|)/TrustRad = %0.6f\n", mx);
-   ae_trace("stp = %0.6f\n", localstp);
-   if (dotracexd) {
-      ae_trace("X0 (scaled) = ");
-      tracevectorautoprec(curx, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("D  (scaled) = ");
-      tracevectorautoprec(&state13->d, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("X1 (scaled) = ");
-      tracevectorautoprec(&state13->stepkxn, 0, n, _state);
-      ae_trace("\n");
-   }
-   ae_trace("meritF:         %14.6e -> %14.6e (delta=%11.3e)\n", f0, f1, f1 - f0);
-   ae_trace("scaled-targetF: %14.6e -> %14.6e (delta=%11.3e)\n", curfi->xR[0], state13->stepkfin.xR[0], state13->stepkfin.xR[0] - curfi->xR[0]);
 lbl_8:
 // Move to new point
    *stp = localstp;
@@ -36582,9 +35322,6 @@ lbl_rcomm:
    state13->rphase13state.ia.xZ[6] = innerk;
    state13->rphase13state.ia.xZ[7] = i;
    state13->rphase13state.ia.xZ[8] = j;
-   state13->rphase13state.ba.xB[0] = dotrace;
-   state13->rphase13state.ba.xB[1] = doprobing;
-   state13->rphase13state.ba.xB[2] = dotracexd;
    state13->rphase13state.ra.xR[0] = v;
    state13->rphase13state.ra.xR[1] = mx;
    state13->rphase13state.ra.xR[2] = f0;
@@ -36693,9 +35430,6 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    double f0;
    double f1;
    double mu;
-   bool dotrace;
-   bool doprobing;
-   bool dotracexd;
    bool result;
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -36719,9 +35453,6 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       j = state2->rphase2state.ia.xZ[10];
       innerk = state2->rphase2state.ia.xZ[11];
       nondescentcnt = state2->rphase2state.ia.xZ[12];
-      dotrace = state2->rphase2state.ba.xB[0];
-      doprobing = state2->rphase2state.ba.xB[1];
-      dotracexd = state2->rphase2state.ba.xB[2];
       stp = state2->rphase2state.ra.xR[0];
       v = state2->rphase2state.ra.xR[1];
       vv = state2->rphase2state.ra.xR[2];
@@ -36746,9 +35477,6 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       j = 84;
       innerk = 529;
       nondescentcnt = 14;
-      dotrace = false;
-      doprobing = false;
-      dotracexd = true;
       stp = 289;
       v = 317;
       vv = 476;
@@ -36776,14 +35504,7 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   dotrace = ae_is_trace_enabled("SLP");
-   dotracexd = dotrace && ae_is_trace_enabled("SLP.DETAILED");
-   doprobing = ae_is_trace_enabled("SLP.PROBING");
    ae_assert(lagmult->cnt >= nec + nic + nlec + nlic, "Phase13Iteration: integrity check failed", _state);
-// Report iteration beginning
-   if (dotrace) {
-      ae_trace("\n--- linear step with conjugate constraints (CG-like convergence) -----------------------------------\n");
-   }
 // The default decision is to continue iterations
    *status = 1;
 // Perform inner LP subiterations.
@@ -36811,14 +35532,8 @@ lbl_3:
    // It may happen when we solve problem with LOTS of conjugacy constraints.
       if (innerk == 1) {
       // The very first iteration failed, really strange.
-         if (dotrace) {
-            ae_trace("[WARNING] the very first LP subproblem failed to produce descent direction\n");
-         }
       } else {
       // Quite a normal, the problem is overconstrained by conjugacy constraints now
-         if (dotrace) {
-            ae_trace("> LP subproblem is overconstrained (happens after too many iterations), time to stop\n");
-         }
       }
       result = false;
       return result;
@@ -36831,15 +35546,6 @@ lbl_3:
    // Nearly-zero direction is suggested (maybe we arrived exactly to the solution), stop iterations
       *status = 1;
       nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, _state);
-      if (dotrace) {
-         ae_trace("> LP subproblem suggested nearly zero step\n");
-      }
-      if (dotrace) {
-         ae_trace("max(|Di|)/TrustRad = %0.6f\n", mx);
-      }
-      if (dotrace) {
-         ae_trace("> stopping CG-like iterations\n");
-      }
       result = false;
       return result;
    }
@@ -36873,14 +35579,8 @@ lbl_3:
    // Append direction to the conjugacy constraints and retry direction generation.
    //
    // We make several retries with conjugate directions before giving up.
-      if (dotrace) {
-         ae_trace("> LP subproblem suggested nondescent step, skipping it (dLag=%0.3e)\n", v);
-      }
       inc(&nondescentcnt, _state);
       if (nlcslp_nondescentlimit > 0 && nondescentcnt > nlcslp_nondescentlimit) {
-         if (dotrace) {
-            ae_trace("> too many nondescent steps, stopping CG-like iterations\n");
-         }
          *status = 1;
          result = false;
          return result;
@@ -36907,9 +35607,6 @@ lbl_0:
    // Failed to retrieve func/Jac, infinities detected
       *status = 0;
       state->repterminationtype = -8;
-      if (dotrace) {
-         ae_trace("[ERROR] infinities in target/constraints are detected\n");
-      }
       result = false;
       return result;
    }
@@ -36934,21 +35631,12 @@ lbl_7:
       // The very first iteration failed, really strange.
       // Let's decrease trust radius and try one more time.
          state->trustrad = 0.5 * state->trustrad;
-         if (dotrace) {
-            ae_trace("> line search failed miserably for unknown reason, decreasing trust radius\n");
-         }
          if (state->trustrad < state->epsx) {
             state->repterminationtype = 2;
             *status = 0;
-            if (dotrace) {
-               ae_trace("> stopping condition met: trust radius is smaller than %0.3e\n", state->epsx);
-            }
          }
       } else {
       // Well, it can be normal
-         if (dotrace) {
-            ae_trace("> line search failed miserably for unknown reason, proceeding further\n");
-         }
       }
       result = false;
       return result;
@@ -36969,13 +35657,8 @@ lbl_7:
    if (mx > nlcslp_bfgstol) {
       *gammamax = maxreal(*gammamax, ae_fabs(vv / v, _state), _state);
    }
-// Trace
-   if (!dotrace) {
-      goto lbl_8;
-   }
-   if (!doprobing) {
-      goto lbl_10;
-   }
+   goto lbl_8;
+   goto lbl_10;
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad, _state);
 lbl_12:
    if (!smoothnessmonitorprobe(smonitor, _state)) {
@@ -37003,13 +35686,6 @@ lbl_1:
    smonitor->probingf.xR[1] = state2->stepkfic.xR[0];
    goto lbl_12;
 lbl_13:
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |   probing search direction suggested by LP subproblem    |\n");
-   ae_trace("*** ------------------------------------------------------------\n");
-   ae_trace("*** |  Step  | Lagrangian (unaugmentd)|    Target  function    |\n");
-   ae_trace("*** |along  D|     must be smooth     |     must be smooth     |\n");
-   ae_trace("*** |        | function   |    slope  | function   |    slope  |\n");
-   smoothnessmonitortraceprobingresults(smonitor, _state);
 lbl_10:
    mx = 0.0;
    for (i = 0; i < n; i++) {
@@ -37017,27 +35693,6 @@ lbl_10:
    }
    f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit, _state);
    f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit, _state);
-   ae_trace("> LP subproblem produced good direction, minimization was performed\n");
-   ae_trace("max(|Di|)/TrustRad = %0.6f\n", mx);
-   ae_trace("stp = %0.6f\n", stp);
-   if (dotracexd) {
-      ae_trace("X0 = ");
-      tracevectorautoprec(curx, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("D  = ");
-      tracevectorautoprec(&state2->d, 0, n, _state);
-      ae_trace("\n");
-      ae_trace("X1 = X0 + stp*D\n");
-      ae_trace("   = ");
-      tracevectorautoprec(&state2->stepkxn, 0, n, _state);
-      ae_trace("\n");
-   }
-   ae_trace("meritF:         %14.6e -> %14.6e (delta=%11.3e)\n", f0, f1, f1 - f0);
-   ae_trace("scaled-targetF: %14.6e -> %14.6e (delta=%11.3e)\n", curfi->xR[0], state2->stepkfin.xR[0], state2->stepkfin.xR[0] - curfi->xR[0]);
-   ae_trace("aug.Lagrangian: %14.6e -> %14.6e (delta=%11.3e)\n", stepklagval, stepknlagval, stepknlagval - stepklagval);
-   if (*gammamax > gammaprev) {
-      ae_trace("|H| = %0.3e (Hessian norm increased)\n", *gammamax);
-   }
 lbl_8:
 // Check status of the termination request
 // Update current point
@@ -37047,9 +35702,6 @@ lbl_8:
    // User requested termination, break before we move to new point
       *status = 0;
       state->repterminationtype = 8;
-      if (dotrace) {
-         ae_trace("# user requested termination\n");
-      }
       result = false;
       return result;
    }
@@ -37070,9 +35722,6 @@ lbl_2:
    if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
    // Iteration limit exhausted
       *status = 1;
-      if (dotrace) {
-         ae_trace("# stopping criteria met (MaxIts iterations performed)\n");
-      }
       result = false;
       return result;
    }
@@ -37084,9 +35733,6 @@ lbl_2:
    // In any case, authors of the original algorithm recommend to break inner LP
    // iteration and proceed to test of sufficient decrease of merit function.
       *status = 1;
-      if (dotrace) {
-         ae_trace("> step is close to 1, stopping iterations\n");
-      }
       result = false;
       return result;
    }
@@ -37095,9 +35741,6 @@ lbl_2:
    // (neither sufficient decrease, neither maximum step);
    // terminate.
       *status = 1;
-      if (dotrace) {
-         ae_trace("> line search ended with bad MCINFO, no more CG-like iterations\n");
-      }
       result = false;
       return result;
    }
@@ -37123,9 +35766,6 @@ lbl_rcomm:
    state2->rphase2state.ia.xZ[10] = j;
    state2->rphase2state.ia.xZ[11] = innerk;
    state2->rphase2state.ia.xZ[12] = nondescentcnt;
-   state2->rphase2state.ba.xB[0] = dotrace;
-   state2->rphase2state.ba.xB[1] = doprobing;
-   state2->rphase2state.ba.xB[2] = dotracexd;
    state2->rphase2state.ra.xR[0] = stp;
    state2->rphase2state.ra.xR[1] = v;
    state2->rphase2state.ra.xR[2] = vv;
@@ -37294,8 +35934,6 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    double setscaleto;
    double prevtrustrad;
    double mu;
-   bool dotrace;
-   bool dodetailedtrace;
    bool result;
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -37317,8 +35955,6 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
       innerk = state->rstate.ia.xZ[8];
       status = state->rstate.ia.xZ[9];
       lpstagesuccess = state->rstate.ba.xB[0];
-      dotrace = state->rstate.ba.xB[1];
-      dodetailedtrace = state->rstate.ba.xB[2];
       v = state->rstate.ra.xR[0];
       vv = state->rstate.ra.xR[1];
       mx = state->rstate.ra.xR[2];
@@ -37343,8 +35979,6 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
       innerk = 809;
       status = 205;
       lpstagesuccess = false;
-      dotrace = true;
-      dodetailedtrace = false;
       v = 763;
       vv = -541;
       mx = -698;
@@ -37380,8 +36014,6 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   dotrace = ae_is_trace_enabled("SLP");
-   dodetailedtrace = dotrace && ae_is_trace_enabled("SLP.DETAILED");
 // Prepare rcomm interface
    state->needfij = false;
    state->xupdated = false;
@@ -37434,12 +36066,6 @@ lbl_1:
    state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
-// Trace output (if needed)
-   if (dotrace) {
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("//  SLP SOLVER STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   }
 // Perform outer (NLC) iterations
    nlcslp_initlpsubsolver(state, &state->subsolver, state->hessiantype, _state);
 lbl_5:
@@ -37484,40 +36110,6 @@ lbl_5:
    }
 // Save initial point for the outer iteration
    nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->step0x, &state->step0fi, &state->step0j, _state);
-// Trace output (if needed)
-   if (dotrace) {
-      ae_trace("\n==== OUTER ITERATION %5d STARTED ====\n", (int)state->repouteriterationscount);
-      if (dodetailedtrace) {
-         ae_trace("> printing raw data (prior to applying variable and function scales)\n");
-         ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, true, &state->s, false, _state);
-         ae_trace("\n");
-         ae_trace("> printing scaled data (after applying variable and function scales)\n");
-         ae_trace("X (scaled)    = ");
-         tracevectorautoprec(&state->step0x, 0, n, _state);
-         ae_trace("\n");
-         ae_trace("FScales       = ");
-         tracevectorautoprec(&state->fscales, 0, 1 + nlec + nlic, _state);
-         ae_trace("\n");
-         ae_trace("Fi (scaled)   = ");
-         tracevectorautoprec(&state->stepkfi, 0, 1 + nlec + nlic, _state);
-         ae_trace("\n");
-         ae_trace("|Ji| (scaled) = ");
-         tracerownrm1autoprec(&state->stepkj, 0, 1 + nlec + nlic, 0, n, _state);
-         ae_trace("\n");
-      }
-      mx = 0.0;
-      for (i = 1; i <= nlec; i++) {
-         mx = maxreal(mx, ae_fabs(state->stepkfi.xR[i], _state), _state);
-      }
-      for (i = nlec + 1; i <= nlec + nlic; i++) {
-         mx = maxreal(mx, state->stepkfi.xR[i], _state);
-      }
-      ae_trace("trustRad      = %0.3e\n", state->trustrad);
-      ae_trace("lin.violation = %0.3e    (scaled violation of linear constraints)\n", state->replcerr);
-      ae_trace("nlc.violation = %0.3e    (scaled violation of nonlinear constraints)\n", mx);
-      ae_trace("gammaMax      = %0.3e\n", gammamax);
-   }
 // PHASE 1:
 //
 // * perform step using linear model with second order correction
@@ -37564,9 +36156,6 @@ lbl_8:
    if (stp >= nlcslp_slpstpclosetoone) {
       goto lbl_9;
    }
-   if (dotrace) {
-      ae_trace("> linear model produced short step, starting conjugate-gradient-like phase\n");
-   }
    nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->backupx, &state->backupfi, &state->backupj, _state);
 // LP subiterations
    nlcslp_phase2init(&state->state2, n, nec, nic, nlec, nlic, &state->meritlagmult, _state);
@@ -37600,10 +36189,6 @@ lbl_12:
       f1 = maxreal(f1, state->meritfunctionhistory.xR[i], _state);
    }
    f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit, _state);
-   if (dotrace) {
-      ae_trace("> evaluating changes in merit function (max over last %0d values is used for reference):\n", (int)(nlcslp_nonmonotonicphase2limit + 1));
-      ae_trace("meritF: %14.6e -> %14.6e (delta=%11.3e)\n", f1, f2, f2 - f1);
-   }
    if (f2 < f1) {
       goto lbl_13;
    }
@@ -37611,9 +36196,6 @@ lbl_12:
 // more "fake" inner iteration.
 //
 // NOTE: it is important that F2=F1 is considered as "does not decrease"
-   if (dotrace) {
-      ae_trace("> CG-like phase increased merit function, completely discarding phase (happens sometimes, but not too often)\n");
-   }
    nlcslp_slpcopystate(state, &state->backupx, &state->backupfi, &state->backupj, &state->stepkx, &state->stepkfi, &state->stepkj, _state);
    inc(&state->repinneriterationscount, _state);
    nlcslp_slpsendx(state, &state->stepkx, _state);
@@ -37629,20 +36211,10 @@ lbl_4:
 lbl_13:
 // Merit function decreased, accept phase
    state->meritfunctionhistory.xR[0] = f2;
-   if (dotrace) {
-      ae_trace("> CG-like phase decreased merit function, CG-like step accepted\n");
-   }
 lbl_14:
    goto lbl_10;
 lbl_9:
 // No phase #2
-   if (dotrace) {
-      if (stp > 0.0) {
-         ae_trace("> linear model produced long step, no need to start CG-like iterations\n");
-      } else {
-         ae_trace("> linear model produced zero step, maybe trust radius is too large\n");
-      }
-   }
 lbl_10:
 // Update trust region
    prevtrustrad = state->trustrad;
@@ -37656,19 +36228,6 @@ lbl_10:
    if (deltamax >= nlcslp_slpdeltaincrease) {
       state->trustrad = state->trustrad * minreal(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth, _state);
    }
-// Trace
-   if (dotrace) {
-      ae_trace("\n--- outer iteration ends ---------------------------------------------------------------------------\n");
-      ae_trace("deltaMax    = %0.3f (ratio of step length to trust radius)\n", deltamax);
-      ae_trace("newTrustRad = %0.3e", state->trustrad);
-      if (state->trustrad > prevtrustrad) {
-         ae_trace(", trust radius increased");
-      }
-      if (state->trustrad < prevtrustrad) {
-         ae_trace(", trust radius decreased");
-      }
-      ae_trace("\n");
-   }
 // Advance outer iteration counter, test stopping criteria
    inc(&state->repouteriterationscount, _state);
    if (ae_fabs(state->stepkfi.xR[0] - state->step0fi.xR[0], _state) <= nlcslp_stagnationepsf * ae_fabs(state->step0fi.xR[0], _state)) {
@@ -37678,28 +36237,18 @@ lbl_10:
    }
    if (state->trustrad <= state->epsx) {
       state->repterminationtype = 2;
-      if (dotrace) {
-         ae_trace("> stopping condition met: trust radius is smaller than %0.3e\n", state->epsx);
-      }
       goto lbl_6;
    }
    if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
       state->repterminationtype = 5;
-      if (dotrace) {
-         ae_trace("> stopping condition met: %0d iterations performed\n", (int)state->repinneriterationscount);
-      }
       goto lbl_6;
    }
    if (state->fstagnationcnt >= nlcslp_fstagnationlimit) {
       state->repterminationtype = 7;
-      if (dotrace) {
-         ae_trace("> stopping criteria are too stringent: F stagnated for %0d its, stopping\n", (int)state->fstagnationcnt);
-      }
       goto lbl_6;
    }
    goto lbl_5;
 lbl_6:
-   smoothnessmonitortracestatus(smonitor, dotrace, _state);
    result = false;
    return result;
 // Saving state
@@ -37716,8 +36265,6 @@ lbl_rcomm:
    state->rstate.ia.xZ[8] = innerk;
    state->rstate.ia.xZ[9] = status;
    state->rstate.ba.xB[0] = lpstagesuccess;
-   state->rstate.ba.xB[1] = dotrace;
-   state->rstate.ba.xB[2] = dodetailedtrace;
    state->rstate.ra.xR[0] = v;
    state->rstate.ra.xR[1] = vv;
    state->rstate.ra.xR[2] = mx;
@@ -38788,51 +37335,6 @@ void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state 
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
-// ==== TRACING SLP SOLVER ====
-//
-// SLP solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'SLP'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-//                   It also prints OptGuard  integrity  checker  report when
-//                   nonsmoothness of target/constraints is suspected.
-// * 'SLP.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'SLP'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'SLP.PROBING' - to let algorithm insert additional function  evaluations
-//                   before line search  in  order  to  build  human-readable
-//                   chart of the raw  Lagrangian  (~40  additional  function
-//                   evaluations is performed for  each  line  search).  This
-//                   symbol also implicitly defines 'SLP'. Definition of this
-//                   symbol also automatically activates OptGuard  smoothness
-//                   monitor.
-// * 'OPTGUARD'    - for report of smoothness/continuity violations in target
-//                   and/or constraints. This kind of reporting is   included
-//                   in 'SLP', but it comes with lots of additional info.  If
-//                   you  need  just  smoothness  monitoring,   specify  this
-//                   setting.
-//
-//                   NOTE: this tag merely directs  OptGuard  output  to  log
-//                         file. Even if you specify it, you  still  have  to
-//                         configure OptGuard  by calling minnlcoptguard...()
-//                         family of functions.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related   overhead.  Specifying  'SLP.PROBING'  adds   even  larger
-// overhead due to additional function evaluations being performed.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("SLP,SLP.PROBING,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 02.04.2018 by Sergey Bochkanov
 // API: void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams);
 void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
@@ -38884,47 +37386,8 @@ void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
 // per step, and it is not enough for OptGuard to detect nonsmoothness.
 //
 // So, if you suspect that your problem is  nonsmooth  and  if  you  want  to
-// confirm or deny it, we recommend you to either:
-// * use AUL or SLP solvers, which can detect nonsmoothness of the problem
-// * or, alternatively, activate 'SQP.PROBING' trace  tag  that  will  insert
-//   additional  function  evaluations (~40  per  line  step) that will  help
-//   OptGuard integrity checker to study properties of your problem
-//
-// ==== TRACING SQP SOLVER ====
-//
-// SQP solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'SQP'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-//                   It also prints OptGuard  integrity  checker  report when
-//                   nonsmoothness of target/constraints is suspected.
-// * 'SQP.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'SQP'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'SQP.PROBING' - to let algorithm insert additional function  evaluations
-//                   before line search  in  order  to  build  human-readable
-//                   chart of the raw  Lagrangian  (~40  additional  function
-//                   evaluations is performed for  each  line  search).  This
-//                   symbol  also  implicitly  defines  'SQP'  and  activates
-//                   OptGuard integrity checker which detects continuity  and
-//                   smoothness violations. An OptGuard log is printed at the
-//                   end of the file.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related   overhead.  Specifying  'SQP.PROBING'  adds   even  larger
-// overhead due to additional function evaluations being performed.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("SQP,SQP.PROBING,PREC.F6", "path/to/trace.log")
-// >
+// confirm or deny it, we recommend you to use AUL or SLP solvers,  which can
+// detect nonsmoothness of the problem.
 // ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
 // API: void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams);
 void minnlcsetalgosqp(minnlcstate *state, ae_state *_state) {
@@ -40223,8 +38686,6 @@ bool minnlciteration(minnlcstate *state, ae_state *_state) {
    minnlc_clearrequestfields(state, _state);
    ae_assert(state->smoothnessguardlevel == 0 || state->smoothnessguardlevel == 1, "MinNLCIteration: integrity check failed", _state);
    b = state->smoothnessguardlevel > 0;
-   b = b || (state->solvertype == 1 && ae_is_trace_enabled("SLP.PROBING"));
-   b = b || (state->solvertype == 2 && ae_is_trace_enabled("SQP.PROBING"));
    smoothnessmonitorinit(&state->smonitor, &state->s, n, 1 + ng + nh, b, _state);
    for (i = 0; i < n; i++) {
       state->lastscaleused.xR[i] = state->s.xR[i];
@@ -42062,37 +40523,6 @@ void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
 // * penalty coefficient for  linear  constraints  is  chosen  automatically;
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
-//
-// ==== TRACING AGS SOLVER ====
-//
-// AGS solver supports advanced tracing capabilities. You can trace algorithm
-// output by specifying following trace symbols (case-insensitive)  by  means
-// of trace_file() call:
-// * 'AGS'         - for basic trace of algorithm  steps and decisions.  Only
-//                   short scalars (function values and deltas) are  printed.
-//                   N-dimensional quantities like search directions are  NOT
-//                   printed.
-// * 'AGS.DETAILED'- for output of points being visited and search directions
-//                   This  symbol  also  implicitly  defines  'AGS'. You  can
-//                   control output format by additionally specifying:
-//                   * nothing     to output in  6-digit exponential format
-//                   * 'PREC.E15'  to output in 15-digit exponential format
-//                   * 'PREC.F6'   to output in  6-digit fixed-point format
-// * 'AGS.DETAILED.SAMPLE'-
-//                   for output of points being visited ,  search  directions
-//                   and gradient sample. May take a LOT of  space ,  do  not
-//                   use it on problems with more that several tens of vars.
-//                   This  symbol   also    implicitly   defines   'AGS'  and
-//                   'AGS.DETAILED'.
-//
-// By default trace is disabled and adds  no  overhead  to  the  optimization
-// process. However, specifying any of the symbols adds some  formatting  and
-// output-related overhead.
-//
-// You may specify multiple symbols by separating them with commas:
-// >
-// > alglib::trace_file("AGS,PREC.F6", "path/to/trace.log")
-// >
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 // API: void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams);
 void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state *_state) {
@@ -42888,9 +41318,6 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    ae_int_t maxbacktrackits;
    bool fullsample;
    double currentf0;
-   bool dotrace;
-   bool dodetailedtrace;
-   bool dotracesample;
    bool result;
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -42918,9 +41345,6 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
       b = state->rstateags.ba.xB[0];
       alphadecreased = state->rstateags.ba.xB[1];
       fullsample = state->rstateags.ba.xB[2];
-      dotrace = state->rstateags.ba.xB[3];
-      dodetailedtrace = state->rstateags.ba.xB[4];
-      dotracesample = state->rstateags.ba.xB[5];
       radius0 = state->rstateags.ra.xR[0];
       radius = state->rstateags.ra.xR[1];
       alpha = state->rstateags.ra.xR[2];
@@ -42950,9 +41374,6 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
       b = false;
       alphadecreased = false;
       fullsample = true;
-      dotrace = true;
-      dodetailedtrace = true;
-      dotracesample = true;
       radius0 = 922;
       radius = -154;
       alpha = 306;
@@ -42984,20 +41405,8 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    nic = state->nic;
    ng = state->ng;
    nh = state->nh;
-   dotrace = ae_is_trace_enabled("AGS");
-   dodetailedtrace = dotrace && ae_is_trace_enabled("AGS.DETAILED");
-   dotracesample = dodetailedtrace && ae_is_trace_enabled("AGS.DETAILED.SAMPLE");
-// Trace output (if needed)
-   if (dotrace) {
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-      ae_trace("//  AGS SOLVER STARTED // \n");
-      ae_trace("////////////////////////////////////////////////////////////////////////////////////////////////////\n");
-   }
 // Check consistency of parameters
    if (ng + nh > 0 && state->agsrhononlinear == 0.0) {
-      if (dotrace) {
-         ae_trace("> inconsistent parameters detected, stopping\n\n");
-      }
       state->repterminationtype = -1;
       result = false;
       return result;
@@ -43031,9 +41440,6 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    for (i = 0; i < n; i++) {
    // Check and scale constraints
       if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndu.xR[i] < state->bndl.xR[i]) {
-         if (dotrace) {
-            ae_trace("> inconsistent box constraints detected, stopping\n\n");
-         }
          state->repterminationtype = -3;
          result = false;
          return result;
@@ -43110,9 +41516,6 @@ lbl_4:
    if (false) {
       goto lbl_5;
    }
-   if (dotrace) {
-      ae_trace("\n==== ITERATION %5d STARTED ====\n", (int)state->repinneriterationscount);
-   }
 // First phase of iteration - central point:
 //
 // 1. evaluate function at central point - first entry in sample.
@@ -43167,9 +41570,6 @@ lbl_1:
 lbl_6:
    if (state->userterminationneeded) {
    // User requested termination
-      if (dotrace) {
-         ae_trace("> termination requested by user\n\n");
-      }
       state->repterminationtype = 8;
       goto lbl_5;
    }
@@ -43179,9 +41579,6 @@ lbl_6:
    }
    if (!ae_isfinite(v, _state) || !ae_isfinite(state->samplef.xR[0], _state)) {
    // Abnormal termination - infinities in function/gradient
-      if (dotrace) {
-         ae_trace("> NAN/INF detected in function/gradient, termination\n\n");
-      }
       state->repterminationtype = -8;
       goto lbl_5;
    }
@@ -43189,47 +41586,17 @@ lbl_6:
    ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error", _state);
    if (ae_sqrt(rdotv2(n, &state->rawg, _state), _state) * state->agspenaltylevel > state->rholinear) {
       state->rholinear = ae_sqrt(rdotv2(n, &state->rawg, _state), _state) * state->agspenaltyincrease;
-      if (dotrace) {
-         ae_trace("> penalty parameter needs increase, iteration restarted\n\n");
-      }
       cursamplesize = 0;
       goto lbl_4;
-   }
-// Trace if needed
-   if (dotrace) {
-      if (dodetailedtrace) {
-         ae_trace("> printing raw data (prior to applying variable and function scales)\n");
-         ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->xc, n, &state->s, true, &state->s, false, _state);
-         ae_trace("\n");
-         ae_trace("> printing scaled data (after applying variable and function scales)\n");
-         ae_trace("X (scaled)    = ");
-         tracevectorautoprec(&state->xc, 0, n, _state);
-         ae_trace("\n");
-      }
-      ae_trace("sampleRad     = %0.3e\n", radius);
-      ae_trace("lin.violation = %0.3e    (scaled violation of linear constraints)\n", state->replcerr);
-      ae_trace("nlc.violation = %0.3e    (scaled violation of nonlinear constraints)\n", state->repnlcerr);
-      ae_trace("targetF       = %0.3e    (target function)\n", currentf0);
-      ae_trace("meritF        = %0.3e    (merit  function)\n", state->samplef.xR[0]);
-      ae_trace("Rho linear    = %0.3e\n", state->rholinear);
-      ae_trace("Rho nonlinear = %0.3e\n", state->agsrhononlinear);
-      ae_trace("----------------------------------------------------------------------------------------------------\n");
    }
 // Check stopping conditions.
    if (radiusdecays >= state->agsmaxraddecays) {
    // Too many attempts to decrease radius
-      if (dotrace) {
-         ae_trace("> stopping condition met: too many attempts to decrease radius\n\n");
-      }
       state->repterminationtype = 7;
       goto lbl_5;
    }
    if (state->repinneriterationscount >= state->maxits && state->maxits > 0) {
    // Too many iterations
-      if (dotrace) {
-         ae_trace("> stopping condition met: %0d iterations performed\n\n", (int)state->repinneriterationscount);
-      }
       state->repterminationtype = 5;
       goto lbl_5;
    }
@@ -43238,9 +41605,6 @@ lbl_6:
    //
    // Additional decay is required in order to make sure that optimization session
    // with radius equal to EpsX was successfully done.
-      if (dotrace) {
-         ae_trace("> stopping condition met: sampling radius is smaller than %0.3e\n\n", state->epsx);
-      }
       state->repterminationtype = 2;
       goto lbl_5;
    }
@@ -43359,14 +41723,6 @@ lbl_10:
          }
       }
    }
-   if (dotracesample) {
-      ae_trace("> gradient sample\n");
-      for (i = 0; i < cursamplesize; i++) {
-         ae_trace("SampleGrad[]  = ");
-         tracerowautoprec(&state->samplegmbc, i, 0, n, _state);
-         ae_trace("\n");
-      }
-   }
 // Calculate diagonal Hessian.
 //
 // This Hessian serves two purposes:
@@ -43412,12 +41768,6 @@ lbl_10:
       }
       state->diagh.xR[j] = 1.0;
    }
-   if (dodetailedtrace) {
-      ae_trace("> diagonal quasi-Hessian\n");
-      ae_trace("H             = ");
-      tracevectorautoprec(&state->diagh, 0, n, _state);
-      ae_trace("\n");
-   }
 // PROJECTION PHASE
 //
 // We project zero vector on convex hull of gradient sample.
@@ -43440,17 +41790,11 @@ lbl_10:
    for (j = 0; j < n; j++) {
       v = maxreal(v, ae_fabs(state->d.xR[j] / coalesce(state->colmax.xR[j], 1.0, _state), _state), _state);
    }
-   if (dotrace) {
-      ae_trace("> stationarity test:\n|proj(0)|     = %0.3e (projection of zero vector on convex hull of gradient sample)\n", v);
-   }
    if (v <= state->agsstattold) {
    // Stationarity test succeeded.
    // Decrease radius and restart.
    //
    // NOTE: we also clear ShortStepsCnt on restart
-      if (dotrace) {
-         ae_trace("> stationarity test satisfied, decreasing radius\n");
-      }
       radius = radius * state->agsraddecay;
       shortstepscnt = 0;
       inc(&radiusdecays, _state);
@@ -43471,14 +41815,6 @@ lbl_10:
       dhd = dhd + state->d.xR[i] * state->diagh.xR[i] * state->d.xR[i];
    }
    dnrminf = rmaxabsv(n, &state->d, _state);
-   if (dotrace) {
-      ae_trace("> search direction is ready:\n|D|           = %0.3e (inf-norm)\n(D,grad)      = %0.3e\n", dnrminf, rdotvr(n, &state->d, &state->samplegmbc, 0, _state));
-      if (dodetailedtrace) {
-         ae_trace("D             = ");
-         tracevectorautoprec(&state->d, 0, n, _state);
-         ae_trace("\n");
-      }
-   }
    ae_assert(dnrminf > 0.0, "MinNS: integrity error (2752)", _state);
    alpha = recommendedstep / dnrminf;
    alphadecreased = false;
@@ -43526,9 +41862,6 @@ lbl_3:
    }
    goto lbl_11;
 lbl_12:
-   if (dotrace) {
-      ae_trace("> backtracking line search finished:\nstp           = %0.3e\n", alpha);
-   }
    if ((alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius) || ae_fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize], _state) <= state->agsshortf) {
       inc(&shortstepscnt, _state);
    } else {
@@ -43542,9 +41875,6 @@ lbl_12:
    // gradients.
    //
    // Decrease radius and restart.
-      if (dotrace) {
-         ae_trace("> too many subsequent short steps, decreasing radius\n");
-      }
       radius = radius * state->agsraddecay;
       shortstepscnt = 0;
       inc(&radiusdecays, _state);
@@ -43586,9 +41916,6 @@ lbl_rcomm:
    state->rstateags.ba.xB[0] = b;
    state->rstateags.ba.xB[1] = alphadecreased;
    state->rstateags.ba.xB[2] = fullsample;
-   state->rstateags.ba.xB[3] = dotrace;
-   state->rstateags.ba.xB[4] = dodetailedtrace;
-   state->rstateags.ba.xB[5] = dotracesample;
    state->rstateags.ra.xR[0] = radius0;
    state->rstateags.ra.xR[1] = radius;
    state->rstateags.ra.xR[2] = alpha;
