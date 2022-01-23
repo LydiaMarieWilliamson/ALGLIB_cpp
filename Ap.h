@@ -775,10 +775,6 @@ extern const double pi;
 #endif
 
 // Debugging and tracing functions
-void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc);
-const char *ae_get_last_error_file();
-int ae_get_last_error_line();
-const char *ae_get_last_error_xdesc();
 void ae_trace_file(const char *tags, const char *filename);
 void ae_trace_disable();
 bool ae_is_trace_enabled(const char *tag);

@@ -91,7 +91,6 @@ void scomplexarray_init(void *_p, ae_state *_state, bool make_automatic);
 void scomplexarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void scomplexarray_free(void *_p, bool make_automatic);
 
-void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s, ae_state *_state);
 bool alwaysfalse(ae_state *_state);
 void touchint(ae_int_t *a, ae_state *_state);
 void touchreal(double *a, ae_state *_state);

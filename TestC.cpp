@@ -7,6 +7,42 @@
 
 using namespace alglib_impl;
 
+// Error tracking facilities; this fields are modified every time set_error_flag()
+// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
+static const char *sef_file = "";
+static int sef_line = 0;
+static const char *sef_xdesc = "";
+
+void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
+   if (cond) {
+      *p_flag = true;
+      sef_file = filename;
+      sef_line = lineno;
+      sef_xdesc = xdesc;
+#ifdef ALGLIB_ABORT_ON_ERROR_FLAG
+      printf("[ALGLIB] aborting on set_error_flag(cond=true)\n");
+      printf("[ALGLIB] %s:%d\n", filename, lineno);
+      printf("[ALGLIB] %s\n", xdesc);
+      fflush(stdout);
+      if (alglib_trace_file != NULL) fflush(alglib_trace_file);
+      abort();
+#endif
+   }
+}
+
+// Internally calls SetErrorFlag() with condition:
+//
+//     Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
+//
+// This function is used to test relative error in Val against  RefVal,  with
+// relative error being replaced by absolute when scale  of  RefVal  is  less
+// than S.
+//
+// This function returns value of COND.
+void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s, ae_state *_state) {
+   set_error_flag(flag, ae_fabs(val - refval, _state) > tol * maxreal(ae_fabs(refval, _state), s, _state), __FILE__, __LINE__, "apserv.ap:162");
+}
+
 // === ablasf testing unit ===
 struct ablasfplayground {
    double v0;
@@ -90447,7 +90483,7 @@ int main(int argc, char **argv) {
    time(&time_1);
    printf("Done in %ld seconds\n", (long)difftime(time_1, time_0));
    if (global_failure_flag)
-      printf("Last error at %s:%d (%s)\n", ae_get_last_error_file(), (int)ae_get_last_error_line(), ae_get_last_error_xdesc());
+      printf("Last error at %s:%d (%s)\n", sef_file, (int)sef_line, sef_xdesc);
 // Free structures
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
    pthread_mutex_destroy(&tests_lock);

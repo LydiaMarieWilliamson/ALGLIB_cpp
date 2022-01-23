@@ -16,19 +16,6 @@
 
 // === APSERV Package ===
 namespace alglib_impl {
-// Internally calls SetErrorFlag() with condition:
-//
-//     Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
-//
-// This function is used to test relative error in Val against  RefVal,  with
-// relative error being replaced by absolute when scale  of  RefVal  is  less
-// than S.
-//
-// This function returns value of COND.
-void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s, ae_state *_state) {
-   set_error_flag(flag, ae_fabs(val - refval, _state) > tol * maxreal(ae_fabs(refval, _state), s, _state), __FILE__, __LINE__, "apserv.ap:162");
-}
-
 // The function always returns False.
 // It may be used sometimes to prevent spurious warnings.
 // ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov

@@ -326,6 +326,11 @@ A6.2. Test Stages
 39	Synthesized the local ‟gateway” alglib_impl::complex → alglib::complex function complex_from_c() in Ap.cpp.
 	Generalized existing routines: complex_from_{d,i}(⋯) from (X) to (X, Y = 0.0).
 	Synthesized complex::complex(⋯) and complex_from_{d,i,c}(⋯) for Y ≠ 0.0.
+39	Move diagnostic functions to TestC.cpp and remove their declarations:
+	―	seterrordiff() from AlgLibInternal.{cpp,h}
+	―	set_error_flag(), ae_get_last_error_file(), ae_get_last_error_line(), ae_get_last_error_xdesc() from Ap.{cpp,h}
+	−	sef_file, sef_line, sef_xdesc from Ap.cpp
+	―	Eliminate the ae_get_last_error_*() functions and replace them by the corresponding sef_* variables.
 
 A6.3. Test Results
 ──────────────────

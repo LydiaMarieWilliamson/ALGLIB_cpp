@@ -4632,47 +4632,6 @@ const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 
 const double pi = 3.1415926535897932384626433832795;
 #endif
 
-// Error tracking facilities; this fields are modified every time set_error_flag()
-// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
-static const char *sef_file = "";
-static int sef_line = 0;
-static const char *sef_xdesc = "";
-
-void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
-   if (cond) {
-      *p_flag = true;
-      sef_file = filename;
-      sef_line = lineno;
-      sef_xdesc = xdesc;
-#ifdef ALGLIB_ABORT_ON_ERROR_FLAG
-      printf("[ALGLIB] aborting on set_error_flag(cond=true)\n");
-      printf("[ALGLIB] %s:%d\n", filename, lineno);
-      printf("[ALGLIB] %s\n", xdesc);
-      fflush(stdout);
-      if (alglib_trace_file != NULL) fflush(alglib_trace_file);
-      abort();
-#endif
-   }
-}
-
-// This function returns file name for the last call of set_error_flag()
-// with non-zero cond parameter.
-const char *ae_get_last_error_file() {
-   return sef_file;
-}
-
-// This function returns line number for the last call of set_error_flag()
-// with non-zero cond parameter.
-int ae_get_last_error_line() {
-   return sef_line;
-}
-
-// This function returns extra description for the last call of set_error_flag()
-// with non-zero cond parameter.
-const char *ae_get_last_error_xdesc() {
-   return sef_xdesc;
-}
-
 // Activates tracing to file
 //
 // IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
