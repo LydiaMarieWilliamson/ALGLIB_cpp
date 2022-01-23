@@ -107,8 +107,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
       status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr, _state);
       ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed", _state);
       for (i = 0; i < ne; i++) {
-         x->xC[i].x = wr.xR[i];
-         x->xC[i].y = wi.xR[i];
+         x->xC[i] = complex_from_d(wr.xR[i], wi.xR[i]);
       }
    }
 // Remaining NZ zero roots

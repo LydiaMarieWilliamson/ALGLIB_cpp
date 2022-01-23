@@ -3960,38 +3960,35 @@ double ae_exp(double x, ae_state *state) {
 }
 
 // Complex math functions
-complex complex_from_i(ae_int_t v) {
+complex complex_from_i(ae_int_t x, ae_int_t y/* = 0*/) {
    complex r;
-   r.x = (double)v;
-   r.y = 0.0;
+   r.x = (double)x;
+   r.y = (double)y;
    return r;
 }
 
-complex complex_from_d(double v) {
+complex complex_from_d(double x, double y/* = 0.0*/) {
    complex r;
-   r.x = v;
-   r.y = 0.0;
+   r.x = x;
+   r.y = y;
    return r;
 }
 
 complex ae_c_neg(complex lhs) {
    complex result;
-   result.x = -lhs.x;
-   result.y = -lhs.y;
+   result = complex_from_d(-lhs.x, -lhs.y);
    return result;
 }
 
 complex conj(complex lhs, ae_state *state) {
    complex result;
-   result.x = +lhs.x;
-   result.y = -lhs.y;
+   result = complex_from_d(+lhs.x, -lhs.y);
    return result;
 }
 
 complex csqr(complex lhs, ae_state *state) {
    complex result;
-   result.x = lhs.x * lhs.x - lhs.y * lhs.y;
-   result.y = 2 * lhs.x * lhs.y;
+   result = complex_from_d(lhs.x * lhs.x - lhs.y * lhs.y, 2 * lhs.x * lhs.y);
    return result;
 }
 
@@ -4030,22 +4027,19 @@ bool ae_c_neq(complex lhs, complex rhs) {
 
 complex ae_c_add(complex lhs, complex rhs) {
    complex result;
-   result.x = lhs.x + rhs.x;
-   result.y = lhs.y + rhs.y;
+   result = complex_from_d(lhs.x + rhs.x, lhs.y + rhs.y);
    return result;
 }
 
 complex ae_c_mul(complex lhs, complex rhs) {
    complex result;
-   result.x = lhs.x * rhs.x - lhs.y * rhs.y;
-   result.y = lhs.x * rhs.y + lhs.y * rhs.x;
+   result = complex_from_d(lhs.x * rhs.x - lhs.y * rhs.y, lhs.x * rhs.y + lhs.y * rhs.x);
    return result;
 }
 
 complex ae_c_sub(complex lhs, complex rhs) {
    complex result;
-   result.x = lhs.x - rhs.x;
-   result.y = lhs.y - rhs.y;
+   result = complex_from_d(lhs.x - rhs.x, lhs.y - rhs.y);
    return result;
 }
 
@@ -4056,13 +4050,11 @@ complex ae_c_div(complex lhs, complex rhs) {
    if (fabs(rhs.y) < fabs(rhs.x)) {
       e = rhs.y / rhs.x;
       f = rhs.x + rhs.y * e;
-      result.x = (lhs.x + lhs.y * e) / f;
-      result.y = (lhs.y - lhs.x * e) / f;
+      result = complex_from_d((lhs.x + lhs.y * e) / f, (lhs.y - lhs.x * e) / f);
    } else {
       e = rhs.x / rhs.y;
       f = rhs.y + rhs.x * e;
-      result.x = (lhs.y + lhs.x * e) / f;
-      result.y = (-lhs.x + lhs.y * e) / f;
+      result = complex_from_d((lhs.y + lhs.x * e) / f, (-lhs.x + lhs.y * e) / f);
    }
    return result;
 }
@@ -4085,36 +4077,31 @@ bool ae_c_neq_d(complex lhs, double rhs) {
 
 complex ae_c_add_d(complex lhs, double rhs) {
    complex result;
-   result.x = lhs.x + rhs;
-   result.y = lhs.y;
+   result = complex_from_d(lhs.x + rhs, lhs.y);
    return result;
 }
 
 complex ae_c_mul_d(complex lhs, double rhs) {
    complex result;
-   result.x = lhs.x * rhs;
-   result.y = lhs.y * rhs;
+   result = complex_from_d(lhs.x * rhs, lhs.y * rhs);
    return result;
 }
 
 complex ae_c_sub_d(complex lhs, double rhs) {
    complex result;
-   result.x = lhs.x - rhs;
-   result.y = lhs.y;
+   result = complex_from_d(lhs.x - rhs, lhs.y);
    return result;
 }
 
 complex ae_c_d_sub(double lhs, complex rhs) {
    complex result;
-   result.x = lhs - rhs.x;
-   result.y = -rhs.y;
+   result = complex_from_d(lhs - rhs.x, -rhs.y);
    return result;
 }
 
 complex ae_c_div_d(complex lhs, double rhs) {
    complex result;
-   result.x = lhs.x / rhs;
-   result.y = lhs.y / rhs;
+   result = complex_from_d(lhs.x / rhs, lhs.y / rhs);
    return result;
 }
 
@@ -4125,13 +4112,11 @@ complex ae_c_d_div(double lhs, complex rhs) {
    if (fabs(rhs.y) < fabs(rhs.x)) {
       e = rhs.y / rhs.x;
       f = rhs.x + rhs.y * e;
-      result.x = lhs / f;
-      result.y = -lhs * e / f;
+      result = complex_from_d(lhs / f, -lhs * e / f);
    } else {
       e = rhs.x / rhs.y;
       f = rhs.y + rhs.x * e;
-      result.x = lhs * e / f;
-      result.y = -lhs / f;
+      result = complex_from_d(lhs * e / f, -lhs / f);
    }
    return result;
 }
@@ -4187,8 +4172,7 @@ complex ae_v_cdotproduct(const complex *v0, ae_int_t stride0, const char *conj0,
          ry += v0x * v1y + v0y * v1x;
       }
    }
-   result.x = rx;
-   result.y = ry;
+   result = complex_from_d(rx, ry);
    return result;
 }
 
@@ -4455,8 +4439,7 @@ void ae_v_csubd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_
 }
 
 void ae_v_csubc(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   alpha.x = -alpha.x;
-   alpha.y = -alpha.y;
+   alpha = complex_from_d(-alpha.x, -alpha.y);
    ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, alpha);
 }
 
@@ -6015,11 +5998,9 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
          complex tmp_c;
          complex beta;
          complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
          cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -6029,11 +6010,9 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
          complex tmp_c;
          complex beta;
          complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
          cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -6137,11 +6116,9 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
          complex tmp_c;
          complex beta;
          complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
          cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -6151,11 +6128,9 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
          complex tmp_c;
          complex beta;
          complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
          cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -6232,10 +6207,8 @@ static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, complex *
 // if beta == 0, then C is filled by zeros (and not referenced)
 //
 // alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   c_alpha.x = alpha;
-   c_alpha.y = 0;
-   c_beta.x = beta;
-   c_beta.y = 0;
+   c_alpha = complex_from_d(alpha);
+   c_beta = complex_from_d(beta);
    if (alpha == 0)
       k = 0;
    if (k > 0) {
@@ -8736,10 +8709,6 @@ int iceil(double x) {
    return int(ceil(x));
 }
 
-double pi() {
-   return 3.14159265358979323846;
-}
-
 double sqr(double x) {
    return x * x;
 }
@@ -8885,16 +8854,19 @@ complex &complex::operator/=(const complex &z) {
    if (fabs(z.y) < fabs(z.x)) {
       e = z.y / z.x;
       f = z.x + z.y * e;
-      result.x = (x + y * e) / f;
-      result.y = (y - x * e) / f;
+      result = complex((x + y * e) / f, (y - x * e) / f);
    } else {
       e = z.x / z.y;
       f = z.y + z.x * e;
-      result.x = (y + x * e) / f;
-      result.y = (-x + y * e) / f;
+      result = complex((y + x * e) / f, (-x + y * e) / f);
    }
    *this = result;
    return *this;
+}
+
+// alglib_impl-alglib gateway.
+static inline alglib_impl::complex complex_from_c(complex z) {
+   return alglib_impl::complex_from_d(z.x, z.y);
 }
 
 alglib_impl::complex *complex::c_ptr() {
@@ -9015,13 +8987,11 @@ const complex operator/(const complex &lhs, const complex &rhs) {
    if (fabs(rhs.y) < fabs(rhs.x)) {
       e = rhs.y / rhs.x;
       f = rhs.x + rhs.y * e;
-      result.x = (lhs.x + lhs.y * e) / f;
-      result.y = (lhs.y - lhs.x * e) / f;
+      result = complex((lhs.x + lhs.y * e) / f, (lhs.y - lhs.x * e) / f);
    } else {
       e = rhs.x / rhs.y;
       f = rhs.y + rhs.x * e;
-      result.x = (lhs.y + lhs.x * e) / f;
-      result.y = (-lhs.x + lhs.y * e) / f;
+      result = complex((lhs.y + lhs.x * e) / f, (-lhs.x + lhs.y * e) / f);
    }
    return result;
 }
@@ -9033,13 +9003,11 @@ const complex operator/(const double &lhs, const complex &rhs) {
    if (fabs(rhs.y) < fabs(rhs.x)) {
       e = rhs.y / rhs.x;
       f = rhs.x + rhs.y * e;
-      result.x = lhs / f;
-      result.y = -lhs * e / f;
+      result = complex(lhs / f, -lhs * e / f);
    } else {
       e = rhs.x / rhs.y;
       f = rhs.y + rhs.x * e;
-      result.x = lhs * e / f;
-      result.y = -lhs / f;
+      result = complex(lhs * e / f, -lhs / f);
    }
    return result;
 }
@@ -10254,12 +10222,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
          case alglib_impl::DT_BOOL: This->xB[i] = parse_bool_delim(svec[i], ",]"); break;
          case alglib_impl::DT_INT: This->xZ[i] = parse_int_delim(svec[i], ",]"); break;
          case alglib_impl::DT_REAL: This->xR[i] = parse_real_delim(svec[i], ",]"); break;
-         case alglib_impl::DT_COMPLEX: {
-            complex t = parse_complex_delim(svec[i], ",]");
-            This->xC[i].x = t.x;
-            This->xC[i].y = t.y;
-         }
-         break;
+         case alglib_impl::DT_COMPLEX: This->xC[i] = complex_from_c(parse_complex_delim(svec[i], ",]")); break;
       }
       alglib_impl::ae_free(p);
    } catch(...) {
@@ -10529,10 +10492,8 @@ void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
    if (This == NULL || This->cnt != iLen)
       return;
 // copy
-   for (i = 0; i < iLen; i++) {
-      This->xC[i].x = pContent[i].x;
-      This->xC[i].y = pContent[i].y;
-   }
+   for (i = 0; i < iLen; i++)
+      This->xC[i] = complex_from_c(pContent[i]);
 }
 
 const complex *complex_1d_array::getcontent() const {
@@ -10681,12 +10642,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
          case alglib_impl::DT_BOOL: This->xyB[i][j] = parse_bool_delim(smat[i][j], ",]"); break;
          case alglib_impl::DT_INT: This->xyZ[i][j] = parse_int_delim(smat[i][j], ",]"); break;
          case alglib_impl::DT_REAL: This->xyR[i][j] = parse_real_delim(smat[i][j], ",]"); break;
-         case alglib_impl::DT_COMPLEX: {
-            complex t = parse_complex_delim(smat[i][j], ",]");
-            This->xyC[i][j].x = t.x;
-            This->xyC[i][j].y = t.y;
-         }
-         break;
+         case alglib_impl::DT_COMPLEX: This->xyC[i][j] = complex_from_c(parse_complex_delim(smat[i][j], ",]")); break;
       }
       alglib_impl::ae_free(p);
    } catch(...) {
@@ -10973,10 +10929,8 @@ void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex 
       return;
 // copy
    for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++) {
-         This->xyC[i][j].x = pContent[i * icols + j].x;
-         This->xyC[i][j].y = pContent[i * icols + j].y;
-      }
+      for (j = 0; j < icols; j++)
+         This->xyC[i][j] = complex_from_c(pContent[i * icols + j]);
 }
 
 #if !defined AE_NO_EXCEPTIONS

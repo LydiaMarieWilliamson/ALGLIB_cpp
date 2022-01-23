@@ -4870,14 +4870,10 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
                offsa = offsa + 1;
                offsb = offsb + 1;
             }
-            v00.x = v00x;
-            v00.y = v00y;
-            v10.x = v10x;
-            v10.y = v10y;
-            v01.x = v01x;
-            v01.y = v01y;
-            v11.x = v11x;
-            v11.y = v11y;
+            v00 = complex_from_d(v00x, v00y);
+            v10 = complex_from_d(v10x, v10y);
+            v01 = complex_from_d(v01x, v01y);
+            v11 = complex_from_d(v11x, v11y);
             if (ae_c_eq_d(beta, 0.0)) {
                c->xyC[ic + i + 0][jc + j + 0] = ae_c_mul(alpha, v00);
                c->xyC[ic + i + 0][jc + j + 1] = ae_c_mul(alpha, v01);

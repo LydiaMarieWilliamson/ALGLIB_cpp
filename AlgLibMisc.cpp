@@ -534,8 +534,7 @@ namespace alglib_impl {
 void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state) {
    SetObj(xdebugrecord1, rec1);
    rec1->i = 1;
-   rec1->c.x = 1.0;
-   rec1->c.y = 1.0;
+   rec1->c = complex_from_d(1.0, 1.0);
    ae_vector_set_length(&rec1->a, 2, _state);
    rec1->a.xR[0] = 2.0;
    rec1->a.xR[1] = 3.0;
@@ -830,8 +829,7 @@ void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
    ae_vector_set_length(a, n, _state);
    for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
-         a->xC[i].x = i * 0.250;
-         a->xC[i].y = i * 0.125;
+         a->xC[i] = complex_from_d(i * 0.250, i * 0.125);
       } else {
          a->xC[i] = complex_from_i(0);
       }
@@ -1167,8 +1165,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j].x = ae_sin((double)(3 * i + 5 * j), _state);
-         a->xyC[i][j].y = ae_cos((double)(3 * i + 5 * j), _state);
+         a->xyC[i][j] = complex_from_d(ae_sin((double)(3 * i + 5 * j), _state), ae_cos((double)(3 * i + 5 * j), _state));
       }
    }
 }

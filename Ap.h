@@ -712,8 +712,8 @@ double ae_exp(double x, ae_state *state);
 // Complex math functions:
 // *	basic arithmetic operations
 // *	standard functions
-complex complex_from_i(ae_int_t v);
-complex complex_from_d(double v);
+complex complex_from_i(ae_int_t x, ae_int_t y = 0);
+complex complex_from_d(double x, double y = 0.0);
 
 complex ae_c_neg(complex lhs);
 complex conj(complex lhs, ae_state *state);
@@ -1103,7 +1103,6 @@ int round(double x);
 int trunc(double x);
 int ifloor(double x);
 int iceil(double x);
-double pi();
 
 double sqr(double x);
 int maxint(int m1, int m2);

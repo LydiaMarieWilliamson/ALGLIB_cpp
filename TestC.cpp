@@ -2484,13 +2484,11 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refca, 2 * m, 2 * m, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
-            refca.xyC[i][j].x = 0.2 * randomreal(_state) - 0.1;
-            refca.xyC[i][j].y = 0.2 * randomreal(_state) - 0.1;
+            refca.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
          }
       }
       for (i = 0; i < m; i++) {
-         refca.xyC[i][i].x = (2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state));
-         refca.xyC[i][i].y = (2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state));
+         refca.xyC[i][i] = complex_from_d((2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state)), (2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state)));
       }
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
@@ -2518,15 +2516,13 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refcxr, n, m, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            refcxr.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcxr.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refcxr.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       ae_matrix_set_length(&refcxl, m, n, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            refcxl.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcxl.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refcxl.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
    // test different types of operations, offsets, and so on...
@@ -2803,8 +2799,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
          refca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
          for (j = i + 1; j < n; j++) {
             refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             refra.xyR[j][i] = refra.xyR[i][j];
             refca.xyC[j][i] = conj(refca.xyC[i][j], _state);
          }
@@ -2824,8 +2819,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       for (i = 0; i < n; i++) {
          for (j = 0; j < k; j++) {
             refrc.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refcc.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcc.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refcc.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
    // test different types of operations, offsets, and so on...
@@ -3093,12 +3087,9 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
             refra.xyR[i][j] = 2 * randomreal(_state) - 1;
             refrb.xyR[i][j] = 2 * randomreal(_state) - 1;
             refrc.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].y = 2 * randomreal(_state) - 1;
-            refcb.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcb.xyC[i][j].y = 2 * randomreal(_state) - 1;
-            refcc.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcc.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refcb.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refcc.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
    // test different types of operations, offsets, and so on...
@@ -3123,14 +3114,12 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       alphar = randominteger(2, _state) * (2 * randomreal(_state) - 1);
       betar = randominteger(2, _state) * (2 * randomreal(_state) - 1);
       if (randomreal(_state) > 0.5) {
-         alphac.x = 2 * randomreal(_state) - 1;
-         alphac.y = 2 * randomreal(_state) - 1;
+         alphac = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       } else {
          alphac = complex_from_i(0);
       }
       if (randomreal(_state) > 0.5) {
-         betac.x = 2 * randomreal(_state) - 1;
-         betac.y = 2 * randomreal(_state) - 1;
+         betac = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       } else {
          betac = complex_from_i(0);
       }
@@ -3211,8 +3200,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn, ae_state *_sta
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
             refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             refrb.xyR[i][j] = i * v1 + j * v2;
             refcb.xyC[i][j] = complex_from_d(i * v1 + j * v2);
          }
@@ -3297,23 +3285,20 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn, ae_state *_sta
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             refrb.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refcb.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refcb.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refcb.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       ae_vector_set_length(&ru, 2 * m, _state);
       ae_vector_set_length(&cu, 2 * m, _state);
       for (i = 0; i < 2 * m; i++) {
          ru.xR[i] = 2 * randomreal(_state) - 1;
-         cu.xC[i].x = 2 * randomreal(_state) - 1;
-         cu.xC[i].y = 2 * randomreal(_state) - 1;
+         cu.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
       ae_vector_set_length(&rv, 2 * n, _state);
       ae_vector_set_length(&cv, 2 * n, _state);
       for (i = 0; i < 2 * n; i++) {
          rv.xR[i] = 2 * randomreal(_state) - 1;
-         cv.xC[i].x = 2 * randomreal(_state) - 1;
-         cv.xC[i].y = 2 * randomreal(_state) - 1;
+         cv.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
    // Generate random offsets of all operands and random coefficients.
       aoffsi = randominteger(maxn, _state);
@@ -3423,8 +3408,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       ae_vector_set_length(&rx, 2 * maxn, _state);
@@ -3433,8 +3417,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_vector_set_length(&cy, 2 * maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          rx.xR[i] = 2 * randomreal(_state) - 1;
-         cx.xC[i].x = 2 * randomreal(_state) - 1;
-         cx.xC[i].y = 2 * randomreal(_state) - 1;
+         cx.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
    // Select random offsets and operations.
    //
@@ -3844,8 +3827,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             rb.xyR[i][j] = (double)(1 + 2 * i + 3 * j);
             cb.xyC[i][j] = complex_from_i(1 + 2 * i + 3 * j);
          }
@@ -4302,11 +4284,9 @@ bool testhblas(bool silent, ae_state *_state) {
       ae_vector_set_length(&y3, n + 1, _state);
    // fill A, UA, LA
       for (i = 1; i <= n; i++) {
-         a.xyC[i][i].x = 2 * randomreal(_state) - 1;
-         a.xyC[i][i].y = 0.0;
+         a.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
          for (j = i + 1; j <= n; j++) {
-            a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             a.xyC[j][i] = conj(a.xyC[i][j], _state);
          }
       }
@@ -4335,11 +4315,9 @@ bool testhblas(bool silent, ae_state *_state) {
          for (i2 = i1; i2 <= n; i2++) {
          // Fill X, choose Alpha
             for (i = 1; i <= i2 - i1 + 1; i++) {
-               x.xC[i].x = 2 * randomreal(_state) - 1;
-               x.xC[i].y = 2 * randomreal(_state) - 1;
+               x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             }
-            alpha.x = 2 * randomreal(_state) - 1;
-            alpha.y = 2 * randomreal(_state) - 1;
+            alpha = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          // calculate A*x, UA*x, LA*x
             for (i = i1; i <= i2; i++) {
                v = ae_v_cdotproduct(&a.xyC[i][i1], 1, "N", &x.xC[1], 1, "N", i2 - i1 + 1);
@@ -4423,8 +4401,7 @@ bool testcreflections(bool silent, ae_state *_state) {
       ae_matrix_set_length(&c, maxmn + 1, maxmn + 1, _state);
    // GenerateReflection
       for (i = 1; i <= n; i++) {
-         x.xC[i].x = 2 * randomreal(_state) - 1;
-         x.xC[i].y = 2 * randomreal(_state) - 1;
+         x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          v.xC[i] = x.xC[i];
       }
       complexgeneratereflection(&v, n, &tau, _state);
@@ -4452,14 +4429,12 @@ bool testcreflections(bool silent, ae_state *_state) {
       meg = maxreal(meg, err, _state);
    // ApplyReflectionFromTheLeft
       for (i = 1; i <= m; i++) {
-         x.xC[i].x = 2 * randomreal(_state) - 1;
-         x.xC[i].y = 2 * randomreal(_state) - 1;
+         x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          v.xC[i] = x.xC[i];
       }
       for (i = 1; i <= m; i++) {
          for (j = 1; j <= n; j++) {
-            a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             b.xyC[i][j] = a.xyC[i][j];
          }
       }
@@ -4725,8 +4700,7 @@ static void testortfacunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (randomreal(_state) >= sparcity) {
-            a->xyC[i][j].x = 2 * randomreal(_state) - 1;
-            a->xyC[i][j].y = 2 * randomreal(_state) - 1;
+            a->xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          } else {
             a->xyC[i][j] = complex_from_i(0);
          }
@@ -5580,8 +5554,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors, _state);
@@ -5610,8 +5583,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors, _state);
@@ -5633,8 +5605,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             ra.xyR[j][i] = ra.xyR[i][j];
             ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
          }
@@ -5674,8 +5645,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors, _state);
@@ -5690,8 +5660,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors, _state);
@@ -5702,8 +5671,7 @@ bool testortfac(bool silent, ae_state *_state) {
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
             ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             ra.xyR[j][i] = ra.xyR[i][j];
             ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
          }
@@ -5994,18 +5962,12 @@ static bool testmatgenunit_testeult(ae_state *_state) {
    // Prepare symmetric matrix with complex values
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            b.xyC[i][j].x = range * (2 * randomreal(_state) - 1);
-            if (i != j) {
-               b.xyC[i][j].y = range * (2 * randomreal(_state) - 1);
-            } else {
-               b.xyC[i][j].y = 0.0;
-            }
+            b.xyC[i][j] = complex_from_d(range * (2 * randomreal(_state) - 1), i == j ? 0.0 : range * (2 * randomreal(_state) - 1));
          }
       }
       for (i = 0; i < n; i++) {
          for (j = i + 1; j < n; j++) {
-            b.xyC[i][j].x = b.xyC[j][i].x;
-            b.xyC[i][j].y = -b.xyC[j][i].y;
+            b.xyC[i][j] = complex_from_d(b.xyC[j][i].x, -b.xyC[j][i].y);
          }
       }
       hmatrixrndmultiply(&b, n, _state);
@@ -11037,8 +10999,7 @@ static void testevdunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, d
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (randomreal(_state) >= sparcity) {
-            a->xyC[i][j].x = 2 * randomreal(_state) - 1;
-            a->xyC[i][j].y = 2 * randomreal(_state) - 1;
+            a->xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          } else {
             a->xyC[i][j] = complex_from_i(0);
          }
@@ -11046,8 +11007,7 @@ static void testevdunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, d
    }
    if (diagmag > 0.0) {
       for (i = 0; i < minint(m, n, _state); i++) {
-         a->xyC[i][i].x = diagmag * (2 * randomreal(_state) - 1);
-         a->xyC[i][i].y = diagmag * (2 * randomreal(_state) - 1);
+         a->xyC[i][i] = complex_from_d(diagmag * (2 * randomreal(_state) - 1), diagmag * (2 * randomreal(_state) - 1));
       }
    }
 }
@@ -12536,8 +12496,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
          ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+         ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          ra.xyR[j][i] = ra.xyR[i][j];
          ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
       }
@@ -12552,8 +12511,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
          ra.xyR[i][j] = 0.1 * (2 * randomreal(_state) - 1) / n;
-         ca.xyC[i][j].x = 0.1 * (2 * randomreal(_state) - 1) / n;
-         ca.xyC[i][j].y = 0.1 * (2 * randomreal(_state) - 1) / n;
+         ca.xyC[i][j] = complex_from_d(0.1 * (2 * randomreal(_state) - 1) / n, 0.1 * (2 * randomreal(_state) - 1) / n);
          ra.xyR[j][i] = ra.xyR[i][j];
          ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
       }
@@ -12684,8 +12642,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j].x = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j].y = 2 * randomreal(_state) - 1;
+         ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
    }
    testevdunit_testnsevdproblem(&ra, n, threshold, nserrors, _state);
@@ -15859,11 +15816,9 @@ bool testsafesolve(bool silent, ae_state *_state) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (i == j) {
-               ca.xyC[i][j].x = (2 * randominteger(2, _state) - 1) * (5 + randomreal(_state));
-               ca.xyC[i][j].y = (2 * randominteger(2, _state) - 1) * (5 + randomreal(_state));
+               ca.xyC[i][j] = complex_from_d((2 * randominteger(2, _state) - 1) * (5 + randomreal(_state)), (2 * randominteger(2, _state) - 1) * (5 + randomreal(_state)));
             } else {
-               ca.xyC[i][j].x = 0.2 * randomreal(_state) - 0.1;
-               ca.xyC[i][j].y = 0.2 * randomreal(_state) - 0.1;
+               ca.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
             }
          }
       }
@@ -15897,8 +15852,7 @@ bool testsafesolve(bool silent, ae_state *_state) {
       }
       ae_vector_set_length(&cxe, n, _state);
       for (i = 0; i < n; i++) {
-         cxe.xC[i].x = 2 * randomreal(_state) - 1;
-         cxe.xC[i].y = 2 * randomreal(_state) - 1;
+         cxe.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
       ae_vector_set_length(&cxs, n, _state);
       for (i = 0; i < n; i++) {
@@ -16718,13 +16672,11 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          isunit = randomreal(_state) > 0.5;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.xyC[i][j].x = randomreal(_state) - 0.5;
-               a.xyC[i][j].y = randomreal(_state) - 0.5;
+               a.xyC[i][j] = complex_from_d(randomreal(_state) - 0.5, randomreal(_state) - 0.5);
             }
          }
          for (i = 0; i < n; i++) {
-            a.xyC[i][i].x = 1 + randomreal(_state);
-            a.xyC[i][i].y = 1 + randomreal(_state);
+            a.xyC[i][i] = complex_from_d(1 + randomreal(_state), 1 + randomreal(_state));
          }
          testrcondunit_cmatrixmakeacopy(&a, n, n, &ea, _state);
          for (i = 0; i < n; i++) {
@@ -17393,14 +17345,12 @@ bool testxblas(bool silent, ae_state *_state) {
          ae_vector_set_length(&temp, 2 * n, _state);
          for (i = 0; i < n; i++) {
             if (randomreal(_state) > 0.2) {
-               cx.xC[i].x = 2 * randomreal(_state) - 1;
-               cx.xC[i].y = 2 * randomreal(_state) - 1;
+               cx.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             } else {
                cx.xC[i] = complex_from_i(0);
             }
             if (randomreal(_state) > 0.2) {
-               cy.xC[i].x = 2 * randomreal(_state) - 1;
-               cy.xC[i].y = 2 * randomreal(_state) - 1;
+               cy.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             } else {
                cy.xC[i] = complex_from_i(0);
             }
@@ -17466,8 +17416,7 @@ bool testxblas(bool silent, ae_state *_state) {
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
-      cy.xC[0].x = (2 * randomreal(_state) - 1) * s * ae_sqrt(2 * randomreal(_state), _state);
-      cy.xC[0].y = (2 * randomreal(_state) - 1) * s * ae_sqrt(2 * randomreal(_state), _state);
+      cy.xC[0] = complex_from_d((2 * randomreal(_state) - 1) * s * ae_sqrt(2 * randomreal(_state), _state), (2 * randomreal(_state) - 1) * s * ae_sqrt(2 * randomreal(_state), _state));
       for (i = 1; i < n; i++) {
          cy.xC[i] = cy.xC[0];
       }
@@ -18384,8 +18333,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                  xe.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                  xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -18489,8 +18437,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                      }
                   }
                   k = randominteger(n, _state);
@@ -18501,8 +18448,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                      }
                   }
                   k = randominteger(n, _state);
@@ -18516,8 +18462,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                      }
                   }
                   k = 1 + randominteger(n - 1, _state);
@@ -18531,8 +18476,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                      }
                   }
                   k = 1 + randominteger(n - 1, _state);
@@ -18656,13 +18600,11 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
       ae_vector_set_length(&xv, n, _state);
       ae_vector_set_length(&y, n, _state);
       for (i = 0; i < n; i++) {
-         xv.xC[i].x = 2 * randomreal(_state) - 1;
-         xv.xC[i].y = 2 * randomreal(_state) - 1;
+         xv.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-            a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
          ae_v_cmove(y.xC, 1, a.xyC[i], 1, "N", n);
          xcdot(&y, &xv, n, &tx, &v, &verr, _state);
@@ -19029,8 +18971,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                  xe.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                  xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -19124,8 +19065,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
@@ -19141,8 +19081,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
@@ -19161,8 +19100,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                        a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
@@ -24373,11 +24311,9 @@ static void testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
                   if (i == j) {
-                     a.xyC[i][i].x = 1 + randomreal(_state);
-                     a.xyC[i][i].y = 1 + randomreal(_state);
+                     a.xyC[i][i] = complex_from_d(1 + randomreal(_state), 1 + randomreal(_state));
                   } else {
-                     a.xyC[i][j].x = 0.2 * randomreal(_state) - 0.1;
-                     a.xyC[i][j].y = 0.2 * randomreal(_state) - 0.1;
+                     a.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
                   }
                   b.xyC[i][j] = a.xyC[i][j];
                }
@@ -24661,8 +24597,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = randominteger(n, _state);
@@ -24673,8 +24608,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = randominteger(n, _state);
@@ -24688,8 +24622,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = 1 + randominteger(n - 1, _state);
@@ -24703,8 +24636,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = 1 + randominteger(n - 1, _state);
@@ -24906,8 +24838,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = randominteger(n, _state);
@@ -24919,8 +24850,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j].x = 2 * randomreal(_state) - 1;
-                     a.xyC[i][j].y = 2 * randomreal(_state) - 1;
+                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                   }
                }
                k = randominteger(n, _state);
@@ -72307,8 +72237,7 @@ static void testfftunit_refinternalrfft(RVector *a, ae_int_t nn, CVector *f, ae_
    testfftunit_refinternalcfft(&tmp, nn, false, _state);
    ae_vector_set_length(f, nn, _state);
    for (i = 0; i < nn; i++) {
-      f->xC[i].x = tmp.xR[2 * i + 0];
-      f->xC[i].y = tmp.xR[2 * i + 1];
+      f->xC[i] = complex_from_d(tmp.xR[2 * i + 0], tmp.xR[2 * i + 1]);
    }
    ae_frame_leave(_state);
 }
@@ -72327,8 +72256,7 @@ static void testfftunit_reffftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    }
    testfftunit_refinternalcfft(&buf, n, false, _state);
    for (i = 0; i < n; i++) {
-      a->xC[i].x = buf.xR[2 * i + 0];
-      a->xC[i].y = buf.xR[2 * i + 1];
+      a->xC[i] = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
    }
    ae_frame_leave(_state);
 }
@@ -72347,8 +72275,7 @@ static void testfftunit_reffftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
    }
    testfftunit_refinternalcfft(&buf, n, true, _state);
    for (i = 0; i < n; i++) {
-      a->xC[i].x = buf.xR[2 * i + 0];
-      a->xC[i].y = buf.xR[2 * i + 1];
+      a->xC[i] = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
    }
    ae_frame_leave(_state);
 }
@@ -72380,8 +72307,7 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr, a
    ae_vector_set_length(&a0, n, _state);
    ae_vector_set_length(&a1, n, _state);
    for (i = 0; i < n; i++) {
-      a0.xC[i].x = 2 * randomreal(_state) - 1;
-      a0.xC[i].y = 2 * randomreal(_state) - 1;
+      a0.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       a1.xC[i] = a0.xC[i];
    }
    fftc1d(&a0, n, _state);
@@ -72450,8 +72376,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a2, n, _state);
       ae_vector_set_length(&a3, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i].x = 2 * randomreal(_state) - 1;
-         a1.xC[i].y = 2 * randomreal(_state) - 1;
+         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          a2.xC[i] = a1.xC[i];
          a3.xC[i] = a1.xC[i];
       }
@@ -72488,8 +72413,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a1, n, _state);
       ae_vector_set_length(&a2, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i].x = 2 * randomreal(_state) - 1;
-         a1.xC[i].y = 2 * randomreal(_state) - 1;
+         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          a2.xC[i] = a1.xC[i];
       }
       fftc1d(&a1, n, _state);
@@ -72501,8 +72425,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a1, n, _state);
       ae_vector_set_length(&a2, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i].x = 2 * randomreal(_state) - 1;
-         a1.xC[i].y = 2 * randomreal(_state) - 1;
+         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          a2.xC[i] = a1.xC[i];
       }
       fftc1dinv(&a1, n, _state);
@@ -72593,11 +72516,10 @@ bool testfft(bool silent, ae_state *_state) {
       }
       ae_vector_set_length(&a2, ifloor((double)n / 2.0, _state) + 1, _state);
       a2.xC[0] = complex_from_d(r1.xR[0]);
-      for (i = 1; i < ifloor((double)n / 2.0, _state); i++) {
-         a2.xC[i].x = r1.xR[2 * i + 0];
-         a2.xC[i].y = r1.xR[2 * i + 1];
+      for (i = 1; i < n / 2; i++) {
+         a2.xC[i] = complex_from_d(r1.xR[2 * i + 0], r1.xR[2 * i + 1]);
       }
-      a2.xC[ifloor((double)n / 2.0, _state)] = complex_from_d(r1.xR[1]);
+      a2.xC[n / 2] = complex_from_d(r1.xR[1]);
       ftcomplexfftplan(n / 2, 1, &plan, _state);
       ae_vector_set_length(&buf, n, _state);
       fftr1dinvinternaleven(&r1, n, &buf, &plan, _state);
@@ -72926,13 +72848,11 @@ bool testconv(bool silent, ae_state *_state) {
             // Complex convolution
                ae_vector_set_length(&ca, m, _state);
                for (i = 0; i < m; i++) {
-                  ca.xC[i].x = 2 * randomreal(_state) - 1;
-                  ca.xC[i].y = 2 * randomreal(_state) - 1;
+                  ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                }
                ae_vector_set_length(&cb, n, _state);
                for (i = 0; i < n; i++) {
-                  cb.xC[i].x = 2 * randomreal(_state) - 1;
-                  cb.xC[i].y = 2 * randomreal(_state) - 1;
+                  cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
                }
                ae_vector_set_length(&cr1, 1, _state);
                if (rkind == -3) {
@@ -73025,13 +72945,11 @@ bool testconv(bool silent, ae_state *_state) {
       // Complex circilar and non-circular
          ae_vector_set_length(&ca, m, _state);
          for (i = 0; i < m; i++) {
-            ca.xC[i].x = 2 * randomreal(_state) - 1;
-            ca.xC[i].y = 2 * randomreal(_state) - 1;
+            ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
          ae_vector_set_length(&cb, n, _state);
          for (i = 0; i < n; i++) {
-            cb.xC[i].x = 2 * randomreal(_state) - 1;
-            cb.xC[i].y = 2 * randomreal(_state) - 1;
+            cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
          ae_vector_set_length(&cr1, 1, _state);
          ae_vector_set_length(&cr2, 1, _state);
@@ -73258,13 +73176,11 @@ bool testcorr(bool silent, ae_state *_state) {
       // Complex correlation
          ae_vector_set_length(&ca, m, _state);
          for (i = 0; i < m; i++) {
-            ca.xC[i].x = 2 * randomreal(_state) - 1;
-            ca.xC[i].y = 2 * randomreal(_state) - 1;
+            ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
          ae_vector_set_length(&cb, n, _state);
          for (i = 0; i < n; i++) {
-            cb.xC[i].x = 2 * randomreal(_state) - 1;
-            cb.xC[i].y = 2 * randomreal(_state) - 1;
+            cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
          }
          ae_vector_set_length(&cr1, 1, _state);
          corrc1d(&ca, m, &cb, n, &cr1, _state);
@@ -88680,8 +88596,7 @@ static void testalglibbasicsunit_createpoolandrecords(poolrec2 *seedrec2, poolre
    seedrec2->recval.bval = randomreal(_state) > 0.5;
    seedrec2->recval.ival = randominteger(10, _state);
    seedrec2->recval.rval = randomreal(_state);
-   seedrec2->recval.cval.x = randomreal(_state);
-   seedrec2->recval.cval.y = randomreal(_state);
+   seedrec2->recval.cval = complex_from_d(randomreal(_state), randomreal(_state));
    ae_vector_set_length(&seedrec2->recval.i1val, 3, _state);
    seedrec2->recval.i1val.xZ[0] = randominteger(10, _state);
    seedrec2->recval.i1val.xZ[1] = randominteger(10, _state);
@@ -89311,15 +89226,12 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
    divrc = true;
    for (pass = 1; pass <= passcount; pass++) {
    // Test AbsC
-      ca.x = 2 * randomreal(_state) - 1;
-      ca.y = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       ra = abscomplex(ca, _state);
       absc = absc && ae_fabs(ra - ae_sqrt(sqr(ca.x, _state) + sqr(ca.y, _state), _state), _state) < threshold;
    // test Add
-      ca.x = 2 * randomreal(_state) - 1;
-      ca.y = 2 * randomreal(_state) - 1;
-      cb.x = 2 * randomreal(_state) - 1;
-      cb.y = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       ra = 2 * randomreal(_state) - 1;
       rb = 2 * randomreal(_state) - 1;
       res = ae_c_add(ca, cb);
@@ -89329,10 +89241,8 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_add_d(cb, ra);
       addrc = (addrc && ae_fabs(res.x - ra - cb.x, _state) < threshold) && ae_fabs(res.y - cb.y, _state) < threshold;
    // test Sub
-      ca.x = 2 * randomreal(_state) - 1;
-      ca.y = 2 * randomreal(_state) - 1;
-      cb.x = 2 * randomreal(_state) - 1;
-      cb.y = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       ra = 2 * randomreal(_state) - 1;
       rb = 2 * randomreal(_state) - 1;
       res = ae_c_sub(ca, cb);
@@ -89342,10 +89252,8 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_d_sub(ra, cb);
       subrc = (subrc && ae_fabs(res.x - (ra - cb.x), _state) < threshold) && ae_fabs(res.y + cb.y, _state) < threshold;
    // test Mul
-      ca.x = 2 * randomreal(_state) - 1;
-      ca.y = 2 * randomreal(_state) - 1;
-      cb.x = 2 * randomreal(_state) - 1;
-      cb.y = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       ra = 2 * randomreal(_state) - 1;
       rb = 2 * randomreal(_state) - 1;
       res = ae_c_mul(ca, cb);
@@ -89355,11 +89263,9 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_mul_d(cb, ra);
       mulrc = (mulrc && ae_fabs(res.x - ra * cb.x, _state) < threshold) && ae_fabs(res.y - ra * cb.y, _state) < threshold;
    // test Div
-      ca.x = 2 * randomreal(_state) - 1;
-      ca.y = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       do {
-         cb.x = 2 * randomreal(_state) - 1;
-         cb.y = 2 * randomreal(_state) - 1;
+         cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
       } while (abscomplex(cb, _state) <= 0.5);
       ra = 2 * randomreal(_state) - 1;
       do {

@@ -322,6 +322,10 @@ A6.2. Test Stages
 		ae_randommid → randommid, ae_randomreal → randomreal, ae_randombool → randombool, ae_randominteger → randominteger,
 		ae_tickcount → tickcount,
 		ae_complex_from_i → complex_from_i, ae_complex_from_d → complex_from_d
+39	Removed pi() from Ap.{cpp,h} (since it's already defined in Ap.h as a constant, ‟pi”).
+39	Synthesized the local ‟gateway” alglib_impl::complex → alglib::complex function complex_from_c() in Ap.cpp.
+	Generalized existing routines: complex_from_{d,i}(⋯) from (X) to (X, Y = 0.0).
+	Synthesized complex::complex(⋯) and complex_from_{d,i,c}(⋯) for Y ≠ 0.0.
 
 A6.3. Test Results
 ──────────────────
@@ -345,6 +349,7 @@ A6.3. Test Results
 39	7874 1.0x 11766 1.0x 12199 1.0x 9476 1.0x 1639513145 (61b8fc39) 84 // TRFAC failed in TestC.
 39	7874 1.0x 12049 1.0x 10104 1.1x 9367 1.0x 1639516272 (61b90870) 82 // Corrected.
 39	7463 0.8x 11629 1.0x 11769 1.0x 8752 1.0x 1641874215 (61dd0327) 87 // Re-sorted the routines.
+39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -401,19 +406,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7463
-* RGEMM-MTN-16              0.8x
-* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-SEQ-16   (MFLOPS)   7937
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)  12196
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11769
+* RGEMM-SEQ-64   (MFLOPS)  12052
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   8752
+* RGEMM-SEQ-1024 (MFLOPS)   9544
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1641874215
+SEED: 1642926906
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -513,4 +518,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 87 seconds
+Done in 85 seconds
