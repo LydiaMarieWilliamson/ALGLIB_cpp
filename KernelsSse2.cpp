@@ -77,9 +77,7 @@ double rdotv_sse2(ae_int_t n, const Real *x, const Real *y, ae_state *_state) {
             ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pY[0]), _mm_mul_pd(pX[1], pY[1])), _mm_add_pd(_mm_mul_pd(pX[2], pY[2]), _mm_mul_pd(pX[3], pY[3]))), _mm_add_pd(_mm_mul_pd(pX[4], pY[4]), _mm_mul_pd(pX[5], pY[5])));
             break;
          case 7:
-            ans =
-               _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pY[0]), _mm_mul_pd(pX[1], pY[1])), _mm_add_pd(_mm_mul_pd(pX[2], pY[2]), _mm_mul_pd(pX[3], pY[3]))), _mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[4], pY[4]), _mm_mul_pd(pX[5], pY[5])),
-                  _mm_mul_pd(pX[6], pY[6])));
+            ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pY[0]), _mm_mul_pd(pX[1], pY[1])), _mm_add_pd(_mm_mul_pd(pX[2], pY[2]), _mm_mul_pd(pX[3], pY[3]))), _mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[4], pY[4]), _mm_mul_pd(pX[5], pY[5])), _mm_mul_pd(pX[6], pY[6])));
             break;
       }
    }
@@ -162,9 +160,7 @@ double rdotv2_sse2(ae_int_t n, const Real *x, ae_state *_state) {
             ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pX[0]), _mm_mul_pd(pX[1], pX[1])), _mm_add_pd(_mm_mul_pd(pX[2], pX[2]), _mm_mul_pd(pX[3], pX[3]))), _mm_add_pd(_mm_mul_pd(pX[4], pX[4]), _mm_mul_pd(pX[5], pX[5])));
             break;
          case 7:
-            ans =
-               _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pX[0]), _mm_mul_pd(pX[1], pX[1])), _mm_add_pd(_mm_mul_pd(pX[2], pX[2]), _mm_mul_pd(pX[3], pX[3]))), _mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[4], pX[4]), _mm_mul_pd(pX[5], pX[5])),
-                  _mm_mul_pd(pX[6], pX[6])));
+            ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[0], pX[0]), _mm_mul_pd(pX[1], pX[1])), _mm_add_pd(_mm_mul_pd(pX[2], pX[2]), _mm_mul_pd(pX[3], pX[3]))), _mm_add_pd(_mm_add_pd(_mm_mul_pd(pX[4], pX[4]), _mm_mul_pd(pX[5], pX[5])), _mm_mul_pd(pX[6], pX[6])));
             break;
       }
    }

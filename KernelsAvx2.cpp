@@ -781,13 +781,10 @@ void rgemv_straight_avx2(const ae_int_t m, const ae_int_t n, const double alpha,
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_mul_pd(pX[4], pRow[4]));
                break;
             case 6:
-               sum =
-                  _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]),
-                     _mm256_mul_pd(pX[5], pRow[5])));
+               sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]), _mm256_mul_pd(pX[5], pRow[5])));
                break;
             case 7:
-               sum =
-                  _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]), _mm256_mul_pd(pX[5], pRow[5])), _mm256_mul_pd(pX[6], pRow[6])));
+               sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]), _mm256_mul_pd(pX[5], pRow[5])), _mm256_mul_pd(pX[6], pRow[6])));
                break;
          }
       }
@@ -886,19 +883,13 @@ void rgemvx_straight_avx2_xaligned(const ae_int_t m, const ae_int_t n, const dou
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3]))));
                break;
             case 5:
-               sum =
-                  _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))),
-                  _mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])));
+               sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])));
                break;
             case 6:
-               sum =
-                  _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))),
-                  _mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))));
+               sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))));
                break;
             case 7:
-               sum =
-                  _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))),
-                  _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))), _mm256_mul_pd(pX[6], ULOAD256PD(pRow[6]))));
+               sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))), _mm256_mul_pd(pX[6], ULOAD256PD(pRow[6]))));
                break;
          }
       }

@@ -10455,8 +10455,7 @@ bool testsparse(bool silent, ae_state *_state) {
    testsparseunit_testgetrow(&getrowerrors, _state);
    testserialize(&serializeerrors, _state);
 // report
-   waserrors = ((((((((((((((((((skserrors || crserrors) || getrowerrors) || serializeerrors) || basicerrors) || linearerrors) || basicrnderrors) || level2unsymmetricerrors) || level2symmetricerrors) || level2triangularerrors) || level3unsymmetricerrors)
-                           || level3symmetricerrors) || symmetricpermerrors) || linearserrors) || linearmmerrors) || linearsmmerrors) || copyerrors) || basiccopyerrors) || enumerateerrors) || rewriteexistingerr;
+   waserrors = ((((((((((((((((((skserrors || crserrors) || getrowerrors) || serializeerrors) || basicerrors) || linearerrors) || basicrnderrors) || level2unsymmetricerrors) || level2symmetricerrors) || level2triangularerrors) || level3unsymmetricerrors) || level3symmetricerrors) || symmetricpermerrors) || linearserrors) || linearmmerrors) || linearsmmerrors) || copyerrors) || basiccopyerrors) || enumerateerrors) || rewriteexistingerr;
    if (!silent) {
       printf("TESTING SPARSE\n");
       printf("STORAGE FORMAT SPECIFICS:\n");
