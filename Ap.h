@@ -196,7 +196,7 @@ typedef ptrdiff_t ae_int_t;
 
 typedef double Real; // Used in the Kernel*.{cpp,h} files.
 
-struct ae_complex { double x, y; };
+struct complex { double x, y; };
 
 typedef enum { ERR_OK = 0, ERR_OUT_OF_MEMORY = 1, ERR_XARRAY_TOO_LARGE = 2, ERR_ASSERTION_FAILED = 3 } ae_error_type;
 typedef enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 } ae_datatype;
@@ -318,7 +318,7 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 void ae_clean_up_before_breaking(ae_state *state);
 void ae_assert(bool cond, const char *msg, ae_state *state);
 
-int ae_tickcount();
+int tickcount();
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
@@ -357,7 +357,7 @@ struct ae_vector {
       unsigned char *xU;
       ae_int_t *xZ;
       double *xR;
-      ae_complex *xC;
+      complex *xC;
    };
 };
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic);
@@ -384,7 +384,7 @@ struct ae_matrix {
       bool **xyB;
       ae_int_t **xyZ;
       double **xyR;
-      ae_complex **xyC;
+      complex **xyC;
    };
 };
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic);
@@ -681,20 +681,20 @@ bool ae_isneginf(double x, ae_state *state);
 // * standard functions
 double ae_fabs(double x, ae_state *state);
 ae_int_t ae_iabs(ae_int_t x, ae_state *state);
-double ae_sqr(double x, ae_state *state);
+double sqr(double x, ae_state *state);
 double ae_sqrt(double x, ae_state *state);
-ae_int_t ae_sign(double x, ae_state *state);
-ae_int_t ae_round(double x, ae_state *state);
-ae_int_t ae_trunc(double x, ae_state *state);
-ae_int_t ae_ifloor(double x, ae_state *state);
-ae_int_t ae_iceil(double x, ae_state *state);
+ae_int_t sign(double x, ae_state *state);
+ae_int_t iround(double x, ae_state *state);
+ae_int_t itrunc(double x, ae_state *state);
+ae_int_t ifloor(double x, ae_state *state);
+ae_int_t iceil(double x, ae_state *state);
 
-ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2, ae_state *state);
-ae_int_t ae_minint(ae_int_t m1, ae_int_t m2, ae_state *state);
-double ae_maxreal(double m1, double m2, ae_state *state);
-double ae_minreal(double m1, double m2, ae_state *state);
-double ae_randomreal(ae_state *state);
-ae_int_t ae_randominteger(ae_int_t maxv, ae_state *state);
+ae_int_t maxint(ae_int_t m1, ae_int_t m2, ae_state *state);
+ae_int_t minint(ae_int_t m1, ae_int_t m2, ae_state *state);
+double maxreal(double m1, double m2, ae_state *state);
+double minreal(double m1, double m2, ae_state *state);
+double randomreal(ae_state *state);
+ae_int_t randominteger(ae_int_t maxv, ae_state *state);
 double ae_sin(double x, ae_state *state);
 double ae_cos(double x, ae_state *state);
 double ae_tan(double x, ae_state *state);
@@ -712,46 +712,46 @@ double ae_exp(double x, ae_state *state);
 // Complex math functions:
 // *	basic arithmetic operations
 // *	standard functions
-ae_complex ae_complex_from_i(ae_int_t v);
-ae_complex ae_complex_from_d(double v);
+complex complex_from_i(ae_int_t v);
+complex complex_from_d(double v);
 
-ae_complex ae_c_neg(ae_complex lhs);
-ae_complex ae_c_conj(ae_complex lhs, ae_state *state);
-ae_complex ae_c_sqr(ae_complex lhs, ae_state *state);
-double ae_c_abs(ae_complex z, ae_state *state);
+complex ae_c_neg(complex lhs);
+complex conj(complex lhs, ae_state *state);
+complex csqr(complex lhs, ae_state *state);
+double abscomplex(complex z, ae_state *state);
 
-bool ae_c_eq(ae_complex lhs, ae_complex rhs);
-bool ae_c_neq(ae_complex lhs, ae_complex rhs);
+bool ae_c_eq(complex lhs, complex rhs);
+bool ae_c_neq(complex lhs, complex rhs);
 
-ae_complex ae_c_add(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_div(ae_complex lhs, ae_complex rhs);
+complex ae_c_add(complex lhs, complex rhs);
+complex ae_c_mul(complex lhs, complex rhs);
+complex ae_c_sub(complex lhs, complex rhs);
+complex ae_c_div(complex lhs, complex rhs);
 
-bool ae_c_eq_d(ae_complex lhs, double rhs);
-bool ae_c_neq_d(ae_complex lhs, double rhs);
+bool ae_c_eq_d(complex lhs, double rhs);
+bool ae_c_neq_d(complex lhs, double rhs);
 
-ae_complex ae_c_add_d(ae_complex lhs, double rhs);
-ae_complex ae_c_mul_d(ae_complex lhs, double rhs);
-ae_complex ae_c_sub_d(ae_complex lhs, double rhs);
-ae_complex ae_c_d_sub(double lhs, ae_complex rhs);
-ae_complex ae_c_div_d(ae_complex lhs, double rhs);
-ae_complex ae_c_d_div(double lhs, ae_complex rhs);
+complex ae_c_add_d(complex lhs, double rhs);
+complex ae_c_mul_d(complex lhs, double rhs);
+complex ae_c_sub_d(complex lhs, double rhs);
+complex ae_c_d_sub(double lhs, complex rhs);
+complex ae_c_div_d(complex lhs, double rhs);
+complex ae_c_d_div(double lhs, complex rhs);
 
 // Complex BLAS operations.
-ae_complex ae_v_cdotproduct(const ae_complex *A, ae_int_t dA, const char *CjA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
-void ae_v_cmove(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
-void ae_v_cmoveneg(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
-void ae_v_cmoved(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
-void ae_v_cmovec(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
-void ae_v_cadd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
-void ae_v_caddd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
-void ae_v_caddc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
-void ae_v_csub(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
-void ae_v_csubd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
-void ae_v_csubc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
-void ae_v_cmuld(ae_complex *A, ae_int_t dA, ae_int_t N, double Alpha);
-void ae_v_cmulc(ae_complex *A, ae_int_t dA, ae_int_t N, ae_complex Alpha);
+complex ae_v_cdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmoveneg(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmoved(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_cmovec(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void ae_v_cadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_caddd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_caddc(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void ae_v_csub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_csubd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_csubc(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void ae_v_cmuld(complex *A, ae_int_t dA, ae_int_t N, double Alpha);
+void ae_v_cmulc(complex *A, ae_int_t dA, ae_int_t N, complex Alpha);
 
 // Real BLAS operations.
 double ae_v_dotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
@@ -765,17 +765,17 @@ void ae_v_subd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N,
 void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha);
 
 #if 0
-extern const double ae_machineepsilon, ae_maxrealnumber, ae_minrealnumber;
-extern const double ae_pi;
+extern const double machineepsilon, maxrealnumber, minrealnumber;
+extern const double pi;
 #else
-#   define ae_machineepsilon 5E-16
-#   define ae_maxrealnumber  1E300
-#   define ae_minrealnumber  1E-300
-#   define ae_pi 3.1415926535897932384626433832795
+#   define machineepsilon 5E-16
+#   define maxrealnumber  1E300
+#   define minrealnumber  1E-300
+#   define pi 3.1415926535897932384626433832795
 #endif
 
 // Debugging and tracing functions
-void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc);
+void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc);
 const char *ae_get_last_error_file();
 int ae_get_last_error_line();
 const char *ae_get_last_error_xdesc();
@@ -891,7 +891,7 @@ void rcommstate_free(rcommstate *p, bool make_automatic);
 // Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
 bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
 bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
@@ -1133,8 +1133,8 @@ struct complex {
    complex &operator*=(const complex &z);
    complex &operator/=(const double &v);
    complex &operator/=(const complex &z);
-   alglib_impl::ae_complex *c_ptr();
-   const alglib_impl::ae_complex *c_ptr() const;
+   alglib_impl::complex *c_ptr();
+   const alglib_impl::complex *c_ptr() const;
 #if !defined AE_NO_EXCEPTIONS
    std::string tostring(int dps) const;
 #endif

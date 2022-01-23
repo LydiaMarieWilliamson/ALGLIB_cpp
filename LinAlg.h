@@ -45,7 +45,7 @@ void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja,
 double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, RVector *tmp, ae_state *_state);
 void rmatrixtrsv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
 void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
@@ -1039,9 +1039,9 @@ bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, 
 // Depends on: TRFAC
 namespace alglib_impl {
 double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state);
-ae_complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state);
+complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state);
 double rmatrixdet(RMatrix *a, ae_int_t n, ae_state *_state);
-ae_complex cmatrixdet(CMatrix *a, ae_int_t n, ae_state *_state);
+complex cmatrixdet(CMatrix *a, ae_int_t n, ae_state *_state);
 double spdmatrixcholeskydet(RMatrix *a, ae_int_t n, ae_state *_state);
 double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state);
 } // end of namespace alglib_impl

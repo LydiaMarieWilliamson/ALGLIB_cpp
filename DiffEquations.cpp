@@ -66,7 +66,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    if (h == 0.0) {
       v = ae_fabs(x->xR[1] - x->xR[0], _state);
       for (i = 2; i < m; i++) {
-         v = ae_minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
+         v = minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
       }
       h = 0.001 * v;
    }
@@ -306,7 +306,7 @@ lbl_6:
 // These maximums are initialized by zeros,
 // then updated every iterations.
    for (j = 0; j < n; j++) {
-      state->escale.xR[j] = ae_maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
+      state->escale.xR[j] = maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
    }
 // make one step:
 // 1. calculate all info needed to do step
@@ -352,14 +352,14 @@ lbl_10:
    for (j = 0; j < n; j++) {
       if (!state->fraceps) {
       // absolute error is estimated
-         err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state), _state);
+         err = maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state), _state);
       } else {
       // Relative error is estimated
          v = state->escale.xR[j];
          if (v == 0.0) {
             v = 1.0;
          }
-         err = ae_maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
+         err = maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
       }
    }
 // calculate new step, restart if necessary
@@ -372,7 +372,7 @@ lbl_10:
       h2 = h / odesolver_odesolvermaxshrink;
    }
    if (err > state->eps) {
-      h = ae_minreal(h2, odesolver_odesolverguaranteeddecay * h, _state);
+      h = minreal(h2, odesolver_odesolverguaranteeddecay * h, _state);
       goto lbl_6;
    }
 // advance position

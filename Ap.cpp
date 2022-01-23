@@ -519,7 +519,7 @@ void ae_assert(bool cond, const char *msg, ae_state *state) {
 }
 
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-int ae_tickcount() {
+int tickcount() {
    struct timeval now;
    ae_int64_t r, v;
    gettimeofday(&now, NULL);
@@ -534,11 +534,11 @@ int ae_tickcount() {
 #   endif
 }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-int ae_tickcount() {
+int tickcount() {
    return (int)GetTickCount();
 }
 #else
-int ae_tickcount() {
+int tickcount() {
    return 0;
 }
 #endif
@@ -1976,11 +1976,11 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       return;
    } else {
    // base case
-      ae_complex *p1, *p2, *prow, *pcol;
+      complex *p1, *p2, *prow, *pcol;
       double v;
       ae_int_t i, j;
-      p1 = (ae_complex *)a->x_ptr + offset0 * a->stride + offset1;
-      p2 = (ae_complex *)a->x_ptr + offset1 * a->stride + offset0;
+      p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
+      p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2015,7 +2015,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
 //  b) err      componentwise difference between A0 and A0^H
 //
 static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err, ae_state *_state) {
-   ae_complex *p, *prow, *pcol;
+   complex *p, *prow, *pcol;
    double v;
    ae_int_t i, j;
 // try to split problem into two smaller ones
@@ -2028,7 +2028,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       return;
    }
 // base case
-   p = (ae_complex *)a->x_ptr + offset * a->stride + offset;
+   p = (complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -2183,10 +2183,10 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       return;
    } else {
    // base case
-      ae_complex *p1, *p2, *prow, *pcol;
+      complex *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
-      p1 = (ae_complex *)a->x_ptr + offset0 * a->stride + offset1;
-      p2 = (ae_complex *)a->x_ptr + offset1 * a->stride + offset0;
+      p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
+      p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
       for (i = 0; i < len0; i++) {
          pcol = p2 + i;
          prow = p1 + i * a->stride;
@@ -2208,7 +2208,7 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
 //     [          . ]
 //
 static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
-   ae_complex *p, *prow, *pcol;
+   complex *p, *prow, *pcol;
    ae_int_t i, j;
 // try to split problem into two smaller ones
    if (len > x_nb) {
@@ -2220,7 +2220,7 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       return;
    }
 // base case
-   p = (ae_complex *)a->x_ptr + offset * a->stride + offset;
+   p = (complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
       prow = p + i * a->stride;
@@ -3848,7 +3848,7 @@ ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
    return x >= 0 ? x : -x;
 }
 
-double ae_sqr(double x, ae_state *state) {
+double sqr(double x, ae_state *state) {
    return x * x;
 }
 
@@ -3856,45 +3856,45 @@ double ae_sqrt(double x, ae_state *state) {
    return sqrt(x);
 }
 
-ae_int_t ae_sign(double x, ae_state *state) {
+ae_int_t sign(double x, ae_state *state) {
    if (x > 0) return 1;
    if (x < 0) return -1;
    return 0;
 }
 
-ae_int_t ae_round(double x, ae_state *state) {
-   return (ae_int_t)ae_ifloor(x + 0.5, state);
+ae_int_t iround(double x, ae_state *state) {
+   return (ae_int_t)ifloor(x + 0.5, state);
 }
 
-ae_int_t ae_trunc(double x, ae_state *state) {
-   return (ae_int_t)(x > 0 ? ae_ifloor(x, state) : ae_iceil(x, state));
+ae_int_t itrunc(double x, ae_state *state) {
+   return (ae_int_t)(x > 0 ? ifloor(x, state) : iceil(x, state));
 }
 
-ae_int_t ae_ifloor(double x, ae_state *state) {
+ae_int_t ifloor(double x, ae_state *state) {
    return (ae_int_t)floor(x);
 }
 
-ae_int_t ae_iceil(double x, ae_state *state) {
+ae_int_t iceil(double x, ae_state *state) {
    return (ae_int_t)ceil(x);
 }
 
-ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
+ae_int_t maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
    return m1 > m2 ? m1 : m2;
 }
 
-ae_int_t ae_minint(ae_int_t m1, ae_int_t m2, ae_state *state) {
+ae_int_t minint(ae_int_t m1, ae_int_t m2, ae_state *state) {
    return m1 > m2 ? m2 : m1;
 }
 
-double ae_maxreal(double m1, double m2, ae_state *state) {
+double maxreal(double m1, double m2, ae_state *state) {
    return m1 > m2 ? m1 : m2;
 }
 
-double ae_minreal(double m1, double m2, ae_state *state) {
+double minreal(double m1, double m2, ae_state *state) {
    return m1 > m2 ? m2 : m1;
 }
 
-double ae_randomreal(ae_state *state) {
+double randomreal(ae_state *state) {
    int i1 = rand();
    int i2 = rand();
    double mx = (double)RAND_MAX + 1.0;
@@ -3903,7 +3903,7 @@ double ae_randomreal(ae_state *state) {
    return tmp1 / mx;
 }
 
-ae_int_t ae_randominteger(ae_int_t maxv, ae_state *state) {
+ae_int_t randominteger(ae_int_t maxv, ae_state *state) {
    return rand() % maxv;
 }
 
@@ -3960,42 +3960,42 @@ double ae_exp(double x, ae_state *state) {
 }
 
 // Complex math functions
-ae_complex ae_complex_from_i(ae_int_t v) {
-   ae_complex r;
+complex complex_from_i(ae_int_t v) {
+   complex r;
    r.x = (double)v;
    r.y = 0.0;
    return r;
 }
 
-ae_complex ae_complex_from_d(double v) {
-   ae_complex r;
+complex complex_from_d(double v) {
+   complex r;
    r.x = v;
    r.y = 0.0;
    return r;
 }
 
-ae_complex ae_c_neg(ae_complex lhs) {
-   ae_complex result;
+complex ae_c_neg(complex lhs) {
+   complex result;
    result.x = -lhs.x;
    result.y = -lhs.y;
    return result;
 }
 
-ae_complex ae_c_conj(ae_complex lhs, ae_state *state) {
-   ae_complex result;
+complex conj(complex lhs, ae_state *state) {
+   complex result;
    result.x = +lhs.x;
    result.y = -lhs.y;
    return result;
 }
 
-ae_complex ae_c_sqr(ae_complex lhs, ae_state *state) {
-   ae_complex result;
+complex csqr(complex lhs, ae_state *state) {
+   complex result;
    result.x = lhs.x * lhs.x - lhs.y * lhs.y;
    result.y = 2 * lhs.x * lhs.y;
    return result;
 }
 
-double ae_c_abs(ae_complex z, ae_state *state) {
+double abscomplex(complex z, ae_state *state) {
    double w;
    double xabs;
    double yabs;
@@ -4012,7 +4012,7 @@ double ae_c_abs(ae_complex z, ae_state *state) {
    }
 }
 
-bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
+bool ae_c_eq(complex lhs, complex rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -4020,7 +4020,7 @@ bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
    return x1 == x2 && y1 == y2;
 }
 
-bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
+bool ae_c_neq(complex lhs, complex rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -4028,29 +4028,29 @@ bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
    return x1 != x2 || y1 != y2;
 }
 
-ae_complex ae_c_add(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_add(complex lhs, complex rhs) {
+   complex result;
    result.x = lhs.x + rhs.x;
    result.y = lhs.y + rhs.y;
    return result;
 }
 
-ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_mul(complex lhs, complex rhs) {
+   complex result;
    result.x = lhs.x * rhs.x - lhs.y * rhs.y;
    result.y = lhs.x * rhs.y + lhs.y * rhs.x;
    return result;
 }
 
-ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_sub(complex lhs, complex rhs) {
+   complex result;
    result.x = lhs.x - rhs.x;
    result.y = lhs.y - rhs.y;
    return result;
 }
 
-ae_complex ae_c_div(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_div(complex lhs, complex rhs) {
+   complex result;
    double e;
    double f;
    if (fabs(rhs.y) < fabs(rhs.x)) {
@@ -4067,7 +4067,7 @@ ae_complex ae_c_div(ae_complex lhs, ae_complex rhs) {
    return result;
 }
 
-bool ae_c_eq_d(ae_complex lhs, double rhs) {
+bool ae_c_eq_d(complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
@@ -4075,7 +4075,7 @@ bool ae_c_eq_d(ae_complex lhs, double rhs) {
    return x1 == x2 && y1 == y2;
 }
 
-bool ae_c_neq_d(ae_complex lhs, double rhs) {
+bool ae_c_neq_d(complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
@@ -4083,43 +4083,43 @@ bool ae_c_neq_d(ae_complex lhs, double rhs) {
    return x1 != x2 || y1 != y2;
 }
 
-ae_complex ae_c_add_d(ae_complex lhs, double rhs) {
-   ae_complex result;
+complex ae_c_add_d(complex lhs, double rhs) {
+   complex result;
    result.x = lhs.x + rhs;
    result.y = lhs.y;
    return result;
 }
 
-ae_complex ae_c_mul_d(ae_complex lhs, double rhs) {
-   ae_complex result;
+complex ae_c_mul_d(complex lhs, double rhs) {
+   complex result;
    result.x = lhs.x * rhs;
    result.y = lhs.y * rhs;
    return result;
 }
 
-ae_complex ae_c_sub_d(ae_complex lhs, double rhs) {
-   ae_complex result;
+complex ae_c_sub_d(complex lhs, double rhs) {
+   complex result;
    result.x = lhs.x - rhs;
    result.y = lhs.y;
    return result;
 }
 
-ae_complex ae_c_d_sub(double lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_d_sub(double lhs, complex rhs) {
+   complex result;
    result.x = lhs - rhs.x;
    result.y = -rhs.y;
    return result;
 }
 
-ae_complex ae_c_div_d(ae_complex lhs, double rhs) {
-   ae_complex result;
+complex ae_c_div_d(complex lhs, double rhs) {
+   complex result;
    result.x = lhs.x / rhs;
    result.y = lhs.y / rhs;
    return result;
 }
 
-ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
-   ae_complex result;
+complex ae_c_d_div(double lhs, complex rhs) {
+   complex result;
    double e;
    double f;
    if (fabs(rhs.y) < fabs(rhs.x)) {
@@ -4137,12 +4137,12 @@ ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
 }
 
 // Complex BLAS operations
-ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
+complex ae_v_cdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
    double rx = 0.0, ry = 0.0;
    ae_int_t i;
    bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
    bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
-   ae_complex result;
+   complex result;
    if (bconj0 && bconj1) {
       double v0x, v0y, v1x, v1y;
       for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
@@ -4192,7 +4192,7 @@ ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *
    return result;
 }
 
-void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
+void ae_v_cmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4220,7 +4220,7 @@ void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
    }
 }
 
-void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
+void ae_v_cmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4252,7 +4252,7 @@ void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc
    }
 }
 
-void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
+void ae_v_cmoved(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4284,7 +4284,7 @@ void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
    }
 }
 
-void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
+void ae_v_cmovec(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4320,7 +4320,7 @@ void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
    }
 }
 
-void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
+void ae_v_cadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4352,7 +4352,7 @@ void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae
    }
 }
 
-void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
+void ae_v_caddd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4384,7 +4384,7 @@ void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
    }
 }
 
-void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
+void ae_v_caddc(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4418,7 +4418,7 @@ void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
    }
 }
 
-void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
+void ae_v_csub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
    bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
@@ -4450,17 +4450,17 @@ void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae
    }
 }
 
-void ae_v_csubd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
+void ae_v_csubd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
    ae_v_caddd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
 }
 
-void ae_v_csubc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
+void ae_v_csubc(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
    alpha.x = -alpha.x;
    alpha.y = -alpha.y;
    ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, alpha);
 }
 
-void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
+void ae_v_cmuld(complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
    ae_int_t i;
    if (stride_dst != 1) {
    // general unoptimized case
@@ -4477,7 +4477,7 @@ void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha)
    }
 }
 
-void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex alpha) {
+void ae_v_cmulc(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha) {
    ae_int_t i;
    if (stride_dst != 1) {
    // general unoptimized case
@@ -4649,20 +4649,20 @@ const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 
 const double pi = 3.1415926535897932384626433832795;
 #endif
 
-// Error tracking facilities; this fields are modified every time ae_set_error_flag()
+// Error tracking facilities; this fields are modified every time set_error_flag()
 // is called with non-zero cond. Thread unsafe access, but it does not matter actually.
 static const char *sef_file = "";
 static int sef_line = 0;
 static const char *sef_xdesc = "";
 
-void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
+void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
    if (cond) {
       *p_flag = true;
       sef_file = filename;
       sef_line = lineno;
       sef_xdesc = xdesc;
 #ifdef ALGLIB_ABORT_ON_ERROR_FLAG
-      printf("[ALGLIB] aborting on ae_set_error_flag(cond=true)\n");
+      printf("[ALGLIB] aborting on set_error_flag(cond=true)\n");
       printf("[ALGLIB] %s:%d\n", filename, lineno);
       printf("[ALGLIB] %s\n", xdesc);
       fflush(stdout);
@@ -4672,19 +4672,19 @@ void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno
    }
 }
 
-// This function returns file name for the last call of ae_set_error_flag()
+// This function returns file name for the last call of set_error_flag()
 // with non-zero cond parameter.
 const char *ae_get_last_error_file() {
    return sef_file;
 }
 
-// This function returns line number for the last call of ae_set_error_flag()
+// This function returns line number for the last call of set_error_flag()
 // with non-zero cond parameter.
 int ae_get_last_error_line() {
    return sef_line;
 }
 
-// This function returns extra description for the last call of ae_set_error_flag()
+// This function returns extra description for the last call of set_error_flag()
 // with non-zero cond parameter.
 const char *ae_get_last_error_xdesc() {
    return sef_xdesc;
@@ -5256,7 +5256,7 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
 // * A must be stored in row-major order, as sequence of double precision
 //   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
 //   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
+// * Y may be referenced by cy (pointer to complex) or
 //   dy (pointer to array of double precision pair) depending on what type of
 //   output you wish. Pass pointer to Y as one of these parameters,
 //   AND SET OTHER PARAMETER TO NULL.
@@ -5271,7 +5271,7 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
 //
 // If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
-static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex alpha, complex beta) {
    ae_int_t i, j, m2;
    const double *pa0, *pa1, *parow, *pb;
    __m128d vbeta, vbetax, vbetay;
@@ -5382,12 +5382,12 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
 // * A must be stored in row-major order, as sequence of double precision
 //   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
 //   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
+// * Y may be referenced by cy (pointer to complex) or
 //   dy (pointer to array of double precision pair) depending on what type of
 //   output you wish. Pass pointer to Y as one of these parameters,
 //   AND SET OTHER PARAMETER TO NULL.
 // * both A and x must be aligned; y may be non-aligned.
-static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex alpha, complex beta) {
    ae_int_t i, j;
    const double *pa, *parow, *pb;
    parow = a;
@@ -5433,7 +5433,7 @@ static void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
 }
 
 // This subroutine sets vector to zero
-static void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
+static void _ialglib_vzero_complex(ae_int_t n, complex *p, ae_int_t stride) {
    ae_int_t i;
    if (stride == 1) {
       for (i = 0; i < n; i++, p++) {
@@ -5466,11 +5466,11 @@ static void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double
 }
 
 // This subroutine copies unaligned complex vector
-// (passed as ae_complex*)
+// (passed as complex*)
 //
 // 1. strideb is stride measured in complex numbers, not doubles
 // 2. conj may be "N" (no conj.) or "C" (conj.)
-static void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+static void _ialglib_vcopy_complex(ae_int_t n, const complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
    ae_int_t i;
 // more general case
    if (conj[0] == 'N' || conj[0] == 'n') {
@@ -5717,7 +5717,7 @@ static void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_in
 // * non-aligned
 // * non-contigous
 // * may be transformed during copying (as prescribed by op)
-// * pointer to ae_complex is passed
+// * pointer to complex is passed
 //
 // B:
 // * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
@@ -5730,9 +5730,9 @@ static void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_in
 // * 1 - transposition
 // * 2 - conjugate transposition
 // * 3 - conjugate, but no  transposition
-static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
+static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const complex *a, ae_int_t op, ae_int_t stride, double *b) {
    ae_int_t i, j;
-   const ae_complex *psrc;
+   const complex *psrc;
    double *pdst;
    if (op == 0) {
       for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
@@ -5778,17 +5778,17 @@ static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex
 // * MxN
 // * non-aligned
 // * non-contigous
-// * pointer to ae_complex is passed
+// * pointer to complex is passed
 //
 // Transformation types:
 // * 0 - no transform
 // * 1 - transposition
 // * 2 - conjugate transposition
 // * 3 - conjugate, but no  transposition
-static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
+static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, complex *b, ae_int_t stride) {
    ae_int_t i, j;
    const double *psrc;
-   ae_complex *pdst;
+   complex *pdst;
    if (op == 0) {
       for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
          for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
@@ -5871,9 +5871,9 @@ static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 }
 
 // Complex GEMM kernel.
-static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
-   const ae_complex *arow;
-   ae_complex *crow;
+static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, complex *_b, ae_int_t _b_stride, ae_int_t optypeb, complex beta, complex *_c, ae_int_t _c_stride) {
+   const complex *arow;
+   complex *crow;
    ae_int_t i;
    double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
    double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
@@ -5881,7 +5881,7 @@ static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex 
    double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
    ae_int_t brows;
    ae_int_t bcols;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
       return false;
 // Check for SSE2 support
@@ -5977,7 +5977,7 @@ static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int
 }
 
 // Complex Right TRSM kernel.
-static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag;
    ae_int_t i;
@@ -5988,7 +5988,7 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
    bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
 // Check for SSE2 support
@@ -6012,9 +6012,9 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae
 // Solve Y*A^-1=X where A is upper or lower triangular
    if (uppera) {
       for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
+         complex tmp_c;
+         complex beta;
+         complex alpha;
          tmp_c.x = pdiag[0];
          tmp_c.y = pdiag[1];
          beta = ae_c_d_div(1.0, tmp_c);
@@ -6026,9 +6026,9 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae
       _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    } else {
       for (i = n - 1, pdiag = abuf + 2 * ((n - 1) * alglib_c_block + (n - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
+         complex tmp_c;
+         complex beta;
+         complex alpha;
          tmp_c.x = pdiag[0];
          tmp_c.y = pdiag[1];
          beta = ae_c_d_div(1.0, tmp_c);
@@ -6098,7 +6098,7 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
 }
 
 // Complex Left TRSM kernel.
-static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag, *arow;
    ae_int_t i;
@@ -6109,7 +6109,7 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
    bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
 // Check for SSE2 support
@@ -6134,9 +6134,9 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_
 // Solve A^-1*Y^T=X^T where A is upper or lower triangular
    if (uppera) {
       for (i = m - 1, pdiag = abuf + 2 * ((m - 1) * alglib_c_block + (m - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
+         complex tmp_c;
+         complex beta;
+         complex alpha;
          tmp_c.x = pdiag[0];
          tmp_c.y = pdiag[1];
          beta = ae_c_d_div(1.0, tmp_c);
@@ -6148,9 +6148,9 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_
       _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
    } else {
       for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
+         complex tmp_c;
+         complex beta;
+         complex alpha;
          tmp_c.x = pdiag[0];
          tmp_c.y = pdiag[1];
          beta = ae_c_d_div(1.0, tmp_c);
@@ -6213,10 +6213,10 @@ static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_
 }
 
 // Complex SYRK/HERK kernel.
-static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
+static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, complex *_c, ae_int_t _c_stride, bool isupper) {
 // local buffers
    double *arow, *crow;
-   ae_complex c_alpha, c_beta;
+   complex c_alpha, c_beta;
    ae_int_t i;
    double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
@@ -6316,9 +6316,9 @@ static bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _
 }
 
 // Complex rank-1 kernel.
-static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
+static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, complex *_u, complex *_v) {
 // Locals
-   ae_complex *arow, *pu, *pv, *vtmp, *dst;
+   complex *arow, *pu, *pv, *vtmp, *dst;
    ae_int_t n2 = n / 2;
    ae_int_t i, j;
 // Quick exit
@@ -6414,7 +6414,7 @@ bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, a
    return _ialglib_rmatrixgemm(m, n, k, alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, beta, _c->xyR[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if ((alpha.x == 0.0 && alpha.y == 0) || k == 0 || n == 0 || m == 0)
       return false;
@@ -7608,7 +7608,7 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = ae_maxreal(x->xR[i], y->xR[i], _state);
+      x->xR[i] = maxreal(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -7629,7 +7629,7 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = ae_maxreal(x->xyR[rowidx][i], y->xR[i], _state);
+      x->xyR[rowidx][i] = maxreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -7650,7 +7650,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i < n; i++) {
-      y->xR[i] = ae_maxreal(y->xR[i], x->xyR[rowidx][i], _state);
+      y->xR[i] = maxreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -7671,7 +7671,7 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = ae_minreal(x->xR[i], y->xR[i], _state);
+      x->xR[i] = minreal(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -7692,7 +7692,7 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = ae_minreal(x->xyR[rowidx][i], y->xR[i], _state);
+      x->xyR[rowidx][i] = minreal(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -7713,7 +7713,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i < n; i++) {
-      y->xR[i] = ae_minreal(y->xR[i], x->xyR[rowidx][i], _state);
+      y->xR[i] = minreal(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -8897,12 +8897,12 @@ complex &complex::operator/=(const complex &z) {
    return *this;
 }
 
-alglib_impl::ae_complex *complex::c_ptr() {
-   return (alglib_impl::ae_complex *)this;
+alglib_impl::complex *complex::c_ptr() {
+   return (alglib_impl::complex *)this;
 }
 
-const alglib_impl::ae_complex *complex::c_ptr() const {
-   return (const alglib_impl::ae_complex *)this;
+const alglib_impl::complex *complex::c_ptr() const {
+   return (const alglib_impl::complex *)this;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -9082,7 +9082,7 @@ const xparams &parallel = *(const xparams *)&_i64_xparallel;
 
 ae_int_t getnworkers() {
 #ifdef AE_HPC
-   return alglib_impl::ae_get_cores_to_use();
+   return alglib_impl::getnworkers();
 #else
    return 1;
 #endif
@@ -9090,7 +9090,7 @@ ae_int_t getnworkers() {
 
 void setnworkers(ae_int_t nworkers) {
 #ifdef AE_HPC
-   alglib_impl::ae_set_cores_to_use(nworkers);
+   alglib_impl::setnworkers(nworkers);
 #endif
 }
 

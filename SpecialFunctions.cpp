@@ -74,7 +74,7 @@ double gammafunction(double x, ae_state *_state) {
    if (q > 33.0) {
       if (x < 0.0) {
          p = floor(q);
-         i = ae_round(p, _state);
+         i = iround(p, _state);
          if (i % 2 == 0) {
             sgngam = -1.0;
          }
@@ -83,9 +83,9 @@ double gammafunction(double x, ae_state *_state) {
             p = p + 1;
             z = q - p;
          }
-         z = q * ae_sin(ae_pi * z, _state);
+         z = q * ae_sin(pi * z, _state);
          z = ae_fabs(z, _state);
-         z = ae_pi / (z * gammafunc_gammastirf(q, _state));
+         z = pi / (z * gammafunc_gammastirf(q, _state));
       } else {
          z = gammafunc_gammastirf(x, _state);
       }
@@ -194,7 +194,7 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
       q = -x;
       w = lngamma(q, &tmp, _state);
       p = floor(q);
-      i = ae_round(p, _state);
+      i = iround(p, _state);
       if (i % 2 == 0) {
          *sgngam = -1.0;
       } else {
@@ -205,7 +205,7 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
          p = p + 1;
          z = p - q;
       }
-      z = q * ae_sin(ae_pi * z, _state);
+      z = q * ae_sin(pi * z, _state);
       result = logpi - ae_log(z, _state) - w;
       return result;
    }
@@ -337,7 +337,7 @@ double errorfunction(double x, ae_state *_state) {
    double p;
    double q;
    double result;
-   s = (double)ae_sign(x, _state);
+   s = (double)sign(x, _state);
    x = ae_fabs(x, _state);
    if (x < 0.5) {
       xsq = x * x;
@@ -426,7 +426,7 @@ double errorfunctionc(double x, ae_state *_state) {
    q = 6089.5424232724435504633068 + x * q;
    q = 4958.82756472114071495438422 + x * q;
    q = 1826.3348842295112595576438 + x * q;
-   result = ae_exp(-ae_sqr(x, _state), _state) * p / q;
+   result = ae_exp(-sqr(x, _state), _state) * p / q;
    return result;
 }
 
@@ -452,7 +452,7 @@ double normaldistribution(double x, ae_state *_state) {
 double normalpdf(double x, ae_state *_state) {
    double result;
    ae_assert(ae_isfinite(x, _state), "NormalPDF: X is infinite", _state);
-   result = ae_exp(-x * x / 2, _state) / ae_sqrt(2 * ae_pi, _state);
+   result = ae_exp(-x * x / 2, _state) / ae_sqrt(2 * pi, _state);
    return result;
 }
 
@@ -535,11 +535,11 @@ double invnormalcdf(double y0, ae_state *_state) {
    expm2 = 0.13533528323661269189;
    s2pi = 2.50662827463100050242;
    if (y0 <= 0.0) {
-      result = -ae_maxrealnumber;
+      result = -maxrealnumber;
       return result;
    }
    if (y0 >= 1.0) {
-      result = ae_maxrealnumber;
+      result = maxrealnumber;
       return result;
    }
    code = 1;
@@ -664,7 +664,7 @@ double bivariatenormalpdf(double x, double y, double rho, ae_state *_state) {
    ae_assert(ae_isfinite(rho, _state), "BivariateNormalCDF: Rho is infinite", _state);
    ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range", _state);
    onerho2 = (1 - rho) * (1 + rho);
-   result = ae_exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2), _state) / (2 * ae_pi * ae_sqrt(onerho2, _state));
+   result = ae_exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2), _state) / (2 * pi * ae_sqrt(onerho2, _state));
    return result;
 }
 
@@ -776,18 +776,18 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749, _state);
       v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192, _state);
       v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192, _state);
-      v = v * 0.5 * (rangeb - rangea) / (2 * ae_pi);
+      v = v * 0.5 * (rangeb - rangea) / (2 * pi);
       result = normalcdf(x, _state) * normalcdf(y, _state) + v;
    } else {
    // Rho is large, compute integral using using formula (6) by Alan Genz, integrated
    // by means of 20-point Gauss-Legendre quadrature.
       x = -x;
       y = -y;
-      s = (double)ae_sign(rho, _state);
+      s = (double)sign(rho, _state);
       if (s > 0.0) {
-         fxys = normalcdf(-ae_maxreal(x, y, _state), _state);
+         fxys = normalcdf(-maxreal(x, y, _state), _state);
       } else {
-         fxys = ae_maxreal(0.0, normalcdf(-x, _state) - normalcdf(y, _state), _state);
+         fxys = maxreal(0.0, normalcdf(-x, _state) - normalcdf(y, _state), _state);
       }
       rangea = 0.0;
       rangeb = ae_sqrt((1 - rho) * (1 + rho), _state);
@@ -795,8 +795,8 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       ta = rangeb;
       tb = ae_fabs(x - s * y, _state);
       tc = (4 - s * x * y) / 8;
-      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * ae_exp(-tb * tb / (2 * ta * ta), _state) - tb * (1 - tc * tb * tb / 3) * ae_sqrt(2 * ae_pi, _state) * normalcdf(-tb / ta, _state);
-      v0 = v0 * ae_exp(-s * x * y / 2, _state) / (2 * ae_pi);
+      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * ae_exp(-tb * tb / (2 * ta * ta), _state) - tb * (1 - tc * tb * tb / 3) * ae_sqrt(2 * pi, _state) * normalcdf(-tb / ta, _state);
+      v0 = v0 * ae_exp(-s * x * y / 2, _state) / (2 * pi);
    // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
       v1 = 0.0;
       v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973, _state);
@@ -819,11 +819,11 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138, _state);
       v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949, _state);
       v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949, _state);
-      v1 = v1 * 0.5 * (rangeb - rangea) / (2 * ae_pi);
+      v1 = v1 * 0.5 * (rangeb - rangea) / (2 * pi);
       result = fxys - s * (v0 + v1);
    }
-   result = ae_maxreal(result, 0.0, _state);
-   result = ae_minreal(result, 1.0, _state);
+   result = maxreal(result, 0.0, _state);
+   result = minreal(result, 1.0, _state);
    return result;
 }
 } // end of namespace alglib_impl
@@ -974,7 +974,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
    ans = 1.0;
    r = 1.0;
    n = 0;
-   thresh = 3.0 * ae_machineepsilon;
+   thresh = 3.0 * machineepsilon;
    do {
       xk = -x * k1 * k2 / (k3 * k4);
       pk = pkm1 + pkm2 * xk;
@@ -1072,7 +1072,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
    ans = 1.0;
    r = 1.0;
    n = 0;
-   thresh = 3.0 * ae_machineepsilon;
+   thresh = 3.0 * machineepsilon;
    do {
       xk = -z * k1 * k2 / (k3 * k4);
       pk = pkm1 + pkm2 * xk;
@@ -1149,7 +1149,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    t = u;
    n = 2.0;
    s = 0.0;
-   z = ae_machineepsilon * ai;
+   z = machineepsilon * ai;
    while (ae_fabs(v, _state) > z) {
       u = (n - b) * x / n;
       t = t * u;
@@ -1160,12 +1160,12 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    s = s + t1;
    s = s + ai;
    u = a * ae_log(x, _state);
-   if (a + b < maxgam && ae_fabs(u, _state) < ae_log(ae_maxrealnumber, _state)) {
+   if (a + b < maxgam && ae_fabs(u, _state) < ae_log(maxrealnumber, _state)) {
       t = gammafunction(a + b, _state) / (gammafunction(a, _state) * gammafunction(b, _state));
       s = s * t * ae_pow(x, a, _state);
    } else {
       t = lngamma(a + b, &sg, _state) - lngamma(a, &sg, _state) - lngamma(b, &sg, _state) + u + ae_log(s, _state);
-      if (t < ae_log(ae_minrealnumber, _state)) {
+      if (t < ae_log(minrealnumber, _state)) {
          s = 0.0;
       } else {
          s = ae_exp(t, _state);
@@ -1231,8 +1231,8 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
    big = 4.503599627370496e15;
    biginv = 2.22044604925031308085e-16;
    maxgam = 171.624376956302725;
-   minlog = ae_log(ae_minrealnumber, _state);
-   maxlog = ae_log(ae_maxrealnumber, _state);
+   minlog = ae_log(minrealnumber, _state);
+   maxlog = ae_log(maxrealnumber, _state);
    ae_assert(a > 0.0 && b > 0.0, "Domain error in IncompleteBeta", _state);
    ae_assert(x >= 0.0 && x <= 1.0, "Domain error in IncompleteBeta", _state);
    if (x == 0.0) {
@@ -1261,8 +1261,8 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
    }
    if ((flag == 1 && b * x <= 1.0) && x <= 0.95) {
       t = ibetaf_incompletebetaps(a, b, x, maxgam, _state);
-      if (t <= ae_machineepsilon) {
-         result = 1.0 - ae_machineepsilon;
+      if (t <= machineepsilon) {
+         result = 1.0 - machineepsilon;
       } else {
          result = 1.0 - t;
       }
@@ -1283,8 +1283,8 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
       t = t * w;
       t = t * (gammafunction(a + b, _state) / (gammafunction(a, _state) * gammafunction(b, _state)));
       if (flag == 1) {
-         if (t <= ae_machineepsilon) {
-            result = 1.0 - ae_machineepsilon;
+         if (t <= machineepsilon) {
+            result = 1.0 - machineepsilon;
          } else {
             result = 1.0 - t;
          }
@@ -1301,8 +1301,8 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
       t = ae_exp(y, _state);
    }
    if (flag == 1) {
-      if (t <= ae_machineepsilon) {
-         t = 1.0 - ae_machineepsilon;
+      if (t <= machineepsilon) {
+         t = 1.0 - machineepsilon;
       } else {
          t = 1.0 - t;
       }
@@ -1437,7 +1437,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
          x = 2.0 / (1.0 / (2.0 * aaa - 1.0) + 1.0 / (2.0 * bbb - 1.0));
          d = yp * ae_sqrt(x + lgm, _state) / x - (1.0 / (2.0 * bbb - 1.0) - 1.0 / (2.0 * aaa - 1.0)) * (lgm + 5.0 / 6.0 - 2.0 / (3.0 * x));
          d = 2.0 * d;
-         if (d < ae_log(ae_minrealnumber, _state)) {
+         if (d < ae_log(minrealnumber, _state)) {
             x = 0.0;
             break;
          }
@@ -1465,7 +1465,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
             if (i != 0) {
                x = x0 + di * (x1 - x0);
                if (x == 1.0) {
-                  x = 1.0 - ae_machineepsilon;
+                  x = 1.0 - machineepsilon;
                }
                if (x == 0.0) {
                   di = 0.5;
@@ -1527,7 +1527,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                }
             } else {
                x1 = x;
-               if (rflg == 1 && x1 < ae_machineepsilon) {
+               if (rflg == 1 && x1 < machineepsilon) {
                   x = 0.0;
                   break;
                }
@@ -1559,7 +1559,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
    // breakihalvecycle
       if (mainlooppos == breakihalvecycle) {
          if (x0 >= 1.0) {
-            x = 1.0 - ae_machineepsilon;
+            x = 1.0 - machineepsilon;
             break;
          }
          if (x <= 0.0) {
@@ -1608,10 +1608,10 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                continue;
             }
             d = (aaa - 1.0) * ae_log(x, _state) + (bbb - 1.0) * ae_log(1.0 - x, _state) + lgm;
-            if (d < ae_log(ae_minrealnumber, _state)) {
+            if (d < ae_log(minrealnumber, _state)) {
                break;
             }
-            if (d > ae_log(ae_maxrealnumber, _state)) {
+            if (d > ae_log(maxrealnumber, _state)) {
                mainlooppos = breaknewtcycle;
                continue;
             }
@@ -1635,7 +1635,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                }
             }
             x = xt;
-            if (ae_fabs(d / x, _state) < 128.0 * ae_machineepsilon) {
+            if (ae_fabs(d / x, _state) < 128.0 * machineepsilon) {
                break;
             }
             i = i + 1;
@@ -1648,15 +1648,15 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
       }
    // breaknewtcycle
       if (mainlooppos == breaknewtcycle) {
-         dithresh = 256.0 * ae_machineepsilon;
+         dithresh = 256.0 * machineepsilon;
          mainlooppos = ihalve;
          continue;
       }
    }
 // done
    if (rflg != 0) {
-      if (x <= ae_machineepsilon) {
-         x = 1.0 - ae_machineepsilon;
+      if (x <= machineepsilon) {
+         x = 1.0 - machineepsilon;
       } else {
          x = 1.0 - x;
       }
@@ -1766,19 +1766,19 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
          f = 1.0;
          tz = 1.0;
          j = 3;
-         while (j < k - 1 && tz / f > ae_machineepsilon) {
+         while (j < k - 1 && tz / f > machineepsilon) {
             tz = tz * ((j - 1) / (z * j));
             f = f + tz;
             j = j + 2;
          }
          p = p + f * xsqk / z;
       }
-      p = p * 2.0 / ae_pi;
+      p = p * 2.0 / pi;
    } else {
       f = 1.0;
       tz = 1.0;
       j = 2;
-      while (j < k - 1 && tz / f > ae_machineepsilon) {
+      while (j < k - 1 && tz / f > machineepsilon) {
          tz = tz * ((j - 1) / (z * j));
          f = f + tz;
          j = j + 2;
@@ -1836,8 +1836,8 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
       rflg = 1;
    }
    z = invincompletebeta(0.5 * rk, 0.5, 2.0 * p, _state);
-   if (ae_maxrealnumber * z < rk) {
-      result = rflg * ae_maxrealnumber;
+   if (maxrealnumber * z < rk) {
+      result = rflg * maxrealnumber;
       return result;
    }
    t = ae_sqrt(rk / z - rk, _state);
@@ -3047,7 +3047,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
          } else {
             t = 1.0;
          }
-      } while (t >= ae_machineepsilon);
+      } while (t >= machineepsilon);
       t = 1.0;
       for (i = 1; i < n; i++) {
          t = t * z / i;
@@ -3089,7 +3089,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
             qkm2 = qkm2 / big;
             qkm1 = qkm1 / big;
          }
-      } while (t >= ae_machineepsilon);
+      } while (t >= machineepsilon);
       result = result * ae_exp(-x, _state);
    }
    return result;
@@ -3207,7 +3207,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    c.xR[0] = ae_sqrt(m, _state);
    twon = 1.0;
    i = 0;
-   while (ae_fabs(c.xR[i] / a.xR[i], _state) > ae_machineepsilon) {
+   while (ae_fabs(c.xR[i] / a.xR[i], _state) > machineepsilon) {
       if (i > 7) {
          ae_assert(false, "Overflow in JacobianEllipticFunctions", _state);
          break;
@@ -3312,7 +3312,7 @@ void sinecosineintegrals(double x, double *si, double *ci, ae_state *_state) {
    }
    if (x == 0.0) {
       *si = 0.0;
-      *ci = -ae_maxrealnumber;
+      *ci = -maxrealnumber;
       return;
    }
    if (x > 1.0E9) {
@@ -3505,7 +3505,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
    }
    if (x == 0.0) {
       *shi = 0.0;
-      *chi = -ae_maxrealnumber;
+      *chi = -maxrealnumber;
       return;
    }
    if (x < 8.0) {
@@ -3521,7 +3521,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
          a = a / k;
          s = s + a / k;
          k = k + 1.0;
-      } while (ae_fabs(a / s, _state) >= ae_machineepsilon);
+      } while (ae_fabs(a / s, _state) >= machineepsilon);
       s = s * x;
    } else {
       if (x < 18.0) {
@@ -3633,11 +3633,11 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
             c = k * 0.5 * (b0 - b2);
          } else {
             if (sg != 0) {
-               *shi = -ae_maxrealnumber;
+               *shi = -maxrealnumber;
             } else {
-               *shi = ae_maxrealnumber;
+               *shi = maxrealnumber;
             }
-            *chi = ae_maxrealnumber;
+            *chi = maxrealnumber;
             return;
          }
       }
@@ -4035,7 +4035,7 @@ double beta(double a, double b, ae_state *_state) {
       sg = sg * s;
       y = lngamma(a, &s, _state) + y;
       sg = sg * s;
-      ae_assert(y <= ae_log(ae_maxrealnumber, _state), "Overflow in Beta", _state);
+      ae_assert(y <= ae_log(maxrealnumber, _state), "Overflow in Beta", _state);
       result = sg * ae_exp(y, _state);
       return result;
    }
@@ -4160,13 +4160,13 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
       cd = cd * t + 8.68029542941784300606E-4;
       cd = cd * t + 4.12142090722199792936E-2;
       cd = cd * t + 1.00000000000000000118E0;
-      *s = ae_sign(xxa, _state) * x * x2 * sn / sd;
-      *c = ae_sign(xxa, _state) * x * cn / cd;
+      *s = sign(xxa, _state) * x * x2 * sn / sd;
+      *c = sign(xxa, _state) * x * cn / cd;
       return;
    }
    if (x > 36974.0) {
-      *c = ae_sign(xxa, _state) * 0.5;
-      *s = ae_sign(xxa, _state) * 0.5;
+      *c = sign(xxa, _state) * 0.5;
+      *s = sign(xxa, _state) * 0.5;
       return;
    }
    x2 = x * x;
@@ -4225,8 +4225,8 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
    t = mpi * x;
    *c = 0.5 + (f * ss - g * cc) / t;
    *s = 0.5 - (f * cc + g * ss) / t;
-   *c = *c * ae_sign(xxa, _state);
-   *s = *s * ae_sign(xxa, _state);
+   *c = *c * sign(xxa, _state);
+   *s = *s * sign(xxa, _state);
 }
 } // end of namespace alglib_impl
 
@@ -4302,7 +4302,7 @@ double psi(double x, ae_state *_state) {
       p = floor(q);
       if (p == q) {
          ae_assert(false, "Singularity in Psi(x)", _state);
-         result = ae_maxrealnumber;
+         result = maxrealnumber;
          return result;
       }
       nz = q - p;
@@ -4311,7 +4311,7 @@ double psi(double x, ae_state *_state) {
             p = p + 1.0;
             nz = q - p;
          }
-         nz = ae_pi / ae_tan(ae_pi * nz, _state);
+         nz = pi / ae_tan(pi * nz, _state);
       } else {
          nz = 0.0;
       }
@@ -4319,7 +4319,7 @@ double psi(double x, ae_state *_state) {
    }
    if (x <= 10.0 && x == floor(x)) {
       y = 0.0;
-      n = ae_ifloor(x, _state);
+      n = ifloor(x, _state);
       for (i = 1; i < n; i++) {
          w = (double)i;
          y = y + 1.0 / w;
@@ -4444,8 +4444,8 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
    if (x > 25.77) {
       *ai = 0.0;
       *aip = 0.0;
-      *bi = ae_maxrealnumber;
-      *bip = ae_maxrealnumber;
+      *bi = maxrealnumber;
+      *bip = maxrealnumber;
       return;
    }
    if (x < -2.09) {
@@ -4499,7 +4499,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
       agd = agd * zz + 1.17166733214413521882E-6;
       agd = agd * zz + 4.91834570062930015649E-9;
       ug = z * agn / agd;
-      theta = zeta + 0.25 * ae_pi;
+      theta = zeta + 0.25 * pi;
       f = ae_sin(theta, _state);
       g = ae_cos(theta, _state);
       *ai = k * (f * uf - g * ug);
@@ -4635,7 +4635,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
    ug = x;
    k = 1.0;
    z = x * x * x;
-   while (t > ae_machineepsilon) {
+   while (t > machineepsilon) {
       uf = uf * z;
       k = k + 1.0;
       uf = uf / k;
@@ -4664,7 +4664,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
    g = 1.0 + ug;
    uf = uf / 3.0;
    t = 1.0;
-   while (t > ae_machineepsilon) {
+   while (t > machineepsilon) {
       uf = uf * z;
       ug = ug / k;
       k = k + 1.0;
@@ -5232,11 +5232,11 @@ double besselj0(double x, ae_state *_state) {
    }
    if (x > 8.0) {
       bessel_besselasympt0(x, &pzero, &qzero, _state);
-      nn = x - ae_pi / 4;
-      result = ae_sqrt(2 / ae_pi / x, _state) * (pzero * ae_cos(nn, _state) - qzero * ae_sin(nn, _state));
+      nn = x - pi / 4;
+      result = ae_sqrt(2 / pi / x, _state) * (pzero * ae_cos(nn, _state) - qzero * ae_sin(nn, _state));
       return result;
    }
-   xsq = ae_sqr(x, _state);
+   xsq = sqr(x, _state);
    p1 = 26857.86856980014981415848441;
    p1 = -40504123.71833132706360663322 + xsq * p1;
    p1 = 25071582855.36881945555156435 + xsq * p1;
@@ -5287,20 +5287,20 @@ double besselj1(double x, ae_state *_state) {
    double p1;
    double q1;
    double result;
-   s = (double)ae_sign(x, _state);
+   s = (double)sign(x, _state);
    if (x < 0.0) {
       x = -x;
    }
    if (x > 8.0) {
       bessel_besselasympt1(x, &pzero, &qzero, _state);
-      nn = x - 3 * ae_pi / 4;
-      result = ae_sqrt(2 / ae_pi / x, _state) * (pzero * ae_cos(nn, _state) - qzero * ae_sin(nn, _state));
+      nn = x - 3 * pi / 4;
+      result = ae_sqrt(2 / pi / x, _state) * (pzero * ae_cos(nn, _state) - qzero * ae_sin(nn, _state));
       if (s < 0.0) {
          result = -result;
       }
       return result;
    }
-   xsq = ae_sqr(x, _state);
+   xsq = sqr(x, _state);
    p1 = 2701.122710892323414856790990;
    p1 = -4695753.530642995859767162166 + xsq * p1;
    p1 = 3413234182.301700539091292655 + xsq * p1;
@@ -5391,7 +5391,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       }
       return result;
    }
-   if (x < ae_machineepsilon) {
+   if (x < machineepsilon) {
       result = 0.0;
       return result;
    }
@@ -5462,11 +5462,11 @@ double bessely0(double x, ae_state *_state) {
    double result;
    if (x > 8.0) {
       bessel_besselasympt0(x, &pzero, &qzero, _state);
-      nn = x - ae_pi / 4;
-      result = ae_sqrt(2 / ae_pi / x, _state) * (pzero * ae_sin(nn, _state) + qzero * ae_cos(nn, _state));
+      nn = x - pi / 4;
+      result = ae_sqrt(2 / pi / x, _state) * (pzero * ae_sin(nn, _state) + qzero * ae_cos(nn, _state));
       return result;
    }
-   xsq = ae_sqr(x, _state);
+   xsq = sqr(x, _state);
    p4 = -41370.35497933148554125235152;
    p4 = 59152134.65686889654273830069 + xsq * p4;
    p4 = -34363712229.79040378171030138 + xsq * p4;
@@ -5485,7 +5485,7 @@ double bessely0(double x, ae_state *_state) {
    q4 = 23928830434997818.57439356652 + xsq * q4;
    q4 = 4192417043410839973.904769661 + xsq * q4;
    q4 = 372645883898616588198.9980 + xsq * q4;
-   result = p4 / q4 + 2 / ae_pi * besselj0(x, _state) * ae_log(x, _state);
+   result = p4 / q4 + 2 / pi * besselj0(x, _state) * ae_log(x, _state);
    return result;
 }
 
@@ -5519,11 +5519,11 @@ double bessely1(double x, ae_state *_state) {
    double result;
    if (x > 8.0) {
       bessel_besselasympt1(x, &pzero, &qzero, _state);
-      nn = x - 3 * ae_pi / 4;
-      result = ae_sqrt(2 / ae_pi / x, _state) * (pzero * ae_sin(nn, _state) + qzero * ae_cos(nn, _state));
+      nn = x - 3 * pi / 4;
+      result = ae_sqrt(2 / pi / x, _state) * (pzero * ae_sin(nn, _state) + qzero * ae_cos(nn, _state));
       return result;
    }
-   xsq = ae_sqr(x, _state);
+   xsq = sqr(x, _state);
    p4 = -2108847.540133123652824139923;
    p4 = 3639488548.124002058278999428 + xsq * p4;
    p4 = -2580681702194.450950541426399 + xsq * p4;
@@ -5543,7 +5543,7 @@ double bessely1(double x, ae_state *_state) {
    q4 = 29549879358971486742.90758119 + xsq * q4;
    q4 = 5435310377188854170800.653097 + xsq * q4;
    q4 = 508206736694124324531442.4152 + xsq * q4;
-   result = x * p4 / q4 + 2 / ae_pi * (besselj1(x, _state) * ae_log(x, _state) - 1 / x);
+   result = x * p4 / q4 + 2 / pi * (besselj1(x, _state) * ae_log(x, _state) - 1 / x);
    return result;
 }
 
@@ -6031,14 +6031,14 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
                zn = zn * z;
                t = nk1f * zn / kf;
                s = s + t;
-               ae_assert(ae_maxrealnumber - ae_fabs(t, _state) > ae_fabs(s, _state), "Overflow in BesselKN", _state);
-               ae_assert(!(tox > 1.0 && ae_maxrealnumber / tox < zmn), "Overflow in BesselKN", _state);
+               ae_assert(maxrealnumber - ae_fabs(t, _state) > ae_fabs(s, _state), "Overflow in BesselKN", _state);
+               ae_assert(!(tox > 1.0 && maxrealnumber / tox < zmn), "Overflow in BesselKN", _state);
                zmn = zmn * tox;
             }
             s = s * 0.5;
             t = ae_fabs(s, _state);
-            ae_assert(!(zmn > 1.0 && ae_maxrealnumber / zmn < t), "Overflow in BesselKN", _state);
-            ae_assert(!(t > 1.0 && ae_maxrealnumber / t < zmn), "Overflow in BesselKN", _state);
+            ae_assert(!(zmn > 1.0 && maxrealnumber / zmn < t), "Overflow in BesselKN", _state);
+            ae_assert(!(t > 1.0 && maxrealnumber / t < zmn), "Overflow in BesselKN", _state);
             ans = s * zmn;
          }
       }
@@ -6059,7 +6059,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
          pn = pn + 1.0 / (k + n);
          s = s + (pk + pn - tlg) * t;
          k = k + 1.0;
-      } while (ae_fabs(t / s, _state) > ae_machineepsilon);
+      } while (ae_fabs(t / s, _state) > machineepsilon);
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
          s = -s;
@@ -6068,7 +6068,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       result = ans;
       return result;
    }
-   if (x > ae_log(ae_maxrealnumber, _state)) {
+   if (x > ae_log(maxrealnumber, _state)) {
       result = 0.0;
       return result;
    }
@@ -6079,7 +6079,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
    fn = 1.0;
    t = 1.0;
    s = t;
-   nkf = ae_maxrealnumber;
+   nkf = maxrealnumber;
    i = 0;
    do {
       z = pn - pk * pk;
@@ -6093,8 +6093,8 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       fn = fn + 1.0;
       pk = pk + 2.0;
       i = i + 1;
-   } while (ae_fabs(t / s, _state) > ae_machineepsilon);
-   result = ae_exp(-x, _state) * ae_sqrt(ae_pi / (2.0 * x), _state) * s;
+   } while (ae_fabs(t / s, _state) > machineepsilon);
+   result = ae_exp(-x, _state) * ae_sqrt(pi / (2.0 * x), _state) * s;
    return result;
 }
 } // end of namespace alglib_impl
@@ -6361,7 +6361,7 @@ double ellipticintegralkhighprecision(double m1, ae_state *_state) {
    double p;
    double q;
    double result;
-   if (m1 <= ae_machineepsilon) {
+   if (m1 <= machineepsilon) {
       result = 1.3862943611198906188E0 - 0.5 * ae_log(m1, _state);
    } else {
       p = 1.37982864606273237150E-4;
@@ -6483,7 +6483,7 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
       result = ae_log(ae_tan(0.5 * (pio2 + phi), _state), _state);
       return result;
    }
-   npio2 = ae_ifloor(phi / pio2, _state);
+   npio2 = ifloor(phi / pio2, _state);
    if (npio2 % 2 != 0) {
       npio2 = npio2 + 1;
    }
@@ -6520,10 +6520,10 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
    c = ae_sqrt(m, _state);
    d = 1;
    md = 0;
-   while (ae_fabs(c / a, _state) > ae_machineepsilon) {
+   while (ae_fabs(c / a, _state) > machineepsilon) {
       temp = b / a;
-      phi = phi + ae_atan(t * temp, _state) + md * ae_pi;
-      md = ae_trunc((phi + pio2) / ae_pi, _state);
+      phi = phi + ae_atan(t * temp, _state) + md * pi;
+      md = itrunc((phi + pio2) / pi, _state);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = ae_sqrt(a * b, _state);
@@ -6531,7 +6531,7 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
       b = temp;
       d = d + d;
    }
-   temp = (ae_atan(t, _state) + md * ae_pi) / (d * a);
+   temp = (ae_atan(t, _state) + md * pi) / (d * a);
    if (s < 0) {
       temp = -temp;
    }
@@ -6650,7 +6650,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
       return result;
    }
    lphi = phi;
-   npio2 = ae_ifloor(lphi / pio2, _state);
+   npio2 = ifloor(lphi / pio2, _state);
    if (npio2 % 2 != 0) {
       npio2 = npio2 + 1;
    }
@@ -6694,10 +6694,10 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    d = 1;
    e = 0.0;
    md = 0;
-   while (ae_fabs(c / a, _state) > ae_machineepsilon) {
+   while (ae_fabs(c / a, _state) > machineepsilon) {
       temp = b / a;
-      lphi = lphi + ae_atan(t * temp, _state) + md * ae_pi;
-      md = ae_trunc((lphi + pio2) / ae_pi, _state);
+      lphi = lphi + ae_atan(t * temp, _state) + md * pi;
+      md = itrunc((lphi + pio2) / pi, _state);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = ae_sqrt(a * b, _state);
@@ -6707,7 +6707,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
       e = e + c * ae_sin(lphi, _state);
    }
    temp = ebig / ellipticintegralk(m, _state);
-   temp = temp * ((ae_atan(t, _state) + md * ae_pi) / (d * a));
+   temp = temp * ((ae_atan(t, _state) + md * pi) / (d * a));
    temp = temp + e;
    if (s < 0) {
       temp = -temp;

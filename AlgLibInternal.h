@@ -78,7 +78,7 @@ void srealarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 void srealarray_free(void *_p, bool make_automatic);
 
 struct scomplex {
-   ae_complex val;
+   complex val;
 };
 void scomplex_init(void *_p, ae_state *_state, bool make_automatic);
 void scomplex_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
@@ -165,9 +165,9 @@ ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state);
 double rboundval(double x, double b1, double b2, ae_state *_state);
 ae_int_t countnz1(RVector *v, ae_int_t n, ae_state *_state);
 ae_int_t countnz2(RMatrix *v, ae_int_t m, ae_int_t n, ae_state *_state);
-void alloccomplex(ae_serializer *s, ae_complex v, ae_state *_state);
-void serializecomplex(ae_serializer *s, ae_complex v, ae_state *_state);
-ae_complex unserializecomplex(ae_serializer *s, ae_state *_state);
+void alloccomplex(ae_serializer *s, complex v, ae_state *_state);
+void serializecomplex(ae_serializer *s, complex v, ae_state *_state);
+complex unserializecomplex(ae_serializer *s, ae_state *_state);
 void allocrealarray(ae_serializer *s, RVector *v, ae_int_t n, ae_state *_state);
 void serializerealarray(ae_serializer *s, RVector *v, ae_int_t n, ae_state *_state);
 void unserializerealarray(ae_serializer *s, RVector *v, ae_state *_state);
@@ -293,26 +293,26 @@ bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t
 bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
-bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===
 namespace alglib_impl {
-void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y, ae_state *_state);
-void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha, ae_state *_state);
+void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, complex alpha, CVector *y, ae_state *_state);
+void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, complex alpha, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === CREFLECTIONS Package ===
 namespace alglib_impl {
-void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau, ae_state *_state);
-void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
-void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
+void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau, ae_state *_state);
+void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
+void complexapplyreflectionfromtheright(CMatrix *c, complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === SBLAS Package ===
@@ -335,7 +335,7 @@ bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t 
 bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state);
 bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
-bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
 bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state);
@@ -433,7 +433,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
 // === XBLAS Package ===
 namespace alglib_impl {
 void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr, ae_state *_state);
-void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr, ae_state *_state);
+void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double *rerr, ae_state *_state);
 } // end of namespace alglib_impl
 
 // === LINMIN Package ===

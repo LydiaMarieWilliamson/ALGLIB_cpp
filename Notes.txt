@@ -313,6 +313,15 @@ A6.2. Test Stages
 	―	trypexec from DataAnalysis, Interpolation, LinAlg, Statistics,
 	―	notes are kept on the parallelism hooks.
 39	Topologically sorted all the functions: both static and external, except *alloc(), [un]serialize(), *_{init,copy,free}().
+39	Ap.{cpp,h}: Normalized translator-generated names across namespaces:
+		ae_machineepsilon → machineepsilon, ae_pi → pi, ae_maxrealnumber → maxrealnumber, ae_minrealnumber → minrealnumber,
+		ae_c_abs → abscomplex, ae_complex → complex, ae_c_conj → conj, ae_c_sqr → csqr, ae_sign → sign, ae_sqr → sqr,
+		ae_iceil → iceil, ae_ifloor → ifloor, ae_round → iround, ae_trunc → itrunc,
+		ae_maxreal → maxreal, ae_minreal → minreal, ae_maxint → maxint, ae_minint → minint,
+		ae_get_cores_to_use → getnworkers, ae_set_cores_to_use → setnworkers, ae_set_error_flag → set_error_flag,
+		ae_randommid → randommid, ae_randomreal → randomreal, ae_randombool → randombool, ae_randominteger → randominteger,
+		ae_tickcount → tickcount,
+		ae_complex_from_i → complex_from_i, ae_complex_from_d → complex_from_d
 
 A6.3. Test Results
 ──────────────────

@@ -61,8 +61,8 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    bool status;
    ae_int_t nz;
    ae_int_t ne;
-   ae_complex v;
-   ae_complex vv;
+   complex v;
+   complex vv;
    ae_frame_make(_state, &_frame_block);
    DupVector(a, _state);
    SetVector(x);
@@ -113,18 +113,18 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    }
 // Remaining NZ zero roots
    for (i = ne; i < n; i++) {
-      x->xC[i] = ae_complex_from_i(0);
+      x->xC[i] = complex_from_i(0);
    }
 // Rep
    rep->maxerr = 0.0;
    for (i = 0; i < ne; i++) {
-      v = ae_complex_from_i(0);
-      vv = ae_complex_from_i(1);
+      v = complex_from_i(0);
+      vv = complex_from_i(1);
       for (j = 0; j <= ne; j++) {
          v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
          vv = ae_c_mul(vv, x->xC[i]);
       }
-      rep->maxerr = ae_maxreal(rep->maxerr, ae_c_abs(v, _state), _state);
+      rep->maxerr = maxreal(rep->maxerr, abscomplex(v, _state), _state);
    }
    ae_frame_leave(_state);
 }
@@ -221,7 +221,7 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *xb, ae_state *_state) {
    ae_int_t i;
-   ae_complex v;
+   complex v;
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          v = xb->xC[i];
@@ -295,12 +295,12 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb, ae_state *_state) {
    ae_int_t i;
-   ae_complex v;
+   complex v;
 // A = L*L' or A=U'*U
    if (isupper) {
    // Solve U'*y=b first.
       for (i = 0; i < n; i++) {
-         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i], _state));
          if (i < n - 1) {
             v = xb->xC[i];
             ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", n - i - 1, v);
@@ -325,7 +325,7 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
       }
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i], _state));
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i], _state));
          if (i > 0) {
             v = xb->xC[i];
             ae_v_csubc(xb->xC, 1, cha->xyC[i], 1, "Conj", i, v);
@@ -399,7 +399,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
          v = b->xyR[i][j];
-         mxb = ae_maxreal(mxb, ae_fabs(v, _state), _state);
+         mxb = maxreal(mxb, ae_fabs(v, _state), _state);
          x->xyR[i][j] = v;
       }
    }
@@ -455,7 +455,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    ae_int_t k;
    ae_int_t rfs;
    ae_int_t nrfs;
-   ae_complex v;
+   complex v;
    double verr;
    bool smallerr;
    bool terminatenexttime;
@@ -497,7 +497,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    if (rep->r1 < rcondthreshold(_state) || rep->rinf < rcondthreshold(_state)) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -548,11 +548,11 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
             ae_v_cmove(xb.xC, 1, xc.xC, 1, "N", n);
             for (i = 0; i < n; i++) {
                ae_v_cmove(xa.xC, 1, a->xyC[i], 1, "N", n);
-               xa.xC[n] = ae_complex_from_i(-1);
+               xa.xC[n] = complex_from_i(-1);
                xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr, _state);
                y.xC[i] = ae_c_neg(v);
-               smallerr = smallerr && ae_c_abs(v, _state) < 4 * verr;
+               smallerr = smallerr && abscomplex(v, _state) < 4 * verr;
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -648,7 +648,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    if (rep->r1 < rcondthreshold(_state)) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -1437,7 +1437,7 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 // API: void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
-   ae_complex v;
+   complex v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -1456,7 +1456,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < m; k++) {
-               b->xyC[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1585,7 +1585,7 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
    for (i = 0; i < n; i++) {
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
-            b->xC[j] = ae_complex_from_d(0.0);
+            b->xC[j] = complex_from_d(0.0);
          }
          *info = -3;
          ae_frame_leave(_state);
@@ -1690,7 +1690,7 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
 void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
-   ae_complex v;
+   complex v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -1704,7 +1704,7 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < m; k++) {
-               b->xyC[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1838,7 +1838,7 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
    for (i = 0; i < n; i++) {
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
-            b->xC[j] = ae_complex_from_d(0.0);
+            b->xC[j] = complex_from_d(0.0);
          }
          *info = -3;
          return;
@@ -2544,7 +2544,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
       ae_matrix_set_length(x, n, m, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -2600,7 +2600,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            b->xyC[i][j] = ae_complex_from_d(0.0);
+            b->xyC[i][j] = complex_from_d(0.0);
          }
       }
       *info = -3;
@@ -2722,7 +2722,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
    }
    if (!hpdmatrixcholesky(a, n, isupper, _state)) {
       for (i = 0; i < n; i++) {
-         b->xC[i] = ae_complex_from_d(0.0);
+         b->xC[i] = complex_from_d(0.0);
       }
       *info = -3;
       ae_frame_leave(_state);
@@ -2849,7 +2849,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-               b->xyC[i][j] = ae_complex_from_d(0.0);
+               b->xyC[i][j] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -2976,7 +2976,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
    for (k = 0; k < n; k++) {
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i < n; i++) {
-            b->xC[i] = ae_complex_from_d(0.0);
+            b->xC[i] = complex_from_d(0.0);
          }
          *info = -3;
          return;
@@ -3062,7 +3062,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       return;
    }
    if (threshold == 0.0) {
-      threshold = 1000 * ae_machineepsilon;
+      threshold = 1000 * machineepsilon;
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt, _state);
@@ -3093,7 +3093,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       ae_frame_leave(_state);
       return;
    }
-   nsv = ae_minint(ncols, nrows, _state);
+   nsv = minint(ncols, nrows, _state);
    if (nsv == ncols) {
       rep->r2 = sv.xR[nsv - 1] / sv.xR[0];
    } else {
@@ -4019,7 +4019,7 @@ void sparsesolversetalgogmres(sparsesolverstate *state, ae_int_t k, ae_state *_s
    if (k == 0) {
       k = 50;
    }
-   state->gmresk = ae_minint(k, state->n, _state);
+   state->gmresk = minint(k, state->n, _state);
 }
 
 // This function sets starting point.
@@ -4339,7 +4339,7 @@ lbl_15:
       state->repterminationtype = 1;
       goto lbl_12;
    }
-   if (res >= prevres * (1 - ae_sqrt(ae_machineepsilon, _state))) {
+   if (res >= prevres * (1 - ae_sqrt(machineepsilon, _state))) {
    // The algorithm stagnated
       state->repterminationtype = 7;
       goto lbl_12;
@@ -5730,7 +5730,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       }
       if (state->needprec) {
          for (i = 0; i < n; i++) {
-            state->pv.xR[i] = state->x.xR[i] * ae_sqr(state->tmpd.xR[i], _state);
+            state->pv.xR[i] = state->x.xR[i] * sqr(state->tmpd.xR[i], _state);
          }
       }
    }
@@ -6043,7 +6043,7 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
    state->prectype = 0;
    state->epsa = linlsqr_atol;
    state->epsb = linlsqr_btol;
-   state->epsc = 1 / ae_sqrt(ae_machineepsilon, _state);
+   state->epsc = 1 / ae_sqrt(machineepsilon, _state);
    state->maxits = 0;
    state->lambdai = 0.0;
    state->xrep = false;
@@ -6443,7 +6443,7 @@ lbl_5:
 // precision used internally by Intel chips allows R2 to increase
 // slightly in some rare, but possible cases. This property is
 // undesirable, so we prefer to guard against R increase.
-   state->r2 = ae_minreal(state->r2, state->phibarip1 * state->phibarip1, _state);
+   state->r2 = minreal(state->r2, state->phibarip1 * state->phibarip1, _state);
 // Update d and DNorm, check condition-related stopping criteria
    for (i = 0; i < state->n; i++) {
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
@@ -6584,7 +6584,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
       t0 = 0;
       t1 = 0;
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v, _state)) {
-         state->tmpd.xR[j] = state->tmpd.xR[j] + ae_sqr(v, _state);
+         state->tmpd.xR[j] = state->tmpd.xR[j] + sqr(v, _state);
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
@@ -7174,7 +7174,7 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
    lnlambda = ae_log(*lambdav, _state);
    lnlambdaup = ae_log(lambdaup, _state);
    lnnu = ae_log(*nu, _state);
-   lnmax = 0.5 * ae_log(ae_maxrealnumber, _state);
+   lnmax = 0.5 * ae_log(maxrealnumber, _state);
    if (lnlambda + lnlambdaup + lnnu > lnmax) {
       return result;
    }
@@ -7190,8 +7190,8 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
 // Decreases lambda, but leaves it unchanged when there is danger of underflow.
 static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, ae_state *_state) {
    *nu = 1.0;
-   if (ae_log(*lambdav, _state) + ae_log(lambdadown, _state) < ae_log(ae_minrealnumber, _state)) {
-      *lambdav = ae_minrealnumber;
+   if (ae_log(*lambdav, _state) + ae_log(lambdadown, _state) < ae_log(minrealnumber, _state)) {
+      *lambdav = minrealnumber;
    } else {
       *lambdav = *lambdav * lambdadown;
    }
@@ -7278,7 +7278,7 @@ lbl_0:
    state->repnfunc = state->repnfunc + 1;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
-   state->fprev = ae_maxrealnumber;
+   state->fprev = maxrealnumber;
    if (!state->xrep) {
       goto lbl_5;
    }
@@ -7290,7 +7290,7 @@ lbl_0:
 lbl_1:
    state->xupdated = false;
 lbl_5:
-   if (state->f <= ae_sqr(state->epsf, _state)) {
+   if (state->f <= sqr(state->epsf, _state)) {
       state->repterminationtype = 1;
       result = false;
       return result;
@@ -7343,7 +7343,7 @@ lbl_9:
    }
    linminnormalized(&state->candstep, &stepnorm, n, _state);
    if (state->stpmax != 0.0) {
-      stepnorm = ae_minreal(stepnorm, state->stpmax, _state);
+      stepnorm = minreal(stepnorm, state->stpmax, _state);
    }
 // Test new step - is it good enough?
 // * if not, Lambda is increased and we try again.

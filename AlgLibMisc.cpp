@@ -54,8 +54,8 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
    ae_int_t s0;
    ae_int_t s1;
    SetObj(hqrndstate, state);
-   s0 = ae_randominteger(hqrnd_hqrndm1, _state);
-   s1 = ae_randominteger(hqrnd_hqrndm2, _state);
+   s0 = randominteger(hqrnd_hqrndm1, _state);
+   s1 = randominteger(hqrnd_hqrndm2, _state);
    hqrndseed(s0, s1, state, _state);
 }
 
@@ -199,7 +199,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
    while (true) {
       u = 2 * hqrnduniformr(state, _state) - 1;
       v = 2 * hqrnduniformr(state, _state) - 1;
-      s = ae_sqr(u, _state) + ae_sqr(v, _state);
+      s = sqr(u, _state) + sqr(v, _state);
       if (s > 0.0 && s < 1.0) {
       // two Sqrt's instead of one to
       // avoid overflow when S is too small
@@ -297,9 +297,9 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
    do {
       hqrndnormal2(state, x, y, _state);
    } while (!(*x != 0.0 || *y != 0.0));
-   mx = ae_maxreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
-   mn = ae_minreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
-   v = mx * ae_sqrt(1 + ae_sqr(mn / mx, _state), _state);
+   mx = maxreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
+   mn = minreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
+   v = mx * ae_sqrt(1 + sqr(mn / mx, _state), _state);
    *x = *x / v;
    *y = *y / v;
 }
@@ -768,10 +768,10 @@ void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams = xdefault);
-ae_complex xdebugc1sum(CVector *a, ae_state *_state) {
+complex xdebugc1sum(CVector *a, ae_state *_state) {
    ae_int_t i;
-   ae_complex result;
-   result = ae_complex_from_i(0);
+   complex result;
+   result = complex_from_i(0);
    for (i = 0; i < a->cnt; i++) {
       result = ae_c_add(result, a->xC[i]);
    }
@@ -833,7 +833,7 @@ void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
          a->xC[i].x = i * 0.250;
          a->xC[i].y = i * 0.125;
       } else {
-         a->xC[i] = ae_complex_from_i(0);
+         a->xC[i] = complex_from_i(0);
       }
    }
 }
@@ -1001,7 +1001,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = ae_sign(ae_sin((double)(3 * i + 5 * j), _state), _state);
+         a->xyZ[i][j] = sign(ae_sin((double)(3 * i + 5 * j), _state), _state);
       }
    }
 }
@@ -1095,11 +1095,11 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams = xdefault);
-ae_complex xdebugc2sum(CMatrix *a, ae_state *_state) {
+complex xdebugc2sum(CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
-   ae_complex result;
-   result = ae_complex_from_i(0);
+   complex result;
+   result = complex_from_i(0);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
          result = ae_c_add(result, a->xyC[i][j]);
@@ -1352,7 +1352,7 @@ complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams) {
    TryCatch(_alglib_env_state, complex(0.0))
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a), &_alglib_env_state);
+   alglib_impl::complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
@@ -1500,7 +1500,7 @@ complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams) {
    TryCatch(_alglib_env_state, complex(0.0))
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ae_complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a), &_alglib_env_state);
+   alglib_impl::complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
@@ -1827,7 +1827,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *
    ae_vector_set_length(&buf->boxmax, kdt->nx, _state);
    ae_vector_set_length(&buf->idx, kdt->n, _state);
    ae_vector_set_length(&buf->r, kdt->n, _state);
-   ae_vector_set_length(&buf->buf, ae_maxint(kdt->n, kdt->nx, _state), _state);
+   ae_vector_set_length(&buf->buf, maxint(kdt->n, kdt->nx, _state), _state);
    ae_vector_set_length(&buf->curboxmin, kdt->nx, _state);
    ae_vector_set_length(&buf->curboxmax, kdt->nx, _state);
    buf->kcur = 0;
@@ -1906,8 +1906,8 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    ae_v_move(kdt->boxmax.xR, 1, kdt->xy.xyR[0], 1, nx);
    for (i = 1; i < n; i++) {
       for (j = 0; j < nx; j++) {
-         kdt->boxmin.xR[j] = ae_minreal(kdt->boxmin.xR[j], kdt->xy.xyR[i][j], _state);
-         kdt->boxmax.xR[j] = ae_maxreal(kdt->boxmax.xR[j], kdt->xy.xyR[i][j], _state);
+         kdt->boxmin.xR[j] = minreal(kdt->boxmin.xR[j], kdt->xy.xyR[i][j], _state);
+         kdt->boxmax.xR[j] = maxreal(kdt->boxmax.xR[j], kdt->xy.xyR[i][j], _state);
       }
    }
 // Generate tree
@@ -1983,7 +1983,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
    ae_assert(buf->x.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->idx.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->r.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
-   ae_assert(buf->buf.cnt >= ae_maxint(kdt->n, kdt->nx, _state), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
+   ae_assert(buf->buf.cnt >= maxint(kdt->n, kdt->nx, _state), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->curboxmin.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->curboxmax.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
 }
@@ -2009,10 +2009,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
          buf->curboxmin.xR[i] = vmin;
          buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = ae_maxreal(buf->curdist, vmin - vx, _state);
+            buf->curdist = maxreal(buf->curdist, vmin - vx, _state);
          } else {
             if (vx > vmax) {
-               buf->curdist = ae_maxreal(buf->curdist, vx - vmax, _state);
+               buf->curdist = maxreal(buf->curdist, vx - vmax, _state);
             }
          }
       }
@@ -2043,10 +2043,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
          buf->curboxmin.xR[i] = vmin;
          buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = buf->curdist + ae_sqr(vmin - vx, _state);
+            buf->curdist = buf->curdist + sqr(vmin - vx, _state);
          } else {
             if (vx > vmax) {
-               buf->curdist = buf->curdist + ae_sqr(vx - vmax, _state);
+               buf->curdist = buf->curdist + sqr(vx - vmax, _state);
             }
          }
       }
@@ -2085,7 +2085,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          nx = kdt->nx;
          if (kdt->normtype == 0) {
             for (j = 0; j < nx; j++) {
-               ptdist = ae_maxreal(ptdist, ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state), _state);
+               ptdist = maxreal(ptdist, ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state), _state);
             }
          }
          if (kdt->normtype == 1) {
@@ -2095,7 +2095,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          }
          if (kdt->normtype == 2) {
             for (j = 0; j < nx; j++) {
-               ptdist = ptdist + ae_sqr(kdt->xy.xyR[i][j] - buf->x.xR[j], _state);
+               ptdist = ptdist + sqr(kdt->xy.xyR[i][j] - buf->x.xR[j], _state);
             }
          }
       // Skip points with zero distance if self-matches are turned off
@@ -2167,13 +2167,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             v = buf->curboxmin.xR[d];
             if (t1 <= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = ae_maxreal(buf->curdist, s - t1, _state);
+                  buf->curdist = maxreal(buf->curdist, s - t1, _state);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist = buf->curdist - ae_maxreal(v - t1, 0.0, _state) + s - t1;
+                  buf->curdist = buf->curdist - maxreal(v - t1, 0.0, _state) + s - t1;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist = buf->curdist - ae_sqr(ae_maxreal(v - t1, 0.0, _state), _state) + ae_sqr(s - t1, _state);
+                  buf->curdist = buf->curdist - sqr(maxreal(v - t1, 0.0, _state), _state) + sqr(s - t1, _state);
                }
             }
             buf->curboxmin.xR[d] = s;
@@ -2183,13 +2183,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             v = buf->curboxmax.xR[d];
             if (t1 >= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = ae_maxreal(buf->curdist, t1 - s, _state);
+                  buf->curdist = maxreal(buf->curdist, t1 - s, _state);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist = buf->curdist - ae_maxreal(t1 - v, 0.0, _state) + t1 - s;
+                  buf->curdist = buf->curdist - maxreal(t1 - v, 0.0, _state) + t1 - s;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist = buf->curdist - ae_sqr(ae_maxreal(t1 - v, 0.0, _state), _state) + ae_sqr(t1 - s, _state);
+                  buf->curdist = buf->curdist - sqr(maxreal(t1 - v, 0.0, _state), _state) + sqr(t1 - s, _state);
                }
             }
             buf->curboxmax.xR[d] = s;
@@ -2285,12 +2285,12 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
 // Check consistency of request buffer
    nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
 // Prepare parameters
-   k = ae_minint(k, kdt->n, _state);
+   k = minint(k, kdt->n, _state);
    buf->kneeded = k;
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
    if (kdt->normtype == 2) {
-      buf->approxf = 1 / ae_sqr(1 + eps, _state);
+      buf->approxf = 1 / sqr(1 + eps, _state);
    } else {
       buf->approxf = 1 / (1 + eps);
    }
@@ -2505,7 +2505,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
    if (kdt->normtype != 2) {
       buf->rneeded = r;
    } else {
-      buf->rneeded = ae_sqr(r, _state);
+      buf->rneeded = sqr(r, _state);
    }
    buf->selfmatch = selfmatch;
    buf->approxf = 1.0;

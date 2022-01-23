@@ -405,7 +405,7 @@ void rmergemaxv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
    }
    const ae_int_t tail = sse2len << 1;
    if (n - tail) {
-      *(double *)(pDest + i) = ae_maxreal(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
+      *(double *)(pDest + i) = maxreal(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
    }
 }
 
@@ -419,7 +419,7 @@ void rmergeminv_sse2(const ae_int_t n, const Real *__restrict y, Real *__restric
    }
    const ae_int_t tail = sse2len << 1;
    if (n - tail) {
-      *(double *)(pDest + i) = ae_minreal(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
+      *(double *)(pDest + i) = minreal(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
    }
 }
 

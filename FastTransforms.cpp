@@ -141,9 +141,9 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    ae_int_t i;
    ae_int_t n2;
    ae_int_t idx;
-   ae_complex hn;
-   ae_complex hmnc;
-   ae_complex v;
+   complex hn;
+   complex hmnc;
+   complex v;
    ae_frame_make(_state, &_frame_block);
    SetVector(f);
    NewVector(buf, 0, DT_REAL, _state);
@@ -158,7 +158,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
 // After this block we assume that N is strictly greater than 2
    if (n == 1) {
       ae_vector_set_length(f, 1, _state);
-      f->xC[0] = ae_complex_from_d(a->xR[0]);
+      f->xC[0] = complex_from_d(a->xR[0]);
       ae_frame_leave(_state);
       return;
    }
@@ -187,20 +187,20 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
          idx = 2 * ((n2 - i) % n2);
          hmnc.x = buf.xR[idx + 0];
          hmnc.y = -buf.xR[idx + 1];
-         v.x = -ae_sin(-2 * ae_pi * i / n, _state);
-         v.y = ae_cos(-2 * ae_pi * i / n, _state);
+         v.x = -ae_sin(-2 * pi * i / n, _state);
+         v.y = ae_cos(-2 * pi * i / n, _state);
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
          f->xC[i].x = 0.5 * f->xC[i].x;
          f->xC[i].y = 0.5 * f->xC[i].y;
       }
       for (i = n2 + 1; i < n; i++) {
-         f->xC[i] = ae_c_conj(f->xC[n - i], _state);
+         f->xC[i] = conj(f->xC[n - i], _state);
       }
    } else {
    // use complex FFT
       ae_vector_set_length(f, n, _state);
       for (i = 0; i < n; i++) {
-         f->xC[i] = ae_complex_from_d(a->xR[i]);
+         f->xC[i] = complex_from_d(a->xR[i]);
       }
       fftc1d(f, n, _state);
    }
@@ -247,14 +247,14 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    NewVector(h, 0, DT_REAL, _state);
    NewVector(fh, 0, DT_COMPLEX, _state);
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
-   ae_assert(f->cnt >= ae_ifloor((double)n / 2.0, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
+   ae_assert(f->cnt >= ifloor((double)n / 2.0, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
    ae_assert(ae_isfinite(f->xC[0].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
-   for (i = 1; i < ae_ifloor((double)n / 2.0, _state); i++) {
+   for (i = 1; i < ifloor((double)n / 2.0, _state); i++) {
       ae_assert(ae_isfinite(f->xC[i].x, _state) && ae_isfinite(f->xC[i].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
-   ae_assert(ae_isfinite(f->xC[ae_ifloor((double)n / 2.0, _state)].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+   ae_assert(ae_isfinite(f->xC[ifloor((double)n / 2.0, _state)].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    if (n % 2 != 0) {
-      ae_assert(ae_isfinite(f->xC[ae_ifloor((double)n / 2.0, _state)].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+      ae_assert(ae_isfinite(f->xC[ifloor((double)n / 2.0, _state)].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
 // Special case: N=1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
@@ -272,15 +272,15 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_vector_set_length(&h, n, _state);
    ae_vector_set_length(a, n, _state);
    h.xR[0] = f->xC[0].x;
-   for (i = 1; i < ae_ifloor((double)n / 2.0, _state); i++) {
+   for (i = 1; i < ifloor((double)n / 2.0, _state); i++) {
       h.xR[i] = f->xC[i].x - f->xC[i].y;
       h.xR[n - i] = f->xC[i].x + f->xC[i].y;
    }
    if (n % 2 == 0) {
-      h.xR[ae_ifloor((double)n / 2.0, _state)] = f->xC[ae_ifloor((double)n / 2.0, _state)].x;
+      h.xR[ifloor((double)n / 2.0, _state)] = f->xC[ifloor((double)n / 2.0, _state)].x;
    } else {
-      h.xR[ae_ifloor((double)n / 2.0, _state)] = f->xC[ae_ifloor((double)n / 2.0, _state)].x - f->xC[ae_ifloor((double)n / 2.0, _state)].y;
-      h.xR[ae_ifloor((double)n / 2.0, _state) + 1] = f->xC[ae_ifloor((double)n / 2.0, _state)].x + f->xC[ae_ifloor((double)n / 2.0, _state)].y;
+      h.xR[ifloor((double)n / 2.0, _state)] = f->xC[ifloor((double)n / 2.0, _state)].x - f->xC[ifloor((double)n / 2.0, _state)].y;
+      h.xR[ifloor((double)n / 2.0, _state) + 1] = f->xC[ifloor((double)n / 2.0, _state)].x + f->xC[ifloor((double)n / 2.0, _state)].y;
    }
    fftr1d(&h, n, &fh, _state);
    for (i = 0; i < n; i++) {
@@ -297,9 +297,9 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    ae_int_t i;
    ae_int_t n2;
    ae_int_t idx;
-   ae_complex hn;
-   ae_complex hmnc;
-   ae_complex v;
+   complex hn;
+   complex hmnc;
+   complex v;
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DEvenInplace: incorrect N!", _state);
 // Special cases:
 // * N=2
@@ -324,8 +324,8 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
       idx = 2 * (n2 - i);
       hmnc.x = buf->xR[idx + 0];
       hmnc.y = -buf->xR[idx + 1];
-      v.x = -ae_sin(-2 * ae_pi * i / n, _state);
-      v.y = ae_cos(-2 * ae_pi * i / n, _state);
+      v.x = -ae_sin(-2 * pi * i / n, _state);
+      v.y = ae_cos(-2 * pi * i / n, _state);
       v = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
       a->xR[2 * i + 0] = 0.5 * v.x;
       a->xR[2 * i + 1] = 0.5 * v.y;
@@ -582,7 +582,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    ae_int_t i2;
    ae_int_t j1;
    ae_int_t j2;
-   ae_complex v;
+   complex v;
    double ax;
    double ay;
    double bx;
@@ -612,7 +612,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          flopbest = (double)(2 * m * n);
       } else {
-         flopbest = ae_maxrealnumber;
+         flopbest = maxrealnumber;
       }
    // Another candidate - generic FFT code
       if (alg == -1) {
@@ -641,7 +641,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal, _state) + 8 * ptotal);
+         flopcand = iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal, _state) + 8 * ptotal);
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
@@ -690,7 +690,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       // non-circular convolution
          ae_vector_set_length(r, m + n - 1, _state);
          for (i = 0; i < m + n - 1; i++) {
-            r->xC[i] = ae_complex_from_i(0);
+            r->xC[i] = complex_from_i(0);
          }
          for (i = 0; i < n; i++) {
             v = b->xC[i];
@@ -823,19 +823,19 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       if (circular) {
          ae_vector_set_length(r, m, _state);
          for (i = 0; i < m; i++) {
-            r->xC[i] = ae_complex_from_i(0);
+            r->xC[i] = complex_from_i(0);
          }
       } else {
          ae_vector_set_length(r, m + n - 1, _state);
          for (i = 0; i < m + n - 1; i++) {
-            r->xC[i] = ae_complex_from_i(0);
+            r->xC[i] = complex_from_i(0);
          }
       }
    // pre-calculated FFT(B)
       ae_vector_set_length(&bbuf, q + n - 1, _state);
       ae_v_cmove(bbuf.xC, 1, b->xC, 1, "N", n);
       for (j = n; j < q + n - 1; j++) {
-         bbuf.xC[j] = ae_complex_from_i(0);
+         bbuf.xC[j] = complex_from_i(0);
       }
       fftc1d(&bbuf, q + n - 1, _state);
    // prepare FFT plan for chunks of A
@@ -843,7 +843,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    // main overlap-add cycle
       i = 0;
       while (i < m) {
-         p = ae_minint(q, m - i, _state);
+         p = minint(q, m - i, _state);
          for (j = 0; j < p; j++) {
             buf.xR[2 * j + 0] = a->xC[i + j].x;
             buf.xR[2 * j + 1] = a->xC[i + j].y;
@@ -866,7 +866,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftapplyplan(&plan, &buf, 0, 1, _state);
          t = 1.0 / (q + n - 1);
          if (circular) {
-            j1 = ae_minint(i + p + n - 2, m - 1, _state) - i;
+            j1 = minint(i + p + n - 2, m - 1, _state) - i;
             j2 = j1 + 1;
          } else {
             j1 = p + n - 2;
@@ -953,9 +953,9 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    double t;
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
@@ -1043,11 +1043,11 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
    if (m < n) {
       ae_vector_set_length(&buf, m, _state);
       for (i1 = 0; i1 < m; i1++) {
-         buf.xC[i1] = ae_complex_from_i(0);
+         buf.xC[i1] = complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
@@ -1089,9 +1089,9 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    double t;
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
@@ -1105,11 +1105,11 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    if (m < n) {
       ae_vector_set_length(&cbuf, m, _state);
       for (i = 0; i < m; i++) {
-         cbuf.xC[i] = ae_complex_from_i(0);
+         cbuf.xC[i] = complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
@@ -1205,7 +1205,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
 // handle special cases
-   if (ae_minint(m, n, _state) <= 2) {
+   if (minint(m, n, _state) <= 2) {
       alg = 0;
    }
 // Auto-select
@@ -1219,7 +1219,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          flopbest = 0.15 * m * n;
       } else {
-         flopbest = ae_maxrealnumber;
+         flopbest = maxrealnumber;
       }
    // Another candidate - generic FFT code
       if (alg == -1) {
@@ -1248,7 +1248,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
-         flopcand = ae_iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal / 2, _state) + 1 * (ptotal / 2));
+         flopcand = iceil((double)m / p, _state) * (2 * ftbasegetflopestimate(ptotal / 2, _state) + 1 * (ptotal / 2));
          if (flopcand < flopbest) {
             flopbest = flopcand;
             algbest = 2;
@@ -1426,7 +1426,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    // main overlap-add cycle
       i = 0;
       while (i < m) {
-         p = ae_minint(q, m - i, _state);
+         p = minint(q, m - i, _state);
          ae_v_move(buf.xR, 1, &a->xR[i], 1, p);
          for (j = p; j < q + n - 1; j++) {
             buf.xR[j] = 0.0;
@@ -1446,7 +1446,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          }
          fftr1dinvinternaleven(&buf, q + n - 1, &buf3, &plan, _state);
          if (circular) {
-            j1 = ae_minint(i + p + n - 2, m - 1, _state) - i;
+            j1 = minint(i + p + n - 2, m - 1, _state) - i;
             j2 = j1 + 1;
          } else {
             j1 = p + n - 2;
@@ -1522,9 +1522,9 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
@@ -1601,7 +1601,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
@@ -1644,9 +1644,9 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    ae_frame_make(_state, &_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL, _state);
@@ -1665,7 +1665,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
@@ -1711,7 +1711,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
          buf2.xR[i] = 0.0;
       }
       fftr1d(&buf2, m, &cbuf2, _state);
-      for (i = 0; i <= ae_ifloor((double)m / 2.0, _state); i++) {
+      for (i = 0; i <= ifloor((double)m / 2.0, _state); i++) {
          cbuf.xC[i] = ae_c_div(cbuf.xC[i], cbuf2.xC[i]);
       }
       fftr1dinv(&cbuf, m, r, _state);
@@ -1840,7 +1840,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
    for (i = 0; i < m; i++) {
-      p.xC[m - 1 - i] = ae_c_conj(pattern->xC[i], _state);
+      p.xC[m - 1 - i] = conj(pattern->xC[i], _state);
    }
    convc1d(&p, m, signal, n, &b, _state);
    ae_vector_set_length(r, m + n - 1, _state);
@@ -1890,11 +1890,11 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    if (m < n) {
       ae_vector_set_length(&b, m, _state);
       for (i1 = 0; i1 < m; i1++) {
-         b.xC[i1] = ae_complex_from_i(0);
+         b.xC[i1] = complex_from_i(0);
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(b.xC, 1, &pattern->xC[i1], 1, "N", j2 + 1);
          i1 = i1 + m;
@@ -1906,7 +1906,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 // Task is normalized
    ae_vector_set_length(&p, n, _state);
    for (i = 0; i < n; i++) {
-      p.xC[n - 1 - i] = ae_c_conj(pattern->xC[i], _state);
+      p.xC[n - 1 - i] = conj(pattern->xC[i], _state);
    }
    convc1dcircular(signal, m, &p, n, &b, _state);
    ae_vector_set_length(c, m, _state);
@@ -2014,7 +2014,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = ae_minint(i1 + m - 1, n - 1, _state);
+         i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(b.xR, 1, &pattern->xR[i1], 1, j2 + 1);
          i1 = i1 + m;
