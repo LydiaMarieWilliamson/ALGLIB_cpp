@@ -6222,7 +6222,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             a->xyR[j][i] = 0.0;
          }
       }
-      a->xyR[i][i] = a->xyR[i][i] + 1.0;
+      a->xyR[i][i]++;
    }
    nm = 0;
    for (k = n; k >= 1; k--) {
@@ -78722,7 +78722,7 @@ static bool testclusteringunit_advancedahctests(ae_state *_state) {
             for (j = 0; j < d; j++) {
                xy.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
             }
-            xy.xyR[i][i % d] = xy.xyR[i][i % d] + 1.0;
+            xy.xyR[i][i % d]++;
             idx.xZ[i] = i % d;
          }
          for (i = 0; i < n * d; i++) {

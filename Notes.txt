@@ -349,6 +349,7 @@ A6.2. Test Stages
 39	Synthesized increment operators:
 	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
 	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
+	―	X = X + 1.0 ⇒ X++;
 
 A6.3. Test Results
 ──────────────────

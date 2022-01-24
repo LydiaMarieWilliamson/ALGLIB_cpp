@@ -111,7 +111,7 @@ double gammafunction(double x, ae_state *_state) {
          return result;
       }
       z = z / x;
-      x = x + 1.0;
+      x++;
    }
    if (x == 2.0) {
       result = z;
@@ -1002,11 +1002,11 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
       if (t < thresh) {
          break;
       }
-      k1 = k1 + 1.0;
-      k2 = k2 + 1.0;
+      k1++;
+      k2++;
       k3 = k3 + 2.0;
       k4 = k4 + 2.0;
-      k5 = k5 + 1.0;
+      k5++;
       k6 = k6 - 1.0;
       k7 = k7 + 2.0;
       k8 = k8 + 2.0;
@@ -1100,12 +1100,12 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
       if (t < thresh) {
          break;
       }
-      k1 = k1 + 1.0;
+      k1++;
       k2 = k2 - 1.0;
       k3 = k3 + 2.0;
       k4 = k4 + 2.0;
-      k5 = k5 + 1.0;
-      k6 = k6 + 1.0;
+      k5++;
+      k6++;
       k7 = k7 + 2.0;
       k8 = k8 + 2.0;
       if (ae_fabs(qk, _state) + ae_fabs(pk, _state) > big) {
@@ -1155,7 +1155,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
       t = t * u;
       v = t / (a + n);
       s = s + v;
-      n = n + 1.0;
+      n++;
    }
    s = s + t1;
    s = s + ai;
@@ -3517,10 +3517,10 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
       do {
          a = a * z / k;
          c = c + a / k;
-         k = k + 1.0;
+         k++;
          a = a / k;
          s = s + a / k;
-         k = k + 1.0;
+         k++;
       } while (ae_fabs(a / s, _state) >= machineepsilon);
       s = s * x;
    } else {
@@ -4308,7 +4308,7 @@ double psi(double x, ae_state *_state) {
       nz = q - p;
       if (nz != 0.5) {
          if (nz > 0.5) {
-            p = p + 1.0;
+            p++;
             nz = q - p;
          }
          nz = pi / ae_tan(pi * nz, _state);
@@ -4330,7 +4330,7 @@ double psi(double x, ae_state *_state) {
       w = 0.0;
       while (s < 10.0) {
          w = w + 1.0 / s;
-         s = s + 1.0;
+         s++;
       }
       if (s < 1.0E17) {
          z = 1.0 / (s * s);
@@ -4637,14 +4637,14 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
    z = x * x * x;
    while (t > machineepsilon) {
       uf = uf * z;
-      k = k + 1.0;
+      k++;
       uf = uf / k;
       ug = ug * z;
-      k = k + 1.0;
+      k++;
       ug = ug / k;
       uf = uf / k;
       f = f + uf;
-      k = k + 1.0;
+      k++;
       ug = ug / k;
       g = g + ug;
       t = ae_fabs(uf / f, _state);
@@ -4667,15 +4667,15 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
    while (t > machineepsilon) {
       uf = uf * z;
       ug = ug / k;
-      k = k + 1.0;
+      k++;
       ug = ug * z;
       uf = uf / k;
       f = f + uf;
-      k = k + 1.0;
+      k++;
       ug = ug / k;
       uf = uf / k;
       g = g + ug;
-      k = k + 1.0;
+      k++;
       t = ae_fabs(ug / g, _state);
    }
    uf = c1 * f;
@@ -6013,7 +6013,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
          k = 1.0;
          for (i = 1; i < n; i++) {
             pn = pn + 1.0 / k;
-            k = k + 1.0;
+            k++;
             fn = fn * k;
          }
          zmn = tox;
@@ -6058,7 +6058,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
          pk = pk + 1.0 / k;
          pn = pn + 1.0 / (k + n);
          s = s + (pk + pn - tlg) * t;
-         k = k + 1.0;
+         k++;
       } while (ae_fabs(t / s, _state) > machineepsilon);
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
@@ -6090,7 +6090,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       }
       nkf = nk1f;
       s = s + t;
-      fn = fn + 1.0;
+      fn++;
       pk = pk + 2.0;
       i++;
    } while (ae_fabs(t / s, _state) > machineepsilon);
