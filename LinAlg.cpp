@@ -21288,7 +21288,7 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
          meand = meand + d;
       }
       meand = meand / n;
-      tau = iround(10 * meand, _state) + 2;
+      tau = round(10 * meand) + 2;
    }
    ivectorsetlengthatleast(&buf->ls, n, _state);
    amdordering_nsinitemptyslow(n, &buf->setp, _state);

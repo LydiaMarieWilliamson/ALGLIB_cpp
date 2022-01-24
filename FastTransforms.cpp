@@ -240,14 +240,15 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    NewVector(h, 0, DT_REAL, _state);
    NewVector(fh, 0, DT_COMPLEX, _state);
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
-   ae_assert(f->cnt >= ifloor((double)n / 2.0, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
+   ae_int_t Nq = n / 2, Nr = n % 2;
+   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
    ae_assert(ae_isfinite(f->xC[0].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
-   for (i = 1; i < ifloor((double)n / 2.0, _state); i++) {
+   for (i = 1; i < Nq; i++) {
       ae_assert(ae_isfinite(f->xC[i].x, _state) && ae_isfinite(f->xC[i].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
-   ae_assert(ae_isfinite(f->xC[ifloor((double)n / 2.0, _state)].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
-   if (n % 2 != 0) {
-      ae_assert(ae_isfinite(f->xC[ifloor((double)n / 2.0, _state)].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+   ae_assert(ae_isfinite(f->xC[Nq].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+   if (Nr) {
+      ae_assert(ae_isfinite(f->xC[Nq].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
 // Special case: N=1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
@@ -265,15 +266,15 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_vector_set_length(&h, n, _state);
    ae_vector_set_length(a, n, _state);
    h.xR[0] = f->xC[0].x;
-   for (i = 1; i < ifloor((double)n / 2.0, _state); i++) {
+   for (i = 1; i < Nq; i++) {
       h.xR[i] = f->xC[i].x - f->xC[i].y;
       h.xR[n - i] = f->xC[i].x + f->xC[i].y;
    }
-   if (n % 2 == 0) {
-      h.xR[ifloor((double)n / 2.0, _state)] = f->xC[ifloor((double)n / 2.0, _state)].x;
+   if (!Nr) {
+      h.xR[Nq] = f->xC[Nq].x;
    } else {
-      h.xR[ifloor((double)n / 2.0, _state)] = f->xC[ifloor((double)n / 2.0, _state)].x - f->xC[ifloor((double)n / 2.0, _state)].y;
-      h.xR[ifloor((double)n / 2.0, _state) + 1] = f->xC[ifloor((double)n / 2.0, _state)].x + f->xC[ifloor((double)n / 2.0, _state)].y;
+      h.xR[Nq] = f->xC[Nq].x - f->xC[Nq].y;
+      h.xR[Nq + 1] = f->xC[Nq].x + f->xC[Nq].y;
    }
    fftr1d(&h, n, &fh, _state);
    for (i = 0; i < n; i++) {
@@ -1654,7 +1655,8 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       return;
    }
 // Task is normalized
-   if (m % 2 == 0) {
+   ae_int_t Mq = m /2, Mr = m % 2;
+   if (Mr == 0) {
    // size is even, use fast even-size FFT
       ae_vector_set_length(&buf, m, _state);
       ae_v_move(buf.xR, 1, a->xR, 1, m);
@@ -1664,12 +1666,12 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
          buf2.xR[i] = 0.0;
       }
       ae_vector_set_length(&buf3, m, _state);
-      ftcomplexfftplan(m / 2, 1, &plan, _state);
+      ftcomplexfftplan(Mq, 1, &plan, _state);
       fftr1dinternaleven(&buf, m, &buf3, &plan, _state);
       fftr1dinternaleven(&buf2, m, &buf3, &plan, _state);
       buf.xR[0] = buf.xR[0] / buf2.xR[0];
       buf.xR[1] = buf.xR[1] / buf2.xR[1];
-      for (i = 1; i < m / 2; i++) {
+      for (i = 1; i < Mq; i++) {
          c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
          c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
          c3 = ae_c_div(c1, c2);
@@ -1688,7 +1690,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
          buf2.xR[i] = 0.0;
       }
       fftr1d(&buf2, m, &cbuf2, _state);
-      for (i = 0; i <= ifloor((double)m / 2.0, _state); i++) {
+      for (i = 0; i <= Mq; i++) {
          cbuf.xC[i] = ae_c_div(cbuf.xC[i], cbuf2.xC[i]);
       }
       fftr1dinv(&cbuf, m, r, _state);

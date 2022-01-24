@@ -3842,11 +3842,11 @@ ae_int_t sign(double x, ae_state *state) {
 }
 
 ae_int_t iround(double x, ae_state *state) {
-   return (ae_int_t)ifloor(x + 0.5, state);
+   return (ae_int_t)round(x);
 }
 
 ae_int_t itrunc(double x, ae_state *state) {
-   return (ae_int_t)(x > 0 ? ifloor(x, state) : iceil(x, state));
+   return (ae_int_t)trunc(x);
 }
 
 ae_int_t ifloor(double x, ae_state *state) {
@@ -8557,11 +8557,11 @@ ae_int_t randominteger(ae_int_t maxv) {
 }
 
 int round(double x) {
-   return int(floor(x + 0.5));
+   return int(round(x));
 }
 
 int trunc(double x) {
-   return int(x > 0 ? floor(x) : ceil(x));
+   return int(trunc(x));
 }
 
 int ifloor(double x) {

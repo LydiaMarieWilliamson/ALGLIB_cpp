@@ -39744,7 +39744,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       }
       minlmresults(&state, &x, &rep, _state);
       set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:284");
-      set_error_flag(errorflag, ae_fabs(x.xR[0] / pi - iround(x.xR[0] / pi, _state), _state) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:285");
+      set_error_flag(errorflag, ae_fabs(x.xR[0] / pi - round(x.xR[0] / pi), _state) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:285");
    }
 // Linear equations: test normal optimization and optimization with restarts
    for (n = 1; n <= 10; n++) {
@@ -42799,7 +42799,7 @@ bool testmincg(bool silent, ae_state *_state) {
             }
          }
          mincgresults(&state, &x, &rep, _state);
-         linerror1 = (linerror1 || rep.terminationtype <= 0) || ae_fabs(x.xR[0] / pi - iround(x.xR[0] / pi, _state), _state) > 0.001;
+         linerror1 = (linerror1 || rep.terminationtype <= 0) || ae_fabs(x.xR[0] / pi - round(x.xR[0] / pi), _state) > 0.001;
       // 1D problem #2
          ae_vector_set_length(&x, 0 + 1, _state);
          n = 1;
@@ -72484,13 +72484,13 @@ bool testfft(bool silent, ae_state *_state) {
       for (i = 0; i < n; i++) {
          refrerr = maxreal(refrerr, abscomplex(ae_c_sub(a1.xC[i], a2.xC[i]), _state), _state);
       }
-      ae_vector_set_length(&a3, ifloor((double)n / 2.0, _state) + 1, _state);
-      for (i = 0; i <= ifloor((double)n / 2.0, _state); i++) {
+      ae_vector_set_length(&a3, n / 2 + 1, _state);
+      for (i = 0; i <= n / 2; i++) {
          a3.xC[i] = a2.xC[i];
       }
       a3.xC[0].y = 2 * randomreal(_state) - 1;
       if (n % 2 == 0) {
-         a3.xC[ifloor((double)n / 2.0, _state)].y = 2 * randomreal(_state) - 1;
+         a3.xC[n / 2].y = 2 * randomreal(_state) - 1;
       }
       for (i = 0; i < n; i++) {
          r1.xR[i] = 0.0;
@@ -72549,7 +72549,7 @@ bool testfft(bool silent, ae_state *_state) {
       for (i = 0; i < n; i++) {
          r1.xR[i] = 2 * randomreal(_state) - 1;
       }
-      ae_vector_set_length(&a2, ifloor((double)n / 2.0, _state) + 1, _state);
+      ae_vector_set_length(&a2, n / 2 + 1, _state);
       a2.xC[0] = complex_from_d(r1.xR[0]);
       for (i = 1; i < n / 2; i++) {
          a2.xC[i] = complex_from_d(r1.xR[2 * i + 0], r1.xR[2 * i + 1]);
@@ -81218,7 +81218,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.xyR[i][j] = (double)(k % 3);
-                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + iround(xy.xyR[i][j], _state);
+                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + round(xy.xyR[i][j]);
                   k = k / 3;
                }
                xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars], _state) % 3 - 1);
@@ -81227,7 +81227,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.xyR[i][j] = (double)(k % nclasses);
-                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + iround(xy.xyR[i][j], _state);
+                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + round(xy.xyR[i][j]);
                   k = k / nclasses;
                }
                xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars], _state) % nclasses);

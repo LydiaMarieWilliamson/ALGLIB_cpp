@@ -725,7 +725,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    NewVector(s, 0, DT_REAL, _state);
    NewVector(xgtmp, 0, DT_REAL, _state);
    NewVector(wgtmp, 0, DT_REAL, _state);
-   if (n % 2 != 1 || n < 3) {
+   if (!(n % 2) || n < 3) {
       *info = -1;
       ae_frame_leave(_state);
       return;
@@ -750,18 +750,19 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // Resize:
 // * A from 0..floor(3*n/2) to 0..2*n
 // * B from 0..ceil(3*n/2)  to 0..2*n
-   ae_vector_set_length(&ta, ifloor((double)(3 * n) / 2.0, _state) + 1, _state);
-   ae_v_move(ta.xR, 1, alpha->xR, 1, ifloor((double)(3 * n) / 2.0, _state) + 1);
+   ae_int_t alen = 3 * n / 2 + 1, blen = (3 * n + 1) / 2 + 1;
+   ae_vector_set_length(&ta, alen, _state);
+   ae_v_move(ta.xR, 1, alpha->xR, 1, alen);
    ae_vector_set_length(alpha, 2 * n + 1, _state);
-   ae_v_move(alpha->xR, 1, ta.xR, 1, ifloor((double)(3 * n) / 2.0, _state) + 1);
-   for (i = ifloor((double)(3 * n) / 2.0, _state) + 1; i <= 2 * n; i++) {
+   ae_v_move(alpha->xR, 1, ta.xR, 1, alen);
+   for (i = alen; i <= 2 * n; i++) {
       alpha->xR[i] = 0.0;
    }
-   ae_vector_set_length(&ta, iceil((double)(3 * n) / 2.0, _state) + 1, _state);
-   ae_v_move(ta.xR, 1, beta->xR, 1, iceil((double)(3 * n) / 2.0, _state) + 1);
+   ae_vector_set_length(&ta, blen, _state);
+   ae_v_move(ta.xR, 1, beta->xR, 1, blen);
    ae_vector_set_length(beta, 2 * n + 1, _state);
-   ae_v_move(beta->xR, 1, ta.xR, 1, iceil((double)(3 * n) / 2.0, _state) + 1);
-   for (i = iceil((double)(3 * n) / 2.0, _state) + 1; i <= 2 * n; i++) {
+   ae_v_move(beta->xR, 1, ta.xR, 1, blen);
+   for (i = blen; i <= 2 * n; i++) {
       beta->xR[i] = 0.0;
    }
 // Initialize T, S
@@ -875,14 +876,14 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    SetVector(wgauss);
    NewVector(alpha, 0, DT_REAL, _state);
    NewVector(beta, 0, DT_REAL, _state);
-   if (n % 2 != 1 || n < 3) {
+   if (!(n % 2) || n < 3) {
       *info = -1;
       ae_frame_leave(_state);
       return;
    }
    mu0 = 2.0;
-   alen = ifloor((double)(3 * (n / 2)) / 2.0, _state) + 1;
-   blen = iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
+   alen = 3 * n / 2 + 1;
+   blen = (3 * n + 1) / 2 + 1;
    ae_vector_set_length(&alpha, alen, _state);
    ae_vector_set_length(&beta, blen, _state);
    for (k = 0; k < alen; k++) {

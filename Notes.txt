@@ -329,6 +329,7 @@ A6.2. Test Stages
 39	Move diagnostic functions to TestC.cpp and remove their declarations:
 	―	seterrordiff() from AlgLibInternal.{cpp,h}
 	―	set_error_flag(), ae_get_last_error_file(), ae_get_last_error_line(), ae_get_last_error_xdesc() from Ap.{cpp,h}
+
 	−	sef_file, sef_line, sef_xdesc from Ap.cpp
 	―	Eliminate the ae_get_last_error_*() functions and replace them by the corresponding sef_* variables.
 39	Remove all comments on, references to and support for tracing/logging added in 3.16:
@@ -343,6 +344,8 @@ A6.2. Test Stages
 		3.17: The tracegamma vector and extendeddebug and dotimers flags & members and rep*time members are also removed.
 	―	Optimization.cpp, Manual.htm:
 			TRACING * SOLVER comments
+39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
+	Replaced i{floor,ceil,trunc,round}() by std::{floor,ceil,trunc,round}(), for floating point types.
 
 A6.3. Test Results
 ──────────────────
