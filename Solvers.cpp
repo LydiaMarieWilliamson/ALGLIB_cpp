@@ -85,7 +85,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 //   (here NE=N-NZ)
    nz = 0;
    while (nz < n && a->xR[nz] == 0.0) {
-      nz = nz + 1;
+      nz++;
    }
    ne = n - nz;
    for (i = nz; i <= n; i++) {
@@ -4249,7 +4249,7 @@ lbl_7:
    goto lbl_rcomm;
 lbl_0:
    state->requesttype = -999;
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    rcopyv(state->n, &state->b, &state->wrkb, _state);
    raddv(state->n, -1.0, &state->ax, &state->wrkb, _state);
 lbl_8:
@@ -4297,7 +4297,7 @@ lbl_13:
 lbl_2:
    state->requesttype = -999;
    rcopyv(state->n, &state->ax, &state->gmressolver.ax, _state);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    if (state->userterminationneeded) {
    // User requested termination
       state->repterminationtype = 8;
@@ -4315,7 +4315,7 @@ lbl_14:
    goto lbl_rcomm;
 lbl_3:
    state->requesttype = -999;
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    rcopyv(state->n, &state->b, &state->wrkb, _state);
    raddv(state->n, -1.0, &state->ax, &state->wrkb, _state);
    state->repr2 = rdotv2(state->n, &state->wrkb, _state);
@@ -4349,7 +4349,7 @@ lbl_15:
       result = false;
       return result;
    }
-   outeridx = outeridx + 1;
+   outeridx++;
    goto lbl_11;
 lbl_12:
    result = false;
@@ -5388,7 +5388,7 @@ bool lincgiteration(lincgstate *state, ae_state *_state) {
 // Start 0-th iteration
    ae_v_move(state->rx.xR, 1, state->startx.xR, 1, state->n);
    ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
    state->rstate.stage = 0;
@@ -5430,7 +5430,7 @@ lbl_8:
    }
 // Calculate Z and P
    ae_v_move(state->x.xR, 1, state->r.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state, _state);
    state->needprec = true;
    state->rstate.stage = 2;
@@ -5447,10 +5447,10 @@ lbl_10:
    if (false) {
       goto lbl_11;
    }
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
 // Calculate Alpha
    ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state, _state);
    state->needvmv = true;
    state->rstate.stage = 3;
@@ -5501,7 +5501,7 @@ lbl_3:
 lbl_12:
 // Calculate R using matrix-vector multiplication
    ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state, _state);
    state->needmv = true;
    state->rstate.stage = 4;
@@ -5597,7 +5597,7 @@ lbl_18:
    }
    ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
 // prepere of parameters for next iteration
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state, _state);
    state->needprec = true;
    state->rstate.stage = 7;
@@ -6245,7 +6245,7 @@ lbl_7:
       goto lbl_9;
    }
    ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
    state->rstate.stage = 0;
@@ -6260,7 +6260,7 @@ lbl_9:
    }
    ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
 // matrix-vector multiplication
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state, _state);
    state->needmtv = true;
    state->rstate.stage = 1;
@@ -6332,7 +6332,7 @@ lbl_13:
       }
       state->x.xR[i] = state->ui.xR[i];
    }
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state, _state);
    state->needmtv = true;
    state->rstate.stage = 3;
@@ -6370,7 +6370,7 @@ lbl_15:
       goto lbl_16;
    }
 // At I-th step State.RepIterationsCount=I.
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
 // Bidiagonalization part:
 //     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
 //     alpha[i+1]*v[i+1] = A_mod'*u[i+1] - beta[i+1]*v[i]
@@ -6383,7 +6383,7 @@ lbl_15:
 //        and, although no division by zero will happen, orthogonality
 //        in U and V will be lost.
    ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state, _state);
    state->needmv = true;
    state->rstate.stage = 4;
@@ -6405,7 +6405,7 @@ lbl_4:
       }
    }
    ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state, _state);
    state->needmtv = true;
    state->rstate.stage = 5;
@@ -7274,7 +7274,7 @@ bool nleqiteration(nleqstate *state, ae_state *_state) {
    goto lbl_rcomm;
 lbl_0:
    state->needf = false;
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
    state->fprev = maxrealnumber;
@@ -7314,8 +7314,8 @@ lbl_7:
    goto lbl_rcomm;
 lbl_2:
    state->needfij = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repnjac = state->repnjac + 1;
+   state->repnfunc++;
+   state->repnjac++;
    rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0, _state);
    ae_v_muld(state->rightpart.xR, 1, n, -1);
 // Inner cycle: find good lambda
@@ -7373,7 +7373,7 @@ lbl_9:
    goto lbl_rcomm;
 lbl_3:
    state->needf = false;
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    if (state->f < state->fbase) {
    // function value decreased, move on
       nleq_decreaselambda(&lambdav, &rho, lambdadown, _state);
@@ -7393,7 +7393,7 @@ lbl_10:
 // * new function value
    state->fbase = state->f;
    ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
 // Report new iteration
    if (!state->xrep) {
       goto lbl_11;

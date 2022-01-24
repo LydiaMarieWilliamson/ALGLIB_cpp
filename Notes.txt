@@ -346,6 +346,9 @@ A6.2. Test Stages
 			TRACING * SOLVER comments
 39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
 	Replaced i{floor,ceil,trunc,round}() by std::{floor,ceil,trunc,round}(), for floating point types.
+39	Synthesized increment operators:
+	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
+	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
 
 A6.3. Test Results
 ──────────────────
@@ -371,6 +374,7 @@ A6.3. Test Results
 39	7463 0.8x 11629 1.0x 11769 1.0x 8752 1.0x 1641874215 (61dd0327) 87 // Re-sorted the routines.
 39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
 39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
+39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -427,19 +431,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   6410
-* RGEMM-MTN-16              0.9x
-* RGEMM-SEQ-32   (MFLOPS)  10310
-* RGEMM-MTN-32              1.1x
-* RGEMM-SEQ-64   (MFLOPS)  10313
+* RGEMM-SEQ-16   (MFLOPS)   7353
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)  11365
+* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-64   (MFLOPS)  11368
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9539
+* RGEMM-SEQ-1024 (MFLOPS)   9241
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1642933377
+SEED: 1643002115
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -539,4 +543,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 83 seconds
+Done in 82 seconds

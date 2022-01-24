@@ -292,7 +292,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
    }
    *info = 1;
 // Initialize, D[1:N], E[1:N]
-   n = n - 1;
+   n--;
    ae_vector_set_length(&d, n + 1, _state);
    ae_vector_set_length(&e, n, _state);
    for (i = 1; i <= n; i++) {
@@ -1812,7 +1812,7 @@ lbl_0:
 // Integral |F(x)|
 // Use rectangles method
    inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
-   i = i + 1;
+   i++;
    goto lbl_5;
 lbl_7:
    intk = intk * (state->b - state->a) * 0.5;
@@ -1867,7 +1867,7 @@ lbl_1:
 // Integral |F(x)|
 // Use rectangles method
    inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
-   i = i + 1;
+   i++;
    goto lbl_11;
 lbl_13:
    intk = intk * (tb - ta) * 0.5;
@@ -1880,7 +1880,7 @@ lbl_13:
    state->heap.xyR[j][4] = tb;
    state->sumerr = state->sumerr + state->heap.xyR[j][0];
    state->sumabs = state->sumabs + ae_fabs(inta, _state);
-   j = j + 1;
+   j++;
    goto lbl_8;
 lbl_10:
 lbl_4:
@@ -1942,7 +1942,7 @@ lbl_2:
 // Integral |F(x)|
 // Use rectangles method
    inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
-   i = i + 1;
+   i++;
    goto lbl_19;
 lbl_21:
    intk = intk * (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
@@ -1953,12 +1953,12 @@ lbl_21:
    state->heap.xyR[j][2] = inta;
    state->sumerr = state->sumerr + state->heap.xyR[j][0];
    state->sumabs = state->sumabs + state->heap.xyR[j][2];
-   j = j + 1;
+   j++;
    goto lbl_16;
 lbl_18:
    autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth, _state);
    autogk_mheappush(&state->heap, state->heapused, state->heapwidth, _state);
-   state->heapused = state->heapused + 1;
+   state->heapused++;
    goto lbl_14;
 lbl_15:
    result = false;
@@ -2077,7 +2077,7 @@ lbl_5:
    goto lbl_rcomm;
 lbl_0:
    state->needf = false;
-   state->nfev = state->nfev + 1;
+   state->nfev++;
    state->internalstate.f = state->f;
    goto lbl_5;
 lbl_6:
@@ -2149,7 +2149,7 @@ lbl_1:
    } else {
       state->internalstate.f = state->f;
    }
-   state->nfev = state->nfev + 1;
+   state->nfev++;
    goto lbl_9;
 lbl_10:
    v1 = state->internalstate.r;
@@ -2184,7 +2184,7 @@ lbl_2:
    } else {
       state->internalstate.f = state->f;
    }
-   state->nfev = state->nfev + 1;
+   state->nfev++;
    goto lbl_11;
 lbl_12:
    v2 = state->internalstate.r;

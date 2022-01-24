@@ -942,11 +942,11 @@ void apperiodicmap(double *x, double a, double b, double *k, ae_state *_state) {
    *x = *x - *k * (b - a);
    while (*x < a) {
       *x = *x + (b - a);
-      *k = *k - 1;
+      --*k;
    }
    while (*x > b) {
       *x = *x - (b - a);
-      *k = *k + 1;
+      ++*k;
    }
    *x = maxreal(*x, a, _state);
    *x = minreal(*x, b, _state);
@@ -1094,12 +1094,12 @@ void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state) {
 
 // This function is used to increment value of integer variable
 void inc(ae_int_t *v, ae_state *_state) {
-   *v = *v + 1;
+   ++*v;
 }
 
 // This function is used to decrement value of integer variable
 void dec(ae_int_t *v, ae_state *_state) {
-   *v = *v - 1;
+   --*v;
 }
 
 // This function is used to increment value of integer variable; name of  the
@@ -1107,7 +1107,7 @@ void dec(ae_int_t *v, ae_state *_state) {
 // thread-unsafe manner (optional progress reports which do not need guaranteed
 // correctness)
 void threadunsafeinc(ae_int_t *v, ae_state *_state) {
-   *v = *v + 1;
+   ++*v;
 }
 
 // This function is used to increment value of integer variable; name of  the
@@ -1124,7 +1124,7 @@ void threadunsafeincby(ae_int_t *v, ae_int_t k, ae_state *_state) {
 // It is used by some algorithms to decrease value of internal counters.
 void countdown(ae_int_t *v, ae_state *_state) {
    if (*v > 0) {
-      *v = *v - 1;
+      --*v;
    } else {
       *v = 0;
    }
@@ -1164,7 +1164,7 @@ ae_int_t idivup(ae_int_t a, ae_int_t b, ae_state *_state) {
    ae_int_t result;
    result = a / b;
    if (a % b > 0) {
-      result = result + 1;
+      result++;
    }
    return result;
 }
@@ -1312,7 +1312,7 @@ ae_int_t countnz1(RVector *v, ae_int_t n, ae_state *_state) {
    result = 0;
    for (i = 0; i < n; i++) {
       if (!(v->xR[i] == 0)) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -1327,7 +1327,7 @@ ae_int_t countnz2(RMatrix *v, ae_int_t m, ae_int_t n, ae_state *_state) {
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (!(v->xyR[i][j] == 0)) {
-            result = result + 1;
+            result++;
          }
       }
    }
@@ -1575,7 +1575,7 @@ ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize, ae_state *_state) {
    ae_assert(chunksize >= 1, "ChunksCount: ChunkSize<1", _state);
    result = tasksize / chunksize;
    if (tasksize % chunksize != 0) {
-      result = result + 1;
+      result++;
    }
    return result;
 }
@@ -1656,8 +1656,8 @@ void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1, ae_sta
       *task0 = tasksize / 2;
       *task1 = tasksize / 2;
       if (*task0 % 2 != 0) {
-         *task0 = *task0 + 1;
-         *task1 = *task1 - 1;
+         ++*task0;
+         --*task1;
       }
    } else {
    // Odd task size, split trailing odd part from it.
@@ -3670,8 +3670,8 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                v03 = v03 + a0 * b3;
                v12 = v12 + a1 * b2;
                v13 = v13 + a1 * b3;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
+               offsa++;
+               offsb++;
             }
             if (beta == 0.0) {
                c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
@@ -3871,8 +3871,8 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                v03 = v03 + a0 * b3;
                v12 = v12 + a1 * b2;
                v13 = v13 + a1 * b3;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
+               offsa++;
+               offsb++;
             }
             if (beta == 0.0) {
                c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
@@ -4072,8 +4072,8 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                v03 = v03 + a0 * b3;
                v12 = v12 + a1 * b2;
                v13 = v13 + a1 * b3;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
+               offsa++;
+               offsb++;
             }
             if (beta == 0.0) {
                c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
@@ -4274,8 +4274,8 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                v03 = v03 + a0 * b3;
                v12 = v12 + a1 * b2;
                v13 = v13 + a1 * b3;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
+               offsa++;
+               offsb++;
             }
             if (beta == 0.0) {
                c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
@@ -4643,8 +4643,8 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
                v10y = v10y + a1x * b0y + a1y * b0x;
                v11x = v11x + a1x * b1x - a1y * b1y;
                v11y = v11y + a1x * b1y + a1y * b1x;
-               offsa = offsa + 1;
-               offsb = offsb + 1;
+               offsa++;
+               offsb++;
             }
             v00 = complex_from_d(v00x, v00y);
             v10 = complex_from_d(v10x, v10y);
@@ -5713,7 +5713,7 @@ static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector
             a->xR[k] = v0;
             b->xZ[k] = b->xZ[i];
          }
-         cntless = cntless + 1;
+         cntless++;
          continue;
       }
       if (v0 == vp) {
@@ -5721,14 +5721,14 @@ static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector
          k = i2 - cnteq;
          bufa->xR[k] = v0;
          bufb->xZ[k] = b->xZ[i];
-         cnteq = cnteq + 1;
+         cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
       bufa->xR[k] = v0;
       bufb->xZ[k] = b->xZ[i];
-      cntgreater = cntgreater + 1;
+      cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
@@ -5837,7 +5837,7 @@ static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector
             a->xR[k] = v0;
             b->xR[k] = b->xR[i];
          }
-         cntless = cntless + 1;
+         cntless++;
          continue;
       }
       if (v0 == vp) {
@@ -5845,14 +5845,14 @@ static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector
          k = i2 - cnteq;
          bufa->xR[k] = v0;
          bufb->xR[k] = b->xR[i];
-         cnteq = cnteq + 1;
+         cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
       bufa->xR[k] = v0;
       bufb->xR[k] = b->xR[i];
-      cntgreater = cntgreater + 1;
+      cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
@@ -5956,20 +5956,20 @@ static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_
          if (i != k) {
             a->xR[k] = v0;
          }
-         cntless = cntless + 1;
+         cntless++;
          continue;
       }
       if (v0 == vp) {
       // EQUAL
          k = i2 - cnteq;
          bufa->xR[k] = v0;
-         cnteq = cnteq + 1;
+         cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
       bufa->xR[k] = v0;
-      cntgreater = cntgreater + 1;
+      cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
@@ -6222,8 +6222,8 @@ void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t offset, ae_int_t n, ae_sta
             ak1 = a->xZ[p1 + 1];
             if (ak1 > ak) {
                ak = ak1;
-               p1 = p1 + 1;
-               k = k + 1;
+               p1++;
+               k++;
             }
          }
          if (at >= ak) {
@@ -6299,8 +6299,8 @@ void tagsortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state) {
             ak1 = a->xZ[p1 + 1];
             if (ak1 > ak) {
                ak = ak1;
-               p1 = p1 + 1;
-               k = k + 1;
+               p1++;
+               k++;
             }
          }
          if (at >= ak) {
@@ -6367,8 +6367,8 @@ void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n, ae_state *_state) {
             ak1 = a->xZ[p1 + 1];
             if (ak1 > ak) {
                ak = ak1;
-               p1 = p1 + 1;
-               k = k + 1;
+               p1++;
+               k++;
             }
          }
          if (at >= ak) {
@@ -6505,7 +6505,7 @@ void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb, a
    if (*n == 0) {
       a->xR[0] = va;
       b->xZ[0] = vb;
-      *n = *n + 1;
+      ++*n;
       return;
    }
 // add current point to the heap
@@ -6515,7 +6515,7 @@ void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb, a
 // until its final position is determined
 // (it allow us to reduce number of array access operations)
    j = *n;
-   *n = *n + 1;
+   ++*n;
    while (j > 0) {
       k = (j - 1) / 2;
       v = a->xR[k];
@@ -6641,7 +6641,7 @@ void tagheappopi(RVector *a, ZVector *b, ae_int_t *n, ae_state *_state) {
    vb = b->xZ[*n - 1];
    a->xR[*n - 1] = a->xR[0];
    b->xZ[*n - 1] = b->xZ[0];
-   *n = *n - 1;
+   --*n;
    tagheapreplacetopi(a, b, *n, va, vb, _state);
 }
 
@@ -7318,7 +7318,7 @@ void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf, ae_state *_s
          if (buf->ra1.xR[j] != buf->ra1.xR[i]) {
             break;
          }
-         j = j + 1;
+         j++;
       }
       for (k = i; k < j; k++) {
          buf->ra1.xR[k] = (double)(i + j - 1) / 2.0;
@@ -9028,7 +9028,7 @@ void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *s
       }
       if (*stage == 4) {
          *info = 0;
-         *nfev = *nfev + 1;
+         ++*nfev;
          v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
          state->dg = v;
          state->ftest1 = state->finit + *stp * state->dgtest;
@@ -9218,7 +9218,7 @@ bool armijoiteration(armijostate *state, ae_state *_state) {
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->nfev = state->nfev + 1;
+   state->nfev++;
    if (state->f >= state->fcur) {
       goto lbl_4;
    }
@@ -9249,7 +9249,7 @@ lbl_6:
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->nfev = state->nfev + 1;
+   state->nfev++;
 // make decision
    if (state->f < state->fcur) {
       state->stplen = v;
@@ -9269,7 +9269,7 @@ lbl_4:
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->nfev = state->nfev + 1;
+   state->nfev++;
    if (state->f >= state->fcur) {
       goto lbl_8;
    }
@@ -9297,7 +9297,7 @@ lbl_10:
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->nfev = state->nfev + 1;
+   state->nfev++;
 // make decision
    if (state->f < state->fcur) {
       state->stplen = state->stplen / linmin_armijofactor;
@@ -9506,7 +9506,7 @@ static bool ntheory_isprime(ae_int_t n, ae_state *_state) {
       if (n % p == 0) {
          return result;
       }
-      p = p + 1;
+      p++;
    }
    result = true;
    return result;
@@ -9658,7 +9658,7 @@ void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot
                q = q / f;
             }
          }
-         f = f + 1;
+         f++;
       }
       if (allnonone) {
          *proot = candroot;
@@ -10774,7 +10774,7 @@ static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVe
          for (j = 0; j < n; j++) {
             b->xR[idx1] = a->xR[idx2];
             idx1 = idx1 + bstride;
-            idx2 = idx2 + 1;
+            idx2++;
          }
       }
       return;
@@ -11097,7 +11097,7 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
          }
          ncur = ncur / f;
       }
-      f = f + 1;
+      f++;
    }
 }
 
@@ -11387,25 +11387,25 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
             ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize, _state);
             i = i + chunksize;
          }
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process "reference complex FFT" operation
       if (operation == ftbase_opcomplexreffft) {
          ftbase_ftapplycomplexreffft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, buf, _state);
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process "codelet FFT" operation
       if (operation == ftbase_opcomplexcodeletfft) {
          ftbase_ftapplycomplexcodeletfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process "integrated codelet FFT" operation
       if (operation == ftbase_opcomplexcodelettwfft) {
          ftbase_ftapplycomplexcodelettwfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, _state);
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process Bluestein's FFT operation
@@ -11420,13 +11420,13 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb, _state);
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc, _state);
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufd, _state);
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process Rader's FFT
       if (operation == ftbase_opradersfft) {
          ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam1], plan->entries.xyZ[rowidx][ftbase_colparam2], plan->entries.xyZ[rowidx][ftbase_colparam3], buf, _state);
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process "complex twiddle factors" operation
@@ -11437,7 +11437,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
          for (i = 0; i < operandscnt; i++) {
             ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2, _state);
          }
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Process "complex transposition" operation
@@ -11448,7 +11448,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
          for (i = 0; i < operandscnt; i++) {
             ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf, _state);
          }
-         rowidx = rowidx + 1;
+         rowidx++;
          continue;
       }
    // Error
@@ -11510,7 +11510,7 @@ static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_in
    plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
    plan->entries.xyZ[*rowptr][ftbase_colparam2] = 0;
    plan->entries.xyZ[*rowptr][ftbase_colparam3] = 0;
-   *rowptr = *rowptr + 1;
+   ++*rowptr;
 }
 
 // Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
@@ -11545,7 +11545,7 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
    plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
    plan->entries.xyZ[*rowptr][ftbase_colparam2] = eparam2;
    plan->entries.xyZ[*rowptr][ftbase_colparam3] = eparam3;
-   *rowptr = *rowptr + 1;
+   ++*rowptr;
 }
 
 // This function pushes one more entry to the plan. It resizes Entries matrix

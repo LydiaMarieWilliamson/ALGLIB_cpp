@@ -81,7 +81,7 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state, ae_state *_state) {
    if (result < 1) {
       result = result + 2147483562;
    }
-   result = result - 1;
+   result--;
    return result;
 }
 
@@ -552,7 +552,7 @@ ae_int_t xdebugb1count(BVector *a, ae_state *_state) {
    result = 0;
    for (i = 0; i < a->cnt; i++) {
       if (a->xB[i]) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -850,7 +850,7 @@ ae_int_t xdebugb2count(BMatrix *a, ae_state *_state) {
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
          if (a->xyB[i][j]) {
-            result = result + 1;
+            result++;
          }
       }
    }
@@ -1598,7 +1598,7 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
       if (kdt->xy.xyR[ileft][d] <= s) {
       // XY[ILeft] is on its place.
       // Advance ILeft.
-         ileft = ileft + 1;
+         ileft++;
       } else {
       // XY[ILeft,..] must be at IRight.
       // Swap and advance IRight.
@@ -1610,13 +1610,13 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
          j = kdt->tags.xZ[ileft];
          kdt->tags.xZ[ileft] = kdt->tags.xZ[iright];
          kdt->tags.xZ[iright] = j;
-         iright = iright - 1;
+         iright--;
       }
    }
    if (kdt->xy.xyR[ileft][d] <= s) {
-      ileft = ileft + 1;
+      ileft++;
    } else {
-      iright = iright - 1;
+      iright--;
    }
    *i3 = ileft;
 }
@@ -1707,10 +1707,10 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          maxidx = i1 + i;
       }
       if (v < s) {
-         cntless = cntless + 1;
+         cntless++;
       }
       if (v > s) {
-         cntgreater = cntgreater + 1;
+         cntgreater++;
       }
    }
    if (minv == maxv) {
@@ -1772,7 +1772,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    kdt->splits.xR[*splitsoffs + 0] = s;
    oldoffs = *nodesoffs;
    *nodesoffs = *nodesoffs + nearestneighbor_splitnodesize;
-   *splitsoffs = *splitsoffs + 1;
+   ++*splitsoffs;
 // Recursive generation:
 // * update CurBox
 // * call subroutine
@@ -2766,7 +2766,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
       // Add point to unordered list
          buf->r.xR[buf->kcur] = 0.0;
          buf->idx.xZ[buf->kcur] = i;
-         buf->kcur = buf->kcur + 1;
+         buf->kcur++;
       }
       return;
    }

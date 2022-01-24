@@ -336,7 +336,7 @@ lbl_8:
    goto lbl_rcomm;
 lbl_0:
    state->needdy = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    v = h * state->xscale;
    ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
 // update YN/YNS
@@ -344,7 +344,7 @@ lbl_0:
    ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
    v = state->rkcs.xR[k];
    ae_v_addd(state->yns.xR, 1, state->rkk.xyR[k], 1, n, v);
-   k = k + 1;
+   k++;
    goto lbl_8;
 lbl_10:
 // estimate error
@@ -388,7 +388,7 @@ lbl_10:
 lbl_7:
 // save result
    ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
-   i = i + 1;
+   i++;
    goto lbl_3;
 lbl_5:
    state->repterminationtype = 1;

@@ -917,7 +917,7 @@ int main() {
                   }
             // test that setcontent() actually copies data instead of creating just reference
                r = a0[0];
-               a0[0] = a0[0] + 1;
+               a0[0]++;
                passed = passed && (arr_6[0][0] != a0[0]);
                a0[0] = r;
             // operations on constant arrays

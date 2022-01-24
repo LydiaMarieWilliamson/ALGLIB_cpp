@@ -80,7 +80,7 @@ double gammafunction(double x, ae_state *_state) {
          }
          z = q - p;
          if (z > 0.5) {
-            p = p + 1;
+            p++;
             z = q - p;
          }
          z = q * ae_sin(pi * z, _state);
@@ -94,7 +94,7 @@ double gammafunction(double x, ae_state *_state) {
    }
    z = 1.0;
    while (x >= 3.0) {
-      x = x - 1;
+      x--;
       z = z * x;
    }
    while (x < 0.0) {
@@ -103,7 +103,7 @@ double gammafunction(double x, ae_state *_state) {
          return result;
       }
       z = z / x;
-      x = x + 1;
+      x++;
    }
    while (x < 2.0) {
       if (x < 0.000000001) {
@@ -202,7 +202,7 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
       }
       z = q - p;
       if (z > 0.5) {
-         p = p + 1;
+         p++;
          z = p - q;
       }
       z = q * ae_sin(pi * z, _state);
@@ -214,13 +214,13 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
       p = 0.0;
       u = x;
       while (u >= 3.0) {
-         p = p - 1;
+         p--;
          u = x + p;
          z = z * u;
       }
       while (u < 2.0) {
          z = z / u;
-         p = p + 1;
+         p++;
          u = x + p;
       }
       if (z < 0.0) {
@@ -1022,7 +1022,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
          qkm2 = qkm2 * big;
          qkm1 = qkm1 * big;
       }
-      n = n + 1;
+      n++;
    } while (n != 300);
    result = ans;
    return result;
@@ -1120,7 +1120,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
          qkm2 = qkm2 * big;
          qkm1 = qkm1 * big;
       }
-      n = n + 1;
+      n++;
    } while (n != 300);
    result = ans;
    return result;
@@ -1503,7 +1503,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                      }
                   }
                }
-               dir = dir + 1;
+               dir++;
                if (x0 > 0.75) {
                   if (rflg == 1) {
                      rflg = 0;
@@ -1546,9 +1546,9 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                      }
                   }
                }
-               dir = dir - 1;
+               dir--;
             }
-            i = i + 1;
+            i++;
             mainlooppos = ihalvecycle;
             continue;
          } else {
@@ -1638,7 +1638,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
             if (ae_fabs(d / x, _state) < 128.0 * machineepsilon) {
                break;
             }
-            i = i + 1;
+            i++;
             mainlooppos = newtcycle;
             continue;
          } else {
@@ -2104,7 +2104,7 @@ double incompletegamma(double a, double x, ae_state *_state) {
    c = 1.0;
    ans = 1.0;
    do {
-      r = r + 1;
+      r++;
       c = c * x / r;
       ans = ans + c;
    } while (c / ans > igammaepsilon);
@@ -2190,8 +2190,8 @@ double incompletegammac(double a, double x, ae_state *_state) {
    qkm1 = z * x;
    ans = pkm1 / qkm1;
    do {
-      c = c + 1;
-      y = y + 1;
+      c++;
+      y++;
       z = z + 2;
       yc = y * c;
       pk = pkm1 * z - pkm2 * yc;
@@ -2310,7 +2310,7 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
          return result;
       }
       x = x - d;
-      i = i + 1;
+      i++;
    }
    if (x0 == iinvgammabignumber) {
       if (x <= 0.0) {
@@ -2357,7 +2357,7 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
                d = (y0 - yl) / (yh - yl);
             }
          }
-         dir = dir + 1;
+         dir++;
       } else {
          x0 = x;
          yl = y;
@@ -2371,9 +2371,9 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
                d = (y0 - yl) / (yh - yl);
             }
          }
-         dir = dir - 1;
+         dir--;
       }
-      i = i + 1;
+      i++;
    }
    result = x;
    return result;
@@ -3036,9 +3036,9 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
          result = 1.0 / pk;
       }
       do {
-         xk = xk + 1;
+         xk++;
          yk = yk * z / xk;
-         pk = pk + 1;
+         pk++;
          if (pk != 0.0) {
             result = result + yk / pk;
          }
@@ -3062,7 +3062,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
       qkm1 = x + n;
       result = pkm1 / qkm1;
       do {
-         k = k + 1;
+         k++;
          if (k % 2 == 1) {
             yk = 1.0;
             xk = n + (double)(k - 1) / 2.0;
@@ -3213,7 +3213,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
          break;
       }
       ai = a.xR[i];
-      i = i + 1;
+      i++;
       c.xR[i] = 0.5 * (ai - b);
       t = ae_sqrt(ai * b, _state);
       a.xR[i] = 0.5 * (ai + b);
@@ -3225,7 +3225,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       t = c.xR[i] * ae_sin(phi, _state) / a.xR[i];
       b = phi;
       phi = (ae_asin(t, _state) + phi) / 2.0;
-      i = i - 1;
+      i--;
    } while (i != 0);
    *sn = ae_sin(phi, _state);
    t = ae_cos(phi, _state);
@@ -3816,7 +3816,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
             }
          }
          d = e;
-         k = k + 1;
+         k++;
       } while (k <= n);
       d = b->xR[i];
       e = 0.0;
@@ -3826,7 +3826,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
          k = k + 2;
       }
       b->xR[i] = e;
-      i = i + 1;
+      i++;
    } while (i <= n);
 }
 } // end of namespace alglib_impl
@@ -5402,7 +5402,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
    do {
       pk = pk - 2.0;
       ans = pk - xk / ans;
-      k = k - 1;
+      k--;
    } while (k != 0);
    ans = x / ans;
    pk = 1.0;
@@ -5414,7 +5414,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       pk = pkm1;
       pkm1 = pkm2;
       r = r - 2.0;
-      k = k - 1;
+      k--;
    } while (k != 0);
    if (ae_fabs(pk, _state) > ae_fabs(pkm1, _state)) {
       ans = besselj1(x, _state) / pk;
@@ -6092,7 +6092,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
       s = s + t;
       fn = fn + 1.0;
       pk = pk + 2.0;
-      i = i + 1;
+      i++;
    } while (ae_fabs(t / s, _state) > machineepsilon);
    result = ae_exp(-x, _state) * ae_sqrt(pi / (2.0 * x), _state) * s;
    return result;
@@ -6238,7 +6238,7 @@ double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
       result = ((2 * i - 1 - x) * b - (i - 1) * a) / i;
       a = b;
       b = result;
-      i = i + 1;
+      i++;
    }
    return result;
 }
@@ -6485,7 +6485,7 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
    }
    npio2 = ifloor(phi / pio2, _state);
    if (npio2 % 2 != 0) {
-      npio2 = npio2 + 1;
+      npio2++;
    }
    if (npio2 != 0) {
       k = ellipticintegralk(1 - a, _state);
@@ -6652,7 +6652,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    lphi = phi;
    npio2 = ifloor(lphi / pio2, _state);
    if (npio2 % 2 != 0) {
-      npio2 = npio2 + 1;
+      npio2++;
    }
    lphi = lphi - npio2 * pio2;
    if (lphi < 0.0) {

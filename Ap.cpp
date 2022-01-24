@@ -5443,8 +5443,8 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
             pdst1[0] = psrc1[0];
             pdst0 += alglib_r_block;
             pdst1 += alglib_r_block;
-            psrc0 += 1;
-            psrc1 += 1;
+            psrc0++;
+            psrc1++;
          }
          arow0 += 2 * stride;
          arow1 += 2 * stride;

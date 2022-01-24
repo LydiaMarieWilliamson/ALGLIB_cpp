@@ -4684,7 +4684,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
    ca = 0.0;
    do {
       ca = ey.xR[i + 1] - ey.xR[i];
-      i = i + 1;
+      i++;
    } while (!(ca != 0.0 || i > n - 2));
    if (ca != 0.0) {
       ca = ca / ae_fabs(ca, _state);
@@ -4696,7 +4696,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
       for (j = i; j < n - 1; j++) {
          cb = ey.xR[j + 1] - ey.xR[j];
          if (ca * cb >= 0.0) {
-            tmpn = tmpn + 1;
+            tmpn++;
          } else {
             ca = cb / ae_fabs(cb, _state);
             break;
@@ -5080,7 +5080,7 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
          }
       }
       if (havetoadvance) {
-         intervalindex = intervalindex + 1;
+         intervalindex++;
          a = xold->xR[intervalindex];
          b = xold->xR[intervalindex + 1];
          w = b - a;
@@ -5107,7 +5107,7 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
       if (needd2) {
          d2->xR[pointindex] = 2 * c2 + 6 * t * c3;
       }
-      pointindex = pointindex + 1;
+      pointindex++;
    }
 }
 
@@ -6178,7 +6178,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
       rep->maxerror = maxreal(rep->maxerror, ae_fabs(v, _state), _state);
       if (y->xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(v / y->xR[i], _state);
-         nrel = nrel + 1;
+         nrel++;
       }
    }
    rep->rmserror = ae_sqrt(rep->rmserror / n, _state);
@@ -6648,7 +6648,7 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, 0.0, tex0, x0, _state) + (*nr);
          if (*nr > i) {
             tempdata->xR[i] = spline1d_rescaleval(0.0, tex0, a, *ex0, *x0, _state);
-            i = i + 1;
+            i++;
          }
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, tex0, 1.0, x0, _state) + (*nr);
          if (*nr > i) {
@@ -6656,13 +6656,13 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
             if (i > 0) {
                if (*x0 != tempdata->xR[i - 1]) {
                   tempdata->xR[i] = *x0;
-                  i = i + 1;
+                  i++;
                } else {
-                  *nr = *nr - 1;
+                  --*nr;
                }
             } else {
                tempdata->xR[i] = *x0;
-               i = i + 1;
+               i++;
             }
          }
          if (*nr > 0) {
@@ -6695,16 +6695,16 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, 0.0, tex1, x0, _state) + (*nr);
          if (*nr > i) {
             tempdata->xR[i] = spline1d_rescaleval(0.0, tex1, a, *ex1, *x0, _state);
-            i = i + 1;
+            i++;
          }
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, tex1, 1.0, x0, _state) + (*nr);
          if (*nr > i) {
             *x0 = spline1d_rescaleval(tex1, 1.0, *ex1, b, *x0, _state);
             if (*x0 != tempdata->xR[i - 1]) {
                tempdata->xR[i] = *x0;
-               i = i + 1;
+               i++;
             } else {
-               *nr = *nr - 1;
+               --*nr;
             }
          }
          if (*nr > 0) {
@@ -6722,7 +6722,7 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, 0.0, tex0, x0, _state) + (*nr);
          if (*nr > i) {
             tempdata->xR[i] = spline1d_rescaleval(0.0, tex0, a, *ex0, *x0, _state);
-            i = i + 1;
+            i++;
          }
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, tex0, 1.0, x0, _state) + (*nr);
          if (*nr > i) {
@@ -6730,13 +6730,13 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
             if (i > 0) {
                if (*x0 != tempdata->xR[i - 1]) {
                   tempdata->xR[i] = *x0;
-                  i = i + 1;
+                  i++;
                } else {
-                  *nr = *nr - 1;
+                  --*nr;
                }
             } else {
                tempdata->xR[i] = *x0;
-               i = i + 1;
+               i++;
             }
          }
          if (*nr > 0) {
@@ -6756,7 +6756,7 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, 0.0, tex0, x0, _state) + (*nr);
          if (*nr > i) {
             tempdata->xR[i] = spline1d_rescaleval(0.0, tex0, a, *ex0, *x0, _state);
-            i = i + 1;
+            i++;
          }
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, tex0, tex1, x0, _state) + (*nr);
          if (*nr > i) {
@@ -6764,13 +6764,13 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
             if (i > 0) {
                if (*x0 != tempdata->xR[i - 1]) {
                   tempdata->xR[i] = *x0;
-                  i = i + 1;
+                  i++;
                } else {
-                  *nr = *nr - 1;
+                  --*nr;
                }
             } else {
                tempdata->xR[i] = *x0;
-               i = i + 1;
+               i++;
             }
          }
          *nr = bisectmethod(pa, tmpma, pb, tmpmb, tex1, 1.0, x0, _state) + (*nr);
@@ -6779,13 +6779,13 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
             if (i > 0) {
                if (*x0 != tempdata->xR[i - 1]) {
                   tempdata->xR[i] = *x0;
-                  i = i + 1;
+                  i++;
                } else {
-                  *nr = *nr - 1;
+                  --*nr;
                }
             } else {
                tempdata->xR[i] = *x0;
-               i = i + 1;
+               i++;
             }
          }
       // write are found roots
@@ -6908,12 +6908,12 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
             // if is't, then write new root
                if (x0 != tmpr.xR[*nr - 1]) {
                   tmpr.xR[*nr] = x0;
-                  *nr = *nr + 1;
+                  ++*nr;
                }
             } else {
             // write a first root
                tmpr.xR[*nr] = x0;
-               *nr = *nr + 1;
+               ++*nr;
             }
          } else {
          // case when function at a segment identically to zero
@@ -6927,7 +6927,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
             // clear the root, if there is
                if (*nr > 0) {
                   if (c->x.xR[i] == tmpr.xR[*nr - 1]) {
-                     *nr = *nr - 1;
+                     --*nr;
                   }
                }
             // change state for 'DR'
@@ -6951,13 +6951,13 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
                // maximum
                   tmpet.xZ[*ne] = -1;
                   tmpe.xR[*ne] = c->x.xR[i];
-                  *ne = *ne + 1;
+                  ++*ne;
                } else {
                   if (pl < pll && pl < pr) {
                   // minimum
                      tmpet.xZ[*ne] = 1;
                      tmpe.xR[*ne] = c->x.xR[i];
-                     *ne = *ne + 1;
+                     ++*ne;
                   }
                }
             }
@@ -7044,7 +7044,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
             // decrement 'NR' if at previous step was writen a root
             // (previous segment identical zero)
                if (*nr > 0 && nstep) {
-                  *nr = *nr - 1;
+                  --*nr;
                }
             // previous segment is't constant
                if (nstep) {
@@ -7115,13 +7115,13 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
             // maximum
                tmpe.xR[*ne] = tmpc.xR[2 * i];
                tmpet.xZ[*ne] = -1;
-               *ne = *ne + 1;
+               ++*ne;
             } else {
                if (tmpc.xR[2 * i + 1] < tmpc.xR[2 * (i - 1) + 1] && tmpc.xR[2 * i + 1] < tmpc.xR[2 * (i + 1) + 1]) {
                // minimum
                   tmpe.xR[*ne] = tmpc.xR[2 * i];
                   tmpet.xZ[*ne] = 1;
-                  *ne = *ne + 1;
+                  ++*ne;
                }
             }
          } else {
@@ -7131,13 +7131,13 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
                   // maximum
                      tmpe.xR[*ne] = tmpc.xR[2 * i];
                      tmpet.xZ[*ne] = -1;
-                     *ne = *ne + 1;
+                     ++*ne;
                   } else {
                      if (tmpc.xR[2 * i + 1] < pl && tmpc.xR[2 * i + 1] < tmpc.xR[2 * (i + 1) + 1]) {
                      // minimum
                         tmpe.xR[*ne] = tmpc.xR[2 * i];
                         tmpet.xZ[*ne] = 1;
-                        *ne = *ne + 1;
+                        ++*ne;
                      }
                   }
                }
@@ -7148,13 +7148,13 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
                      // maximum
                         tmpe.xR[*ne] = tmpc.xR[2 * i];
                         tmpet.xZ[*ne] = -1;
-                        *ne = *ne + 1;
+                        ++*ne;
                      } else {
                         if (tmpc.xR[2 * i + 1] < tmpc.xR[2 * (i - 1) + 1] && tmpc.xR[2 * i + 1] < pr) {
                         // minimum
                            tmpe.xR[*ne] = tmpc.xR[2 * i];
                            tmpet.xZ[*ne] = 1;
-                           *ne = *ne + 1;
+                           ++*ne;
                         }
                      }
                   }
@@ -7657,7 +7657,7 @@ static void lsfit_rdprecursive(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1,
    }
    xout->xR[*nout] = x->xR[worstidx];
    yout->xR[*nout] = y->xR[worstidx];
-   *nout = *nout + 1;
+   ++*nout;
    if (worstidx - i0 < i1 - worstidx) {
       lsfit_rdprecursive(x, y, i0, worstidx, eps, xout, yout, nout, _state);
       lsfit_rdprecursive(x, y, worstidx, i1, eps, xout, yout, nout, _state);
@@ -7755,7 +7755,7 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
       v = y->xR[i];
       while (j < n && x->xR[j] == x->xR[i]) {
          v = v + y->xR[j];
-         j = j + 1;
+         j++;
       }
       v = v / (j - i);
       for (k = i; k < j; k++) {
@@ -7913,7 +7913,7 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
       v = y->xR[i];
       while (j < n && x->xR[j] == x->xR[i]) {
          v = v + y->xR[j];
-         j = j + 1;
+         j++;
       }
       v = v / (j - i);
       for (k = i; k < j; k++) {
@@ -8072,7 +8072,7 @@ static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *
    nzcnt = 0;
    for (i = 0; i < n; i++) {
       if (w->xR[i] != 0.0) {
-         nzcnt = nzcnt + 1;
+         nzcnt++;
       }
    }
 // Compute R2
@@ -8417,7 +8417,7 @@ static void lsfit_lsfitlinearinternal(RVector *y, RVector *w, RMatrix *fmatrix, 
       rep->avgerror = rep->avgerror + ae_fabs(v - y->xR[i], _state);
       if (y->xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(v - y->xR[i], _state) / ae_fabs(y->xR[i], _state);
-         relcnt = relcnt + 1;
+         relcnt++;
       }
       rep->maxerror = maxreal(rep->maxerror, ae_fabs(v - y->xR[i], _state), _state);
    }
@@ -9298,7 +9298,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
    for (i = 0; i < n; i++) {
       if (yoriginal.xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(barycentriccalc(p, xoriginal.xR[i], _state) - yoriginal.xR[i], _state) / ae_fabs(yoriginal.xR[i], _state);
-         relcnt = relcnt + 1;
+         relcnt++;
       }
    }
    if (relcnt != 0) {
@@ -9660,7 +9660,7 @@ static void lsfit_logisticfit45errors(RVector *x, RVector *y, ae_int_t n, double
       rep->avgerror = rep->avgerror + ae_fabs(v, _state);
       if (y->xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(v / y->xR[i], _state);
-         k = k + 1;
+         k++;
       }
       rep->maxerror = maxreal(rep->maxerror, ae_fabs(v, _state), _state);
    }
@@ -10760,7 +10760,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    for (i = 0; i < n; i++) {
       if (yoriginal.xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(barycentriccalc(b, xoriginal.xR[i], _state) - yoriginal.xR[i], _state) / ae_fabs(yoriginal.xR[i], _state);
-         relcnt = relcnt + 1;
+         relcnt++;
       }
    }
    if (relcnt != 0) {
@@ -11205,7 +11205,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
    for (i = 0; i < n; i++) {
       if (yoriginal.xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(spline1dcalc(s, xoriginal.xR[i], _state) - yoriginal.xR[i], _state) / ae_fabs(yoriginal.xR[i], _state);
-         relcnt = relcnt + 1;
+         relcnt++;
       }
    }
    if (relcnt != 0) {
@@ -11745,7 +11745,7 @@ void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -11755,7 +11755,7 @@ void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
          } else {
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -12589,10 +12589,10 @@ lbl_2:
       result = false;
       return result;
    }
-   j = j + 1;
+   j++;
    goto lbl_19;
 lbl_21:
-   i = i + 1;
+   i++;
    goto lbl_16;
 lbl_18:
    state->needfg = false;
@@ -12632,7 +12632,7 @@ lbl_3:
    state->needf = false;
    vv = state->wcur.xR[i];
    state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
-   i = i + 1;
+   i++;
    goto lbl_26;
 lbl_28:
    goto lbl_22;
@@ -12658,7 +12658,7 @@ lbl_4:
    state->needf = false;
    vv = state->wcur.xR[i];
    state->optstate.f = state->optstate.f + sqr(vv * (state->f - state->tasky.xR[i]), _state);
-   i = i + 1;
+   i++;
    goto lbl_31;
 lbl_33:
    goto lbl_22;
@@ -12689,7 +12689,7 @@ lbl_5:
    state->optstate.f = state->optstate.f + sqr(vv * (state->f - state->tasky.xR[i]), _state);
    v = sqr(vv, _state) * 2 * (state->f - state->tasky.xR[i]);
    ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
-   i = i + 1;
+   i++;
    goto lbl_36;
 lbl_38:
    goto lbl_22;
@@ -12715,7 +12715,7 @@ lbl_6:
    vv = state->wcur.xR[i];
    state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
    ae_v_moved(state->optstate.j.xyR[i], 1, state->g.xR, 1, k, vv);
-   i = i + 1;
+   i++;
    goto lbl_41;
 lbl_43:
    goto lbl_22;
@@ -12757,7 +12757,7 @@ lbl_7:
       v = 2 * sqr(vv, _state) * (state->f - state->tasky.xR[i]);
       ae_v_addd(state->optstate.h.xyR[j], 1, state->h.xyR[j], 1, k, v);
    }
-   i = i + 1;
+   i++;
    goto lbl_46;
 lbl_48:
    goto lbl_22;
@@ -12819,10 +12819,10 @@ lbl_9:
    state->repavgerror = state->repavgerror + ae_fabs(v - state->tasky.xR[i], _state);
    if (state->tasky.xR[i] != 0.0) {
       state->repavgrelerror = state->repavgrelerror + ae_fabs(v - state->tasky.xR[i], _state) / ae_fabs(state->tasky.xR[i], _state);
-      relcnt = relcnt + 1;
+      relcnt++;
    }
    state->repmaxerror = maxreal(state->repmaxerror, ae_fabs(v - state->tasky.xR[i], _state), _state);
-   i = i + 1;
+   i++;
    goto lbl_53;
 lbl_55:
    state->reprmserror = ae_sqrt(state->reprmserror / n, _state);
@@ -12882,10 +12882,10 @@ lbl_12:
    } else {
       state->tmpjac.xyR[i][j] = 0.0;
    }
-   j = j + 1;
+   j++;
    goto lbl_61;
 lbl_63:
-   i = i + 1;
+   i++;
    goto lbl_58;
 lbl_60:
    state->needf = false;
@@ -12908,7 +12908,7 @@ lbl_13:
    for (j = 0; j < k; j++) {
       state->tmpjac.xyR[i][j] = state->g.xR[j];
    }
-   i = i + 1;
+   i++;
    goto lbl_64;
 lbl_66:
    state->needfg = false;
@@ -17428,7 +17428,7 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
                            for (i = blocks0->xZ[i0]; i <= ubnd; i++) {
                               basisfuncval = pbuf->expbuf0.xR[i] * v;
                               y->xR[dstoffs] = y->xR[dstoffs] + basisfuncval * w0;
-                              dstoffs = dstoffs + 1;
+                              dstoffs++;
                            }
                            continue;
                         }
@@ -18019,10 +18019,10 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f, ae
       f->xR[i] = f->xR[i] + c->f.xR[sfy + s1] * ht00 * hu10 + c->f.xR[sfy + s2] * ht01 * hu10 + c->f.xR[sfy + s3] * ht00 * hu11 + c->f.xR[sfy + s4] * ht01 * hu11;
       f->xR[i] = f->xR[i] + c->f.xR[sfxy + s1] * ht10 * hu10 + c->f.xR[sfxy + s2] * ht11 * hu10 + c->f.xR[sfxy + s3] * ht10 * hu11 + c->f.xR[sfxy + s4] * ht11 * hu11;
    // Advance source indexes
-      s1 = s1 + 1;
-      s2 = s2 + 1;
-      s3 = s3 + 1;
-      s4 = s4 + 1;
+      s1++;
+      s2++;
+      s3++;
+      s4++;
    }
 }
 
@@ -20022,14 +20022,14 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
                   idxj = ah->idx.xZ[srcj];
                   if (idxi == idxj) {
                      v = v + ah->vals.xR[srci] * ah->vals.xR[srcj];
-                     srci = srci + 1;
-                     srcj = srcj + 1;
+                     srci++;
+                     srcj++;
                      continue;
                   }
                   if (idxi < idxj) {
-                     srci = srci + 1;
+                     srci++;
                   } else {
-                     srcj = srcj + 1;
+                     srcj++;
                   }
                }
                blockata->xyR[celloffset + i0][j0] = v;
@@ -20709,7 +20709,7 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
                   sparseset(av, dstidx, (j1 + k1) * kx + (j0 + k0), v * d2x.xyR[1 + k0][1 + k1], _state);
                }
             }
-            dstidx = dstidx + 1;
+            dstidx++;
          // d2F/dy2 term
             v = smoothing;
             for (k1 = -1; k1 <= 1; k1++) {
@@ -20717,7 +20717,7 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
                   sparseset(av, dstidx, (j1 + k1) * kx + (j0 + k0), v * d2y.xyR[1 + k0][1 + k1], _state);
                }
             }
-            dstidx = dstidx + 1;
+            dstidx++;
          // 2*d2F/dxdy term
             v = ae_sqrt(2.0, _state) * smoothing;
             for (k1 = -1; k1 <= 1; k1++) {
@@ -20725,7 +20725,7 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
                   sparseset(av, dstidx, (j1 + k1) * kx + (j0 + k0), v * dxy.xyR[1 + k0][1 + k1], _state);
                }
             }
-            dstidx = dstidx + 1;
+            dstidx++;
          }
       }
    }
@@ -20864,7 +20864,7 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
          i = xyindex->xZ[j1 * (kxtotal - 1) + j0 + 1] - xyindex->xZ[j1 * (kxtotal - 1) + j0];
          a->npoints = a->npoints + i;
          a->ndenserows = a->ndenserows + i;
-         a->ndensebatches = a->ndensebatches + 1;
+         a->ndensebatches++;
          a->maxbatch = maxint(a->maxbatch, i, _state);
       }
    }
@@ -20910,9 +20910,9 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
             for (j = 0; j < d; j++) {
                a->vals.xyR[rowsdone][nzwidth * nzwidth + j] = xy->xR[i * entrywidth + 2 + j];
             }
-            rowsdone = rowsdone + 1;
+            rowsdone++;
          }
-         batchesdone = batchesdone + 1;
+         batchesdone++;
          a->batches.xZ[batchesdone] = rowsdone;
       }
    }
@@ -20957,7 +20957,7 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
                   a->vals.xyR[rowsdone][nzwidth * (k1 - base1) + (k0 - base0)] = v * d2x.xyR[1 + (k0 - j0)][1 + (k1 - j1)];
                }
             }
-            rowsdone = rowsdone + 1;
+            rowsdone++;
          // d2F/dy2 term
             v = lambdans;
             for (j = 0; j < nzwidth * nzwidth + d; j++) {
@@ -20968,7 +20968,7 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
                   a->vals.xyR[rowsdone][nzwidth * (k1 - base1) + (k0 - base0)] = v * d2y.xyR[1 + (k0 - j0)][1 + (k1 - j1)];
                }
             }
-            rowsdone = rowsdone + 1;
+            rowsdone++;
          // 2*d2F/dxdy term
             v = ae_sqrt(2.0, _state) * lambdans;
             for (j = 0; j < nzwidth * nzwidth + d; j++) {
@@ -20979,8 +20979,8 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
                   a->vals.xyR[rowsdone][nzwidth * (k1 - base1) + (k0 - base0)] = v * dxy.xyR[1 + (k0 - j0)][1 + (k1 - j1)];
                }
             }
-            rowsdone = rowsdone + 1;
-            batchesdone = batchesdone + 1;
+            rowsdone++;
+            batchesdone++;
             a->batches.xZ[batchesdone] = rowsdone;
          }
       }
@@ -21241,10 +21241,10 @@ static void spline2d_reorderdatasetandbuildindexrec(RVector *xy, ae_int_t d, RVe
    wrk1 = pt1 - 1;
    while (true) {
       while (wrk0 < pt1 && cidx->xZ[wrk0] < idxmid) {
-         wrk0 = wrk0 + 1;
+         wrk0++;
       }
       while (wrk1 >= pt0 && cidx->xZ[wrk1] >= idxmid) {
-         wrk1 = wrk1 - 1;
+         wrk1--;
       }
       if (wrk1 <= wrk0) {
          break;
@@ -21641,14 +21641,14 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
                idxj = ah->idx.xZ[srcj];
                if (idxi == idxj) {
                   v = v + ah->vals.xR[srci] * ah->vals.xR[srcj];
-                  srci = srci + 1;
-                  srcj = srcj + 1;
+                  srci++;
+                  srcj++;
                   continue;
                }
                if (idxi < idxj) {
-                  srci = srci + 1;
+                  srci++;
                } else {
-                  srcj = srcj + 1;
+                  srcj++;
                }
             }
             ata.xyR[i][j] = v;
@@ -21943,34 +21943,34 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
       while (imin2(kx, ky, _state) > state->maxcoresize + 1) {
          kx = idivup(kx - 1, 2, _state) + 1;
          ky = idivup(ky - 1, 2, _state) + 1;
-         k = k + 1;
+         k++;
       }
       basecasex = kx - 1;
       k0 = 1;
       while (kx > state->maxcoresize + 1) {
          basecasex = idivup(kx - 1, 2, _state);
          kx = basecasex + 1;
-         k0 = k0 + 1;
+         k0++;
       }
       while (k0 > 1) {
          kx = (kx - 1) * 2 + 1;
-         k0 = k0 - 1;
+         k0--;
       }
       basecasey = ky - 1;
       k1 = 1;
       while (ky > state->maxcoresize + 1) {
          basecasey = idivup(ky - 1, 2, _state);
          ky = basecasey + 1;
-         k1 = k1 + 1;
+         k1++;
       }
       while (k1 > 1) {
          ky = (ky - 1) * 2 + 1;
-         k1 = k1 - 1;
+         k1--;
       }
       while (k > 1) {
          kx = (kx - 1) * 2 + 1;
          ky = (ky - 1) * 2 + 1;
-         k = k - 1;
+         k--;
       }
    // Grid is NOT expanded. We have very strict requirements on
    // grid size, and we do not want to overcomplicate it by
@@ -22055,7 +22055,7 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
             xywork.xR[acopied * ew + 2 + j] = v;
             meany.xR[j] = meany.xR[j] + v;
          }
-         acopied = acopied + 1;
+         acopied++;
       }
    }
    npoints = acopied;
@@ -22941,7 +22941,7 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
       localnodes->xZ[*localnodessize + 4] = -1;
       *localnodessize = *localnodessize + 5;
       localsplits->xR[*localsplitssize + 0] = s;
-      *localsplitssize = *localsplitssize + 1;
+      ++*localsplitssize;
       localnodes->xZ[oldnodessize + 3] = nodesbase + (*localnodessize);
       rbfv2_converttreerec(curtree, n, nx, ny, nodele, nodesbase, splitsbase, cwbase, localnodes, localnodessize, localsplits, localsplitssize, localcw, localcwsize, xybuf, _state);
       localnodes->xZ[oldnodessize + 4] = nodesbase + (*localnodessize);
@@ -23493,7 +23493,7 @@ static void rbfv2_partialqueryrec(ZVector *kdnodes, RVector *kdsplits, RVector *
       // Output
          r2->xR[*k] = ptdist2;
          offs->xZ[*k] = itemoffs;
-         *k = *k + 1;
+         ++*k;
       }
       return;
    }
@@ -23612,7 +23612,7 @@ static ae_int_t rbfv2_partialcountrec(ZVector *kdnodes, RVector *kdsplits, RVect
             continue;
          }
       // Output
-         result = result + 1;
+         result++;
       }
       return result;
    }
@@ -23713,7 +23713,7 @@ static void rbfv2_partialunpackrec(ZVector *kdnodes, RVector *kdsplits, RVector 
          for (j = 0; j < nx; j++) {
             xwr->xyR[*k][nx + ny + j] = r * s->xR[j];
          }
-         *k = *k + 1;
+         ++*k;
       }
       return;
    }
@@ -26640,7 +26640,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
       rep->avgerror = rep->avgerror + ae_fabs(v - yoriginal.xR[i], _state);
       if (yoriginal.xR[i] != 0.0) {
          rep->avgrelerror = rep->avgrelerror + ae_fabs(v - yoriginal.xR[i], _state) / ae_fabs(yoriginal.xR[i], _state);
-         relcnt = relcnt + 1;
+         relcnt++;
       }
       rep->maxerror = maxreal(rep->maxerror, ae_fabs(v - yoriginal.xR[i], _state), _state);
    }

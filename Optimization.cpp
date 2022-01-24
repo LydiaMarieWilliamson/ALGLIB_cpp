@@ -1022,14 +1022,14 @@ ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVect
       wasactivated = x->xR[i] != xprev->xR[i] && ((havebndl->xB[i] && x->xR[i] == bndl->xR[i]) || (havebndu->xB[i] && x->xR[i] == bndu->xR[i]));
       wasactivated = wasactivated || variabletofreeze == i;
       if (wasactivated) {
-         result = result + 1;
+         result++;
       }
    }
    for (i = 0; i < nslack; i++) {
       wasactivated = x->xR[nmain + i] != xprev->xR[nmain + i] && x->xR[nmain + i] == 0.0;
       wasactivated = wasactivated || variabletofreeze == nmain + i;
       if (wasactivated) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -1140,13 +1140,13 @@ ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, B
             statuschanged = true;
          }
          if (statuschanged) {
-            result = result + 1;
+            result++;
          }
       }
    }
    for (i = 0; i < nslack; i++) {
       if (x->xR[nmain + i] != xprev->xR[nmain + i] && (x->xR[nmain + i] == 0.0 || xprev->xR[nmain + i] == 0.0)) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -1507,7 +1507,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
                activeconstraints.xR[i] = 1.0;
             }
             if (activeconstraints.xR[i] > 0.0) {
-               nactive = nactive + 1;
+               nactive++;
             }
          }
          for (i = 0; i < nslack; i++) {
@@ -1516,14 +1516,14 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
                activeconstraints.xR[nmain + i] = 1.0;
             }
             if (activeconstraints.xR[nmain + i] > 0.0) {
-               nactive = nactive + 1;
+               nactive++;
             }
          }
          nfree = nmain + nslack - nactive;
          if (nfree == 0) {
             break;
          }
-         *qpits = *qpits + 1;
+         ++*qpits;
       // Reorder variables: CE is reordered to PermCE, X is reordered to PermX
          tagsortbuf(&activeconstraints, nmain + nslack, &p1, &p2, &buf, _state);
          for (i = 0; i < k; i++) {
@@ -1767,7 +1767,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       // check stopping criteria
          werechangesinconstraints = werechangesinconstraints || numberofchangedconstraints(&xn, x, bndl, havebndl, bndu, havebndu, nmain, nslack, _state) > 0;
          ae_v_move(x->xR, 1, xn.xR, 1, nmain + nslack);
-         *gpaits = *gpaits + 1;
+         ++*gpaits;
          if (!werechangesinconstraints) {
             break;
          }
@@ -1796,7 +1796,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
          ae_frame_leave(_state);
          return result;
       }
-      itscount = itscount + 1;
+      itscount++;
    // Block below is never executed; it is necessary just to avoid
    // "unreachable code" warning about automatically generated code.
    //
@@ -3039,7 +3039,7 @@ lbl_0:
       swapelements(&monitor->probingsteps, j - 1, j, _state);
       swaprows(&monitor->probingvalues, j - 1, j, monitor->probingnvalues, _state);
    }
-   i = i + 1;
+   i++;
    goto lbl_1;
 lbl_3:
    result = false;
@@ -3261,7 +3261,7 @@ lbl_3:
       }
    }
 lbl_5:
-   varidx = varidx + 1;
+   varidx++;
    goto lbl_4;
 lbl_6:
    result = false;
@@ -4199,7 +4199,7 @@ lbl_6:
    state->fp2 = state->f;
    state->x.xR[i] = v;
    state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i = i + 1;
+   i++;
    goto lbl_21;
 lbl_23:
    state->f = state->fbase;
@@ -4345,7 +4345,7 @@ lbl_13:
    state->fp2 = state->f;
    state->x.xR[i] = v;
    state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i = i + 1;
+   i++;
    goto lbl_32;
 lbl_34:
    state->f = state->fbase;
@@ -4377,7 +4377,7 @@ lbl_14:
    state->xupdated = false;
 lbl_35:
    state->repnfev = state->repnfev + state->nfev;
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    ae_v_add(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
    ae_v_add(state->yk.xyR[state->p], 1, state->g.xR, 1, n);
 // Stopping conditions
@@ -4502,7 +4502,7 @@ lbl_35:
       ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
    // Next step
       state->fold = state->f;
-      state->k = state->k + 1;
+      state->k++;
    }
    goto lbl_26;
 lbl_27:
@@ -5833,14 +5833,14 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
       s->nfree = 0;
       for (i = 0; i < n; i++) {
          if (!s->activeset.xB[i]) {
-            s->nfree = s->nfree + 1;
+            s->nfree++;
          }
       }
       j = s->nfree;
       for (i = 0; i < n; i++) {
          if (s->activeset.xB[i]) {
             s->txc.xR[j] = s->xc.xR[i];
-            j = j + 1;
+            j++;
          }
       }
    }
@@ -5913,15 +5913,15 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
                   s->tq2dense.xyR[ridx1][cidx1] = v;
                }
                if (s->activeset.xB[j]) {
-                  cidx1 = cidx1 + 1;
+                  cidx1++;
                } else {
-                  cidx0 = cidx0 + 1;
+                  cidx0++;
                }
             }
             if (s->activeset.xB[i]) {
-               ridx1 = ridx1 + 1;
+               ridx1++;
             } else {
-               ridx0 = ridx0 + 1;
+               ridx0++;
             }
          }
       // Now we have TQ2, and we can evaluate TQ1.
@@ -5964,7 +5964,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
          for (i = 0; i < n; i++) {
             if (!s->activeset.xB[i]) {
                s->tq2diag.xR[ridx0] = s->tau * s->d.xR[i];
-               ridx0 = ridx0 + 1;
+               ridx0++;
             } else {
                s->tq0 = s->tq0 + 0.5 * s->tau * s->d.xR[i] * sqr(s->xc.xR[i], _state);
             }
@@ -6033,12 +6033,12 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
                   s->tk2.xyR[i][cidx1] = s->q.xyR[i][j];
                   s->tmp1.xR[i] = s->tmp1.xR[i] + s->q.xyR[i][j] * s->txc.xR[cidx1];
                }
-               cidx1 = cidx1 + 1;
+               cidx1++;
             } else {
                for (i = 0; i < k; i++) {
                   s->tk2.xyR[i][cidx0] = s->q.xyR[i][j];
                }
-               cidx0 = cidx0 + 1;
+               cidx0++;
             }
          }
          for (i = 0; i < k; i++) {
@@ -6073,10 +6073,10 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
       for (i = 0; i < n; i++) {
          if (s->activeset.xB[i]) {
             s->tb.xR[ridx1] = s->b.xR[i];
-            ridx1 = ridx1 + 1;
+            ridx1++;
          } else {
             s->tb.xR[ridx0] = s->b.xR[i];
-            ridx0 = ridx0 + 1;
+            ridx0++;
          }
       }
    }
@@ -6254,7 +6254,7 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state
       for (i = 0; i < n; i++) {
          if (!s->activeset.xB[i]) {
             s->tmpg.xR[cidx0] = s->tmpg.xR[i];
-            cidx0 = cidx0 + 1;
+            cidx0++;
          }
       }
    // Free components of the extrema are calculated in the first NFree elements of TXC.
@@ -6290,7 +6290,7 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state
       for (i = 0; i < n; i++) {
          if (!s->activeset.xB[i]) {
             x->xR[i] = x->xR[i] + s->txc.xR[cidx0];
-            cidx0 = cidx0 + 1;
+            cidx0++;
          }
       }
    }
@@ -6403,7 +6403,7 @@ double cqmdebugconstrainedevalt(convexquadraticmodel *s, RVector *x, ae_state *_
       if (!s->activeset.xB[i]) {
          ae_assert(j < nfree, "CQMDebugConstrainedEvalT: internal error", _state);
          s->txc.xR[j] = x->xR[i];
-         j = j + 1;
+         j++;
       }
    }
 // TQ2, TQ1, TQ0
@@ -6484,7 +6484,7 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x, ae_state *_
       if (!s->activeset.xB[i]) {
          ae_assert(j < nfree, "CQMDebugConstrainedEvalE: internal error", _state);
          s->txc.xR[j] = x->xR[i];
-         j = j + 1;
+         j++;
       }
    }
 // ECA
@@ -8164,7 +8164,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -8174,7 +8174,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
          } else {
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 // Mark state as changed
@@ -8551,7 +8551,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
    nact = 0;
    for (i = 0; i < n; i++) {
       if (newentries->xB[i]) {
-         nact = nact + 1;
+         nact++;
       }
    }
    for (i = n; i < n + nec; i++) {
@@ -8559,7 +8559,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
    }
    for (i = n + nec; i < n + nec + nic; i++) {
       if (newentries->xB[i]) {
-         nact = nact + 1;
+         nact++;
       }
    }
    if (nact + state->basisage > sactivesets_maxbasisage) {
@@ -8915,7 +8915,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    for (j = 0; j < n; j++) {
       if (state->cstatus.xZ[j] > 0) {
          state->sparsebatch.xZ[state->sparsebatchsize] = j;
-         state->sparsebatchsize = state->sparsebatchsize + 1;
+         state->sparsebatchsize++;
       }
    }
    if (!hasactivelin) {
@@ -9598,8 +9598,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->cstatus.xZ[i] = 0;
          state->rctmps.xR[i] = 1.0;
          state->rctmpisequality.xB[nactiveconstraints] = true;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
       if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) {
@@ -9608,8 +9608,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->cstatus.xZ[i] = 0;
          state->rctmps.xR[i] = -1.0;
          state->rctmpisequality.xB[nactiveconstraints] = false;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
       if (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) {
@@ -9618,8 +9618,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->cstatus.xZ[i] = 0;
          state->rctmps.xR[i] = 1.0;
          state->rctmpisequality.xB[nactiveconstraints] = false;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
    }
@@ -9644,8 +9644,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
       state->rctmpconstraintidx.xZ[nactiveconstraints] = n + i;
       state->cstatus.xZ[n + i] = 0;
       state->rctmpisequality.xB[nactiveconstraints] = i < nec;
-      nactiveconstraints = nactiveconstraints + 1;
-      nactivelin = nactivelin + 1;
+      nactiveconstraints++;
+      nactivelin++;
    }
 // Skip if no "candidate" constraints was found
    if (nactiveconstraints == 0) {
@@ -9727,14 +9727,14 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
             state->rctmpdense1.xyR[idx0][j] = state->rctmpdense0.xyR[i][j] / state->rctmps.xR[i] * v;
          }
          state->rctmprightpart.xR[idx0] = state->rctmpg.xR[i] / state->rctmps.xR[i] * v;
-         idx0 = idx0 + 1;
+         idx0++;
       } else {
          v = 1 / ae_sqrt(h->xR[i], _state);
          for (j = 0; j < nactivelin; j++) {
             state->rctmpdense1.xyR[idx1][j] = state->rctmpdense0.xyR[i][j] * v;
          }
          state->rctmprightpart.xR[idx1] = state->rctmpg.xR[i] * v;
-         idx1 = idx1 + 1;
+         idx1++;
       }
    }
    snnlsinit(n, minint(nec + nic, n, _state), n, &state->solver, _state);
@@ -10402,10 +10402,10 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
       b = b || (sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i]);
       if (b) {
          sstate->yidx.xZ[ridx1] = i;
-         ridx1 = ridx1 - 1;
+         ridx1--;
       } else {
          sstate->yidx.xZ[ridx0] = i;
-         ridx0 = ridx0 + 1;
+         ridx0++;
       }
    }
    ae_assert(ridx0 == ridx1 + 1, "CNewtonBuild: internal error", _state);
@@ -10498,7 +10498,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
                   sstate->sparsecca.vals.xR[k] = 0.0;
                }
             }
-            k = k + 1;
+            k++;
          }
       }
    // Perform sparse Cholesky
@@ -10590,10 +10590,10 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
       b = b || (sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i]);
       if (b) {
          sstate->tmpcni.xZ[ridx1] = i;
-         ridx1 = ridx1 - 1;
+         ridx1--;
       } else {
          sstate->tmpcni.xZ[ridx0] = i;
-         ridx0 = ridx0 + 1;
+         ridx0++;
       }
    }
    ae_assert(ridx0 == ridx1 + 1, "CNewtonUpdate: internal error", _state);
@@ -10915,7 +10915,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                sstate->absasum = sstate->absasum + 2 * vv;
                sstate->absasum2 = sstate->absasum2 + 2 * vv * vv;
             }
-            k = k + 1;
+            k++;
          }
       }
    }
@@ -11254,7 +11254,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             ae_v_move(sstate->dp.xR, 1, sstate->dc.xR, 1, n);
             ae_v_move(sstate->cgp.xR, 1, sstate->cgc.xR, 1, n);
          // Update iterations counter
-            sstate->repinneriterationscount = sstate->repinneriterationscount + 1;
+            sstate->repinneriterationscount++;
          }
          if (*terminationtype != 0) {
             break;
@@ -12038,7 +12038,7 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
       j1 = scleic->ridx.xZ[i + 1] - 1;
       if (j1 >= j0 && scleic->idx.xZ[j1] == nmain) {
          state->sclsftcleic.xyR[dnec + i][nmain] = scleic->vals.xR[j1];
-         j1 = j1 - 1;
+         j1--;
       }
       for (j = j0; j <= j1; j++) {
          k = scleic->idx.xZ[j];
@@ -12054,7 +12054,7 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
       j1 = scleic->ridx.xZ[snec + i + 1] - 1;
       if (j1 >= j0 && scleic->idx.xZ[j1] == nmain) {
          state->sclsftcleic.xyR[dnec + snec + dnic + i][nmain] = scleic->vals.xR[j1];
-         j1 = j1 - 1;
+         j1--;
       }
       for (j = j0; j <= j1; j++) {
          k = scleic->idx.xZ[j];
@@ -12475,7 +12475,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                swapelements(&state->cscales, nectotal + nicwork, nectotal + k, _state);
                state->exxc.xR[nmain + nicwork] = 0.0;
                state->nulc.xR[nectotal + nicwork] = 0.0;
-               state->nicnact.xZ[nicwork] = state->nicnact.xZ[nicwork] + 1;
+               state->nicnact.xZ[nicwork]++;
                inc(&nicwork, _state);
                inc(&nwork, _state);
                inc(&kwork, _state);
@@ -12894,7 +12894,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -12904,7 +12904,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
          } else {
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 // Normalize rows of State.CLEIC: each row must have unit norm.
@@ -13610,7 +13610,7 @@ lbl_2:
 lbl_27:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold, _state);
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    if (!state->xrep) {
       goto lbl_28;
    }
@@ -13723,7 +13723,7 @@ lbl_11:
    }
 lbl_38:
    state->x.xR[i] = v;
-   i = i + 1;
+   i++;
    goto lbl_34;
 lbl_36:
    state->f = state->fbase;
@@ -13786,7 +13786,7 @@ lbl_39:
 //       instead of just for() loop - this counter may be
 //       decreased at some occasions to perform "restart"
 //       of an iteration.
-   itidx = itidx + 1;
+   itidx++;
 // At the beginning of each iteration:
 // * SAS.XC stores current point
 // * FC stores current function value
@@ -13866,7 +13866,7 @@ lbl_39:
    //              preserve computational budget for iterations.
       sasimmediateactivation(&state->sas, state->cidx, state->cval, _state);
       state->bufsize = 0;
-      itidx = itidx - 1;
+      itidx--;
       goto lbl_39;
    }
    if (state->stpmax > 0.0) {
@@ -13925,7 +13925,7 @@ lbl_43:
    goto lbl_rcomm;
 lbl_13:
    state->needfg = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    goto lbl_46;
 lbl_45:
 // Numerical differentiation
@@ -14000,7 +14000,7 @@ lbl_20:
    state->repnfev = state->repnfev + 2;
 lbl_51:
    state->x.xR[i] = v;
-   i = i + 1;
+   i++;
    goto lbl_47;
 lbl_49:
    state->f = state->fbase;
@@ -14074,7 +14074,7 @@ lbl_44:
          state->stp = state->curstpmax;
          mcinfo = 5;
          ae_v_move(state->xn.xR, 1, state->tmp0.xR, 1, n);
-         state->nonmonotoniccnt = state->nonmonotoniccnt - 1;
+         state->nonmonotoniccnt--;
          b = true;
       }
       if (!b) {
@@ -14120,7 +14120,7 @@ lbl_44:
 lbl_21:
    state->xupdated = false;
 lbl_52:
-   state->repinneriterationscount = state->repinneriterationscount + 1;
+   state->repinneriterationscount++;
    if (mcinfo == 1) {
    // Accept new LBFGS update given by Sk,Yk
       if (state->bufsize == m) {
@@ -14135,7 +14135,7 @@ lbl_52:
          }
       } else {
       // Buffer is not full, increase buffer size by 1
-         state->bufsize = state->bufsize + 1;
+         state->bufsize++;
       }
       v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
       vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
@@ -15697,7 +15697,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
       // Sparsify dense term
          nnz = 0;
          for (i = 0; i < n; i++) {
-            nnz = nnz + 1;
+            nnz++;
             if (isupper) {
                j0 = i + 1;
                j1 = n - 1;
@@ -15707,7 +15707,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
             }
             for (j = j0; j <= j1; j++) {
                if (denseh->xyR[i][j] != 0) {
-                  nnz = nnz + 1;
+                  nnz++;
                }
             }
          }
@@ -15726,7 +15726,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                      state->sparseh.idx.xZ[offs] = j;
                      state->sparseh.vals.xR[offs] = v;
                      vv = vv + v;
-                     offs = offs + 1;
+                     offs++;
                   }
                }
             }
@@ -15735,7 +15735,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
             state->sparseh.idx.xZ[offs] = i;
             state->sparseh.vals.xR[offs] = v;
             vv = vv + v;
-            offs = offs + 1;
+            offs++;
          // Off-diagonal elements are copied only when nonzero
             if (isupper) {
                for (j = i + 1; j < n; j++) {
@@ -15744,7 +15744,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                      state->sparseh.idx.xZ[offs] = j;
                      state->sparseh.vals.xR[offs] = v;
                      vv = vv + v;
-                     offs = offs + 1;
+                     offs++;
                   }
                }
             }
@@ -15777,7 +15777,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                   state->sparseh.idx.xZ[offs] = sparseh->idx.xZ[k];
                   state->sparseh.vals.xR[offs] = v;
                   vv = vv + v;
-                  offs = offs + 1;
+                  offs++;
                }
             }
          // Diagonal element is always copied
@@ -15788,7 +15788,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
             state->sparseh.idx.xZ[offs] = i;
             state->sparseh.vals.xR[offs] = v;
             vv = vv + v;
-            offs = offs + 1;
+            offs++;
          // Copy superdiagonal elements (if needed)
             if (isupper) {
                j0 = sparseh->uidx.xZ[i];
@@ -15798,7 +15798,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                   state->sparseh.idx.xZ[offs] = sparseh->idx.xZ[k];
                   state->sparseh.vals.xR[offs] = v;
                   vv = vv + v;
-                  offs = offs + 1;
+                  offs++;
                }
             }
          // Finalize row
@@ -16008,13 +16008,13 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
             if (k < nmain) {
                state->sparseamain.idx.xZ[offsmain] = k;
                state->sparseamain.vals.xR[offsmain] = v;
-               offsmain = offsmain + 1;
+               offsmain++;
             } else {
                ae_assert(state->tmpi.xZ[k - nmain] == 0, "VIPMSetConstraints: slack column contains more than one nonzero element", _state);
                state->combinedaslack.idx.xZ[offscombined] = k - nmain;
                state->combinedaslack.vals.xR[offscombined] = v;
-               state->tmpi.xZ[k - nmain] = state->tmpi.xZ[k - nmain] + 1;
-               offscombined = offscombined + 1;
+               state->tmpi.xZ[k - nmain]++;
+               offscombined++;
             }
          }
          state->sparseamain.ridx.xZ[i + 1] = offsmain;
@@ -16032,8 +16032,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
                ae_assert(state->tmpi.xZ[k - nmain] == 0, "VIPMSetConstraints: slack column contains more than one nonzero element", _state);
                state->combinedaslack.idx.xZ[offscombined] = k - nmain;
                state->combinedaslack.vals.xR[offscombined] = state->denseafull.xyR[i][k];
-               state->tmpi.xZ[k - nmain] = state->tmpi.xZ[k - nmain] + 1;
-               offscombined = offscombined + 1;
+               state->tmpi.xZ[k - nmain]++;
+               offscombined++;
             }
          }
          state->combinedaslack.ridx.xZ[msparse + i + 1] = offscombined;
@@ -16405,19 +16405,19 @@ static double vipmsolver_varscomputemu(vipmvars *vstate, ae_state *_state) {
    for (i = 0; i < vstate->n; i++) {
       result = result + vstate->z.xR[i] * vstate->g.xR[i] + vstate->s.xR[i] * vstate->t.xR[i];
       if (!(vstate->z.xR[i] * vstate->g.xR[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
       if (!(vstate->s.xR[i] * vstate->t.xR[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
    }
    for (i = 0; i < vstate->m; i++) {
       result = result + vstate->v.xR[i] * vstate->w.xR[i] + vstate->p.xR[i] * vstate->q.xR[i];
       if (!(vstate->v.xR[i] * vstate->w.xR[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
       if (!(vstate->p.xR[i] * vstate->q.xR[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
    }
    result = result / coalesce((double)k, 1.0, _state);
@@ -17049,20 +17049,20 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
                if (!state->isfrozen.xB[j]) {
                   state->factsparsekkttmpl.idx.xZ[offs] = j;
                   state->factsparsekkttmpl.vals.xR[offs] = -state->sparseh.vals.xR[k];
-                  offs = offs + 1;
+                  offs++;
                }
             }
          // Output diagonal entry (it is always not frozen)
             state->factsparsekkttmpl.idx.xZ[offs] = i;
             state->factsparsekkttmpl.vals.xR[offs] = -state->sparseh.vals.xR[state->sparseh.didx.xZ[i]];
-            offs = offs + 1;
+            offs++;
          } else {
          // Entire row is frozen, output just -1
             state->factsparsekkttmpl.idx.xZ[offs] = i;
             state->factsparsekkttmpl.vals.xR[offs] = -1.0;
-            offs = offs + 1;
+            offs++;
          }
-         rowoffs = rowoffs + 1;
+         rowoffs++;
          state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
       }
       for (i = 0; i < state->msparse; i++) {
@@ -17073,13 +17073,13 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
             if (!state->isfrozen.xB[j]) {
                state->factsparsekkttmpl.idx.xZ[offs] = j;
                state->factsparsekkttmpl.vals.xR[offs] = state->sparseafull.vals.xR[k];
-               offs = offs + 1;
+               offs++;
             }
          }
          state->factsparsekkttmpl.idx.xZ[offs] = rowoffs;
          state->factsparsekkttmpl.vals.xR[offs] = 0.0;
-         offs = offs + 1;
-         rowoffs = rowoffs + 1;
+         offs++;
+         rowoffs++;
          state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
       }
       for (i = 0; i < state->mdense; i++) {
@@ -17087,13 +17087,13 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
             if (state->denseafull.xyR[i][k] != 0.0 && !state->isfrozen.xB[k]) {
                state->factsparsekkttmpl.idx.xZ[offs] = k;
                state->factsparsekkttmpl.vals.xR[offs] = state->denseafull.xyR[i][k];
-               offs = offs + 1;
+               offs++;
             }
          }
          state->factsparsekkttmpl.idx.xZ[offs] = rowoffs;
          state->factsparsekkttmpl.vals.xR[offs] = 0.0;
-         offs = offs + 1;
-         rowoffs = rowoffs + 1;
+         offs++;
+         rowoffs++;
          state->factsparsekkttmpl.ridx.xZ[rowoffs] = offs;
       }
       ae_assert(rowoffs == m + n, "VIPMPowerUp: critical integrity check failed", _state);
@@ -19969,8 +19969,8 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
             continue;
          }
          ae_assert(ae_isfinite(v, _state), "MinQPSetLCSparse: C contains infinite or NAN values", _state);
-         nnz = nnz + 1;
-         rs.xZ[i] = rs.xZ[i] + 1;
+         nnz++;
+         rs.xZ[i]++;
       }
    // Prepare new sparse CRS storage, copy leading SparseK*N submatrix into the storage
       for (i = 0; i < sparsek; i++) {
@@ -20380,7 +20380,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->sparsec.idx.xZ[offsdst] != state->sparsec.idx.xZ[offs + i]) {
-         offsdst = offsdst + 1;
+         offsdst++;
          state->sparsec.idx.xZ[offsdst] = state->sparsec.idx.xZ[offs + i];
          state->sparsec.vals.xR[offsdst] = state->sparsec.vals.xR[offs + i];
       } else {
@@ -20476,7 +20476,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
    nnz = 0;
    for (i = 0; i < n; i++) {
       if (!(da->xR[i] == 0.0)) {
-         nnz = nnz + 1;
+         nnz++;
       }
    }
    offs = state->sparsec.ridx.xZ[state->msparse];
@@ -20507,7 +20507,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
       if (!(da->xR[i] == 0.0)) {
          state->sparsec.idx.xZ[offs + nzi] = i;
          state->sparsec.vals.xR[offs + nzi] = da->xR[i];
-         nzi = nzi + 1;
+         nzi++;
       }
    }
    uidx = -1;
@@ -20631,10 +20631,10 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
    nbc = 0;
    for (i = 0; i < n; i++) {
       if (state->havebndl.xB[i]) {
-         nbc = nbc + 1;
+         nbc++;
       }
       if (state->havebndu.xB[i]) {
-         nbc = nbc + 1;
+         nbc++;
       }
    }
 // Effective scale
@@ -21706,7 +21706,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -21716,7 +21716,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
          } else {
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -22832,7 +22832,7 @@ lbl_2:
    v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
    state->f = v;
 lbl_35:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    minlm_clearrequestfields(state, _state);
    state->xupdated = true;
@@ -22921,7 +22921,7 @@ lbl_44:
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] = state->x.xR[k] + state->s.xR[k] * state->diffstep;
@@ -22937,7 +22937,7 @@ lbl_4:
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
    v = state->xp1 - state->xm1;
    if (v != 0.0) {
@@ -22949,7 +22949,7 @@ lbl_5:
          state->j.xyR[i][k] = 0.0;
       }
    }
-   k = k + 1;
+   k++;
    goto lbl_44;
 lbl_46:
 // Calculate F(XBase)
@@ -22960,8 +22960,8 @@ lbl_46:
    goto lbl_rcomm;
 lbl_6:
    state->needfi = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repnjac = state->repnjac + 1;
+   state->repnfunc++;
+   state->repnjac++;
 // New model
    state->modelage = 0;
    goto lbl_43;
@@ -22974,8 +22974,8 @@ lbl_42:
    goto lbl_rcomm;
 lbl_7:
    state->needfij = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repnjac = state->repnjac + 1;
+   state->repnfunc++;
+   state->repnjac++;
 // New model
    state->modelage = 0;
 lbl_43:
@@ -23008,7 +23008,7 @@ lbl_40:
    ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
    ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
 // Increase model age
-   state->modelage = state->modelage + 1;
+   state->modelage++;
 lbl_41:
    rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0, _state);
    rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0, _state);
@@ -23062,7 +23062,7 @@ lbl_47:
       goto lbl_48;
    }
    ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!", _state);
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    minlm_clearrequestfields(state, _state);
    if (!state->finderstate.needfi) {
       goto lbl_49;
@@ -23201,7 +23201,7 @@ lbl_61:
 lbl_13:
    state->xupdated = false;
 lbl_65:
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
       state->repterminationtype = 5;
    }
@@ -23223,7 +23223,7 @@ lbl_69:
    result = false;
    return result;
 lbl_67:
-   state->modelage = state->modelage + 1;
+   state->modelage++;
    goto lbl_38;
 lbl_39:
 // Lambda is too large, we have to break iterations.
@@ -23317,7 +23317,7 @@ lbl_81:
    state->rstate.stage = 16;
    goto lbl_rcomm;
 lbl_16:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] = state->x.xR[k] + state->s.xR[k] * state->diffstep;
@@ -23333,7 +23333,7 @@ lbl_16:
    state->rstate.stage = 17;
    goto lbl_rcomm;
 lbl_17:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
    v = state->xp1 - state->xm1;
    if (v != 0.0) {
@@ -23345,7 +23345,7 @@ lbl_17:
          state->j.xyR[i][k] = 0.0;
       }
    }
-   k = k + 1;
+   k++;
    goto lbl_81;
 lbl_83:
 // Calculate F(XBase)
@@ -23356,8 +23356,8 @@ lbl_83:
    goto lbl_rcomm;
 lbl_18:
    state->needfi = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repnjac = state->repnjac + 1;
+   state->repnfunc++;
+   state->repnjac++;
 // New model
    state->modelage = 0;
    goto lbl_80;
@@ -23370,8 +23370,8 @@ lbl_79:
    goto lbl_rcomm;
 lbl_19:
    state->needfij = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repnjac = state->repnjac + 1;
+   state->repnfunc++;
+   state->repnjac++;
 // New model
    state->modelage = 0;
 lbl_80:
@@ -23404,7 +23404,7 @@ lbl_77:
    ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
    ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
 // Increase model age
-   state->modelage = state->modelage + 1;
+   state->modelage++;
 lbl_78:
 // Generate quadratic model:
 //     f(xbase+dx) =
@@ -23436,9 +23436,9 @@ lbl_75:
    goto lbl_rcomm;
 lbl_20:
    state->needfgh = false;
-   state->repnfunc = state->repnfunc + 1;
-   state->repngrad = state->repngrad + 1;
-   state->repnhess = state->repnhess + 1;
+   state->repnfunc++;
+   state->repngrad++;
+   state->repnhess++;
    rmatrixcopy(n, n, &state->h, 0, 0, &state->quadraticmodel, 0, 0, _state);
    ae_v_move(state->gbase.xR, 1, state->g.xR, 1, n);
    state->fbase = state->f;
@@ -23628,7 +23628,7 @@ lbl_94:
 lbl_23:
    state->needf = false;
 lbl_95:
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    if (!ae_isfinite(state->f, _state)) {
    // Integrity check failed, break!
       state->repterminationtype = -8;
@@ -23734,7 +23734,7 @@ lbl_96:
 lbl_25:
    state->xupdated = false;
 lbl_102:
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
       state->repterminationtype = 5;
    }
@@ -23756,7 +23756,7 @@ lbl_106:
    result = false;
    return result;
 lbl_104:
-   state->modelage = state->modelage + 1;
+   state->modelage++;
    goto lbl_73;
 lbl_74:
 // Lambda is too large, we have to break iterations.
@@ -25479,7 +25479,7 @@ lbl_6:
    state->fp2 = state->f;
    state->x.xR[i] = v;
    state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i = i + 1;
+   i++;
    goto lbl_24;
 lbl_26:
    state->f = state->fbase;
@@ -25642,7 +25642,7 @@ lbl_15:
    state->fp2 = state->f;
    state->x.xR[i] = v;
    state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i = i + 1;
+   i++;
    goto lbl_39;
 lbl_41:
    state->f = state->fbase;
@@ -25727,7 +25727,7 @@ lbl_44:
    // We'll set BetaK=0, which will restart CG algorithm.
    // We can stop later (during normal checks) if stopping conditions are met.
       betak = 0.0;
-      state->debugrestartscount = state->debugrestartscount + 1;
+      state->debugrestartscount++;
    }
    if (state->repiterationscount > 0 && state->repiterationscount % (3 + n) == 0) {
    // clear Beta every N iterations
@@ -25736,7 +25736,7 @@ lbl_44:
    if (state->mcinfo == 1 || state->mcinfo == 5) {
       state->rstimer = mincg_rscountdownlen;
    } else {
-      state->rstimer = state->rstimer - 1;
+      state->rstimer--;
    }
    ae_v_moveneg(state->dn.xR, 1, state->g.xR, 1, n);
    mincg_preconditionedmultiply(state, &state->dn, &state->work0, &state->work1, _state);
@@ -25780,7 +25780,7 @@ lbl_44:
       return result;
    }
    state->repnfev = state->repnfev + state->nfev;
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
    // Too many iterations
       state->repterminationtype = 5;
@@ -25818,7 +25818,7 @@ lbl_44:
    ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
    ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
    state->fold = state->f;
-   state->k = state->k + 1;
+   state->k++;
    goto lbl_31;
 lbl_32:
    result = false;
@@ -26757,7 +26757,7 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
    for (i = 0; i < nec + nic; i++) {
       for (j = 0; j < n; j++) {
          if (sstate->scaledcleic.xyR[i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -26774,7 +26774,7 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
          // Primary part of the matrix
             subsolver->sparserawlc.vals.xR[offs] = sstate->scaledcleic.xyR[i][j];
             subsolver->sparserawlc.idx.xZ[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       subsolver->sparserawlc.ridx.xZ[i + 1] = offs;
@@ -27057,7 +27057,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    for (i = 0; i < nlec + nlic; i++) {
       for (j = 0; j < n; j++) {
          if (jac->xyR[1 + i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -27124,7 +27124,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       for (k = j0; k <= j1; k++) {
          subsolver->sparseefflc.idx.xZ[offs] = subsolver->sparserawlc.idx.xZ[k];
          subsolver->sparseefflc.vals.xR[offs] = subsolver->sparserawlc.vals.xR[k];
-         offs = offs + 1;
+         offs++;
       }
    // Set up slack variables
       if (i < nec) {
@@ -27137,7 +27137,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       // Slack variables for inequality constraints
          subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.idx.xZ[offs] = offsslackic + (i - nec);
-         offs = offs + 1;
+         offs++;
       }
    // Finalize row
       subsolver->sparseefflc.ridx.xZ[i + 1] = offs;
@@ -27184,7 +27184,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          if (jac->xyR[1 + i][j] != 0.0) {
             subsolver->sparseefflc.vals.xR[offs] = vv * jac->xyR[1 + i][j];
             subsolver->sparseefflc.idx.xZ[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       if (i < nlec) {
@@ -27198,7 +27198,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       // Add slack terms for inequality constraints
          subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.idx.xZ[offs] = offsslacknlic + (i - nlec);
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i + 1] = offs;
    // Set box constraints on slack variables and bounds on linear equality/inequality constraints
@@ -29610,7 +29610,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       reviseddualsimplex_pivottobwd(&s->tmpi, m, &s->rowpermbwd, _state);
       s->isvalidtrf = true;
       s->trfage = 0;
-      s->statfact = s->statfact + 1;
+      s->statfact++;
       s->statoffdiag = s->statoffdiag + sqr((double)(m - 1), _state);
       result = reviseddualsimplex_basisminimumdiagonalelement(s, _state);
       return result;
@@ -29647,7 +29647,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             s->colpermbwd.xZ[nlogical] = j;
             s->tcinvidx.xZ[s->colpermbwd.xZ[nlogical]] = nlogical;
             s->tcinvidx.xZ[s->colpermbwd.xZ[j1]] = j1;
-            nlogical = nlogical + 1;
+            nlogical++;
          }
       }
       sortmiddlei(&s->colpermbwd, nlogical, m - nlogical, _state);
@@ -29690,12 +29690,12 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             // Append element to SparseLU1
                s->sparselu1.idx.xZ[offs1] = k1;
                s->sparselu1.vals.xR[offs1] = at->vals.xR[j];
-               offs1 = offs1 + 1;
+               offs1++;
             } else {
             // Append element to SparseLU2
                s->sparselu2.idx.xZ[offs2] = k1 - nlogical;
                s->sparselu2.vals.xR[offs2] = at->vals.xR[j];
-               offs2 = offs2 + 1;
+               offs2++;
             }
          }
       // Elements added to the last row of LU1 can be unordered,
@@ -29756,18 +29756,18 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             for (j = j0; j <= j1; j++) {
                s->sparsel.idx.xZ[offs] = s->sparselu1.idx.xZ[j];
                s->sparsel.vals.xR[offs] = -s->sparselu1.vals.xR[j];
-               offs = offs + 1;
+               offs++;
             }
             j0 = s->sparselu2.ridx.xZ[i];
             j1 = s->sparselu2.didx.xZ[i] - 1;
             for (j = j0; j <= j1; j++) {
                s->sparsel.idx.xZ[offs] = nlogical + s->sparselu2.idx.xZ[j];
                s->sparsel.vals.xR[offs] = s->sparselu2.vals.xR[j];
-               offs = offs + 1;
+               offs++;
             }
             s->sparsel.idx.xZ[offs] = nlogical + i;
             s->sparsel.vals.xR[offs] = 1.0;
-            offs = offs + 1;
+            offs++;
             s->sparsel.ridx.xZ[nlogical + i + 1] = offs;
          }
          ae_assert(s->sparsel.ninitialized == s->sparsel.ridx.xZ[m], "BasisFreshTrf: integrity check failed", _state);
@@ -29806,13 +29806,13 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             } else {
                s->sparseu.vals.xR[offs] = 0.0;
             }
-            offs = offs + 1;
+            offs++;
             j0 = s->sparselu2.uidx.xZ[i];
             j1 = s->sparselu2.ridx.xZ[i + 1] - 1;
             for (j = j0; j <= j1; j++) {
                s->sparseu.idx.xZ[offs] = nlogical + s->sparselu2.idx.xZ[j];
                s->sparseu.vals.xR[offs] = s->sparselu2.vals.xR[j];
-               offs = offs + 1;
+               offs++;
             }
             s->sparseu.ridx.xZ[nlogical + i + 1] = offs;
          }
@@ -29835,7 +29835,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       sparsecopytransposecrsbuf(&s->sparseu, &s->sparseut, _state);
       s->isvalidtrf = true;
       s->trfage = 0;
-      s->statfact = s->statfact + 1;
+      s->statfact++;
       s->statoffdiag = s->statoffdiag + (s->sparsel.ridx.xZ[m] - m) + (s->sparseu.ridx.xZ[m] - m);
       result = reviseddualsimplex_basisminimumdiagonalelement(s, _state);
       return result;
@@ -30289,7 +30289,7 @@ static void reviseddualsimplex_dvdensetosparse(dssvector *x, ae_state *_state) {
       if (v != 0.0) {
          x->idx.xZ[k] = i;
          x->vals.xR[k] = v;
-         k = k + 1;
+         k++;
       }
    }
    x->k = k;
@@ -30368,7 +30368,7 @@ static void reviseddualsimplex_dvsparsetodense(dssvector *x, ae_state *_state) {
 
 static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t *cnt, ae_state *_state) {
    *acc = *acc + v;
-   *cnt = *cnt + 1;
+   ++*cnt;
 }
 
 // This function performs PivotRow step
@@ -30426,7 +30426,7 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
             if (v != 0.0) {
                alphar->idx.xZ[alphark] = i;
                alphar->vals.xR[alphark] = v;
-               alphark = alphark + 1;
+               alphark++;
             }
          } else {
          // Enforce condition that basic elements of AlphaR are exactly zero
@@ -30449,7 +30449,7 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
          if (v != 0.0) {
             alphar->idx.xZ[alphark] = k;
             alphar->vals.xR[alphark] = v;
-            alphark = alphark + 1;
+            alphark++;
          }
       }
       alphar->k = alphark;
@@ -30580,14 +30580,14 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       if (bndt == reviseddualsimplex_cclower || (bndt == reviseddualsimplex_ccrange && vx == s->bndl.xR[nj])) {
          if (alphawaver > vp) {
             state->eligiblealphar.xZ[eligiblecnt] = j;
-            eligiblecnt = eligiblecnt + 1;
+            eligiblecnt++;
             continue;
          }
       }
       if (bndt == reviseddualsimplex_ccupper || (bndt == reviseddualsimplex_ccrange && vx == s->bndu.xR[nj])) {
          if (alphawaver < -vp) {
             state->eligiblealphar.xZ[eligiblecnt] = j;
-            eligiblecnt = eligiblecnt + 1;
+            eligiblecnt++;
             continue;
          }
       }
@@ -30660,9 +30660,9 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          }
       // Update eligible set, record flip
          possibleflips->xZ[*possibleflipscnt] = state->eligiblealphar.xZ[idx];
-         *possibleflipscnt = *possibleflipscnt + 1;
+         ++*possibleflipscnt;
          state->eligiblealphar.xZ[idx] = state->eligiblealphar.xZ[eligiblecnt - 1];
-         eligiblecnt = eligiblecnt - 1;
+         eligiblecnt--;
       }
       ae_assert(*q >= 0, "RatioTest: unexpected failure", _state);
       *thetad = s->d.xR[*q] / (*alpharpiv);
@@ -30756,7 +30756,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             }
          }
          inc(&s->trfage, _state);
-         s->statupdt = s->statupdt + 1;
+         s->statupdt++;
          s->statoffdiag = s->statoffdiag + sqr((double)(m - 1), _state);
          processed = true;
       }
@@ -30803,8 +30803,8 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             while (srcidx < idxd) {
                s->sparsel.idx.xZ[dstoffs] = srcidx;
                s->sparsel.vals.xR[dstoffs] = srcval;
-               dstoffs = dstoffs + 1;
-               srcoffs = srcoffs + 1;
+               dstoffs++;
+               srcoffs++;
                srcidx = s->sparsel.idx.xZ[srcoffs];
                srcval = s->sparsel.vals.xR[srcoffs];
             }
@@ -30813,7 +30813,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          // is used to determine coefficients of update matrix.
             if (srcidx == idxd) {
                s->utmp0.xR[i - 1] = srcval;
-               srcoffs = srcoffs + 1;
+               srcoffs++;
                srcidx = s->sparsel.idx.xZ[srcoffs];
                srcval = s->sparsel.vals.xR[srcoffs];
             }
@@ -30823,8 +30823,8 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
                s->sparsel.idx.xZ[dstoffs] = srcidx - 1;
                s->sparsel.vals.xR[dstoffs] = srcval;
                v = v - srcval * s->utmp0.xR[srcidx - 1];
-               dstoffs = dstoffs + 1;
-               srcoffs = srcoffs + 1;
+               dstoffs++;
+               srcoffs++;
                srcidx = s->sparsel.idx.xZ[srcoffs];
                srcval = s->sparsel.vals.xR[srcoffs];
             }
@@ -30832,7 +30832,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          // Write out unit diagonal, finalize row
             s->sparsel.idx.xZ[dstoffs] = i - 1;
             s->sparsel.vals.xR[dstoffs] = 1.0;
-            dstoffs = dstoffs + 1;
+            dstoffs++;
             s->sparsel.ridx.xZ[i] = dstoffs;
          }
          s->utmp0.xR[m - 1] = 1.0;
@@ -30842,7 +30842,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             if (v != 0) {
                s->sparsel.idx.xZ[dstoffs] = j;
                s->sparsel.vals.xR[dstoffs] = v;
-               dstoffs = dstoffs + 1;
+               dstoffs++;
             }
          }
          vcorner = alphaqim->xR[idxd];
@@ -30851,13 +30851,13 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             if (v != 0) {
                s->sparsel.idx.xZ[dstoffs] = j - 1;
                s->sparsel.vals.xR[dstoffs] = v;
-               dstoffs = dstoffs + 1;
+               dstoffs++;
                vcorner = vcorner - v * s->utmp0.xR[j - 1];
             }
          }
          s->sparsel.idx.xZ[dstoffs] = m - 1;
          s->sparsel.vals.xR[dstoffs] = 1.0;
-         dstoffs = dstoffs + 1;
+         dstoffs++;
          s->sparsel.ridx.xZ[m] = dstoffs;
          s->sparsel.ninitialized = s->sparsel.ridx.xZ[m];
          for (i = 0; i < m; i++) {
@@ -30875,7 +30875,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          reviseddualsimplex_inversecyclicpermutation(&s->rowpermbwd, m, idxd, &s->utmpi, _state);
       // Done
          inc(&s->trfage, _state);
-         s->statupdt = s->statupdt + 1;
+         s->statupdt++;
          s->statoffdiag = s->statoffdiag + (s->sparsel.ridx.xZ[m] - m) + (s->sparseu.ridx.xZ[m] - m);
          processed = true;
       }
@@ -30954,7 +30954,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n, ae_state *_s
    k = 0;
    for (i = 0; i < n; i++) {
       if (ae_fabs(x->xR[i], _state) > mx) {
-         k = k + 1;
+         k++;
       }
    }
    result = (double)k / n;
@@ -31058,7 +31058,7 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
       if (flipped) {
          delta = delta - dir * (bndu - bndl) * ae_fabs(alphar->vals.xR[aj], _state);
          state->ustmpi.xZ[actualflipscnt] = j;
-         actualflipscnt = actualflipscnt + 1;
+         actualflipscnt++;
          k0 = state->at.ridx.xZ[j];
          k1 = state->at.ridx.xZ[j + 1] - 1;
          for (k = k0; k <= k1; k++) {
@@ -32380,7 +32380,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
          state->at.vals.xR[offs + i] = -1.0;
          state->at.idx.xZ[offs + i] = i;
          state->at.ridx.xZ[ns + i + 1] = state->at.ridx.xZ[ns + i] + 1;
-         state->at.ninitialized = state->at.ninitialized + 1;
+         state->at.ninitialized++;
       }
       state->at.m = state->at.m + k;
       sparseinitduidx(&state->at, _state);
@@ -33477,7 +33477,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->a.idx.xZ[offsdst] != state->a.idx.xZ[offs + i]) {
-         offsdst = offsdst + 1;
+         offsdst++;
          state->a.idx.xZ[offsdst] = state->a.idx.xZ[offs + i];
          state->a.vals.xR[offsdst] = state->a.vals.xR[offs + i];
       } else {
@@ -33551,7 +33551,7 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_st
       if (a->xR[i] != 0.0) {
          state->adddtmpi.xZ[nnz] = i;
          state->adddtmpr.xR[nnz] = a->xR[i];
-         nnz = nnz + 1;
+         nnz++;
       }
    }
    minlpaddlc2(state, &state->adddtmpi, &state->adddtmpr, nnz, al, au, _state);
@@ -34248,7 +34248,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
    for (i = 0; i < nec + nic; i++) {
       for (j = 0; j < n; j++) {
          if (sstate->scaledcleic.xyR[i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -34265,7 +34265,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
          // Primary part of the matrix
             subsolver->sparserawlc.vals.xR[offs] = sstate->scaledcleic.xyR[i][j];
             subsolver->sparserawlc.idx.xZ[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       subsolver->sparserawlc.ridx.xZ[i + 1] = offs;
@@ -34420,7 +34420,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    for (i = 0; i < nlec + nlic; i++) {
       for (j = 0; j < n; j++) {
          if (jac->xyR[1 + i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -34488,7 +34488,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       for (k = j0; k <= j1; k++) {
          subsolver->sparseefflc.idx.xZ[offs] = subsolver->sparserawlc.idx.xZ[k];
          subsolver->sparseefflc.vals.xR[offs] = subsolver->sparserawlc.vals.xR[k];
-         offs = offs + 1;
+         offs++;
       }
    // Set up slack variables
       if (i < nec) {
@@ -34501,7 +34501,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       // Slack variables for inequality constraints
          subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.idx.xZ[offs] = offsslackic + (i - nec);
-         offs = offs + 1;
+         offs++;
       }
    // Finalize row
       subsolver->sparseefflc.ridx.xZ[i + 1] = offs;
@@ -34540,7 +34540,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          if (jac->xyR[1 + i][j] != 0.0) {
             subsolver->sparseefflc.vals.xR[offs] = vv * jac->xyR[1 + i][j];
             subsolver->sparseefflc.idx.xZ[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       if (i < nlec) {
@@ -34554,7 +34554,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       // Add slack terms for inequality constraints
          subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.idx.xZ[offs] = offsslacknlic + (i - nlec);
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + i + 1] = offs;
    // Set box constraints on slack variables and bounds on linear equality/inequality constraints
@@ -34592,14 +34592,14 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          vv = subsolver->curhd.xyR[i][j];
          subsolver->sparseefflc.vals.xR[offs] = v * vv;
          subsolver->sparseefflc.idx.xZ[offs] = j;
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m + 1] = offs;
    // Set bounds on linear constraints
       subsolver->cural.xR[subsolver->sparseefflc.m] = 0.0;
       subsolver->curau.xR[subsolver->sparseefflc.m] = 0.0;
    // Increase row count
-      subsolver->sparseefflc.m = subsolver->sparseefflc.m + 1;
+      subsolver->sparseefflc.m++;
    }
 // Finalize sparse matrix structure
    ae_assert(subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m] <= subsolver->sparseefflc.idx.cnt, "LPSubproblemSolve: critical integrity check failed", _state);
@@ -35745,7 +35745,7 @@ lbl_2:
       return result;
    }
 lbl_4:
-   innerk = innerk + 1;
+   innerk++;
    goto lbl_3;
 lbl_5:
    result = false;
@@ -36773,7 +36773,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
          state->lcsrcidx.xZ[state->nec] = i;
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -36784,7 +36784,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
          state->lcsrcidx.xZ[state->nec + state->nic] = i;
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -38491,7 +38491,7 @@ lbl_2:
          state->nunlc.xR[i - 1] = boundval(state->nunlc.xR[i - 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       }
    }
-   outerit = outerit + 1;
+   outerit++;
    goto lbl_3;
 lbl_5:
    for (i = 0; i < n; i++) {
@@ -38786,7 +38786,7 @@ lbl_4:
    for (i = 0; i <= ng + nh; i++) {
       state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[i]);
    }
-   k = k + 1;
+   k++;
    goto lbl_35;
 lbl_37:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
@@ -38923,7 +38923,7 @@ lbl_13:
    }
 lbl_50:
 lbl_47:
-   k = k + 1;
+   k++;
    goto lbl_46;
 lbl_48:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
@@ -39091,7 +39091,7 @@ lbl_22:
    }
 lbl_67:
 lbl_64:
-   k = k + 1;
+   k++;
    goto lbl_63;
 lbl_65:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
@@ -40302,7 +40302,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] == 0) {
          ae_v_move(state->cleic.xyR[state->nec], 1, c->xyR[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -40312,7 +40312,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
          } else {
             ae_v_move(state->cleic.xyR[state->nec + state->nic], 1, c->xyR[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -41032,7 +41032,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
       ncandbnd = 0;
       for (i = 0; i < n; i++) {
          if (state->xc.xR[i] == 0.0) {
-            ncandbnd = ncandbnd + 1;
+            ncandbnd++;
          }
       }
       idx1 = ncandbnd;
@@ -41047,13 +41047,13 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
             state->tmpidx.xZ[idx0] = i;
             state->tmpd.xR[idx0] = (-state->gc.xR[i]) * (-1);
             state->tmpc2.xyR[idx0][0] = 1.0 * (-1);
-            idx0 = idx0 + 1;
+            idx0++;
          } else {
          // We are far away from boundary.
             state->tmpidx.xZ[idx1] = i;
             state->tmpd.xR[idx1] = -state->gc.xR[i];
             state->tmpc2.xyR[idx1][0] = 1.0;
-            idx1 = idx1 + 1;
+            idx1++;
          }
       }
       ae_assert(idx0 == ncandbnd, "MinNSQP: integrity check failed (2346)", _state);
@@ -41175,7 +41175,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          for (i = 0; i < n; i++) {
             v = v + state->d.xR[i];
             if (state->d.xR[i] != 0.0) {
-               k = k + 1;
+               k++;
             }
          }
          if (k > 0 && v > 0.0) {
@@ -41633,7 +41633,7 @@ lbl_6:
       rcopyrr(n, &state->samplex, i, &state->samplex, k, _state);
       rcopyrr(n, &state->samplegm, i, &state->samplegm, k, _state);
       state->samplef.xR[k] = state->samplef.xR[i];
-      k = k + 1;
+      k++;
    }
    cursamplesize = k;
    if (state->agssamplesize - cursamplesize < state->agsminupdate) {
@@ -41688,8 +41688,8 @@ lbl_2:
    state->needfij = false;
    state->samplef.xR[i] = state->meritf;
    rcopyvr(n, &state->meritg, &state->samplegm, i, _state);
-   k = k + 1;
-   i = i + 1;
+   k++;
+   i++;
    goto lbl_8;
 lbl_10:
    cursamplesize = cursamplesize + k;
@@ -42047,7 +42047,7 @@ lbl_6:
    goto lbl_rcomm;
 lbl_0:
    ae_v_move(state->fbase.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    k = 0;
 lbl_10:
    if (k > n - 1) {
@@ -42087,7 +42087,7 @@ lbl_2:
 lbl_13:
    rsetc(1 + ng + nh, 0.0, &state->j, k, _state);
 lbl_14:
-   k = k + 1;
+   k++;
    goto lbl_10;
 lbl_12:
 // Restore previous values of fields and continue
@@ -43139,7 +43139,7 @@ lbl_15:
       result = false;
       return result;
    }
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
 // Main cycle
 //
 // At the beginning of new iteration:
@@ -43194,7 +43194,7 @@ lbl_21:
    goto lbl_rcomm;
 lbl_2:
    state->needfg = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    stepfound = state->f <= state->finit + mincomp_gpaftol * state->dginit;
    goto lbl_24;
 lbl_23:
@@ -43229,7 +43229,7 @@ lbl_27:
    goto lbl_rcomm;
 lbl_3:
    state->needfg = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    if (state->stp <= mincomp_stpmin) {
       goto lbl_28;
    }
@@ -43241,7 +43241,7 @@ lbl_3:
 lbl_28:
    ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
 lbl_26:
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (!state->xrep) {
       goto lbl_29;
    }
@@ -43269,7 +43269,7 @@ lbl_29:
          break;
       }
    }
-   state->acount = state->acount + 1;
+   state->acount++;
    ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
    ae_v_move(state->ak.xR, 1, state->an.xR, 1, n);
 // Stopping conditions
@@ -43364,7 +43364,7 @@ lbl_43:
       }
    }
 // Next iteration
-   state->k = state->k + 1;
+   state->k++;
    goto lbl_21;
 lbl_22:
 lbl_19:
@@ -43458,13 +43458,13 @@ lbl_52:
          state->an.xR[i] = 1.0;
       }
       if (state->an.xR[i] != state->ak.xR[i]) {
-         diffcnt = diffcnt + 1;
+         diffcnt++;
       }
       state->ak.xR[i] = state->an.xR[i];
    }
    ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
    state->repnfev = state->repnfev + state->nfev;
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (!state->xrep) {
       goto lbl_53;
    }
@@ -43610,14 +43610,14 @@ lbl_63:
    // We'll set BetaK=0, which will restart CG algorithm.
    // We can stop later (during normal checks) if stopping conditions are met.
       betak = 0.0;
-      state->debugrestartscount = state->debugrestartscount + 1;
+      state->debugrestartscount++;
    }
    ae_v_moveneg(state->dn.xR, 1, state->gc.xR, 1, n);
    ae_v_addd(state->dn.xR, 1, state->dk.xR, 1, n, betak);
    ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
 // update other information
    state->fold = state->f;
-   state->k = state->k + 1;
+   state->k++;
    goto lbl_49;
 lbl_50:
 lbl_47:
@@ -43656,7 +43656,7 @@ void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_stat
    rep->activeconstraints = 0;
    for (i = 0; i < state->n; i++) {
       if (state->ak.xR[i] == 0.0) {
-         rep->activeconstraints = rep->activeconstraints + 1;
+         rep->activeconstraints++;
       }
    }
 }
@@ -44667,7 +44667,7 @@ lbl_2:
 lbl_35:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold, _state);
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    if (!state->xrep) {
       goto lbl_36;
    }
@@ -44779,7 +44779,7 @@ lbl_11:
    }
 lbl_46:
    state->x.xR[i] = v;
-   i = i + 1;
+   i++;
    goto lbl_42;
 lbl_44:
    state->f = state->fbase;
@@ -44868,7 +44868,7 @@ lbl_47:
    goto lbl_rcomm;
 lbl_12:
    state->needfg = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    goto lbl_50;
 lbl_49:
 // Numerical differentiation
@@ -44943,7 +44943,7 @@ lbl_19:
    state->repnfev = state->repnfev + 2;
 lbl_55:
    state->x.xR[i] = v;
-   i = i + 1;
+   i++;
    goto lbl_51;
 lbl_53:
    state->f = state->fbase;
@@ -45003,7 +45003,7 @@ lbl_48:
          v = state->curstpmax;
          ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
          ae_v_addd(state->xn.xR, 1, state->d.xR, 1, n, v);
-         state->nonmonotoniccnt = state->nonmonotoniccnt - 1;
+         state->nonmonotoniccnt--;
       } else {
       // Numerical properties of the function does not allow
       // us to solve problem. Algorithm is terminated
@@ -45037,7 +45037,7 @@ lbl_48:
 lbl_20:
    state->xupdated = false;
 lbl_56:
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (mcinfo == 1) {
       v = 0.0;
       for (i = 0; i < n; i++) {
@@ -45185,7 +45185,7 @@ lbl_61:
    goto lbl_rcomm;
 lbl_21:
    state->needfg = false;
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    goto lbl_64;
 lbl_63:
 // Numerical differentiation
@@ -45260,7 +45260,7 @@ lbl_28:
    state->repnfev = state->repnfev + 2;
 lbl_69:
    state->x.xR[i] = v;
-   i = i + 1;
+   i++;
    goto lbl_65;
 lbl_67:
    state->f = state->fbase;
@@ -45351,7 +45351,7 @@ lbl_62:
 lbl_29:
    state->xupdated = false;
 lbl_70:
-   state->repiterationscount = state->repiterationscount + 1;
+   state->repiterationscount++;
    if (state->bufsize == m) {
    // Buffer is full, shift contents by one row
       for (i = 0; i < state->bufsize; i++) {
@@ -45364,7 +45364,7 @@ lbl_70:
       }
    } else {
    // Buffer is not full, increase buffer size by 1
-      state->bufsize = state->bufsize + 1;
+      state->bufsize++;
    }
    v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
    vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
@@ -45407,7 +45407,7 @@ lbl_70:
       goto lbl_60;
    }
 lbl_59:
-   itidx = itidx + 1;
+   itidx++;
    goto lbl_58;
 lbl_60:
 // Decrease decay coefficient. Subsequent L-BFGS stages will

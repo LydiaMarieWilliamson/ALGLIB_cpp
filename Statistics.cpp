@@ -319,10 +319,10 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
          a = x->xR[l + 1];
          while (true) {
             do {
-               i = i + 1;
+               i++;
             } while (x->xR[i] < a);
             do {
-               j = j - 1;
+               j--;
             } while (x->xR[j] > a);
             if (j < i) {
                break;
@@ -9125,7 +9125,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
          continue;
       }
       x->xR[ns] = x->xR[i];
-      ns = ns + 1;
+      ns++;
    }
    if (ns < 5) {
       *bothtails = 1.0;
@@ -9159,7 +9159,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
                t = k;
             }
          }
-         i = i + 1;
+         i++;
       } while (i <= ns);
       i = ns - 1;
       do {
@@ -9177,7 +9177,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
             } else {
                if (k < i) {
                   if (r.xR[k] > r.xR[k - 1]) {
-                     k = k + 1;
+                     k++;
                   }
                }
                if (r.xR[t - 1] >= r.xR[k - 1]) {
@@ -9193,7 +9193,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
                }
             }
          }
-         i = i - 1;
+         i--;
       } while (i >= 1);
    }
 // compute tied ranks
@@ -9204,7 +9204,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
          if (r.xR[j] != r.xR[i]) {
             break;
          }
-         j = j + 1;
+         j++;
       }
       for (k = i; k < j; k++) {
          r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
@@ -12776,7 +12776,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
                t = k;
             }
          }
-         i = i + 1;
+         i++;
       } while (i <= ns);
       i = ns - 1;
       do {
@@ -12794,7 +12794,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
             } else {
                if (k < i) {
                   if (r.xR[k] > r.xR[k - 1]) {
-                     k = k + 1;
+                     k++;
                   }
                }
                if (r.xR[t - 1] >= r.xR[k - 1]) {
@@ -12810,7 +12810,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
                }
             }
          }
-         i = i - 1;
+         i--;
       } while (i >= 1);
    }
 // compute tied ranks
@@ -12823,13 +12823,13 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
          if (r.xR[j] != r.xR[i]) {
             break;
          }
-         j = j + 1;
+         j++;
       }
       for (k = i; k < j; k++) {
          r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
       }
       tiesize.xZ[tiecount] = j - i;
-      tiecount = tiecount + 1;
+      tiecount++;
       i = j;
    }
 // Compute U
@@ -12933,10 +12933,10 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
    necnt = 0;
    for (i = 0; i < n; i++) {
       if (x->xR[i] > median) {
-         gtcnt = gtcnt + 1;
+         gtcnt++;
       }
       if (x->xR[i] != median) {
-         necnt = necnt + 1;
+         necnt++;
       }
    }
    if (necnt == 0) {

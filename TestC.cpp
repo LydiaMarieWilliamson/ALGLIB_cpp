@@ -604,7 +604,7 @@ static ae_int_t testablasfunit_pseudorandominit1(RVector *x, ae_int_t iseed, ae_
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
       x->xR[i] = ae_sin(iseed + ae_sin((double)i, _state), _state);
-      iseed = iseed + 1;
+      iseed++;
    }
    result = iseed;
    return result;
@@ -615,7 +615,7 @@ static ae_int_t testablasfunit_pseudorandominit1i(ZVector *x, ae_int_t iseed, ae
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
       x->xZ[i] = iround(100 * ae_sin(iseed + ae_sin((double)i, _state), _state), _state);
-      iseed = iseed + 1;
+      iseed++;
    }
    result = iseed;
    return result;
@@ -626,7 +626,7 @@ static ae_int_t testablasfunit_pseudorandominit1b(BVector *x, ae_int_t iseed, ae
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
       x->xB[i] = ae_sin(iseed + ae_sin((double)i, _state), _state) > 0.0;
-      iseed = iseed + 1;
+      iseed++;
    }
    result = iseed;
    return result;
@@ -644,20 +644,20 @@ static ae_int_t testablasfunit_pseudorandominit2(RMatrix *x, ae_int_t iseed, ae_
    for (i = 0; i < x->rows; i++) {
       xr.xR[i] = ae_sin((double)(13 + 2 * i + iseed), _state);
    }
-   iseed = iseed + 1;
+   iseed++;
    ae_vector_set_length(&xc, x->cols, _state);
    for (j = 0; j < x->cols; j++) {
       xc.xR[j] = ae_sin((double)(17 + 3 * j + iseed), _state);
    }
-   iseed = iseed + 1;
+   iseed++;
    for (i = 0; i < x->rows; i++) {
       for (j = 0; j < x->cols; j++) {
          x->xyR[i][j] = xr.xR[i] + xc.xR[j];
          while (x->xyR[i][j] > 1.0) {
-            x->xyR[i][j] = x->xyR[i][j] - 1;
+            x->xyR[i][j]--;
          }
          while (x->xyR[i][j] < -1.0) {
-            x->xyR[i][j] = x->xyR[i][j] + 1;
+            x->xyR[i][j]++;
          }
       }
    }
@@ -673,19 +673,19 @@ static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablas
    maxpad = 10;
    k = iseed + iseed * iseed * iseed;
    ae_vector_set_length(&s->x0, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->x1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->x2, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->ix0, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->ix1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->bx0, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_vector_set_length(&s->bx1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
-   k = k + 1;
+   k++;
    ae_matrix_set_length(&s->a0, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), minlen + iround(maxpad * sqr(ae_sin((double)(k + 1), _state), _state), _state), _state);
    k = k + 2;
    ae_matrix_set_length(&s->a1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), minlen + iround(maxpad * sqr(ae_sin((double)(k + 1), _state), _state), _state), _state);
@@ -806,7 +806,7 @@ static bool testablasfunit_testxdot(ae_int_t maxn, double tol, ae_state *_state)
    // Prepare two identical playground structures
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
-      iseed = iseed + 1;
+      iseed++;
    // Compute each rDot version twice - reference vs library.
    // Compare playground snapshots - should be identical.
       ridx = randominteger(maxint(n, 1, _state), _state);
@@ -886,7 +886,7 @@ static bool testablasfunit_testxset(ae_int_t maxn, double tol, ae_state *_state)
       refrsetvx(n / 2, alpha, &s1.x0, offsx, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:219");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -949,7 +949,7 @@ static bool testablasfunit_testxadd(ae_int_t maxn, double tol, ae_state *_state)
       refraddvx(n / 2, alpha, &s1.x0, offsx, &s1.x1, offsy, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:287");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -991,7 +991,7 @@ static bool testablasfunit_testxmul(ae_int_t maxn, double tol, ae_state *_state)
       refrmulvx(n / 2, alpha, &s1.x0, offsx, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:334");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1034,7 +1034,7 @@ static bool testablasfunit_testxmax(ae_int_t maxn, double tol, ae_state *_state)
       s1.v0 = refrmaxabsr(n, &s1.a0, ridx, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:383");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1102,7 +1102,7 @@ static bool testablasfunit_testxmerge(ae_int_t maxn, double tol, ae_state *_stat
       refrmergeminrv(n, &s1.a0, ridx, &s1.x0, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:462");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1200,7 +1200,7 @@ static bool testablasfunit_testxcopy(ae_int_t maxn, double tol, ae_state *_state
       refrcopymulvc(n, alpha, &s1.x0, &s1.a0, cidx, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:572");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1249,7 +1249,7 @@ static bool testablasfunit_testxgemv(ae_int_t maxn, double tol, ae_state *_state
       refrgemvx(m, n, alpha, &s1.a0, offs0, offs1, opa, &s1.x0, offsx, beta, &s1.x1, offsy, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:621");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1305,7 +1305,7 @@ static bool testablasfunit_testxger(ae_int_t maxn, double tol, ae_state *_state)
       testablasfunit_refgerx(n, m, &s1.a0, 0, 0, alpha, &s1.x0, 0, &s1.x1, 0, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:662");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1345,7 +1345,7 @@ static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol, ae_state *_state
       reftrsvx(n, &s1.a0, offs0, offs1, isupper, isunit, opa, &s1.x0, offsx, _state);
       set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1, _state) > tol, __FILE__, __LINE__, "testablasfunit.ap:703");
    // Increment seed
-      iseed = iseed + 1;
+      iseed++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1511,7 +1511,7 @@ static bool hqrndcontinuoustest(bool silent, ae_state *_state) {
          v = hqrndcontinuous(&state, &sample, samplesize, _state);
          for (j = 0; j < nb; j++) {
             if (v > binbounds.xR[j] && v < binbounds.xR[j + 1]) {
-               bins.xZ[j] = bins.xZ[j] + 1;
+               bins.xZ[j]++;
                break;
             }
          }
@@ -1568,7 +1568,7 @@ static bool hqrnddiscretetest(bool silent, ae_state *_state) {
          tsample = hqrnddiscrete(&state, &sample, binscount, _state);
          for (j = 0; j < binscount; j++) {
             if (tsample == sample.xR[j]) {
-               nn.xZ[j] = nn.xZ[j] + 1;
+               nn.xZ[j]++;
                break;
             }
          }
@@ -1877,7 +1877,7 @@ bool testhqrnd(bool silent, ae_state *_state) {
       if (k >= bins.cnt) {
          k = bins.cnt - 1;
       }
-      bins.xZ[k] = bins.xZ[k] + 1;
+      bins.xZ[k]++;
    }
    for (i = 0; i < bins.cnt; i++) {
       set_error_flag(&unit2errors, (double)bins.xZ[i] < 0.9 * n / bins.cnt || (double)bins.xZ[i] > 1.1 * n / bins.cnt, __FILE__, __LINE__, "testhqrndunit.ap:301");
@@ -4918,7 +4918,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       for (j = 0; j < m; j++) {
          v = ae_v_dotproduct(q.xyR[i], 1, q.xyR[j], 1, m);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *qrerrors = *qrerrors || ae_fabs(v, _state) >= threshold;
       }
@@ -5016,7 +5016,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.xyR[i], 1, q.xyR[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *lqerrors = *lqerrors || ae_fabs(v, _state) >= threshold;
       }
@@ -5253,7 +5253,7 @@ static void testortfacunit_testrhessproblem(RMatrix *a, ae_int_t n, double thres
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(&q.xyR[0][i], q.stride, &q.xyR[0][j], q.stride, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *hesserrors = *hesserrors || ae_fabs(v, _state) > threshold;
       }
@@ -5351,7 +5351,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.xyR[i], 1, q.xyR[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *tderrors = *tderrors || ae_fabs(v, _state) > threshold;
       }
@@ -5392,7 +5392,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.xyR[i], 1, q.xyR[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *tderrors = *tderrors || ae_fabs(v, _state) > threshold;
       }
@@ -6890,7 +6890,7 @@ static void testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector
       f.xZ[i] = 0;
    }
    for (i = 0; i < n; i++) {
-      f.xZ[p1->xZ[i]] = f.xZ[p1->xZ[i]] + 1;
+      f.xZ[p1->xZ[i]]++;
    }
    for (i = 0; i < n; i++) {
       *waserrors = *waserrors || f.xZ[i] != 1;
@@ -7745,7 +7745,7 @@ static bool basicfunctest(ae_state *_state) {
                   inc(&lowercnt, _state);
                }
                a.xyR[i1][j1] = i1 + j1 + (double)((i + j) * (m + n)) / 2.0;
-               a.xyR[i1][j1] = a.xyR[i1][j1] + 1;
+               a.xyR[i1][j1]++;
                sparseset(&s, i1, j1, i1 + j1 + (double)((i + j) * (m + n)) / 2.0, _state);
                sparseadd(&s, i1, j1, 1.0, _state);
                if (a.xyR[i1][j1] != sparseget(&s, i1, j1, _state)) {
@@ -9049,7 +9049,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             rowsizes.xZ[i] = 0;
             for (j = 0; j < n; j++) {
                if (da->xyR[i][j] != 0.0) {
-                  rowsizes.xZ[i] = rowsizes.xZ[i] + 1;
+                  rowsizes.xZ[i]++;
                }
             }
          }
@@ -9971,7 +9971,7 @@ static bool testsparseunit_enumeratetest(ae_state *_state) {
                      a.xyR[i][j] = r * (2 * randomreal(_state) - 1);
                   } while (a.xyR[i][j] == 0.0);
                // Number of non-zero elements
-                  ne = ne + 1;
+                  ne++;
                }
             }
          }
@@ -9990,7 +9990,7 @@ static bool testsparseunit_enumeratetest(ae_state *_state) {
             counter = 0;
             while (sparseenumerate(&spa, &t0, &t1, &i, &j, &v, _state)) {
                ta.xyB[i][j] = true;
-               counter = counter + 1;
+               counter++;
                if (v != a.xyR[i][j]) {
                   set_error_flag(&result, true, __FILE__, __LINE__, "testsparseunit.ap:3112");
                   ae_frame_leave(_state);
@@ -10062,7 +10062,7 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
                         a.xyR[i][j] = r * (2 * randomreal(_state) - 1);
                      } while (a.xyR[i][j] == 0.0);
                      sparseset(&spa, i, j, a.xyR[i][j], _state);
-                     ne = ne + 1;
+                     ne++;
                   }
                   ta.xyB[i][j] = false;
                }
@@ -10079,7 +10079,7 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
                      ta.xyB[i][j] = sparserewriteexisting(&spa, i, j, v, _state);
                      if (ta.xyB[i][j]) {
                         a.xyR[i][j] = v;
-                        nr = nr + 1;
+                        nr++;
                      }
                   }
                }
@@ -10089,7 +10089,7 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
                for (j = 0; j < n; j++) {
                   if (ta.xyB[i][j]) {
                      spaval = sparseget(&spa, i, j, _state);
-                     nr = nr - 1;
+                     nr--;
                      if (spaval != v || spaval != a.xyR[i][j]) {
                         result = true;
                         ae_frame_leave(_state);
@@ -10115,7 +10115,7 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (ta.xyB[i][j]) {
-                     ne = ne - 1;
+                     ne--;
                   }
                }
             }
@@ -10282,7 +10282,7 @@ static bool testsparseunit_testconvertsm(ae_state *_state) {
                ner.xZ[i] = 0;
                for (j = 0; j < n; j++) {
                   if (randominteger(5, _state) == 3) {
-                     ner.xZ[i] = ner.xZ[i] + 1;
+                     ner.xZ[i]++;
                      do {
                         a.xyR[i][j] = 2 * randomreal(_state) - 1;
                      } while (a.xyR[i][j] == 0.0);
@@ -11226,7 +11226,7 @@ static double testevdunit_testort(RMatrix *z, ae_int_t n, ae_state *_state) {
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(&z->xyR[0][i], z->stride, &z->xyR[0][j], z->stride, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          result = maxreal(result, ae_fabs(v, _state), _state);
       }
@@ -11265,9 +11265,9 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
 // Test simple EVD: values and full vectors, lower A
    testevdunit_unset1d(&lambdaref, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(al, n, 1, false, &lambdaref, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11283,9 +11283,9 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
 // Test simple EVD: values and full vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(au, n, 1, true, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11301,9 +11301,9 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
 // Test simple EVD: values only, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(al, n, 0, false, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11313,9 +11313,9 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(au, n, 0, true, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11336,9 +11336,9 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
 // Test simple EVD: values and full vectors, lower A
    testevdunit_unset1d(&lambdaref, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(al, n, 1, false, &lambdaref, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11354,9 +11354,9 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
 // Test simple EVD: values and full vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(au, n, 1, true, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11372,9 +11372,9 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
 // Test simple EVD: values only, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(al, n, 0, false, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11384,9 +11384,9 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(au, n, 0, true, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11426,9 +11426,9 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    ae_matrix_set_length(&a1, n - 1 + 1, n - 1 + 1, _state);
    ae_matrix_set_length(&a2, n - 1 + 1, n - 1 + 1, _state);
 // Reference EVD
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(afull, n, 1, true, &lambdaref, &zref, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11442,13 +11442,13 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       if (ae_fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1], _state) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (ae_fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2], _state) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 // Select A, B
    if (i1 > 0) {
@@ -11464,14 +11464,14 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test interval, no vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(al, n, 0, false, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11481,14 +11481,14 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(au, n, 0, true, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11498,9 +11498,9 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(al, n, 0, false, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11511,9 +11511,9 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(au, n, 0, true, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11524,14 +11524,14 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(al, n, 1, false, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11555,14 +11555,14 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test interval, vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(au, n, 1, true, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11586,9 +11586,9 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test indexes, vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(al, n, 1, false, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11613,9 +11613,9 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // Test indexes, vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_unset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(au, n, 1, true, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11670,9 +11670,9 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    ae_matrix_set_length(&a1, n - 1 + 1, n - 1 + 1, _state);
    ae_matrix_set_length(&a2, n - 1 + 1, n - 1 + 1, _state);
 // Reference EVD
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(afull, n, 1, true, &lambdaref, &zref, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11686,13 +11686,13 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       if (ae_fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1], _state) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (ae_fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2], _state) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 // Select A, B
    if (i1 > 0) {
@@ -11708,14 +11708,14 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test interval, no vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(al, n, 0, false, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11725,14 +11725,14 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(au, n, 0, true, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11742,9 +11742,9 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(al, n, 0, false, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11755,9 +11755,9 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(au, n, 0, true, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11768,14 +11768,14 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(al, n, 1, false, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11798,14 +11798,14 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test interval, vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(au, n, 1, true, a, b, &m, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11828,9 +11828,9 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test indexes, vectors, lower A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(al, n, 1, false, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -11854,9 +11854,9 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // Test indexes, vectors, upper A
    testevdunit_unset1d(&lambdav, _state);
    testevdunit_cunset2d(&z, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(au, n, 1, true, i1, i2, &lambdav, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12061,9 +12061,9 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
 // Reference EVD
    ae_vector_set_length(&lambdaref, n, _state);
    ae_v_move(lambdaref.xR, 1, d->xR, 1, n);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevd(&lambdaref, e, n, 2, &zref, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12077,13 +12077,13 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       if (ae_fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1], _state) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (ae_fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2], _state) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 // Test different combinations
 // Select A, B
@@ -12102,14 +12102,14 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    for (i = 0; i < n; i++) {
       lambdav.xR[i] = d->xR[i];
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 0, a, b, &m, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12121,9 +12121,9 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    for (i = 0; i < n; i++) {
       lambdav.xR[i] = d->xR[i];
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 0, i1, i2, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12144,14 +12144,14 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
          a2.xyR[i][j] = a1.xyR[i][j];
       }
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 1, a, b, &m, &a1, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12191,9 +12191,9 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
          a2.xyR[i][j] = a1.xyR[i][j];
       }
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 1, i1, i2, &a1, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12227,14 +12227,14 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       lambdav.xR[i] = d->xR[i];
    }
    ae_matrix_set_length(&z, 0 + 1, 0 + 1, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 2, a, b, &m, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12260,9 +12260,9 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       lambdav.xR[i] = d->xR[i];
    }
    ae_matrix_set_length(&z, 0 + 1, 0 + 1, _state);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 2, i1, i2, &z, _state)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave(_state);
       return;
    }
@@ -12433,7 +12433,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
                set_error_flag(nserrors, ae_fabs(vec2r.xR[i] - vec3r.xR[i], _state) > threshold, __FILE__, __LINE__, "testevdunit.ap:1657");
                set_error_flag(nserrors, ae_fabs(vec2i.xR[i] - vec3i.xR[i], _state) > threshold, __FILE__, __LINE__, "testevdunit.ap:1658");
             }
-            k = k + 1;
+            k++;
          }
       }
    // Test left vectors
@@ -12480,7 +12480,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
                set_error_flag(nserrors, ae_fabs(vec2r.xR[i] - vec3r.xR[i], _state) > threshold, __FILE__, __LINE__, "testevdunit.ap:1713");
                set_error_flag(nserrors, ae_fabs(vec2i.xR[i] - vec3i.xR[i], _state) > threshold, __FILE__, __LINE__, "testevdunit.ap:1714");
             }
-            k = k + 1;
+            k++;
          }
       }
    }
@@ -12621,7 +12621,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
          while (j < n - 1) {
             e.xR[j] = 0.0;
             j = j + i;
-            i = i + 1;
+            i++;
          }
       }
       if (mkind == 4) {
@@ -12901,7 +12901,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
                         rmatrixsetlengthatleast(&rb, n, requestsize, _state);
                         rmatrixgemm(n, requestsize, n, 1.0, &densea, 0, 0, 0, &ra, 0, 0, 0, 0.0, &rb, 0, 0, _state);
                         eigsubspaceoocsendresult(&s, &rb, _state);
-                        callcount = callcount + 1;
+                        callcount++;
                      }
                      eigsubspaceoocstop(&s, &sw, &sz, &rep, _state);
                      set_error_flag(errorflag, callcount > itscount + 2, __FILE__, __LINE__, "testevdunit.ap:2238");
@@ -12947,7 +12947,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
             for (j = i; j < m; j++) {
                v = ae_v_dotproduct(&sz.xyR[0][i], sz.stride, &sz.xyR[0][j], sz.stride, n);
                if (j == i) {
-                  v = v - 1;
+                  v--;
                }
                set_error_flag(errorflag, ae_fabs(v, _state) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2291");
             }
@@ -12962,7 +12962,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
             for (j = i; j < m; j++) {
                v = ae_v_dotproduct(&sz.xyR[0][i], sz.stride, &sz.xyR[0][j], sz.stride, n);
                if (j == i) {
-                  v = v - 1;
+                  v--;
                }
                set_error_flag(errorflag, ae_fabs(v, _state) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2310");
             }
@@ -15205,7 +15205,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
       w.xR[i] = d->xR[i];
    }
    if (!rmatrixbdsvd(&w, e, n, true, false, &u, n, &c, n, &vt, n, _state)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave(_state);
       return;
@@ -15219,7 +15219,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
       w.xR[i] = d->xR[i];
    }
    if (!rmatrixbdsvd(&w, e, n, true, true, &u, n, &c, n, &vt, n, _state)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave(_state);
       return;
@@ -15235,7 +15235,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
       w.xR[i] = d->xR[i];
    }
    if (!rmatrixbdsvd(&w, e, n, false, false, &u, n, &c, n, &vt, n, _state)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave(_state);
       return;
@@ -15249,7 +15249,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
       w.xR[i] = d->xR[i];
    }
    if (!rmatrixbdsvd(&w, e, n, false, true, &u, n, &c, n, &vt, n, _state)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave(_state);
       return;
@@ -15257,7 +15257,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
    testbdsvdunit_getbdsvderror(d, e, n, false, &u, &c, &w, &vt, materr, orterr, wsorted, _state);
    testbdsvdunit_checksvdmultiplication(d, e, n, false, &u, &c, &w, &vt, materr, _state);
 // update counter
-   *succcount = *succcount + 1;
+   ++*succcount;
    ae_frame_leave(_state);
 }
 
@@ -15458,7 +15458,7 @@ static void testsvdunit_testsvdproblem(RMatrix *a, ae_int_t m, ae_int_t n, doubl
    NewVector(w2, 0, DT_REAL, _state);
 // Main SVD test
    if (!rmatrixsvd(a, m, n, 2, 2, 2, &w, &u, &vt, _state)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave(_state);
       return;
@@ -15469,7 +15469,7 @@ static void testsvdunit_testsvdproblem(RMatrix *a, ae_int_t m, ae_int_t n, doubl
       for (vtjob = 0; vtjob <= 2; vtjob++) {
          for (memjob = 0; memjob <= 2; memjob++) {
             if (!rmatrixsvd(a, m, n, ujob, vtjob, memjob, &w2, &u2, &vt2, _state)) {
-               *failcount = *failcount + 1;
+               ++*failcount;
                *wfailed = true;
                ae_frame_leave(_state);
                return;
@@ -15505,7 +15505,7 @@ static void testsvdunit_testsvdproblem(RMatrix *a, ae_int_t m, ae_int_t n, doubl
       }
    }
 // update counter
-   *succcount = *succcount + 1;
+   ++*succcount;
    ae_frame_leave(_state);
 }
 
@@ -19703,7 +19703,7 @@ static void testfblsunit_testgmres(bool *err, ae_state *_state) {
             for (j = 0; j < itscnt; j++) {
                v = rdotrr(n, &state.qi, i, &state.qi, j, _state);
                if (i == j) {
-                  v = v - 1;
+                  v--;
                }
                set_error_flag(err, ae_fabs(v, _state) > 100 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:389");
             }
@@ -20345,13 +20345,13 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          set_error_flag(err, ae_fabs(rdotv2(n, &ax, _state) - v, _state) > tol * (1 + rdotv2(n, &ax, _state)), __FILE__, __LINE__, "testiterativesparseunit.ap:376");
          set_error_flag(err, v > rprev + tol, __FILE__, __LINE__, "testiterativesparseunit.ap:377");
          rprev = v;
-         nreports = nreports + 1;
+         nreports++;
          continue;
       }
       ae_assert(requesttype == 0, "SparseSolverSolve: integrity check 5364 failed", _state);
       sparsesolveroocgetrequestdata(&solver, &xr, _state);
       sparsemv(&crsa, &xr, &ax, _state);
-      nmv = nmv + 1;
+      nmv++;
       sparsesolveroocsendresult(&solver, &ax, _state);
    }
    sparsesolveroocstop(&solver, &x, &rep, _state);
@@ -20519,7 +20519,7 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
                mtx.xyR[numofit][i] = state.x.xR[i];
             }
             getrnorm = state.r2;
-            numofit = numofit + 1;
+            numofit++;
          }
       }
       lincgresults(&state, &x0, &rep, _state);
@@ -20879,7 +20879,7 @@ static bool testlincgunit_basictestx(bool silent, ae_state *_state) {
                   x01.xR[i] = s.x.xR[i];
                }
             }
-            iters = iters + 1;
+            iters++;
          }
       }
    // Check first and last points
@@ -21076,7 +21076,7 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             }
          }
          if (s.xupdated) {
-            iters = iters + 1;
+            iters++;
          }
       }
       lincgresults(&s, &x0, &rep, _state);
@@ -21129,7 +21129,7 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             }
          }
          if (s.xupdated) {
-            iters = iters + 1;
+            iters++;
          }
       }
       lincgresults(&s, &x0, &rep, _state);
@@ -21213,7 +21213,7 @@ static void testlincgunit_gramshmidtortnorm(RMatrix *a, ae_int_t n, ae_int_t k, 
             b->xyR[*k2][j] = b->xyR[*k2][j] / tmp;
          }
       }
-      *k2 = *k2 + 1;
+      ++*k2;
    }
 }
 
@@ -21384,7 +21384,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                mtx.xyR[numofit][i] = s.x.xR[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
    // Check that I-th step S_i=X[I+1]-X[i] belongs to I-th Krylov subspace.
@@ -21638,7 +21638,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                mtx.xyR[numofit][i] = s.x.xR[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
       lincgsetstartingpoint(&s, &tx0, _state);
@@ -21678,7 +21678,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                mtprex.xyR[numofit][i] = s.x.xR[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
    // Compare results - sequence of points generated when solving original problem with
@@ -21993,7 +21993,7 @@ bool testnormestimator(bool silent, ae_state *_state) {
       normestimatorestimatesparse(&e2, &s, _state);
       normestimatorresults(&e2, &enorm2, _state);
       if (ae_fabs(enorm2 - snorm, _state) < ae_fabs(enorm - snorm, _state)) {
-         nbetter = nbetter + 1;
+         nbetter++;
       }
    }
    waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * ae_sqrt(0.25 * passcount, _state);
@@ -22021,7 +22021,7 @@ bool testnormestimator(bool silent, ae_state *_state) {
       normestimatorestimatesparse(&e2, &s, _state);
       normestimatorresults(&e2, &enorm2, _state);
       if (ae_fabs(enorm2 - snorm, _state) < ae_fabs(enorm - snorm, _state)) {
-         nbetter = nbetter + 1;
+         nbetter++;
       }
    }
    waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * ae_sqrt(0.25 * passcount, _state);
@@ -22865,7 +22865,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
                      return result;
                   }
                   rnorm = s.r2;
-                  its = its + 1;
+                  its++;
                // get X value from first iteration
                // and from last iteration.
                   if (its == 0) {
@@ -23243,7 +23243,7 @@ static bool testlinlsqrunit_analytictest(bool silent, ae_state *_state) {
             if (s.xupdated) {
                ae_assert(pointsstored < xk.rows, "LinLSQR test: internal error", _state);
                ae_v_move(xk.xyR[pointsstored], 1, s.x.xR, 1, n);
-               pointsstored = pointsstored + 1;
+               pointsstored++;
             }
          }
          if (pointsstored < 3) {
@@ -23908,15 +23908,15 @@ bool testnleq(bool silent, ae_state *_state) {
       // update info and continue
          ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          flast = state.f;
-         itcnt = itcnt + 1;
+         itcnt++;
          continue;
       }
       if (state.needf) {
-         nfunc = nfunc + 1;
+         nfunc++;
       }
       if (state.needfij) {
-         nfunc = nfunc + 1;
-         njac = njac + 1;
+         nfunc++;
+         njac++;
       }
       testnlequnit_testfunchbm(&state, _state);
    }
@@ -24034,7 +24034,7 @@ static bool testmatinvunit_rmatrixcheckinverse(RMatrix *a, RMatrix *inva, ae_int
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
             if (i == j) {
-               v = v - 1;
+               v--;
             }
             result = result && ae_fabs(v, _state) <= threshold;
          }
@@ -24099,7 +24099,7 @@ static bool testmatinvunit_spdmatrixcheckinverse(RMatrix *a, RMatrix *inva, bool
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
             if (i == j) {
-               v = v - 1;
+               v--;
             }
             result = result && ae_fabs(v, _state) <= threshold;
          }
@@ -26369,7 +26369,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.xR[varidx] = state.g.xR[varidx] + 1;
+                  state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
                   state.g.xR[varidx] = state.g.xR[varidx] * 2;
@@ -26410,7 +26410,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] + 1;
+            jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
             jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
@@ -31201,7 +31201,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.xR[varidx] = state.g.xR[varidx] + 1;
+                  state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
                   state.g.xR[varidx] = state.g.xR[varidx] * 2;
@@ -31242,7 +31242,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] + 1;
+            jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
             jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
@@ -35957,7 +35957,7 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
             if (rawc->xyR[i][j] != 0.0) {
                cv.xR[nnz] = rawc->xyR[i][j];
                ci.xZ[nnz] = j;
-               nnz = nnz + 1;
+               nnz++;
             }
          }
       // Add duplicates which do not change constraint (after simplification)
@@ -35966,7 +35966,7 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
             ci.xZ[nnz] = ci.xZ[j];
             cv.xR[nnz] = hqrndnormal(rs, _state);
             cv.xR[j] = cv.xR[j] - cv.xR[nnz];
-            nnz = nnz + 1;
+            nnz++;
          }
       // Add constraint to the set
          minqpaddlc2(state, &ci, &cv, nnz, rawcl->xR[i], rawcu->xR[i], _state);
@@ -36243,7 +36243,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                   }
                   activeset.xyR[i][nactive] = 1.0;
                   activeeq.xB[nactive] = true;
-                  nactive = nactive + 1;
+                  nactive++;
                } else {
                // I-th box constraint is inequality one
                   for (j = 0; j < n; j++) {
@@ -36263,7 +36263,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                      }
                   }
                   activeeq.xB[nactive] = false;
-                  nactive = nactive + 1;
+                  nactive++;
                }
             }
             for (i = 0; i < rawccnt - 1; i++) {
@@ -36296,7 +36296,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                      activeset.xyR[j][nactive] = rawc.xyR[i][j];
                   }
                   activeeq.xB[nactive] = true;
-                  nactive = nactive + 1;
+                  nactive++;
                } else {
                // I-th box constraint is inequality one
                   v = ae_v_dotproduct(rawc.xyR[i], 1, gs.xR, 1, n);
@@ -36312,7 +36312,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                      }
                   }
                   activeeq.xB[nactive] = false;
-                  nactive = nactive + 1;
+                  nactive++;
                }
             }
             ae_v_moveneg(tmp.xR, 1, gs.xR, 1, n);
@@ -39467,22 +39467,22 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state, a
    bool result;
    nset = 0;
    if (state->needfi) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needf) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfg) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfij) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfgh) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->xupdated) {
-      nset = nset + 1;
+      nset++;
    }
    if (nset != 1) {
       result = false;
@@ -41044,7 +41044,7 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                         state.j.xyR[funcidx][varidx] = 0.0;
                      }
                      if (defecttype == 1) {
-                        state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] + 1;
+                        state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
                         state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] * 2;
@@ -41097,7 +41097,7 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                jacdefect.xyR[funcidx][varidx] = 0.0;
             }
             if (defecttype == 1) {
-               jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] + 1;
+               jacdefect.xyR[funcidx][varidx]++;
             }
             if (defecttype == 2) {
                jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] * 2;
@@ -42344,7 +42344,7 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.xR[varidx] = state.g.xR[varidx] + 1;
+                  state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
                   state.g.xR[varidx] = state.g.xR[varidx] * 2;
@@ -42385,7 +42385,7 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] + 1;
+            jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
             jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
@@ -43995,7 +43995,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
          al->xR[*m] = v;
          au->xR[*m] = v - ae_pow(q, hqrndnormal(rs, _state), _state);
       }
-      *m = *m + 1;
+      ++*m;
       ae_frame_leave(_state);
       return;
    }
@@ -44054,17 +44054,17 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
          if ((ae_isfinite(al->xR[i], _state) && ae_isfinite(au->xR[i], _state)) && al->xR[i] == au->xR[i]) {
             a1.xyR[ccnt][n] = al->xR[i];
             ct.xZ[ccnt] = 0;
-            ccnt = ccnt + 1;
+            ccnt++;
          } else {
             if (ae_isfinite(al->xR[i], _state)) {
                a1.xyR[ccnt][n] = al->xR[i];
                ct.xZ[ccnt] = 1;
-               ccnt = ccnt + 1;
+               ccnt++;
             }
             if (ae_isfinite(au->xR[i], _state)) {
                a1.xyR[ccnt][n] = au->xR[i];
                ct.xZ[ccnt] = -1;
-               ccnt = ccnt + 1;
+               ccnt++;
             }
          }
       }
@@ -44121,7 +44121,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
                if (a->xyR[i][j] != 0.0) {
                   ai.xR[nz] = a->xyR[i][j];
                   idxi.xZ[nz] = j;
-                  nz = nz + 1;
+                  nz++;
                }
             }
             rvectorresize(&ai, nz, _state);
@@ -48598,7 +48598,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                         state.j.xyR[funcidx][varidx] = 0.0;
                      }
                      if (defecttype == 1) {
-                        state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] + 1;
+                        state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
                         state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] * 2;
@@ -48648,7 +48648,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   jacdefect.xyR[funcidx][varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] + 1;
+                  jacdefect.xyR[funcidx][varidx]++;
                }
                if (defecttype == 2) {
                   jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] * 2;
@@ -52708,7 +52708,7 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.xR[varidx] = state.g.xR[varidx] + 1;
+                  state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
                   state.g.xR[varidx] = state.g.xR[varidx] * 2;
@@ -52749,7 +52749,7 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] + 1;
+            jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
             jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
@@ -54213,7 +54213,7 @@ bool testodesolver(bool silent, ae_state *_state) {
          while (odesolveriteration(&state, _state)) {
             state.dy.xR[0] = state.y.xR[1];
             state.dy.xR[1] = -state.y.xR[0];
-            mynfev = mynfev + 1;
+            mynfev++;
          }
          odesolverresults(&state, &m2, &xtbl, &ytbl, &rep, _state);
       // check results
@@ -54263,7 +54263,7 @@ bool testodesolver(bool silent, ae_state *_state) {
       odesolverrkck(&y, 1, &xg, m, eps, h, &state, _state);
       while (odesolveriteration(&state, _state)) {
          state.dy.xR[0] = maxreal(state.x - 1, 0.0, _state);
-         mynfev = mynfev + 1;
+         mynfev++;
       }
       odesolverresults(&state, &m2, &xtbl, &ytbl, &rep, _state);
       if (rep.terminationtype <= 0) {
@@ -57062,7 +57062,7 @@ bool testmannwhitneyu(bool silent, ae_state *_state) {
          }
          mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr, _state);
          if (tailb < 0.05) {
-            k = k + 1;
+            k++;
          }
       }
       v = ae_fabs((double)k / testcnt - 0.05, _state);
@@ -57500,7 +57500,7 @@ static void testratintunit_poldiff2(RVector *x, RVector *f, ae_int_t n, double t
    *d2p = 0;
    NewVector(df, 0, DT_REAL, _state);
    NewVector(d2f, 0, DT_REAL, _state);
-   n = n - 1;
+   n--;
    ae_vector_set_length(&df, n + 1, _state);
    ae_vector_set_length(&d2f, n + 1, _state);
    for (i = 0; i <= n; i++) {
@@ -57997,7 +57997,7 @@ static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny
             yy.xyR[i][j] = yy.xyR[i + 1][j] - yy.xyR[i][j];
          }
       }
-      nsteps = nsteps - 1;
+      nsteps--;
    }
    ae_frame_leave(_state);
 }
@@ -58193,7 +58193,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
                xy.xyR[i][nx + j] = hqrndnormal(&rs, _state);
                meany.xR[j] = meany.xR[j] + xy.xyR[i][nx + j] / n;
             }
-            i = i + 1;
+            i++;
          }
       // Build IDW model
          initdone = false;
@@ -58405,7 +58405,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
                refrss = refrss + 2 * v * v;
             }
          // Next I
-            i = i + 1;
+            i++;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < ny; j++) {
@@ -58740,7 +58740,7 @@ static double testpolintunit_internalpolint(RVector *x, RVector *f, ae_int_t n, 
    double result;
    ae_frame_make(_state, &_frame_block);
    DupVector(f, _state);
-   n = n - 1;
+   n--;
    for (j = 0; j < n; j++) {
       for (i = j + 1; i <= n; i++) {
          f->xR[i] = ((t - x->xR[j]) * f->xR[i] - (t - x->xR[i]) * f->xR[j]) / (x->xR[i] - x->xR[j]);
@@ -59169,7 +59169,7 @@ static bool testspline1dunit_enumerateallsplines(RVector *x, RVector *y, ae_int_
    if (*splineindex == 0) {
    // Linear spline
       spline1dbuildlinear(x, y, n, s, _state);
-      *splineindex = *splineindex + 1;
+      ++*splineindex;
       result = true;
       return result;
    } else {
@@ -59183,7 +59183,7 @@ static bool testspline1dunit_enumerateallsplines(RVector *x, RVector *y, ae_int_
          // Non-periodic spline
             spline1dbuildcubic(x, y, n, idxoffs / 3, 2 * randomreal(_state) - 1, idxoffs % 3, 2 * randomreal(_state) - 1, s, _state);
          }
-         *splineindex = *splineindex + 1;
+         ++*splineindex;
          result = true;
          return result;
       }
@@ -59731,7 +59731,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
          set_error_flag(fiterrors, penalty >= prevpenalty, __FILE__, __LINE__, "testspline1dunit.ap:1683");
          prevresiduals = residuals;
          prevpenalty = penalty;
-         rho = rho + 1;
+         rho++;
       }
       set_error_flag(fiterrors, penalty >= 1.0E-6, __FILE__, __LINE__, "testspline1dunit.ap:1688");
       set_error_flag(fiterrors, mxd2 >= 1.0E-3, __FILE__, __LINE__, "testspline1dunit.ap:1689");
@@ -62546,13 +62546,13 @@ static void testlsfitunit_fitlinearnonlinear(ae_int_t m, ae_int_t deravailable, 
       }
       i = 0;
       if (state->needf) {
-         i = i + 1;
+         i++;
       }
       if (state->needfg) {
-         i = i + 1;
+         i++;
       }
       if (state->needfgh) {
-         i = i + 1;
+         i++;
       }
       if (i != 1) {
          *nlserrors = true;
@@ -63125,15 +63125,15 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + ae_fabs(c.xR[i] - cend.xR[i], _state) / rep.errpar.xR[i]) / (adpcnt + 1);
-               adpcnt = adpcnt + 1;
+               adpcnt++;
             }
             for (i = 0; i < a.rows; i++) {
                v1 = ae_v_dotproduct(c.xR, 1, a.xyR[i], 1, n);
                v2 = ae_v_dotproduct(cend.xR, 1, a.xyR[i], 1, n);
                avgdeviationcurve = (avgdeviationcurve * adccnt + ae_fabs(v1 - v2, _state) / rep.errcurve.xR[i]) / (adccnt + 1);
-               adccnt = adccnt + 1;
+               adccnt++;
                avgdeviationnoise = (avgdeviationnoise * adncnt + rep.noise.xR[i] / s.xR[i]) / (adncnt + 1);
-               adncnt = adncnt + 1;
+               adncnt++;
             }
          // Check that estimates are not too optimistic.
          // This test is performed always.
@@ -63887,7 +63887,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
          eavg = eavg + ae_fabs(v, _state);
          if (y.xR[i] != 0.0) {
             eavgrel = eavgrel + ae_fabs(v / y.xR[i], _state);
-            k = k + 1;
+            k++;
          }
          emax = maxreal(emax, ae_fabs(v, _state), _state);
       }
@@ -64495,7 +64495,7 @@ static void testfitsphereunit_testspherefittingns(bool *err, ae_state *_state) {
 // Used to initialize dynamic array with constant values
 static void testfitsphereunit_addvalue(RMatrix *xy, ae_int_t *cnt, double v, ae_state *_state) {
    xy->xyR[*cnt / xy->cols][*cnt % xy->cols] = v;
-   *cnt = *cnt + 1;
+   ++*cnt;
 }
 
 // This function tests sphere fitting
@@ -67839,7 +67839,7 @@ static bool testspline3dunit_basictest(ae_state *_state) {
             for (i = 0; i < n; i++) {
                for (di = 0; di < d; di++) {
                   vf.xR[offs] = di + ax * i + ay * j + az * k + axy * i * j + ayz * j * k;
-                  offs = offs + 1;
+                  offs++;
                }
             }
          }
@@ -68689,7 +68689,7 @@ static bool basicmultilayerrbf1dtest(ae_state *_state) {
             return result;
          }
          q = q / 2;
-         nlayers = nlayers + 1;
+         nlayers++;
          if (errtype == 1 && q <= 1 / f2) {
             errtype = 2;
          }
@@ -73909,7 +73909,7 @@ bool testpca(bool silent, ae_state *_state) {
             for (j = 0; j < m; j++) {
                t = ae_v_dotproduct(&v.xyR[0][i], v.stride, &v.xyR[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                pcaorterrors = pcaorterrors || ae_fabs(t, _state) > threshold;
             }
@@ -73976,7 +73976,7 @@ bool testpca(bool silent, ae_state *_state) {
          for (j = 0; j < m; j++) {
             t = ae_v_dotproduct(&v.xyR[0][i], v.stride, &v.xyR[0][j], v.stride, m);
             if (i == j) {
-               t = t - 1;
+               t--;
             }
             pcaorterrors = pcaorterrors || ae_fabs(t, _state) > threshold;
          }
@@ -74014,7 +74014,7 @@ bool testpca(bool silent, ae_state *_state) {
             for (j = 0; j < requested; j++) {
                t = ae_v_dotproduct(&v.xyR[0][i], v.stride, &v.xyR[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                set_error_flag(&pcadensesubspaceerrors, ae_fabs(t, _state) > threshold, __FILE__, __LINE__, "testpcaunit.ap:217");
             }
@@ -74103,7 +74103,7 @@ bool testpca(bool silent, ae_state *_state) {
          for (j = 0; j < requested; j++) {
             t = ae_v_dotproduct(&v.xyR[0][i], v.stride, &v.xyR[0][j], v.stride, m);
             if (i == j) {
-               t = t - 1;
+               t--;
             }
             set_error_flag(&pcadensesubspaceerrors, ae_fabs(t, _state) > threshold, __FILE__, __LINE__, "testpcaunit.ap:323");
          }
@@ -74181,7 +74181,7 @@ bool testpca(bool silent, ae_state *_state) {
             for (j = 0; j < requested; j++) {
                t = ae_v_dotproduct(&v.xyR[0][i], v.stride, &v.xyR[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                set_error_flag(&pcasparsesubspaceerrors, ae_fabs(t, _state) > threshold, __FILE__, __LINE__, "testpcaunit.ap:417");
             }
@@ -74388,9 +74388,9 @@ bool testbdss(bool silent, ae_state *_state) {
          for (i = 0; i < n; i++) {
             a.xR[i] = (double)randominteger(2, _state);
             if (a.xR[i] == 0.0) {
-               c0 = c0 + 1;
+               c0++;
             } else {
-               c1 = c1 + 1;
+               c1++;
             }
             a0.xR[i] = a.xR[i];
             at.xR[i] = a.xR[i];
@@ -74779,10 +74779,10 @@ bool testbdss(bool silent, ae_state *_state) {
             a.xR[i] = (double)(i / ((n + 1) / 2));
             c.xZ[i] = i / ((n + 1) / 2);
             if (c.xZ[i] == 0) {
-               c0 = c0 + 1;
+               c0++;
             }
             if (c.xZ[i] == 1) {
-               c1 = c1 + 1;
+               c1++;
             }
          }
          dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
@@ -74876,10 +74876,10 @@ bool testbdss(bool silent, ae_state *_state) {
             a.xR[i] = (double)(i / ((n + 1) / 2));
             c.xZ[i] = i / ((n + 1) / 2);
             if (c.xZ[i] == 0) {
-               c0 = c0 + 1;
+               c0++;
             }
             if (c.xZ[i] == 1) {
-               c1 = c1 + 1;
+               c1++;
             }
          }
          dssplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
@@ -76615,7 +76615,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             refavgerror = refavgerror + ae_fabs(y.xR[j] - y1.xR[j], _state);
             if (y1.xR[j] != 0.0) {
                refavgrelerror = refavgrelerror + ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
-               avgrelcnt = avgrelcnt + 1;
+               avgrelcnt++;
             }
             if (y.xR[j] > y.xR[nnmax]) {
                nnmax = j;
@@ -76625,7 +76625,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             }
          }
          if (nnmax != dsmax) {
-            refclserror = refclserror + 1;
+            refclserror++;
          }
       }
       sparseconverttocrs(&sparsexy, _state);
@@ -77509,7 +77509,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             refavgerror = refavgerror + ae_fabs(y.xR[j] - y1.xR[j], _state);
             if (y1.xR[j] != 0.0) {
                refavgrelerror = refavgrelerror + ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
-               avgrelcnt = avgrelcnt + 1;
+               avgrelcnt++;
             }
             if (y.xR[j] > y.xR[nnmax]) {
                nnmax = j;
@@ -77519,7 +77519,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             }
          }
          if (nnmax != dsmax) {
-            refclserror = refclserror + 1;
+            refclserror++;
          }
       }
       sparseconverttocrs(&sparsexy, _state);
@@ -77896,11 +77896,11 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       t = 0;
       for (j = 0; j < clustersizes.xZ[rep->z.xyZ[mergeidx][0]]; j++) {
          cm.xyZ[npoints + mergeidx][t] = cm.xyZ[rep->z.xyZ[mergeidx][0]][j];
-         t = t + 1;
+         t++;
       }
       for (j = 0; j < clustersizes.xZ[rep->z.xyZ[mergeidx][1]]; j++) {
          cm.xyZ[npoints + mergeidx][t] = cm.xyZ[rep->z.xyZ[mergeidx][1]][j];
-         t = t + 1;
+         t++;
       }
       clustersizes.xZ[npoints + mergeidx] = t;
       clustersizes.xZ[rep->z.xyZ[mergeidx][0]] = 0;
@@ -77941,7 +77941,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
                for (i0 = 0; i0 < clustersizes.xZ[i]; i0++) {
                   for (i1 = 0; i1 < clustersizes.xZ[npoints + mergeidx]; i1++) {
                      v = v + d->xyR[cm.xyZ[i][i0]][cm.xyZ[npoints + mergeidx][i1]];
-                     t = t + 1;
+                     t++;
                   }
                }
                v = v / t;
@@ -79575,7 +79575,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
       }
    // Calculate statistic.
       if (ea < eb) {
-         p = p + 1;
+         p++;
       }
       if (ea == eb) {
          p = p + 0.5;
@@ -80197,7 +80197,7 @@ static void testdforestunit_basictest2(bool *err, ae_state *_state) {
          if (x.xR[0] > 2.0) {
             avgerr = avgerr + ae_fabs(1 - y.xR[1], _state);
          }
-         cnt = cnt + 1;
+         cnt++;
       // Advance
          x.xR[0] = x.xR[0] + 0.01;
       }
@@ -80388,7 +80388,7 @@ static void testdforestunit_basictest4(bool *err, ae_state *_state) {
             dfprocess(&df, &x, &y, _state);
             maxerr = maxreal(maxerr, ae_fabs(y.xR[0] - ey, _state), _state);
             avgerr = avgerr + ae_fabs(y.xR[0] - ey, _state);
-            cnt = cnt + 1;
+            cnt++;
          }
       }
       avgerr = avgerr / cnt;
@@ -80564,7 +80564,7 @@ static void testdforestunit_basictestrandom(bool *err, ae_state *_state) {
                refavg = refavg + ae_fabs(v, _state);
                if (xy.xyR[i][nvars] != 0.0) {
                   refavgrel = refavgrel + ae_fabs(v / xy.xyR[i][nvars], _state);
-                  relcnt = relcnt + 1;
+                  relcnt++;
                }
             }
             refrms = ae_sqrt(refrms / npoints, _state);
@@ -80599,7 +80599,7 @@ static void testdforestunit_basictestrandom(bool *err, ae_state *_state) {
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
                   if ((double)j == xy.xyR[i][nvars]) {
-                     v = v - 1;
+                     v--;
                   }
                   refrms = refrms + sqr(v, _state);
                   refavg = refavg + ae_fabs(v, _state);
@@ -80719,7 +80719,7 @@ static void testdforestunit_basictestallsame(bool *err, ae_state *_state) {
             refavg = refavg + ae_fabs(v, _state);
             if (xy.xyR[i][nvars] != 0.0) {
                refavgrel = refavgrel + ae_fabs(v / xy.xyR[i][nvars], _state);
-               relcnt = relcnt + 1;
+               relcnt++;
             }
          }
          refrms = ae_sqrt(refrms / npoints, _state);
@@ -80747,7 +80747,7 @@ static void testdforestunit_basictestallsame(bool *err, ae_state *_state) {
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
                if ((double)j == xy.xyR[i][nvars]) {
-                  v = v - 1;
+                  v--;
                }
                refrms = refrms + sqr(v, _state);
                refavg = refavg + ae_fabs(v, _state);
@@ -81191,7 +81191,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                return;
             }
             set_error_flag(err, tmp.xR[rep.topvars.xZ[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1873");
-            tmp.xR[rep.topvars.xZ[j]] = tmp.xR[rep.topvars.xZ[j]] + 1;
+            tmp.xR[rep.topvars.xZ[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
             set_error_flag(err, rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1877");
@@ -81269,7 +81269,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                return;
             }
             set_error_flag(err, tmp.xR[rep.topvars.xZ[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1964");
-            tmp.xR[rep.topvars.xZ[j]] = tmp.xR[rep.topvars.xZ[j]] + 1;
+            tmp.xR[rep.topvars.xZ[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
             set_error_flag(err, rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1968");
@@ -84379,7 +84379,7 @@ static void testssaunit_testspecial(bool *errorflag, ae_state *_state) {
                for (j = 0; j < windowwidth; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, a.xyR[j], 1, windowwidth);
                   if (i == j) {
-                     v = v - 1;
+                     v--;
                   }
                   set_error_flag(errorflag, ae_fabs(v, _state) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1899");
                }
@@ -84779,7 +84779,7 @@ static void testldaunit_fishers(RMatrix *xy, ae_int_t npoints, ae_int_t nfeature
    for (i = 0; i < npoints; i++) {
       ae_v_add(mu.xR, 1, xy->xyR[i], 1, nfeatures);
       ae_v_add(muc.xyR[c.xZ[i]], 1, xy->xyR[i], 1, nfeatures);
-      nc.xZ[c.xZ[i]] = nc.xZ[c.xZ[i]] + 1;
+      nc.xZ[c.xZ[i]]++;
    }
    for (i = 0; i < nclasses; i++) {
       v = 1.0 / nc.xZ[i];
@@ -86183,7 +86183,7 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
          *avg = *avg + ae_fabs(v, _state);
          if (ey.xR[j] != 0.0) {
             *avgrel = *avgrel + ae_fabs(v / ey.xR[j], _state);
-            relcnt = relcnt + 1;
+            relcnt++;
          }
       }
       if (iscls) {
@@ -86197,14 +86197,14 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
          // of the uncertainty interval for the classification error.
             for (j = 0; j < nout; j++) {
                if (j != iround(xy->xyR[i][nvars], _state) && y.xR[j] == mxy) {
-                  *relcls1 = *relcls1 + 1;
+                  ++*relcls1;
                   break;
                }
             }
          } else {
          // Both bounds of the error range are increased by 1
-            *relcls0 = *relcls0 + 1;
-            *relcls1 = *relcls1 + 1;
+            ++*relcls0;
+            ++*relcls1;
          }
       }
    }
@@ -86735,7 +86735,7 @@ static void testknnunit_testknnalgo(bool *err, ae_state *_state) {
       v = ae_fabs(y1.xR[0] - v, _state);
       maxerr = maxreal(maxerr, v, _state);
       avgerr = avgerr + v;
-      cnt = cnt + 1;
+      cnt++;
    }
    avgerr = avgerr / cnt;
    set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testknnunit.ap:669");
@@ -87080,7 +87080,7 @@ static bool testmlptrainunit_testmlpxorregr(ae_state *_state) {
             averr = averr + ae_fabs(y.xR[0] - xy.xyR[i][2], _state);
          }
          if (averr / n > eps) {
-            nfailures = nfailures + 1;
+            nfailures++;
          }
       }
    }
@@ -87564,7 +87564,7 @@ static bool testmlptrainunit_testmlprestarts(ae_state *_state) {
          e1 = ae_v_dotproduct(net1.weights.xR, 1, net1.weights.xR, 1, wcount1);
          e1 = mlperrorn(&net1, &xy, n, _state) + 0.5 * vdecay * e1;
          if (e0 <= e1) {
-            avval = avval + 1;
+            avval++;
          }
       }
       if (mean - numsigma < avval) {
@@ -87773,20 +87773,20 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
       mlpkfoldcv(&trainer, &net, nneedrest, foldscount, &cvrep, _state);
       if (!isregr) {
          if (ae_fabs(tstrelclserror - rep.relclserror, _state) < ae_fabs(tstrelclserror - cvrep.relclserror, _state)) {
-            r0 = r0 + 1;
+            r0++;
          }
          if (ae_fabs(tstavgce - rep.avgce, _state) < ae_fabs(tstavgce - cvrep.avgce, _state)) {
-            r1 = r1 + 1;
+            r1++;
          }
       }
       if (ae_fabs(tstrmserror - rep.rmserror, _state) < ae_fabs(tstrmserror - cvrep.rmserror, _state)) {
-         r2 = r2 + 1;
+         r2++;
       }
       if (ae_fabs(tstavgerror - rep.avgerror, _state) < ae_fabs(tstavgerror - cvrep.avgerror, _state)) {
-         r3 = r3 + 1;
+         r3++;
       }
       if (ae_fabs(tstavgrelerror - rep.avgrelerror, _state) < ae_fabs(tstavgrelerror - cvrep.avgrelerror, _state)) {
-         r4 = r4 + 1;
+         r4++;
       }
    }
    if (!isregr) {
@@ -87923,10 +87923,10 @@ static bool testmlptrainunit_testmlptrainens(ae_state *_state) {
                result = true;
             } else {
                if (mlpermserror(&ensemble, &xy, npoints, _state) < e) {
-                  nless = nless + 1;
+                  nless++;
                }
             }
-            nall = nall + 1;
+            nall++;
          }
       }
    }
@@ -88169,7 +88169,7 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
          for (j = 0; j < nin; j++) {
             xytrain.xyR[i][j] = delta * (randomreal(_state) - 1);
          }
-         xytrain.xyR[i][val] = xytrain.xyR[i][val] + 1;
+         xytrain.xyR[i][val]++;
          xytrain.xyR[i][nin] = (double)val;
       }
    // Set dense dataset in trainer
@@ -88195,7 +88195,7 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
          for (j = 0; j < nin; j++) {
             xytest.xyR[i][j] = delta * (randomreal(_state) - 1);
          }
-         xytest.xyR[i][val] = xytest.xyR[i][val] + 1;
+         xytest.xyR[i][val]++;
          xytest.xyR[i][nin] = (double)val;
       }
    // Create ensemble
@@ -88698,7 +88698,7 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
       return result;
    }
    seedrec2.bval = !seedrec2.bval;
-   seedrec2.recval.i1val.xZ[0] = seedrec2.recval.i1val.xZ[0] + 1;
+   seedrec2.recval.i1val.xZ[0]++;
    ae_shared_pool_retrieve(&pool, &_prec2, _state);
    if (!(prec2 != NULL)) {
       ae_frame_leave(_state);
@@ -88719,7 +88719,7 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
 // * check that it is unchanged.
    testalglibbasicsunit_createpoolandrecords(&seedrec2, &seedrec2copy, &pool, _state);
    ae_shared_pool_retrieve(&pool, &_prec2, _state);
-   prec2->recval.ival = prec2->recval.ival + 1;
+   prec2->recval.ival++;
    ae_shared_pool_retrieve(&pool, &_prec2, _state);
    if (prec2->recval.ival != seedrec2copy.recval.ival) {
       ae_frame_leave(_state);
@@ -88738,7 +88738,7 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
 // * check that unmodified value was returned,
    testalglibbasicsunit_createpoolandrecords(&seedrec2, &seedrec2copy, &pool, _state);
    ae_shared_pool_retrieve(&pool, &_prec2, _state);
-   prec2->recval.ival = prec2->recval.ival + 1;
+   prec2->recval.ival++;
    ae_shared_pool_recycle(&pool, &_prec2, _state);
    if (prec2 != NULL) {
       ae_frame_leave(_state);
@@ -88786,13 +88786,13 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
    ae_shared_pool_first_recycled(&pool, &_prec2, _state);
    while (prec2 != NULL) {
       if (prec2->recval.ival == 100) {
-         val100cnt = val100cnt + 1;
+         val100cnt++;
       }
       if (prec2->recval.ival == 101) {
-         val101cnt = val101cnt + 1;
+         val101cnt++;
       }
       if (prec2->recval.ival == 102) {
-         val102cnt = val102cnt + 1;
+         val102cnt++;
       }
       ae_shared_pool_next_recycled(&pool, &_prec2, _state);
    }
@@ -88806,13 +88806,13 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
    ae_shared_pool_first_recycled(&pool, &_prec2, _state);
    while (prec2 != NULL) {
       if (prec2->recval.ival == 100) {
-         val100cnt = val100cnt + 1;
+         val100cnt++;
       }
       if (prec2->recval.ival == 101) {
-         val101cnt = val101cnt + 1;
+         val101cnt++;
       }
       if (prec2->recval.ival == 102) {
-         val102cnt = val102cnt + 1;
+         val102cnt++;
       }
       ae_shared_pool_next_recycled(&pool, &_prec2, _state);
    }
@@ -88840,7 +88840,7 @@ static bool testalglibbasicsunit_sharedpoolerrors(ae_state *_state) {
       return result;
    }
    ae_shared_pool_retrieve(ppool0, &_p0, _state);
-   p0->recval.ival = p0->recval.ival + 1;
+   p0->recval.ival++;
    tmpval = p0->recval.ival;
    ae_shared_pool_recycle(ppool0, &_p0, _state);
    ae_shared_pool_retrieve(ppool1, &_p1, _state);
@@ -88991,24 +88991,24 @@ static void testalglibbasicsunit_mergesortedarrays(ZVector *a, ZVector *buf, ae_
       }
       if (srcleft == idx1) {
          buf->xZ[dst] = a->xZ[srcright];
-         srcright = srcright + 1;
-         dst = dst + 1;
+         srcright++;
+         dst++;
          continue;
       }
       if (srcright == idx2) {
          buf->xZ[dst] = a->xZ[srcleft];
-         srcleft = srcleft + 1;
-         dst = dst + 1;
+         srcleft++;
+         dst++;
          continue;
       }
       if (a->xZ[srcleft] < a->xZ[srcright]) {
          buf->xZ[dst] = a->xZ[srcleft];
-         srcleft = srcleft + 1;
-         dst = dst + 1;
+         srcleft++;
+         dst++;
       } else {
          buf->xZ[dst] = a->xZ[srcright];
-         srcright = srcright + 1;
-         dst = dst + 1;
+         srcright++;
+         dst++;
       }
    }
    for (dst = idx0; dst < idx2; dst++) {
