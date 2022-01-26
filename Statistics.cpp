@@ -60,18 +60,18 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->xR[i];
+      *mean += x->xR[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - (*mean), _state);
+         v1 += sqr(x->xR[i] - (*mean), _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - (*mean));
+         v2 += (x->xR[i] - (*mean));
       }
       v2 = sqr(v2, _state) / n;
       *variance = (v1 - v2) / (n - 1);
@@ -85,10 +85,10 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
       for (i = 0; i < n; i++) {
          v = (x->xR[i] - (*mean)) / stddev;
          v2 = sqr(v, _state);
-         *skewness = *skewness + v2 * v;
-         *kurtosis = *kurtosis + sqr(v2, _state);
+         *skewness += v2 * v;
+         *kurtosis += sqr(v2, _state);
       }
-      *skewness = *skewness / n;
+      *skewness /= n;
       *kurtosis = *kurtosis / n - 3;
    }
 }
@@ -225,14 +225,14 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
    }
 // Mean
    for (i = 0; i < n; i++) {
-      mean = mean + x->xR[i];
+      mean += x->xR[i];
    }
-   mean = mean / n;
+   mean /= n;
 // ADev
    for (i = 0; i < n; i++) {
-      *adev = *adev + ae_fabs(x->xR[i] - mean, _state);
+      *adev += ae_fabs(x->xR[i] - mean, _state);
    }
-   *adev = *adev / n;
+   *adev /= n;
 }
 
 // Median calculation.
@@ -397,7 +397,7 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
    }
    t = p * (n - 1);
    i1 = ifloor(t, _state);
-   t = t - ifloor(t, _state);
+   t -= ifloor(t, _state);
    *v = x->xR[i1] * (1 - t) + x->xR[i1 + 1] * t;
    ae_frame_leave(_state);
 }
@@ -643,10 +643,10 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       s = x->xR[i];
       samex = samex && s == x0;
-      xmean = xmean + s * v;
+      xmean += s * v;
       s = y->xR[i];
       samey = samey && s == y0;
-      ymean = ymean + s * v;
+      ymean += s * v;
    }
    if (samex || samey) {
       result = 0.0;
@@ -656,7 +656,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    v = 1.0 / (n - 1);
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + v * (x->xR[i] - xmean) * (y->xR[i] - ymean);
+      result += v * (x->xR[i] - xmean) * (y->xR[i] - ymean);
    }
    return result;
 }
@@ -721,10 +721,10 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       s = x->xR[i];
       samex = samex && s == x0;
-      xmean = xmean + s * v;
+      xmean += s * v;
       s = y->xR[i];
       samey = samey && s == y0;
-      ymean = ymean + s * v;
+      ymean += s * v;
    }
    if (samex || samey) {
       result = 0.0;
@@ -737,9 +737,9 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       t1 = x->xR[i] - xmean;
       t2 = y->xR[i] - ymean;
-      xv = xv + sqr(t1, _state);
-      yv = yv + sqr(t2, _state);
-      s = s + t1 * t2;
+      xv += sqr(t1, _state);
+      yv += sqr(t2, _state);
+      s += t1 * t2;
    }
    if (xv == 0.0 || yv == 0.0) {
       result = 0.0;
@@ -931,7 +931,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
    for (i = 0; i < m; i++) {
       v = t.xR[i];
       for (j = 0; j < m; j++) {
-         c->xyR[i][j] = c->xyR[i][j] * v * t.xR[j];
+         c->xyR[i][j] *= v * t.xR[j];
       }
    }
    ae_frame_leave(_state);
@@ -1004,10 +1004,10 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
       x0 = xc.xyR[i][0];
       for (j = 0; j < n; j++) {
          vv = xc.xyR[i][j];
-         v = v + vv;
+         v += vv;
          b = b && vv == x0;
       }
-      v = v / n;
+      v /= n;
    // Center/zero I-th variable
       if (b) {
       // Zero
@@ -1017,7 +1017,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
       } else {
       // Center
          for (j = 0; j < n; j++) {
-            xc.xyR[i][j] = xc.xyR[i][j] - v;
+            xc.xyR[i][j] -= v;
          }
       }
    }
@@ -1034,7 +1034,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
    for (i = 0; i < m; i++) {
       v = t.xR[i];
       for (j = i; j < m; j++) {
-         c->xyR[i][j] = c->xyR[i][j] * v * t.xR[j];
+         c->xyR[i][j] *= v * t.xR[j];
       }
    }
 // force symmetricity
@@ -1252,7 +1252,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
          if (samex.xB[j]) {
             x->xyR[i][j] = 0.0;
          }
-         sx.xR[j] = sx.xR[j] + x->xyR[i][j] * x->xyR[i][j];
+         sx.xR[j] += x->xyR[i][j] * x->xyR[i][j];
       }
    }
    for (j = 0; j < m1; j++) {
@@ -1278,7 +1278,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
          if (samey.xB[j]) {
             y->xyR[i][j] = 0.0;
          }
-         sy.xR[j] = sy.xR[j] + y->xyR[i][j] * y->xyR[i][j];
+         sy.xR[j] += y->xyR[i][j] * y->xyR[i][j];
       }
    }
    for (j = 0; j < m2; j++) {
@@ -1304,7 +1304,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
    for (i = 0; i < m1; i++) {
       v = sx.xR[i];
       for (j = 0; j < m2; j++) {
-         c->xyR[i][j] = c->xyR[i][j] * v * sy.xR[j];
+         c->xyR[i][j] *= v * sy.xR[j];
       }
    }
    ae_frame_leave(_state);
@@ -1401,10 +1401,10 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       x0 = xc.xyR[i][0];
       for (j = 0; j < n; j++) {
          vv = xc.xyR[i][j];
-         v = v + vv;
+         v += vv;
          b = b && vv == x0;
       }
-      v = v / n;
+      v /= n;
       if (b) {
          for (j = 0; j < n; j++) {
             xc.xyR[i][j] = 0.0;
@@ -1413,7 +1413,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
          for (j = 0; j < n; j++) {
             vv = xc.xyR[i][j];
             xc.xyR[i][j] = vv - v;
-            v2 = v2 + (vv - v) * (vv - v);
+            v2 += (vv - v) * (vv - v);
          }
       }
       sx.xR[i] = ae_sqrt(v2 / (n - 1), _state);
@@ -1425,10 +1425,10 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       y0 = yc.xyR[i][0];
       for (j = 0; j < n; j++) {
          vv = yc.xyR[i][j];
-         v = v + vv;
+         v += vv;
          b = b && vv == y0;
       }
-      v = v / n;
+      v /= n;
       if (b) {
          for (j = 0; j < n; j++) {
             yc.xyR[i][j] = 0.0;
@@ -1437,7 +1437,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
          for (j = 0; j < n; j++) {
             vv = yc.xyR[i][j];
             yc.xyR[i][j] = vv - v;
-            v2 = v2 + (vv - v) * (vv - v);
+            v2 += (vv - v) * (vv - v);
          }
       }
       sy.xR[i] = ae_sqrt(v2 / (n - 1), _state);
@@ -1462,7 +1462,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    for (i = 0; i < m1; i++) {
       v = sx.xR[i];
       for (j = 0; j < m2; j++) {
-         c->xyR[i][j] = c->xyR[i][j] * v * sy.xR[j];
+         c->xyR[i][j] *= v * sy.xR[j];
       }
    }
    ae_frame_leave(_state);
@@ -2457,7 +2457,7 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 namespace alglib_impl {
 static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
-   *r = *r + c * (*tj);
+   *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
    *tj1 = t;
@@ -4070,18 +4070,18 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
    ae_assert(n > 1, "Assertion failed", _state);
 // Mean
    for (i = 0; i < n; i++) {
-      mean = mean + x->xR[i];
+      mean += x->xR[i];
    }
-   mean = mean / n;
+   mean /= n;
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - mean, _state);
+         v1 += sqr(x->xR[i] - mean, _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - mean);
+         v2 += (x->xR[i] - mean);
       }
       v2 = sqr(v2, _state) / n;
       variance = (v1 - v2) / (n - 1);
@@ -4095,10 +4095,10 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
       for (i = 0; i < n; i++) {
          v = (x->xR[i] - mean) / stddev;
          v2 = sqr(v, _state);
-         skewness = skewness + v2 * v;
-         kurtosis = kurtosis + sqr(v2, _state);
+         skewness += v2 * v;
+         kurtosis += sqr(v2, _state);
       }
-      skewness = skewness / n;
+      skewness /= n;
       kurtosis = kurtosis / n - 3;
    }
 // Statistic
@@ -4409,25 +4409,25 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 // Mean
    xmean = 0.0;
    for (i = 0; i < n; i++) {
-      xmean = xmean + x->xR[i];
+      xmean += x->xR[i];
    }
-   xmean = xmean / n;
+   xmean /= n;
    ymean = 0.0;
    for (i = 0; i < m; i++) {
-      ymean = ymean + y->xR[i];
+      ymean += y->xR[i];
    }
-   ymean = ymean / m;
+   ymean /= m;
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar = xvar + sqr(x->xR[i] - xmean, _state);
+      xvar += sqr(x->xR[i] - xmean, _state);
    }
-   xvar = xvar / (n - 1);
+   xvar /= n - 1;
    yvar = 0.0;
    for (i = 0; i < m; i++) {
-      yvar = yvar + sqr(y->xR[i] - ymean, _state);
+      yvar += sqr(y->xR[i] - ymean, _state);
    }
-   yvar = yvar / (m - 1);
+   yvar /= m - 1;
    if (xvar == 0.0 || yvar == 0.0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -4492,15 +4492,15 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 // Mean
    xmean = 0.0;
    for (i = 0; i < n; i++) {
-      xmean = xmean + x->xR[i];
+      xmean += x->xR[i];
    }
-   xmean = xmean / n;
+   xmean /= n;
 // Variance
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar = xvar + sqr(x->xR[i] - xmean, _state);
+      xvar += sqr(x->xR[i] - xmean, _state);
    }
-   xvar = xvar / (n - 1);
+   xvar /= n - 1;
    if (xvar == 0.0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -4542,7 +4542,7 @@ namespace alglib_impl {
 // Sequential Chebyshev interpolation.
 static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
-   *r = *r + c * (*tj);
+   *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
    *tj1 = t;
@@ -9215,7 +9215,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    w = 0.0;
    for (i = 0; i < ns; i++) {
       if (x->xR[c.xZ[i]] > e) {
-         w = w + r.xR[i];
+         w += r.xR[i];
       }
    }
 // Result
@@ -9253,7 +9253,7 @@ namespace alglib_impl {
 // Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
    double t;
-   *r = *r + c * (*tj);
+   *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
    *tj1 = t;
@@ -12836,7 +12836,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    u = 0.0;
    for (i = 0; i < ns; i++) {
       if (c.xZ[i] == 0) {
-         u = u + r.xR[i];
+         u += r.xR[i];
       }
    }
    u = rmul2((double)n, (double)m, _state) + rmul2((double)n, (double)(n + 1), _state) * 0.5 - u;
@@ -12844,7 +12844,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    mu = rmul2((double)n, (double)m, _state) / 2;
    tmp = ns * (sqr((double)ns, _state) - 1) / 12;
    for (i = 0; i < tiecount; i++) {
-      tmp = tmp - tiesize.xZ[i] * (sqr((double)tiesize.xZ[i], _state) - 1) / 12;
+      tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i], _state) - 1) / 12;
    }
    sigma = ae_sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp, _state);
    s = (u - mu) / sigma;
@@ -13032,13 +13032,13 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    samex = true;
    for (i = 0; i < n; i++) {
       v = x->xR[i];
-      xmean = xmean + v;
+      xmean += v;
       samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
    } else {
-      xmean = xmean / n;
+      xmean /= n;
    }
 // Variance (using corrected two-pass algorithm)
    xvariance = 0.0;
@@ -13046,11 +13046,11 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    if (n != 1 && !samex) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - xmean, _state);
+         v1 += sqr(x->xR[i] - xmean, _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - xmean);
+         v2 += (x->xR[i] - xmean);
       }
       v2 = sqr(v2, _state) / n;
       xvariance = (v1 - v2) / (n - 1);
@@ -13150,35 +13150,35 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    samex = true;
    for (i = 0; i < n; i++) {
       v = x->xR[i];
-      xmean = xmean + v;
+      xmean += v;
       samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
    } else {
-      xmean = xmean / n;
+      xmean /= n;
    }
    ymean = 0.0;
    y0 = y->xR[0];
    samey = true;
    for (i = 0; i < m; i++) {
       v = y->xR[i];
-      ymean = ymean + v;
+      ymean += v;
       samey = samey && v == y0;
    }
    if (samey) {
       ymean = y0;
    } else {
-      ymean = ymean / m;
+      ymean /= m;
    }
 // S
    s = 0.0;
    if (n + m > 2) {
       for (i = 0; i < n; i++) {
-         s = s + sqr(x->xR[i] - xmean, _state);
+         s += sqr(x->xR[i] - xmean, _state);
       }
       for (i = 0; i < m; i++) {
-         s = s + sqr(y->xR[i] - ymean, _state);
+         s += sqr(y->xR[i] - ymean, _state);
       }
       s = ae_sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2), _state);
    }
@@ -13278,41 +13278,41 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    samex = true;
    for (i = 0; i < n; i++) {
       v = x->xR[i];
-      xmean = xmean + v;
+      xmean += v;
       samex = samex && v == x0;
    }
    if (samex) {
       xmean = x0;
    } else {
-      xmean = xmean / n;
+      xmean /= n;
    }
    ymean = 0.0;
    y0 = y->xR[0];
    samey = true;
    for (i = 0; i < m; i++) {
       v = y->xR[i];
-      ymean = ymean + v;
+      ymean += v;
       samey = samey && v == y0;
    }
    if (samey) {
       ymean = y0;
    } else {
-      ymean = ymean / m;
+      ymean /= m;
    }
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    if (n >= 2 && !samex) {
       for (i = 0; i < n; i++) {
-         xvar = xvar + sqr(x->xR[i] - xmean, _state);
+         xvar += sqr(x->xR[i] - xmean, _state);
       }
-      xvar = xvar / (n - 1);
+      xvar /= n - 1;
    }
    yvar = 0.0;
    if (m >= 2 && !samey) {
       for (i = 0; i < m; i++) {
-         yvar = yvar + sqr(y->xR[i] - ymean, _state);
+         yvar += sqr(y->xR[i] - ymean, _state);
       }
-      yvar = yvar / (m - 1);
+      yvar /= m - 1;
    }
 // Handle different special cases
 // (one or both variances are zero).

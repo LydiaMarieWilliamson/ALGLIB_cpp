@@ -225,7 +225,7 @@ ae_uint64_t ae_get_global_threading() {
 // * multithreading, if cores_to_use allows it
 //
 void ae_set_global_threading(ae_uint64_t flg_value) {
-   flg_value = flg_value & _ALGLIB_FLG_THREADING_MASK;
+   flg_value &= _ALGLIB_FLG_THREADING_MASK;
    AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
    _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
 }
@@ -505,7 +505,7 @@ int tickcount() {
    v = now.tv_sec;
    r = v * 1000;
    v = now.tv_usec / 1000;
-   r = r + v;
+   r += v;
    return r;
 #   if 0
    struct timespec now;
@@ -704,7 +704,7 @@ static void ae_static_free(void *block) {
    page_idx = (unsigned char *)block - sm_mem;
    AE_CRITICAL_ASSERT(page_idx >= 0);
    AE_CRITICAL_ASSERT((page_idx % sm_page_size) == 0);
-   page_idx = page_idx / sm_page_size;
+   page_idx /= sm_page_size;
    AE_CRITICAL_ASSERT(page_idx < sm_page_cnt);
    page_cnt = sm_page_tbl[page_idx];
    AE_CRITICAL_ASSERT(page_cnt >= 1);
@@ -1778,8 +1778,8 @@ static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) 
             return;
          }
          r = nb - *n1 % nb;
-         *n1 = *n1 + r;
-         *n2 = *n2 - r;
+         *n1 += r;
+         *n2 -= r;
       }
    }
 }
@@ -6781,7 +6781,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
 // Original generic C implementation
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + x->xR[i] * y->xR[i];
+      result += x->xR[i] * y->xR[i];
    }
    return result;
 }
@@ -6806,7 +6806,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state) 
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, x->xR, a->xyR[i], _state))
    result = 0.0;
    for (j = 0; j < n; j++) {
-      result = result + x->xR[j] * a->xyR[i][j];
+      result += x->xR[j] * a->xyR[i][j];
    }
    return result;
 }
@@ -6831,7 +6831,7 @@ double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_s
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv, (n, a->xyR[ia], b->xyR[ib], _state))
    result = 0.0;
    for (j = 0; j < n; j++) {
-      result = result + a->xyR[ia][j] * b->xyR[ib][j];
+      result += a->xyR[ia][j] * b->xyR[ib][j];
    }
    return result;
 }
@@ -6856,7 +6856,7 @@ double rdotv2(ae_int_t n, RVector *x, ae_state *_state) {
    result = 0.0;
    for (i = 0; i < n; i++) {
       v = x->xR[i];
-      result = result + v * v;
+      result += v * v;
    }
    return result;
 }
@@ -7203,7 +7203,7 @@ void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * v;
+      x->xR[i] *= v;
    }
 }
 
@@ -7224,7 +7224,7 @@ void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) 
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv, (n, v, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] * v;
+      x->xyR[rowidx][i] *= v;
    }
 }
 
@@ -7245,7 +7245,7 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) 
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx, (n, v, x->xR + offsx, _state))
    for (i = 0; i < n; i++) {
-      x->xR[offsx + i] = x->xR[offsx + i] * v;
+      x->xR[offsx + i] *= v;
    }
 }
 
@@ -7267,7 +7267,7 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] + alpha * y->xR[i];
+      x->xR[i] += alpha * y->xR[i];
    }
 }
 
@@ -7289,7 +7289,7 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, a
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] + alpha * y->xR[i];
+      x->xyR[rowidx][i] += alpha * y->xR[i];
    }
 }
 
@@ -7312,7 +7312,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridx], x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] + alpha * y->xyR[ridx][i];
+      x->xR[i] += alpha * y->xyR[ridx][i];
    }
 }
 
@@ -7336,7 +7336,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridxsrc], x->xyR[ridxdst], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[ridxdst][i] = x->xyR[ridxdst][i] + alpha * y->xyR[ridxsrc][i];
+      x->xyR[ridxdst][i] += alpha * y->xyR[ridxsrc][i];
    }
 }
 
@@ -7360,7 +7360,7 @@ void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->xR + offsy, x->xR + offsx, _state))
    for (i = 0; i < n; i++) {
-      x->xR[offsx + i] = x->xR[offsx + i] + alpha * y->xR[offsy + i];
+      x->xR[offsx + i] += alpha * y->xR[offsy + i];
    }
 }
 
@@ -7381,7 +7381,7 @@ void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * y->xR[i];
+      x->xR[i] *= y->xR[i];
    }
 }
 
@@ -7402,7 +7402,7 @@ void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] * y->xR[i];
+      x->xyR[rowidx][i] *= y->xR[i];
    }
 }
 
@@ -7423,7 +7423,7 @@ void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv, (n, y->xyR[rowidx], x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * y->xyR[rowidx][i];
+      x->xR[i] *= y->xyR[rowidx][i];
    }
 }
 
@@ -7779,9 +7779,9 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
       for (i = 0; i < m; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + a->xyR[i][j] * x->xR[j];
+            v += a->xyR[i][j] * x->xR[j];
          }
-         y->xR[i] = alpha * v + y->xR[i];
+         y->xR[i] += alpha * v;
       }
       return;
    }
@@ -7793,7 +7793,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
       for (i = 0; i < n; i++) {
          v = alpha * x->xR[i];
          for (j = 0; j < m; j++) {
-            y->xR[j] = y->xR[j] + v * a->xyR[i][j];
+            y->xR[j] += v * a->xyR[i][j];
          }
       }
       return;
@@ -7866,9 +7866,9 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
       for (i = 0; i < m; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            v += a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
-         y->xR[iy + i] = alpha * v + y->xR[iy + i];
+         y->xR[iy + i] += alpha * v;
       }
       return;
    }
@@ -7880,7 +7880,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
       for (i = 0; i < n; i++) {
          v = alpha * x->xR[ix + i];
          for (j = 0; j < m; j++) {
-            y->xR[iy + j] = y->xR[iy + j] + v * a->xyR[ia + i][ja + j];
+            y->xR[iy + j] += v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -7911,7 +7911,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    for (i = 0; i < m; i++) {
       s = alpha * u->xR[i];
       for (j = 0; j < n; j++) {
-         a->xyR[i][j] = a->xyR[i][j] + s * v->xR[j];
+         a->xyR[i][j] += s * v->xR[j];
       }
    }
 }
@@ -7954,10 +7954,10 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       for (i = n - 1; i >= 0; i--) {
          v = x->xR[ix + i];
          for (j = i + 1; j < n; j++) {
-            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
       }
@@ -7967,10 +7967,10 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
          for (j = 0; j < i; j++) {
-            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
       }
@@ -7980,14 +7980,14 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = i + 1; j < n; j++) {
-            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -7996,14 +7996,14 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
       for (i = n - 1; i >= 0; i--) {
          v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = 0; j < i; j++) {
-            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -8137,7 +8137,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
       baseoffs = offss + (k + blocksize) * sstride;
       v = simdbuf->xR[i * simdwidth];
       for (j = 0; j < blocksize; j++) {
-         v = v - rowstorage->xR[baseoffs + j] * x->xR[cols0 + j];
+         v -= rowstorage->xR[baseoffs + j] * x->xR[cols0 + j];
       }
       simdbuf->xR[i * simdwidth] = v;
    }
@@ -8329,10 +8329,10 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0;
       }
    }
    if (urank == 2) {
@@ -8341,10 +8341,10 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
          offsk = offsu + k * urowstride;
          uk0 = rowstorage->xR[offsk + 0];
          uk1 = rowstorage->xR[offsk + 1];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1;
       }
    }
    if (urank == 3) {
@@ -8354,10 +8354,10 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
          uk0 = rowstorage->xR[offsk + 0];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2;
       }
    }
    if (urank == 4) {
@@ -8368,10 +8368,10 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
       }
    }
    result = true;
@@ -8460,10 +8460,10 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
       }
    } else {
    // Row scatter is performed, less efficient code using double mapping to determine target row index
@@ -8474,10 +8474,10 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] = rowstorage->xR[targetrow + 0] - u00 * uk0 - u01 * uk1 - u02 * uk2 - u03 * uk3;
-         rowstorage->xR[targetrow + 1] = rowstorage->xR[targetrow + 1] - u10 * uk0 - u11 * uk1 - u12 * uk2 - u13 * uk3;
-         rowstorage->xR[targetrow + 2] = rowstorage->xR[targetrow + 2] - u20 * uk0 - u21 * uk1 - u22 * uk2 - u23 * uk3;
-         rowstorage->xR[targetrow + 3] = rowstorage->xR[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
+         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
       }
    }
    result = true;
@@ -10885,7 +10885,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
          }
    // advance row start
       rows_count++;
-      row_start = row_start + row_length + 1;
+      row_start += row_length + 1;
    }
    AE_CRITICAL_ASSERT(rows_count >= 1);
    AE_CRITICAL_ASSERT(cols_count >= 1);

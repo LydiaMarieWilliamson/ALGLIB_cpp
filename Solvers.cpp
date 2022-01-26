@@ -203,9 +203,9 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
    }
    for (i = 1; i < n; i++) {
       v = ae_v_dotproduct(lua->xyR[i], 1, xb->xR, 1, i);
-      xb->xR[i] = xb->xR[i] - v;
+      xb->xR[i] -= v;
    }
-   xb->xR[n - 1] = xb->xR[n - 1] / lua->xyR[n - 1][n - 1];
+   xb->xR[n - 1] /= lua->xyR[n - 1][n - 1];
    for (i = n - 2; i >= 0; i--) {
       v = ae_v_dotproduct(&lua->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
       xb->xR[i] = (xb->xR[i] - v) / lua->xyR[i][i];
@@ -252,7 +252,7 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
    if (isupper) {
    // Solve U'*y=b first.
       for (i = 0; i < n; i++) {
-         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
+         xb->xR[i] /= cha->xyR[i][i];
          if (i < n - 1) {
             v = xb->xR[i];
             ae_v_subd(&xb->xR[i + 1], 1, &cha->xyR[i][i + 1], 1, n - i - 1, v);
@@ -262,22 +262,22 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, b
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
             v = ae_v_dotproduct(&cha->xyR[i][i + 1], 1, &xb->xR[i + 1], 1, n - i - 1);
-            xb->xR[i] = xb->xR[i] - v;
+            xb->xR[i] -= v;
          }
-         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
+         xb->xR[i] /= cha->xyR[i][i];
       }
    } else {
    // Solve L*y=b first
       for (i = 0; i < n; i++) {
          if (i > 0) {
             v = ae_v_dotproduct(cha->xyR[i], 1, xb->xR, 1, i);
-            xb->xR[i] = xb->xR[i] - v;
+            xb->xR[i] -= v;
          }
-         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
+         xb->xR[i] /= cha->xyR[i][i];
       }
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->xR[i] = xb->xR[i] / cha->xyR[i][i];
+         xb->xR[i] /= cha->xyR[i][i];
          if (i > 0) {
             v = xb->xR[i];
             ae_v_subd(xb->xR, 1, cha->xyR[i], 1, i, v);
@@ -4306,7 +4306,7 @@ lbl_2:
    }
    goto lbl_13;
 lbl_14:
-   state->repiterationscount = state->repiterationscount + state->gmressolver.itsperformed;
+   state->repiterationscount += state->gmressolver.itsperformed;
    raddv(state->n, 1.0, &state->gmressolver.xs, &state->xf, _state);
 // Update residual, evaluate residual decrease, terminate if needed
    state->requesttype = 0;
@@ -5400,9 +5400,9 @@ lbl_0:
    state->meritfunction = 0.0;
    for (i = 0; i < state->n; i++) {
       state->r.xR[i] = state->b.xR[i] - state->mv.xR[i];
-      state->r2 = state->r2 + state->r.xR[i] * state->r.xR[i];
-      state->meritfunction = state->meritfunction + state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
-      bnorm = bnorm + state->b.xR[i] * state->b.xR[i];
+      state->r2 += state->r.xR[i] * state->r.xR[i];
+      state->meritfunction += state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
+      bnorm += state->b.xR[i] * state->b.xR[i];
    }
    bnorm = ae_sqrt(bnorm, _state);
 // Output first report
@@ -5471,9 +5471,9 @@ lbl_3:
    }
    state->alpha = 0.0;
    for (i = 0; i < state->n; i++) {
-      state->alpha = state->alpha + state->r.xR[i] * state->z.xR[i];
+      state->alpha += state->r.xR[i] * state->z.xR[i];
    }
-   state->alpha = state->alpha / state->vmv;
+   state->alpha /= state->vmv;
    if (!ae_isfinite(state->alpha, _state)) {
    // Overflow when calculating Alpha
       state->running = false;
@@ -5516,7 +5516,7 @@ lbl_4:
 // Check emergency stopping criterion
    v = 0.0;
    for (i = 0; i < state->n; i++) {
-      v = v + state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
+      v += state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
    }
    if (v < state->meritfunction) {
       goto lbl_14;
@@ -5554,7 +5554,7 @@ lbl_13:
 // NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
    state->r2 = 0.0;
    for (i = 0; i < state->n; i++) {
-      state->r2 = state->r2 + state->cr.xR[i] * state->cr.xR[i];
+      state->r2 += state->cr.xR[i] * state->cr.xR[i];
    }
 // output report
    if (!state->xrep) {
@@ -5609,8 +5609,8 @@ lbl_7:
       state->beta = 0.0;
       uvar = 0.0;
       for (i = 0; i < state->n; i++) {
-         state->beta = state->beta + state->cz.xR[i] * state->cr.xR[i];
-         uvar = uvar + state->z.xR[i] * state->r.xR[i];
+         state->beta += state->cz.xR[i] * state->cr.xR[i];
+         uvar += state->z.xR[i] * state->r.xR[i];
       }
    // check that UVar is't INF or is't zero
       if (!ae_isfinite(uvar, _state) || uvar == 0.0) {
@@ -5620,7 +5620,7 @@ lbl_7:
          return result;
       }
    // calculate .BETA
-      state->beta = state->beta / uvar;
+      state->beta /= uvar;
    // check that .BETA neither INF nor NaN
       if (!ae_isfinite(state->beta, _state)) {
          state->running = false;
@@ -6124,7 +6124,7 @@ void linlsqrsetb(linlsqrstate *state, RVector *b, ae_state *_state) {
    state->bnorm2 = 0.0;
    for (i = 0; i < state->m; i++) {
       state->b.xR[i] = b->xR[i];
-      state->bnorm2 = state->bnorm2 + b->xR[i] * b->xR[i];
+      state->bnorm2 += b->xR[i] * b->xR[i];
    }
 }
 
@@ -6340,11 +6340,11 @@ lbl_13:
 lbl_3:
    state->needmtv = false;
    for (i = 0; i < state->n; i++) {
-      state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->ui.xR[state->m + i];
+      state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
    }
    state->alphai = 0.0;
    for (i = 0; i < state->n; i++) {
-      state->alphai = state->alphai + state->mtv.xR[i] * state->mtv.xR[i];
+      state->alphai += state->mtv.xR[i] * state->mtv.xR[i];
    }
    state->alphai = ae_sqrt(state->alphai, _state);
    if (state->alphai == 0.0) {
@@ -6396,12 +6396,12 @@ lbl_4:
    state->betaip1 = 0.0;
    for (i = 0; i < summn; i++) {
       state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
-      state->betaip1 = state->betaip1 + state->uip1.xR[i] * state->uip1.xR[i];
+      state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
    }
    if (state->betaip1 != 0.0) {
       state->betaip1 = ae_sqrt(state->betaip1, _state);
       for (i = 0; i < summn; i++) {
-         state->uip1.xR[i] = state->uip1.xR[i] / state->betaip1;
+         state->uip1.xR[i] /= state->betaip1;
       }
    }
    ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
@@ -6413,17 +6413,17 @@ lbl_4:
 lbl_5:
    state->needmtv = false;
    for (i = 0; i < state->n; i++) {
-      state->mtv.xR[i] = state->mtv.xR[i] + state->lambdai * state->uip1.xR[state->m + i];
+      state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
    }
    state->alphaip1 = 0.0;
    for (i = 0; i < state->n; i++) {
       state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
-      state->alphaip1 = state->alphaip1 + state->vip1.xR[i] * state->vip1.xR[i];
+      state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
    }
    if (state->alphaip1 != 0.0) {
       state->alphaip1 = ae_sqrt(state->alphaip1, _state);
       for (i = 0; i < state->n; i++) {
-         state->vip1.xR[i] = state->vip1.xR[i] / state->alphaip1;
+         state->vip1.xR[i] /= state->alphaip1;
       }
    }
 // Build next orthogonal transformation
@@ -6446,7 +6446,7 @@ lbl_5:
 // Update d and DNorm, check condition-related stopping criteria
    for (i = 0; i < state->n; i++) {
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
-      state->dnorm = state->dnorm + state->d.xR[i] * state->d.xR[i];
+      state->dnorm += state->d.xR[i] * state->d.xR[i];
    }
    if (ae_sqrt(state->dnorm, _state) * state->anorm >= state->epsc) {
       state->running = false;
@@ -6456,7 +6456,7 @@ lbl_5:
    }
 // Update x, output report
    for (i = 0; i < state->n; i++) {
-      state->rx.xR[i] = state->rx.xR[i] + state->phii / state->rhoi * state->omegai.xR[i];
+      state->rx.xR[i] += state->phii / state->rhoi * state->omegai.xR[i];
    }
    if (!state->xrep) {
       goto lbl_17;
@@ -6583,7 +6583,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
       t0 = 0;
       t1 = 0;
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v, _state)) {
-         state->tmpd.xR[j] = state->tmpd.xR[j] + sqr(v, _state);
+         state->tmpd.xR[j] += sqr(v, _state);
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
@@ -6616,12 +6616,12 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
       if (state->needmtv) {
          sparsemtv(a, &state->x, &state->mtv, _state);
          for (i = 0; i < n; i++) {
-            state->mtv.xR[i] = state->tmpd.xR[i] * state->mtv.xR[i];
+            state->mtv.xR[i] *= state->tmpd.xR[i];
          }
       }
    }
    for (i = 0; i < n; i++) {
-      state->rx.xR[i] = state->tmpd.xR[i] * state->rx.xR[i];
+      state->rx.xR[i] *= state->tmpd.xR[i];
    }
 }
 
@@ -7180,8 +7180,8 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
    if (lnnu + ae_log(2.0, _state) > lnmax) {
       return result;
    }
-   *lambdav = *lambdav * lambdaup * (*nu);
-   *nu = *nu * 2;
+   *lambdav *= lambdaup * (*nu);
+   *nu *= 2;
    result = true;
    return result;
 }
@@ -7192,7 +7192,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
    if (ae_log(*lambdav, _state) + ae_log(lambdadown, _state) < ae_log(minrealnumber, _state)) {
       *lambdav = minrealnumber;
    } else {
-      *lambdav = *lambdav * lambdadown;
+      *lambdav *= lambdadown;
    }
 }
 

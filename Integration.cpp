@@ -164,7 +164,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    }
    *info = 1;
 // Initialize, D[1:N+1], E[1:N]
-   n = n - 2;
+   n -= 2;
    ae_vector_set_length(&d, n + 2, _state);
    ae_vector_set_length(&e, n + 1, _state);
    for (i = 1; i <= n + 1; i++) {
@@ -202,13 +202,13 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    b1 = a * pia;
    b2 = b * pib;
    if (ae_fabs(a11, _state) > ae_fabs(a21, _state)) {
-      a22 = a22 - a12 * a21 / a11;
-      b2 = b2 - b1 * a21 / a11;
+      a22 -= a12 * a21 / a11;
+      b2 -= b1 * a21 / a11;
       bet = b2 / a22;
       alph = (b1 - bet * a12) / a11;
    } else {
-      a12 = a12 - a22 * a11 / a21;
-      b1 = b1 - b2 * a11 / a21;
+      a12 -= a22 * a11 / a21;
+      b1 -= b2 * a11 / a21;
       bet = b1 / a12;
       alph = (b2 - bet * a22) / a21;
    }
@@ -739,7 +739,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    }
    *info = 1;
 // from external conventions about N/Beta/Mu0 to internal
-   n = n / 2;
+   n /= 2;
    beta->xR[0] = mu0;
 // Calculate Gauss nodes/weights, save them for later processing
    gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp, _state);
@@ -781,7 +781,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       u = 0.0;
       for (k = (m + 1) / 2; k >= 0; k--) {
          l = m - k;
-         u = u + (alpha->xR[k + n + 1] - alpha->xR[l]) * t.xR[woffs + k] + beta->xR[k + n + 1] * s.xR[woffs + k - 1] - beta->xR[l] * s.xR[woffs + k];
+         u += (alpha->xR[k + n + 1] - alpha->xR[l]) * t.xR[woffs + k] + beta->xR[k + n + 1] * s.xR[woffs + k - 1] - beta->xR[l] * s.xR[woffs + k];
          s.xR[woffs + k] = u;
       }
       ae_v_move(ta.xR, 1, t.xR, 1, wlen);
@@ -796,7 +796,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       for (k = m + 1 - n; k <= (m - 1) / 2; k++) {
          l = m - k;
          j = n - 1 - l;
-         u = u - (alpha->xR[k + n + 1] - alpha->xR[l]) * t.xR[woffs + j] - beta->xR[k + n + 1] * s.xR[woffs + j] + beta->xR[l] * s.xR[woffs + j + 1];
+         u -= (alpha->xR[k + n + 1] - alpha->xR[l]) * t.xR[woffs + j] + beta->xR[k + n + 1] * s.xR[woffs + j] - beta->xR[l] * s.xR[woffs + j + 1];
          s.xR[woffs + j] = u;
       }
       if (m % 2 == 0) {
@@ -1805,19 +1805,19 @@ lbl_5:
 lbl_0:
    v = state->f;
 // Gauss-Kronrod formula
-   intk = intk + v * state->wk.xR[i];
+   intk += v * state->wk.xR[i];
    if (i % 2 == 1) {
-      intg = intg + v * state->wg.xR[i];
+      intg += v * state->wg.xR[i];
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
+   inta += ae_fabs(v, _state) * state->wr.xR[i];
    i++;
    goto lbl_5;
 lbl_7:
-   intk = intk * (state->b - state->a) * 0.5;
-   intg = intg * (state->b - state->a) * 0.5;
-   inta = inta * (state->b - state->a) * 0.5;
+   intk *= (state->b - state->a) * 0.5;
+   intg *= (state->b - state->a) * 0.5;
+   inta *= (state->b - state->a) * 0.5;
    state->heap.xyR[0][0] = ae_fabs(intg - intk, _state);
    state->heap.xyR[0][1] = intk;
    state->heap.xyR[0][2] = inta;
@@ -1860,26 +1860,26 @@ lbl_11:
 lbl_1:
    v = state->f;
 // Gauss-Kronrod formula
-   intk = intk + v * state->wk.xR[i];
+   intk += v * state->wk.xR[i];
    if (i % 2 == 1) {
-      intg = intg + v * state->wg.xR[i];
+      intg += v * state->wg.xR[i];
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
+   inta += ae_fabs(v, _state) * state->wr.xR[i];
    i++;
    goto lbl_11;
 lbl_13:
-   intk = intk * (tb - ta) * 0.5;
-   intg = intg * (tb - ta) * 0.5;
-   inta = inta * (tb - ta) * 0.5;
+   intk *= (tb - ta) * 0.5;
+   intg *= (tb - ta) * 0.5;
+   inta *= (tb - ta) * 0.5;
    state->heap.xyR[j][0] = ae_fabs(intg - intk, _state);
    state->heap.xyR[j][1] = intk;
    state->heap.xyR[j][2] = inta;
    state->heap.xyR[j][3] = ta;
    state->heap.xyR[j][4] = tb;
-   state->sumerr = state->sumerr + state->heap.xyR[j][0];
-   state->sumabs = state->sumabs + ae_fabs(inta, _state);
+   state->sumerr += state->heap.xyR[j][0];
+   state->sumabs += ae_fabs(inta, _state);
    j++;
    goto lbl_8;
 lbl_10:
@@ -1897,15 +1897,15 @@ lbl_14:
    if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
       state->r = 0.0;
       for (j = 0; j < state->heapused; j++) {
-         state->r = state->r + state->heap.xyR[j][1];
+         state->r += state->heap.xyR[j][1];
       }
       result = false;
       return result;
    }
 // Exclude interval with maximum absolute error
    autogk_mheappop(&state->heap, state->heapused, state->heapwidth, _state);
-   state->sumerr = state->sumerr - state->heap.xyR[state->heapused - 1][0];
-   state->sumabs = state->sumabs - state->heap.xyR[state->heapused - 1][2];
+   state->sumerr -= state->heap.xyR[state->heapused - 1][0];
+   state->sumabs -= state->heap.xyR[state->heapused - 1][2];
 // Divide interval, create subintervals
    ta = state->heap.xyR[state->heapused - 1][3];
    tb = state->heap.xyR[state->heapused - 1][4];
@@ -1935,24 +1935,24 @@ lbl_19:
 lbl_2:
    v = state->f;
 // Gauss-Kronrod formula
-   intk = intk + v * state->wk.xR[i];
+   intk += v * state->wk.xR[i];
    if (i % 2 == 1) {
-      intg = intg + v * state->wg.xR[i];
+      intg += v * state->wg.xR[i];
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta = inta + ae_fabs(v, _state) * state->wr.xR[i];
+   inta += ae_fabs(v, _state) * state->wr.xR[i];
    i++;
    goto lbl_19;
 lbl_21:
-   intk = intk * (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   intg = intg * (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   inta = inta * (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+   intk *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+   intg *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+   inta *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
    state->heap.xyR[j][0] = ae_fabs(intg - intk, _state);
    state->heap.xyR[j][1] = intk;
    state->heap.xyR[j][2] = inta;
-   state->sumerr = state->sumerr + state->heap.xyR[j][0];
-   state->sumabs = state->sumabs + state->heap.xyR[j][2];
+   state->sumerr += state->heap.xyR[j][0];
+   state->sumabs += state->heap.xyR[j][2];
    j++;
    goto lbl_16;
 lbl_18:
@@ -2153,7 +2153,7 @@ lbl_1:
    goto lbl_9;
 lbl_10:
    v1 = state->internalstate.r;
-   state->nintervals = state->nintervals + state->internalstate.heapused;
+   state->nintervals += state->internalstate.heapused;
 // then, integrate right half of [a,b]:
 //     integral(f(x)dx, (b+a)/2, b) =
 //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
@@ -2188,7 +2188,7 @@ lbl_2:
    goto lbl_11;
 lbl_12:
    v2 = state->internalstate.r;
-   state->nintervals = state->nintervals + state->internalstate.heapused;
+   state->nintervals += state->internalstate.heapused;
 // final result
    state->v = s * (v1 + v2);
    state->terminationtype = 1;

@@ -332,7 +332,7 @@ void rmulvx_sse2(const ae_int_t n, const double v, double *__restrict x, const a
       rmulv_sse2(n, v, x, _state);
       return;
    }
-   x[0] = v * x[0];
+   x[0] *= v;
    rmulv_sse2(n - 1, v, x + 1, _state);
 }
 

@@ -104,7 +104,7 @@ static double refrdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state) {
    double result;
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + x->xR[i] * y->xR[i];
+      result += x->xR[i] * y->xR[i];
    }
    return result;
 }
@@ -114,7 +114,7 @@ static double refrdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state
    double result;
    result = 0.0;
    for (j = 0; j < n; j++) {
-      result = result + x->xR[j] * a->xyR[i][j];
+      result += x->xR[j] * a->xyR[i][j];
    }
    return result;
 }
@@ -124,7 +124,7 @@ static double refrdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_
    double result;
    result = 0.0;
    for (j = 0; j < n; j++) {
-      result = result + a->xyR[ia][j] * b->xyR[ib][j];
+      result += a->xyR[ia][j] * b->xyR[ib][j];
    }
    return result;
 }
@@ -136,7 +136,7 @@ static double refrdotv2(ae_int_t n, RVector *x, ae_state *_state) {
    result = 0.0;
    for (i = 0; i < n; i++) {
       v = x->xR[i];
-      result = result + v * v;
+      result += v * v;
    }
    return result;
 }
@@ -144,42 +144,42 @@ static double refrdotv2(ae_int_t n, RVector *x, ae_state *_state) {
 static void refraddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] + alpha * y->xR[i];
+      x->xR[i] += alpha * y->xR[i];
    }
 }
 
 static void refraddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[offsx + i] = x->xR[offsx + i] + alpha * y->xR[offsy + i];
+      x->xR[offsx + i] += alpha * y->xR[offsy + i];
    }
 }
 
 static void refraddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xyR[i][colidx] = x->xyR[i][colidx] + alpha * y->xR[i];
+      x->xyR[i][colidx] += alpha * y->xR[i];
    }
 }
 
 static void refraddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] + alpha * y->xR[i];
+      x->xyR[rowidx][i] += alpha * y->xR[i];
    }
 }
 
 static void refraddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] + alpha * y->xyR[ridx][i];
+      x->xR[i] += alpha * y->xyR[ridx][i];
    }
 }
 
 static void refraddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xyR[ridxdst][i] = x->xyR[ridxdst][i] + alpha * y->xyR[ridxsrc][i];
+      x->xyR[ridxdst][i] += alpha * y->xyR[ridxsrc][i];
    }
 }
 
@@ -329,42 +329,42 @@ static void refrcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t
 static void refrmulv(ae_int_t n, double v, RVector *x, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * v;
+      x->xR[i] *= v;
    }
 }
 
 static void refrmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] * v;
+      x->xyR[rowidx][i] *= v;
    }
 }
 
 static void refrmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[offsx + i] = x->xR[offsx + i] * v;
+      x->xR[offsx + i] *= v;
    }
 }
 
 static void refrmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * y->xR[i];
+      x->xR[i] *= y->xR[i];
    }
 }
 
 static void refrmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = x->xyR[rowidx][i] * y->xR[i];
+      x->xyR[rowidx][i] *= y->xR[i];
    }
 }
 
 static void refrmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      x->xR[i] = x->xR[i] * y->xyR[rowidx][i];
+      x->xR[i] *= y->xyR[rowidx][i];
    }
 }
 
@@ -486,7 +486,7 @@ static void refrgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t
    if (n <= 0 || alpha == 0.0) {
       if (beta != 0.0) {
          for (i = 0; i < m; i++) {
-            y->xR[iy + i] = beta * y->xR[iy + i];
+            y->xR[iy + i] *= beta;
          }
       } else {
          for (i = 0; i < m; i++) {
@@ -516,7 +516,7 @@ static void refrgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t
          }
       } else {
          for (i = 0; i < m; i++) {
-            y->xR[iy + i] = beta * y->xR[iy + i];
+            y->xR[iy + i] *= beta;
          }
       }
    // y += A^T*x
@@ -542,10 +542,10 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
       for (i = n - 1; i >= 0; i--) {
          v = x->xR[ix + i];
          for (j = i + 1; j < n; j++) {
-            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
       }
@@ -555,10 +555,10 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
       for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
          for (j = 0; j < i; j++) {
-            v = v - a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
       }
@@ -568,14 +568,14 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
       for (i = 0; i < n; i++) {
          v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = i + 1; j < n; j++) {
-            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -584,14 +584,14 @@ static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isup
       for (i = n - 1; i >= 0; i--) {
          v = x->xR[ix + i];
          if (!isunit) {
-            v = v / a->xyR[ia + i][ja + i];
+            v /= a->xyR[ia + i][ja + i];
          }
          x->xR[ix + i] = v;
          if (v == 0) {
             continue;
          }
          for (j = 0; j < i; j++) {
-            x->xR[ix + j] = x->xR[ix + j] - v * a->xyR[ia + i][ja + j];
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
          }
       }
       return;
@@ -687,9 +687,9 @@ static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablas
    ae_vector_set_length(&s->bx1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), _state);
    k++;
    ae_matrix_set_length(&s->a0, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), minlen + iround(maxpad * sqr(ae_sin((double)(k + 1), _state), _state), _state), _state);
-   k = k + 2;
+   k += 2;
    ae_matrix_set_length(&s->a1, minlen + iround(maxpad * sqr(ae_sin((double)k, _state), _state), _state), minlen + iround(maxpad * sqr(ae_sin((double)(k + 1), _state), _state), _state), _state);
-   k = k + 2;
+   k += 2;
    s->v0 = 0.0;
    k = testablasfunit_pseudorandominit1(&s->x0, k, _state);
    k = testablasfunit_pseudorandominit1(&s->x1, k, _state);
@@ -726,7 +726,7 @@ static double testablasfunit_rcmp1(RVector *x, RVector *y, ae_state *_state) {
       mx = maxreal(mx, ae_fabs(x->xR[i], _state), _state);
       mx = maxreal(mx, ae_fabs(y->xR[i], _state), _state);
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -770,7 +770,7 @@ static double testablasfunit_rcmp2(RMatrix *x, RMatrix *y, ae_state *_state) {
          mx = maxreal(mx, ae_fabs(y->xyR[i][j], _state), _state);
       }
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -1269,7 +1269,7 @@ static void testablasfunit_refgerx(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t 
    for (i = 0; i < m; i++) {
       s = alpha * u->xR[iu + i];
       for (j = 0; j < n; j++) {
-         a->xyR[ia + i][ja + j] = a->xyR[ia + i][ja + j] + s * v->xR[iv + j];
+         a->xyR[ia + i][ja + j] += s * v->xR[iv + j];
       }
    }
 }
@@ -1613,18 +1613,18 @@ static void testhqrndunit_calculatemv(RVector *x, ae_int_t n, double *mean, doub
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->xR[i];
+      *mean += x->xR[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - (*mean), _state);
+         v1 += sqr(x->xR[i] - (*mean), _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - (*mean));
+         v2 += (x->xR[i] - (*mean));
       }
       v2 = sqr(v2, _state) / n;
       variance = (v1 - v2) / (n - 1);
@@ -1799,7 +1799,7 @@ bool testhqrnd(bool silent, ae_state *_state) {
       if (i + 1 < samplesize) {
          x.xR[i + 1] = r2;
       }
-      i = i + 2;
+      i += 2;
    }
    normsigmaerr = 0.0;
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs, _state);
@@ -2680,7 +2680,7 @@ static void testablasunit_refrmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, R
             if (beta == 0.0) {
                c->xyR[i + ic][j + jc] = 0.0;
             } else {
-               c->xyR[i + ic][j + jc] = c->xyR[i + ic][j + jc] * beta;
+               c->xyR[i + ic][j + jc] *= beta;
             }
          }
       }
@@ -2708,12 +2708,12 @@ static void testablasunit_refrmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, R
          if (k > 0) {
             vr = ae_v_dotproduct(ae.xyR[i], 1, ae.xyR[j], 1, k);
          }
-         vr = alpha * vr;
+         vr *= alpha;
          if (isupper && j >= i) {
-            c->xyR[ic + i][jc + j] = vr + c->xyR[ic + i][jc + j];
+            c->xyR[ic + i][jc + j] += vr;
          }
          if (!isupper && j <= i) {
-            c->xyR[ic + i][jc + j] = vr + c->xyR[ic + i][jc + j];
+            c->xyR[ic + i][jc + j] += vr;
          }
       }
    }
@@ -2994,9 +2994,9 @@ static void testablasunit_refrmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, dou
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          vc = ae_v_dotproduct(ae.xyR[i], 1, &be.xyR[0][j], be.stride, k);
-         vc = alpha * vc;
+         vc *= alpha;
          if (beta != 0.0) {
-            vc = vc + beta * c->xyR[ic + i][jc + j];
+            vc += beta * c->xyR[ic + i][jc + j];
          }
          c->xyR[ic + i][jc + j] = vc;
       }
@@ -3565,7 +3565,7 @@ static void testablasunit_refrmatrixsymv(ae_int_t n, double alpha, RMatrix *a, a
    for (i = 0; i < n; i++) {
       v = beta * y->xR[iy + i];
       for (j = 0; j < n; j++) {
-         v = v + alpha * b.xyR[i][j] * x->xR[ix + j];
+         v += alpha * b.xyR[i][j] * x->xR[ix + j];
       }
       y->xR[iy + i] = v;
    }
@@ -3602,7 +3602,7 @@ static double testablasunit_refrmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia,
    result = 0.0;
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         result = result + x->xR[ix + i] * b.xyR[i][j] * x->xR[ix + j];
+         result += x->xR[ix + i] * b.xyR[i][j] * x->xR[ix + j];
       }
    }
    ae_frame_leave(_state);
@@ -3736,7 +3736,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       isunita = randomreal(_state) > 0.5;
       opa = randominteger(2, _state);
       for (i = 0; i < n; i++) {
-         refra.xyR[aoffsi + i][aoffsj + i] = refra.xyR[aoffsi + i][aoffsj + i] + 10;
+         refra.xyR[aoffsi + i][aoffsj + i] += 10;
       }
    // Test RMatrixTRSV():
    // * check that elements of RX beyond [XOffs,XOffs+N-1] are unchanged
@@ -4825,7 +4825,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix *a, ae_int_t ai1
          for (r = bi1; r <= bi2; r++) {
             for (l = ai1; l <= ai2; l++) {
                v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
-               c->xyR[ci1 + l - ai1][cj1 + r - bi1] = c->xyR[ci1 + l - ai1][cj1 + r - bi1] + alpha * v;
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave(_state);
@@ -4834,7 +4834,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix *a, ae_int_t ai1
          for (l = ai1; l <= ai2; l++) {
             for (r = bi1; r <= bi2; r++) {
                v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
-               c->xyR[ci1 + l - ai1][cj1 + r - bi1] = c->xyR[ci1 + l - ai1][cj1 + r - bi1] + alpha * v;
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave(_state);
@@ -4875,7 +4875,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix *a, ae_int_t ai1
             ae_v_move(&work.xR[1], 1, &a->xyR[ai1][l], a->stride, k);
             for (r = bi1; r <= bi2; r++) {
                v = ae_v_dotproduct(&work.xR[1], 1, &b->xyR[r][bj1], 1, k);
-               c->xyR[ci1 + l - aj1][cj1 + r - bi1] = c->xyR[ci1 + l - aj1][cj1 + r - bi1] + alpha * v;
+               c->xyR[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave(_state);
@@ -5831,7 +5831,7 @@ static bool testmatgenunit_isspd(RMatrix *a, ae_int_t n, bool isupper, ae_state 
          if (j < n - 1) {
             for (i = j + 1; i < n; i++) {
                v = ae_v_dotproduct(&a->xyR[0][i], a->stride, &a->xyR[0][j], a->stride, j);
-               a->xyR[j][i] = a->xyR[j][i] - v;
+               a->xyR[j][i] -= v;
             }
             v = 1 / ajj;
             ae_v_muld(&a->xyR[j][j + 1], 1, n - j - 1, v);
@@ -5854,7 +5854,7 @@ static bool testmatgenunit_isspd(RMatrix *a, ae_int_t n, bool isupper, ae_state 
          if (j < n - 1) {
             for (i = j + 1; i < n; i++) {
                v = ae_v_dotproduct(a->xyR[i], 1, a->xyR[j], 1, j);
-               a->xyR[i][j] = a->xyR[i][j] - v;
+               a->xyR[i][j] -= v;
             }
             v = 1 / ajj;
             ae_v_muld(&a->xyR[j + 1][j], a->stride, n - j - 1, v);
@@ -6101,12 +6101,12 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
       vscale = 0.0;
       if (i <= m) {
          for (k = i; k <= m; k++) {
-            vscale = vscale + ae_fabs(a->xyR[k][i], _state);
+            vscale += ae_fabs(a->xyR[k][i], _state);
          }
          if (vscale != 0.0) {
             for (k = i; k <= m; k++) {
-               a->xyR[k][i] = a->xyR[k][i] / vscale;
-               s = s + a->xyR[k][i] * a->xyR[k][i];
+               a->xyR[k][i] /= vscale;
+               s += a->xyR[k][i] * a->xyR[k][i];
             }
             f = a->xyR[i][i];
             g = -testmatgenunit_extsign(ae_sqrt(s, _state), f, _state);
@@ -6116,16 +6116,16 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
                for (j = l; j <= n; j++) {
                   s = 0.0;
                   for (k = i; k <= m; k++) {
-                     s = s + a->xyR[k][i] * a->xyR[k][j];
+                     s += a->xyR[k][i] * a->xyR[k][j];
                   }
                   f = s / h;
                   for (k = i; k <= m; k++) {
-                     a->xyR[k][j] = a->xyR[k][j] + f * a->xyR[k][i];
+                     a->xyR[k][j] += f * a->xyR[k][i];
                   }
                }
             }
             for (k = i; k <= m; k++) {
-               a->xyR[k][i] = vscale * a->xyR[k][i];
+               a->xyR[k][i] *= vscale;
             }
          }
       }
@@ -6135,12 +6135,12 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
       vscale = 0.0;
       if (i <= m && i != n) {
          for (k = l; k <= n; k++) {
-            vscale = vscale + ae_fabs(a->xyR[i][k], _state);
+            vscale += ae_fabs(a->xyR[i][k], _state);
          }
          if (vscale != 0.0) {
             for (k = l; k <= n; k++) {
-               a->xyR[i][k] = a->xyR[i][k] / vscale;
-               s = s + a->xyR[i][k] * a->xyR[i][k];
+               a->xyR[i][k] /= vscale;
+               s += a->xyR[i][k] * a->xyR[i][k];
             }
             f = a->xyR[i][l];
             g = -testmatgenunit_extsign(ae_sqrt(s, _state), f, _state);
@@ -6153,15 +6153,15 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
                for (j = l; j <= m; j++) {
                   s = 0.0;
                   for (k = l; k <= n; k++) {
-                     s = s + a->xyR[j][k] * a->xyR[i][k];
+                     s += a->xyR[j][k] * a->xyR[i][k];
                   }
                   for (k = l; k <= n; k++) {
-                     a->xyR[j][k] = a->xyR[j][k] + s * rv1.xR[k];
+                     a->xyR[j][k] += s * rv1.xR[k];
                   }
                }
             }
             for (k = l; k <= n; k++) {
-               a->xyR[i][k] = vscale * a->xyR[i][k];
+               a->xyR[i][k] *= vscale;
             }
          }
       }
@@ -6176,10 +6176,10 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             for (j = l; j <= n; j++) {
                s = 0.0;
                for (k = l; k <= n; k++) {
-                  s = s + a->xyR[i][k] * v->xyR[k][j];
+                  s += a->xyR[i][k] * v->xyR[k][j];
                }
                for (k = l; k <= n; k++) {
-                  v->xyR[k][j] = v->xyR[k][j] + s * v->xyR[k][i];
+                  v->xyR[k][j] += s * v->xyR[k][i];
                }
             }
          }
@@ -6206,16 +6206,16 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             for (j = l; j <= n; j++) {
                s = 0.0;
                for (k = l; k <= m; k++) {
-                  s = s + a->xyR[k][i] * a->xyR[k][j];
+                  s += a->xyR[k][i] * a->xyR[k][j];
                }
                f = s / a->xyR[i][i] * g;
                for (k = i; k <= m; k++) {
-                  a->xyR[k][j] = a->xyR[k][j] + f * a->xyR[k][i];
+                  a->xyR[k][j] += f * a->xyR[k][i];
                }
             }
          }
          for (j = i; j <= m; j++) {
-            a->xyR[j][i] = a->xyR[j][i] * g;
+            a->xyR[j][i] *= g;
          }
       } else {
          for (j = i; j <= m; j++) {
@@ -6289,7 +6289,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             g = rv1.xR[i];
             y = w->xR[i];
             h = s * g;
-            g = c * g;
+            g *= c;
             z = testmatgenunit_pythag(f, h, _state);
             rv1.xR[j] = z;
             c = f / z;
@@ -6297,7 +6297,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             f = x * c + g * s;
             g = -x * s + g * c;
             h = y * s;
-            y = y * c;
+            y *= c;
             for (jj = 1; jj <= n; jj++) {
                x = v->xyR[jj][j];
                z = v->xyR[jj][i];
@@ -7332,8 +7332,8 @@ static bool skstest(ae_state *_state) {
          uppercnt = 0;
          lowercnt = 0;
          for (i = 0; i < n; i++) {
-            uppercnt = uppercnt + u.xZ[i];
-            lowercnt = lowercnt + d.xZ[i];
+            uppercnt += u.xZ[i];
+            lowercnt += d.xZ[i];
          }
       // Check correctness of SparseExists()
          for (i = 0; i < n; i++) {
@@ -7917,7 +7917,7 @@ lbl_0:
    if (nz == 0) {
       goto lbl_5;
    }
-   nz = nz / 2;
+   nz /= 2;
    goto lbl_4;
 lbl_5:
    result = false;
@@ -7947,7 +7947,7 @@ lbl_8:
             do {
                g->bufa.xyR[i][i] = hqrnduniformr(&g->rs, _state) - 0.5;
             } while (g->bufa.xyR[i][i] == 0.0);
-            g->bufa.xyR[i][i] = g->bufa.xyR[i][i] + 1.5 * sign(g->bufa.xyR[i][i], _state);
+            g->bufa.xyR[i][i] += 1.5 * sign(g->bufa.xyR[i][i], _state);
             continue;
          }
          if (hqrnduniformr(&g->rs, _state) <= pnz) {
@@ -7978,7 +7978,7 @@ lbl_1:
    if (nz == 0) {
       goto lbl_9;
    }
-   nz = nz / 2;
+   nz /= 2;
    goto lbl_8;
 lbl_9:
    result = false;
@@ -8124,9 +8124,9 @@ static bool testlevel2unsymmetric(ae_state *_state) {
                         v = 0.0;
                         for (j = 0; j < opn; j++) {
                            if (ops == 0) {
-                              v = v + a.xyR[i][j] * x1.xR[ix + j];
+                              v += a.xyR[i][j] * x1.xR[ix + j];
                            } else {
-                              v = v + a.xyR[j][i] * x1.xR[ix + j];
+                              v += a.xyR[j][i] * x1.xR[ix + j];
                            }
                         }
                         y1.xR[iy + i] = alpha * v + beta * y1.xR[iy + i];
@@ -8415,7 +8415,7 @@ static bool testlevel2symmetric(ae_state *_state) {
             vb = 0.0;
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  vb = vb + x1.xR[i] * a.xyR[i][j] * x1.xR[j];
+                  vb += x1.xR[i] * a.xyR[i][j] * x1.xR[j];
                }
             }
             va = sparsevsmv(&s0, isupper, &x0, _state);
@@ -8632,7 +8632,7 @@ static bool testsymmetricperm(ae_state *_state) {
             }
          }
       // Increase sparsity
-         nzprob = 0.75 * nzprob;
+         nzprob *= 0.75;
       }
    }
    ae_frame_leave(_state);
@@ -9024,7 +9024,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
                da->xyR[i][j] = v;
                sparseset(sa, i, j, v, _state);
             } else {
-               da->xyR[i][j] = da->xyR[i][j] + v;
+               da->xyR[i][j] += v;
                sparseadd(sa, i, j, v, _state);
             }
          }
@@ -9220,8 +9220,8 @@ static bool linearfunctionstest(ae_state *_state) {
          // Searching true result
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 < j; j1++) {
-                  ty.xR[i1] = ty.xR[i1] + a.xyR[i1][j1] * x0.xR[j1];
-                  tyt.xR[j1] = tyt.xR[j1] + a.xyR[i1][j1] * x1.xR[i1];
+                  ty.xR[i1] += a.xyR[i1][j1] * x0.xR[j1];
+                  tyt.xR[j1] += a.xyR[i1][j1] * x1.xR[i1];
                }
             }
          // Multiplication
@@ -9247,8 +9247,8 @@ static bool linearfunctionstest(ae_state *_state) {
          // Searching true result
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 < j; j1++) {
-                  ty.xR[i1] = ty.xR[i1] + a.xyR[i1][j1] * x0.xR[j1];
-                  tyt.xR[j1] = tyt.xR[j1] + a.xyR[i1][j1] * x0.xR[i1];
+                  ty.xR[i1] += a.xyR[i1][j1] * x0.xR[j1];
+                  tyt.xR[j1] += a.xyR[i1][j1] * x0.xR[i1];
                }
             }
             sparsemv(&s, &x0, &y, _state);
@@ -9328,17 +9328,17 @@ static bool linearfunctionsstest(ae_state *_state) {
    // of the matrix
       for (i1 = 0; i1 < i; i1++) {
          for (j1 = i1; j1 < i; j1++) {
-            ty.xR[i1] = ty.xR[i1] + a.xyR[i1][j1] * x0.xR[j1];
+            ty.xR[i1] += a.xyR[i1][j1] * x0.xR[j1];
             if (i1 != j1) {
-               ty.xR[j1] = ty.xR[j1] + a.xyR[i1][j1] * x0.xR[i1];
+               ty.xR[j1] += a.xyR[i1][j1] * x0.xR[i1];
             }
          }
       }
       for (i1 = 0; i1 < i; i1++) {
          for (j1 = 0; j1 <= i1; j1++) {
-            tyt.xR[i1] = tyt.xR[i1] + a.xyR[i1][j1] * x1.xR[j1];
+            tyt.xR[i1] += a.xyR[i1][j1] * x1.xR[j1];
             if (i1 != j1) {
-               tyt.xR[j1] = tyt.xR[j1] + a.xyR[i1][j1] * x1.xR[i1];
+               tyt.xR[j1] += a.xyR[i1][j1] * x1.xR[i1];
             }
          }
       }
@@ -9432,8 +9432,8 @@ static bool linearfunctionsmmtest(ae_state *_state) {
             for (i1 = 0; i1 < i; i1++) {
                for (k1 = 0; k1 < kmax; k1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.xyR[i1][k1] = ty.xyR[i1][k1] + a.xyR[i1][j1] * x0.xyR[j1][k1];
-                     tyt.xyR[j1][k1] = tyt.xyR[j1][k1] + a.xyR[i1][j1] * x1.xyR[i1][k1];
+                     ty.xyR[i1][k1] += a.xyR[i1][j1] * x0.xyR[j1][k1];
+                     tyt.xyR[j1][k1] += a.xyR[i1][j1] * x1.xyR[i1][k1];
                   }
                }
             }
@@ -9441,8 +9441,8 @@ static bool linearfunctionsmmtest(ae_state *_state) {
             for (i1 = 0; i1 < i; i1++) {
                for (k1 = 0; k1 < kmax; k1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.xyR[i1][k1] = ty.xyR[i1][k1] + a.xyR[i1][j1] * x0.xyR[j1][k1];
-                     tyt.xyR[j1][k1] = tyt.xyR[j1][k1] + a.xyR[i1][j1] * x0.xyR[i1][k1];
+                     ty.xyR[i1][k1] += a.xyR[i1][j1] * x0.xyR[j1][k1];
+                     tyt.xyR[j1][k1] += a.xyR[i1][j1] * x0.xyR[i1][k1];
                   }
                }
             }
@@ -9565,9 +9565,9 @@ static bool linearfunctionssmmtest(ae_state *_state) {
          for (k1 = 0; k1 < j; k1++) {
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = i1; j1 < i; j1++) {
-                  ty.xyR[i1][k1] = ty.xyR[i1][k1] + a.xyR[i1][j1] * x0.xyR[j1][k1];
+                  ty.xyR[i1][k1] += a.xyR[i1][j1] * x0.xyR[j1][k1];
                   if (i1 != j1) {
-                     ty.xyR[j1][k1] = ty.xyR[j1][k1] + a.xyR[i1][j1] * x0.xyR[i1][k1];
+                     ty.xyR[j1][k1] += a.xyR[i1][j1] * x0.xyR[i1][k1];
                   }
                }
             }
@@ -9575,9 +9575,9 @@ static bool linearfunctionssmmtest(ae_state *_state) {
          for (k1 = 0; k1 < j; k1++) {
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 <= i1; j1++) {
-                  tyt.xyR[i1][k1] = tyt.xyR[i1][k1] + a.xyR[i1][j1] * x1.xyR[j1][k1];
+                  tyt.xyR[i1][k1] += a.xyR[i1][j1] * x1.xyR[j1][k1];
                   if (i1 != j1) {
-                     tyt.xyR[j1][k1] = tyt.xyR[j1][k1] + a.xyR[i1][j1] * x1.xyR[i1][k1];
+                     tyt.xyR[j1][k1] += a.xyR[i1][j1] * x1.xyR[i1][k1];
                   }
                }
             }
@@ -9793,8 +9793,8 @@ static bool copyfunctest(bool silent, ae_state *_state) {
             // Searching true result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.xR[i1] = ty.xR[i1] + a.xyR[i1][j1] * x0.xR[j1];
-                     tyt.xR[j1] = tyt.xR[j1] + a.xyR[i1][j1] * x1.xR[i1];
+                     ty.xR[i1] += a.xyR[i1][j1] * x0.xR[j1];
+                     tyt.xR[j1] += a.xyR[i1][j1] * x1.xR[i1];
                   }
                }
             // Multiplication
@@ -9852,8 +9852,8 @@ static bool copyfunctest(bool silent, ae_state *_state) {
             // Searching true result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.xR[i1] = ty.xR[i1] + a.xyR[i1][j1] * x0.xR[j1];
-                     tyt.xR[j1] = tyt.xR[j1] + a.xyR[i1][j1] * x0.xR[i1];
+                     ty.xR[i1] += a.xyR[i1][j1] * x0.xR[j1];
+                     tyt.xR[j1] += a.xyR[i1][j1] * x0.xR[i1];
                   }
                }
             // Multiplication
@@ -10330,7 +10330,7 @@ static bool testsparseunit_testconvertsm(ae_state *_state) {
                   sparseset(&cs, i, j, tmp, _state);
                   tmp = 2 * randomreal(_state) - 1;
                   j = randominteger(n, _state);
-                  a.xyR[i][j] = a.xyR[i][j] + tmp;
+                  a.xyR[i][j] += tmp;
                   sparseadd(&cs, i, j, tmp, _state);
                }
             }
@@ -10731,7 +10731,7 @@ bool testblas(bool silent, ae_state *_state) {
       }
       v = 0.0;
       for (i = i1; i <= i2; i++) {
-         v = v + sqr(x1.xR[i], _state);
+         v += sqr(x1.xR[i], _state);
       }
       v = ae_sqrt(v, _state);
       e1 = maxreal(e1, ae_fabs(v - vectornorm2(&x1, i1, i2, _state), _state), _state);
@@ -10744,8 +10744,8 @@ bool testblas(bool silent, ae_state *_state) {
       }
       e3 = maxreal(e3, ae_fabs(v * scl3 - vectornorm2(&x2, i1, i2, _state), _state), _state);
    }
-   e2 = e2 / scl2;
-   e3 = e3 / scl3;
+   e2 /= scl2;
+   e3 /= scl3;
    n2errors = (e1 >= threshold || e2 >= threshold) || e3 >= threshold;
 // Testing VectorAbsMax, Column/Row AbsMax
    ae_vector_set_length(&x1, 5 + 1, _state);
@@ -11118,7 +11118,7 @@ static double testevdunit_tdtestproduct(RVector *d, RVector *e, ae_int_t n, RMat
       // Calculate V = A[i,j], A = Z*Lambda*Z'
          v = 0.0;
          for (k = 0; k < n; k++) {
-            v = v + z->xyR[i][k] * lambdav->xR[k] * z->xyR[j][k];
+            v += z->xyR[i][k] * lambdav->xR[k] * z->xyR[j][k];
          }
       // Compare
          if (ae_iabs(i - j, _state) == 0) {
@@ -11142,7 +11142,7 @@ static double testevdunit_tdtestproduct(RVector *d, RVector *e, ae_int_t n, RMat
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -11161,7 +11161,7 @@ static double testevdunit_testproduct(RMatrix *a, ae_int_t n, RMatrix *z, RVecto
       // Calculate V = A[i,j], A = Z*Lambda*Z'
          v = 0.0;
          for (k = 0; k < n; k++) {
-            v = v + z->xyR[i][k] * lambdav->xR[k] * z->xyR[j][k];
+            v += z->xyR[i][k] * lambdav->xR[k] * z->xyR[j][k];
          }
       // Compare
          result = maxreal(result, ae_fabs(v - a->xyR[i][j], _state), _state);
@@ -11176,7 +11176,7 @@ static double testevdunit_testproduct(RMatrix *a, ae_int_t n, RMatrix *z, RVecto
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -11210,7 +11210,7 @@ static double testevdunit_testcproduct(CMatrix *a, ae_int_t n, CMatrix *z, RVect
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -12421,7 +12421,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
                vec2r.xR[i] = vt;
                vt = ae_v_dotproduct(a->xyR[i], 1, vec1i.xR, 1, n);
                vec2i.xR[i] = vt;
-               vnorm = vnorm + sqr(vec1r.xR[i], _state) + sqr(vec1i.xR[i], _state);
+               vnorm += sqr(vec1r.xR[i], _state) + sqr(vec1i.xR[i], _state);
             }
             vnorm = ae_sqrt(vnorm, _state);
             ae_v_moved(vec3r.xR, 1, vec1r.xR, 1, n, curwr);
@@ -12468,7 +12468,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
                vec2r.xR[j] = vt;
                vt = ae_v_dotproduct(vec1i.xR, 1, &a->xyR[0][j], a->stride, n);
                vec2i.xR[j] = -vt;
-               vnorm = vnorm + sqr(vec1r.xR[j], _state) + sqr(vec1i.xR[j], _state);
+               vnorm += sqr(vec1r.xR[j], _state) + sqr(vec1i.xR[j], _state);
             }
             vnorm = ae_sqrt(vnorm, _state);
             ae_v_moved(vec3r.xR, 1, vec1r.xR, 1, n, curwr);
@@ -12620,7 +12620,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
          i = 2;
          while (j < n - 1) {
             e.xR[j] = 0.0;
-            j = j + i;
+            j += i;
             i++;
          }
       }
@@ -12752,7 +12752,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + qa.xyR[k][i] * diaga.xR[k] * qa.xyR[k][j];
+                     v += qa.xyR[k][i] * diaga.xR[k] * qa.xyR[k][j];
                   }
                   densea.xyR[i][j] = v;
                }
@@ -12840,7 +12840,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
                diaga.xR[i] = diaga.xR[i - 1] * sgn / (decaya * (1 + 0.01 * hqrnduniformr(&rs, _state)));
             }
             for (i = m; i < n; i++) {
-               diaga.xR[i] = diaga.xR[i] / (100 + 10 * hqrnduniformr(&rs, _state));
+               diaga.xR[i] /= 100 + 10 * hqrnduniformr(&rs, _state);
             }
             rmatrixrndorthogonal(n, &qa, _state);
             ae_matrix_set_length(&densea, n, n, _state);
@@ -12848,7 +12848,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + qa.xyR[k][i] * diaga.xR[k] * qa.xyR[k][j];
+                     v += qa.xyR[k][i] * diaga.xR[k] * qa.xyR[k][j];
                   }
                   densea.xyR[i][j] = v;
                }
@@ -13003,7 +13003,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
       eigsubspacecreate(n, m, &s, _state);
       eigsubspacesetcond(&s, eps, 0, _state);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep, _state);
-      cnta = cnta + rep.iterationscount;
+      cnta += rep.iterationscount;
    // Solve with eigensolver operating in warm-start mode,
    // iteration count based stopping condition.
       for (i = 0; i < n; i++) {
@@ -13012,7 +13012,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
       rmatrixger(n, n, &ra, 0, 0, nu, &u, 0, &u, 0, _state);
       eigsubspacesetwarmstart(&s, true, _state);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep, _state);
-      cntb = cntb + rep.iterationscount;
+      cntb += rep.iterationscount;
    // Solve with eigensolver operating in explicit cold-start mode,
    // iteration count based stopping condition.
       for (i = 0; i < n; i++) {
@@ -13021,7 +13021,7 @@ static void testevdunit_testsisymm(bool *errorflag, ae_state *_state) {
       rmatrixger(n, n, &ra, 0, 0, nu, &u, 0, &u, 0, _state);
       eigsubspacesetwarmstart(&s, false, _state);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep, _state);
-      cntc = cntc + rep.iterationscount;
+      cntc += rep.iterationscount;
    }
    set_error_flag(errorflag, (double)cntb > 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2387");
    set_error_flag(errorflag, (double)cntc < 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2388");
@@ -13374,7 +13374,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      v = 0.0;
                      for (k = 0; k < n; k++) {
-                        v = v + sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
+                        v += sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
                      }
                      a1.xyR[i][j] = v;
                   }
@@ -13384,7 +13384,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      v = 0.0;
                      for (k = 0; k < n; k++) {
-                        v = v + sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
+                        v += sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
                      }
                      a1.xyR[i][j] = v;
                   }
@@ -13432,7 +13432,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
 // Negative definite LDLT factorization: performed for matrices with various sparsity factors
@@ -13561,7 +13561,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
+                     v += sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
                   }
                   a1.xyR[i][j] = v;
                }
@@ -13571,7 +13571,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
+                     v += sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
                   }
                   a1.xyR[i][j] = v;
                }
@@ -13591,7 +13591,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
 // Basis test of modified Cholesky.
@@ -13662,7 +13662,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
 // Specially designed matrix that allows us to test all internal supernodal update kernels,
@@ -13796,7 +13796,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      v = 0.0;
                      for (k = 0; k < n; k++) {
-                        v = v + sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
+                        v += sparseget(&sc, k, j, _state) * d.xR[k] * sparseget(&sc, k, i, _state);
                      }
                      a1.xyR[i][j] = v;
                   }
@@ -13806,7 +13806,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      v = 0.0;
                      for (k = 0; k < n; k++) {
-                        v = v + sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
+                        v += sparseget(&sc, j, k, _state) * d.xR[k] * sparseget(&sc, i, k, _state);
                      }
                      a1.xyR[i][j] = v;
                   }
@@ -13918,7 +13918,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sa, k, j, _state) * sparseget(&sa, k, i, _state);
+                     v += sparseget(&sa, k, j, _state) * sparseget(&sa, k, i, _state);
                   }
                   set_error_flag(&result, ae_fabs(a.xyR[i][j] - v, _state) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1430");
                }
@@ -13928,7 +13928,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sa, j, k, _state) * sparseget(&sa, i, k, _state);
+                     v += sparseget(&sa, j, k, _state) * sparseget(&sa, i, k, _state);
                   }
                   set_error_flag(&result, ae_fabs(a.xyR[i][j] - v, _state) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1441");
                }
@@ -13961,7 +13961,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
 // Test fill-in reducing permutation - on average, AMD and its variants must reduce fill-in.
@@ -14159,7 +14159,7 @@ static void sparsereallutest(bool *err, ae_state *_state) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
    ae_frame_leave(_state);
@@ -14479,7 +14479,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag, ae_sta
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if ((j >= i && isupper) || (j <= i && !isupper)) {
-               a1.xyR[i][j] = a1.xyR[i][j] + u.xR[i] * u.xR[j];
+               a1.xyR[i][j] += u.xR[i] * u.xR[j];
             }
          }
       }
@@ -15007,7 +15007,7 @@ static void testbdsvdunit_getbdsvderror(RVector *d, RVector *e, ae_int_t n, bool
       for (j = 0; j < n; j++) {
          sm = 0.0;
          for (k = 0; k < n; k++) {
-            sm = sm + w->xR[k] * u->xyR[i][k] * vt->xyR[k][j];
+            sm += w->xR[k] * u->xyR[i][k] * vt->xyR[k][j];
          }
          if (isupper) {
             if (i == j) {
@@ -15407,7 +15407,7 @@ static void testsvdunit_getsvderror(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix 
       for (j = 0; j < n; j++) {
          sm = 0.0;
          for (k = 0; k < minmn; k++) {
-            sm = sm + w->xR[k] * u->xyR[i][k] * vt->xyR[k][j];
+            sm += w->xR[k] * u->xyR[i][k] * vt->xyR[k][j];
          }
          locerr = maxreal(locerr, ae_fabs(a->xyR[i][j] - sm, _state), _state);
       }
@@ -16323,7 +16323,7 @@ static bool testrcondunit_rmatrixinvmatlu(RMatrix *a, ZVector *pivots, ae_int_t 
       if (j < n - 1) {
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(&a->xyR[i][j + 1], 1, &work.xR[j + 1], 1, n - j - 1);
-            a->xyR[i][j] = a->xyR[i][j] - v;
+            a->xyR[i][j] -= v;
          }
       }
    }
@@ -16443,12 +16443,12 @@ static void testrcondunit_rmatrixrefrcond(RMatrix *a, ae_int_t n, double *rc1, d
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_fabs(a->xyR[i][k], _state);
+         v += ae_fabs(a->xyR[i][k], _state);
       }
       nrm1a = maxreal(nrm1a, v, _state);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_fabs(a->xyR[k][i], _state);
+         v += ae_fabs(a->xyR[k][i], _state);
       }
       nrminfa = maxreal(nrminfa, v, _state);
    }
@@ -16458,12 +16458,12 @@ static void testrcondunit_rmatrixrefrcond(RMatrix *a, ae_int_t n, double *rc1, d
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_fabs(inva.xyR[i][k], _state);
+         v += ae_fabs(inva.xyR[i][k], _state);
       }
       nrm1inva = maxreal(nrm1inva, v, _state);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_fabs(inva.xyR[k][i], _state);
+         v += ae_fabs(inva.xyR[k][i], _state);
       }
       nrminfinva = maxreal(nrminfinva, v, _state);
    }
@@ -16501,12 +16501,12 @@ static void testrcondunit_cmatrixrefrcond(CMatrix *a, ae_int_t n, double *rc1, d
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + abscomplex(a->xyC[i][k], _state);
+         v += abscomplex(a->xyC[i][k], _state);
       }
       nrm1a = maxreal(nrm1a, v, _state);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + abscomplex(a->xyC[k][i], _state);
+         v += abscomplex(a->xyC[k][i], _state);
       }
       nrminfa = maxreal(nrminfa, v, _state);
    }
@@ -16516,12 +16516,12 @@ static void testrcondunit_cmatrixrefrcond(CMatrix *a, ae_int_t n, double *rc1, d
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + abscomplex(inva.xyC[i][k], _state);
+         v += abscomplex(inva.xyC[i][k], _state);
       }
       nrm1inva = maxreal(nrm1inva, v, _state);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + abscomplex(inva.xyC[k][i], _state);
+         v += abscomplex(inva.xyC[k][i], _state);
       }
       nrminfinva = maxreal(nrminfinva, v, _state);
    }
@@ -16604,19 +16604,19 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
       // 1-norm
          v = 1 / rmatrixtrrcond1(&a, n, isupper, isunit, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm
          v = 1 / rmatrixtrrcondinf(&a, n, isupper, isunit, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -16733,19 +16733,19 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
       // 1-norm
          v = 1 / cmatrixtrrcond1(&a, n, isupper, isunit, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm
          v = 1 / cmatrixtrrcondinf(&a, n, isupper, isunit, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -16839,37 +16839,37 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
       // 1-norm, normal
          v = 1 / rmatrixrcond1(&a, n, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // 1-norm, LU
          v = 1 / rmatrixlurcond1(&lua, n, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm, normal
          v = 1 / rmatrixrcondinf(&a, n, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[2] = q50.xR[2] + 1.0 / passcount;
+            q50.xR[2] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[2] = q90.xR[2] + 1.0 / passcount;
+            q90.xR[2] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       // Inf-norm, LU
          v = 1 / rmatrixlurcondinf(&lua, n, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[3] = q50.xR[3] + 1.0 / passcount;
+            q50.xR[3] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[3] = q90.xR[3] + 1.0 / passcount;
+            q90.xR[3] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -16968,37 +16968,37 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
       // 1-norm, normal
          v = 1 / cmatrixrcond1(&a, n, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // 1-norm, LU
          v = 1 / cmatrixlurcond1(&lua, n, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm, normal
          v = 1 / cmatrixrcondinf(&a, n, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[2] = q50.xR[2] + 1.0 / passcount;
+            q50.xR[2] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[2] = q90.xR[2] + 1.0 / passcount;
+            q90.xR[2] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       // Inf-norm, LU
          v = 1 / cmatrixlurcondinf(&lua, n, _state);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.xR[3] = q50.xR[3] + 1.0 / passcount;
+            q50.xR[3] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.xR[3] = q90.xR[3] + 1.0 / passcount;
+            q90.xR[3] += 1.0 / passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -17091,19 +17091,19 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
       // normal
          v = 1 / spdmatrixrcond(&a, n, isupper, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Cholesky
          v = 1 / spdmatrixcholeskyrcond(&cha, n, isupper, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       }
@@ -17192,19 +17192,19 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
       // normal
          v = 1 / hpdmatrixrcond(&a, n, isupper, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[0] = q50.xR[0] + 1.0 / passcount;
+            q50.xR[0] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[0] = q90.xR[0] + 1.0 / passcount;
+            q90.xR[0] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       // Cholesky
          v = 1 / hpdmatrixcholeskyrcond(&cha, n, isupper, _state);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.xR[1] = q50.xR[1] + 1.0 / passcount;
+            q50.xR[1] += 1.0 / passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.xR[1] = q90.xR[1] + 1.0 / passcount;
+            q90.xR[1] += 1.0 / passcount;
          }
          errless = errless || v > erc1 * 1.001;
       }
@@ -19601,7 +19601,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag, ae_state *_stat
             if (noffdiag == 0) {
                break;
             }
-            noffdiag = noffdiag / 2;
+            noffdiag /= 2;
          }
       }
    }
@@ -20153,7 +20153,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          sparsesmv(&crsa, isupper, &x, &b2, _state);
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + sqr(b.xR[i] - b2.xR[i], _state);
+            v += sqr(b.xR[i] - b2.xR[i], _state);
          }
          v = ae_sqrt(v, _state) / coalesce(ae_sqrt(rdotv2(n, &b, _state), _state), 1.0, _state);
          set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:189");
@@ -20168,7 +20168,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          sparsesmv(&crsa, isupper, &x, &b2, _state);
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + sqr(b.xR[i] - b2.xR[i], _state);
+            v += sqr(b.xR[i] - b2.xR[i], _state);
          }
          v = ae_sqrt(v, _state) / coalesce(ae_sqrt(rdotv2(n, &b, _state), _state), 1.0, _state);
          set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:202");
@@ -20190,7 +20190,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          sparsemv(&crsa, &x, &b2, _state);
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + sqr(b.xR[i] - b2.xR[i], _state);
+            v += sqr(b.xR[i] - b2.xR[i], _state);
          }
          v = ae_sqrt(v, _state) / coalesce(ae_sqrt(rdotv2(n, &b, _state), _state), 1.0, _state);
          set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:224");
@@ -20205,7 +20205,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          sparsemv(&crsa, &x, &b2, _state);
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + sqr(b.xR[i] - b2.xR[i], _state);
+            v += sqr(b.xR[i] - b2.xR[i], _state);
          }
          v = ae_sqrt(v, _state) / coalesce(ae_sqrt(rdotv2(n, &b, _state), _state), 1.0, _state);
          set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:237");
@@ -20213,7 +20213,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err, ae_state
          if (nnz == 0) {
             break;
          }
-         nnz = nnz / 2;
+         nnz /= 2;
       }
    }
 // Check that initial point is actually used and improves the situation:
@@ -20489,7 +20489,7 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
             for (i = 0; i < sz; i++) {
                state.mv.xR[i] = 0.0;
                for (j = 0; j < sz; j++) {
-                  state.mv.xR[i] = state.mv.xR[i] + a.xyR[i][j] * state.x.xR[j];
+                  state.mv.xR[i] += a.xyR[i][j] * state.x.xR[j];
                }
             }
          }
@@ -20498,9 +20498,9 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
             for (i = 0; i < sz; i++) {
                state.mv.xR[i] = 0.0;
                for (j = 0; j < sz; j++) {
-                  state.mv.xR[i] = state.mv.xR[i] + a.xyR[i][j] * state.x.xR[j];
+                  state.mv.xR[i] += a.xyR[i][j] * state.x.xR[j];
                }
-               state.vmv = state.vmv + state.mv.xR[i] * state.x.xR[i];
+               state.vmv += state.mv.xR[i] * state.x.xR[i];
             }
          }
          if (state.needprec) {
@@ -20537,7 +20537,7 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
       for (i = 0; i < sz; i++) {
          tmp = 0.0;
          for (j = 0; j < sz; j++) {
-            tmp = tmp + a.xyR[i][j] * x0.xR[j];
+            tmp += a.xyR[i][j] * x0.xR[j];
          }
          residual.xR[i] = b.xR[i] - tmp;
       }
@@ -20552,7 +20552,7 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
             ae_frame_leave(_state);
             return result;
          }
-         normofresidual = normofresidual + residual.xR[i] * residual.xR[i];
+         normofresidual += residual.xR[i] * residual.xR[i];
       }
       if (ae_fabs(normofresidual - rep.r2, _state) > testlincgunit_e0) {
          if (!silent) {
@@ -20576,7 +20576,7 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
                mtp.xyR[i][j] = mtx.xyR[i + 1][j] - mtx.xyR[i][j];
                tmp = 0.0;
                for (k = 0; k < sz; k++) {
-                  tmp = tmp + a.xyR[j][k] * mtx.xyR[i][k];
+                  tmp += a.xyR[j][k] * mtx.xyR[i][k];
                }
                mtr.xyR[i][j] = b.xR[j] - tmp;
             }
@@ -20593,11 +20593,11 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
                for (k = 0; k < sz; k++) {
                   tmp = 0.0;
                   for (l = 0; l < sz; l++) {
-                     tmp = tmp + a.xyR[k][l] * mtp.xyR[i][l];
+                     tmp += a.xyR[k][l] * mtp.xyR[i][l];
                   }
-                  sclr = sclr + tmp * mtp.xyR[j][k];
-                  nv0 = nv0 + mtp.xyR[i][k] * mtp.xyR[i][k];
-                  nv1 = nv1 + mtp.xyR[j][k] * mtp.xyR[j][k];
+                  sclr += tmp * mtp.xyR[j][k];
+                  nv0 += mtp.xyR[i][k] * mtp.xyR[i][k];
+                  nv1 += mtp.xyR[j][k] * mtp.xyR[j][k];
                }
                nv0 = ae_sqrt(nv0, _state);
                nv1 = ae_sqrt(nv1, _state);
@@ -20619,9 +20619,9 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
                nv0 = 0.0;
                nv1 = 0.0;
                for (k = 0; k < sz; k++) {
-                  sclr = sclr + mtr.xyR[i][k] * mtp.xyR[j][k];
-                  nv0 = nv0 + mtr.xyR[i][k] * mtr.xyR[i][k];
-                  nv1 = nv1 + mtp.xyR[j][k] * mtp.xyR[j][k];
+                  sclr += mtr.xyR[i][k] * mtp.xyR[j][k];
+                  nv0 += mtr.xyR[i][k] * mtr.xyR[i][k];
+                  nv1 += mtp.xyR[j][k] * mtp.xyR[j][k];
                }
                nv0 = ae_sqrt(nv0, _state);
                nv1 = ae_sqrt(nv1, _state);
@@ -20643,9 +20643,9 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
                nv0 = 0.0;
                nv1 = 0.0;
                for (k = 0; k < sz; k++) {
-                  sclr = sclr + mtr.xyR[i][k] * mtr.xyR[j][k];
-                  nv0 = nv0 + mtr.xyR[i][k] * mtr.xyR[i][k];
-                  nv1 = nv1 + mtr.xyR[j][k] * mtr.xyR[j][k];
+                  sclr += mtr.xyR[i][k] * mtr.xyR[j][k];
+                  nv0 += mtr.xyR[i][k] * mtr.xyR[i][k];
+                  nv1 += mtr.xyR[j][k] * mtr.xyR[j][k];
                }
                nv0 = ae_sqrt(nv0, _state);
                nv1 = ae_sqrt(nv1, _state);
@@ -20721,9 +20721,9 @@ static bool testlincgunit_complexres(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                b.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  b.xR[i] = b.xR[i] + a.xyR[i][j] * xs.xR[j];
+                  b.xR[i] += a.xyR[i][j] * xs.xR[j];
                }
-               eps = eps + b.xR[i] * b.xR[i];
+               eps += b.xR[i] * b.xR[i];
             }
             eps = 1.0E-6 * ae_sqrt(eps, _state);
          // Solve with different stopping criteria
@@ -20741,7 +20741,7 @@ static bool testlincgunit_complexres(bool silent, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      s.mv.xR[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                        s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                      }
                   }
                }
@@ -20750,9 +20750,9 @@ static bool testlincgunit_complexres(bool silent, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      s.mv.xR[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                        s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                      }
-                     s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+                     s.vmv += s.mv.xR[i] * s.x.xR[i];
                   }
                }
                if (s.needprec) {
@@ -20767,9 +20767,9 @@ static bool testlincgunit_complexres(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                tmp = 0.0;
                for (j = 0; j < n; j++) {
-                  tmp = tmp + a.xyR[i][j] * x0.xR[j];
+                  tmp += a.xyR[i][j] * x0.xR[j];
                }
-               err = err + sqr(b.xR[i] - tmp, _state);
+               err += sqr(b.xR[i] - tmp, _state);
             }
             err = ae_sqrt(err, _state);
             if (err > eps) {
@@ -20849,7 +20849,7 @@ static bool testlincgunit_basictestx(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -20858,9 +20858,9 @@ static bool testlincgunit_basictestx(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -20964,7 +20964,7 @@ static bool testlincgunit_testrcorrectness(bool silent, ae_state *_state) {
          for (i = 0; i < n; i++) {
             s.mv.xR[i] = 0.0;
             for (j = 0; j < n; j++) {
-               s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+               s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
             }
          }
       }
@@ -20973,9 +20973,9 @@ static bool testlincgunit_testrcorrectness(bool silent, ae_state *_state) {
          for (i = 0; i < n; i++) {
             s.mv.xR[i] = 0.0;
             for (j = 0; j < n; j++) {
-               s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+               s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
             }
-            s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+            s.vmv += s.mv.xR[i] * s.x.xR[i];
          }
       }
       if (s.needprec) {
@@ -20989,9 +20989,9 @@ static bool testlincgunit_testrcorrectness(bool silent, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + a.xyR[i][j] * s.x.xR[j];
+               v += a.xyR[i][j] * s.x.xR[j];
             }
-            r2 = r2 + sqr(v - b.xR[i], _state);
+            r2 += sqr(v - b.xR[i], _state);
          }
          if (ae_fabs(r2 - s.r2, _state) > rtol) {
             result = true;
@@ -21056,7 +21056,7 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -21065,9 +21065,9 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -21109,7 +21109,7 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -21118,9 +21118,9 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -21174,7 +21174,7 @@ static void testlincgunit_gramshmidtortnorm(RMatrix *a, ae_int_t n, ae_int_t k, 
    for (i = 0; i < k; i++) {
       tmp = 0.0;
       for (j = 0; j < n; j++) {
-         tmp = tmp + a->xyR[i][j] * a->xyR[i][j];
+         tmp += a->xyR[i][j] * a->xyR[i][j];
       }
       if (tmp > scaling) {
          scaling = tmp;
@@ -21186,7 +21186,7 @@ static void testlincgunit_gramshmidtortnorm(RMatrix *a, ae_int_t n, ae_int_t k, 
       tmp = 0.0;
       for (j = 0; j < n; j++) {
          b->xyR[*k2][j] = a->xyR[i][j];
-         tmp = tmp + a->xyR[i][j] * a->xyR[i][j];
+         tmp += a->xyR[i][j] * a->xyR[i][j];
       }
       tmp = ae_sqrt(tmp, _state);
       if (tmp <= e) {
@@ -21195,22 +21195,22 @@ static void testlincgunit_gramshmidtortnorm(RMatrix *a, ae_int_t n, ae_int_t k, 
       for (j = 0; j < *k2; j++) {
          sc = 0.0;
          for (m = 0; m < n; m++) {
-            sc = sc + b->xyR[*k2][m] * b->xyR[j][m];
+            sc += b->xyR[*k2][m] * b->xyR[j][m];
          }
          for (l = 0; l < n; l++) {
-            b->xyR[*k2][l] = b->xyR[*k2][l] - sc * b->xyR[j][l];
+            b->xyR[*k2][l] -= sc * b->xyR[j][l];
          }
       }
       tmp = 0.0;
       for (j = 0; j < n; j++) {
-         tmp = tmp + b->xyR[*k2][j] * b->xyR[*k2][j];
+         tmp += b->xyR[*k2][j] * b->xyR[*k2][j];
       }
       tmp = ae_sqrt(tmp, _state);
       if (tmp <= e) {
          continue;
       } else {
          for (j = 0; j < n; j++) {
-            b->xyR[*k2][j] = b->xyR[*k2][j] / tmp;
+            b->xyR[*k2][j] /= tmp;
          }
       }
       ++*k2;
@@ -21233,7 +21233,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
 // calculating NORM for X
    normx = 0.0;
    for (i = 0; i < n; i++) {
-      normx = normx + x->xR[i] * x->xR[i];
+      normx += x->xR[i] * x->xR[i];
    }
    normx = ae_sqrt(normx, _state);
 // Gram-Shmidt method
@@ -21241,7 +21241,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
    for (i = 0; i < k2; i++) {
       alpha = 0.0;
       for (j = 0; j < n; j++) {
-         alpha = alpha + x->xR[j] * ortnormbasis.xyR[i][j];
+         alpha += x->xR[j] * ortnormbasis.xyR[i][j];
       }
       alphas.xR[i] = alpha;
    }
@@ -21249,7 +21249,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
    for (i = 0; i < n; i++) {
       alpha = 0.0;
       for (j = 0; j < k2; j++) {
-         alpha = alpha + alphas.xR[j] * ortnormbasis.xyR[j][i];
+         alpha += alphas.xR[j] * ortnormbasis.xyR[j][i];
       }
       if (ae_fabs(x->xR[i] - alpha, _state) > normx * eps) {
          result = false;
@@ -21324,10 +21324,10 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
          for (i = 0; i < n; i++) {
             tmp = 0.0;
             for (j = 0; j < n; j++) {
-               tmp = tmp + a.xyR[i][j] * x0.xR[j];
+               tmp += a.xyR[i][j] * x0.xR[j];
             }
             r0.xR[i] = b.xR[i] - tmp;
-            normr0 = normr0 + r0.xR[i] * r0.xR[i];
+            normr0 += r0.xR[i] * r0.xR[i];
          }
       } while (ae_sqrt(normr0, _state) <= eps);
    // Fill KSR by {r0, A*r0, A^2*r0, ... }
@@ -21339,7 +21339,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
             for (l = 0; l < n; l++) {
                tarray.xR[l] = 0.0;
                for (m = 0; m < n; m++) {
-                  tarray.xR[l] = tarray.xR[l] + a.xyR[l][m] * ksr.xyR[i][m];
+                  tarray.xR[l] += a.xyR[l][m] * ksr.xyR[i][m];
                }
             }
             for (l = 0; l < n; l++) {
@@ -21361,7 +21361,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -21370,9 +21370,9 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -21460,9 +21460,9 @@ static bool testlincgunit_sparsetest(bool silent, ae_state *_state) {
       for (i = 0; i < n; i++) {
          b.xR[i] = 0.0;
          for (j = 0; j < n; j++) {
-            b.xR[i] = b.xR[i] + a.xyR[i][j] * xs.xR[j];
+            b.xR[i] += a.xyR[i][j] * xs.xR[j];
          }
-         eps = eps + b.xR[i] * b.xR[i];
+         eps += b.xR[i] * b.xR[i];
       }
       eps = 1.0E-6 * ae_sqrt(eps, _state);
       sparsecreate(n, n, 0, &uppera, _state);
@@ -21486,7 +21486,7 @@ static bool testlincgunit_sparsetest(bool silent, ae_state *_state) {
       lincgresults(&s, &x0, &rep, _state);
       err = 0.0;
       for (i = 0; i < n; i++) {
-         err = err + sqr(x0.xR[i] - xs.xR[i], _state);
+         err += sqr(x0.xR[i] - xs.xR[i], _state);
       }
       err = ae_sqrt(err, _state);
       if (err > eps) {
@@ -21501,7 +21501,7 @@ static bool testlincgunit_sparsetest(bool silent, ae_state *_state) {
       lincgresults(&s, &x1, &rep, _state);
       err = 0.0;
       for (i = 0; i < n; i++) {
-         err = err + sqr(x1.xR[i] - xs.xR[i], _state);
+         err += sqr(x1.xR[i] - xs.xR[i], _state);
       }
       err = ae_sqrt(err, _state);
       if (err > eps) {
@@ -21610,7 +21610,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -21619,9 +21619,9 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -21650,7 +21650,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + ta.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += ta.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -21659,9 +21659,9 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + ta.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += ta.xyR[i][j] * s.x.xR[j];
                }
-               s.vmv = s.vmv + s.mv.xR[i] * s.x.xR[i];
+               s.vmv += s.mv.xR[i] * s.x.xR[i];
             }
          }
          if (s.needprec) {
@@ -21734,7 +21734,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
    for (i = 0; i < n; i++) {
       b.xR[i] = 0.0;
       for (j = 0; j < n; j++) {
-         b.xR[i] = b.xR[i] + ta.xyR[i][j] * xe.xR[j];
+         b.xR[i] += ta.xyR[i][j] * xe.xR[j];
       }
    }
    ae_vector_set_length(&d, n, _state);
@@ -21748,8 +21748,8 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
          a.xyR[i][j] = d.xR[i] * ta.xyR[i][j] * d.xR[j];
          sparseset(&sa, i, j, a.xyR[i][j], _state);
       }
-      b.xR[i] = b.xR[i] * d.xR[i];
-      xe.xR[i] = xe.xR[i] / d.xR[i];
+      b.xR[i] *= d.xR[i];
+      xe.xR[i] /= d.xR[i];
    }
    sparseconverttocrs(&sa, _state);
    lincgcreate(n, &s, _state);
@@ -22122,18 +22122,18 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
    for (i = 0; i < minmn; i++) {
       tmparr.xR[i] = 0.0;
       for (j = 0; j < m; j++) {
-         tmparr.xR[i] = tmparr.xR[i] + u.xyR[j][i] * b->xR[j];
+         tmparr.xR[i] += u.xyR[j][i] * b->xR[j];
       }
       if (w.xR[i] <= ae_sqrt(machineepsilon, _state) * w.xR[0]) {
          tmparr.xR[i] = 0.0;
       } else {
-         tmparr.xR[i] = tmparr.xR[i] / w.xR[i];
+         tmparr.xR[i] /= w.xR[i];
       }
    }
    for (i = 0; i < n; i++) {
       svdx.xR[i] = 0.0;
       for (j = 0; j < minmn; j++) {
-         svdx.xR[i] = svdx.xR[i] + vt.xyR[j][i] * tmparr.xR[j];
+         svdx.xR[i] += vt.xyR[j][i] * tmparr.xR[j];
       }
    }
 // Calculate residual, perform checks 1.a and 1.b:
@@ -22144,7 +22144,7 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
       v = ae_v_dotproduct(svda.xyR[i], 1, x->xR, 1, n);
       r.xR[i] = v;
       if (i < m) {
-         r.xR[i] = r.xR[i] - b->xR[i];
+         r.xR[i] -= b->xR[i];
       }
    }
    v = ae_v_dotproduct(r.xR, 1, r.xR, 1, m + n);
@@ -22166,10 +22166,10 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
       for (i = 0; i < n; i++) {
          v = 0.0;
          for (j = 0; j < m + n; j++) {
-            v = v + svda.xyR[j][i] * r.xR[j];
-            anorm = anorm + sqr(svda.xyR[j][i], _state);
+            v += svda.xyR[j][i] * r.xR[j];
+            anorm += sqr(svda.xyR[j][i], _state);
          }
-         atrnorm = atrnorm + sqr(v, _state);
+         atrnorm += sqr(v, _state);
       }
       anorm = ae_sqrt(anorm, _state);
       atrnorm = ae_sqrt(atrnorm, _state);
@@ -22251,7 +22251,7 @@ static bool testlinlsqrunit_svdtest(bool silent, ae_state *_state) {
                for (i = 0; i < m; i++) {
                   s.mv.xR[i] = 0.0;
                   for (j = 0; j < n; j++) {
-                     s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                     s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                   }
                }
             }
@@ -22259,7 +22259,7 @@ static bool testlinlsqrunit_svdtest(bool silent, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   s.mtv.xR[i] = 0.0;
                   for (j = 0; j < m; j++) {
-                     s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                     s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                   }
                }
             }
@@ -22351,7 +22351,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                   rmatrixrndcond(m, c, &a, _state);
                   for (i = 0; i < m; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = s0 * a.xyR[i][j];
+                        a.xyR[i][j] *= s0;
                      }
                   }
                   ae_vector_set_length(&b, m, _state);
@@ -22359,7 +22359,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                      bnorm = 0.0;
                      for (i = 0; i < m; i++) {
                         b.xR[i] = 2 * randomreal(_state) - 1;
-                        bnorm = bnorm + b.xR[i] * b.xR[i];
+                        bnorm += b.xR[i] * b.xR[i];
                      }
                      bnorm = ae_sqrt(bnorm, _state);
                   } while (bnorm <= testlinlsqrunit_e0);
@@ -22376,7 +22376,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                         for (i = 0; i < m; i++) {
                            s.mv.xR[i] = 0.0;
                            for (j = 0; j < n; j++) {
-                              s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                              s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                            }
                         }
                      }
@@ -22384,7 +22384,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                         for (i = 0; i < n; i++) {
                            s.mtv.xR[i] = 0.0;
                            for (j = 0; j < m; j++) {
-                              s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                              s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                            }
                         }
                      }
@@ -22476,7 +22476,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent, ae_state *_state) {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
                            b.xR[i] = 2 * randomreal(_state) - 1;
-                           bnorm = bnorm + b.xR[i] * b.xR[i];
+                           bnorm += b.xR[i] * b.xR[i];
                         }
                         bnorm = ae_sqrt(bnorm, _state);
                      } while (bnorm <= testlinlsqrunit_e0);
@@ -22493,7 +22493,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent, ae_state *_state) {
                            for (i = 0; i < m; i++) {
                               s.mv.xR[i] = 0.0;
                               for (j = 0; j < n; j++) {
-                                 s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                                 s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                               }
                            }
                         }
@@ -22501,7 +22501,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent, ae_state *_state) {
                            for (i = 0; i < n; i++) {
                               s.mtv.xR[i] = 0.0;
                               for (j = 0; j < m; j++) {
-                                 s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                                 s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                               }
                            }
                         }
@@ -22603,7 +22603,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                      }
                      for (i = 0; i < m; i++) {
                         for (j = 0; j < n; j++) {
-                           a.xyR[i][j] = s0 * a.xyR[i][j];
+                           a.xyR[i][j] *= s0;
                         }
                      }
                      ae_vector_set_length(&b, m, _state);
@@ -22611,7 +22611,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
                            b.xR[i] = 2 * randomreal(_state) - 1;
-                           bnorm = bnorm + b.xR[i] * b.xR[i];
+                           bnorm += b.xR[i] * b.xR[i];
                         }
                         bnorm = ae_sqrt(bnorm, _state);
                      } while (bnorm <= testlinlsqrunit_e0);
@@ -22627,7 +22627,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                            for (i = 0; i < m; i++) {
                               s.mv.xR[i] = 0.0;
                               for (j = 0; j < n; j++) {
-                                 s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                                 s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                               }
                            }
                         }
@@ -22635,7 +22635,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                            for (i = 0; i < n; i++) {
                               s.mtv.xR[i] = 0.0;
                               for (j = 0; j < m; j++) {
-                                 s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                                 s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                               }
                            }
                         }
@@ -22721,7 +22721,7 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent, ae_state *_state) {
                   for (i = 0; i < m; i++) {
                      s.mv.xR[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                        s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                      }
                   }
                }
@@ -22729,7 +22729,7 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      s.mtv.xR[i] = 0.0;
                      for (j = 0; j < m; j++) {
-                        s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                        s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                      }
                   }
                }
@@ -22808,7 +22808,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
             for (i = 0; i < m + n; i++) {
                if (i < m) {
                   b.xR[i] = (mx - mn) * randomreal(_state) + mn;
-                  rnorm = rnorm + b.xR[i] * b.xR[i];
+                  rnorm += b.xR[i] * b.xR[i];
                } else {
                   b.xR[i] = 0.0;
                }
@@ -22828,7 +22828,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
                   for (i = 0; i < m; i++) {
                      s.mv.xR[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                        s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                      }
                   }
                }
@@ -22836,7 +22836,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
                   for (i = 0; i < n; i++) {
                      s.mtv.xR[i] = 0.0;
                      for (j = 0; j < m; j++) {
-                        s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                        s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                      }
                   }
                }
@@ -22845,9 +22845,9 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
                   for (i = 0; i < m + n; i++) {
                      tmp = 0.0;
                      for (j = 0; j < n; j++) {
-                        tmp = tmp + a.xyR[i][j] * s.x.xR[j];
+                        tmp += a.xyR[i][j] * s.x.xR[j];
                      }
-                     tnorm = tnorm + (b.xR[i] - tmp) * (b.xR[i] - tmp);
+                     tnorm += (b.xR[i] - tmp) * (b.xR[i] - tmp);
                   }
                // check, that RNorm is't more than S.R2
                // and difference between S.R2 and TNorm
@@ -22960,7 +22960,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
       bnorm = 0.0;
       for (i = 0; i < n; i++) {
          b.xR[i] = (mx - mn) * randomreal(_state) + mn;
-         bnorm = bnorm + b.xR[i] * b.xR[i];
+         bnorm += b.xR[i] * b.xR[i];
       }
       bnorm = ae_sqrt(bnorm, _state);
    // Test MaxIts
@@ -22977,7 +22977,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -22985,7 +22985,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             for (i = 0; i < n; i++) {
                s.mtv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                  s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                }
             }
          }
@@ -23021,7 +23021,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
          }
@@ -23029,7 +23029,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             for (i = 0; i < n; i++) {
                s.mtv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                  s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                }
             }
          }
@@ -23039,9 +23039,9 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
       for (i = 0; i < n; i++) {
          tmp = 0.0;
          for (j = 0; j < n; j++) {
-            tmp = tmp + a.xyR[i][j] * x0.xR[j];
+            tmp += a.xyR[i][j] * x0.xR[j];
          }
-         rknorm = rknorm + (tmp - b.xR[i]) * (tmp - b.xR[i]);
+         rknorm += (tmp - b.xR[i]) * (tmp - b.xR[i]);
       }
       rknorm = ae_sqrt(rknorm, _state);
       if (rknorm > epsmod * bnorm || rep.terminationtype <= 0) {
@@ -23072,7 +23072,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             rmatrixrndorthogonal(n, &a, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  a.xyR[i][j] = anorm * a.xyR[i][j];
+                  a.xyR[i][j] *= anorm;
                }
             }
             ae_vector_set_length(&b, n, _state);
@@ -23085,7 +23085,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             }
             tmp = 0.0;
             for (i = 0; i < n; i++) {
-               tmp = tmp + sqr(b.xR[i], _state);
+               tmp += sqr(b.xR[i], _state);
             }
             tmp = ae_pow(10.0, (double)(10 * k1), _state) / ae_sqrt(tmp, _state);
             ae_v_muld(b.xR, 1, n, tmp);
@@ -23104,7 +23104,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
                   for (i = 0; i < n; i++) {
                      s.mv.xR[i] = 0.0;
                      for (j = 0; j < n - 1; j++) {
-                        s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                        s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                      }
                   }
                }
@@ -23112,7 +23112,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
                   for (i = 0; i < n - 1; i++) {
                      s.mtv.xR[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                        s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                      }
                   }
                }
@@ -23125,18 +23125,18 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
             for (i = 0; i < n; i++) {
                rk.xR[i] = b.xR[i];
                for (j = 0; j < n - 1; j++) {
-                  rk.xR[i] = rk.xR[i] - a.xyR[i][j] * x0.xR[j];
+                  rk.xR[i] -= a.xyR[i][j] * x0.xR[j];
                }
-               rknorm = rknorm + sqr(rk.xR[i], _state);
+               rknorm += sqr(rk.xR[i], _state);
             }
             rknorm = ae_sqrt(rknorm, _state);
             arknorm = 0.0;
             for (i = 0; i < n - 1; i++) {
                ark.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  ark.xR[i] = ark.xR[i] + a.xyR[j][i] * rk.xR[j];
+                  ark.xR[i] += a.xyR[j][i] * rk.xR[j];
                }
-               arknorm = arknorm + sqr(ark.xR[i], _state);
+               arknorm += sqr(ark.xR[i], _state);
             }
             arknorm = ae_sqrt(arknorm, _state);
             if (arknorm / (anorm * rknorm) > epsmod || rep.terminationtype != 4) {
@@ -23228,7 +23228,7 @@ static bool testlinlsqrunit_analytictest(bool silent, ae_state *_state) {
                for (i = 0; i < m; i++) {
                   s.mv.xR[i] = 0.0;
                   for (j = 0; j < n; j++) {
-                     s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                     s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                   }
                }
             }
@@ -23236,7 +23236,7 @@ static bool testlinlsqrunit_analytictest(bool silent, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   s.mtv.xR[i] = 0.0;
                   for (j = 0; j < m; j++) {
-                     s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                     s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                   }
                }
             }
@@ -23279,7 +23279,7 @@ static bool testlinlsqrunit_analytictest(bool silent, ae_state *_state) {
             for (i = 0; i < m; i++) {
                ap.xyR[k][i] = 0.0;
                for (j = 0; j < n; j++) {
-                  ap.xyR[k][i] = ap.xyR[k][i] + a.xyR[i][j] * (xk.xyR[k + 1][j] - xk.xyR[k][j]);
+                  ap.xyR[k][i] += a.xyR[i][j] * (xk.xyR[k + 1][j] - xk.xyR[k][j]);
                }
             }
          // Calculate K-th row of R
@@ -23354,7 +23354,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err, ae_state *_state)
             for (i = 0; i < m; i++) {
                s.mv.xR[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.xR[i] = s.mv.xR[i] + a.xyR[i][j] * s.x.xR[j];
+                  s.mv.xR[i] += a.xyR[i][j] * s.x.xR[j];
                }
             }
             if (firstpointreported) {
@@ -23368,7 +23368,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err, ae_state *_state)
             for (i = 0; i < n; i++) {
                s.mtv.xR[i] = 0.0;
                for (j = 0; j < m; j++) {
-                  s.mtv.xR[i] = s.mtv.xR[i] + a.xyR[j][i] * s.x.xR[j];
+                  s.mtv.xR[i] += a.xyR[j][i] * s.x.xR[j];
                }
             }
             if (firstpointreported) {
@@ -23441,7 +23441,7 @@ static bool testlinlsqrunit_preconditionertest(ae_state *_state) {
    for (i = 0; i < n; i++) {
       b.xR[i] = 0.0;
       for (j = 0; j < n; j++) {
-         b.xR[i] = b.xR[i] + ta.xyR[i][j] * xe.xR[j];
+         b.xR[i] += ta.xyR[i][j] * xe.xR[j];
       }
    }
    ae_vector_set_length(&d, n, _state);
@@ -23455,7 +23455,7 @@ static bool testlinlsqrunit_preconditionertest(ae_state *_state) {
          a.xyR[i][j] = ta.xyR[i][j] * d.xR[j];
          sparseset(&sa, i, j, a.xyR[i][j], _state);
       }
-      xe.xR[i] = xe.xR[i] / d.xR[i];
+      xe.xR[i] /= d.xR[i];
    }
    sparseconverttocrs(&sa, _state);
    linlsqrcreate(n, n, &s, _state);
@@ -25103,7 +25103,7 @@ static void testoptservunit_testprec(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < k; i++) {
             ae_v_move(sk.xyR[i], 1, va.xyR[i], 1, n);
             v = ae_v_dotproduct(va.xyR[i], 1, sk.xyR[i], 1, n);
-            v = v * vc.xR[i];
+            v *= vc.xR[i];
             for (j = 0; j < n; j++) {
                yk.xyR[i][j] = vd.xR[j] * sk.xyR[i][j] + va.xyR[i][j] * v;
             }
@@ -25122,8 +25122,8 @@ static void testoptservunit_testprec(bool *wereerrors, ae_state *_state) {
             for (j0 = 0; j0 < n; j0++) {
                bksk.xR[j0] = 0.0;
                for (j1 = 0; j1 < n; j1++) {
-                  theta = theta + sk.xyR[i][j0] * bk.xyR[j0][j1] * sk.xyR[i][j1];
-                  bksk.xR[j0] = bksk.xR[j0] + bk.xyR[j0][j1] * sk.xyR[i][j1];
+                  theta += sk.xyR[i][j0] * bk.xyR[j0][j1] * sk.xyR[i][j1];
+                  bksk.xR[j0] += bk.xyR[j0][j1] * sk.xyR[i][j1];
                }
             }
             theta = 1 / theta;
@@ -25131,12 +25131,12 @@ static void testoptservunit_testprec(bool *wereerrors, ae_state *_state) {
             rho = 1 / rho;
             for (j0 = 0; j0 < n; j0++) {
                for (j1 = 0; j1 < n; j1++) {
-                  bk.xyR[j0][j1] = bk.xyR[j0][j1] + rho * yk.xyR[i][j0] * yk.xyR[i][j1];
+                  bk.xyR[j0][j1] += rho * yk.xyR[i][j0] * yk.xyR[i][j1];
                }
             }
             for (j0 = 0; j0 < n; j0++) {
                for (j1 = 0; j1 < n; j1++) {
-                  bk.xyR[j0][j1] = bk.xyR[j0][j1] - theta * bksk.xR[j0] * bksk.xR[j1];
+                  bk.xyR[j0][j1] -= theta * bksk.xR[j0] * bksk.xR[j1];
                }
             }
          }
@@ -25224,7 +25224,7 @@ static void testoptservunit_testprec(bool *wereerrors, ae_state *_state) {
                   v = 0.0;
                }
                for (j1 = 0; j1 < k; j1++) {
-                  v = v + va.xyR[j1][i] * vc.xR[j1] * va.xyR[j1][j];
+                  v += va.xyR[j1][i] * vc.xR[j1] * va.xyR[j1][j];
                }
                bk.xyR[i][j] = v;
             }
@@ -25234,7 +25234,7 @@ static void testoptservunit_testprec(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + bk.xyR[i][j] * s2.xR[j];
+               v += bk.xyR[i][j] * s2.xR[j];
             }
             tmp.xR[i] = v;
          }
@@ -25377,7 +25377,7 @@ static void testminlbfgsunit_calciip2(minlbfgsstate *state, ae_int_t n, ae_state
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f = state->f + sqr((double)(i * i + 1), _state) * sqr(state->x.xR[i], _state);
+         state->f += sqr((double)(i * i + 1), _state) * sqr(state->x.xR[i], _state);
       }
       if (state->needfg) {
          state->g.xR[i] = sqr((double)(i * i + 1), _state) * 2 * state->x.xR[i];
@@ -25445,7 +25445,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntb1 = cntb1 + rep.iterationscount;
+         cntb1 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
    // Test it with unit preconditioner
@@ -25470,7 +25470,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntb2 = cntb2 + rep.iterationscount;
+         cntb2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
    // Test it with perturbed Hessian preconditioner
@@ -25499,7 +25499,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntg1 = cntg1 + rep.iterationscount;
+         cntg1 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
    // Test it with perturbed diagonal preconditioner
@@ -25518,7 +25518,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntg2 = cntg2 + rep.iterationscount;
+         cntg2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
    // Compare
@@ -25556,7 +25556,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntb2 = cntb2 + rep.iterationscount;
+         cntb2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
       minlbfgssetprecscale(&state, _state);
@@ -25571,7 +25571,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
             testminlbfgsunit_calciip2(&state, n, _state);
          }
          minlbfgsresults(&state, &x, &rep, _state);
-         cntg2 = cntg2 + rep.iterationscount;
+         cntg2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
       *err = *err || cntb2 < cntg2;
@@ -25647,7 +25647,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+            state.f += sqr((1 + i) * state.x.xR[i], _state);
             state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
          }
       }
@@ -25692,7 +25692,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             if (state.needf || state.needfg) {
-               state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+               state.f += sqr((1 + i) * state.x.xR[i], _state);
             }
             if (state.needfg) {
                state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
@@ -25799,7 +25799,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
+                  state.f += a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
                   state.g.xR[i] = 4 * a.xR[i] * ae_pow(state.x.xR[i], 3.0, _state);
                }
             }
@@ -25812,7 +25812,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + sqr(s.xR[i] * 4 * a.xR[i] * ae_pow(x.xR[i], 3.0, _state), _state);
+            v += sqr(s.xR[i] * 4 * a.xR[i] * ae_pow(x.xR[i], 3.0, _state), _state);
          }
          v = ae_sqrt(v, _state);
          *err = *err || v > tmpeps;
@@ -25828,7 +25828,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
+                  state.f += a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
                   state.g.xR[i] = 4 * a.xR[i] * ae_pow(state.x.xR[i], 3.0, _state);
                }
             }
@@ -25836,7 +25836,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
                if (hasxlast) {
                   lastscaledstep = 0.0;
                   for (i = 0; i < n; i++) {
-                     lastscaledstep = lastscaledstep + sqr(state.x.xR[i] - xlast.xR[i], _state) / sqr(s.xR[i], _state);
+                     lastscaledstep += sqr(state.x.xR[i] - xlast.xR[i], _state) / sqr(s.xR[i], _state);
                   }
                   lastscaledstep = ae_sqrt(lastscaledstep, _state);
                } else {
@@ -25955,11 +25955,11 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.xR[i] * state.x.xR[i];
+               state.f += b.xR[i] * state.x.xR[i];
                state.g.xR[i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                  state.g.xR[i] = state.g.xR[i] + fulla.xyR[i][j] * state.x.xR[j];
+                  state.f += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                  state.g.xR[i] += fulla.xyR[i][j] * state.x.xR[j];
                }
             }
             if (k >= spoiliteration) {
@@ -26069,9 +26069,9 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + ae_fabs(vv, _state);
+            v += ae_fabs(vv, _state);
          }
          set_error_flag(err, ae_fabs(v - rep->f.xR[k], _state) > 1.0E-6 * maxreal(ae_fabs(v, _state), 1.0, _state), __FILE__, __LINE__, "testminlbfgsunit.ap:1776");
       }
@@ -26081,8 +26081,8 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
       }
@@ -26145,9 +26145,9 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + sign(vv, _state) * a->xyR[i][rep->vidx];
+            v += sign(vv, _state) * a->xyR[i][rep->vidx];
             tooclose = tooclose || ae_fabs(vv, _state) < 1.0E-4;
          }
          if (!tooclose) {
@@ -26161,8 +26161,8 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          tooclose = (tooclose || ae_fabs(va, _state) < 1.0E-8) || ae_fabs(vb, _state) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
@@ -26247,9 +26247,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + 0.5 * state.x.xR[i] * v;
+            state.f += 0.5 * state.x.xR[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.xR[i] = 0.0;
@@ -26303,12 +26303,12 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + ae_fabs(v, _state);
+            state.f += ae_fabs(v, _state);
             v = (double)sign(v, _state);
             for (j = 0; j < n; j++) {
-               state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+               state.g.xR[j] += v * a.xyR[i][j];
             }
          }
          continue;
@@ -26360,9 +26360,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                  state.f += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                   state.g.xR[i] = v;
                }
                if (defecttype == 0) {
@@ -26372,10 +26372,10 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] = state.g.xR[varidx] * 2;
+                  state.g.xR[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.xR[i] = state.g.xR[i] / s.xR[i];
+                  state.g.xR[i] /= s.xR[i];
                }
                continue;
             }
@@ -26401,7 +26401,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+               v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
             }
             jactrue.xyR[0][i] = v;
             jacdefect.xyR[0][i] = v;
@@ -26413,11 +26413,11 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
+            jacdefect.xyR[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-            jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
+            jactrue.xyR[0][i] /= s.xR[i];
+            jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
          set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n, _state), __FILE__, __LINE__, "testminlbfgsunit.ap:1413");
@@ -26495,12 +26495,12 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
                v = (double)sign(v, _state);
                for (j = 0; j < n; j++) {
-                  state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+                  state.g.xR[j] += v * a.xyR[i][j];
                }
             }
             continue;
@@ -26540,8 +26540,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1544");
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n, _state);
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n, _state);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1552");
          set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1553");
@@ -26556,8 +26556,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1563");
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n, _state);
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n, _state);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1571");
          set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1572");
@@ -26612,9 +26612,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
             }
             continue;
          }
@@ -26667,11 +26667,11 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.xR[i] * state.x.xR[i];
+            state.f += b.xR[i] * state.x.xR[i];
             state.g.xR[i] = b.xR[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
-               state.g.xR[i] = state.g.xR[i] + a.xyR[i][j] * state.x.xR[j];
+               state.f += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+               state.g.xR[i] += a.xyR[i][j] * state.x.xR[j];
             }
          }
          continue;
@@ -26788,7 +26788,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
          }
          minlbfgsresults(&state, &x, &rep, _state);
          nonconverror = (nonconverror || rep.terminationtype <= 0) || ae_fabs(x.xR[0], _state) > 0.001;
-         v = v + 0.1;
+         v += 0.1;
       }
    }
 // F2 problem with restarts:
@@ -26852,7 +26852,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = 2 * randomreal(_state) - 1;
          }
-         a.xyR[i][i] = a.xyR[i][i] + 3 * sign(a.xyR[i][i], _state);
+         a.xyR[i][i] += 3 * sign(a.xyR[i][i], _state);
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(a.xyR[i], 1, xe.xR, 1, n);
@@ -26884,11 +26884,11 @@ bool testminlbfgs(bool silent, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
                   if (state.needf || state.needfg) {
-                     state.f = state.f + sqr(v - b.xR[i], _state);
+                     state.f += sqr(v - b.xR[i], _state);
                   }
                   if (state.needfg) {
                      for (j = 0; j < n; j++) {
-                        state.g.xR[j] = state.g.xR[j] + 2 * (v - b.xR[i]) * a.xyR[i][j];
+                        state.g.xR[j] += 2 * (v - b.xR[i]) * a.xyR[i][j];
                      }
                   }
                }
@@ -27164,24 +27164,24 @@ bool testcqmodels(bool silent, ae_state *_state) {
             adxe.xR[i] = 0.0;
          }
          for (i = 0; i < n; i++) {
-            v = v + x.xR[i] * b.xR[i];
-            ge.xR[i] = ge.xR[i] + b.xR[i];
-            v = v + 0.5 * sqr(x.xR[i], _state) * tau * d.xR[i];
-            ge.xR[i] = ge.xR[i] + x.xR[i] * tau * d.xR[i];
-            adxe.xR[i] = adxe.xR[i] + x.xR[i] * tau * d.xR[i];
-            xtadx2 = xtadx2 + 0.5 * sqr(x.xR[i], _state) * tau * d.xR[i];
+            v += x.xR[i] * b.xR[i];
+            ge.xR[i] += b.xR[i];
+            v += 0.5 * sqr(x.xR[i], _state) * tau * d.xR[i];
+            ge.xR[i] += x.xR[i] * tau * d.xR[i];
+            adxe.xR[i] += x.xR[i] * tau * d.xR[i];
+            xtadx2 += 0.5 * sqr(x.xR[i], _state) * tau * d.xR[i];
             for (j = 0; j < n; j++) {
-               v = v + 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
-               ge.xR[i] = ge.xR[i] + alpha * a.xyR[i][j] * x.xR[j];
-               adxe.xR[i] = adxe.xR[i] + alpha * a.xyR[i][j] * x.xR[j];
-               xtadx2 = xtadx2 + 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
+               v += 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
+               ge.xR[i] += alpha * a.xyR[i][j] * x.xR[j];
+               adxe.xR[i] += alpha * a.xyR[i][j] * x.xR[j];
+               xtadx2 += 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
             }
          }
          for (i = 0; i < k; i++) {
             v2 = ae_v_dotproduct(q.xyR[i], 1, x.xR, 1, n);
-            v = v + 0.5 * theta * sqr(v2 - r.xR[i], _state);
+            v += 0.5 * theta * sqr(v2 - r.xR[i], _state);
             for (j = 0; j < n; j++) {
-               ge.xR[j] = ge.xR[j] + theta * (v2 - r.xR[i]) * q.xyR[i][j];
+               ge.xR[j] += theta * (v2 - r.xR[i]) * q.xyR[i][j];
             }
          }
          v2 = cqmeval(&s, &x, _state);
@@ -27250,14 +27250,14 @@ bool testcqmodels(bool silent, ae_state *_state) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + xc.xR[i] * b.xR[i];
+            v += xc.xR[i] * b.xR[i];
             for (j = 0; j < n; j++) {
-               v = v + 0.5 * alpha * xc.xR[i] * a.xyR[i][j] * xc.xR[j];
+               v += 0.5 * alpha * xc.xR[i] * a.xyR[i][j] * xc.xR[j];
             }
          }
          for (i = 0; i < k; i++) {
             v2 = ae_v_dotproduct(q.xyR[i], 1, xc.xR, 1, n);
-            v = v + 0.5 * theta * sqr(v2 - r.xR[i], _state);
+            v += 0.5 * theta * sqr(v2 - r.xR[i], _state);
          }
          eval1errors = eval1errors || ae_fabs(v - cqmeval(&s, &xc, _state), _state) > 10000 * machineepsilon;
          eval1errors = eval1errors || ae_fabs(v - cqmdebugconstrainedevalt(&s, &x, _state), _state) > 10000 * machineepsilon;
@@ -27419,24 +27419,24 @@ bool testcqmodels(bool silent, ae_state *_state) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + x.xR[i] * b.xR[i];
+            v += x.xR[i] * b.xR[i];
          }
          if (tau > 0.0) {
             for (i = 0; i < n; i++) {
-               v = v + 0.5 * tau * d.xR[i] * sqr(x.xR[i], _state);
+               v += 0.5 * tau * d.xR[i] * sqr(x.xR[i], _state);
             }
          }
          if (alpha > 0.0) {
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  v = v + 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
+                  v += 0.5 * alpha * x.xR[i] * a.xyR[i][j] * x.xR[j];
                }
             }
          }
          if (theta > 0.0) {
             for (i = 0; i < k; i++) {
                v2 = ae_v_dotproduct(q.xyR[i], 1, x.xR, 1, n);
-               v = v + 0.5 * theta * sqr(v2 - r.xR[i], _state);
+               v += 0.5 * theta * sqr(v2 - r.xR[i], _state);
             }
          }
          v2 = cqmeval(&s, &x, _state);
@@ -27599,7 +27599,7 @@ bool testcqmodels(bool silent, ae_state *_state) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                q.xyR[i][j] = 2 * randomreal(_state) - 1;
-               v = v + q.xyR[i][j] * x0.xR[j];
+               v += q.xyR[i][j] * x0.xR[j];
             }
             r.xR[i] = v;
          }
@@ -27627,11 +27627,11 @@ bool testcqmodels(bool silent, ae_state *_state) {
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + 0.5 * tau * d.xR[i] * sqr(x.xR[i], _state) + x.xR[i] * b.xR[i];
+               v += 0.5 * tau * d.xR[i] * sqr(x.xR[i], _state) + x.xR[i] * b.xR[i];
             }
             for (i = 0; i < k; i++) {
                v2 = ae_v_dotproduct(q.xyR[i], 1, x.xR, 1, n);
-               v = v + 0.5 * theta * sqr(v2 - r.xR[i], _state);
+               v += 0.5 * theta * sqr(v2 - r.xR[i], _state);
             }
             v2 = cqmeval(&s, &x, _state);
             newton2errors = (newton2errors || !ae_isfinite(v2, _state)) || ae_fabs(v - v2, _state) > 10000 * machineepsilon;
@@ -27923,7 +27923,7 @@ bool testsnnls(bool silent, ae_state *_state) {
                for (i = 0; i < nr; i++) {
                   v = 0.0;
                   for (j = 0; j < ns + nd; j++) {
-                     v = v + effectivea.xyR[i][j] * xs.xR[j];
+                     v += effectivea.xyR[i][j] * xs.xR[j];
                   }
                   b.xR[i] = v;
                }
@@ -28128,13 +28128,13 @@ static void testsactivesetsunit_testspecproperties(bool *err, ae_state *_state) 
          v = 0.0;
          for (j = 0; j < n; j++) {
             c.xyR[i][j] = hqrndnormal(&rs, _state);
-            v = v + c.xyR[i][j] * x.xR[j];
+            v += c.xyR[i][j] * x.xR[j];
          }
          c.xyR[i][n] = v;
          if (i < nec) {
             ct.xZ[i] = 0;
          } else {
-            c.xyR[i][n] = c.xyR[i][n] + 0.1;
+            c.xyR[i][n] += 0.1;
             ct.xZ[i] = -1;
          }
       }
@@ -28150,11 +28150,11 @@ static void testsactivesetsunit_testspecproperties(bool *err, ae_state *_state) 
          if (scaletype != 0) {
             s.xR[i] = ae_pow(10.0, 40 * hqrnduniformr(&rs, _state) - 20, _state);
          }
-         x.xR[i] = x.xR[i] * s.xR[i];
-         bl.xR[i] = bl.xR[i] * s.xR[i];
-         bu.xR[i] = bu.xR[i] * s.xR[i];
+         x.xR[i] *= s.xR[i];
+         bl.xR[i] *= s.xR[i];
+         bu.xR[i] *= s.xR[i];
          for (j = 0; j < nec + nic; j++) {
-            c.xyR[j][i] = c.xyR[j][i] / s.xR[i];
+            c.xyR[j][i] /= s.xR[i];
          }
       }
       for (i = 0; i < nec + nic; i++) {
@@ -28192,8 +28192,8 @@ static void testsactivesetsunit_testspecproperties(bool *err, ae_state *_state) 
             vv = 0.0;
             for (j = 0; j < n; j++) {
                c.xyR[i][j] = hqrndnormal(&rs, _state);
-               vv = vv + sqr(c.xyR[i][j], _state);
-               v = v + c.xyR[i][j] * x.xR[j];
+               vv += sqr(c.xyR[i][j], _state);
+               v += c.xyR[i][j] * x.xR[j];
             }
             c.xyR[i][n] = v;
             vv = coalesce(vv, 1.0, _state);
@@ -28220,9 +28220,9 @@ static void testsactivesetsunit_testspecproperties(bool *err, ae_state *_state) 
             if (scaletype != 0) {
                s.xR[i] = ae_pow(10.0, 40 * hqrnduniformr(&rs, _state) - 20, _state);
             }
-            x.xR[i] = x.xR[i] * s.xR[i];
+            x.xR[i] *= s.xR[i];
             for (j = 0; j < nec + nic; j++) {
-               c.xyR[j][i] = c.xyR[j][i] / s.xR[i];
+               c.xyR[j][i] /= s.xR[i];
             }
          }
          for (i = 0; i < nec + nic; i++) {
@@ -28236,7 +28236,7 @@ static void testsactivesetsunit_testspecproperties(bool *err, ae_state *_state) 
          sasstartoptimization(&state, &x, _state);
          set_error_flag(err, !state.feasinitpt, __FILE__, __LINE__, "testsactivesetsunit.ap:225");
       // Solve for infeasible initial X and check State.FeasInitPt flag
-         x.xR[distortidx] = x.xR[distortidx] + s.xR[distortidx] * distortmag;
+         x.xR[distortidx] += s.xR[distortidx] * distortmag;
          sasinit(n, &state, _state);
          sassetscale(&state, &s, _state);
          sassetlc(&state, &c, &ct, nec + nic, _state);
@@ -28291,7 +28291,7 @@ static void testminbleicunit_calciip2(minbleicstate *state, ae_int_t n, ae_int_t
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f = state->f + ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * sqr(state->x.xR[i], _state);
+         state->f += ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * sqr(state->x.xR[i], _state);
          state->g.xR[i] = ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * 2 * state->x.xR[i];
       }
    }
@@ -28405,7 +28405,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      x.xR[i] = 2 * randomreal(_state) - 1;
                      c.xyR[0][i] = 2 * randomreal(_state) - 1;
                      v = 2 * randomreal(_state) - 1;
-                     c.xyR[0][n] = c.xyR[0][n] + c.xyR[0][i] * v;
+                     c.xyR[0][n] += c.xyR[0][i] * v;
                   }
                   ct.xZ[0] = 0;
                // Create and optimize
@@ -28424,7 +28424,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_pow(state.x.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i], (double)p, _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = p * ae_pow(state.x.xR[i], (double)(p - 1), _state);
@@ -28534,7 +28534,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + sqr(state.x.xR[i] - x0.xR[i], _state);
+                           state.f += sqr(state.x.xR[i] - x0.xR[i], _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = 2 * (state.x.xR[i] - x0.xR[i]);
@@ -28555,7 +28555,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                // Compare with XS
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + sqr(x.xR[i] - xs.xR[i], _state);
+                     v += sqr(x.xR[i] - xs.xR[i], _state);
                   }
                   v = ae_sqrt(v, _state);
                   set_error_flag(converr, ae_fabs(v, _state) > 0.001, __FILE__, __LINE__, "testminbleicunit.ap:393");
@@ -28610,7 +28610,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
@@ -28630,7 +28630,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > 0.0 && x.xR[i] < 1.0) {
-                        v = v + sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
+                        v += sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
                      }
                      *feaserr = *feaserr || x.xR[i] < 0.0;
                      *feaserr = *feaserr || x.xR[i] > 1.0;
@@ -28692,7 +28692,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
@@ -28712,7 +28712,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > bl.xR[i] && x.xR[i] < bu.xR[i]) {
-                        v = v + sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
+                        v += sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
                      }
                      *feaserr = *feaserr || x.xR[i] < bl.xR[i];
                      *feaserr = *feaserr || x.xR[i] > bu.xR[i];
@@ -28770,7 +28770,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                        state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
                      }
                      continue;
@@ -28791,7 +28791,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                v = 0.0;
                for (i = 0; i < n; i++) {
                   if (x.xR[i] > 0.02 && x.xR[i] < 0.98) {
-                     v = v + sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
+                     v += sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
                   }
                   *feaserr = *feaserr || x.xR[i] < 0.0 - epsfeas;
                   *feaserr = *feaserr || x.xR[i] > 1.0 + epsfeas;
@@ -28841,7 +28841,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      c.xyR[i][n] = 0.0;
                      for (j = 0; j < n; j++) {
                         c.xyR[i][j] = 2 * randomreal(_state) - 1;
-                        c.xyR[i][n] = c.xyR[i][n] + c.xyR[i][j] * xc.xR[j];
+                        c.xyR[i][n] += c.xyR[i][j] * xc.xR[j];
                      }
                      ct.xZ[i] = randominteger(3, _state) - 1;
                   }
@@ -28855,7 +28855,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                            state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
                         }
                         continue;
@@ -28878,7 +28878,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   for (i = 0; i < k; i++) {
                      v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
-                     v = v - c.xyR[i][n];
+                     v -= c.xyR[i][n];
                      if (ct.xZ[i] == 0) {
                         *feaserr = *feaserr || ae_fabs(v, _state) > epsfeas;
                      }
@@ -28932,7 +28932,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                        state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
                      }
                      continue;
@@ -28992,7 +28992,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f = state.f + ae_pow(state.x.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i], (double)p, _state);
                            state.g.xR[i] = p * ae_pow(state.x.xR[i], (double)(p - 1), _state);
                         }
                         continue;
@@ -29119,7 +29119,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.xR[i];
+            state.f += state.x.xR[i];
             state.g.xR[i] = 1.0;
          }
       }
@@ -29138,7 +29138,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.xR[i];
+            state.f += state.x.xR[i];
             state.g.xR[i] = 1.0;
          }
       }
@@ -29173,7 +29173,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+               state.f += sqr((1 + i) * state.x.xR[i], _state);
                state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
             }
          }
@@ -29218,7 +29218,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+                  state.f += sqr((1 + i) * state.x.xR[i], _state);
                }
                if (state.needfg) {
                   state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
@@ -29371,7 +29371,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + a.xR[i] * sqr(state.x.xR[i], _state);
+                        state.f += a.xR[i] * sqr(state.x.xR[i], _state);
                         state.g.xR[i] = 2 * a.xR[i] * state.x.xR[i];
                      }
                   }
@@ -29384,7 +29384,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
                }
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i], _state);
+                  v += sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i], _state);
                }
                v = ae_sqrt(v, _state);
                set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbleicunit.ap:1320");
@@ -29562,7 +29562,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state);
                if (state.x.xR[0] == x.xR[0] && state.x.xR[1] == x.xR[1]) {
-                  state.f = state.f - 0.1;
+                  state.f -= 0.1;
                }
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
@@ -29617,11 +29617,11 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.xR[i] * state.x.xR[i];
+               state.f += b.xR[i] * state.x.xR[i];
                state.g.xR[i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                  state.g.xR[i] = state.g.xR[i] + fulla.xyR[i][j] * state.x.xR[j];
+                  state.f += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                  state.g.xR[i] += fulla.xyR[i][j] * state.x.xR[j];
                }
             }
             if (k >= spoiliteration) {
@@ -29725,13 +29725,13 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             c.xyR[i][j] = hqrndnormal(&rs, _state);
-            v = v + c.xyR[i][j] * x.xR[j];
+            v += c.xyR[i][j] * x.xR[j];
          }
          c.xyR[i][n] = v;
          if (i < nec) {
             ct.xZ[i] = 0;
          } else {
-            c.xyR[i][n] = c.xyR[i][n] + 0.1;
+            c.xyR[i][n] += 0.1;
             ct.xZ[i] = -1;
          }
       }
@@ -29747,11 +29747,11 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          if (scaletype != 0) {
             s.xR[i] = ae_pow(10.0, 40 * hqrnduniformr(&rs, _state) - 20, _state);
          }
-         x.xR[i] = x.xR[i] * s.xR[i];
-         bl.xR[i] = bl.xR[i] * s.xR[i];
-         bu.xR[i] = bu.xR[i] * s.xR[i];
+         x.xR[i] *= s.xR[i];
+         bl.xR[i] *= s.xR[i];
+         bu.xR[i] *= s.xR[i];
          for (j = 0; j < nec + nic; j++) {
-            c.xyR[j][i] = c.xyR[j][i] / s.xR[i];
+            c.xyR[j][i] /= s.xR[i];
          }
       }
       for (i = 0; i < nec + nic; i++) {
@@ -29768,7 +29768,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.x.xR[i];
+               state.f += state.x.xR[i];
                state.g.xR[i] = 1.0;
             }
          }
@@ -29788,18 +29788,18 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       spdmatrixrndcond(n, 1.0E3, &fulla, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            fulla.xyR[i][j] = fulla.xyR[i][j] * 1.0E9;
+            fulla.xyR[i][j] *= 1.0E9;
          }
       }
       ae_vector_set_length(&x0, n, _state);
       v = 0.0;
       for (i = 0; i < n; i++) {
          x0.xR[i] = hqrnduniformr(&rs, _state);
-         v = v + sqr(x0.xR[i], _state);
+         v += sqr(x0.xR[i], _state);
       }
       ae_assert(v > 0.0, "MinBLEIC: integrity check failed in the unit test", _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = x0.xR[i] / ae_sqrt(v, _state);
+         x0.xR[i] /= ae_sqrt(v, _state);
       }
       ae_matrix_set_length(&c, 1, n + 1, _state);
       ae_vector_set_length(&ct, 1, _state);
@@ -29808,7 +29808,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(fulla.xyR[i], 1, x0.xR, 1, n);
          c.xyR[0][i] = v;
-         c.xyR[0][n] = c.xyR[0][n] + v * x0.xR[i];
+         c.xyR[0][n] += v * x0.xR[i];
       }
       ae_assert(c.xyR[0][n] > 0.0, "MinBLEIC: integrity check failed in the unit test", _state);
       minbleiccreate(n, &x0, &state, _state);
@@ -29819,7 +29819,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.xyR[i], 1, state.x.xR, 1, n);
-               state.f = state.f + 0.5 * v * state.x.xR[i];
+               state.f += 0.5 * v * state.x.xR[i];
                state.g.xR[i] = v;
             }
          }
@@ -30043,11 +30043,11 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.xyR[i][j] = randomnormal(_state);
-               v = v + sqr(c.xyR[i][j], _state);
+               v += sqr(c.xyR[i][j], _state);
             }
             if (v > 0.0) {
                for (j = 0; j < n; j++) {
-                  c.xyR[i][j] = c.xyR[i][j] / ae_sqrt(v, _state);
+                  c.xyR[i][j] /= ae_sqrt(v, _state);
                }
             }
             v = ae_v_dotproduct(c.xyR[i], 1, xf.xR, 1, n);
@@ -30056,7 +30056,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                ct.xZ[i] = 0;
             } else {
                ct.xZ[i] = -1;
-               c.xyR[i][n] = c.xyR[i][n] + 0.1 + 0.9 * randomreal(_state);
+               c.xyR[i][n] += 0.1 + 0.9 * randomreal(_state);
             }
          }
          ae_matrix_set_length(&a, m, n + 1, _state);
@@ -30084,8 +30084,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-               v = v - a.xyR[i][n];
-               state.f = state.f + 0.5 * sqr(v, _state);
+               v -= a.xyR[i][n];
+               state.f += 0.5 * sqr(v, _state);
                ae_v_addd(state.g.xR, 1, a.xyR[i], 1, n, v);
             }
          }
@@ -30104,7 +30104,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
-            v = v - c.xyR[i][n];
+            v -= c.xyR[i][n];
             if (ct.xZ[i] == 0 && ae_fabs(v, _state) > epsfeas) {
                set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2132");
                ae_frame_leave(_state);
@@ -30119,8 +30119,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          f0 = 0.0;
          for (i = 0; i < m; i++) {
             v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-            v = v - a.xyR[i][n];
-            f0 = f0 + 0.5 * sqr(v, _state);
+            v -= a.xyR[i][n];
+            f0 += 0.5 * sqr(v, _state);
          }
       // Solve problem 1:
       // * restart from XS1
@@ -30135,8 +30135,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-               v = v - a.xyR[i][n];
-               state.f = state.f + 0.5 * sqr(v, _state);
+               v -= a.xyR[i][n];
+               state.f += 0.5 * sqr(v, _state);
                ae_v_addd(state.g.xR, 1, a.xyR[i], 1, n, v);
             }
          }
@@ -30155,7 +30155,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
-            v = v - c.xyR[i][n];
+            v -= c.xyR[i][n];
             if (ct.xZ[i] == 0 && ae_fabs(v, _state) > epsfeas) {
                set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2188");
                ae_frame_leave(_state);
@@ -30170,8 +30170,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          f1 = 0.0;
          for (i = 0; i < m; i++) {
             v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-            v = v - a.xyR[i][n];
-            f1 = f1 + 0.5 * sqr(v, _state);
+            v -= a.xyR[i][n];
+            f1 += 0.5 * sqr(v, _state);
          }
       // compare F0 and F1
          set_error_flag(err, ae_fabs(f0 - f1, _state) > 1.0E-4, __FILE__, __LINE__, "testminbleicunit.ap:2208");
@@ -30241,7 +30241,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                      v = hqrndnormal(&rs, _state);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                           a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                         }
                      }
                   }
@@ -30262,8 +30262,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                   c.xyR[i][n] = sign((double)shiftkind, _state) * ae_pow(10.0, ae_fabs((double)shiftkind, _state), _state) * machineepsilon;
                   for (j = 0; j < n; j++) {
                      c.xyR[i][j] = (double)(2 * (k % 2) - 1);
-                     c.xyR[i][n] = c.xyR[i][n] + c.xyR[i][j] * c.xyR[i][j];
-                     k = k / 2;
+                     c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
+                     k /= 2;
                   }
                }
             // Create and optimize
@@ -30275,13 +30275,13 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                   ae_assert(state.needfg, "Assertion failed", _state);
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + state.x.xR[i] * b.xR[i];
+                     state.f += state.x.xR[i] * b.xR[i];
                      state.g.xR[i] = b.xR[i];
                   }
                   for (i = 0; i < n; i++) {
                      v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-                     state.f = state.f + 0.5 * state.x.xR[i] * v;
-                     state.g.xR[i] = state.g.xR[i] + v;
+                     state.f += 0.5 * state.x.xR[i] * v;
+                     state.g.xR[i] += v;
                   }
                }
                minbleicresults(&state, &xs0, &rep, _state);
@@ -30294,14 +30294,14 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                vv = 0.0;
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, xs0.xR, 1, n);
-                  v = v + b.xR[i];
+                  v += b.xR[i];
                   if (xs0.xR[i] <= bl.xR[i] + tolconstr && v > 0.0) {
                      v = 0.0;
                   }
                   if (xs0.xR[i] >= bu.xR[i] - tolconstr && v < 0.0) {
                      v = 0.0;
                   }
-                  vv = vv + sqr(v, _state);
+                  vv += sqr(v, _state);
                }
                vv = ae_sqrt(vv, _state);
                set_error_flag(err, vv > 1.0E-5, __FILE__, __LINE__, "testminbleicunit.ap:2365");
@@ -30367,7 +30367,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                   v = hqrndnormal(&rs, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -30398,13 +30398,13 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                ae_assert(state.needfg, "Assertion failed", _state);
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + state.x.xR[i] * b.xR[i];
+                  state.f += state.x.xR[i] * b.xR[i];
                   state.g.xR[i] = b.xR[i];
                }
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-                  state.f = state.f + 0.5 * state.x.xR[i] * v;
-                  state.g.xR[i] = state.g.xR[i] + v;
+                  state.f += 0.5 * state.x.xR[i] * v;
+                  state.g.xR[i] += v;
                }
             }
             minbleicresults(&state, &xs0, &rep, _state);
@@ -30456,7 +30456,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             }
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
-               v = v - c.xyR[i][n];
+               v -= c.xyR[i][n];
                set_error_flag(err, ct.xZ[i] == 0 && ae_fabs(v, _state) > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2540");
                set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2541");
                set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2542");
@@ -30487,7 +30487,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             snnlssolve(&nnls, &tmp, _state);
             for (i = 0; i < k; i++) {
                for (j = 0; j < n; j++) {
-                  g.xR[j] = g.xR[j] - tmp.xR[i] * ce.xyR[j][i];
+                  g.xR[j] -= tmp.xR[i] * ce.xyR[j][i];
                }
             }
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
@@ -30595,7 +30595,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbleicunit_calciip2(&state, n, fk, _state);
             }
             minbleicresults(&state, &x, &rep, _state);
-            cntb1 = cntb1 + rep.inneriterationscount;
+            cntb1 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          ae_vector_set_length(&diagh, n, _state);
@@ -30614,7 +30614,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbleicunit_calciip2(&state, n, fk, _state);
             }
             minbleicresults(&state, &x, &rep, _state);
-            cntg1 = cntg1 + rep.inneriterationscount;
+            cntg1 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb1 < cntg1;
@@ -30635,7 +30635,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbleicunit_calciip2(&state, n, fk, _state);
             }
             minbleicresults(&state, &x, &rep, _state);
-            cntb2 = cntb2 + rep.inneriterationscount;
+            cntb2 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          minbleicsetprecscale(&state, _state);
@@ -30650,7 +30650,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbleicunit_calciip2(&state, n, fk, _state);
             }
             minbleicresults(&state, &x, &rep, _state);
-            cntg2 = cntg2 + rep.inneriterationscount;
+            cntg2 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -30729,7 +30729,7 @@ static void testminbleicunit_testbugs(bool *err, ae_state *_state) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + sqr(state.x.xR[i], _state) + state.x.xR[i] * c.xyR[0][i];
+                     state.f += sqr(state.x.xR[i], _state) + state.x.xR[i] * c.xyR[0][i];
                      state.g.xR[i] = 2 * state.x.xR[i] + c.xyR[0][i];
                   }
                }
@@ -30768,12 +30768,12 @@ static void testminbleicunit_testbugs(bool *err, ae_state *_state) {
          c.xyR[i][9] = 0.0;
          for (j = 0; j < 9; j++) {
             c.xyR[i][j] = 2 * randomreal(_state) - 1;
-            c.xyR[i][9] = c.xyR[i][9] + c.xyR[i][j] * (1.0 / 9.0);
+            c.xyR[i][9] += c.xyR[i][j] * (1.0 / 9.0);
          }
       }
       ct.xZ[0] = 0;
       ct.xZ[1] = 1;
-      c.xyR[1][9] = c.xyR[1][9] - 0.1;
+      c.xyR[1][9] -= 0.1;
       for (i = 0; i < 3; i++) {
          for (k = 0; k < 9; k++) {
             c.xyR[2 + i][k] = 0.0;
@@ -30825,16 +30825,16 @@ static void testminbleicunit_testbugs(bool *err, ae_state *_state) {
          // Calculate regularization term
             state.f = 0.0;
             for (i = 0; i < 9; i++) {
-               state.f = state.f + regterm * sqr(state.x.xR[i] - prior.xR[i], _state);
+               state.f += regterm * sqr(state.x.xR[i] - prior.xR[i], _state);
                state.g.xR[i] = 2 * regterm * (state.x.xR[i] - prior.xR[i]);
             }
          // calculate prediction error/gradient for K-th pair
             for (k = 0; k < xy.rows - 1; k++) {
                for (i = 0; i < 3; i++) {
                   v = ae_v_dotproduct(&state.x.xR[i * 3], 1, xy.xyR[k], 1, 3);
-                  state.f = state.f + sqr(w.xR[i] * (v - xy.xyR[k + 1][i]), _state);
+                  state.f += sqr(w.xR[i] * (v - xy.xyR[k + 1][i]), _state);
                   for (j = 0; j < 3; j++) {
-                     state.g.xR[i * 3 + j] = state.g.xR[i * 3 + j] + 2 * w.xR[i] * w.xR[i] * (v - xy.xyR[k + 1][i]) * xy.xyR[k][j];
+                     state.g.xR[i * 3 + j] += 2 * w.xR[i] * w.xR[i] * (v - xy.xyR[k + 1][i]) * xy.xyR[k][j];
                   }
                }
             }
@@ -30885,9 +30885,9 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + ae_fabs(vv, _state);
+            v += ae_fabs(vv, _state);
          }
          set_error_flag(err, ae_fabs(v - rep->f.xR[k], _state) > 1.0E-6 * maxreal(ae_fabs(v, _state), 1.0, _state), __FILE__, __LINE__, "testminbleicunit.ap:3601");
       }
@@ -30897,8 +30897,8 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
       }
@@ -30961,9 +30961,9 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + sign(vv, _state) * a->xyR[i][rep->vidx];
+            v += sign(vv, _state) * a->xyR[i][rep->vidx];
             tooclose = tooclose || ae_fabs(vv, _state) < 1.0E-4;
          }
          if (!tooclose) {
@@ -30977,8 +30977,8 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          tooclose = (tooclose || ae_fabs(va, _state) < 1.0E-8) || ae_fabs(vb, _state) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
@@ -31064,9 +31064,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + 0.5 * state.x.xR[i] * v;
+            state.f += 0.5 * state.x.xR[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.xR[i] = 0.0;
@@ -31120,12 +31120,12 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + ae_fabs(v, _state);
+            state.f += ae_fabs(v, _state);
             v = (double)sign(v, _state);
             for (j = 0; j < n; j++) {
-               state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+               state.g.xR[j] += v * a.xyR[i][j];
             }
          }
          continue;
@@ -31192,9 +31192,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                  state.f += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                   state.g.xR[i] = v;
                }
                if (defecttype == 0) {
@@ -31204,10 +31204,10 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] = state.g.xR[varidx] * 2;
+                  state.g.xR[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.xR[i] = state.g.xR[i] / s.xR[i];
+                  state.g.xR[i] /= s.xR[i];
                }
                continue;
             }
@@ -31233,7 +31233,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+               v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
             }
             jactrue.xyR[0][i] = v;
             jacdefect.xyR[0][i] = v;
@@ -31245,11 +31245,11 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
+            jacdefect.xyR[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-            jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
+            jactrue.xyR[0][i] /= s.xR[i];
+            jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
          set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n, _state), __FILE__, __LINE__, "testminbleicunit.ap:3237");
@@ -31327,12 +31327,12 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
                v = (double)sign(v, _state);
                for (j = 0; j < n; j++) {
-                  state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+                  state.g.xR[j] += v * a.xyR[i][j];
                }
             }
             continue;
@@ -31372,8 +31372,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3368");
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n, _state);
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n, _state);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3376");
          set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3377");
@@ -31388,8 +31388,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3387");
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n, _state);
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n, _state);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3395");
          set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3396");
@@ -31446,9 +31446,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
             }
             continue;
          }
@@ -31500,11 +31500,11 @@ static void testminbleicunit_testoptguard(bool *wereerrors, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.xR[i] * state.x.xR[i];
+            state.f += b.xR[i] * state.x.xR[i];
             state.g.xR[i] = b.xR[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
-               state.g.xR[i] = state.g.xR[i] + a.xyR[i][j] * state.x.xR[j];
+               state.f += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+               state.g.xR[i] += a.xyR[i][j] * state.x.xR[j];
             }
          }
          continue;
@@ -31792,7 +31792,7 @@ static bool functest1(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             b.xR[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.xR[j] = b.xR[j] - xoric.xR[k] * a.xyR[k][j];
+               b.xR[j] -= xoric.xR[k] * a.xyR[k][j];
             }
          }
          minqpsetlinearterm(&state, &b, _state);
@@ -31835,7 +31835,7 @@ static double testminqpunit_projectedantigradnorm(ae_int_t n, RVector *x, RVecto
    for (i = 0; i < n; i++) {
       ae_assert(x->xR[i] >= bndl->xR[i] && x->xR[i] <= bndu->xR[i], "ProjectedAntiGradNormal: boundary constraints violation", _state);
       if (((x->xR[i] > bndl->xR[i] && x->xR[i] < bndu->xR[i]) || (x->xR[i] == bndl->xR[i] && -g->xR[i] > 0.0)) || (x->xR[i] == bndu->xR[i] && -g->xR[i] < 0.0)) {
-         r = r + g->xR[i] * g->xR[i];
+         r += g->xR[i] * g->xR[i];
       }
    }
    result = ae_sqrt(r, _state);
@@ -31916,7 +31916,7 @@ static bool functest2(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             b.xR[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.xR[j] = b.xR[j] - xoric.xR[k] * a.xyR[k][j];
+               b.xR[j] -= xoric.xR[k] * a.xyR[k][j];
             }
          }
          minqpsetlinearterm(&state, &b, _state);
@@ -31951,7 +31951,7 @@ static bool functest2(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             c.xR[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               c.xR[j] = c.xR[j] - xori.xR[k] * a.xyR[k][j];
+               c.xR[j] -= xori.xR[k] * a.xyR[k][j];
             }
          }
       // initialization for starting point
@@ -32046,7 +32046,7 @@ static bool consoletest(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             b.xR[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.xR[j] = b.xR[j] - xoric.xR[k] * a.xyR[k][j];
+               b.xR[j] -= xoric.xR[k] * a.xyR[k][j];
             }
             printf("B[%0d]=%0.5f\n", (int)j, b.xR[j]);
          }
@@ -32071,7 +32071,7 @@ static bool consoletest(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             c = 0.0;
             for (k = 0; k < sn; k++) {
-               c = c - xori.xR[k] * a.xyR[k][j];
+               c -= xori.xR[k] * a.xyR[k][j];
             }
             g.xR[j] = b.xR[j] + c + y0.xR[j] + y1.xR[j];
          }
@@ -32140,7 +32140,7 @@ static void testminqpunit_testbcgradandfeasibility(RMatrix *a, RVector *b, RVect
    for (i = 0; i < n; i++) {
       g = b->xR[i];
       for (j = 0; j < n; j++) {
-         g = g + a->xyR[i][j] * x->xR[j];
+         g += a->xyR[i][j] * x->xR[j];
       }
       if (x->xR[i] == bndl->xR[i] && g > 0.0) {
          g = 0.0;
@@ -32148,7 +32148,7 @@ static void testminqpunit_testbcgradandfeasibility(RMatrix *a, RVector *b, RVect
       if (x->xR[i] == bndu->xR[i] && g < 0.0) {
          g = 0.0;
       }
-      gnorm = gnorm + sqr(g, _state);
+      gnorm += sqr(g, _state);
       if (x->xR[i] < bndl->xR[i]) {
          *errorflag = true;
       }
@@ -32284,9 +32284,9 @@ static bool quickqptests(ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
+               g += fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
          }
          gnorm = ae_sqrt(gnorm, _state);
          set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:5721");
@@ -32392,7 +32392,7 @@ static bool quickqptests(ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
+               g += fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
             }
             if (x1.xR[i] == bndl.xR[i] && g > 0.0) {
                g = 0.0;
@@ -32400,7 +32400,7 @@ static bool quickqptests(ae_state *_state) {
             if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5838");
             set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5839");
          }
@@ -32429,7 +32429,7 @@ static bool quickqptests(ae_state *_state) {
       // Generate problem
          spdmatrixrndcond(n, 1.0E3, &fulla, _state);
          for (i = 0; i < n; i++) {
-            fulla.xyR[i][i] = fulla.xyR[i][i] - 0.5;
+            fulla.xyR[i][i] -= 0.5;
          }
          isupper = hqrnduniformr(&rs, _state) < 0.5;
          ae_matrix_set_length(&halfa, n, n, _state);
@@ -32487,7 +32487,7 @@ static bool quickqptests(ae_state *_state) {
             if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5930");
             set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5931");
          }
@@ -32584,7 +32584,7 @@ static bool quickqptests(ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + a.xyR[i][j] * x1.xR[j];
+               g += a.xyR[i][j] * x1.xR[j];
             }
             if (x1.xR[i] == bndl.xR[i] && g > 0.0) {
                g = 0.0;
@@ -32592,7 +32592,7 @@ static bool quickqptests(ae_state *_state) {
             if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6042");
             set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6043");
          }
@@ -32720,7 +32720,7 @@ static bool quickqptests(ae_state *_state) {
       for (i = 0; i < n; i++) {
          g = b.xR[i];
          for (j = 0; j < n; j++) {
-            g = g + a.xyR[i][j] * x1.xR[j];
+            g += a.xyR[i][j] * x1.xR[j];
          }
          if (x1.xR[i] == bndl.xR[i] && g > 0.0) {
             g = 0.0;
@@ -32728,7 +32728,7 @@ static bool quickqptests(ae_state *_state) {
          if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
             g = 0.0;
          }
-         gnorm = gnorm + sqr(g, _state);
+         gnorm += sqr(g, _state);
          set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6199");
          set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6200");
       }
@@ -33198,17 +33198,17 @@ static bool bleictests(ae_state *_state) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + x0.xR[i];
+            v += x0.xR[i];
          }
          for (i = 0; i < n; i++) {
-            x0.xR[i] = x0.xR[i] - v / n;
+            x0.xR[i] -= v / n;
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + b.xR[i];
+            v += b.xR[i];
          }
          for (i = 0; i < n; i++) {
-            b.xR[i] = b.xR[i] - v / n;
+            b.xR[i] -= v / n;
          }
          ae_matrix_set_length(&a, n, n, _state);
          for (i = 0; i < n; i++) {
@@ -33246,7 +33246,7 @@ static bool bleictests(ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + a.xyR[i][j] * x1.xR[j];
+               g += a.xyR[i][j] * x1.xR[j];
             }
             if (x1.xR[i] == bndl.xR[i] && g > 0.0) {
                g = 0.0;
@@ -33254,7 +33254,7 @@ static bool bleictests(ae_state *_state) {
             if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6814");
             set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6815");
          }
@@ -33468,10 +33468,10 @@ static bool bleictests(ae_state *_state) {
    for (pass = 1; pass <= 10000; pass++) {
    // Apply random distortion
       for (j = 0; j < n; j++) {
-         b.xR[j] = b.xR[j] + (2 * hqrnduniformi(&rs, 2, _state) - 1) * 0.1;
+         b.xR[j] += (2 * hqrnduniformi(&rs, 2, _state) - 1) * 0.1;
       }
       for (j = 0; j < 6; j++) {
-         c.xyR[j][n] = c.xyR[j][n] + (2 * hqrnduniformi(&rs, 2, _state) - 1) * 0.1;
+         c.xyR[j][n] += (2 * hqrnduniformi(&rs, 2, _state) - 1) * 0.1;
       }
    // Solve
       minqpcreate(3, &state, _state);
@@ -33763,7 +33763,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
+               g += fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
             }
             if (x1.xR[i] <= bndl.xR[i] + bctol && g > 0.0) {
                g = 0.0;
@@ -33771,7 +33771,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
             if (x1.xR[i] >= bndu.xR[i] - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:904");
             set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:905");
          }
@@ -33784,12 +33784,12 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = b.xR[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
+                  v += fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
                }
                gtrial.xR[i] = v;
             }
             for (i = 0; i < n; i++) {
-               gtrial.xR[i] = gtrial.xR[i] + rep.lagbc.xR[i];
+               gtrial.xR[i] += rep.lagbc.xR[i];
             }
             for (i = 0; i < n; i++) {
                set_error_flag(wereerrors, ae_fabs(gtrial.xR[i], _state) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:928");
@@ -33892,7 +33892,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
+               g += fulla.xyR[i][j] * (x1.xR[j] - xori.xR[j]);
             }
             if (x1.xR[i] <= vl + bctol && g > 0.0) {
                g = 0.0;
@@ -33900,7 +33900,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
             if (x1.xR[i] >= vu - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(wereerrors, x1.xR[i] < vl, __FILE__, __LINE__, "testminqpunit.ap:1037");
             set_error_flag(wereerrors, x1.xR[i] > vu, __FILE__, __LINE__, "testminqpunit.ap:1038");
          }
@@ -33969,7 +33969,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             g = b.xR[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.xyR[i][j] * x1.xR[j];
+               g += fulla.xyR[i][j] * x1.xR[j];
             }
             if (x1.xR[i] <= bndl.xR[i] + bctol && g > 0.0) {
                g = 0.0;
@@ -33977,7 +33977,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
             if (x1.xR[i] >= bndu.xR[i] - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1121");
             set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1122");
          }
@@ -34006,7 +34006,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
       // Generate problem
          spdmatrixrndcond(n, 1.0E3, &fulla, _state);
          for (i = 0; i < n; i++) {
-            fulla.xyR[i][i] = fulla.xyR[i][i] - 0.5;
+            fulla.xyR[i][i] -= 0.5;
          }
          isupper = hqrnduniformr(&rs, _state) < 0.5;
          ae_matrix_set_length(&halfa, n, n, _state);
@@ -34065,7 +34065,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
             if (x1.xR[i] == bndu.xR[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + sqr(g, _state);
+            gnorm += sqr(g, _state);
             set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1215");
             set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1216");
          }
@@ -34306,7 +34306,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          ae_v_move(g.xR, 1, b.xR, 1, n);
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(a.xyR[i], 1, xend.xR, 1, n);
-            g.xR[i] = g.xR[i] + v;
+            g.xR[i] += v;
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(g.xR, 1, c.xyR[i], 1, n);
@@ -34440,11 +34440,11 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
-               f1 = f1 + 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
+               f0 += 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
+               f1 += 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
             }
-            f0 = f0 + xend.xR[i] * b.xR[i];
-            f1 = f1 + xend2.xR[i] * b.xR[i];
+            f0 += xend.xR[i] * b.xR[i];
+            f1 += xend2.xR[i] * b.xR[i];
          }
       // Check feasibility properties and compare
          set_error_flag(&waserrors, ae_fabs(f0 - f1, _state) > eps, __FILE__, __LINE__, "testminqpunit.ap:1657");
@@ -34692,11 +34692,11 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       f1 = 0.0;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            f0 = f0 + 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
-            f1 = f1 + 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
+            f0 += 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
+            f1 += 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
          }
-         f0 = f0 + xend.xR[i] * b.xR[i];
-         f1 = f1 + xend2.xR[i] * b.xR[i];
+         f0 += xend.xR[i] * b.xR[i];
+         f1 += xend2.xR[i] * b.xR[i];
       }
       set_error_flag(&waserrors, ae_fabs(f0 - f1, _state) > eps, __FILE__, __LINE__, "testminqpunit.ap:1969");
    }
@@ -34731,12 +34731,12 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       v = 0.0;
       for (i = 0; i < n; i++) {
          c.xyR[0][i] = tmp.xR[i];
-         c.xyR[0][n] = c.xyR[0][n] + tmp.xR[i] * x0.xR[i];
+         c.xyR[0][n] += tmp.xR[i] * x0.xR[i];
          b.xR[i] = -(x0.xR[i] + tmp.xR[i]);
-         v = v + tmp.xR[i] * xd.xR[i];
+         v += tmp.xR[i] * xd.xR[i];
       }
       for (i = 0; i < n; i++) {
-         xd.xR[i] = xd.xR[i] - v * tmp.xR[i];
+         xd.xR[i] -= v * tmp.xR[i];
          xs.xR[i] = x0.xR[i] + xd.xR[i] * ae_pow(2.0, (double)-rk, _state);
       }
       ae_matrix_set_length(&a, n, n, _state);
@@ -34764,7 +34764,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       }
       v = -c.xyR[0][n];
       for (i = 0; i < n; i++) {
-         v = v + xend.xR[i] * c.xyR[0][i];
+         v += xend.xR[i] * c.xyR[0][i];
       }
       set_error_flag(&waserrors, ae_fabs(v, _state) > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:2048");
    }
@@ -34861,12 +34861,12 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             v = 0.0;
             for (i = 0; i < n; i++) {
                c.xyR[0][i] = 2 * randomreal(_state) - 1;
-               v = v + sqr(c.xyR[0][i], _state);
+               v += sqr(c.xyR[0][i], _state);
             }
             v = ae_sqrt(v, _state);
          } while (v == 0.0);
          for (i = 0; i < n; i++) {
-            c.xyR[0][i] = c.xyR[0][i] / v;
+            c.xyR[0][i] /= v;
          }
          c.xyR[0][n] = 0.0;
          ct.xZ[0] = 1;
@@ -34904,7 +34904,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             ae_v_move(g.xR, 1, b.xR, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, xend.xR, 1, n);
-               g.xR[i] = g.xR[i] + v;
+               g.xR[i] += v;
             }
             v = ae_v_dotproduct(g.xR, 1, c.xyR[0], 1, n);
             ae_v_subd(g.xR, 1, c.xyR[0], 1, n, v);
@@ -35000,11 +35000,11 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * (xend.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (xend.xR[j] - xorigin.xR[j]);
-               f1 = f1 + 0.5 * (xend2.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (xend2.xR[j] - xorigin.xR[j]);
+               f0 += 0.5 * (xend.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (xend.xR[j] - xorigin.xR[j]);
+               f1 += 0.5 * (xend2.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (xend2.xR[j] - xorigin.xR[j]);
             }
-            f0 = f0 + (xend.xR[i] - xorigin.xR[i]) * b.xR[i];
-            f1 = f1 + (xend2.xR[i] - xorigin.xR[i]) * b.xR[i];
+            f0 += (xend.xR[i] - xorigin.xR[i]) * b.xR[i];
+            f1 += (xend2.xR[i] - xorigin.xR[i]) * b.xR[i];
          }
       // Check feasibility properties and compare solutions
          for (i = 0; i < k; i++) {
@@ -35321,7 +35321,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_vector_set_length(&tmp0, n, _state);
       ae_v_move(tmp0.xR, 1, b.xR, 1, n);
       for (i = 0; i < n; i++) {
-         tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+         tmp0.xR[i] /= da.xR[i];
       }
       ae_vector_set_length(&b2, n, _state);
       for (i = 0; i < n; i++) {
@@ -35350,7 +35350,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          tmp0.xR[i] = v - b.xR[i];
       }
       for (i = 0; i < n; i++) {
-         tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+         tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
          set_error_flag(err, ae_fabs(tmp0.xR[i] - xend.xR[i], _state) > eps * maxreal(ae_fabs(tmp0.xR[i], _state), 1.0, _state), __FILE__, __LINE__, "testminqpunit.ap:2739");
@@ -35406,10 +35406,10 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             ct.xZ[i] = 1;
          }
          if (ct.xZ[i] < 0) {
-            c.xyR[i][n] = c.xyR[i][n] + 0.1;
+            c.xyR[i][n] += 0.1;
          }
          if (ct.xZ[i] > 0) {
-            c.xyR[i][n] = c.xyR[i][n] - 0.1;
+            c.xyR[i][n] -= 0.1;
          }
       }
    // Solve with XStart
@@ -35443,11 +35443,11 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       f1 = 0.0;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            f0 = f0 + 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
-            f1 = f1 + 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
+            f0 += 0.5 * xend.xR[i] * a.xyR[i][j] * xend.xR[j];
+            f1 += 0.5 * xend2.xR[i] * a.xyR[i][j] * xend2.xR[j];
          }
-         f0 = f0 + xend.xR[i] * b.xR[i];
-         f1 = f1 + xend2.xR[i] * b.xR[i];
+         f0 += xend.xR[i] * b.xR[i];
+         f1 += xend2.xR[i] * b.xR[i];
       }
       set_error_flag(err, ae_fabs(f0 - f1, _state) > eps, __FILE__, __LINE__, "testminqpunit.ap:2853");
    }
@@ -35516,7 +35516,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                      v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                           a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                         }
                      }
                   }
@@ -35536,7 +35536,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                      v = hqrndnormal(&rs, _state);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                           a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                         }
                      }
                   }
@@ -35558,8 +35558,8 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                   c.xyR[i][n] = sign((double)shiftkind, _state) * ae_pow(10.0, ae_fabs((double)shiftkind, _state), _state) * machineepsilon;
                   for (j = 0; j < n; j++) {
                      c.xyR[i][j] = (double)(2 * (k % 2) - 1);
-                     c.xyR[i][n] = c.xyR[i][n] + c.xyR[i][j] * c.xyR[i][j];
-                     k = k / 2;
+                     c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
+                     k /= 2;
                   }
                }
             // Create and optimize
@@ -35585,14 +35585,14 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                vv = 0.0;
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, xs0.xR, 1, n);
-                  v = v + b.xR[i];
+                  v += b.xR[i];
                   if (xs0.xR[i] <= bl.xR[i] + tolconstr && v > 0.0) {
                      v = 0.0;
                   }
                   if (xs0.xR[i] >= bu.xR[i] - tolconstr && v < 0.0) {
                      v = 0.0;
                   }
-                  vv = vv + sqr(v, _state);
+                  vv += sqr(v, _state);
                }
                vv = ae_sqrt(vv, _state);
                set_error_flag(err, vv > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3024");
@@ -35660,7 +35660,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                   v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -35680,7 +35680,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                   v = hqrndnormal(&rs, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -35765,7 +35765,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             }
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
-               v = v - c.xyR[i][n];
+               v -= c.xyR[i][n];
                set_error_flag(err, ct.xZ[i] == 0 && ae_fabs(v, _state) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3212");
                set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3213");
                set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3214");
@@ -35796,7 +35796,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             snnlssolve(&nnls, &tmp, _state);
             for (i = 0; i < k; i++) {
                for (j = 0; j < n; j++) {
-                  g.xR[j] = g.xR[j] - tmp.xR[i] * ce.xyR[j][i];
+                  g.xR[j] -= tmp.xR[i] * ce.xyR[j][i];
                }
             }
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
@@ -35902,9 +35902,9 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
    sparseccnt = hqrnduniformi(rs, rawccnt + 1, _state);
    denseccnt = rawccnt - sparseccnt;
    appenddense = hqrnduniformi(rs, denseccnt + 1, _state);
-   denseccnt = denseccnt - appenddense;
+   denseccnt -= appenddense;
    appendsparse = hqrnduniformi(rs, sparseccnt + 1, _state);
-   sparseccnt = sparseccnt - appendsparse;
+   sparseccnt -= appendsparse;
    ae_vector_set_length(&wrkcl, sparseccnt + denseccnt, _state);
    ae_vector_set_length(&wrkcu, sparseccnt + denseccnt, _state);
    if (sparseccnt > 0) {
@@ -35965,7 +35965,7 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
             j = hqrnduniformi(rs, nnz, _state);
             ci.xZ[nnz] = ci.xZ[j];
             cv.xR[nnz] = hqrndnormal(rs, _state);
-            cv.xR[j] = cv.xR[j] - cv.xR[nnz];
+            cv.xR[j] -= cv.xR[nnz];
             nnz++;
          }
       // Add constraint to the set
@@ -36076,9 +36076,9 @@ static double testminqpunit_quadratictarget(RMatrix *a, RVector *b, ae_int_t n, 
    double result;
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + b->xR[i] * x->xR[i];
+      result += b->xR[i] * x->xR[i];
       for (j = 0; j < n; j++) {
-         result = result + 0.5 * x->xR[i] * a->xyR[i][j] * x->xR[j];
+         result += 0.5 * x->xR[i] * a->xyR[i][j] * x->xR[j];
       }
    }
    return result;
@@ -36216,7 +36216,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&tmp, n, _state);
          rmatrixmv(n, n, &rawa, 0, 0, 0, &xs, 0, &gs, 0, _state);
          for (i = 0; i < n; i++) {
-            gs.xR[i] = gs.xR[i] + b.xR[i];
+            gs.xR[i] += b.xR[i];
          }
          rawccnt = 1 + hqrnduniformi(&rs, n, _state);
          ae_vector_set_length(&bndl, n, _state);
@@ -36277,12 +36277,12 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                rawc.xyR[i][hqrnduniformi(&rs, n, _state)] = hqrndnormal(&rs, _state);
                rawc.xyR[i][n] = 0.0;
                for (j = 0; j < n; j++) {
-                  rawc.xyR[i][n] = rawc.xyR[i][n] + rawc.xyR[i][j] * xs.xR[j];
+                  rawc.xyR[i][n] += rawc.xyR[i][j] * xs.xR[j];
                }
                rawct.xZ[i] = -1;
                if (hqrnduniformr(&rs, _state) < 0.66) {
                // I-th box constraint is inactive
-                  rawc.xyR[i][n] = rawc.xyR[i][n] + (1 + hqrnduniformr(&rs, _state));
+                  rawc.xyR[i][n] += (1 + hqrnduniformr(&rs, _state));
                   if (hqrnduniformr(&rs, _state) > 0.50) {
                      ae_v_muld(rawc.xyR[i], 1, n + 1, -1);
                      rawct.xZ[i] = -rawct.xZ[i];
@@ -36383,11 +36383,11 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          f0 = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f0 = f0 + b.xR[i] * xs.xR[i];
-            f1 = f1 + b.xR[i] * x1.xR[i];
+            f0 += b.xR[i] * xs.xR[i];
+            f1 += b.xR[i] * x1.xR[i];
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * xs.xR[i] * rawa.xyR[i][j] * xs.xR[j];
-               f1 = f1 + 0.5 * x1.xR[i] * rawa.xyR[i][j] * x1.xR[j];
+               f0 += 0.5 * xs.xR[i] * rawa.xyR[i][j] * xs.xR[j];
+               f1 += 0.5 * x1.xR[i] * rawa.xyR[i][j] * x1.xR[j];
             }
          }
          set_error_flag(errorflag, ae_fabs(f0 - f1, _state) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3584");
@@ -36423,12 +36423,12 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   rawc.xyR[0][i] = 2 * randomreal(_state) - 1;
-                  v = v + sqr(rawc.xyR[0][i], _state);
+                  v += sqr(rawc.xyR[0][i], _state);
                }
                v = ae_sqrt(v, _state);
             } while (v == 0.0);
             for (i = 0; i < n; i++) {
-               rawc.xyR[0][i] = rawc.xyR[0][i] / v;
+               rawc.xyR[0][i] /= v;
             }
             rawc.xyR[0][n] = 0.0;
             rawct.xZ[0] = 1;
@@ -36483,7 +36483,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                ae_v_move(g.xR, 1, b.xR, 1, n);
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-                  g.xR[i] = g.xR[i] + v;
+                  g.xR[i] += v;
                }
                v = ae_v_dotproduct(g.xR, 1, rawc.xyR[0], 1, n);
                ae_v_subd(g.xR, 1, rawc.xyR[0], 1, n, v);
@@ -36637,7 +36637,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                   if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
                      tolconstr = 1.0E-3;
                      if (akind == 3) {
-                        tolconstr = tolconstr * 5;
+                        tolconstr *= 5;
                      }
                   } else {
                      ae_assert(false, "unexpected solver type", _state);
@@ -36680,7 +36680,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                      v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                           a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                         }
                      }
                   }
@@ -36778,7 +36778,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                }
                for (i = 0; i < rawccnt; i++) {
                   v = ae_v_dotproduct(rawc.xyR[i], 1, x1.xR, 1, n);
-                  v = v - rawc.xyR[i][n];
+                  v -= rawc.xyR[i][n];
                   set_error_flag(errorflag, rawct.xZ[i] == 0 && ae_fabs(v, _state) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4014");
                   set_error_flag(errorflag, rawct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4015");
                   set_error_flag(errorflag, rawct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4016");
@@ -36809,7 +36809,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                snnlssolve(&nnls, &tmp, _state);
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     g.xR[j] = g.xR[j] - tmp.xR[i] * ce.xyR[j][i];
+                     g.xR[j] -= tmp.xR[i] * ce.xyR[j][i];
                   }
                }
                vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
@@ -36951,11 +36951,11 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             f1 = 0.0;
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  f0 = f0 + 0.5 * (x1.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
-                  f1 = f1 + 0.5 * (x2.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (x2.xR[j] - xorigin.xR[j]);
+                  f0 += 0.5 * (x1.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
+                  f1 += 0.5 * (x2.xR[i] - xorigin.xR[i]) * a.xyR[i][j] * (x2.xR[j] - xorigin.xR[j]);
                }
-               f0 = f0 + (x1.xR[i] - xorigin.xR[i]) * b.xR[i];
-               f1 = f1 + (x2.xR[i] - xorigin.xR[i]) * b.xR[i];
+               f0 += (x1.xR[i] - xorigin.xR[i]) * b.xR[i];
+               f1 += (x2.xR[i] - xorigin.xR[i]) * b.xR[i];
             }
             set_error_flag(errorflag, ae_fabs(f0 - f1, _state) > ftol, __FILE__, __LINE__, "testminqpunit.ap:4200");
             for (i = 0; i < n; i++) {
@@ -37022,15 +37022,15 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                v = 0.0;
                for (j = 0; j < n; j++) {
                   rawc.xyR[i][j] = hqrndnormal(&rs, _state);
-                  v = v + rawc.xyR[i][j] * x0.xR[j];
+                  v += rawc.xyR[i][j] * x0.xR[j];
                }
                rawc.xyR[i][n] = v;
                rawct.xZ[i] = hqrnduniformi(&rs, 3, _state) - 1;
                if (rawct.xZ[i] < 0) {
-                  rawc.xyR[i][n] = rawc.xyR[i][n] + 0.1;
+                  rawc.xyR[i][n] += 0.1;
                }
                if (rawct.xZ[i] > 0) {
-                  rawc.xyR[i][n] = rawc.xyR[i][n] - 0.1;
+                  rawc.xyR[i][n] -= 0.1;
                }
             }
             testminqpunit_randomlysplitlc(&rawc, &rawct, k, n, &sparsec, &sparsect, &sparseccnt, &densec, &densect, &denseccnt, &rs, _state);
@@ -37075,7 +37075,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             if (akind == 0) {
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = a.xyR[i][j] / (s.xR[i] * s.xR[j]);
+                     a.xyR[i][j] /= s.xR[i] * s.xR[j];
                   }
                }
             } else {
@@ -37087,15 +37087,15 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                }
             }
             for (i = 0; i < n; i++) {
-               b.xR[i] = b.xR[i] / s.xR[i];
-               xstart.xR[i] = xstart.xR[i] * s.xR[i];
-               xorigin.xR[i] = xorigin.xR[i] * s.xR[i];
-               bndl.xR[i] = bndl.xR[i] * s.xR[i];
-               bndu.xR[i] = bndu.xR[i] * s.xR[i];
+               b.xR[i] /= s.xR[i];
+               xstart.xR[i] *= s.xR[i];
+               xorigin.xR[i] *= s.xR[i];
+               bndl.xR[i] *= s.xR[i];
+               bndu.xR[i] *= s.xR[i];
             }
             for (i = 0; i < denseccnt; i++) {
                for (j = 0; j < n; j++) {
-                  densec.xyR[i][j] = densec.xyR[i][j] / s.xR[j];
+                  densec.xyR[i][j] /= s.xR[j];
                }
             }
             for (i = 0; i < sparseccnt; i++) {
@@ -37241,7 +37241,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&tmp0, n, _state);
          ae_v_move(tmp0.xR, 1, b.xR, 1, n);
          for (i = 0; i < n; i++) {
-            tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+            tmp0.xR[i] /= da.xR[i];
          }
          ae_vector_set_length(&b2, n, _state);
          for (i = 0; i < n; i++) {
@@ -37270,7 +37270,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             tmp0.xR[i] = v - b.xR[i];
          }
          for (i = 0; i < n; i++) {
-            tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+            tmp0.xR[i] /= da.xR[i];
          }
          for (i = 0; i < n; i++) {
             set_error_flag(errorflag, ae_fabs(tmp0.xR[i] - x1.xR[i], _state) > xtol * maxreal(ae_fabs(tmp0.xR[i], _state), 1.0, _state), __FILE__, __LINE__, "testminqpunit.ap:4536");
@@ -37535,8 +37535,8 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                rawc.xyR[i][n] = sign((double)shiftkind, _state) * ae_pow(10.0, ae_fabs((double)shiftkind, _state), _state) * machineepsilon;
                for (j = 0; j < n; j++) {
                   rawc.xyR[i][j] = (double)(2 * (k % 2) - 1);
-                  rawc.xyR[i][n] = rawc.xyR[i][n] + rawc.xyR[i][j] * rawc.xyR[i][j];
-                  k = k / 2;
+                  rawc.xyR[i][n] += rawc.xyR[i][j] * rawc.xyR[i][j];
+                  k /= 2;
                }
             }
          // Create and optimize
@@ -37574,14 +37574,14 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             vv = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               v = v + b.xR[i];
+               v += b.xR[i];
                if (x1.xR[i] <= bndl.xR[i] + tolconstr && v > 0.0) {
                   v = 0.0;
                }
                if (x1.xR[i] >= bndu.xR[i] - tolconstr && v < 0.0) {
                   v = 0.0;
                }
-               vv = vv + sqr(v, _state);
+               vv += sqr(v, _state);
             }
             vv = ae_sqrt(vv, _state);
             set_error_flag(errorflag, vv > gtol, __FILE__, __LINE__, "testminqpunit.ap:4882");
@@ -37647,7 +37647,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                   v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -37670,7 +37670,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                for (k = 0; k < nnz; k++) {
                   j = hqrnduniformi(&rs, n, _state);
                   v = hqrndnormal(&rs, _state);
-                  v = v + 0.1 * possign(v, _state);
+                  v += 0.1 * possign(v, _state);
                   rawc.xyR[i][j] = v;
                }
             }
@@ -37700,16 +37700,16 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + a.xyR[i][j] * (xf.xR[j] - xorigin.xR[j]);
+                  v += a.xyR[i][j] * (xf.xR[j] - xorigin.xR[j]);
                }
                g.xR[i] = v;
             }
             for (i = 0; i < n; i++) {
-               g.xR[i] = g.xR[i] + lagbc.xR[i];
+               g.xR[i] += lagbc.xR[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  g.xR[j] = g.xR[j] + laglc.xR[i] * rawc.xyR[i][j];
+                  g.xR[j] += laglc.xR[i] * rawc.xyR[i][j];
                }
             }
             ae_vector_set_length(&b, n, _state);
@@ -37749,7 +37749,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             for (i = 0; i < rawccnt; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + rawc.xyR[i][j] * xf.xR[j];
+                  v += rawc.xyR[i][j] * xf.xR[j];
                }
                rawcl.xR[i] = minushuge;
                rawcu.xR[i] = plushuge;
@@ -37843,16 +37843,16 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     v = v + a.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
+                     v += a.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
                   }
                   gtrial.xR[i] = v;
                }
                for (i = 0; i < n; i++) {
-                  gtrial.xR[i] = gtrial.xR[i] + rep.lagbc.xR[i];
+                  gtrial.xR[i] += rep.lagbc.xR[i];
                }
                for (i = 0; i < rawccnt; i++) {
                   for (j = 0; j < n; j++) {
-                     gtrial.xR[j] = gtrial.xR[j] + rep.laglc.xR[i] * rawc.xyR[i][j];
+                     gtrial.xR[j] += rep.laglc.xR[i] * rawc.xyR[i][j];
                   }
                }
                for (i = 0; i < n; i++) {
@@ -38047,7 +38047,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       ae_vector_set_length(&tmp0, n, _state);
       ae_v_move(tmp0.xR, 1, b.xR, 1, n);
       for (i = 0; i < n; i++) {
-         tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+         tmp0.xR[i] /= da.xR[i];
       }
       ae_vector_set_length(&b2, rawccnt, _state);
       for (i = 0; i < rawccnt; i++) {
@@ -38076,7 +38076,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          tmp0.xR[i] = v - b.xR[i];
       }
       for (i = 0; i < n; i++) {
-         tmp0.xR[i] = tmp0.xR[i] / da.xR[i];
+         tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
          set_error_flag(errorflag, ae_fabs(tmp0.xR[i] - x1.xR[i], _state) > xtol * maxreal(ae_fabs(tmp0.xR[i], _state), 1.0, _state), __FILE__, __LINE__, "testminqpunit.ap:5434");
@@ -38308,11 +38308,11 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] / (s.xR[i] * s.xR[j]);
+               rawa.xyR[i][j] /= s.xR[i] * s.xR[j];
             }
-            b.xR[i] = b.xR[i] / s.xR[i];
-            x0.xR[i] = x0.xR[i] * s.xR[i];
-            xsol.xR[i] = xsol.xR[i] * s.xR[i];
+            b.xR[i] /= s.xR[i];
+            x0.xR[i] *= s.xR[i];
+            xsol.xR[i] *= s.xR[i];
          }
       // Create optimizer, solve
          rho = ae_pow(10.0, 2 * hqrnduniformr(&rs, _state), _state);
@@ -38424,8 +38424,8 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
                rawc.xyR[i][j] = hqrndnormal(&rs, _state);
-               v = v + rawc.xyR[i][j] * x0.xR[j];
-               vv = vv + rawc.xyR[i][j] * xsol.xR[j];
+               v += rawc.xyR[i][j] * x0.xR[j];
+               vv += rawc.xyR[i][j] * xsol.xR[j];
             }
             if (hqrndnormal(&rs, _state) > 0.0) {
                rawct.xZ[i] = 1;
@@ -38446,17 +38446,17 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] / (s.xR[i] * s.xR[j]);
+               rawa.xyR[i][j] /= s.xR[i] * s.xR[j];
             }
-            b.xR[i] = b.xR[i] / s.xR[i];
-            x0.xR[i] = x0.xR[i] * s.xR[i];
-            xsol.xR[i] = xsol.xR[i] * s.xR[i];
-            bndl.xR[i] = bndl.xR[i] * s.xR[i];
-            bndu.xR[i] = bndu.xR[i] * s.xR[i];
+            b.xR[i] /= s.xR[i];
+            x0.xR[i] *= s.xR[i];
+            xsol.xR[i] *= s.xR[i];
+            bndl.xR[i] *= s.xR[i];
+            bndu.xR[i] *= s.xR[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.xyR[i][j] = rawc.xyR[i][j] / s.xR[j];
+               rawc.xyR[i][j] /= s.xR[j];
             }
          }
       // Create optimizer, solve
@@ -38524,15 +38524,15 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] / (s.xR[i] * s.xR[j]);
+               rawa.xyR[i][j] /= s.xR[i] * s.xR[j];
             }
-            b.xR[i] = b.xR[i] / s.xR[i];
-            x0.xR[i] = x0.xR[i] * s.xR[i];
-            xsol.xR[i] = xsol.xR[i] * s.xR[i];
+            b.xR[i] /= s.xR[i];
+            x0.xR[i] *= s.xR[i];
+            xsol.xR[i] *= s.xR[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.xyR[i][j] = rawc.xyR[i][j] / s.xR[j];
+               rawc.xyR[i][j] /= s.xR[j];
             }
          }
       // Create optimizer, solve
@@ -38626,15 +38626,15 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] / (s.xR[i] * s.xR[j]);
+               rawa.xyR[i][j] /= s.xR[i] * s.xR[j];
             }
-            b.xR[i] = b.xR[i] / s.xR[i];
-            x0.xR[i] = x0.xR[i] * s.xR[i];
-            xsol.xR[i] = xsol.xR[i] * s.xR[i];
+            b.xR[i] /= s.xR[i];
+            x0.xR[i] *= s.xR[i];
+            xsol.xR[i] *= s.xR[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.xyR[i][j] = rawc.xyR[i][j] / s.xR[j];
+               rawc.xyR[i][j] /= s.xR[j];
             }
          }
       // Create optimizer, solve
@@ -38753,24 +38753,24 @@ static void testminqpunit_denseaultests(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] / (s.xR[i] * s.xR[j]);
+               rawa.xyR[i][j] /= s.xR[i] * s.xR[j];
             }
-            b.xR[i] = b.xR[i] / s.xR[i];
-            x0.xR[i] = x0.xR[i] * s.xR[i];
-            xsol.xR[i] = xsol.xR[i] * s.xR[i];
+            b.xR[i] /= s.xR[i];
+            x0.xR[i] *= s.xR[i];
+            xsol.xR[i] *= s.xR[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.xyR[i][j] = rawc.xyR[i][j] / s.xR[j];
+               rawc.xyR[i][j] /= s.xR[j];
             }
          }
       // Multiply A/B by some coefficient with wild magnitude
          v = ae_pow(10.0, (double)(10 * scaletype), _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.xyR[i][j] = rawa.xyR[i][j] * v;
+               rawa.xyR[i][j] *= v;
             }
-            b.xR[i] = b.xR[i] * v;
+            b.xR[i] *= v;
          }
       // Create optimizer, solve
          rho = 100.0;
@@ -38960,7 +38960,7 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
                   v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
                   for (i = 0; i < nmain; i++) {
                      for (j = 0; j < nmain; j++) {
-                        maina.xyR[i][j] = maina.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        maina.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -38996,14 +38996,14 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
                   for (k = 0; k < nnz; k++) {
                      j = hqrnduniformi(&rs, nmain, _state);
                      v = hqrndnormal(&rs, _state);
-                     v = v + 0.1 * possign(v, _state);
+                     v += 0.1 * possign(v, _state);
                      rawc.xyR[i][j] = v;
                   }
                }
                for (j = nmain; j < n; j++) {
                   if (hqrndnormal(&rs, _state) > 0.0) {
                      v = hqrndnormal(&rs, _state);
-                     v = v + 0.1 * possign(v, _state);
+                     v += 0.1 * possign(v, _state);
                      rawc.xyR[hqrnduniformi(&rs, rawccnt, _state)][j] = v;
                   }
                }
@@ -39021,12 +39021,12 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
             k = hqrnduniformi(&rs, minint(nactive, rawccnt, _state) + 1, _state);
             for (i = 0; i < k; i++) {
                v = hqrndnormal(&rs, _state);
-               v = v + 0.01 * possign(v, _state);
+               v += 0.01 * possign(v, _state);
                laglc.xR[hqrnduniformi(&rs, rawccnt, _state)] = v;
             }
             for (i = k; i < nactive; i++) {
                v = hqrndnormal(&rs, _state);
-               v = v + 0.01 * possign(v, _state);
+               v += 0.01 * possign(v, _state);
                lagbc.xR[hqrnduniformi(&rs, n, _state)] = v;
             }
          // Generate solution and gradient at the solution, set B to -G
@@ -39038,16 +39038,16 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + fulla.xyR[i][j] * (xf.xR[j] - xorigin.xR[j]);
+                  v += fulla.xyR[i][j] * (xf.xR[j] - xorigin.xR[j]);
                }
                g.xR[i] = v;
             }
             for (i = 0; i < n; i++) {
-               g.xR[i] = g.xR[i] + lagbc.xR[i];
+               g.xR[i] += lagbc.xR[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  g.xR[j] = g.xR[j] + laglc.xR[i] * rawc.xyR[i][j];
+                  g.xR[j] += laglc.xR[i] * rawc.xyR[i][j];
                }
             }
             ae_vector_set_length(&b, n, _state);
@@ -39087,7 +39087,7 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
             for (i = 0; i < rawccnt; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + rawc.xyR[i][j] * xf.xR[j];
+                  v += rawc.xyR[i][j] * xf.xR[j];
                }
                rawcl.xR[i] = _state->v_neginf;
                rawcu.xR[i] = _state->v_posinf;
@@ -39164,16 +39164,16 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = b.xR[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
+                  v += fulla.xyR[i][j] * (x1.xR[j] - xorigin.xR[j]);
                }
                gtrial.xR[i] = v;
             }
             for (i = 0; i < n; i++) {
-               gtrial.xR[i] = gtrial.xR[i] + replagbc.xR[i];
+               gtrial.xR[i] += replagbc.xR[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  gtrial.xR[j] = gtrial.xR[j] + replaglc.xR[i] * rawc.xyR[i][j];
+                  gtrial.xR[j] += replaglc.xR[i] * rawc.xyR[i][j];
                }
             }
             for (i = 0; i < n; i++) {
@@ -39548,17 +39548,17 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix *a, RVector *b, ae_int
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(a->xyR[i], 1, state->x.xR, 1, n);
       if ((state->needf || state->needfg) || state->needfgh) {
-         state->f = state->f + sqr(v - b->xR[i], _state);
+         state->f += sqr(v - b->xR[i], _state);
       }
       if (state->needfg || state->needfgh) {
          for (j = 0; j < n; j++) {
-            state->g.xR[j] = state->g.xR[j] + 2 * (v - b->xR[i]) * a->xyR[i][j];
+            state->g.xR[j] += 2 * (v - b->xR[i]) * a->xyR[i][j];
          }
       }
       if (state->needfgh) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < n; k++) {
-               state->h.xyR[j][k] = state->h.xyR[j][k] + 2 * a->xyR[i][j] * a->xyR[i][k];
+               state->h.xyR[j][k] += 2 * a->xyR[i][j] * a->xyR[i][k];
             }
          }
       }
@@ -39957,7 +39957,7 @@ static void testminlmunit_testfunc1(ae_int_t n, ae_int_t m, RMatrix *c, RVector 
    for (i = 0; i < m; i++) {
       v = c->xyR[i][n];
       for (j = 0; j < n; j++) {
-         v = v + (alpha * x->xR[j] + ae_pow(x->xR[j], 3.0, _state)) * c->xyR[i][j];
+         v += (alpha * x->xR[j] + ae_pow(x->xR[j], 3.0, _state)) * c->xyR[i][j];
          if (needjac) {
             jac->xyR[i][j] = (alpha + 3 * ae_pow(x->xR[j], 2.0, _state)) * c->xyR[i][j];
          }
@@ -39966,7 +39966,7 @@ static void testminlmunit_testfunc1(ae_int_t n, ae_int_t m, RMatrix *c, RVector 
          fi->xR[i] = v;
       }
       if (needf) {
-         *f = *f + v * v;
+         *f += v * v;
       }
    }
 }
@@ -40037,7 +40037,7 @@ static void testminlmunit_testbc(bool *errorflag, ae_state *_state) {
             if ((state.needf || state.needfg) || state.needfgh) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + ae_pow(state.x.xR[i] - xe.xR[i], 4.0, _state);
+                  state.f += ae_pow(state.x.xR[i] - xe.xR[i], 4.0, _state);
                }
             }
             if (state.needfg || state.needfgh) {
@@ -40309,7 +40309,7 @@ static void testminlmunit_testlc(bool *errorflag, ae_state *_state) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                rawc.xyR[i][j] = hqrndnormal(&rs, _state);
-               v = v + x0.xR[j] * rawc.xyR[i][j];
+               v += x0.xR[j] * rawc.xyR[i][j];
             }
             rawc.xyR[i][n] = v;
             rawct.xZ[i] = 2 * hqrnduniformi(&rs, 2, _state) - 1;
@@ -40352,7 +40352,7 @@ static void testminlmunit_testlc(bool *errorflag, ae_state *_state) {
          }
          for (i = 0; i < rawccnt; i++) {
             v = ae_v_dotproduct(rawc.xyR[i], 1, x.xR, 1, n);
-            v = v - rawc.xyR[i][n];
+            v -= rawc.xyR[i][n];
             if (rawct.xZ[i] > 0) {
                set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testminlmunit.ap:911");
             }
@@ -40377,7 +40377,7 @@ static void testminlmunit_testlc(bool *errorflag, ae_state *_state) {
             for (i = 0; i < rawccnt; i++) {
                ae_assert(rawct.xZ[i] != 0, "Assertion failed", _state);
                v = ae_v_dotproduct(rawc.xyR[i], 1, x1.xR, 1, n);
-               v = v - rawc.xyR[i][n];
+               v -= rawc.xyR[i][n];
                bflag = bflag || (rawct.xZ[i] > 0 && v < 0.0);
                bflag = bflag || (rawct.xZ[i] < 0 && v > 0.0);
             }
@@ -40432,7 +40432,7 @@ static void testminlmunit_testlc(bool *errorflag, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             rawc.xyR[i][j] = z.xyR[i][j];
-            v = v + x0.xR[j] * rawc.xyR[i][j];
+            v += x0.xR[j] * rawc.xyR[i][j];
          }
          rawc.xyR[i][n] = v;
          rawct.xZ[i] = 0;
@@ -40466,7 +40466,7 @@ static void testminlmunit_testlc(bool *errorflag, ae_state *_state) {
    // Test feasibility w.r.t. linear equality constraints
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, x.xR, 1, n);
-         v = v - rawc.xyR[i][n];
+         v -= rawc.xyR[i][n];
          set_error_flag(errorflag, ae_fabs(v, _state) > xtol, __FILE__, __LINE__, "testminlmunit.ap:1042");
       }
    // Make several random trial steps and:
@@ -40944,9 +40944,9 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * v;
+            state.fi.xR[0] += 0.5 * state.x.xR[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.j.xyR[0][i] = 0.0;
@@ -41021,9 +41021,9 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      v = 0.0;
                      for (j = 0; j < n; j++) {
-                        v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                        v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                      }
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                     state.fi.xR[0] += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                      if (state.needfij) {
                         state.j.xyR[0][i] = v;
                      }
@@ -41032,9 +41032,9 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      v = 0.0;
                      for (j = 0; j < n; j++) {
-                        v = v + state.x.xR[j] / s.xR[j] * a1.xyR[i][j];
+                        v += state.x.xR[j] / s.xR[j] * a1.xyR[i][j];
                      }
-                     state.fi.xR[1] = state.fi.xR[1] + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                     state.fi.xR[1] += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                      if (state.needfij) {
                         state.j.xyR[1][i] = v;
                      }
@@ -41047,13 +41047,13 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                         state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] * 2;
+                        state.j.xyR[funcidx][varidx] *= 2;
                      }
                   }
                   if (state.needfij) {
                      for (i = 0; i < n; i++) {
-                        state.j.xyR[0][i] = state.j.xyR[0][i] / s.xR[i];
-                        state.j.xyR[1][i] = state.j.xyR[1][i] / s.xR[i];
+                        state.j.xyR[0][i] /= s.xR[i];
+                        state.j.xyR[1][i] /= s.xR[i];
                      }
                   }
                   continue;
@@ -41080,7 +41080,7 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+                  v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
                }
                jactrue.xyR[0][i] = v;
                jacdefect.xyR[0][i] = v;
@@ -41088,7 +41088,7 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a1.xyR[i][j];
+                  v += ogrep.badgradxbase.xR[j] / s.xR[j] * a1.xyR[i][j];
                }
                jactrue.xyR[1][i] = v;
                jacdefect.xyR[1][i] = v;
@@ -41100,13 +41100,13 @@ static void testminlmunit_testoptguard(bool *wereerrors, ae_state *_state) {
                jacdefect.xyR[funcidx][varidx]++;
             }
             if (defecttype == 2) {
-               jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] * 2;
+               jacdefect.xyR[funcidx][varidx] *= 2;
             }
             for (i = 0; i < n; i++) {
-               jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-               jactrue.xyR[1][i] = jactrue.xyR[1][i] / s.xR[i];
-               jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
-               jacdefect.xyR[1][i] = jacdefect.xyR[1][i] / s.xR[i];
+               jactrue.xyR[0][i] /= s.xR[i];
+               jactrue.xyR[1][i] /= s.xR[i];
+               jacdefect.xyR[0][i] /= s.xR[i];
+               jacdefect.xyR[1][i] /= s.xR[i];
             }
          // Check OptGuard report
             set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 2, n, _state), __FILE__, __LINE__, "testminlmunit.ap:1741");
@@ -41318,7 +41318,7 @@ static void testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+               state.f += sqr((1 + i) * state.x.xR[i], _state);
                state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
             }
          }
@@ -41362,7 +41362,7 @@ static void testother(bool *err, ae_state *_state) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+                  state.f += sqr((1 + i) * state.x.xR[i], _state);
                }
                if (state.needfg) {
                   state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
@@ -41467,7 +41467,7 @@ static void testother(bool *err, ae_state *_state) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
+                     state.f += a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
                      state.g.xR[i] = 4 * a.xR[i] * ae_pow(state.x.xR[i], 3.0, _state);
                   }
                }
@@ -41480,7 +41480,7 @@ static void testother(bool *err, ae_state *_state) {
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + sqr(s.xR[i] * 4 * a.xR[i] * ae_pow(x.xR[i], 3.0, _state), _state);
+               v += sqr(s.xR[i] * 4 * a.xR[i] * ae_pow(x.xR[i], 3.0, _state), _state);
             }
             v = ae_sqrt(v, _state);
             *err = *err || v > tmpeps;
@@ -41496,7 +41496,7 @@ static void testother(bool *err, ae_state *_state) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
+                     state.f += a.xR[i] * ae_pow(state.x.xR[i], 4.0, _state);
                      state.g.xR[i] = 4 * a.xR[i] * ae_pow(state.x.xR[i], 3.0, _state);
                   }
                }
@@ -41504,7 +41504,7 @@ static void testother(bool *err, ae_state *_state) {
                   if (hasxlast) {
                      lastscaledstep = 0.0;
                      for (i = 0; i < n; i++) {
-                        lastscaledstep = lastscaledstep + sqr(state.x.xR[i] - xlast.xR[i], _state) / sqr(s.xR[i], _state);
+                        lastscaledstep += sqr(state.x.xR[i] - xlast.xR[i], _state) / sqr(s.xR[i], _state);
                      }
                      lastscaledstep = ae_sqrt(lastscaledstep, _state);
                   } else {
@@ -41619,11 +41619,11 @@ static void testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.xR[i] * state.x.xR[i];
+               state.f += b.xR[i] * state.x.xR[i];
                state.g.xR[i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                  state.g.xR[i] = state.g.xR[i] + fulla.xyR[i][j] * state.x.xR[j];
+                  state.f += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                  state.g.xR[i] += fulla.xyR[i][j] * state.x.xR[j];
                }
             }
             if (k >= spoiliteration) {
@@ -41765,7 +41765,7 @@ static void testmincgunit_calciip2(mincgstate *state, ae_int_t n, ae_state *_sta
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f = state->f + sqr((double)(i * i + 1), _state) * sqr(state->x.xR[i], _state);
+         state->f += sqr((double)(i * i + 1), _state) * sqr(state->x.xR[i], _state);
       }
       if (state->needfg) {
          state->g.xR[i] = sqr((double)(i * i + 1), _state) * 2 * state->x.xR[i];
@@ -41786,15 +41786,15 @@ static void testmincgunit_calclowrank(mincgstate *state, ae_int_t n, ae_int_t vc
    }
    for (i = 0; i < n; i++) {
       dx = state->x.xR[i] - x0->xR[i];
-      state->f = state->f + 0.5 * dx * d->xR[i] * dx;
-      state->g.xR[i] = state->g.xR[i] + d->xR[i] * dx;
+      state->f += 0.5 * dx * d->xR[i] * dx;
+      state->g.xR[i] += d->xR[i] * dx;
    }
    for (i = 0; i < vcnt; i++) {
       t = 0.0;
       for (j = 0; j < n; j++) {
-         t = t + v->xyR[i][j] * (state->x.xR[j] - x0->xR[j]);
+         t += v->xyR[i][j] * (state->x.xR[j] - x0->xR[j]);
       }
-      state->f = state->f + 0.5 * t * vd->xR[i] * t;
+      state->f += 0.5 * t * vd->xR[i] * t;
       t2 = t * vd->xR[i];
       ae_v_addd(state->g.xR, 1, v->xyR[i], 1, n, t2);
    }
@@ -41860,7 +41860,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                testmincgunit_calciip2(&state, n, _state);
             }
             mincgresults(&state, &x, &rep, _state);
-            cntb1 = cntb1 + rep.iterationscount;
+            cntb1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
       // Test it with perturbed diagonal preconditioner
@@ -41879,7 +41879,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                testmincgunit_calciip2(&state, n, _state);
             }
             mincgresults(&state, &x, &rep, _state);
-            cntg1 = cntg1 + rep.iterationscount;
+            cntg1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
       // Compare
@@ -41931,7 +41931,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                   testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0, _state);
                }
                mincgresults(&state, &x, &rep, _state);
-               cntb1 = cntb1 + rep.iterationscount;
+               cntb1 += rep.iterationscount;
                *err = *err || rep.terminationtype <= 0;
             }
          // Test it with low rank preconditioner
@@ -41946,7 +41946,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                   testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0, _state);
                }
                mincgresults(&state, &x, &rep, _state);
-               cntg1 = cntg1 + rep.iterationscount;
+               cntg1 += rep.iterationscount;
                *err = *err || rep.terminationtype <= 0;
             }
          // Compare
@@ -41982,7 +41982,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                testmincgunit_calciip2(&state, n, _state);
             }
             mincgresults(&state, &x, &rep, _state);
-            cntb2 = cntb2 + rep.iterationscount;
+            cntb2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          mincgsetprecscale(&state, _state);
@@ -41997,7 +41997,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
                testmincgunit_calciip2(&state, n, _state);
             }
             mincgresults(&state, &x, &rep, _state);
-            cntg2 = cntg2 + rep.iterationscount;
+            cntg2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -42046,9 +42046,9 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + ae_fabs(vv, _state);
+            v += ae_fabs(vv, _state);
          }
          set_error_flag(err, ae_fabs(v - rep->f.xR[k], _state) > 1.0E-6 * maxreal(ae_fabs(v, _state), 1.0, _state), __FILE__, __LINE__, "testmincgunit.ap:1803");
       }
@@ -42058,8 +42058,8 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
       }
@@ -42122,9 +42122,9 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + sign(vv, _state) * a->xyR[i][rep->vidx];
+            v += sign(vv, _state) * a->xyR[i][rep->vidx];
             tooclose = tooclose || ae_fabs(vv, _state) < 1.0E-4;
          }
          if (!tooclose) {
@@ -42138,8 +42138,8 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          tooclose = (tooclose || ae_fabs(va, _state) < 1.0E-8) || ae_fabs(vb, _state) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
@@ -42223,9 +42223,9 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + 0.5 * state.x.xR[i] * v;
+            state.f += 0.5 * state.x.xR[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.xR[i] = 0.0;
@@ -42279,12 +42279,12 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + ae_fabs(v, _state);
+            state.f += ae_fabs(v, _state);
             v = (double)sign(v, _state);
             for (j = 0; j < n; j++) {
-               state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+               state.g.xR[j] += v * a.xyR[i][j];
             }
          }
          continue;
@@ -42335,9 +42335,9 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                  state.f += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                   state.g.xR[i] = v;
                }
                if (defecttype == 0) {
@@ -42347,10 +42347,10 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] = state.g.xR[varidx] * 2;
+                  state.g.xR[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.xR[i] = state.g.xR[i] / s.xR[i];
+                  state.g.xR[i] /= s.xR[i];
                }
                continue;
             }
@@ -42376,7 +42376,7 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+               v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
             }
             jactrue.xyR[0][i] = v;
             jacdefect.xyR[0][i] = v;
@@ -42388,11 +42388,11 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
+            jacdefect.xyR[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-            jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
+            jactrue.xyR[0][i] /= s.xR[i];
+            jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
          set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n, _state), __FILE__, __LINE__, "testmincgunit.ap:1439");
@@ -42470,12 +42470,12 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
                v = (double)sign(v, _state);
                for (j = 0; j < n; j++) {
-                  state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+                  state.g.xR[j] += v * a.xyR[i][j];
                }
             }
             continue;
@@ -42515,8 +42515,8 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1570");
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n, _state);
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n, _state);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1578");
          set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1579");
@@ -42531,8 +42531,8 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1589");
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n, _state);
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n, _state);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1597");
          set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1598");
@@ -42589,9 +42589,9 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
             }
             continue;
          }
@@ -42643,11 +42643,11 @@ static void testmincgunit_testoptguard(bool *wereerrors, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.xR[i] * state.x.xR[i];
+            state.f += b.xR[i] * state.x.xR[i];
             state.g.xR[i] = b.xR[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
-               state.g.xR[i] = state.g.xR[i] + a.xyR[i][j] * state.x.xR[j];
+               state.f += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+               state.g.xR[i] += a.xyR[i][j] * state.x.xR[j];
             }
          }
          continue;
@@ -42837,7 +42837,7 @@ bool testmincg(bool silent, ae_state *_state) {
                for (j = 0; j < n; j++) {
                   a.xyR[i][j] = 2 * randomreal(_state) - 1;
                }
-               a.xyR[i][i] = a.xyR[i][i] + 3 * sign(a.xyR[i][i], _state);
+               a.xyR[i][i] += 3 * sign(a.xyR[i][i], _state);
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, xe.xR, 1, n);
@@ -42866,11 +42866,11 @@ bool testmincg(bool silent, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
                   if (state.needf || state.needfg) {
-                     state.f = state.f + sqr(v - b.xR[i], _state);
+                     state.f += sqr(v - b.xR[i], _state);
                   }
                   if (state.needfg) {
                      for (j = 0; j < n; j++) {
-                        state.g.xR[j] = state.g.xR[j] + 2 * (v - b.xR[i]) * a.xyR[i][j];
+                        state.g.xR[j] += 2 * (v - b.xR[i]) * a.xyR[i][j];
                      }
                   }
                }
@@ -43076,11 +43076,11 @@ static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *b
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         d.xR[j] = d.xR[j] + rep->laglc.xR[i] * a->xyR[i][j];
+         d.xR[j] += rep->laglc.xR[i] * a->xyR[i][j];
       }
    }
    for (i = 0; i < n; i++) {
-      d.xR[i] = d.xR[i] + rep->lagbc.xR[i];
+      d.xR[i] += rep->lagbc.xR[i];
    }
    *errdual = maxreal(*errdual, rmaxabsv(n, &d, _state), _state);
 // Test complementary slackness
@@ -43138,7 +43138,7 @@ static void testminlpunit_selectsolver(minlpstate *state, ae_int_t st, ae_state 
 static void testminlpunit_shiftfromzero(RVector *c, ae_int_t n, double s, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < n; i++) {
-      c->xR[i] = c->xR[i] + sign(c->xR[i], _state) * s;
+      c->xR[i] += sign(c->xR[i], _state) * s;
    }
 }
 
@@ -43446,7 +43446,7 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
          v0 = 0.0;
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = hqrndnormal(&rs, _state);
-            v0 = v0 + a.xyR[i][j] * x0.xR[j];
+            v0 += a.xyR[i][j] * x0.xR[j];
          }
          al.xR[i] = v0 - 0.25 * hqrnduniformr(&rs, _state);
          au.xR[i] = v0 + 0.25 * hqrnduniformr(&rs, _state);
@@ -43518,7 +43518,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          ax.xyR[i][j] = hqrndnormal(rs, _state);
-         ax.xyR[i][j] = ax.xyR[i][j] + sign(ax.xyR[i][j], _state) * mincoeff;
+         ax.xyR[i][j] += sign(ax.xyR[i][j], _state) * mincoeff;
          a->xyR[i][j] = ax.xyR[i][j];
       }
       for (j = 0; j < m; j++) {
@@ -43537,7 +43537,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    for (i = 0; i < m; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + xx->xR[j] * ax.xyR[i][j];
+         v += xx->xR[j] * ax.xyR[i][j];
       }
       xx->xR[n + i] = v;
    }
@@ -43682,8 +43682,8 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->xyR[i][j] = hqrndnormal(rs, _state) * hqrnduniformi(rs, 2, _state);
-            a->xyR[i][j] = a->xyR[i][j] + sign(a->xyR[i][j], _state) * mincoeff;
-            v = v + a->xyR[i][j] * x0.xR[j];
+            a->xyR[i][j] += sign(a->xyR[i][j], _state) * mincoeff;
+            v += a->xyR[i][j] * x0.xR[j];
          }
          al->xR[i] = v - ae_pow(q, hqrndnormal(rs, _state), _state);
          au->xR[i] = v + ae_pow(q, hqrndnormal(rs, _state), _state);
@@ -43716,8 +43716,8 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->xyR[i][j] = hqrndnormal(rs, _state);
-            a->xyR[i][j] = a->xyR[i][j] + sign(a->xyR[i][j], _state) * mincoeff;
-            v = v + a->xyR[i][j] * x0.xR[j];
+            a->xyR[i][j] += sign(a->xyR[i][j], _state) * mincoeff;
+            v += a->xyR[i][j] * x0.xR[j];
          }
          al->xR[i] = v - ae_pow(q, hqrndnormal(rs, _state), _state);
          au->xR[i] = v + ae_pow(q, hqrndnormal(rs, _state), _state);
@@ -43775,7 +43775,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
       for (i = 0; i < ndual; i++) {
          j = basicnonbasic.xZ[*m + hqrnduniformi(rs, n, _state)];
          if (j < n) {
-            c->xR[j] = c->xR[j] - d.xR[j];
+            c->xR[j] -= d.xR[j];
             d.xR[j] = 0.0;
          }
       }
@@ -43850,7 +43850,7 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
       do {
          c->xR[i] = hqrndnormal(rs, _state);
       } while (c->xR[i] == 0.0);
-      c->xR[i] = c->xR[i] + 0.1 * sign(c->xR[i], _state);
+      c->xR[i] += 0.1 * sign(c->xR[i], _state);
       v = ae_pow(q, hqrndnormal(rs, _state), _state) - ae_pow(q, hqrndnormal(rs, _state), _state);
       if (c->xR[i] < 0.0) {
          bndl->xR[i] = v;
@@ -43886,8 +43886,8 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
          vv = 0.0;
          for (j = 0; j < n; j++) {
             a->xyR[i][j] = hqrndnormal(rs, _state);
-            v = v + a->xyR[i][j] * x0.xR[j];
-            vv = vv + a->xyR[i][j] * c->xR[j];
+            v += a->xyR[i][j] * x0.xR[j];
+            vv += a->xyR[i][j] * c->xR[j];
          }
          if (vv >= 0.0) {
             al->xR[i] = _state->v_neginf;
@@ -43978,7 +43978,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
          a->xyR[*m][i] = a->xyR[*m - 1][i];
       }
       v = minerr + ae_pow(q, hqrndnormal(rs, _state), _state);
-      v = v * maxreal(1.0, ae_sqrt(rdotrr(n, a, *m, a, *m, _state), _state), _state);
+      v *= maxreal(1.0, ae_sqrt(rdotrr(n, a, *m, a, *m, _state), _state), _state);
       if (ae_isfinite(al->xR[*m - 1], _state) && ae_isfinite(au->xR[*m - 1], _state)) {
          al->xR[*m] = au->xR[*m - 1] + v;
          au->xR[*m] = al->xR[*m] + ae_pow(q, hqrndnormal(rs, _state), _state);
@@ -44137,7 +44137,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
                   v = hqrndnormal(rs, _state);
                   idxi.xZ[nz + j] = idxi.xZ[k];
                   ai.xR[nz + j] = v;
-                  ai.xR[k] = ai.xR[k] - v;
+                  ai.xR[k] -= v;
                }
             }
          // Possibly nonexistent elements are added as +V and -V
@@ -44275,8 +44275,8 @@ static void testminlpunit_singlecalltests(bool *err, ae_state *_state) {
          f = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f = f + x0.xR[i] * c.xR[i];
-            f1 = f1 + x1.xR[i] * c.xR[i];
+            f += x0.xR[i] * c.xR[i];
+            f1 += x1.xR[i] * c.xR[i];
          }
          set_error_flag(err, ae_fabs(f1 - f, _state) > ftol, __FILE__, __LINE__, "testminlpunit.ap:511");
       // Test scaling (random scale is applied, target values for
@@ -44411,7 +44411,7 @@ static void testminlpunit_singlecalltests(bool *err, ae_state *_state) {
             v0 = 0.0;
             for (j = n0; j < n; j++) {
                a.xyR[i][j] = hqrndnormal(&rs, _state);
-               v0 = v0 + 0.5 * a.xyR[i][j];
+               v0 += 0.5 * a.xyR[i][j];
             }
             al.xR[i] = v0 - ae_pow(2.0, hqrndnormal(&rs, _state), _state);
             au.xR[i] = v0 + ae_pow(2.0, hqrndnormal(&rs, _state), _state);
@@ -44423,7 +44423,7 @@ static void testminlpunit_singlecalltests(bool *err, ae_state *_state) {
             } else {
                a.xyR[m - 1][i] = 0.0;
             }
-            v0 = v0 + a.xyR[m - 1][i];
+            v0 += a.xyR[m - 1][i];
          }
          al.xR[m - 1] = v0 + alpha;
          au.xR[m - 1] = al.xR[m - 1];
@@ -44680,12 +44680,12 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = x0.xR[i] * s.xR[i];
-                  bndl.xR[i] = bndl.xR[i] * s.xR[i];
-                  bndu.xR[i] = bndu.xR[i] * s.xR[i];
-                  b.xR[i] = b.xR[i] / s.xR[i];
+                  x0.xR[i] *= s.xR[i];
+                  bndl.xR[i] *= s.xR[i];
+                  bndu.xR[i] *= s.xR[i];
+                  b.xR[i] /= s.xR[i];
                   for (j = 0; j < n; j++) {
-                     fulla.xyR[i][j] = fulla.xyR[i][j] / (s.xR[i] * s.xR[j]);
+                     fulla.xyR[i][j] /= s.xR[i] * s.xR[j];
                   }
                }
             // Solve problem
@@ -44721,11 +44721,11 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                        state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                         state.j.xyR[0][i] = b.xR[i];
                         for (j = 0; j < n; j++) {
-                           state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                           state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                           state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                           state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                         }
                      }
                      continue;
@@ -44759,16 +44759,16 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   g = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     g = g + fulla.xyR[i][j] * x1.xR[j];
+                     g += fulla.xyR[i][j] * x1.xR[j];
                   }
-                  g = s.xR[i] * g;
+                  g *= s.xR[i];
                   if ((ae_isfinite(bndl.xR[i], _state) && ae_fabs(x1.xR[i] - bndl.xR[i], _state) < tolx * s.xR[i]) && g > 0.0) {
                      g = 0.0;
                   }
                   if ((ae_isfinite(bndu.xR[i], _state) && ae_fabs(x1.xR[i] - bndu.xR[i], _state) < tolx * s.xR[i]) && g < 0.0) {
                      g = 0.0;
                   }
-                  gnorm = gnorm + sqr(g, _state);
+                  gnorm += sqr(g, _state);
                }
                gnorm = ae_sqrt(gnorm, _state);
                set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:286");
@@ -44847,11 +44847,11 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                        state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                         state.j.xyR[0][i] = b.xR[i];
                         for (j = 0; j < n; j++) {
-                           state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                           state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                           state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                           state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                         }
                      }
                      continue;
@@ -44880,7 +44880,7 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   g = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     g = g + fulla.xyR[i][j] * x1.xR[j];
+                     g += fulla.xyR[i][j] * x1.xR[j];
                   }
                   if ((ae_isfinite(bndl.xR[i], _state) && ae_fabs(x1.xR[i] - bndl.xR[i], _state) < tolx) && g > 0.0) {
                      g = 0.0;
@@ -44888,7 +44888,7 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                   if ((ae_isfinite(bndu.xR[i], _state) && ae_fabs(x1.xR[i] - bndu.xR[i], _state) < tolx) && g < 0.0) {
                      g = 0.0;
                   }
-                  gnorm = gnorm + sqr(g, _state);
+                  gnorm += sqr(g, _state);
                }
                gnorm = ae_sqrt(gnorm, _state);
                set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:415");
@@ -45011,13 +45011,13 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = x0.xR[i] * s.xR[i];
-                  xstart.xR[i] = xstart.xR[i] * s.xR[i];
-                  b.xR[i] = b.xR[i] / s.xR[i];
+                  x0.xR[i] *= s.xR[i];
+                  xstart.xR[i] *= s.xR[i];
+                  b.xR[i] /= s.xR[i];
                }
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     c.xyR[i][j] = c.xyR[i][j] / s.xR[j];
+                     c.xyR[i][j] /= s.xR[j];
                   }
                }
             // Create optimizer, solve
@@ -45054,7 +45054,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i] + 0.5 * sqr(state.x.xR[i], _state) / sqr(s.xR[i], _state);
+                        state.fi.xR[0] += b.xR[i] * state.x.xR[i] + 0.5 * sqr(state.x.xR[i], _state) / sqr(s.xR[i], _state);
                         state.j.xyR[0][i] = b.xR[i] + state.x.xR[i] / sqr(s.xR[i], _state);
                      }
                      continue;
@@ -45081,8 +45081,8 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                f0 = 0.0;
                f1 = 0.0;
                for (i = 0; i < n; i++) {
-                  f0 = f0 + b.xR[i] * x0.xR[i] + 0.5 * sqr(x0.xR[i] / s.xR[i], _state);
-                  f1 = f1 + b.xR[i] * x1.xR[i] + 0.5 * sqr(x1.xR[i] / s.xR[i], _state);
+                  f0 += b.xR[i] * x0.xR[i] + 0.5 * sqr(x0.xR[i] / s.xR[i], _state);
+                  f1 += b.xR[i] * x1.xR[i] + 0.5 * sqr(x1.xR[i] / s.xR[i], _state);
                }
                set_error_flag(wereerrors, ae_fabs(f1 - f0, _state) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:608");
             }
@@ -45121,12 +45121,12 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   c.xyR[0][i] = 2 * randomreal(_state) - 1;
-                  v = v + sqr(c.xyR[0][i], _state);
+                  v += sqr(c.xyR[0][i], _state);
                }
                v = ae_sqrt(v, _state);
             } while (v == 0.0);
             for (i = 0; i < n; i++) {
-               c.xyR[0][i] = c.xyR[0][i] / v;
+               c.xyR[0][i] /= v;
             }
             c.xyR[0][n] = 0.0;
             ct.xZ[0] = 1;
@@ -45146,15 +45146,15 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                }
             }
             for (i = 0; i < n; i++) {
-               xm.xR[i] = xm.xR[i] * s.xR[i];
-               xstart.xR[i] = xstart.xR[i] * s.xR[i];
-               b.xR[i] = b.xR[i] / s.xR[i];
+               xm.xR[i] *= s.xR[i];
+               xstart.xR[i] *= s.xR[i];
+               b.xR[i] /= s.xR[i];
                for (j = 0; j < n; j++) {
-                  fulla.xyR[i][j] = fulla.xyR[i][j] / (s.xR[i] * s.xR[j]);
+                  fulla.xyR[i][j] /= s.xR[i] * s.xR[j];
                }
             }
             for (j = 0; j < n; j++) {
-               c.xyR[0][j] = c.xyR[0][j] / s.xR[j];
+               c.xyR[0][j] /= s.xR[j];
             }
          // Create optimizer, solve
             minnlccreate(n, &xstart, &state, _state);
@@ -45180,11 +45180,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                      state.j.xyR[0][i] = b.xR[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                        state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                        state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                        state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                      }
                   }
                   continue;
@@ -45212,7 +45212,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             ae_v_move(g.xR, 1, b.xR, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.xyR[i], 1, x1.xR, 1, n);
-               g.xR[i] = g.xR[i] + v;
+               g.xR[i] += v;
             }
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[0], 1, n);
             set_error_flag(wereerrors, v < -tolx, __FILE__, __LINE__, "testminnlcunit.ap:759");
@@ -45222,15 +45222,15 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                v = 0.0;
                vv = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + g.xR[i] * c.xyR[0][i];
-                  vv = vv + c.xyR[0][i] * c.xyR[0][i];
+                  v += g.xR[i] * c.xyR[0][i];
+                  vv += c.xyR[0][i] * c.xyR[0][i];
                }
-               v = v / vv;
+               v /= vv;
                ae_v_subd(g.xR, 1, c.xyR[0], 1, n, v);
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + sqr(g.xR[i] * s.xR[i], _state);
+               v += sqr(g.xR[i] * s.xR[i], _state);
             }
             set_error_flag(wereerrors, ae_sqrt(v, _state) > tolg, __FILE__, __LINE__, "testminnlcunit.ap:779");
          }
@@ -45299,11 +45299,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                      state.j.xyR[0][i] = b.xR[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                        state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                        state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                        state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                      }
                   }
                   continue;
@@ -45335,7 +45335,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             ae_v_move(g.xR, 1, b.xR, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.xyR[i], 1, x1.xR, 1, n);
-               g.xR[i] = g.xR[i] + v;
+               g.xR[i] += v;
             }
             for (i = 0; i < k; i++) {
                v = ae_v_dotproduct(g.xR, 1, c.xyR[i], 1, n);
@@ -45415,11 +45415,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45457,11 +45457,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45479,11 +45479,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          f0 = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f0 = f0 + b.xR[i] * x1.xR[i];
-            f1 = f1 + b.xR[i] * x2.xR[i];
+            f0 += b.xR[i] * x1.xR[i];
+            f1 += b.xR[i] * x2.xR[i];
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * x1.xR[i] * fulla.xyR[i][j] * x1.xR[j];
-               f1 = f1 + 0.5 * x2.xR[i] * fulla.xyR[i][j] * x2.xR[j];
+               f0 += 0.5 * x1.xR[i] * fulla.xyR[i][j] * x1.xR[j];
+               f1 += 0.5 * x2.xR[i] * fulla.xyR[i][j] * x2.xR[j];
             }
          }
          set_error_flag(wereerrors, ae_fabs(f0 - f1, _state) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1080");
@@ -45556,11 +45556,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45623,7 +45623,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.xyR[i][j] = hqrndnormal(&rs, _state);
-               v = v + c.xyR[i][j] * xm.xR[j];
+               v += c.xyR[i][j] * xm.xR[j];
             }
             c.xyR[i][n] = v;
             ct.xZ[i] = 0;
@@ -45632,14 +45632,14 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.xyR[i][j] = hqrndnormal(&rs, _state) / ae_sqrt((double)n, _state);
-               v = v + c.xyR[i][j] * xm.xR[j];
+               v += c.xyR[i][j] * xm.xR[j];
             }
             c.xyR[i][n] = v;
             ct.xZ[i] = 2 * hqrnduniformi(&rs, 2, _state) - 1;
             if (ct.xZ[i] > 0) {
-               c.xyR[i][n] = c.xyR[i][n] - 0.1;
+               c.xyR[i][n] -= 0.1;
             } else {
-               c.xyR[i][n] = c.xyR[i][n] + 0.1;
+               c.xyR[i][n] += 0.1;
             }
          }
       // Create optimizer, solve
@@ -45670,11 +45670,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45748,7 +45748,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             for (j = 0; j < n; j++) {
                c.xyR[i][j] = 2 * randomreal(_state) - 1;
             }
-            c.xyR[i][i] = c.xyR[i][i] + 4;
+            c.xyR[i][i] += 4;
             v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
             ct.xZ[i] = 0;
@@ -45781,11 +45781,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45812,11 +45812,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -45835,11 +45835,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * x0.xR[i] * fulla.xyR[i][j] * x0.xR[j];
-               f1 = f1 + 0.5 * x1.xR[i] * fulla.xyR[i][j] * x1.xR[j];
+               f0 += 0.5 * x0.xR[i] * fulla.xyR[i][j] * x0.xR[j];
+               f1 += 0.5 * x1.xR[i] * fulla.xyR[i][j] * x1.xR[j];
             }
-            f0 = f0 + x0.xR[i] * b.xR[i];
-            f1 = f1 + x1.xR[i] * b.xR[i];
+            f0 += x0.xR[i] * b.xR[i];
+            f1 += x1.xR[i] * b.xR[i];
          }
          set_error_flag(wereerrors, ae_fabs(f0 - f1, _state) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1486");
       }
@@ -45909,7 +45909,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                   v = hqrndnormal(&rs, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                        a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                      }
                   }
                }
@@ -45930,8 +45930,8 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                c.xyR[i][n] = sign((double)shiftkind, _state) * ae_pow(10.0, ae_fabs((double)shiftkind, _state), _state) * machineepsilon;
                for (j = 0; j < n; j++) {
                   c.xyR[i][j] = (double)(2 * (k % 2) - 1);
-                  c.xyR[i][n] = c.xyR[i][n] + c.xyR[i][j] * c.xyR[i][j];
-                  k = k / 2;
+                  c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
+                  k /= 2;
                }
             }
          // Create and optimize
@@ -45959,13 +45959,13 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                ae_assert(state.needfij, "Assertion failed", _state);
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + state.x.xR[i] * b.xR[i];
+                  state.fi.xR[0] += state.x.xR[i] * b.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                }
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-                  state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * v;
-                  state.j.xyR[0][i] = state.j.xyR[0][i] + v;
+                  state.fi.xR[0] += 0.5 * state.x.xR[i] * v;
+                  state.j.xyR[0][i] += v;
                }
             }
             minnlcresults(&state, &xs0, &rep, _state);
@@ -45983,15 +45983,15 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             gnrm2 = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, xs0.xR, 1, n);
-               v = v + b.xR[i];
-               gnrm2 = gnrm2 + v * v;
+               v += b.xR[i];
+               gnrm2 += v * v;
                if (xs0.xR[i] <= bl.xR[i] + tolconstr && v > 0.0) {
                   v = 0.0;
                }
                if (xs0.xR[i] >= bu.xR[i] - tolconstr && v < 0.0) {
                   v = 0.0;
                }
-               vv = vv + sqr(v, _state);
+               vv += sqr(v, _state);
             }
             vv = ae_sqrt(vv / (gnrm2 + 1.0), _state);
             set_error_flag(wereerrors, vv > 1.0E-2, __FILE__, __LINE__, "testminnlcunit.ap:1672");
@@ -46058,7 +46058,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                         v = hqrndnormal(&rs, _state);
                         for (i = 0; i < n; i++) {
                            for (j = 0; j < n; j++) {
-                              a.xyR[i][j] = a.xyR[i][j] + v * tmp.xR[i] * tmp.xR[j];
+                              a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
                            }
                         }
                      }
@@ -46080,7 +46080,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      c.xyR[i][j] = hqrnduniformr(&rs, _state) - 0.5;
                   }
-                  c.xyR[i][i] = c.xyR[i][i] + 4;
+                  c.xyR[i][i] += 4;
                }
             // Create and optimize
                minnlccreate(n, &x, &state, _state);
@@ -46107,13 +46107,13 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                   ae_assert(state.needfij, "Assertion failed", _state);
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + state.x.xR[i] * b.xR[i];
+                     state.fi.xR[0] += state.x.xR[i] * b.xR[i];
                      state.j.xyR[0][i] = b.xR[i];
                   }
                   for (i = 0; i < n; i++) {
                      v = ae_v_dotproduct(a.xyR[i], 1, state.x.xR, 1, n);
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * v;
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + v;
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * v;
+                     state.j.xyR[0][i] += v;
                   }
                }
                minnlcresults(&state, &xs0, &rep, _state);
@@ -46169,7 +46169,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                }
                for (i = 0; i < ccnt; i++) {
                   v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
-                  v = v - c.xyR[i][n];
+                  v -= c.xyR[i][n];
                   set_error_flag(wereerrors, ct.xZ[i] == 0 && ae_fabs(v, _state) > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1875");
                   set_error_flag(wereerrors, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1876");
                   set_error_flag(wereerrors, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1877");
@@ -46200,7 +46200,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                snnlssolve(&nnls, &tmp, _state);
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     g.xR[j] = g.xR[j] - tmp.xR[i] * ce.xyR[j][i];
+                     g.xR[j] -= tmp.xR[i] * ce.xyR[j][i];
                   }
                }
                vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
@@ -46384,12 +46384,12 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                }
             }
             for (i = 0; i < n; i++) {
-               x0.xR[i] = x0.xR[i] * s.xR[i];
-               bndl.xR[i] = bndl.xR[i] * s.xR[i];
-               bndu.xR[i] = bndu.xR[i] * s.xR[i];
-               b.xR[i] = b.xR[i] / s.xR[i];
+               x0.xR[i] *= s.xR[i];
+               bndl.xR[i] *= s.xR[i];
+               bndu.xR[i] *= s.xR[i];
+               b.xR[i] /= s.xR[i];
                for (j = 0; j < n; j++) {
-                  fulla.xyR[i][j] = fulla.xyR[i][j] / (s.xR[i] * s.xR[j]);
+                  fulla.xyR[i][j] /= s.xR[i] * s.xR[j];
                }
             }
          // Solve problem with boundary constraints posed as nonlinear ones
@@ -46423,11 +46423,11 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                   }
                // Function itself
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                      state.j.xyR[0][i] = b.xR[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                        state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                        state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                        state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                      }
                   }
                // Equality constraints
@@ -46470,16 +46470,16 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                g.xR[i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  g.xR[i] = g.xR[i] + fulla.xyR[i][j] * x1.xR[j];
+                  g.xR[i] += fulla.xyR[i][j] * x1.xR[j];
                }
-               g.xR[i] = s.xR[i] * g.xR[i];
+               g.xR[i] *= s.xR[i];
                if ((ae_isfinite(bndl.xR[i], _state) && ae_fabs(x1.xR[i] - bndl.xR[i], _state) < tolx * s.xR[i]) && g.xR[i] > 0.0) {
                   g.xR[i] = 0.0;
                }
                if ((ae_isfinite(bndu.xR[i], _state) && ae_fabs(x1.xR[i] - bndu.xR[i], _state) < tolx * s.xR[i]) && g.xR[i] < 0.0) {
                   g.xR[i] = 0.0;
                }
-               gnorm2 = gnorm2 + sqr(g.xR[i], _state);
+               gnorm2 += sqr(g.xR[i], _state);
             }
             set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state), __FILE__, __LINE__, "testminnlcunit.ap:2199");
          }
@@ -46634,11 +46634,11 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                // Evaluate target function
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                     state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                      state.j.xyR[0][i] = b.xR[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                        state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                        state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                        state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                      }
                   }
                // Evaluate constraint functions
@@ -46742,16 +46742,16 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = b.xR[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.xyR[i][j] * x1.xR[j];
+                  v += fulla.xyR[i][j] * x1.xR[j];
                }
                g.xR[i] = v;
-               rawgnorm2 = rawgnorm2 + v * v;
+               rawgnorm2 += v * v;
             }
             klc = 0;
             for (i = 0; i < n2; i++) {
                if (ckind.xZ[i] == 0) {
                // Unconstrained
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2538");
                   continue;
                }
@@ -46759,7 +46759,7 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                // Bound equality constrained, unconditionally set gradient to zero
                   g.xR[2 * i + 0] = 0.0;
                   g.xR[2 * i + 1] = 0.0;
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2549");
                   continue;
                }
@@ -46772,7 +46772,7 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                   if (x1.xR[2 * i + 1] < bndl.xR[2 * i + 1] + tolx || x1.xR[2 * i + 1] > bndu.xR[2 * i + 1] - tolx) {
                      g.xR[2 * i + 1] = 0.0;
                   }
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2563");
                   continue;
                }
@@ -46781,10 +46781,10 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                // equality constrained subspace
                   v = g.xR[2 * i + 0] * c.xyR[klc][2 * i + 0] + g.xR[2 * i + 1] * c.xyR[klc][2 * i + 1];
                   vv = sqr(c.xyR[klc][2 * i + 0], _state) + sqr(c.xyR[klc][2 * i + 1], _state);
-                  g.xR[2 * i + 0] = g.xR[2 * i + 0] - c.xyR[klc][2 * i + 0] * (v / vv);
-                  g.xR[2 * i + 1] = g.xR[2 * i + 1] - c.xyR[klc][2 * i + 1] * (v / vv);
+                  g.xR[2 * i + 0] -= c.xyR[klc][2 * i + 0] * (v / vv);
+                  g.xR[2 * i + 1] -= c.xyR[klc][2 * i + 1] * (v / vv);
                   inc(&klc, _state);
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2578");
                   continue;
                }
@@ -46795,11 +46795,11 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                   if (v > -tolx) {
                      v = g.xR[2 * i + 0] * c.xyR[klc][2 * i + 0] + g.xR[2 * i + 1] * c.xyR[klc][2 * i + 1];
                      vv = sqr(c.xyR[klc][2 * i + 0], _state) + sqr(c.xyR[klc][2 * i + 1], _state);
-                     g.xR[2 * i + 0] = g.xR[2 * i + 0] - c.xyR[klc][2 * i + 0] * (v / vv);
-                     g.xR[2 * i + 1] = g.xR[2 * i + 1] - c.xyR[klc][2 * i + 1] * (v / vv);
+                     g.xR[2 * i + 0] -= c.xyR[klc][2 * i + 0] * (v / vv);
+                     g.xR[2 * i + 1] -= c.xyR[klc][2 * i + 1] * (v / vv);
                   }
                   inc(&klc, _state);
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2597");
                   continue;
                }
@@ -46812,9 +46812,9 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                   vx = x1.xR[2 * i + 0] / v;
                   vy = x1.xR[2 * i + 1] / v;
                   v = g.xR[2 * i + 0] * vx + g.xR[2 * i + 1] * vy;
-                  g.xR[2 * i + 0] = g.xR[2 * i + 0] - vx * v;
-                  g.xR[2 * i + 1] = g.xR[2 * i + 1] - vy * v;
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  g.xR[2 * i + 0] -= vx * v;
+                  g.xR[2 * i + 1] -= vy * v;
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2615");
                   continue;
                }
@@ -46830,10 +46830,10 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
                      vx = x1.xR[2 * i + 0] / v;
                      vy = x1.xR[2 * i + 1] / v;
                      v = g.xR[2 * i + 0] * vx + g.xR[2 * i + 1] * vy;
-                     g.xR[2 * i + 0] = g.xR[2 * i + 0] - vx * v;
-                     g.xR[2 * i + 1] = g.xR[2 * i + 1] - vy * v;
+                     g.xR[2 * i + 0] -= vx * v;
+                     g.xR[2 * i + 1] -= vy * v;
                   }
-                  gnorm2 = gnorm2 + sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
+                  gnorm2 += sqr(g.xR[2 * i + 0], _state) + sqr(g.xR[2 * i + 1], _state);
                   set_error_flag(wereerrors, gnorm2 > sqr(tolg, _state) * maxreal(rawgnorm2, 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2638");
                   continue;
                }
@@ -46940,7 +46940,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
       set_error_flag(wereerrors, ae_fabs(nd2f - d2f, _state) > dtol * maxreal(ae_fabs(nd2f, _state), 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2729");
    // Next point
-      v = v + h;
+      v += h;
    }
    minnlcequalitypenaltyfunction(0.0, &f0, &df, &d2f, _state);
    set_error_flag(wereerrors, f0 != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:2737");
@@ -46962,7 +46962,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
       set_error_flag(wereerrors, ae_fabs(nd2f - d2f, _state) > dtol * maxreal(ae_fabs(nd2f, _state), 1.0, _state), __FILE__, __LINE__, "testminnlcunit.ap:2764");
    // Next point
-      v = v + h;
+      v += h;
    }
    minnlcinequalityshiftfunction(1.0, &f0, &df, &d2f, _state);
    set_error_flag(wereerrors, ae_fabs(f0, _state) > 1.0E-6, __FILE__, __LINE__, "testminnlcunit.ap:2772");
@@ -47129,11 +47129,11 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                if (k >= spoiliteration) {
@@ -47198,11 +47198,11 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3039");
                   set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3040");
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                     state.j.xyR[0][i] = state.j.xyR[0][i] + fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.j.xyR[0][i] += fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -47230,9 +47230,9 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3075");
                   set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3076");
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
                   }
                }
                continue;
@@ -47270,7 +47270,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + ae_pow(state.x.xR[i], 4.0, _state);
+                  state.fi.xR[0] += ae_pow(state.x.xR[i], 4.0, _state);
                   state.j.xyR[0][i] = 4 * ae_pow(state.x.xR[i], 3.0, _state);
                }
                continue;
@@ -47344,7 +47344,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
+                  state.fi.xR[0] += ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
                   state.j.xyR[0][i] = 2 * (state.x.xR[i] - xu.xR[i]);
                }
                continue;
@@ -47440,7 +47440,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
+                  state.fi.xR[0] += ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
                   state.j.xyR[0][i] = 2 * (state.x.xR[i] - xu.xR[i]);
                }
                continue;
@@ -47458,7 +47458,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
       // Check constraint violation reports
          if (rep.bcerr > 0.0) {
             v = maxreal(bndl.xR[badidx1] - x1.xR[badidx1], x1.xR[badidx1] - bndu.xR[badidx1], _state);
-            v = v / s.xR[badidx1];
+            v /= s.xR[badidx1];
             set_error_flag(wereerrors, rep.bcidx != badidx1, __FILE__, __LINE__, "testminnlcunit.ap:3329");
             set_error_flag(wereerrors, ae_fabs(rep.bcerr - v, _state) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3331");
          } else {
@@ -47543,13 +47543,13 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
+                  state.fi.xR[0] += ae_pow(state.x.xR[i] - xu.xR[i], 2.0, _state);
                   state.j.xyR[0][i] = 2 * (state.x.xR[i] - xu.xR[i]);
                }
                for (i = 0; i < k; i++) {
                   state.fi.xR[i + 1] = -c.xyR[i][n];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[i + 1] = state.fi.xR[i + 1] + c.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[i + 1] += c.xyR[i][j] * state.x.xR[j];
                      state.j.xyR[i + 1][j] = c.xyR[i][j];
                   }
                }
@@ -47569,7 +47569,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
          if (badidx0 < nlec) {
             if (rep.bcerr > 0.0) {
                v = maxreal(bndl.xR[badidx0] - x1.xR[badidx0], x1.xR[badidx0] - bndu.xR[badidx0], _state);
-               v = v / s.xR[badidx0];
+               v /= s.xR[badidx0];
                set_error_flag(wereerrors, rep.bcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3460");
                set_error_flag(wereerrors, ae_fabs(rep.bcerr - v, _state) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3462");
             } else {
@@ -47725,7 +47725,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + sqr(state.x.xR[i], _state);
+                  state.fi.xR[0] += sqr(state.x.xR[i], _state);
                   state.j.xyR[0][i] = 2 * state.x.xR[i];
                }
                if (ctype == 1) {
@@ -47746,7 +47746,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             ae_frame_leave(_state);
             return;
          }
-         nnone = nnone + rep.iterationscount;
+         nnone += rep.iterationscount;
       // Test LBFGS preconditioned iteration
          minnlccreate(n, &x0, &state, _state);
          minnlcsetalgoaul(&state, rho, aulits, _state);
@@ -47761,7 +47761,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + sqr(state.x.xR[i], _state);
+                  state.fi.xR[0] += sqr(state.x.xR[i], _state);
                   state.j.xyR[0][i] = 2 * state.x.xR[i];
                }
                if (ctype == 1) {
@@ -47782,7 +47782,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             ae_frame_leave(_state);
             return;
          }
-         nlbfgs = nlbfgs + rep.iterationscount;
+         nlbfgs += rep.iterationscount;
       // Test exact low rank preconditioner
          minnlccreate(n, &x0, &state, _state);
          minnlcsetalgoaul(&state, rho, aulits, _state);
@@ -47797,7 +47797,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + sqr(state.x.xR[i], _state);
+                  state.fi.xR[0] += sqr(state.x.xR[i], _state);
                   state.j.xyR[0][i] = 2 * state.x.xR[i];
                }
                if (ctype == 1) {
@@ -47818,7 +47818,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             ae_frame_leave(_state);
             return;
          }
-         nexactlowrank = nexactlowrank + rep.iterationscount;
+         nexactlowrank += rep.iterationscount;
       // Test exact robust preconditioner
          minnlccreate(n, &x0, &state, _state);
          minnlcsetalgoaul(&state, rho, aulits, _state);
@@ -47833,7 +47833,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + sqr(state.x.xR[i], _state);
+                  state.fi.xR[0] += sqr(state.x.xR[i], _state);
                   state.j.xyR[0][i] = 2 * state.x.xR[i];
                }
                if (ctype == 1) {
@@ -47854,7 +47854,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             ae_frame_leave(_state);
             return;
          }
-         nexactrobust = nexactrobust + rep.iterationscount;
+         nexactrobust += rep.iterationscount;
       }
    // Compare.
    //
@@ -48088,13 +48088,13 @@ static void testminnlcunit_testbugs(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (j = 0; j < n; j++) {
-                  state.fi.xR[0] = state.fi.xR[0] + 0.5 * d.xR[j] * sqr(state.x.xR[j], _state);
+                  state.fi.xR[0] += 0.5 * d.xR[j] * sqr(state.x.xR[j], _state);
                   state.j.xyR[0][j] = d.xR[j] * state.x.xR[j];
                }
                for (i = 0; i < 2 * k; i++) {
                   state.fi.xR[1 + i] = -c.xyR[i][n];
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[1 + i] = state.fi.xR[1 + i] + c.xyR[i][j] * state.x.xR[j];
+                     state.fi.xR[1 + i] += c.xyR[i][j] * state.x.xR[j];
                      state.j.xyR[1 + i][j] = hqrnduniformi(&rs, 2, _state) * c.xyR[i][j];
                   }
                }
@@ -48153,8 +48153,8 @@ static void testminnlcunit_testoptguardc1test0reportfortask0(bool *err, optguard
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
       }
@@ -48216,8 +48216,8 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          tooclose = (tooclose || ae_fabs(va, _state) < 1.0E-8) || ae_fabs(vb, _state) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
@@ -48413,17 +48413,17 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * v;
+               state.fi.xR[0] += 0.5 * state.x.xR[i] * v;
             }
             state.fi.xR[1] = 0.0;
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a1.xyR[i][j];
+                  v += state.x.xR[j] * a1.xyR[i][j];
                }
-               state.fi.xR[1] = state.fi.xR[1] + 0.5 * state.x.xR[i] * v;
+               state.fi.xR[1] += 0.5 * state.x.xR[i] * v;
             }
             for (i = 0; i < n; i++) {
                state.j.xyR[0][i] = 0.0;
@@ -48491,12 +48491,12 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.fi.xR[0] = state.fi.xR[0] + ae_fabs(v, _state);
+               state.fi.xR[0] += ae_fabs(v, _state);
                v = (double)sign(v, _state);
                for (j = 0; j < n; j++) {
-                  state.j.xyR[0][j] = state.j.xyR[0][j] + v * a.xyR[i][j];
+                  state.j.xyR[0][j] += v * a.xyR[i][j];
                }
             }
             continue;
@@ -48580,18 +48580,18 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                      for (i = 0; i < n; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                           v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                         }
-                        state.fi.xR[0] = state.fi.xR[0] + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                        state.fi.xR[0] += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                         state.j.xyR[0][i] = v;
                      }
                      state.fi.xR[1] = 0.0;
                      for (i = 0; i < n; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + state.x.xR[j] / s.xR[j] * a1.xyR[i][j];
+                           v += state.x.xR[j] / s.xR[j] * a1.xyR[i][j];
                         }
-                        state.fi.xR[1] = state.fi.xR[1] + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                        state.fi.xR[1] += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                         state.j.xyR[1][i] = v;
                      }
                      if (defecttype == 0) {
@@ -48601,11 +48601,11 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                         state.j.xyR[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.xyR[funcidx][varidx] = state.j.xyR[funcidx][varidx] * 2;
+                        state.j.xyR[funcidx][varidx] *= 2;
                      }
                      for (i = 0; i < n; i++) {
-                        state.j.xyR[0][i] = state.j.xyR[0][i] / s.xR[i];
-                        state.j.xyR[1][i] = state.j.xyR[1][i] / s.xR[i];
+                        state.j.xyR[0][i] /= s.xR[i];
+                        state.j.xyR[1][i] /= s.xR[i];
                      }
                      continue;
                   }
@@ -48631,7 +48631,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+                     v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
                   }
                   jactrue.xyR[0][i] = v;
                   jacdefect.xyR[0][i] = v;
@@ -48639,7 +48639,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a1.xyR[i][j];
+                     v += ogrep.badgradxbase.xR[j] / s.xR[j] * a1.xyR[i][j];
                   }
                   jactrue.xyR[1][i] = v;
                   jacdefect.xyR[1][i] = v;
@@ -48651,13 +48651,13 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   jacdefect.xyR[funcidx][varidx]++;
                }
                if (defecttype == 2) {
-                  jacdefect.xyR[funcidx][varidx] = jacdefect.xyR[funcidx][varidx] * 2;
+                  jacdefect.xyR[funcidx][varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-                  jactrue.xyR[1][i] = jactrue.xyR[1][i] / s.xR[i];
-                  jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
-                  jacdefect.xyR[1][i] = jacdefect.xyR[1][i] / s.xR[i];
+                  jactrue.xyR[0][i] /= s.xR[i];
+                  jactrue.xyR[1][i] /= s.xR[i];
+                  jacdefect.xyR[0][i] /= s.xR[i];
+                  jacdefect.xyR[1][i] /= s.xR[i];
                }
             // Check OptGuard report
                set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 2, n, _state), __FILE__, __LINE__, "testminnlcunit.ap:4137");
@@ -48724,11 +48724,11 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
-               state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+               state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                state.j.xyR[0][i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
-                  state.j.xyR[0][i] = state.j.xyR[0][i] + a.xyR[i][j] * state.x.xR[j];
+                  state.fi.xR[0] += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+                  state.j.xyR[0][i] += a.xyR[i][j] * state.x.xR[j];
                }
             }
             continue;
@@ -48790,12 +48790,12 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   xu.xR[i] = 0.1 + hqrnduniformr(&rs, _state);
-                  v = v + sqr(xu.xR[i], _state);
+                  v += sqr(xu.xR[i], _state);
                }
                v = ae_sqrt(v, _state);
             } while (v <= 0.0);
             for (i = 0; i < n; i++) {
-               xu.xR[i] = xu.xR[i] / v;
+               xu.xR[i] /= v;
             }
             for (i = 0; i < n; i++) {
                xlast.xR[i] = 0.0;
@@ -48839,17 +48839,17 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.xR[0] = state.fi.xR[0] + fscale * ae_pow(state.x.xR[i], 2.0, _state);
+                     state.fi.xR[0] += fscale * ae_pow(state.x.xR[i], 2.0, _state);
                      state.j.xyR[0][i] = 2 * fscale * state.x.xR[i];
                   }
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + state.x.xR[i] * xu.xR[i];
+                     v += state.x.xR[i] * xu.xR[i];
                   }
                   if (v < vbnd) {
-                     state.fi.xR[0] = state.fi.xR[0] + (vshift + vpower * (vbnd - v));
+                     state.fi.xR[0] += (vshift + vpower * (vbnd - v));
                      for (i = 0; i < n; i++) {
-                        state.j.xyR[0][i] = state.j.xyR[0][i] - vpower * xu.xR[i];
+                        state.j.xyR[0][i] -= vpower * xu.xR[i];
                      }
                      if (linesearchstarted) {
                         inc(&cntbelow, _state);
@@ -48866,7 +48866,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   if (linesearchstarted) {
                      stplen = 0.0;
                      for (i = 0; i < n; i++) {
-                        stplen = stplen + sqr(state.x.xR[i] - xlast.xR[i], _state);
+                        stplen += sqr(state.x.xR[i] - xlast.xR[i], _state);
                      }
                      stplen = ae_sqrt(stplen, _state);
                      wasgoodlinesearch0 = wasgoodlinesearch0 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
@@ -48881,7 +48881,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   }
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + state.x.xR[i] * xu.xR[i];
+                     v += state.x.xR[i] * xu.xR[i];
                   }
                   if (v < vbnd) {
                      inc(&cntbelow, _state);
@@ -48998,12 +48998,12 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] * a.xyR[i][j];
                   }
-                  state.fi.xR[0] = state.fi.xR[0] + ae_fabs(v, _state);
+                  state.fi.xR[0] += ae_fabs(v, _state);
                   v = (double)sign(v, _state);
                   for (j = 0; j < n; j++) {
-                     state.j.xyR[0][j] = state.j.xyR[0][j] + v * a.xyR[i][j];
+                     state.j.xyR[0][j] += v * a.xyR[i][j];
                   }
                }
                continue;
@@ -49043,8 +49043,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4555");
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n, _state);
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n, _state);
-            avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / passcount;
-            avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / passcount;
+            avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
+            avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
          } else {
             set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4563");
             set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4564");
@@ -49059,8 +49059,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4574");
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n, _state);
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n, _state);
-            avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / passcount;
-            avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / passcount;
+            avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
+            avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
          } else {
             set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4582");
             set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4583");
@@ -49132,9 +49132,9 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] * a.xyR[i][j];
                   }
-                  state.fi.xR[0] = state.fi.xR[0] + ae_fabs(v, _state);
+                  state.fi.xR[0] += ae_fabs(v, _state);
                }
                continue;
             }
@@ -49223,19 +49223,19 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+                  state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                }
                for (i = 0; i < n; i++) {
                   state.fi.xR[1 + i] = -1.0;
                   for (j = 0; j < n; j++) {
-                     state.fi.xR[1 + i] = state.fi.xR[1 + i] + a.xyR[i][j] * sqr(state.x.xR[j], _state);
+                     state.fi.xR[1 + i] += a.xyR[i][j] * sqr(state.x.xR[j], _state);
                      state.j.xyR[1 + i][j] = 2 * a.xyR[i][j] * state.x.xR[j];
                   }
                   if (i != goodidx) {
                      state.fi.xR[1 + i] = maxreal(state.fi.xR[1 + i], 0.0, _state);
                      for (j = 0; j < n; j++) {
-                        state.j.xyR[1 + i][j] = sign(state.fi.xR[1 + i], _state) * state.j.xyR[1 + i][j];
+                        state.j.xyR[1 + i][j] *= sign(state.fi.xR[1 + i], _state);
                      }
                   }
                }
@@ -49417,7 +49417,7 @@ static void testminnsunit_basictest0uc(bool *errors, ae_state *_state) {
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
-               s.fi.xR[0] = s.fi.xR[0] + d.xR[i] * ae_fabs(s.x.xR[i], _state);
+               s.fi.xR[0] += d.xR[i] * ae_fabs(s.x.xR[i], _state);
                s.j.xyR[0][i] = d.xR[i] * sign(s.x.xR[i], _state);
             }
             continue;
@@ -49433,8 +49433,8 @@ static void testminnsunit_basictest0uc(bool *errors, ae_state *_state) {
       for (i = 0; i < n; i++) {
          set_error_flag(errors, !ae_isfinite(x1.xR[i], _state) || ae_fabs(x1.xR[i], _state) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:147");
       }
-      sumits = sumits + (double)rep.iterationscount / passcount;
-      sumnfev = sumnfev + (double)rep.nfev / passcount;
+      sumits += (double)rep.iterationscount / passcount;
+      sumnfev += (double)rep.nfev / passcount;
    }
    ae_frame_leave(_state);
 }
@@ -49470,12 +49470,12 @@ static void testminnsunit_basictest1uc(bool *errors, ae_state *_state) {
          s.j.xyR[0][0] = 10 * sign(sqr(v0, _state) - v1, _state) * 2 * v0 + 2 * (v0 - 1);
          s.j.xyR[0][1] = (double)(10 * sign(sqr(v0, _state) - v1, _state) * (-1));
          if (ae_sqrt(2.0, _state) * v0 - 1 > 0.0) {
-            s.fi.xR[0] = s.fi.xR[0] + 100 * (ae_sqrt(2.0, _state) * v0 - 1);
-            s.j.xyR[0][0] = s.j.xyR[0][0] + 100 * ae_sqrt(2.0, _state);
+            s.fi.xR[0] += 100 * (ae_sqrt(2.0, _state) * v0 - 1);
+            s.j.xyR[0][0] += 100 * ae_sqrt(2.0, _state);
          }
          if (2 * v1 - 1 > 0.0) {
-            s.fi.xR[0] = s.fi.xR[0] + 100 * (2 * v1 - 1);
-            s.j.xyR[0][1] = s.j.xyR[0][1] + 100 * 2;
+            s.fi.xR[0] += 100 * (2 * v1 - 1);
+            s.j.xyR[0][1] += 100 * 2;
          }
          continue;
       }
@@ -49535,7 +49535,7 @@ static void testminnsunit_basictest0bc(bool *errors, ae_state *_state) {
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
-               s.fi.xR[0] = s.fi.xR[0] + d.xR[i] * ae_fabs(s.x.xR[i], _state);
+               s.fi.xR[0] += d.xR[i] * ae_fabs(s.x.xR[i], _state);
                s.j.xyR[0][i] = d.xR[i] * sign(s.x.xR[i], _state);
             }
             continue;
@@ -49551,8 +49551,8 @@ static void testminnsunit_basictest0bc(bool *errors, ae_state *_state) {
       for (i = 0; i < n; i++) {
          set_error_flag(errors, !ae_isfinite(x1.xR[i], _state) || ae_fabs(x1.xR[i] - boundval(0.0, bl.xR[i], bu.xR[i], _state), _state) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:267");
       }
-      sumits = sumits + (double)rep.iterationscount / passcount;
-      sumnfev = sumnfev + (double)rep.nfev / passcount;
+      sumits += (double)rep.iterationscount / passcount;
+      sumnfev += (double)rep.nfev / passcount;
    }
    ae_frame_leave(_state);
 }
@@ -49660,7 +49660,7 @@ static void testminnsunit_basictest0lc(bool *errors, ae_state *_state) {
             c.xyR[nc + 1][i] = 1.0 + randomreal(_state);
             ct.xZ[nc + 0] = 1;
             ct.xZ[nc + 1] = -1;
-            nc = nc + 2;
+            nc += 2;
          }
       }
       minnscreate(n, &x0, &s, _state);
@@ -49686,8 +49686,8 @@ static void testminnsunit_basictest0lc(bool *errors, ae_state *_state) {
       for (i = 0; i < n; i++) {
          set_error_flag(errors, !ae_isfinite(x1.xR[i], _state) || ae_fabs(x1.xR[i], _state) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:408");
       }
-      sumits = sumits + (double)rep.iterationscount / passcount;
-      sumnfev = sumnfev + (double)rep.nfev / passcount;
+      sumits += (double)rep.iterationscount / passcount;
+      sumnfev += (double)rep.nfev / passcount;
    }
    ae_frame_leave(_state);
 }
@@ -49798,7 +49798,7 @@ static void testminnsunit_basictest0nlc(bool *errors, ae_state *_state) {
             }
             ic.xyR[nic + 0][i] = 1.0 + randomreal(_state);
             ic.xyR[nic + 1][i] = -1.0 - randomreal(_state);
-            nic = nic + 2;
+            nic += 2;
          }
       }
       minnscreate(n, &x0, &s, _state);
@@ -49814,14 +49814,14 @@ static void testminnsunit_basictest0nlc(bool *errors, ae_state *_state) {
             for (i = 0; i < nec; i++) {
                s.fi.xR[1 + i] = -ec.xyR[i][n];
                for (j = 0; j < n; j++) {
-                  s.fi.xR[1 + i] = s.fi.xR[1 + i] + s.x.xR[j] * ec.xyR[i][j];
+                  s.fi.xR[1 + i] += s.x.xR[j] * ec.xyR[i][j];
                   s.j.xyR[1 + i][j] = ec.xyR[i][j];
                }
             }
             for (i = 0; i < nic; i++) {
                s.fi.xR[1 + nec + i] = -ic.xyR[i][n];
                for (j = 0; j < n; j++) {
-                  s.fi.xR[1 + nec + i] = s.fi.xR[1 + nec + i] + s.x.xR[j] * ic.xyR[i][j];
+                  s.fi.xR[1 + nec + i] += s.x.xR[j] * ic.xyR[i][j];
                   s.j.xyR[1 + nec + i][j] = ic.xyR[i][j];
                }
             }
@@ -49838,8 +49838,8 @@ static void testminnsunit_basictest0nlc(bool *errors, ae_state *_state) {
       for (i = 0; i < n; i++) {
          set_error_flag(errors, !ae_isfinite(x1.xR[i], _state) || ae_fabs(x1.xR[i], _state) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:571");
       }
-      sumits = sumits + (double)rep.iterationscount / passcount;
-      sumnfev = sumnfev + (double)rep.nfev / passcount;
+      sumits += (double)rep.iterationscount / passcount;
+      sumnfev += (double)rep.nfev / passcount;
    }
    ae_frame_leave(_state);
 }
@@ -49906,7 +49906,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
@@ -49919,7 +49919,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
                werexreports = true;
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  v += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                }
                repferr = maxreal(repferr, ae_fabs(v - state.f, _state), _state);
                continue;
@@ -49968,14 +49968,14 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
             }
             if (state.xupdated) {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  v += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                }
                repferr = maxreal(repferr, ae_fabs(v - state.f, _state), _state);
                continue;
@@ -50027,7 +50027,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
@@ -50048,7 +50048,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i], _state) / s.xR[i];
                }
                continue;
@@ -50172,7 +50172,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
@@ -50185,7 +50185,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
                werexreports = true;
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  v += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                }
                repferr = maxreal(repferr, ae_fabs(v - state.f, _state), _state);
                for (i = 0; i < n; i++) {
@@ -50249,15 +50249,15 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
                state.j.xyR[0][i] = 0.0;
             }
             for (i = 0; i < n; i++) {
-               state.fi.xR[0] = state.fi.xR[0] + b.xR[i] * state.x.xR[i];
+               state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                for (j = 0; j < n; j++) {
-                  state.fi.xR[0] = state.fi.xR[0] + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+                  state.fi.xR[0] += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
                }
             }
             for (i = 0; i < n; i++) {
-               state.j.xyR[0][i] = state.j.xyR[0][i] + b.xR[i];
+               state.j.xyR[0][i] += b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.j.xyR[0][i] = state.j.xyR[0][i] + a.xyR[i][j] * state.x.xR[j];
+                  state.j.xyR[0][i] += a.xyR[i][j] * state.x.xR[j];
                }
             }
             continue;
@@ -50274,7 +50274,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
       for (i = 0; i < n; i++) {
          v = b.xR[i];
          for (j = 0; j < n; j++) {
-            v = v + a.xyR[i][j] * x1.xR[j];
+            v += a.xyR[i][j] * x1.xR[j];
          }
          if (x1.xR[i] == bndl.xR[i] && v > 0.0) {
             v = 0.0;
@@ -50282,7 +50282,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          if (x1.xR[i] == bndu.xR[i] && v < 0.0) {
             v = 0.0;
          }
-         gnorm = gnorm + sqr(v, _state);
+         gnorm += sqr(v, _state);
          set_error_flag(primaryerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1045");
          set_error_flag(primaryerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1046");
       }
@@ -50317,7 +50317,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
                for (i = 0; i < n; i++) {
                   v0 = ae_fabs(state.x.xR[i], _state);
                   v1 = (double)sign(state.x.xR[i], _state);
-                  state.fi.xR[0] = state.fi.xR[0] + v * (v0 + v0 * v0);
+                  state.fi.xR[0] += v * (v0 + v0 * v0);
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
                continue;
@@ -50384,7 +50384,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   set_error_flag(primaryerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1164");
                   set_error_flag(primaryerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1165");
                }
@@ -50393,7 +50393,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.xupdated) {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  v += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   set_error_flag(primaryerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1176");
                   set_error_flag(primaryerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1177");
                }
@@ -50477,7 +50477,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
@@ -50497,7 +50497,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i], _state) / s.xR[i];
                }
                continue;
@@ -50606,7 +50606,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * (2 * (state.x.xR[i] - xc.xR[i]));
                }
                continue;
@@ -50614,7 +50614,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.xupdated) {
                flast0 = 0.0;
                for (i = 0; i < n; i++) {
-                  flast0 = flast0 + d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
+                  flast0 += d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
                }
                repferr = maxreal(repferr, ae_fabs(flast0 - state.f, _state), _state);
                continue;
@@ -50638,12 +50638,12 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * (2 * (state.x.xR[i] - xc.xR[i]));
                }
                for (i = 0; i < nc; i++) {
                   v = ae_v_dotproduct(state.x.xR, 1, c.xyR[i], 1, n);
-                  v = v - c.xyR[i][n];
+                  v -= c.xyR[i][n];
                   vv = 0.0;
                   if (ct.xZ[i] < 0) {
                      vv = (double)sign(maxreal(v, 0.0, _state), _state);
@@ -50657,9 +50657,9 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
                      vv = (double)-sign(maxreal(-v, 0.0, _state), _state);
                      v = maxreal(-v, 0.0, _state);
                   }
-                  state.fi.xR[0] = state.fi.xR[0] + rho * v;
+                  state.fi.xR[0] += rho * v;
                   for (j = 0; j < n; j++) {
-                     state.j.xyR[0][j] = state.j.xyR[0][j] + rho * vv * c.xyR[i][j];
+                     state.j.xyR[0][j] += rho * vv * c.xyR[i][j];
                   }
                }
                continue;
@@ -50667,7 +50667,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.xupdated) {
                flast1 = 0.0;
                for (i = 0; i < n; i++) {
-                  flast1 = flast1 + d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
+                  flast1 += d.xR[i] * sqr(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
             }
@@ -50712,7 +50712,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
                for (i = 0; i < n; i++) {
                   v0 = ae_fabs(state.x.xR[i], _state);
                   v1 = (double)sign(state.x.xR[i], _state);
-                  state.fi.xR[0] = state.fi.xR[0] + v * (v0 + v0 * v0);
+                  state.fi.xR[0] += v * (v0 + v0 * v0);
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
                continue;
@@ -50802,7 +50802,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                }
                continue;
@@ -50822,7 +50822,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
+                  state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i], _state) / s.xR[i];
                }
                continue;
@@ -50920,7 +50920,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                        state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                         state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                      }
                      for (i = 1; i <= nc; i++) {
@@ -50989,7 +50989,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                   if (state.needfi) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                        state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                      }
                      for (i = 1; i <= nc; i++) {
                         state.fi.xR[i] = state.x.xR[i - 1] * r.xR[i - 1];
@@ -51068,7 +51068,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
+                        state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] - xc.xR[i], _state);
                         state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i], _state);
                      }
                      for (i = 1; i <= nc; i++) {
@@ -51094,7 +51094,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.xR[0] = state.fi.xR[0] + d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
+                        state.fi.xR[0] += d.xR[i] * ae_fabs(state.x.xR[i] / s.xR[i] - xc.xR[i], _state);
                         state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i], _state) / s.xR[i];
                      }
                      for (i = 1; i <= nc; i++) {
@@ -51276,7 +51276,7 @@ static void testminbcunit_calciip2(minbcstate *state, ae_int_t n, ae_int_t fk, a
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f = state->f + ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * sqr(state->x.xR[i], _state);
+         state->f += ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * sqr(state->x.xR[i], _state);
          state->g.xR[i] = ae_pow((double)(i * i + 1), (double)(2 * fk), _state) * 2 * state->x.xR[i];
       }
    }
@@ -51390,7 +51390,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
@@ -51410,7 +51410,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > 0.0 && x.xR[i] < 1.0) {
-                        v = v + sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
+                        v += sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
                      }
                      *feaserr = *feaserr || x.xR[i] < 0.0;
                      *feaserr = *feaserr || x.xR[i] > 1.0;
@@ -51472,7 +51472,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                           state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         }
                         if (state.needfg) {
                            state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
@@ -51492,7 +51492,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > bl.xR[i] && x.xR[i] < bu.xR[i]) {
-                        v = v + sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
+                        v += sqr(p * ae_pow(x.xR[i] - x0.xR[i], (double)(p - 1), _state), _state);
                      }
                      *feaserr = *feaserr || x.xR[i] < bl.xR[i];
                      *feaserr = *feaserr || x.xR[i] > bu.xR[i];
@@ -51541,7 +51541,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
+                        state.f += ae_pow(state.x.xR[i] - x0.xR[i], (double)p, _state);
                         state.g.xR[i] = p * ae_pow(state.x.xR[i] - x0.xR[i], (double)(p - 1), _state);
                      }
                      continue;
@@ -51655,7 +51655,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.xR[i];
+            state.f += state.x.xR[i];
             state.g.xR[i] = 1.0;
          }
       }
@@ -51690,7 +51690,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+               state.f += sqr((1 + i) * state.x.xR[i], _state);
                state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
             }
          }
@@ -51735,7 +51735,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + sqr((1 + i) * state.x.xR[i], _state);
+                  state.f += sqr((1 + i) * state.x.xR[i], _state);
                }
                if (state.needfg) {
                   state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
@@ -51878,7 +51878,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + a.xR[i] * sqr(state.x.xR[i], _state);
+                        state.f += a.xR[i] * sqr(state.x.xR[i], _state);
                         state.g.xR[i] = 2 * a.xR[i] * state.x.xR[i];
                      }
                   }
@@ -51891,7 +51891,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
                }
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i], _state);
+                  v += sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i], _state);
                }
                v = ae_sqrt(v, _state);
                set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbcunit.ap:754");
@@ -52069,7 +52069,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state);
                if (state.x.xR[0] == x.xR[0] && state.x.xR[1] == x.xR[1]) {
-                  state.f = state.f - 0.1;
+                  state.f -= 0.1;
                }
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
@@ -52124,11 +52124,11 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.xR[i] * state.x.xR[i];
+               state.f += b.xR[i] * state.x.xR[i];
                state.g.xR[i] = b.xR[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
-                  state.g.xR[i] = state.g.xR[i] + fulla.xyR[i][j] * state.x.xR[j];
+                  state.f += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
+                  state.g.xR[i] += fulla.xyR[i][j] * state.x.xR[j];
                }
             }
             if (k >= spoiliteration) {
@@ -52288,7 +52288,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbcunit_calciip2(&state, n, fk, _state);
             }
             minbcresults(&state, &x, &rep, _state);
-            cntb1 = cntb1 + rep.iterationscount;
+            cntb1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          ae_vector_set_length(&diagh, n, _state);
@@ -52307,7 +52307,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbcunit_calciip2(&state, n, fk, _state);
             }
             minbcresults(&state, &x, &rep, _state);
-            cntg1 = cntg1 + rep.iterationscount;
+            cntg1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb1 < cntg1;
@@ -52328,7 +52328,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbcunit_calciip2(&state, n, fk, _state);
             }
             minbcresults(&state, &x, &rep, _state);
-            cntb2 = cntb2 + rep.iterationscount;
+            cntb2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          minbcsetprecscale(&state, _state);
@@ -52343,7 +52343,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
                testminbcunit_calciip2(&state, n, fk, _state);
             }
             minbcresults(&state, &x, &rep, _state);
-            cntg2 = cntg2 + rep.iterationscount;
+            cntg2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -52392,9 +52392,9 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + ae_fabs(vv, _state);
+            v += ae_fabs(vv, _state);
          }
          set_error_flag(err, ae_fabs(v - rep->f.xR[k], _state) > 1.0E-6 * maxreal(ae_fabs(v, _state), 1.0, _state), __FILE__, __LINE__, "testminbcunit.ap:1891");
       }
@@ -52404,8 +52404,8 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
       }
@@ -52468,9 +52468,9 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
+               vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
-            v = v + sign(vv, _state) * a->xyR[i][rep->vidx];
+            v += sign(vv, _state) * a->xyR[i][rep->vidx];
             tooclose = tooclose || ae_fabs(vv, _state) < 1.0E-4;
          }
          if (!tooclose) {
@@ -52484,8 +52484,8 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
-            vb = vb + a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
+            va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
+            vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
          tooclose = (tooclose || ae_fabs(va, _state) < 1.0E-8) || ae_fabs(vb, _state) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va, _state) != sign(vb, _state);
@@ -52571,9 +52571,9 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + 0.5 * state.x.xR[i] * v;
+            state.f += 0.5 * state.x.xR[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.xR[i] = 0.0;
@@ -52627,12 +52627,12 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.xR[j] * a.xyR[i][j];
+               v += state.x.xR[j] * a.xyR[i][j];
             }
-            state.f = state.f + ae_fabs(v, _state);
+            state.f += ae_fabs(v, _state);
             v = (double)sign(v, _state);
             for (j = 0; j < n; j++) {
-               state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+               state.g.xR[j] += v * a.xyR[i][j];
             }
          }
          continue;
@@ -52699,9 +52699,9 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.xR[j] / s.xR[j] * a.xyR[i][j];
+                     v += state.x.xR[j] / s.xR[j] * a.xyR[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.xR[i] / s.xR[i]) * v;
+                  state.f += 0.5 * (state.x.xR[i] / s.xR[i]) * v;
                   state.g.xR[i] = v;
                }
                if (defecttype == 0) {
@@ -52711,10 +52711,10 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                   state.g.xR[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.xR[varidx] = state.g.xR[varidx] * 2;
+                  state.g.xR[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.xR[i] = state.g.xR[i] / s.xR[i];
+                  state.g.xR[i] /= s.xR[i];
                }
                continue;
             }
@@ -52740,7 +52740,7 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
+               v += ogrep.badgradxbase.xR[j] / s.xR[j] * a.xyR[i][j];
             }
             jactrue.xyR[0][i] = v;
             jacdefect.xyR[0][i] = v;
@@ -52752,11 +52752,11 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             jacdefect.xyR[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.xyR[0][varidx] = jacdefect.xyR[0][varidx] * 2;
+            jacdefect.xyR[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.xyR[0][i] = jactrue.xyR[0][i] / s.xR[i];
-            jacdefect.xyR[0][i] = jacdefect.xyR[0][i] / s.xR[i];
+            jactrue.xyR[0][i] /= s.xR[i];
+            jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
          set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n, _state), __FILE__, __LINE__, "testminbcunit.ap:1502");
@@ -52834,12 +52834,12 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
                v = (double)sign(v, _state);
                for (j = 0; j < n; j++) {
-                  state.g.xR[j] = state.g.xR[j] + v * a.xyR[i][j];
+                  state.g.xR[j] += v * a.xyR[i][j];
                }
             }
             continue;
@@ -52879,8 +52879,8 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1633");
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n, _state);
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n, _state);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1641");
          set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1642");
@@ -52895,8 +52895,8 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
          set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1652");
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n, _state);
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n, _state);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
          set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1660");
          set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1661");
@@ -52953,9 +52953,9 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.xR[j] * a.xyR[i][j];
+                  v += state.x.xR[j] * a.xyR[i][j];
                }
-               state.f = state.f + ae_fabs(v, _state);
+               state.f += ae_fabs(v, _state);
             }
             continue;
          }
@@ -53007,11 +53007,11 @@ static void testminbcunit_testoptguard(bool *wereerrors, ae_state *_state) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.xR[i] * state.x.xR[i];
+            state.f += b.xR[i] * state.x.xR[i];
             state.g.xR[i] = b.xR[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
-               state.g.xR[i] = state.g.xR[i] + a.xyR[i][j] * state.x.xR[j];
+               state.f += 0.5 * state.x.xR[i] * a.xyR[i][j] * state.x.xR[j];
+               state.g.xR[i] += a.xyR[i][j] * state.x.xR[j];
             }
          }
          continue;
@@ -53142,14 +53142,14 @@ static double testnearestneighborunit_vnorm(RVector *x, ae_int_t n, ae_int_t nor
    if (normtype == 1) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + ae_fabs(x->xR[i], _state);
+         result += ae_fabs(x->xR[i], _state);
       }
       return result;
    }
    if (normtype == 2) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + sqr(x->xR[i], _state);
+         result += sqr(x->xR[i], _state);
       }
       result = ae_sqrt(result, _state);
       return result;
@@ -53773,8 +53773,8 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          qmin.xR[j] = boxmin.xR[j] + randomreal(_state) * (boxmax.xR[j] - boxmin.xR[j]);
          qmax.xR[j] = qmin.xR[j];
          v = spread * ae_pow(10.0, -2 * randomreal(_state), _state);
-         qmin.xR[j] = qmin.xR[j] - v;
-         qmax.xR[j] = qmax.xR[j] + v;
+         qmin.xR[j] -= v;
+         qmax.xR[j] += v;
       }
       kx = kdtreetsquerybox(&treext, &bufxt, &qmin, &qmax, _state);
       unsetrealmatrix(&qx, _state);
@@ -53809,8 +53809,8 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          qmin.xR[j] = boxmin.xR[j] + randomreal(_state) * (boxmax.xR[j] - boxmin.xR[j]);
          qmax.xR[j] = qmin.xR[j];
          v = spread * ae_pow(10.0, -2 * randomreal(_state), _state);
-         qmin.xR[j] = qmin.xR[j] - v;
-         qmax.xR[j] = qmax.xR[j] + v;
+         qmin.xR[j] -= v;
+         qmax.xR[j] += v;
       }
       kx = kdtreequerybox(&treext, &qmin, &qmax, _state);
       unsetrealmatrix(&qx, _state);
@@ -53981,7 +53981,7 @@ static void testnearestneighborunit_testkdtreeserialization(bool *err, ae_state 
          }
       }
    // Next N
-      n = n + 25;
+      n += 25;
    }
    ae_frame_leave(_state);
 }
@@ -54416,7 +54416,7 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix *a0, ae
             if (i + 1 <= s) {
                v.xR[i + 1] = u2 * sm;
             }
-            i = i + 2;
+            i += 2;
          }
          lambdav = ae_v_dotproduct(&v.xR[1], 1, &v.xR[1], 1, s);
       } while (lambdav == 0.0);
@@ -54469,7 +54469,7 @@ static void testinverseupdateunit_generaterandommatrixcond(RMatrix *a0, ae_int_t
       for (j = 0; j < n; j++) {
          a0->xyR[i][j] = 0.0;
          for (k = 0; k < n; k++) {
-            a0->xyR[i][j] = a0->xyR[i][j] + q1.xyR[i][k] * cc.xR[k] * q2.xyR[j][k];
+            a0->xyR[i][j] += q1.xyR[i][k] * cc.xR[k] * q2.xyR[j][k];
          }
       }
    }
@@ -54594,7 +54594,7 @@ static bool testinverseupdateunit_invmatlu(RMatrix *a, ZVector *pivots, ae_int_t
       if (j < n - 1) {
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(&a->xyR[i][j + 1], 1, &work.xR[j + 1], 1, n - j - 1);
-            a->xyR[i][j] = a->xyR[i][j] - v;
+            a->xyR[i][j] -= v;
          }
       }
    }
@@ -55259,7 +55259,7 @@ static void testgqunit_buildgausslegendrequadrature(ae_int_t n, RVector *x, RVec
          }
          dp3 = n * (r * p3 - p2) / (r * r - 1);
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       } while (ae_fabs(r - r1, _state) >= machineepsilon * (1 + ae_fabs(r, _state)) * 100);
       x->xR[i] = r;
       x->xR[n - 1 - i] = -r;
@@ -55319,13 +55319,13 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
             t1 = (4.1 + alpha) / ((1 + alpha) * (1 + 0.156 * alpha));
             t2 = 1 + 0.06 * (n - 8) * (1 + 0.12 * alpha) / n;
             t3 = 1 + 0.012 * beta * (1 + 0.25 * ae_fabs(alpha, _state)) / n;
-            r = r - t1 * t2 * t3 * (1 - r);
+            r -= t1 * t2 * t3 * (1 - r);
          } else {
             if (i == 2) {
                t1 = (1.67 + 0.28 * alpha) / (1 + 0.37 * alpha);
                t2 = 1 + 0.22 * (n - 8) / n;
                t3 = 1 + 8 * beta / ((6.28 + beta) * n * n);
-               r = r - t1 * t2 * t3 * (x->xR[0] - r);
+               r -= t1 * t2 * t3 * (x->xR[0] - r);
             } else {
                if (i < n - 2) {
                   r = 3 * x->xR[i - 1] - 3 * x->xR[i - 2] + x->xR[i - 3];
@@ -55334,13 +55334,13 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
                      t1 = (1 + 0.235 * beta) / (0.766 + 0.119 * beta);
                      t2 = 1 / (1 + 0.639 * (n - 4) / (1 + 0.71 * (n - 4)));
                      t3 = 1 / (1 + 20 * alpha / ((7.5 + alpha) * n * n));
-                     r = r + t1 * t2 * t3 * (r - x->xR[i - 2]);
+                     r += t1 * t2 * t3 * (r - x->xR[i - 2]);
                   } else {
                      if (i == n - 1) {
                         t1 = (1 + 0.37 * beta) / (1.67 + 0.28 * beta);
                         t2 = 1 / (1 + 0.22 * (n - 8) / n);
                         t3 = 1 / (1 + 8 * alpha / ((6.28 + alpha) * n * n));
-                        r = r + t1 * t2 * t3 * (r - x->xR[i - 2]);
+                        r += t1 * t2 * t3 * (r - x->xR[i - 2]);
                      }
                   }
                }
@@ -55404,9 +55404,9 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          r = (1 + alpha) * (3 + 0.92 * alpha) / (1 + 2.4 * n + 1.8 * alpha);
       } else {
          if (i == 1) {
-            r = r + (15 + 6.25 * alpha) / (1 + 0.9 * alpha + 2.5 * n);
+            r += (15 + 6.25 * alpha) / (1 + 0.9 * alpha + 2.5 * n);
          } else {
-            r = r + ((1 + 2.55 * (i - 1)) / (1.9 * (i - 1)) + 1.26 * (i - 1) * alpha / (1 + 3.5 * (i - 1))) / (1 + 0.3 * alpha) * (r - x->xR[i - 2]);
+            r += ((1 + 2.55 * (i - 1)) / (1.9 * (i - 1)) + 1.26 * (i - 1) * alpha / (1 + 3.5 * (i - 1))) / (1 + 0.3 * alpha) * (r - x->xR[i - 2]);
          }
       }
       do {
@@ -55419,7 +55419,7 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          }
          dp3 = (n * p3 - (n + alpha) * p2) / r;
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       } while (ae_fabs(r - r1, _state) >= machineepsilon * (1 + ae_fabs(r, _state)) * 100);
       x->xR[i] = r;
       w->xR[i] = -ae_exp(lngamma(alpha + n, &tsg, _state) - lngamma((double)n, &tsg, _state), _state) / (dp3 * n * p2);
@@ -55461,7 +55461,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
          r = ae_sqrt((double)(2 * n + 1), _state) - 1.85575 * ae_pow((double)(2 * n + 1), -1.0 / 6.0, _state);
       } else {
          if (i == 1) {
-            r = r - 1.14 * ae_pow((double)n, 0.426, _state) / r;
+            r -= 1.14 * ae_pow((double)n, 0.426, _state) / r;
          } else {
             if (i == 2) {
                r = 1.86 * r - 0.86 * x->xR[0];
@@ -55484,7 +55484,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
          }
          dp3 = ae_sqrt((double)(2 * j), _state) * p2;
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       } while (ae_fabs(r - r1, _state) >= machineepsilon * (1 + ae_fabs(r, _state)) * 100);
       x->xR[i] = r;
       w->xR[i] = 2 / (dp3 * dp3);
@@ -55611,7 +55611,7 @@ bool testgq(bool silent, ae_state *_state) {
       } else {
          recerrors = true;
       }
-      n = n * 2;
+      n *= 2;
    }
    recerrors = recerrors || err > errtol;
 // Three tests for rec-based Gauss-Lobatto quadratures with known weights/nodes:
@@ -57027,7 +57027,7 @@ bool testmannwhitneyu(bool silent, ae_state *_state) {
          tailrprev = 0.0;
          taillprev = 1.0;
          for (i = 0; i < m; i++) {
-            y.xR[i] = y.xR[i] + ebase;
+            y.xR[i] += ebase;
          }
          for (k = 0; k < ecnt; k++) {
             mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr, _state);
@@ -57037,7 +57037,7 @@ bool testmannwhitneyu(bool silent, ae_state *_state) {
             tailrprev = tailr;
             taillprev = taill;
             for (i = 0; i < m; i++) {
-               y.xR[i] = y.xR[i] + eshift;
+               y.xR[i] += eshift;
             }
          }
       }
@@ -57613,7 +57613,7 @@ bool testratint(bool silent, ae_state *_state) {
             w.xR[j] = 1.0;
             for (k = 0; k < n; k++) {
                if (k != j) {
-                  w.xR[j] = w.xR[j] / (x.xR[j] - x.xR[k]);
+                  w.xR[j] /= x.xR[j] - x.xR[k];
                }
             }
          }
@@ -57651,7 +57651,7 @@ bool testratint(bool silent, ae_state *_state) {
                v2 = x.xR[i] + (t - x.xR[i]) * (j + 1) / k;
                s1 = maxreal(s1, ae_fabs(barycentriccalc(&b1, v2, _state) - barycentriccalc(&b1, v1, _state), _state) / ae_fabs(v2 - v1, _state), _state);
             }
-            k = 2 * k;
+            k *= 2;
             s2 = 0.0;
             for (j = 0; j < k; j++) {
                v1 = x.xR[i] + (t - x.xR[i]) * j / k;
@@ -58191,7 +58191,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
          // Point is accepted
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = hqrndnormal(&rs, _state);
-               meany.xR[j] = meany.xR[j] + xy.xyR[i][nx + j] / n;
+               meany.xR[j] += xy.xyR[i][nx + j] / n;
             }
             i++;
          }
@@ -58310,7 +58310,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
             for (i = 0; i < n; i++) {
                vv = 0.0;
                for (j = 0; j < nx; j++) {
-                  vv = vv + sqr(x.xR[j] - xy.xyR[i][j], _state);
+                  vv += sqr(x.xR[j] - xy.xyR[i][j], _state);
                }
                if (vv < v && vv > 0.0) {
                   i1 = i;
@@ -58391,29 +58391,29 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
             }
          // Update meanY
             for (j = 0; j < ny; j++) {
-               meany.xR[j] = meany.xR[j] + (xy.xyR[2 * i + 0][nx + j] + xy.xyR[2 * i + 1][nx + j]) / n;
+               meany.xR[j] += (xy.xyR[2 * i + 0][nx + j] + xy.xyR[2 * i + 1][nx + j]) / n;
             }
          // Apply perturbation to the target value
             for (j = 0; j < ny; j++) {
                v = ae_pow(2.0, hqrndnormal(&rs, _state), _state);
-               xy.xyR[2 * i + 0][nx + j] = xy.xyR[2 * i + 0][nx + j] + v;
-               xy.xyR[2 * i + 1][nx + j] = xy.xyR[2 * i + 1][nx + j] - v;
+               xy.xyR[2 * i + 0][nx + j] += v;
+               xy.xyR[2 * i + 1][nx + j] -= v;
                v = ae_fabs(v, _state);
-               refrms = refrms + 2 * v * v;
-               refavg = refavg + 2 * v;
+               refrms += 2 * v * v;
+               refavg += 2 * v;
                refmax = maxreal(refmax, v, _state);
-               refrss = refrss + 2 * v * v;
+               refrss += 2 * v * v;
             }
          // Next I
             i++;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < ny; j++) {
-               reftss = reftss + sqr(xy.xyR[i][nx + j] - meany.xR[j], _state);
+               reftss += sqr(xy.xyR[i][nx + j] - meany.xR[j], _state);
             }
          }
          refrms = ae_sqrt(refrms / (n * ny), _state);
-         refavg = refavg / (n * ny);
+         refavg /= n * ny;
          refr2 = 1.0 - refrss / coalesce(reftss, 1.0, _state);
       // Build IDW model
          initdone = false;
@@ -58495,7 +58495,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
             for (i = 0; i < n; i++) {
                vv = 0.0;
                for (j = 0; j < nx; j++) {
-                  vv = vv + sqr(x.xR[j] - xy.xyR[i][j], _state);
+                  vv += sqr(x.xR[j] - xy.xyR[i][j], _state);
                }
                if (vv < v && vv > 0.0) {
                   i1 = i;
@@ -58541,7 +58541,7 @@ static void testidwunit_testcommon(bool *err, ae_state *_state) {
             }
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = hqrndnormal(&rs, _state);
-               meany.xR[j] = meany.xR[j] + xy.xyR[i][nx + j] / n;
+               meany.xR[j] += xy.xyR[i][nx + j] / n;
             }
          }
          initdone = false;
@@ -59131,7 +59131,7 @@ static void testspline1dunit_lconst(double a, double b, spline1dinterpolant *c, 
       *l0 = maxreal(*l0, ae_fabs((f - prevf) / lstep, _state), _state);
       *l1 = maxreal(*l1, ae_fabs((d - prevd) / lstep, _state), _state);
       *l2 = maxreal(*l2, ae_fabs((d2 - prevd2) / lstep, _state), _state);
-      t = t + lstep;
+      t += lstep;
    }
 }
 
@@ -59424,7 +59424,7 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
       alln = 0;
       for (i = 0; i < m; i++) {
          n.xZ[i] = randominteger(npoints, _state) + 2;
-         alln = alln + n.xZ[i];
+         alln += n.xZ[i];
       }
       ae_vector_set_length(&x, alln, _state);
       ae_vector_set_length(&y, alln, _state);
@@ -59440,14 +59440,14 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
             delta = maxreal(delta, x.xR[shift + j] - x.xR[shift + j - 1], _state);
             y.xR[shift + j] = y.xR[shift + j - 1] + sign0 * (st + randomreal(_state));
          }
-         shift = shift + n.xZ[i];
+         shift += n.xZ[i];
          if (i != m - 1) {
             sign0 = ae_pow(-1.0, (double)(i + 1), _state);
             x.xR[shift] = x.xR[shift - 1] + st + randomreal(_state);
             y.xR[shift] = y.xR[shift - 1] + sign0 * randomreal(_state);
          }
       }
-      delta = 3 * delta;
+      delta *= 3;
       spline1dbuildmonotone(&x, &y, alln, &c, _state);
    // Check that built function is monotone
       shift = 0;
@@ -59456,14 +59456,14 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
             st = (x.xR[shift + j] - x.xR[shift + j - 1]) / tp;
             sign0 = y.xR[shift + j] - y.xR[shift + j - 1];
             if (sign0 != 0.0) {
-               sign0 = sign0 / ae_fabs(sign0, _state);
+               sign0 /= ae_fabs(sign0, _state);
             }
             for (l = 0; l < tp; l++) {
                c0 = spline1dcalc(&c, x.xR[shift + j - 1] + l * st, _state);
                c1 = spline1dcalc(&c, x.xR[shift + j - 1] + (l + 1) * st, _state);
                sign1 = c1 - c0;
                if (sign1 != 0.0) {
-                  sign1 = sign1 / ae_fabs(sign1, _state);
+                  sign1 /= ae_fabs(sign1, _state);
                }
                if (sign0 * sign1 < 0.0) {
                   result = true;
@@ -59712,18 +59712,18 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
       // Compute residuals and penalty
          residuals = 0.0;
          for (i = 0; i < n; i++) {
-            residuals = residuals + sqr(spline1dcalc(&c, x.xR[i], _state) - y.xR[i], _state);
+            residuals += sqr(spline1dcalc(&c, x.xR[i], _state) - y.xR[i], _state);
          }
-         residuals = residuals / n;
+         residuals /= n;
          penalty = 0.0;
          mxd2 = 0.0;
          k = 100 * m;
          for (i = 0; i <= k; i++) {
             spline1ddiff(&c, a + (b - a) * i / k, &v, &v1, &v2, _state);
-            penalty = penalty + sqr(v2, _state);
+            penalty += sqr(v2, _state);
             mxd2 = maxreal(mxd2, ae_fabs(v2, _state), _state);
          }
-         penalty = penalty / (k + 1);
+         penalty /= k + 1;
       // Compare with previous, update previous, update Rho
       //
       // Write('M=%i    N=%i    %.15e    %.15e    %.15e\n', M, N, Residuals, Penalty, MxD2);
@@ -60444,7 +60444,7 @@ bool testspline1d(bool silent, ae_state *_state) {
          t = a + (b - a) * randomreal(_state);
          v = -ae_cos(pi * a + 0.4, _state) / pi + ae_exp(a, _state);
          v = -ae_cos(pi * t + 0.4, _state) / pi + ae_exp(t, _state) - v;
-         v = v - spline1dintegrate(&c, t, _state);
+         v -= spline1dintegrate(&c, t, _state);
          err = maxreal(err, ae_fabs(v, _state), _state);
       }
    }
@@ -60471,7 +60471,7 @@ bool testspline1d(bool silent, ae_state *_state) {
    for (pass = 1; pass <= 100; pass++) {
       t = bl + (br - bl) * randomreal(_state);
       v = p0 * t + p1 * sqr(t, _state) / 2 + p2 * sqr(t, _state) * t / 3 - (p0 * a + p1 * sqr(a, _state) / 2 + p2 * sqr(a, _state) * a / 3);
-      v = v - spline1dintegrate(&c, t, _state);
+      v -= spline1dintegrate(&c, t, _state);
       err = maxreal(err, ae_fabs(v, _state), _state);
    }
    ierrors = ierrors || err > threshold;
@@ -60741,8 +60741,8 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
             v1 = 0.0;
             v2 = 0.0;
             for (i = 0; i < n; i++) {
-               v1 = v1 + sqr(barycentriccalc(&p1, x2.xR[i], _state) - y2.xR[i], _state);
-               v2 = v2 + sqr(barycentriccalc(&p2, x2.xR[i], _state) - y2.xR[i], _state);
+               v1 += sqr(barycentriccalc(&p1, x2.xR[i], _state) - y2.xR[i], _state);
+               v2 += sqr(barycentriccalc(&p2, x2.xR[i], _state) - y2.xR[i], _state);
             }
             v1 = ae_sqrt(v1 / n, _state);
             v2 = ae_sqrt(v2 / n, _state);
@@ -60990,8 +60990,8 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
             v1 = 0.0;
             v2 = 0.0;
             for (i = 0; i < n; i++) {
-               v1 = v1 + sqr(barycentriccalc(&b1, x2.xR[i], _state) - y2.xR[i], _state);
-               v2 = v2 + sqr(barycentriccalc(&b2, x2.xR[i], _state) - y2.xR[i], _state);
+               v1 += sqr(barycentriccalc(&b1, x2.xR[i], _state) - y2.xR[i], _state);
+               v2 += sqr(barycentriccalc(&b2, x2.xR[i], _state) - y2.xR[i], _state);
             }
             v1 = ae_sqrt(v1 / n, _state);
             v2 = ae_sqrt(v2 / n, _state);
@@ -61526,7 +61526,7 @@ static void testlsfitunit_testfunc1(ae_int_t k, RVector *x, RVector *z, double *
    alpha = 0.01;
    v = 0.0;
    for (j = 0; j < k; j++) {
-      v = v + (alpha * z->xR[j] + ae_pow(z->xR[j], 3.0, _state)) * x->xR[j];
+      v += (alpha * z->xR[j] + ae_pow(z->xR[j], 3.0, _state)) * x->xR[j];
       if (needg) {
          g->xR[j] = (alpha + 3 * ae_pow(z->xR[j], 2.0, _state)) * x->xR[j];
       }
@@ -61562,7 +61562,7 @@ static void testlsfitunit_testfunc3(RVector *x, ae_int_t nx, RVector *c, ae_int_
    ae_assert(nx == 1, "TestFunc3: integrity check failure", _state);
    v = 0.0;
    for (i = 0; i < nc; i++) {
-      v = v + c->xR[i] * ae_pow(x->xR[0], (double)i, _state);
+      v += c->xR[i] * ae_pow(x->xR[0], (double)i, _state);
       if (needg) {
          g->xR[i] = ae_pow(x->xR[0], (double)i, _state);
       }
@@ -61665,7 +61665,7 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false, _state);
-            f0 = f0 + sqr(v - y.xR[ii], _state);
+            f0 += sqr(v - y.xR[ii], _state);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc, _state);
@@ -61676,12 +61676,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] + h;
+               c2.xR[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2653");
             }
@@ -61689,12 +61689,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] - h;
+               c2.xR[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2669");
             }
@@ -61764,7 +61764,7 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false, _state);
-            f0 = f0 + sqr(v - y.xR[ii], _state);
+            f0 += sqr(v - y.xR[ii], _state);
          }
          h = 0.001;
          relaxationshift = maxreal(ae_fabs(f0, _state), 1.0, _state) * ae_sqrt(machineepsilon, _state);
@@ -61776,12 +61776,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] + h;
+               c2.xR[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0 - relaxationshift, __FILE__, __LINE__, "testlsfitunit.ap:2770");
             }
@@ -61789,12 +61789,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] - h;
+               c2.xR[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0 - relaxationshift, __FILE__, __LINE__, "testlsfitunit.ap:2786");
             }
@@ -61865,7 +61865,7 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc2(&x, nx, &c1, nc, &v, true, &state.g, false, _state);
-            f0 = f0 + sqr(v - y.xR[ii], _state);
+            f0 += sqr(v - y.xR[ii], _state);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc, _state);
@@ -61876,12 +61876,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] + h;
+               c2.xR[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2886");
             }
@@ -61889,12 +61889,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] - h;
+               c2.xR[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2902");
             }
@@ -61963,7 +61963,7 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc3(&x, nx, &c1, nc, &v, true, &state.g, false, _state);
-            f0 = f0 + sqr(v - y.xR[ii], _state);
+            f0 += sqr(v - y.xR[ii], _state);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc, _state);
@@ -61974,12 +61974,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] + h;
+               c2.xR[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3000");
             }
@@ -61987,12 +61987,12 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
                }
-               c2.xR[i] = c2.xR[i] - h;
+               c2.xR[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false, _state);
-                  f1 = f1 + sqr(v - y.xR[ii], _state);
+                  f1 += sqr(v - y.xR[ii], _state);
                }
                set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3016");
             }
@@ -62084,7 +62084,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < nc; j++) {
             rawc.xyR[i][j] = hqrndnormal(&rs, _state);
-            v = v + c0.xR[j] * rawc.xyR[i][j];
+            v += c0.xR[j] * rawc.xyR[i][j];
          }
          rawc.xyR[i][nc] = v;
          rawct.xZ[i] = 2 * hqrnduniformi(&rs, 2, _state) - 1;
@@ -62127,7 +62127,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
       }
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, c1.xR, 1, nc);
-         v = v - rawc.xyR[i][nc];
+         v -= rawc.xyR[i][nc];
          if (rawct.xZ[i] > 0) {
             set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testlsfitunit.ap:3158");
          }
@@ -62143,7 +62143,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
       for (ii = 0; ii < m; ii++) {
          ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
          testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false, _state);
-         f0 = f0 + sqr(v - y.xR[ii], _state);
+         f0 += sqr(v - y.xR[ii], _state);
       }
       ae_vector_set_length(&c2, nc, _state);
       for (trialidx = 0; trialidx <= 10 * nc; trialidx++) {
@@ -62157,7 +62157,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          for (i = 0; i < rawccnt; i++) {
             ae_assert(rawct.xZ[i] != 0, "Assertion failed", _state);
             v = ae_v_dotproduct(rawc.xyR[i], 1, c2.xR, 1, nc);
-            v = v - rawc.xyR[i][nc];
+            v -= rawc.xyR[i][nc];
             bflag = bflag || (rawct.xZ[i] > 0 && v < 0.0);
             bflag = bflag || (rawct.xZ[i] < 0 && v > 0.0);
          }
@@ -62168,7 +62168,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-            f1 = f1 + sqr(v - y.xR[ii], _state);
+            f1 += sqr(v - y.xR[ii], _state);
          }
          set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3209");
       }
@@ -62218,7 +62218,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < nc; j++) {
             rawc.xyR[i][j] = z.xyR[i][j];
-            v = v + c0.xR[j] * rawc.xyR[i][j];
+            v += c0.xR[j] * rawc.xyR[i][j];
          }
          rawc.xyR[i][nc] = v;
          rawct.xZ[i] = 0;
@@ -62252,7 +62252,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
    // Test feasibility w.r.t. linear equality constraints
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, c1.xR, 1, nc);
-         v = v - rawc.xyR[i][nc];
+         v -= rawc.xyR[i][nc];
          set_error_flag(errorflag, ae_fabs(v, _state) > xtol, __FILE__, __LINE__, "testlsfitunit.ap:3306");
       }
    // Make several random trial steps and:
@@ -62263,7 +62263,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
       for (ii = 0; ii < m; ii++) {
          ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
          testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false, _state);
-         f0 = f0 + sqr(v - y.xR[ii], _state);
+         f0 += sqr(v - y.xR[ii], _state);
       }
       ae_vector_set_length(&c2, nc, _state);
       for (trialidx = 0; trialidx <= nc; trialidx++) {
@@ -62284,7 +62284,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false, _state);
-            f1 = f1 + sqr(v - y.xR[ii], _state);
+            f1 += sqr(v - y.xR[ii], _state);
          }
          set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3348");
       }
@@ -62418,7 +62418,7 @@ static void testlsfitunit_testlcnls(bool *errorflag, ae_state *_state) {
          }
          v = -rawc.xyR[0][nc];
          for (j = 0; j < nc; j++) {
-            v = v + rawc.xyR[0][j] * c1.xR[j];
+            v += rawc.xyR[0][j] * c1.xR[j];
          }
          set_error_flag(errorflag, ae_fabs(v, _state) > 1.0E-6, __FILE__, __LINE__, "testlsfitunit.ap:3489");
       }
@@ -62434,7 +62434,7 @@ static double testlsfitunit_getglserror(ae_int_t n, ae_int_t m, RVector *y, RVec
    result = 0.0;
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(fmatrix->xyR[i], 1, c->xR, 1, m);
-      result = result + sqr(w->xR[i] * (v - y->xR[i]), _state);
+      result += sqr(w->xR[i] * (v - y->xR[i]), _state);
    }
    return result;
 }
@@ -63082,13 +63082,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                   if (state.needf) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + state.c.xR[i] * state.x.xR[i];
+                        state.f += state.c.xR[i] * state.x.xR[i];
                      }
                   }
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + state.c.xR[i] * state.x.xR[i];
+                        state.f += state.c.xR[i] * state.x.xR[i];
                         state.g.xR[i] = state.x.xR[i];
                      }
                   }
@@ -63201,13 +63201,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.xR[i] * state.x.xR[i];
+               state.f += state.c.xR[i] * state.x.xR[i];
             }
          }
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.xR[i] * state.x.xR[i];
+               state.f += state.c.xR[i] * state.x.xR[i];
                state.g.xR[i] = state.x.xR[i];
             }
          }
@@ -63225,13 +63225,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.xR[i] * state.x.xR[i];
+               state.f += state.c.xR[i] * state.x.xR[i];
             }
          }
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.xR[i] * state.x.xR[i];
+               state.f += state.c.xR[i] * state.x.xR[i];
                state.g.xR[i] = state.x.xR[i];
             }
          }
@@ -63429,7 +63429,7 @@ static void testlsfitunit_testrdp(bool *errorflag, ae_state *_state) {
          set_error_flag(errorflag, ae_fabs(y2.xR[i] - y3.xR[i], _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1966");
       }
    // Next epsilon
-      eps = eps * 0.5;
+      eps *= 0.5;
    }
 // Test that non-parametric RDP correctly handles requests for more than N-1 section
    n = 100;
@@ -63648,7 +63648,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
          } else {
             vv = a;
          }
-         v = v + sqr(y.xR[i] - vv, _state);
+         v += sqr(y.xR[i] - vv, _state);
       }
       v = ae_sqrt(v / ntotal, _state);
       set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2177");
@@ -63698,7 +63698,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                      vv = d;
                   }
                }
-               v = v + sqr(y.xR[i] - vv, _state);
+               v += sqr(y.xR[i] - vv, _state);
             }
             v = ae_sqrt(v / ntotal, _state);
             set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2240");
@@ -63771,7 +63771,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                vv = d;
             }
          }
-         v = v + sqr(y.xR[i] - vv, _state);
+         v += sqr(y.xR[i] - vv, _state);
       }
       v = ae_sqrt(v / n, _state);
       set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2325");
@@ -63821,7 +63821,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                      vv = d;
                   }
                }
-               v = v + sqr(y.xR[i] - vv, _state);
+               v += sqr(y.xR[i] - vv, _state);
             }
             v = ae_sqrt(v / n, _state);
             set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2388");
@@ -63838,9 +63838,9 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
       for (i = 0; i < n; i++) {
          x.xR[i] = (double)i;
          y.xR[i] = hqrnduniformr(&rs, _state) - 0.5;
-         meany = meany + y.xR[i];
+         meany += y.xR[i];
       }
-      meany = meany / n;
+      meany /= n;
       x.xR[1] = 0.0;
    // Choose model fitting function to test
       k = hqrnduniformi(&rs, 4, _state);
@@ -63880,22 +63880,22 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                v = d;
             }
          }
-         v = v - y.xR[i];
-         rss = rss + v * v;
-         tss = tss + sqr(y.xR[i] - meany, _state);
-         erms = erms + sqr(v, _state);
-         eavg = eavg + ae_fabs(v, _state);
+         v -= y.xR[i];
+         rss += v * v;
+         tss += sqr(y.xR[i] - meany, _state);
+         erms += sqr(v, _state);
+         eavg += ae_fabs(v, _state);
          if (y.xR[i] != 0.0) {
-            eavgrel = eavgrel + ae_fabs(v / y.xR[i], _state);
+            eavgrel += ae_fabs(v / y.xR[i], _state);
             k++;
          }
          emax = maxreal(emax, ae_fabs(v, _state), _state);
       }
       er2 = 1.0 - rss / tss;
       erms = ae_sqrt(erms / n, _state);
-      eavg = eavg / n;
+      eavg /= n;
       if (k > 0) {
-         eavgrel = eavgrel / k;
+         eavgrel /= k;
       }
       set_error_flag(fiterrors, ae_fabs(erms - rep.rmserror, _state) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2477");
       set_error_flag(fiterrors, ae_fabs(eavg - rep.avgerror, _state) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2478");
@@ -63985,18 +63985,18 @@ static void testlsfitunit_funcderiv(RVector *c, RVector *x, RVector *x0, ae_int_
    if (functype == 1) {
       *f = 0.0;
       for (i = 0; i < minint(m, k, _state); i++) {
-         *f = *f + sqr(c->xR[i] * (x->xR[i] - x0->xR[i]), _state);
+         *f += sqr(c->xR[i] * (x->xR[i] - x0->xR[i]), _state);
          g->xR[i] = 2 * c->xR[i] * sqr(x->xR[i] - x0->xR[i], _state);
       }
       if (k > m) {
          for (i = m; i < k; i++) {
-            *f = *f + sqr(c->xR[i], _state);
+            *f += sqr(c->xR[i], _state);
             g->xR[i] = 2 * c->xR[i];
          }
       }
       if (k < m) {
          for (i = k; i < m; i++) {
-            *f = *f + sqr(x->xR[i] - x0->xR[i], _state);
+            *f += sqr(x->xR[i] - x0->xR[i], _state);
          }
       }
       return;
@@ -64004,18 +64004,18 @@ static void testlsfitunit_funcderiv(RVector *c, RVector *x, RVector *x0, ae_int_
    if (functype == 2) {
       *f = 0.0;
       for (i = 0; i < minint(m, k, _state); i++) {
-         *f = *f + c->xR[i] * sqr(ae_sin(x->xR[i] - x0->xR[i], _state), _state);
+         *f += c->xR[i] * sqr(ae_sin(x->xR[i] - x0->xR[i], _state), _state);
          g->xR[i] = sqr(ae_sin(x->xR[i] - x0->xR[i], _state), _state);
       }
       if (k > m) {
          for (i = m; i < k; i++) {
-            *f = *f + c->xR[i] * c->xR[i] * c->xR[i];
+            *f += c->xR[i] * c->xR[i] * c->xR[i];
             g->xR[i] = 3 * sqr(c->xR[i], _state);
          }
       }
       if (k < m) {
          for (i = k; i < m; i++) {
-            *f = *f + sqr(ae_sin(x->xR[i] - x0->xR[i], _state), _state);
+            *f += sqr(ae_sin(x->xR[i] - x0->xR[i], _state), _state);
          }
       }
       return;
@@ -64023,10 +64023,10 @@ static void testlsfitunit_funcderiv(RVector *c, RVector *x, RVector *x0, ae_int_
    if (functype == 3) {
       *f = 0.0;
       for (i = 0; i < m; i++) {
-         *f = *f + sqr(x->xR[i] - x0->xR[i], _state);
+         *f += sqr(x->xR[i] - x0->xR[i], _state);
       }
       for (i = 0; i < k; i++) {
-         *f = *f + c->xR[i] * c->xR[i];
+         *f += c->xR[i] * c->xR[i];
       }
       for (i = 0; i < k; i++) {
          g->xR[i] = 2 * c->xR[i];
@@ -64134,7 +64134,7 @@ static void testlsfitunit_testgradientcheck(bool *testg, ae_state *_state) {
       while (lsfititeration(&state, _state)) {
          if (state.needfg) {
             testlsfitunit_funcderiv(&state.c, &state.x, &x0, k, m, func, &state.f, &state.g, _state);
-            state.g.xR[nbrcomp] = state.g.xR[nbrcomp] + noise;
+            state.g.xR[nbrcomp] += noise;
          }
       }
       lsfitresults(&state, &info, &cres, &rep, _state);
@@ -64253,7 +64253,7 @@ static void testfitsphereunit_calcradii(RMatrix *xy, ae_int_t npoints, ae_int_t 
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + sqr(xy->xyR[i][j] - cx->xR[j], _state);
+         v += sqr(xy->xyR[i][j] - cx->xR[j], _state);
       }
       v = ae_sqrt(v, _state);
       *rhi = maxreal(*rhi, v, _state);
@@ -64272,17 +64272,17 @@ static void testfitsphereunit_calclserror(RMatrix *xy, ae_int_t npoints, ae_int_
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + sqr(cx->xR[j] - xy->xyR[i][j], _state);
+         v += sqr(cx->xR[j] - xy->xyR[i][j], _state);
       }
-      rad = rad + ae_sqrt(v, _state) / npoints;
+      rad += ae_sqrt(v, _state) / npoints;
    }
    *err = 0.0;
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + sqr(cx->xR[j] - xy->xyR[i][j], _state);
+         v += sqr(cx->xR[j] - xy->xyR[i][j], _state);
       }
-      *err = *err + sqr(rad - ae_sqrt(v, _state), _state);
+      *err += sqr(rad - ae_sqrt(v, _state), _state);
    }
 }
 
@@ -64322,13 +64322,13 @@ static void testfitsphereunit_testspherefittingls(bool *err, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
             vv = hqrndnormal(&rs, _state);
-            v = v + sqr(vv, _state);
+            v += sqr(vv, _state);
             xy.xyR[i][j] = vv;
          }
          ae_assert(v > 0.0, "Assertion failed", _state);
          v = (1 + 0.1 * hqrnduniformr(&rs, _state)) / ae_sqrt(v, _state);
          for (j = 0; j < nx; j++) {
-            xy.xyR[i][j] = xy.xyR[i][j] * v;
+            xy.xyR[i][j] *= v;
          }
       }
    // Solve with generic solver, check
@@ -64342,9 +64342,9 @@ static void testfitsphereunit_testspherefittingls(bool *err, ae_state *_state) {
       for (i = 0; i < npoints; i++) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
-            v = v + sqr(cx.xR[j] - xy.xyR[i][j], _state);
+            v += sqr(cx.xR[j] - xy.xyR[i][j], _state);
          }
-         vv = vv + ae_sqrt(v, _state) / npoints;
+         vv += ae_sqrt(v, _state) / npoints;
       }
       set_error_flag(err, ae_fabs(vv - rlo, _state) > xtol, __FILE__, __LINE__, "testfitsphereunit.ap:118");
       testfitsphereunit_calclserror(&xy, npoints, nx, &cx, &v0, _state);
@@ -64417,13 +64417,13 @@ static void testfitsphereunit_testspherefittingns(bool *err, ae_state *_state) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
             vv = hqrndnormal(&rs, _state);
-            v = v + sqr(vv, _state);
+            v += sqr(vv, _state);
             xy.xyR[i][j] = vv;
          }
          ae_assert(v > 0.0, "Assertion failed", _state);
          v = (1 + 0.1 * hqrnduniformr(&rs, _state)) / ae_sqrt(v, _state);
          for (j = 0; j < nx; j++) {
-            xy.xyR[i][j] = xy.xyR[i][j] * v;
+            xy.xyR[i][j] *= v;
          }
       }
    // Perform various kinds of fit, NLC solver is used
@@ -64950,7 +64950,7 @@ static void testparametricunit_testrdp(bool *errorflag, ae_state *_state) {
             }
             spline1dbuildlinear(&x, &y, nsections + 1, &s, _state);
             for (i = 0; i < n; i++) {
-               e.xR[i] = e.xR[i] + sqr(spline1dcalc(&s, (double)i, _state) - xy.xyR[i][j], _state);
+               e.xR[i] += sqr(spline1dcalc(&s, (double)i, _state) - xy.xyR[i][j], _state);
             }
          }
          for (i = 0; i < n; i++) {
@@ -64971,7 +64971,7 @@ static void testparametricunit_testrdp(bool *errorflag, ae_state *_state) {
          }
       }
    // Next epsilon
-      eps = eps * 0.5;
+      eps *= 0.5;
    }
    ae_frame_leave(_state);
 }
@@ -65515,7 +65515,7 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector *lx, RVe
             v1 = 0.0;
             for (ci = 0; ci <= 3; ci++) {
                for (cj = 0; cj <= 3; cj++) {
-                  v1 = v1 + tbl.xyR[p][4 + ci * 4 + cj] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state);
+                  v1 += tbl.xyR[p][4 + ci * 4 + cj] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state);
                }
             }
             v2 = spline2dcalc(c, tbl.xyR[p][0] + tx, tbl.xyR[p][2] + ty, _state);
@@ -65564,12 +65564,12 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
             do {
                a1 = 2 * randomreal(_state) - 1;
             } while (a1 == 0.0);
-            a1 = a1 * xjob;
+            a1 *= xjob;
             b1 = 2 * randomreal(_state) - 1;
             do {
                a2 = 2 * randomreal(_state) - 1;
             } while (a2 == 0.0);
-            a2 = a2 * yjob;
+            a2 *= yjob;
             b2 = 2 * randomreal(_state) - 1;
          // Test XY
             spline2dcopy(c, &c2, _state);
@@ -65918,7 +65918,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag, ae_state *_state)
                   xy.xyR[i][1] = hqrnduniformr(&rs, _state);
                   for (j = 0; j < d; j++) {
                      xy.xyR[i][2 + j] = vterm.xyR[j][0] * xy.xyR[i][0] + vterm.xyR[j][1] * xy.xyR[i][1] + vterm.xyR[j][2];
-                     meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+                     meany.xR[j] += xy.xyR[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints, _state);
@@ -65973,7 +65973,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag, ae_state *_state)
                   xy.xyR[i][1] = hqrnduniformr(&rs, _state);
                   for (j = 0; j < d; j++) {
                      xy.xyR[i][2 + j] = vterm.xyR[j][0] * xy.xyR[i][0] + vterm.xyR[j][1] * xy.xyR[i][1] + vterm.xyR[j][2];
-                     meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+                     meany.xR[j] += xy.xyR[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints, _state);
@@ -66007,7 +66007,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag, ae_state *_state)
                   xy.xyR[i][1] = hqrnduniformr(&rs, _state);
                   for (j = 0; j < d; j++) {
                      xy.xyR[i][2 + j] = vprior;
-                     meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+                     meany.xR[j] += xy.xyR[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints, _state);
@@ -66186,20 +66186,20 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag, ae_state *_stat
                   f0 = spline2dcalcvi(&s, v0 - v, v1, k, _state);
                   f1 = spline2dcalcvi(&s, v0, v1, k, _state);
                   f2 = spline2dcalcvi(&s, v0 + v, v1, k, _state);
-                  penalty.xR[k] = penalty.xR[k] + sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
+                  penalty.xR[k] += sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
                }
                for (k = 0; k < d; k++) {
                   f0 = spline2dcalcvi(&s, v0, v1 - v, k, _state);
                   f1 = spline2dcalcvi(&s, v0, v1, k, _state);
                   f2 = spline2dcalcvi(&s, v0, v1 + v, k, _state);
-                  penalty.xR[k] = penalty.xR[k] + sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
+                  penalty.xR[k] += sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
                }
                for (k = 0; k < d; k++) {
                   f0 = spline2dcalcvi(&s, v0 - v, v1 - v, k, _state);
                   f1 = spline2dcalcvi(&s, v0 + v, v1 - v, k, _state);
                   f2 = spline2dcalcvi(&s, v0 - v, v1 + v, k, _state);
                   f3 = spline2dcalcvi(&s, v0 + v, v1 + v, k, _state);
-                  penalty.xR[k] = penalty.xR[k] + 2 * sqr((f3 - f2 - f1 + f0) / sqr(v, _state), _state);
+                  penalty.xR[k] += 2 * sqr((f3 - f2 - f1 + f0) / sqr(v, _state), _state);
                }
             }
          }
@@ -66228,20 +66228,20 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag, ae_state *_stat
                      f0 = spline2dcalcvi(&s, v0 - v, v1, k, _state);
                      f1 = spline2dcalcvi(&s, v0, v1, k, _state);
                      f2 = spline2dcalcvi(&s, v0 + v, v1, k, _state);
-                     penalty2.xR[k] = penalty2.xR[k] + sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
+                     penalty2.xR[k] += sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
                   }
                   for (k = 0; k < d; k++) {
                      f0 = spline2dcalcvi(&s, v0, v1 - v, k, _state);
                      f1 = spline2dcalcvi(&s, v0, v1, k, _state);
                      f2 = spline2dcalcvi(&s, v0, v1 + v, k, _state);
-                     penalty2.xR[k] = penalty2.xR[k] + sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
+                     penalty2.xR[k] += sqr((f0 + f2 - 2 * f1) / sqr(v, _state), _state);
                   }
                   for (k = 0; k < d; k++) {
                      f0 = spline2dcalcvi(&s, v0 - v, v1 - v, k, _state);
                      f1 = spline2dcalcvi(&s, v0 + v, v1 - v, k, _state);
                      f2 = spline2dcalcvi(&s, v0 - v, v1 + v, k, _state);
                      f3 = spline2dcalcvi(&s, v0 + v, v1 + v, k, _state);
-                     penalty2.xR[k] = penalty2.xR[k] + 2 * sqr((f3 - f2 - f1 + f0) / sqr(v, _state), _state);
+                     penalty2.xR[k] += 2 * sqr((f3 - f2 - f1 + f0) / sqr(v, _state), _state);
                   }
                }
             }
@@ -66406,7 +66406,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag, ae_state *_
                      xy.xyR[i][1] = yc + w1 * (2 * hqrnduniformr(&rs, _state) - 1) * ky;
                      for (j = 0; j < d; j++) {
                         xy.xyR[i][2 + j] = hqrndnormal(&rs, _state);
-                        meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+                        meany.xR[j] += xy.xyR[i][2 + j] / npoints;
                      }
                   }
                // Create solver, set grid, area and other properties
@@ -66447,10 +66447,10 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag, ae_state *_
                      spline2dcalcv(&s, xy.xyR[i][0], xy.xyR[i][1], &tmp0, _state);
                      for (j = 0; j < d; j++) {
                         v = xy.xyR[i][2 + j] - tmp0.xR[j];
-                        rss = rss + v * v;
-                        tss = tss + sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
-                        rmserror = rmserror + sqr(v, _state);
-                        avgerror = avgerror + ae_fabs(v, _state) / (npoints * d);
+                        rss += v * v;
+                        tss += sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
+                        rmserror += sqr(v, _state);
+                        avgerror += ae_fabs(v, _state) / (npoints * d);
                         maxerror = maxreal(maxerror, ae_fabs(v, _state), _state);
                      }
                   }
@@ -66612,7 +66612,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag, ae_state *_
    for (i = 0; i < npoints; i++) {
       j = i + hqrnduniformi(&rs, npoints - i, _state);
       swaprows(&xy, i, j, -1, _state);
-      xy.xyR[i][2] = xy.xyR[i][2] + machineepsilon * hqrndnormal(&rs, _state);
+      xy.xyR[i][2] += machineepsilon * hqrndnormal(&rs, _state);
    }
    spline2dbuildersetpoints(&state, &xy, npoints, _state);
    spline2dfit(&state, &s2, &rep2, _state);
@@ -66705,7 +66705,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
             xy.xyR[i][1] = hqrnduniformr(&rs, _state);
             for (j = 0; j < d; j++) {
                xy.xyR[i][2 + j] = hqrndnormal(&rs, _state);
-               meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+               meany.xR[j] += xy.xyR[i][2 + j] / npoints;
             }
          }
       // Create solver, set grid, area and other properties.
@@ -66746,10 +66746,10 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < d; j++) {
                v = xy.xyR[i][2 + j] - spline2dcalcvi(&s1, xy.xyR[i][0], xy.xyR[i][1], j, _state);
-               rss = rss + v * v;
-               tss = tss + sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
-               rmserror = rmserror + sqr(v, _state);
-               avgerror = avgerror + ae_fabs(v, _state) / (npoints * d);
+               rss += v * v;
+               tss += sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
+               rmserror += sqr(v, _state);
+               avgerror += ae_fabs(v, _state) / (npoints * d);
                maxerror = maxreal(maxerror, ae_fabs(v, _state), _state);
             }
          }
@@ -66854,7 +66854,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
             xy.xyR[i][1] = hqrnduniformr(&rs, _state);
             for (j = 0; j < d; j++) {
                xy.xyR[i][2 + j] = hqrndnormal(&rs, _state);
-               meany.xR[j] = meany.xR[j] + xy.xyR[i][2 + j] / npoints;
+               meany.xR[j] += xy.xyR[i][2 + j] / npoints;
             }
          }
       // Create solver, set grid, area and other properties.
@@ -66875,10 +66875,10 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < d; j++) {
                v = xy.xyR[i][2 + j] - spline2dcalcvi(&s1, xy.xyR[i][0], xy.xyR[i][1], j, _state);
-               rss = rss + v * v;
-               tss = tss + sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
-               rmserror = rmserror + sqr(v, _state);
-               avgerror = avgerror + ae_fabs(v, _state) / (npoints * d);
+               rss += v * v;
+               tss += sqr(xy.xyR[i][2 + j] - meany.xR[j], _state);
+               rmserror += sqr(v, _state);
+               avgerror += ae_fabs(v, _state) / (npoints * d);
                maxerror = maxreal(maxerror, ae_fabs(v, _state), _state);
             }
          }
@@ -66969,7 +66969,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
          for (j = 0; j < d; j++) {
             v = ae_fabs(spline2dcalcvi(&s1, xy.xyR[i][0], xy.xyR[i][1], j, _state) - xy.xyR[i][2 + j], _state);
             emax = maxreal(emax, v, _state);
-            eavg = eavg + v / (npoints * d);
+            eavg += v / (npoints * d);
          }
       }
       set_error_flag(errorflag, emax > 0.00100, __FILE__, __LINE__, "testspline2dunit.ap:2265");
@@ -67058,16 +67058,16 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag, ae_state 
                f0 = spline2dcalc(&s1, v0 - h, v1, _state);
                f1 = spline2dcalc(&s1, v0, v1, _state);
                f2 = spline2dcalc(&s1, v0 + h, v1, _state);
-               v = v + sqr((f0 + f2 - 2 * f1) / sqr(h, _state), _state);
+               v += sqr((f0 + f2 - 2 * f1) / sqr(h, _state), _state);
                f0 = spline2dcalc(&s1, v0, v1 - h, _state);
                f1 = spline2dcalc(&s1, v0, v1, _state);
                f2 = spline2dcalc(&s1, v0, v1 + h, _state);
-               v = v + sqr((f0 + f2 - 2 * f1) / sqr(h, _state), _state);
+               v += sqr((f0 + f2 - 2 * f1) / sqr(h, _state), _state);
                f0 = spline2dcalc(&s1, v0 - h, v1 - h, _state);
                f1 = spline2dcalc(&s1, v0 + h, v1 - h, _state);
                f2 = spline2dcalc(&s1, v0 - h, v1 + h, _state);
                f3 = spline2dcalc(&s1, v0 + h, v1 + h, _state);
-               v = v + 2 * sqr((f3 - f2 - f1 + f0) / sqr(h, _state), _state);
+               v += 2 * sqr((f3 - f2 - f1 + f0) / sqr(h, _state), _state);
             }
          }
          penaltya.xR[k] = v;
@@ -67991,7 +67991,7 @@ static bool testspline3dunit_testunpack(ae_state *_state) {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 = v1 + tbl1.xyR[p1][6 + 2 * (2 * ck + cj) + ci] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state) * ae_pow(tz, (double)ck, _state);
+                           v1 += tbl1.xyR[p1][6 + 2 * (2 * ck + cj) + ci] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state) * ae_pow(tz, (double)ck, _state);
                         }
                      }
                   }
@@ -68002,7 +68002,7 @@ static bool testspline3dunit_testunpack(ae_state *_state) {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 = v1 + tbl0.xyR[p0][6 + 2 * (2 * ck + cj) + ci] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state) * ae_pow(tz, (double)ck, _state);
+                           v1 += tbl0.xyR[p0][6 + 2 * (2 * ck + cj) + ci] * ae_pow(tx, (double)ci, _state) * ae_pow(ty, (double)cj, _state) * ae_pow(tz, (double)ck, _state);
                         }
                      }
                   }
@@ -68066,17 +68066,17 @@ static bool testspline3dunit_testlintrans(ae_state *_state) {
                do {
                   a1 = 2.0 * randomreal(_state) - 1.0;
                } while (a1 == 0.0);
-               a1 = a1 * xjob;
+               a1 *= xjob;
                b1 = x.xR[0] + randomreal(_state) * (x.xR[n - 1] - x.xR[0] + 2.0) - 1.0;
                do {
                   a2 = 2.0 * randomreal(_state) - 1.0;
                } while (a2 == 0.0);
-               a2 = a2 * yjob;
+               a2 *= yjob;
                b2 = y.xR[0] + randomreal(_state) * (y.xR[m - 1] - y.xR[0] + 2.0) - 1.0;
                do {
                   a3 = 2.0 * randomreal(_state) - 1.0;
                } while (a3 == 0.0);
-               a3 = a3 * zjob;
+               a3 *= zjob;
                b3 = z.xR[0] + randomreal(_state) * (z.xR[l - 1] - z.xR[0] + 2.0) - 1.0;
             // Test XYZ
                spline3dcopy(&c, &c2, _state);
@@ -68688,7 +68688,7 @@ static bool basicmultilayerrbf1dtest(ae_state *_state) {
             ae_frame_leave(_state);
             return result;
          }
-         q = q / 2;
+         q /= 2;
          nlayers++;
          if (errtype == 1 && q <= 1 / f2) {
             errtype = 2;
@@ -69062,7 +69062,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = vf.xyR[j][nx];
                for (k = 0; k < nx; k++) {
-                  xy.xyR[i][nx + j] = xy.xyR[i][nx + j] + vf.xyR[j][k] * xy.xyR[i][k];
+                  xy.xyR[i][nx + j] += vf.xyR[j][k] * xy.xyR[i][k];
                }
             }
          }
@@ -69083,7 +69083,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          for (k = 0; k < ny; k++) {
             vv = vf.xyR[k][nx];
             for (j = 0; j < nx; j++) {
-               vv = vv + vf.xyR[k][j] * x.xR[j];
+               vv += vf.xyR[k][j] * x.xR[j];
             }
             set_error_flag(&result, ae_fabs(vv - y.xR[k], _state) > errtol, __FILE__, __LINE__, "testrbfunit.ap:537");
          }
@@ -69710,7 +69710,7 @@ static bool testrbfunit_linearitymodelrbftest(ae_state *_state) {
                         gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
                         gp.xyR[i * k1 + j][nx] = a.xR[nx];
                         for (k = 0; k < nx; k++) {
-                           gp.xyR[i * k1 + j][nx] = gp.xyR[i * k1 + j][nx] + gp.xyR[i * k1 + j][k] * a.xR[k];
+                           gp.xyR[i * k1 + j][nx] += gp.xyR[i * k1 + j][k] * a.xR[k];
                         }
                      }
                   }
@@ -69760,7 +69760,7 @@ static bool testrbfunit_linearitymodelrbftest(ae_state *_state) {
                               gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
                               gp.xyR[(i * k1 + j) * k2 + k][nx] = a.xR[nx];
                               for (l = 0; l < nx; l++) {
-                                 gp.xyR[(i * k1 + j) * k2 + k][nx] = gp.xyR[(i * k1 + j) * k2 + k][nx] + gp.xyR[(i * k1 + j) * k2 + k][l] * a.xR[l];
+                                 gp.xyR[(i * k1 + j) * k2 + k][nx] += gp.xyR[(i * k1 + j) * k2 + k][l] * a.xR[l];
                               }
                            }
                         }
@@ -70086,7 +70086,7 @@ static bool testrbfunit_serializationtest(ae_state *_state) {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
@@ -70695,7 +70695,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
@@ -70844,7 +70844,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
@@ -70922,13 +70922,13 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
             for (j = 0; j < ny; j++) {
                y.xR[j] = uv.xyR[j][nx];
                for (k = 0; k < nx; k++) {
-                  y.xR[j] = y.xR[j] + x.xR[k] * uv.xyR[j][k];
+                  y.xR[j] += x.xR[k] * uv.xyR[j][k];
                }
             }
             for (k = 0; k < unc; k++) {
                v = 0.0;
                for (j = 0; j < nx; j++) {
-                  v = v + sqr(uxwr.xyR[k][j] - x.xR[j], _state) / sqr(uxwr.xyR[k][nx + ny + j], _state);
+                  v += sqr(uxwr.xyR[k][j] - x.xR[j], _state) / sqr(uxwr.xyR[k][nx + ny + j], _state);
                }
                if (v < rbfv2farradius(bf, _state) * rbfv2farradius(bf, _state)) {
                   v = rbfv2basisfunc(bf, v, _state);
@@ -70936,7 +70936,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                   v = 0.0;
                }
                for (j = 0; j < ny; j++) {
-                  y.xR[j] = y.xR[j] + v * uxwr.xyR[k][nx + j];
+                  y.xR[j] += v * uxwr.xyR[k][nx + j];
                }
             }
             for (j = 0; j < ny; j++) {
@@ -71143,7 +71143,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          for (j = 0; j < nx; j++) {
             xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
             xy2.xyR[i][j] = xy.xyR[i][j] * scalefactor;
-            k = k / gridsize;
+            k /= gridsize;
          }
          for (j = 0; j < ny; j++) {
             xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
@@ -71384,14 +71384,14 @@ static bool testrbfunit_scaledhrbftest(ae_state *_state) {
                k = i;
                for (j = 0; j < nx; j++) {
                   xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
-                  k = k / gridsize;
+                  k /= gridsize;
                }
                for (j = 0; j < ny; j++) {
                   xy.xyR[i][nx + j] = 0.0;
                   for (k = 0; k < nx; k++) {
-                     xy.xyR[i][nx + j] = xy.xyR[i][nx + j] + c0.xR[k] * ae_cos(pi * (1 + k) * xy.xyR[i][k], _state);
+                     xy.xyR[i][nx + j] += c0.xR[k] * ae_cos(pi * (1 + k) * xy.xyR[i][k], _state);
                   }
-                  xy.xyR[i][nx + j] = c1.xR[j] * xy.xyR[i][nx + j];
+                  xy.xyR[i][nx + j] *= c1.xR[j];
                }
             }
             ae_matrix_set_length(&xy2, n, nx + ny, _state);
@@ -71465,7 +71465,7 @@ static bool testrbfunit_scaledhrbftest(ae_state *_state) {
                }
                rbfcalc(&s, &x, &y, _state);
                for (j = 0; j < nx; j++) {
-                  x.xR[j] = x.xR[j] * scalex.xR[j];
+                  x.xR[j] *= scalex.xR[j];
                }
                rbfcalc(&s2, &x, &y2, _state);
                for (j = 0; j < ny; j++) {
@@ -71514,7 +71514,7 @@ static bool testrbfunit_spechrbftest(ae_state *_state) {
       vref = ae_exp(-d2, _state);
       vfunc = rbfv2basisfunc(0, d2, _state);
       set_error_flag(&result, ae_fabs(vref - vfunc, _state) > 1.0E-9 * vref, __FILE__, __LINE__, "testrbfunit.ap:3563");
-      d2 = d2 + 1.0 / 64.0;
+      d2 += 1.0 / 64.0;
    }
    d2 = 0.0;
    maxerr = 0.0;
@@ -71523,7 +71523,7 @@ static bool testrbfunit_spechrbftest(ae_state *_state) {
       vfunc = rbfv2basisfunc(1, d2, _state);
       maxerr = maxreal(maxerr, ae_fabs(vref - vfunc, _state), _state);
       set_error_flag(&result, ae_fabs(vref - vfunc, _state) > 0.005, __FILE__, __LINE__, "testrbfunit.ap:3573");
-      d2 = d2 + 1.0 / 64.0;
+      d2 += 1.0 / 64.0;
    }
 // Test that tiny changes in dataset points introduce tiny
 // numerical noise. The noise magnitude depends on the
@@ -71556,8 +71556,8 @@ static bool testrbfunit_spechrbftest(ae_state *_state) {
       return result;
    }
    for (i = 0; i < n * n; i++) {
-      xy.xyR[i][0] = xy.xyR[i][0] + 1.0E-14 * ae_sin((double)(3 * i), _state);
-      xy.xyR[i][1] = xy.xyR[i][1] + 1.0E-14 * ae_sin((double)(7 * i * i), _state);
+      xy.xyR[i][0] += 1.0E-14 * ae_sin((double)(3 * i), _state);
+      xy.xyR[i][1] += 1.0E-14 * ae_sin((double)(7 * i * i), _state);
    }
    rbfcreate(nx, ny, &s1, _state);
    rbfsetalgohierarchical(&s1, rbase, nlayers, 0.0, _state);
@@ -71572,7 +71572,7 @@ static bool testrbfunit_spechrbftest(ae_state *_state) {
    vdiff = 0.0;
    for (i = 0; i < n - 1; i++) {
       for (j = 0; j < n - 1; j++) {
-         vdiff = vdiff + ae_fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j, _state) - rbfcalc2(&s1, 0.5 + i, 0.5 + j, _state), _state) / sqr((double)(n - 1), _state);
+         vdiff += ae_fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j, _state) - rbfcalc2(&s1, 0.5 + i, 0.5 + j, _state), _state) / sqr((double)(n - 1), _state);
       }
    }
    set_error_flag(&result, vdiff > 0.00200 || vdiff < 0.00001, __FILE__, __LINE__, "testrbfunit.ap:3630");
@@ -71837,7 +71837,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             } else {
                scalevec2.xR[i] = 1.0;
             }
-            scalevec2.xR[i] = scalevec2.xR[i] / scalefactor;
+            scalevec2.xR[i] /= scalefactor;
          }
          rbfsetpointsandscales(&s, &xy, n, &scalevec2, _state);
          rbfsetv2bf(&s, bf, _state);
@@ -72047,7 +72047,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             } else {
                scalevec2.xR[i] = 1.0;
             }
-            scalevec2.xR[i] = scalevec2.xR[i] / scalefactor;
+            scalevec2.xR[i] /= scalefactor;
          }
          rbfsetpointsandscales(&s, &xy, n, &scalevec2, _state);
          rbfsetv2bf(&s, bf, _state);
@@ -72225,8 +72225,8 @@ static void testfftunit_refinternalcfft(RVector *a, ae_int_t nn, bool inversefft
             im = a->xR[2 * k + 1];
             c = ae_cos(-2 * pi * k * i / nn, _state);
             s = ae_sin(-2 * pi * k * i / nn, _state);
-            hre = hre + c * re - s * im;
-            him = him + c * im + s * re;
+            hre += c * re - s * im;
+            him += c * im + s * re;
          }
          tmp.xR[2 * i] = hre;
          tmp.xR[2 * i + 1] = him;
@@ -72243,8 +72243,8 @@ static void testfftunit_refinternalcfft(RVector *a, ae_int_t nn, bool inversefft
             im = a->xR[2 * i + 1];
             c = ae_cos(2 * pi * k * i / nn, _state);
             s = ae_sin(2 * pi * k * i / nn, _state);
-            hre = hre + c * re - s * im;
-            him = him + c * im + s * re;
+            hre += c * re - s * im;
+            him += c * im + s * re;
          }
          tmp.xR[2 * k] = hre / nn;
          tmp.xR[2 * k + 1] = him / nn;
@@ -72354,8 +72354,8 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr, a
          im = a1.xC[j].y;
          c = ae_cos(-2 * pi * j * idx / n, _state);
          s = ae_sin(-2 * pi * j * idx / n, _state);
-         v.x = v.x + c * re - s * im;
-         v.y = v.y + c * im + s * re;
+         v.x += c * re - s * im;
+         v.y += c * im + s * re;
       }
       *referr = maxreal(*referr, abscomplex(ae_c_sub(v, a0.xC[idx]), _state), _state);
    }
@@ -72629,7 +72629,7 @@ static void testfhtunit_reffhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + a->xR[j] * (ae_cos(2 * pi * i * j / n, _state) + ae_sin(2 * pi * i * j / n, _state));
+         v += a->xR[j] * (ae_cos(2 * pi * i * j / n, _state) + ae_sin(2 * pi * i * j / n, _state));
       }
       buf.xR[i] = v;
    }
@@ -72645,7 +72645,7 @@ static void testfhtunit_reffhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
    ae_assert(n > 0, "RefFHTR1DInv: incorrect N!", _state);
    testfhtunit_reffhtr1d(a, n, _state);
    for (i = 0; i < n; i++) {
-      a->xR[i] = a->xR[i] / n;
+      a->xR[i] /= n;
    }
 }
 
@@ -72803,7 +72803,7 @@ static void testconvunit_refconvr1dcircular(RVector *a, ae_int_t m, RVector *b, 
       i2 = minint(i1 + m - 1, m + n - 2, _state);
       j2 = i2 - i1;
       ae_v_add(r->xR, 1, &buf.xR[i1], 1, j2 + 1);
-      i1 = i1 + m;
+      i1 += m;
    }
    ae_frame_leave(_state);
 }
@@ -72825,7 +72825,7 @@ static void testconvunit_refconvc1dcircular(CVector *a, ae_int_t m, CVector *b, 
       i2 = minint(i1 + m - 1, m + n - 2, _state);
       j2 = i2 - i1;
       ae_v_cadd(r->xC, 1, &buf.xC[i1], 1, "N", j2 + 1);
-      i1 = i1 + m;
+      i1 += m;
    }
    ae_frame_leave(_state);
 }
@@ -73094,14 +73094,14 @@ static void testcorrunit_refcorrr1d(RVector *signal, ae_int_t n, RVector *patter
          if (i + j >= n) {
             break;
          }
-         v = v + pattern->xR[j] * s.xR[i + j];
+         v += pattern->xR[j] * s.xR[i + j];
       }
       r->xR[i] = v;
    }
    for (i = 1; i < m; i++) {
       v = 0.0;
       for (j = i; j < m; j++) {
-         v = v + pattern->xR[j] * s.xR[-i + j];
+         v += pattern->xR[j] * s.xR[-i + j];
       }
       r->xR[m + n - 1 - i] = v;
    }
@@ -73153,7 +73153,7 @@ static void testcorrunit_refcorrr1dcircular(RVector *signal, ae_int_t n, RVector
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < m; j++) {
-         v = v + pattern->xR[j] * signal->xR[(i + j) % n];
+         v += pattern->xR[j] * signal->xR[(i + j) % n];
       }
       r->xR[i] = v;
    }
@@ -73372,7 +73372,7 @@ bool testchebyshev(bool silent, ae_state *_state) {
          v = 0.0;
          for (n = 0; n <= maxn; n++) {
             c.xR[n] = 2 * randomreal(_state) - 1;
-            v = v + chebyshevcalculate(k, n, x, _state) * c.xR[n];
+            v += chebyshevcalculate(k, n, x, _state) * c.xR[n];
             sumerr = maxreal(sumerr, ae_fabs(v - chebyshevsum(&c, k, n, x, _state), _state), _state);
          }
       }
@@ -73507,7 +73507,7 @@ bool testhermite(bool silent, ae_state *_state) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.xR[n] = 2 * randomreal(_state) - 1;
-         v = v + hermitecalculate(n, x, _state) * c.xR[n];
+         v += hermitecalculate(n, x, _state) * c.xR[n];
          sumerr = maxreal(sumerr, ae_fabs(v - hermitesum(&c, n, x, _state), _state), _state);
       }
    }
@@ -73597,8 +73597,8 @@ bool testlegendre(bool silent, ae_state *_state) {
          v = legendrecalculate(n, x, _state);
          t = 1.0;
          for (i = 0; i <= n; i++) {
-            v = v - c.xR[i] * t;
-            t = t * x;
+            v -= c.xR[i] * t;
+            t *= x;
          }
          err = maxreal(err, ae_fabs(v, _state), _state);
       }
@@ -73611,7 +73611,7 @@ bool testlegendre(bool silent, ae_state *_state) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.xR[n] = 2 * randomreal(_state) - 1;
-         v = v + legendrecalculate(n, x, _state) * c.xR[n];
+         v += legendrecalculate(n, x, _state) * c.xR[n];
          sumerr = maxreal(sumerr, ae_fabs(v - legendresum(&c, n, x, _state), _state), _state);
       }
    }
@@ -73722,7 +73722,7 @@ bool testlaguerre(bool silent, ae_state *_state) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.xR[n] = 2 * randomreal(_state) - 1;
-         v = v + laguerrecalculate(n, x, _state) * c.xR[n];
+         v += laguerrecalculate(n, x, _state) * c.xR[n];
          sumerr = maxreal(sumerr, ae_fabs(v - laguerresum(&c, n, x, _state), _state), _state);
       }
    }
@@ -73802,18 +73802,18 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->xR[i];
+      *mean += x->xR[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - (*mean), _state);
+         v1 += sqr(x->xR[i] - (*mean), _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - (*mean));
+         v2 += (x->xR[i] - (*mean));
       }
       v2 = sqr(v2, _state) / n;
       variance = (v1 - v2) / n;
@@ -73951,9 +73951,9 @@ bool testpca(bool silent, ae_state *_state) {
             t = 0.0;
             for (j = 0; j < m; j++) {
                if (j != k / 2) {
-                  t = t + sqr(v.xyR[j][0], _state);
+                  t += sqr(v.xyR[j][0], _state);
                } else {
-                  t = t + sqr(v.xyR[j][0] + h, _state);
+                  t += sqr(v.xyR[j][0] + h, _state);
                }
             }
             t = 1 / ae_sqrt(t, _state);
@@ -74047,8 +74047,8 @@ bool testpca(bool silent, ae_state *_state) {
          varcomplete = 0.0;
          varreduced = 0.0;
          for (k = 0; k < requested; k++) {
-            varreduced = varreduced + s.xR[k];
-            varcomplete = varcomplete + s2.xR[k];
+            varreduced += s.xR[k];
+            varcomplete += s2.xR[k];
          }
          set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:256");
          set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:257");
@@ -74133,8 +74133,8 @@ bool testpca(bool silent, ae_state *_state) {
       varcomplete = 0.0;
       varreduced = 0.0;
       for (k = 0; k < requested; k++) {
-         varreduced = varreduced + s.xR[k];
-         varcomplete = varcomplete + s2.xR[k];
+         varreduced += s.xR[k];
+         varcomplete += s2.xR[k];
       }
       set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:360");
       set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:361");
@@ -74214,8 +74214,8 @@ bool testpca(bool silent, ae_state *_state) {
          varcomplete = 0.0;
          varreduced = 0.0;
          for (k = 0; k < requested; k++) {
-            varreduced = varreduced + s.xR[k];
-            varcomplete = varcomplete + s2.xR[k];
+            varreduced += s.xR[k];
+            varcomplete += s2.xR[k];
          }
          set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / maxreal(varcomplete, 1.0, _state) < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:456");
          set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / maxreal(varcomplete, 1.0, _state) > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:457");
@@ -74998,15 +74998,15 @@ static double testmlpbaseunit_vectordiff(RVector *g0, RVector *g1, ae_int_t n, d
    norm1 = 0.0;
    diff = 0.0;
    for (i = 0; i < n; i++) {
-      norm0 = norm0 + sqr(g0->xR[i], _state);
-      norm1 = norm1 + sqr(g1->xR[i], _state);
-      diff = diff + sqr(g0->xR[i] - g1->xR[i], _state);
+      norm0 += sqr(g0->xR[i], _state);
+      norm1 += sqr(g1->xR[i], _state);
+      diff += sqr(g0->xR[i] - g1->xR[i], _state);
    }
    norm0 = ae_sqrt(norm0, _state);
    norm1 = ae_sqrt(norm1, _state);
    diff = ae_sqrt(diff, _state);
    if ((norm0 != 0.0 || norm1 != 0.0) || s != 0.0) {
-      diff = diff / maxreal(maxreal(norm0, norm1, _state), s, _state);
+      diff /= maxreal(maxreal(norm0, norm1, _state), s, _state);
    } else {
       diff = 0.0;
    }
@@ -75527,7 +75527,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    for (i = 1; i < nlayers; i++) {
       for (j = 0; j < mlpgetlayersize(&network, i, _state); j++) {
          for (k = 0; k < mlpgetlayersize(&network, i - 1, _state); k++) {
-            neurons.xyR[i][j] = neurons.xyR[i][j] + mlpgetweight(&network, i - 1, k, i, j, _state) * neurons.xyR[i - 1][k];
+            neurons.xyR[i][j] += mlpgetweight(&network, i - 1, k, i, j, _state) * neurons.xyR[i - 1][k];
          }
          mlpgetneuroninfo(&network, i, j, &fkind, &c, _state);
          mlpactivationfunction(neurons.xyR[i][j] - c, fkind, &f, &df, &d2f, _state);
@@ -75537,7 +75537,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    if (nkind == 1) {
       s = 0.0;
       for (j = 0; j < nout; j++) {
-         s = s + ae_exp(neurons.xyR[nlayers - 1][j], _state);
+         s += ae_exp(neurons.xyR[nlayers - 1][j], _state);
       }
       for (j = 0; j < nout; j++) {
          neurons.xyR[nlayers - 1][j] = ae_exp(neurons.xyR[nlayers - 1][j], _state) / s;
@@ -75807,7 +75807,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          mlpprocess(&network, &x1, &y1, _state);
          v = 0.0;
          for (i = 0; i < nout; i++) {
-            v = v + y1.xR[i];
+            v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
          *err = *err || ae_fabs(v - 1, _state) > 1000 * machineepsilon;
@@ -76000,29 +76000,29 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       mlpprocess(&network, &x, &y2, _state);
       ae_v_sub(y2.xR, 1, y.xR, 1, nout);
       referencee = ae_v_dotproduct(y2.xR, 1, y2.xR, 1, nout);
-      referencee = referencee / 2;
+      referencee /= 2;
       for (i = 0; i < wcount; i++) {
          wprev = network.weights.xR[i];
          network.weights.xR[i] = wprev - 2 * h;
          mlpprocess(&network, &x, &y1, _state);
          ae_v_sub(y1.xR, 1, y.xR, 1, nout);
          v1 = ae_v_dotproduct(y1.xR, 1, y1.xR, 1, nout);
-         v1 = v1 / 2;
+         v1 /= 2;
          network.weights.xR[i] = wprev - h;
          mlpprocess(&network, &x, &y1, _state);
          ae_v_sub(y1.xR, 1, y.xR, 1, nout);
          v2 = ae_v_dotproduct(y1.xR, 1, y1.xR, 1, nout);
-         v2 = v2 / 2;
+         v2 /= 2;
          network.weights.xR[i] = wprev + h;
          mlpprocess(&network, &x, &y1, _state);
          ae_v_sub(y1.xR, 1, y.xR, 1, nout);
          v3 = ae_v_dotproduct(y1.xR, 1, y1.xR, 1, nout);
-         v3 = v3 / 2;
+         v3 /= 2;
          network.weights.xR[i] = wprev + 2 * h;
          mlpprocess(&network, &x, &y1, _state);
          ae_v_sub(y1.xR, 1, y.xR, 1, nout);
          v4 = ae_v_dotproduct(y1.xR, 1, y1.xR, 1, nout);
-         v4 = v4 / 2;
+         v4 /= 2;
          network.weights.xR[i] = wprev;
          referenceg.xR[i] = (v1 - 8 * v2 + 8 * v3 - v4) / (12 * h);
       }
@@ -76059,15 +76059,15 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       if (nkind != 1) {
          for (i = 0; i < nout; i++) {
-            referencee = referencee + 0.5 * sqr(y2.xR[i] - y.xR[i], _state);
+            referencee += 0.5 * sqr(y2.xR[i] - y.xR[i], _state);
          }
       } else {
          for (i = 0; i < nout; i++) {
             if (y.xR[i] != 0.0) {
                if (y2.xR[i] == 0.0) {
-                  referencee = referencee + y.xR[i] * ae_log(maxrealnumber, _state);
+                  referencee += y.xR[i] * ae_log(maxrealnumber, _state);
                } else {
-                  referencee = referencee + y.xR[i] * ae_log(y.xR[i] / y2.xR[i], _state);
+                  referencee += y.xR[i] * ae_log(y.xR[i] / y2.xR[i], _state);
                }
             }
          }
@@ -76082,24 +76082,24 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          v = 0.0;
          if (nkind != 1) {
             for (j = 0; j < nout; j++) {
-               v = v + 0.5 * (sqr(y2.xR[j] - y.xR[j], _state) - sqr(y1.xR[j] - y.xR[j], _state)) / (2 * h);
+               v += 0.5 * (sqr(y2.xR[j] - y.xR[j], _state) - sqr(y1.xR[j] - y.xR[j], _state)) / (2 * h);
             }
          } else {
             for (j = 0; j < nout; j++) {
                if (y.xR[j] != 0.0) {
                   if (y2.xR[j] == 0.0) {
-                     v = v + y.xR[j] * ae_log(maxrealnumber, _state);
+                     v += y.xR[j] * ae_log(maxrealnumber, _state);
                   } else {
-                     v = v + y.xR[j] * ae_log(y.xR[j] / y2.xR[j], _state);
+                     v += y.xR[j] * ae_log(y.xR[j] / y2.xR[j], _state);
                   }
                   if (y1.xR[j] == 0.0) {
-                     v = v - y.xR[j] * ae_log(maxrealnumber, _state);
+                     v -= y.xR[j] * ae_log(maxrealnumber, _state);
                   } else {
-                     v = v - y.xR[j] * ae_log(y.xR[j] / y1.xR[j], _state);
+                     v -= y.xR[j] * ae_log(y.xR[j] / y1.xR[j], _state);
                   }
                }
             }
-            v = v / (2 * h);
+            v /= 2 * h;
          }
          referenceg.xR[i] = v;
       }
@@ -76160,7 +76160,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
          }
          mlpgrad(&network, &x1, &y1, &v, &grad2, _state);
-         referencee = referencee + v;
+         referencee += v;
          ae_v_add(referenceg.xR, 1, grad2.xR, 1, wcount);
       }
       sparseconverttocrs(&sparsexy, _state);
@@ -76296,7 +76296,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
          }
          mlpgradn(&network, &x1, &y1, &v, &grad2, _state);
-         referencee = referencee + v;
+         referencee += v;
          ae_v_add(referenceg.xR, 1, grad2.xR, 1, wcount);
       }
       mlpgradnbatch(&network, &xy, ssize, &e2, &grad2, _state);
@@ -76411,7 +76411,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
             } else {
                mlpgradn(&network, &x1, &y1, &v, &grad2, _state);
             }
-            e1 = e1 + v;
+            e1 += v;
             ae_v_add(grad1.xR, 1, grad2.xR, 1, wcount);
          // H1
             for (j = 0; j < wcount; j++) {
@@ -76586,9 +76586,9 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 4 * randomreal(_state) - 2;
                if (y1.xR[j] >= 0.0) {
-                  y1.xR[j] = y1.xR[j] + 0.1;
+                  y1.xR[j] += 0.1;
                } else {
-                  y1.xR[j] = y1.xR[j] - 0.1;
+                  y1.xR[j] -= 0.1;
                }
                sparseset(&sparsexy, i, nin + j, y1.xR[j], _state);
             }
@@ -76600,9 +76600,9 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          nnmax = 0;
          if (mlpissoftmax(&network, _state)) {
             if (y.xR[iround(xy.xyR[i][nin], _state)] > 0.0) {
-               refavgce = refavgce + ae_log(1 / y.xR[iround(xy.xyR[i][nin], _state)], _state);
+               refavgce += ae_log(1 / y.xR[iround(xy.xyR[i][nin], _state)], _state);
             } else {
-               refavgce = refavgce + ae_log(maxrealnumber, _state);
+               refavgce += ae_log(maxrealnumber, _state);
             }
          }
          if (mlpissoftmax(&network, _state)) {
@@ -76611,10 +76611,10 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             dsmax = 0;
          }
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + sqr(y.xR[j] - y1.xR[j], _state);
-            refavgerror = refavgerror + ae_fabs(y.xR[j] - y1.xR[j], _state);
+            refrmserror += sqr(y.xR[j] - y1.xR[j], _state);
+            refavgerror += ae_fabs(y.xR[j] - y1.xR[j], _state);
             if (y1.xR[j] != 0.0) {
-               refavgrelerror = refavgrelerror + ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
+               refavgrelerror += ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
                avgrelcnt++;
             }
             if (y.xR[j] > y.xR[nnmax]) {
@@ -76631,14 +76631,14 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
       sparseconverttocrs(&sparsexy, _state);
       if (ssize > 0) {
          refrmserror = ae_sqrt(refrmserror / (ssize * nout), _state);
-         refavgerror = refavgerror / (ssize * nout);
+         refavgerror /= ssize * nout;
          refrelclserror = refclserror / ssize;
-         refavgce = refavgce / (ssize * ae_log(2.0, _state));
+         refavgce /= ssize * ae_log(2.0, _state);
       } else {
          refrelclserror = 0.0;
       }
       if (avgrelcnt > 0) {
-         refavgrelerror = refavgrelerror / avgrelcnt;
+         refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
       seterrorflagdiff(err, mlprmserror(&network, &xy, ssize, _state), refrmserror, etol, escale, _state);
@@ -76685,7 +76685,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          }
          mlpprocess(&network, &x1, &y, _state);
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + sqr(y.xR[j] - y1.xR[j], _state);
+            refrmserror += sqr(y.xR[j] - y1.xR[j], _state);
          }
       }
       if (subsetsize > 0) {
@@ -77342,7 +77342,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             mlpeprocess(&ensemble, &x1, &y1, _state);
             v = 0.0;
             for (i = 0; i < nout; i++) {
-               v = v + y1.xR[i];
+               v += y1.xR[i];
                *err = *err || y1.xR[i] < 0.0;
             }
             *err = *err || ae_fabs(v - 1, _state) > 1000 * machineepsilon;
@@ -77494,9 +77494,9 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
          nnmax = 0;
          if (mlpeissoftmax(&ensemble, _state)) {
             if (y.xR[iround(xy.xyR[i][nin], _state)] > 0.0) {
-               refavgce = refavgce + ae_log(1 / y.xR[iround(xy.xyR[i][nin], _state)], _state);
+               refavgce += ae_log(1 / y.xR[iround(xy.xyR[i][nin], _state)], _state);
             } else {
-               refavgce = refavgce + ae_log(maxrealnumber, _state);
+               refavgce += ae_log(maxrealnumber, _state);
             }
          }
          if (mlpeissoftmax(&ensemble, _state)) {
@@ -77505,10 +77505,10 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             dsmax = 0;
          }
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + sqr(y.xR[j] - y1.xR[j], _state);
-            refavgerror = refavgerror + ae_fabs(y.xR[j] - y1.xR[j], _state);
+            refrmserror += sqr(y.xR[j] - y1.xR[j], _state);
+            refavgerror += ae_fabs(y.xR[j] - y1.xR[j], _state);
             if (y1.xR[j] != 0.0) {
-               refavgrelerror = refavgrelerror + ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
+               refavgrelerror += ae_fabs(y.xR[j] - y1.xR[j], _state) / ae_fabs(y1.xR[j], _state);
                avgrelcnt++;
             }
             if (y.xR[j] > y.xR[nnmax]) {
@@ -77525,11 +77525,11 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
       sparseconverttocrs(&sparsexy, _state);
       if (ssize > 0) {
          refrmserror = ae_sqrt(refrmserror / (ssize * nout), _state);
-         refavgerror = refavgerror / (ssize * nout);
-         refavgce = refavgce / (ssize * ae_log(2.0, _state));
+         refavgerror /= ssize * nout;
+         refavgce /= ssize * ae_log(2.0, _state);
       }
       if (avgrelcnt > 0) {
-         refavgrelerror = refavgrelerror / avgrelcnt;
+         refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
       seterrorflagdiff(err, mlpermserror(&ensemble, &xy, ssize, _state), refrmserror, etol, escale, _state);
@@ -77940,11 +77940,11 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
                t = 0;
                for (i0 = 0; i0 < clustersizes.xZ[i]; i0++) {
                   for (i1 = 0; i1 < clustersizes.xZ[npoints + mergeidx]; i1++) {
-                     v = v + d->xyR[cm.xyZ[i][i0]][cm.xyZ[npoints + mergeidx][i1]];
+                     v += d->xyR[cm.xyZ[i][i0]][cm.xyZ[npoints + mergeidx][i1]];
                      t++;
                   }
                }
-               v = v / t;
+               v /= t;
             }
             if (ahcalgo == 3) {
                ae_assert(false, "Assertion failed", _state);
@@ -77963,17 +77963,17 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
                }
                for (i0 = 0; i0 < clustersizes.xZ[i]; i0++) {
                   for (j = 0; j < nf; j++) {
-                     x0.xR[j] = x0.xR[j] + xy->xyR[cm.xyZ[i][i0]][j] / clustersizes.xZ[i];
+                     x0.xR[j] += xy->xyR[cm.xyZ[i][i0]][j] / clustersizes.xZ[i];
                   }
                }
                for (i1 = 0; i1 < clustersizes.xZ[npoints + mergeidx]; i1++) {
                   for (j = 0; j < nf; j++) {
-                     x1.xR[j] = x1.xR[j] + xy->xyR[cm.xyZ[npoints + mergeidx][i1]][j] / clustersizes.xZ[npoints + mergeidx];
+                     x1.xR[j] += xy->xyR[cm.xyZ[npoints + mergeidx][i1]][j] / clustersizes.xZ[npoints + mergeidx];
                   }
                }
                v = 0.0;
                for (j = 0; j < nf; j++) {
-                  v = v + sqr(x0.xR[j] - x1.xR[j], _state);
+                  v += sqr(x0.xR[j] - x1.xR[j], _state);
                }
                v = v * clustersizes.xZ[i] * clustersizes.xZ[npoints + mergeidx] / (clustersizes.xZ[i] + clustersizes.xZ[npoints + mergeidx]);
             }
@@ -78601,14 +78601,14 @@ static double testclusteringunit_distfunc(RVector *x0, RVector *x1, ae_int_t d, 
    if (disttype == 1) {
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + ae_fabs(x0->xR[i] - x1->xR[i], _state);
+         result += ae_fabs(x0->xR[i] - x1->xR[i], _state);
       }
       return result;
    }
    if (disttype == 2) {
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + sqr(x0->xR[i] - x1->xR[i], _state);
+         result += sqr(x0->xR[i] - x1->xR[i], _state);
       }
       result = ae_sqrt(result, _state);
       return result;
@@ -78625,14 +78625,14 @@ static double testclusteringunit_distfunc(RVector *x0, RVector *x1, ae_int_t d, 
       s0 = 0.0;
       s1 = 0.0;
       for (i = 0; i < d; i++) {
-         s0 = s0 + sqr(x0->xR[i], _state) / d;
-         s1 = s1 + sqr(x1->xR[i], _state) / d;
+         s0 += sqr(x0->xR[i], _state) / d;
+         s1 += sqr(x1->xR[i], _state) / d;
       }
       s0 = ae_sqrt(s0, _state);
       s1 = ae_sqrt(s1, _state);
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + x0->xR[i] / s0 * (x1->xR[i] / s1) / d;
+         result += x0->xR[i] / s0 * (x1->xR[i] / s1) / d;
       }
       if (disttype == 12) {
          result = maxreal(1 - result, 0.0, _state);
@@ -78965,7 +78965,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
       majoraxis = randominteger(nvars, _state);
       for (i = 0; i < npoints; i++) {
          testclusteringunit_rsphere(&xy, nvars, i, _state);
-         xy.xyR[i][majoraxis] = nc * xy.xyR[i][majoraxis];
+         xy.xyR[i][majoraxis] *= nc;
       }
    // Test
       clusterizercreate(&s, _state);
@@ -79005,7 +79005,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
          ae_v_move(tmp.xR, 1, xy.xyR[i], 1, nvars);
          ae_v_sub(tmp.xR, 1, rep.c.xyR[rep.cidx.xZ[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.xR, 1, tmp.xR, 1, nvars);
-         ekmeans = ekmeans + v;
+         ekmeans += v;
       }
       erandom = 0.0;
       for (i = 0; i < npoints; i++) {
@@ -79019,7 +79019,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
                dclosest = v;
             }
          }
-         erandom = erandom + v;
+         erandom += v;
       }
       if (erandom < ekmeans) {
          *simpleerrors = true;
@@ -79149,7 +79149,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors, ae_state *_
             clusterizersetpoints(&s, &xy, npoints, nfeatures, 2, _state);
             clusterizerrunkmeans(&s, nclusters, &rep, _state);
             set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1069");
-            energies.xR[initalgo] = energies.xR[initalgo] + rep.energy / passcount;
+            energies.xR[initalgo] += rep.energy / passcount;
          }
       }
    // Compare
@@ -79538,7 +79538,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
       for (i = 0; i < npoints; i++) {
          testclusteringunit_rsphere(&xy, nvars, i, _state);
          for (j = 0; j < nvars; j++) {
-            xy.xyR[i][j] = xy.xyR[i][j] + (double)i / clustersize * 5;
+            xy.xyR[i][j] += (double)i / clustersize * 5;
          }
       }
       clusterizercreate(&state, _state);
@@ -79556,7 +79556,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
          ae_v_move(tmp.xR, 1, xy.xyR[i], 1, nvars);
          ae_v_sub(tmp.xR, 1, rep1.c.xyR[rep1.cidx.xZ[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.xR, 1, tmp.xR, 1, nvars);
-         ea = ea + v;
+         ea += v;
       }
    // Test: Restarts>1
       clusterizersetkmeanslimits(&state, restarts, 0, _state);
@@ -79571,14 +79571,14 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
          ae_v_move(tmp.xR, 1, xy.xyR[i], 1, nvars);
          ae_v_sub(tmp.xR, 1, rep2.c.xyR[rep2.cidx.xZ[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.xR, 1, tmp.xR, 1, nvars);
-         eb = eb + v;
+         eb += v;
       }
    // Calculate statistic.
       if (ea < eb) {
          p++;
       }
       if (ea == eb) {
-         p = p + 0.5;
+         p += 0.5;
       }
    }
 // If Restarts doesn't influence quality of centers found, P must be
@@ -79921,7 +79921,7 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
          dfprocess(&df1, &x1, &y1, _state);
          v = 0.0;
          for (i = 0; i < nclasses; i++) {
-            v = v + y1.xR[i];
+            v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
          *err = *err || ae_fabs(v - 1, _state) > 1000 * machineepsilon;
@@ -80031,7 +80031,7 @@ static void testdforestunit_basictest1(bool *err, ae_state *_state) {
                   s = 0.0;
                   for (j = 0; j < nclasses; j++) {
                      set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:492");
-                     s = s + y.xR[j];
+                     s += y.xR[j];
                   }
                   set_error_flag(err, ae_fabs(s - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:495");
                   set_error_flag(err, ae_fabs(y.xR[iround(xy.xyR[i][nvars], _state)] - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:496");
@@ -80082,7 +80082,7 @@ static void testdforestunit_basictest1(bool *err, ae_state *_state) {
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:564");
-                  s = s + y.xR[j];
+                  s += y.xR[j];
                }
                set_error_flag(err, ae_fabs(s - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:567");
                set_error_flag(err, ae_fabs(y.xR[iround(xy.xyR[i][nvars], _state)] - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:568");
@@ -80102,7 +80102,7 @@ static void testdforestunit_basictest1(bool *err, ae_state *_state) {
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:596");
-                  s = s + y.xR[j];
+                  s += y.xR[j];
                }
                set_error_flag(err, ae_fabs(s - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:599");
                set_error_flag(err, ae_fabs(y.xR[iround(xy.xyR[i][nvars], _state)] - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:600");
@@ -80189,19 +80189,19 @@ static void testdforestunit_basictest2(bool *err, ae_state *_state) {
          set_error_flag(err, ae_fabs(y.xR[0] + y.xR[1] - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:706");
       // test for good correlation with results
          if (x.xR[0] < 1.0) {
-            avgerr = avgerr + ae_fabs(1 - y.xR[0], _state);
+            avgerr += ae_fabs(1 - y.xR[0], _state);
          }
          if (x.xR[0] >= 1.0 && x.xR[0] <= 2.0) {
-            avgerr = avgerr + ae_fabs(y.xR[1] - (x.xR[0] - 1), _state);
+            avgerr += ae_fabs(y.xR[1] - (x.xR[0] - 1), _state);
          }
          if (x.xR[0] > 2.0) {
-            avgerr = avgerr + ae_fabs(1 - y.xR[1], _state);
+            avgerr += ae_fabs(1 - y.xR[1], _state);
          }
          cnt++;
       // Advance
-         x.xR[0] = x.xR[0] + 0.01;
+         x.xR[0] += 0.01;
       }
-      avgerr = avgerr / cnt;
+      avgerr /= cnt;
       set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testdforestunit.ap:725");
    }
    ae_frame_leave(_state);
@@ -80387,11 +80387,11 @@ static void testdforestunit_basictest4(bool *err, ae_state *_state) {
             ey = sqr(x.xR[0], _state) + x.xR[1];
             dfprocess(&df, &x, &y, _state);
             maxerr = maxreal(maxerr, ae_fabs(y.xR[0] - ey, _state), _state);
-            avgerr = avgerr + ae_fabs(y.xR[0] - ey, _state);
+            avgerr += ae_fabs(y.xR[0] - ey, _state);
             cnt++;
          }
       }
-      avgerr = avgerr / cnt;
+      avgerr /= cnt;
       set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testdforestunit.ap:969");
       set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testdforestunit.ap:970");
    }
@@ -80560,16 +80560,16 @@ static void testdforestunit_basictestrandom(bool *err, ae_state *_state) {
                }
                dfprocess(&df, &x, &y, _state);
                v = y.xR[0] - xy.xyR[i][nvars];
-               refrms = refrms + sqr(v, _state);
-               refavg = refavg + ae_fabs(v, _state);
+               refrms += sqr(v, _state);
+               refavg += ae_fabs(v, _state);
                if (xy.xyR[i][nvars] != 0.0) {
-                  refavgrel = refavgrel + ae_fabs(v / xy.xyR[i][nvars], _state);
+                  refavgrel += ae_fabs(v / xy.xyR[i][nvars], _state);
                   relcnt++;
                }
             }
             refrms = ae_sqrt(refrms / npoints, _state);
-            refavg = refavg / npoints;
-            refavgrel = refavgrel / coalesce((double)relcnt, 1.0, _state);
+            refavg /= npoints;
+            refavgrel /= coalesce((double)relcnt, 1.0, _state);
             set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1171");
             set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1172");
             set_error_flag(err, ae_fabs(rep.rmserror - refrms, _state) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1173");
@@ -80601,18 +80601,18 @@ static void testdforestunit_basictestrandom(bool *err, ae_state *_state) {
                   if ((double)j == xy.xyR[i][nvars]) {
                      v--;
                   }
-                  refrms = refrms + sqr(v, _state);
-                  refavg = refavg + ae_fabs(v, _state);
+                  refrms += sqr(v, _state);
+                  refavg += ae_fabs(v, _state);
                   if ((double)j == xy.xyR[i][nvars]) {
-                     refavgrel = refavgrel + ae_fabs(v, _state);
-                     refavgce = refavgce - ae_log(v, _state);
+                     refavgrel += ae_fabs(v, _state);
+                     refavgce -= ae_log(v, _state);
                   }
                }
             }
             refrms = ae_sqrt(refrms / (npoints * nclasses), _state);
-            refavg = refavg / (npoints * nclasses);
-            refavgrel = refavgrel / npoints;
-            refavgce = refavgce / npoints;
+            refavg /= npoints * nclasses;
+            refavgrel /= npoints;
+            refavgce /= npoints;
             set_error_flag(err, ae_fabs(rep.avgce - refavgce, _state) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1222");
             set_error_flag(err, ae_fabs(rep.rmserror - refrms, _state) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1223");
             set_error_flag(err, ae_fabs(rep.avgerror - refavg, _state) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1224");
@@ -80715,16 +80715,16 @@ static void testdforestunit_basictestallsame(bool *err, ae_state *_state) {
             }
             dfprocess(&df, &x, &y, _state);
             v = y.xR[0] - xy.xyR[i][nvars];
-            refrms = refrms + sqr(v, _state);
-            refavg = refavg + ae_fabs(v, _state);
+            refrms += sqr(v, _state);
+            refavg += ae_fabs(v, _state);
             if (xy.xyR[i][nvars] != 0.0) {
-               refavgrel = refavgrel + ae_fabs(v / xy.xyR[i][nvars], _state);
+               refavgrel += ae_fabs(v / xy.xyR[i][nvars], _state);
                relcnt++;
             }
          }
          refrms = ae_sqrt(refrms / npoints, _state);
-         refavg = refavg / npoints;
-         refavgrel = refavgrel / coalesce((double)relcnt, 1.0, _state);
+         refavg /= npoints;
+         refavgrel /= coalesce((double)relcnt, 1.0, _state);
          set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1346");
          set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1347");
          set_error_flag(err, ae_fabs(rep.rmserror - refrms, _state) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1348");
@@ -80749,18 +80749,18 @@ static void testdforestunit_basictestallsame(bool *err, ae_state *_state) {
                if ((double)j == xy.xyR[i][nvars]) {
                   v--;
                }
-               refrms = refrms + sqr(v, _state);
-               refavg = refavg + ae_fabs(v, _state);
+               refrms += sqr(v, _state);
+               refavg += ae_fabs(v, _state);
                if ((double)j == xy.xyR[i][nvars]) {
-                  refavgrel = refavgrel + ae_fabs(v, _state);
-                  refavgce = refavgce - ae_log(v, _state);
+                  refavgrel += ae_fabs(v, _state);
+                  refavgce -= ae_log(v, _state);
                }
             }
          }
          refrms = ae_sqrt(refrms / (npoints * nclasses), _state);
-         refavg = refavg / (npoints * nclasses);
-         refavgrel = refavgrel / npoints;
-         refavgce = refavgce / npoints;
+         refavg /= npoints * nclasses;
+         refavgrel /= npoints;
+         refavgce /= npoints;
          set_error_flag(err, ae_fabs(rep.avgce - refavgce, _state) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1390");
          set_error_flag(err, ae_fabs(rep.rmserror - refrms, _state) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1391");
          set_error_flag(err, ae_fabs(rep.avgerror - refavg, _state) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1392");
@@ -80820,7 +80820,7 @@ static void testdforestunit_testcompression(bool *err, ae_state *_state) {
             k = i;
             for (j = 0; j < nvars; j++) {
                xy.xyR[i][j] = (double)(k % 3 - 1);
-               k = k / 3;
+               k /= 3;
             }
             if (nclasses == 1) {
                xy.xyR[i][nvars] = hqrnduniformr(&rs, _state) - 0.5;
@@ -81200,7 +81200,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
          // TRN-Gini importances sum to 1.0
             v = 0.0;
             for (j = 0; j < nvars; j++) {
-               v = v + rep.varimportances.xR[j];
+               v += rep.varimportances.xR[j];
             }
             set_error_flag(err, ae_fabs(v - 1, _state) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1886");
          }
@@ -81218,8 +81218,8 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.xyR[i][j] = (double)(k % 3);
-                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + round(xy.xyR[i][j]);
-                  k = k / 3;
+                  xy.xyR[i][nvars] += round(xy.xyR[i][j]);
+                  k /= 3;
                }
                xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars], _state) % 3 - 1);
             } else {
@@ -81227,8 +81227,8 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.xyR[i][j] = (double)(k % nclasses);
-                  xy.xyR[i][nvars] = xy.xyR[i][nvars] + round(xy.xyR[i][j]);
-                  k = k / nclasses;
+                  xy.xyR[i][nvars] += round(xy.xyR[i][j]);
+                  k /= nclasses;
                }
                xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars], _state) % nclasses);
             }
@@ -81278,7 +81278,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
          // TRN-Gini importances sum to 1.0
             v = 0.0;
             for (j = 0; j < nvars; j++) {
-               v = v + rep.varimportances.xR[j];
+               v += rep.varimportances.xR[j];
             }
             set_error_flag(err, ae_fabs(v - 1, _state) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1977");
          }
@@ -81306,7 +81306,7 @@ static void testdforestunit_testimportance(bool *err, ae_state *_state) {
          xy2.xyR[i][nvars] = 0.01 * hqrndnormal(&rs, _state);
          for (j = 0; j < nvars; j++) {
             xy2.xyR[i][j] = hqrnduniformr(&rs, _state) - 0.5;
-            xy2.xyR[i][nvars] = xy2.xyR[i][nvars] + xy2.xyR[i][j] * c.xR[j];
+            xy2.xyR[i][nvars] += xy2.xyR[i][j] * c.xR[j];
          }
          if (nclasses == 2) {
             if (xy2.xyR[i][nvars] > 0.0) {
@@ -81526,18 +81526,18 @@ static void testlinregunit_calculatemv(RVector *x, ae_int_t n, double *mean, dou
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->xR[i];
+      *mean += x->xR[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + sqr(x->xR[i] - (*mean), _state);
+         v1 += sqr(x->xR[i] - (*mean), _state);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->xR[i] - (*mean));
+         v2 += (x->xR[i] - (*mean));
       }
       v2 = sqr(v2, _state) / n;
       variance = (v1 - v2) / (n - 1);
@@ -81763,7 +81763,7 @@ bool testlinreg(bool silent, ae_state *_state) {
             tb.xR[epass] = b;
             for (i = 0; i < qcnt; i++) {
                if (p <= qtbl.xR[i]) {
-                  qvals.xR[i] = qvals.xR[i] + 1.0 / estpasscount;
+                  qvals.xR[i] += 1.0 / estpasscount;
                }
             }
          }
@@ -82009,7 +82009,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                v = tmpweights.xR[m];
                for (i = 0; i < m; i++) {
                   x.xR[i] = 2 * randomreal(_state) - 1;
-                  v = v + tmpweights.xR[i] * x.xR[i];
+                  v += tmpweights.xR[i] * x.xR[i];
                }
                grothererrors = grothererrors || ae_fabs(v - lrprocess(&wt, &x, _state), _state) / maxreal(ae_fabs(v, _state), 1.0, _state) > threshold;
             // LRPack test
@@ -82036,16 +82036,16 @@ bool testlinreg(bool silent, ae_state *_state) {
                   for (i = 0; i < n; i++) {
                      v = tmpweights.xR[m];
                      for (j = 0; j < m; j++) {
-                        v = v + xy.xyR[i][j] * tmpweights.xR[j];
+                        v += xy.xyR[i][j] * tmpweights.xR[j];
                      }
-                     f = f + sqr((v - xy.xyR[i][m]) / s.xR[i], _state);
+                     f += sqr((v - xy.xyR[i][m]) / s.xR[i], _state);
                      if (k < m) {
                         vv = xy.xyR[i][k];
                      } else {
                         vv = 1.0;
                      }
-                     fp = fp + sqr((v + vv * hstep - xy.xyR[i][m]) / s.xR[i], _state);
-                     fm = fm + sqr((v - vv * hstep - xy.xyR[i][m]) / s.xR[i], _state);
+                     fp += sqr((v + vv * hstep - xy.xyR[i][m]) / s.xR[i], _state);
+                     fm += sqr((v - vv * hstep - xy.xyR[i][m]) / s.xR[i], _state);
                   }
                   gropterrors = (gropterrors || f > fp) || f > fm;
                }
@@ -82106,10 +82106,10 @@ bool testlinreg(bool silent, ae_state *_state) {
                for (i = 0; i < n; i++) {
                // Trn
                   v = ae_v_dotproduct(xy.xyR[i], 1, tmpweights.xR, 1, m);
-                  v = v + tmpweights.xR[m];
-                  rmserror = rmserror + sqr(v - xy.xyR[i][m], _state);
-                  avgerror = avgerror + ae_fabs(v - xy.xyR[i][m], _state);
-                  avgrelerror = avgrelerror + ae_fabs((v - xy.xyR[i][m]) / xy.xyR[i][m], _state);
+                  v += tmpweights.xR[m];
+                  rmserror += sqr(v - xy.xyR[i][m], _state);
+                  avgerror += ae_fabs(v - xy.xyR[i][m], _state);
+                  avgrelerror += ae_fabs((v - xy.xyR[i][m]) / xy.xyR[i][m], _state);
                // CV: non-defect vectors only
                   nondefect = true;
                   for (k = 0; k < ar.ncvdefects; k++) {
@@ -82129,10 +82129,10 @@ bool testlinreg(bool silent, ae_state *_state) {
                      }
                      lrunpack(&wt, &w2, &tmpi, _state);
                      v = ae_v_dotproduct(xy.xyR[i], 1, w2.xR, 1, m);
-                     v = v + w2.xR[m];
-                     cvrmserror = cvrmserror + sqr(v - xy.xyR[i][m], _state);
-                     cvavgerror = cvavgerror + ae_fabs(v - xy.xyR[i][m], _state);
-                     cvavgrelerror = cvavgrelerror + ae_fabs((v - xy.xyR[i][m]) / xy.xyR[i][m], _state);
+                     v += w2.xR[m];
+                     cvrmserror += sqr(v - xy.xyR[i][m], _state);
+                     cvavgerror += ae_fabs(v - xy.xyR[i][m], _state);
+                     cvavgrelerror += ae_fabs((v - xy.xyR[i][m]) / xy.xyR[i][m], _state);
                   }
                // Next set
                   if (i != n - 1) {
@@ -82141,11 +82141,11 @@ bool testlinreg(bool silent, ae_state *_state) {
                   }
                }
                cvrmserror = ae_sqrt(cvrmserror / (n - ar.ncvdefects), _state);
-               cvavgerror = cvavgerror / (n - ar.ncvdefects);
-               cvavgrelerror = cvavgrelerror / (n - ar.ncvdefects);
+               cvavgerror /= n - ar.ncvdefects;
+               cvavgrelerror /= n - ar.ncvdefects;
                rmserror = ae_sqrt(rmserror / n, _state);
-               avgerror = avgerror / n;
-               avgrelerror = avgrelerror / n;
+               avgerror /= n;
+               avgrelerror /= n;
                gresterrors = gresterrors || ae_fabs(ae_log(ar.cvrmserror / cvrmserror, _state), _state) > ae_log(1 + 1.0E-5, _state);
                gresterrors = gresterrors || ae_fabs(ae_log(ar.cvavgerror / cvavgerror, _state), _state) > ae_log(1 + 1.0E-5, _state);
                gresterrors = gresterrors || ae_fabs(ae_log(ar.cvavgrelerror / cvavgrelerror, _state), _state) > ae_log(1 + 1.0E-5, _state);
@@ -82776,15 +82776,15 @@ static void testssaunit_testgeneral(bool *errorflag, ae_state *_state) {
             for (i = 0; i < windowwidth; i++) {
                b.xyR[i][0] = 1 / ae_sqrt((double)windowwidth, _state);
                b.xyR[i][1] = (double)i;
-               v = v + (double)i / windowwidth;
+               v += (double)i / windowwidth;
             }
             vv = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][1] = b.xyR[i][1] - v;
-               vv = vv + sqr(b.xyR[i][1], _state);
+               b.xyR[i][1] -= v;
+               vv += sqr(b.xyR[i][1], _state);
             }
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][1] = b.xyR[i][1] / ae_sqrt(vv, _state);
+               b.xyR[i][1] /= ae_sqrt(vv, _state);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 2, _state);
          } else {
@@ -82940,15 +82940,15 @@ static void testssaunit_testgeneral(bool *errorflag, ae_state *_state) {
             for (i = 0; i < windowwidth; i++) {
                b.xyR[i][0] = 1 / ae_sqrt((double)windowwidth, _state);
                b.xyR[i][1] = (double)i;
-               v = v + (double)i / windowwidth;
+               v += (double)i / windowwidth;
             }
             vv = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][1] = b.xyR[i][1] - v;
-               vv = vv + sqr(b.xyR[i][1], _state);
+               b.xyR[i][1] -= v;
+               vv += sqr(b.xyR[i][1], _state);
             }
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][1] = b.xyR[i][1] / ae_sqrt(vv, _state);
+               b.xyR[i][1] /= ae_sqrt(vv, _state);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 2, _state);
          } else {
@@ -83680,7 +83680,7 @@ static void testssaunit_testgeneral(bool *errorflag, ae_state *_state) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x, nticks - i, forecastlen + i, true, &tmp0, _state);
          for (j = 0; j < forecastlen; j++) {
-            trend2.xR[j] = trend2.xR[j] + tmp0.xR[i + j] / navg;
+            trend2.xR[j] += tmp0.xR[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -83700,7 +83700,7 @@ static void testssaunit_testgeneral(bool *errorflag, ae_state *_state) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x2, nticks - i, forecastlen + i, true, &tmp0, _state);
          for (j = 0; j < forecastlen; j++) {
-            trend2.xR[j] = trend2.xR[j] + tmp0.xR[i + j] / navg;
+            trend2.xR[j] += tmp0.xR[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -83720,7 +83720,7 @@ static void testssaunit_testgeneral(bool *errorflag, ae_state *_state) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x2, nticks - i, forecastlen + i, false, &tmp0, _state);
          for (j = 0; j < forecastlen; j++) {
-            trend2.xR[j] = trend2.xR[j] + tmp0.xR[i + j] / navg;
+            trend2.xR[j] += tmp0.xR[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -84682,7 +84682,7 @@ static void testldaunit_gensimpleset(ae_int_t nfeatures, ae_int_t nclasses, ae_i
          xy->xyR[i][j] = testldaunit_generatenormal(0.0, 1.0, _state);
       }
       c = i % nclasses;
-      xy->xyR[i][axis] = xy->xyR[i][axis] + c;
+      xy->xyR[i][axis] += c;
       xy->xyR[i][nfeatures] = (double)c;
    }
 }
@@ -84706,7 +84706,7 @@ static void testldaunit_gendeg1set(ae_int_t nfeatures, ae_int_t nclasses, ae_int
       }
       xy->xyR[i][nfeatures - 1] = xy->xyR[i][nfeatures - 2];
       c = i % nclasses;
-      xy->xyR[i][axis] = xy->xyR[i][axis] + c;
+      xy->xyR[i][axis] += c;
       xy->xyR[i][nfeatures] = (double)c;
    }
 }
@@ -84884,7 +84884,7 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
       result = result && ae_fabs(v - 1, _state) <= 1000 * machineepsilon;
       v = 0.0;
       for (i = 0; i < nf; i++) {
-         v = v + wn->xyR[i][j];
+         v += wn->xyR[i][j];
       }
       result = result && v >= 0.0;
    }
@@ -85029,15 +85029,15 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       }
       for (j = 0; j < n; j++) {
          i = randominteger(n, _state);
-         pexact.xyR[i][j] = pexact.xyR[i][j] + 0.1;
+         pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.xyR[i][j];
+            v += pexact.xyR[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.xyR[i][j] = pexact.xyR[i][j] / v;
+            pexact.xyR[i][j] /= v;
          }
       }
    // Initialize solver:
@@ -85089,15 +85089,15 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       }
       for (j = 0; j < n; j++) {
          i = randominteger(n, _state);
-         pexact.xyR[i][j] = pexact.xyR[i][j] + 0.1;
+         pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.xyR[i][j];
+            v += pexact.xyR[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.xyR[i][j] = pexact.xyR[i][j] / v;
+            pexact.xyR[i][j] /= v;
          }
       }
    // Initialize solver:
@@ -85118,13 +85118,13 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
          if (i > 0) {
             xy.xyR[0][i - 1] = offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.xyR[1][j] = xy.xyR[1][j] + offdiagonal * pexact.xyR[j][i - 1];
+               xy.xyR[1][j] += offdiagonal * pexact.xyR[j][i - 1];
             }
          }
          if (i < n - 1) {
             xy.xyR[0][i + 1] = offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.xyR[1][j] = xy.xyR[1][j] + offdiagonal * pexact.xyR[j][i + 1];
+               xy.xyR[1][j] += offdiagonal * pexact.xyR[j][i + 1];
             }
          }
          mcpdaddtrack(&s, &xy, 2, _state);
@@ -85163,15 +85163,15 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       }
       for (j = 0; j < n; j++) {
          i = randominteger(n, _state);
-         pexact.xyR[i][j] = pexact.xyR[i][j] + 0.1;
+         pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.xyR[i][j];
+            v += pexact.xyR[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.xyR[i][j] = pexact.xyR[i][j] / v;
+            pexact.xyR[i][j] /= v;
          }
       }
    // Initialize solver:
@@ -85193,13 +85193,13 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
          if (i > 0) {
             xy.xyR[0][i - 1] = v0 * offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.xyR[1][j] = xy.xyR[1][j] + v0 * offdiagonal * pexact.xyR[j][i - 1];
+               xy.xyR[1][j] += v0 * offdiagonal * pexact.xyR[j][i - 1];
             }
          }
          if (i < n - 1) {
             xy.xyR[0][i + 1] = v0 * offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.xyR[1][j] = xy.xyR[1][j] + v0 * offdiagonal * pexact.xyR[j][i + 1];
+               xy.xyR[1][j] += v0 * offdiagonal * pexact.xyR[j][i + 1];
             }
          }
          mcpdaddtrack(&s, &xy, 2, _state);
@@ -85282,11 +85282,11 @@ static void testmcpdunit_testentryexit(bool *err, ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + pexact.xyR[i][j];
+                     v += pexact.xyR[i][j];
                   }
                   if (v != 0.0) {
                      for (i = 0; i < n; i++) {
-                        pexact.xyR[i][j] = pexact.xyR[i][j] / v;
+                        pexact.xyR[i][j] /= v;
                      }
                   }
                }
@@ -85334,11 +85334,11 @@ static void testmcpdunit_testentryexit(bool *err, ae_state *_state) {
                      for (i = 0; i < xy.rows; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + xy.xyR[i][j];
+                           v += xy.xyR[i][j];
                         }
                         if (v > 0.0) {
                            for (j = 0; j < n; j++) {
-                              xy.xyR[i][j] = xy.xyR[i][j] / v;
+                              xy.xyR[i][j] /= v;
                            }
                         }
                      }
@@ -85811,17 +85811,17 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
                      c.xyR[0][i * n + j] = 0.0;
                   } else {
                      c.xyR[0][i * n + j] = randomreal(_state);
-                     v = v + c.xyR[0][i * n + j] * (1.0 / n);
+                     v += c.xyR[0][i * n + j] * (1.0 / n);
                   }
                }
             }
             c.xyR[0][n * n] = v;
             ct.xZ[0] = randominteger(3, _state) - 1;
             if (ct.xZ[0] < 0) {
-               c.xyR[0][n * n] = c.xyR[0][n * n] + 0.1;
+               c.xyR[0][n * n] += 0.1;
             }
             if (ct.xZ[0] > 0) {
-               c.xyR[0][n * n] = c.xyR[0][n * n] - 0.1;
+               c.xyR[0][n * n] -= 0.1;
             }
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
@@ -85832,7 +85832,7 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     v = v + p.xyR[i][j] * c.xyR[0][i * n + j];
+                     v += p.xyR[i][j] * c.xyR[0][i * n + j];
                   }
                }
                if (ct.xZ[0] < 0) {
@@ -85978,16 +85978,16 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
             c.xyR[i][n * n] = 0.0;
             for (j = 0; j < n * n; j++) {
                c.xyR[i][j] = 2 * randomreal(_state) - 1;
-               c.xyR[i][n * n] = c.xyR[i][n * n] + c.xyR[i][j] * (1.0 / n);
+               c.xyR[i][n * n] += c.xyR[i][j] * (1.0 / n);
             }
             ct.xZ[i] = randominteger(3, _state) - 1;
          // If we have inequality constraint, we "shift" right part
          // in order to make feasible some neighborhood of P=(1/N ... 1/N).
             if (ct.xZ[i] < 0) {
-               c.xyR[i][n * n] = c.xyR[i][n * n] + 0.1;
+               c.xyR[i][n * n] += 0.1;
             }
             if (ct.xZ[i] > 0) {
-               c.xyR[i][n * n] = c.xyR[i][n * n] - 0.1;
+               c.xyR[i][n * n] -= 0.1;
             }
          }
       // Test
@@ -86001,7 +86001,7 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     v = v + p.xyR[i][j] * c.xyR[t][i * n + j];
+                     v += p.xyR[i][j] * c.xyR[t][i * n + j];
                   }
                }
                if (ct.xZ[t] < 0) {
@@ -86177,12 +86177,12 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
       for (j = 0; j < nout; j++) {
          v = y.xR[j] - ey.xR[j];
          if (iscls) {
-            *avgce = *avgce - ey.xR[j] * ae_log(y.xR[j] + minrealnumber, _state);
+            *avgce -= ey.xR[j] * ae_log(y.xR[j] + minrealnumber, _state);
          }
-         *rms = *rms + sqr(v, _state);
-         *avg = *avg + ae_fabs(v, _state);
+         *rms += sqr(v, _state);
+         *avg += ae_fabs(v, _state);
          if (ey.xR[j] != 0.0) {
-            *avgrel = *avgrel + ae_fabs(v / ey.xR[j], _state);
+            *avgrel += ae_fabs(v / ey.xR[j], _state);
             relcnt++;
          }
       }
@@ -86208,12 +86208,12 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
          }
       }
    }
-   *relcls0 = *relcls0 / npoints;
-   *relcls1 = *relcls1 / npoints;
-   *avgce = *avgce / npoints;
+   *relcls0 /= npoints;
+   *relcls1 /= npoints;
+   *avgce /= npoints;
    *rms = ae_sqrt(*rms / (npoints * nout), _state);
-   *avg = *avg / (npoints * nout);
-   *avgrel = *avgrel / coalesce((double)relcnt, 1.0, _state);
+   *avg /= npoints * nout;
+   *avgrel /= coalesce((double)relcnt, 1.0, _state);
    ae_frame_leave(_state);
 }
 
@@ -86488,7 +86488,7 @@ static void testknnunit_testknnalgo(bool *err, ae_state *_state) {
          knnprocess(&model1, &x1, &y1, _state);
          v = 0.0;
          for (i = 0; i < nout; i++) {
-            v = v + y1.xR[i];
+            v += y1.xR[i];
             set_error_flag(err, y1.xR[i] < 0.0, __FILE__, __LINE__, "testknnunit.ap:359");
          }
          set_error_flag(err, ae_fabs(v - 1, _state) > 1000 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:361");
@@ -86697,7 +86697,7 @@ static void testknnunit_testknnalgo(bool *err, ae_state *_state) {
          if (x1.xR[0] > 2.0) {
             set_error_flag(err, y1.xR[1] < 0.8, __FILE__, __LINE__, "testknnunit.ap:614");
          }
-         x1.xR[0] = x1.xR[0] + 0.01;
+         x1.xR[0] += 0.01;
       }
    }
 // Test simple regression task without noise:
@@ -86734,10 +86734,10 @@ static void testknnunit_testknnalgo(bool *err, ae_state *_state) {
       knnprocess(&model1, &x1, &y1, _state);
       v = ae_fabs(y1.xR[0] - v, _state);
       maxerr = maxreal(maxerr, v, _state);
-      avgerr = avgerr + v;
+      avgerr += v;
       cnt++;
    }
-   avgerr = avgerr / cnt;
+   avgerr /= cnt;
    set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testknnunit.ap:669");
    set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testknnunit.ap:670");
 // Build model with Eps=1.0, compare error metrics with Eps=0
@@ -86950,7 +86950,7 @@ static bool testmlptrainunit_testmlptrainregr(ae_state *_state) {
          x.xR[1] = xy.xyR[i][1];
          mlpprocess(&net, &x, &y, _state);
       // Calculate average error
-         averr = averr + ae_fabs(y.xR[0] - xy.xyR[i][2], _state);
+         averr += ae_fabs(y.xR[0] - xy.xyR[i][2], _state);
       }
       if (averr / n > eps) {
          result = true;
@@ -87077,7 +87077,7 @@ static bool testmlptrainunit_testmlpxorregr(ae_state *_state) {
             x.xR[1] = xy.xyR[i][1];
             mlpprocess(&net, &x, &y, _state);
          // Calculate average error
-            averr = averr + ae_fabs(y.xR[0] - xy.xyR[i][2], _state);
+            averr += ae_fabs(y.xR[0] - xy.xyR[i][2], _state);
          }
          if (averr / n > eps) {
             nfailures++;
@@ -88008,7 +88008,7 @@ static bool testmlptrainunit_testmlptrainensregr(ae_state *_state) {
          }
          xytrain.xyR[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
-            xytrain.xyR[i][nin] = xytrain.xyR[i][nin] + xytrain.xyR[i][j];
+            xytrain.xyR[i][nin] += xytrain.xyR[i][j];
          }
       }
       if (withtrainer == 1) {
@@ -88036,7 +88036,7 @@ static bool testmlptrainunit_testmlptrainensregr(ae_state *_state) {
          }
          xytest.xyR[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
-            xytest.xyR[i][nin] = xytest.xyR[i][nin] + xytest.xyR[i][j];
+            xytest.xyR[i][nin] += xytest.xyR[i][j];
          }
       }
    // Create ensemble
@@ -88070,17 +88070,17 @@ static bool testmlptrainunit_testmlptrainensregr(ae_state *_state) {
             sparsegetrow(&xytrainsp, i, &x, _state);
          }
          mlpeprocess(&netens, &x, &y, _state);
-         avgerr = avgerr + ae_fabs(y.xR[0] - xytrain.xyR[i][nin], _state);
+         avgerr += ae_fabs(y.xR[0] - xytrain.xyR[i][nin], _state);
       }
-      avgerr = avgerr / ntrain;
+      avgerr /= ntrain;
       set_error_flag(&result, avgerr > eps, __FILE__, __LINE__, "testmlptrainunit.ap:1817");
       avgerr = 0.0;
       for (i = 0; i < ntest; i++) {
          ae_v_move(x.xR, 1, xytest.xyR[i], 1, nin);
          mlpeprocess(&netens, &x, &y, _state);
-         avgerr = avgerr + ae_fabs(y.xR[0] - xytest.xyR[i][nin], _state);
+         avgerr += ae_fabs(y.xR[0] - xytest.xyR[i][nin], _state);
       }
-      avgerr = avgerr / ntest;
+      avgerr /= ntest;
       set_error_flag(&result, avgerr > 2 * eps, __FILE__, __LINE__, "testmlptrainunit.ap:1826");
    }
 // Catch bug in implementation of MLPTrainEnsembleX:
@@ -88222,13 +88222,13 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
          mlpeprocess(&netens, &x, &y, _state);
          for (j = 0; j < nout; j++) {
             if ((double)j != xytrain.xyR[i][nin]) {
-               avgerr = avgerr + y.xR[j];
+               avgerr += y.xR[j];
             } else {
-               avgerr = avgerr + (1 - y.xR[j]);
+               avgerr += (1 - y.xR[j]);
             }
          }
       }
-      avgerr = avgerr / (ntrain * nout);
+      avgerr /= ntrain * nout;
       if (avgerr > eps) {
          result = true;
          ae_frame_leave(_state);
@@ -88241,13 +88241,13 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
          mlpeprocess(&netens, &x, &y, _state);
          for (j = 0; j < nout; j++) {
             if ((double)j != xytest.xyR[i][nin]) {
-               avgerr = avgerr + y.xR[j];
+               avgerr += y.xR[j];
             } else {
-               avgerr = avgerr + (1 - y.xR[j]);
+               avgerr += (1 - y.xR[j]);
             }
          }
       }
-      avgerr = avgerr / (ntest * nout);
+      avgerr /= ntest * nout;
       if (avgerr > eps) {
          result = true;
          ae_frame_leave(_state);
@@ -89991,7 +89991,7 @@ static void testalglibbasicsunit_parallelpoolsum(ae_shared_pool *sumpool, ae_int
    RefObj(poolsummand, ptr, _state);
    if (ind1 - ind0 <= 2) {
       ae_shared_pool_retrieve(sumpool, &_ptr, _state);
-      ptr->val = ptr->val + ind1 - ind0;
+      ptr->val += ind1 - ind0;
       ae_shared_pool_recycle(sumpool, &_ptr, _state);
    } else {
       i = (ind0 + ind1) / 2;
@@ -90025,7 +90025,7 @@ static bool testalglibbasicsunit_performtestpoolsum(ae_state *_state) {
    sum = 0;
    ae_shared_pool_first_recycled(&pool, &_ptr, _state);
    while (ptr != NULL) {
-      sum = sum + ptr->val;
+      sum += ptr->val;
       ae_shared_pool_next_recycled(&pool, &_ptr, _state);
    }
    result = sum == n;

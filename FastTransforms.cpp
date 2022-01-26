@@ -183,8 +183,8 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
          hmnc = complex_from_d(buf.xR[idx + 0], -buf.xR[idx + 1]);
          v = complex_from_d(-ae_sin(-2 * pi * i / n, _state), ae_cos(-2 * pi * i / n, _state));
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
-         f->xC[i].x = 0.5 * f->xC[i].x;
-         f->xC[i].y = 0.5 * f->xC[i].y;
+         f->xC[i].x *= 0.5;
+         f->xC[i].y *= 0.5;
       }
       for (i = n2 + 1; i < n; i++) {
          f->xC[i] = conj(f->xC[n - i], _state);
@@ -514,7 +514,7 @@ void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
 //     invfht(x) = fht(x)/N
    fhtr1d(a, n, _state);
    for (i = 0; i < n; i++) {
-      a->xR[i] = a->xR[i] / n;
+      a->xR[i] /= n;
    }
 }
 } // end of namespace alglib_impl
@@ -628,7 +628,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       q = 1;
       ptotal = 1;
       while (ptotal < n) {
-         ptotal = ptotal * 2;
+         ptotal *= 2;
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
@@ -638,7 +638,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             algbest = 2;
             q = p;
          }
-         ptotal = ptotal * 2;
+         ptotal *= 2;
       }
       alg = algbest;
       convc1dx(a, m, b, n, circular, alg, q, r, _state);
@@ -783,8 +783,8 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
                r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
             }
             for (i = m; i < m + n - 1; i++) {
-               r->xC[i - m].x = r->xC[i - m].x + t * buf.xR[2 * i + 0];
-               r->xC[i - m].y = r->xC[i - m].y - t * buf.xR[2 * i + 1];
+               r->xC[i - m].x += t * buf.xR[2 * i + 0];
+               r->xC[i - m].y -= t * buf.xR[2 * i + 1];
             }
          } else {
          // non-circular, just copy
@@ -861,14 +861,14 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             j2 = j1 + 1;
          }
          for (j = 0; j <= j1; j++) {
-            r->xC[i + j].x = r->xC[i + j].x + buf.xR[2 * j + 0] * t;
-            r->xC[i + j].y = r->xC[i + j].y - buf.xR[2 * j + 1] * t;
+            r->xC[i + j].x += buf.xR[2 * j + 0] * t;
+            r->xC[i + j].y -= buf.xR[2 * j + 1] * t;
          }
          for (j = j2; j < p + n - 1; j++) {
-            r->xC[j - j2].x = r->xC[j - j2].x + buf.xR[2 * j + 0] * t;
-            r->xC[j - j2].y = r->xC[j - j2].y - buf.xR[2 * j + 1] * t;
+            r->xC[j - j2].x += buf.xR[2 * j + 0] * t;
+            r->xC[j - j2].y -= buf.xR[2 * j + 1] * t;
          }
-         i = i + p;
+         i += p;
       }
       ae_frame_leave(_state);
       return;
@@ -1035,7 +1035,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       convc1dcircular(s, m, &buf, m, c, _state);
       ae_frame_leave(_state);
@@ -1097,7 +1097,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       convc1dcircularinv(a, m, &cbuf, m, r, _state);
       ae_frame_leave(_state);
@@ -1226,7 +1226,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       q = 1;
       ptotal = 1;
       while (ptotal < n) {
-         ptotal = ptotal * 2;
+         ptotal *= 2;
       }
       while (ptotal < m + n) {
          p = ptotal - n + 1;
@@ -1236,7 +1236,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             algbest = 2;
             q = p;
          }
-         ptotal = ptotal * 2;
+         ptotal *= 2;
       }
       alg = algbest;
       convr1dx(a, m, b, n, circular, alg, q, r, _state);
@@ -1314,8 +1314,8 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          ftcomplexfftplan(m / 2, 1, &plan, _state);
          fftr1dinternaleven(&buf, m, &buf3, &plan, _state);
          fftr1dinternaleven(&buf2, m, &buf3, &plan, _state);
-         buf.xR[0] = buf.xR[0] * buf2.xR[0];
-         buf.xR[1] = buf.xR[1] * buf2.xR[1];
+         buf.xR[0] *= buf2.xR[0];
+         buf.xR[1] *= buf2.xR[1];
          for (i = 1; i < m / 2; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
@@ -1351,8 +1351,8 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          ftcomplexfftplan(p / 2, 1, &plan, _state);
          fftr1dinternaleven(&buf, p, &buf3, &plan, _state);
          fftr1dinternaleven(&buf2, p, &buf3, &plan, _state);
-         buf.xR[0] = buf.xR[0] * buf2.xR[0];
-         buf.xR[1] = buf.xR[1] * buf2.xR[1];
+         buf.xR[0] *= buf2.xR[0];
+         buf.xR[1] *= buf2.xR[1];
          for (i = 1; i < p / 2; i++) {
             ax = buf.xR[2 * i + 0];
             ay = buf.xR[2 * i + 1];
@@ -1414,8 +1414,8 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
             buf.xR[j] = 0.0;
          }
          fftr1dinternaleven(&buf, q + n - 1, &buf3, &plan, _state);
-         buf.xR[0] = buf.xR[0] * buf2.xR[0];
-         buf.xR[1] = buf.xR[1] * buf2.xR[1];
+         buf.xR[0] *= buf2.xR[0];
+         buf.xR[1] *= buf2.xR[1];
          for (j = 1; j < (q + n - 1) / 2; j++) {
             ax = buf.xR[2 * j + 0];
             ay = buf.xR[2 * j + 1];
@@ -1438,7 +1438,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          if (p + n - 2 >= j2) {
             ae_v_add(r->xR, 1, &buf.xR[j2], 1, p + n - 1 - j2);
          }
-         i = i + p;
+         i += p;
       }
       ae_frame_leave(_state);
       return;
@@ -1529,8 +1529,8 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    ftcomplexfftplan(p / 2, 1, &plan, _state);
    fftr1dinternaleven(&buf, p, &buf3, &plan, _state);
    fftr1dinternaleven(&buf2, p, &buf3, &plan, _state);
-   buf.xR[0] = buf.xR[0] / buf2.xR[0];
-   buf.xR[1] = buf.xR[1] / buf2.xR[1];
+   buf.xR[0] /= buf2.xR[0];
+   buf.xR[1] /= buf2.xR[1];
    for (i = 1; i < p / 2; i++) {
       c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
       c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
@@ -1584,7 +1584,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       convr1dcircular(s, m, &buf, m, c, _state);
       ae_frame_leave(_state);
@@ -1648,7 +1648,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       convr1dcircularinv(a, m, &buf, m, r, _state);
       ae_frame_leave(_state);
@@ -1669,8 +1669,8 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       ftcomplexfftplan(Mq, 1, &plan, _state);
       fftr1dinternaleven(&buf, m, &buf3, &plan, _state);
       fftr1dinternaleven(&buf2, m, &buf3, &plan, _state);
-      buf.xR[0] = buf.xR[0] / buf2.xR[0];
-      buf.xR[1] = buf.xR[1] / buf2.xR[1];
+      buf.xR[0] /= buf2.xR[0];
+      buf.xR[1] /= buf2.xR[1];
       for (i = 1; i < Mq; i++) {
          c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
          c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
@@ -1876,7 +1876,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(b.xC, 1, &pattern->xC[i1], 1, "N", j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       corrc1dcircular(signal, m, &b, m, c, _state);
       ae_frame_leave(_state);
@@ -1996,7 +1996,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
          i2 = minint(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(b.xR, 1, &pattern->xR[i1], 1, j2 + 1);
-         i1 = i1 + m;
+         i1 += m;
       }
       corrr1dcircular(signal, m, &b, m, c, _state);
       ae_frame_leave(_state);

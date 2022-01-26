@@ -376,7 +376,7 @@ lbl_10:
       goto lbl_6;
    }
 // advance position
-   xc = xc + h;
+   xc += h;
    ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
 // update H
    h = h2;

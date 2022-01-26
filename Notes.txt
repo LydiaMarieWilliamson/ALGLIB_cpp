@@ -350,6 +350,19 @@ A6.2. Test Stages
 	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
 	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
 	―	X = X + 1.0 ⇒ X++;
+Synthesized update operators:
+―	X = X % Y ⇒ X %= Y (*)
+―	X = X & Y ⇒ X &= Y
+―	X = X + Y ⇒ X += Y
+―	X = Y + X ⇒ X += Y
+―	X = Y + (X) ⇒ X += Y
+―	X = X - Y ⇒ X -= Y, where Y is a monomial.
+―	X = X - Y ± Y' ± ⋯ ± Y" ⇒ X -= Y ∓ Y' ∓ ⋯ ∓ Y", where Y, Y', ⋯, Y" are monomials. (‡)
+―	X = X * Y ⇒ X *= Y, X = -X * Y ⇒ X *= -Y, X = Z * X ⇒ X *= Z, X = Z * X * Y ⇒ X *= Z * Y, where Y and Z are monomials.
+―	X = X / Y ⇒ X /= Y, where Y is a single factor.
+―	X = X * Y / Z ⇒ X *= Y / Z, in some cases, where X, Y and Z are floating point.
+(*) This was previous already done in its sole occurrence: in hqrnduniformi() in AlgLibMisc.cpp.
+(‡) X = X - Y + Y' - Y" is specially optimized, since its occurrences all involved *max(⋯,⋯) on the right-hand side.
 
 A6.3. Test Results
 ──────────────────
@@ -376,6 +389,7 @@ A6.3. Test Results
 39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
 39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
 39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
+39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&}= operators.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -432,19 +446,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7353
+* RGEMM-SEQ-16   (MFLOPS)   7937
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  11365
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11368
+* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-MTN-32              0.9x
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9241
+* RGEMM-SEQ-1024 (MFLOPS)   9513
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643002115
+SEED: 1643154969
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -544,4 +558,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 82 seconds
+Done in 84 seconds

@@ -1899,7 +1899,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          // * first nmax is just large value to test basic uniformity of generator
          //
             nmax[0] = 1000000;
-            nmax[0] = nmax[0] * nmax[0];
+            nmax[0] *= nmax[0];
             nmax[1] = 2147483562;
             nmax[1] *= 1.5;
             nmax[2] = 2147483562;

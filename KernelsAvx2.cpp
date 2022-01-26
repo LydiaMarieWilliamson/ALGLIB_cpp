@@ -349,11 +349,11 @@ void rmulvx_avx2(const ae_int_t n, const double v, double *__restrict x, const a
          rmulv_avx2(n, v, x, _state);
          return;
       case 8:
-         x[2] = v * x[2];
+         x[2] *= v;
       case 16:
-         x[1] = v * x[1];
+         x[1] *= v;
       case 24:{
-         x[0] = v * x[0];
+         x[0] *= v;
          const ptrdiff_t nDone = 4 - (unal >> 3);
          rmulv_avx2(n - nDone, v, x + nDone, _state);
          return;
@@ -1229,7 +1229,7 @@ void ablasf_daxpby_avx2(ae_int_t n, double alpha, const double *src, double beta
          _mm256_store_pd(dst + i, r);
       }
       for (i = n4; i < n; i++)
-         dst[i] = alpha * src[i] + dst[i];
+         dst[i] += alpha * src[i];
    } else if (beta != 0.0) {
    // Well optimized: DST := alpha*SRC + beta*DST
       ae_int_t i, n4;
