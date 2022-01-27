@@ -350,19 +350,38 @@ A6.2. Test Stages
 	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
 	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
 	―	X = X + 1.0 ⇒ X++;
-Synthesized update operators:
-―	X = X % Y ⇒ X %= Y (*)
-―	X = X & Y ⇒ X &= Y
-―	X = X + Y ⇒ X += Y
-―	X = Y + X ⇒ X += Y
-―	X = Y + (X) ⇒ X += Y
-―	X = X - Y ⇒ X -= Y, where Y is a monomial.
-―	X = X - Y ± Y' ± ⋯ ± Y" ⇒ X -= Y ∓ Y' ∓ ⋯ ∓ Y", where Y, Y', ⋯, Y" are monomials. (‡)
-―	X = X * Y ⇒ X *= Y, X = -X * Y ⇒ X *= -Y, X = Z * X ⇒ X *= Z, X = Z * X * Y ⇒ X *= Z * Y, where Y and Z are monomials.
-―	X = X / Y ⇒ X /= Y, where Y is a single factor.
-―	X = X * Y / Z ⇒ X *= Y / Z, in some cases, where X, Y and Z are floating point.
-(*) This was previous already done in its sole occurrence: in hqrnduniformi() in AlgLibMisc.cpp.
-(‡) X = X - Y + Y' - Y" is specially optimized, since its occurrences all involved *max(⋯,⋯) on the right-hand side.
+39	Synthesized update operators:
+	―	X = X % Y ⇒ X %= Y (*)
+	―	X = X & Y ⇒ X &= Y
+	―	X = X + Y ⇒ X += Y
+	―	X = Y + X ⇒ X += Y
+	―	X = Y + (X) ⇒ X += Y
+	―	X = X - Y ⇒ X -= Y, where Y is a monomial.
+	―	X = X - Y ± Y' ± ⋯ ± Y" ⇒ X -= Y ∓ Y' ∓ ⋯ ∓ Y", where Y, Y', ⋯, Y" are monomials. (‡)
+	―	X = X * Y ⇒ X *= Y, X = -X * Y ⇒ X *= -Y, X = Z * X ⇒ X *= Z, X = Z * X * Y ⇒ X *= Z * Y, where Y and Z are monomials.
+	―	X = X / Y ⇒ X /= Y, where Y is a single factor.
+	―	X = X * Y / Z ⇒ X *= Y / Z, in some cases, where X, Y and Z are floating point.
+	(*) This was previous already done in its sole occurrence: in hqrnduniformi() in AlgLibMisc.cpp.
+	(‡) X = X - Y + Y' - Y" is specially optimized, since its occurrences all involved *max(⋯,⋯) on the right-hand side.
+39	Partial recoding of Ap.{cpp,h} to bring it in line with ALGLIB++:
+	―	The declarations of ae_vector_wrapper::ae_vector_wrapper() and ae_vector_wrapper::operator=() in Ap.h were removed - unused.
+	―	The declarations of ae_matrix_wrapper::ae_matrix_wrapper() and ae_matrix_wrapper::operator=() in Ap.h were removed - unused.
+	―	*_free(⋯, true) changed to *_free(⋯, false) in:
+		ae_vector_wrapper::~ae_{vector,matrix}_wrapper(), ae_vector_wrapper::attach_to(),
+		ae_matrix_wrapper::~ae_{vector,matrix}_wrapper(), ae_matrix_wrapper::attach_to().
+	―	In the original implementaton of ALGLIB *_clear() (= *_free(, true)) should have been *_destroy (= *_free(, false))
+		in each of these routines.
+		Both are equivalent in the GPL version of ALGLIB, because *_clear() and *_destroy() were the same for ae_{vector,matrix},
+		but this is only an incidental equivalence that should not be relied on.
+	―	Synthesized the function alglib::set_error_msg() in Ap.cpp and redefined ThrowErrorMsg() in Ap.h, using it.
+	―	Remade the enum { OWN_CALLER = false, OWN_AE = true } type as bool and removed the enumerated constants.
+	―	In-line some of the alglib:: object member functions in Ap.h, removing them from Ap.cpp.
+		―	alglib::ae_vector_wrapper::c_ptr(), ae_matrix_wrapper::c_ptr()
+		―	c_ptr() for object classes, moved from DefClass to DecClass.
+		―	alglib::complex constructors.
+	―	Added declarations of the global routines in Ap.cpp
+			_ialglib_pack_n2(), _ialglib_mm22(), _ialglib_mm22x2()
+		into Ap.h, alongside those of the other _ialglib_*() routines.
 
 A6.3. Test Results
 ──────────────────
@@ -390,6 +409,7 @@ A6.3. Test Results
 39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
 39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
 39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&}= operators.
+39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators & set_error_msg(), etc.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -446,19 +466,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7937
+* RGEMM-SEQ-16   (MFLOPS)   8000
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12347
-* RGEMM-MTN-32              0.9x
+* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-MTN-32              1.0x
 * RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9513
+* RGEMM-SEQ-1024 (MFLOPS)   9100
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643154969
+SEED: 1643326894
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -558,4 +578,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 84 seconds
+Done in 80 seconds

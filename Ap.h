@@ -421,9 +421,6 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 #define SetObj(Type, P)		Type##_free(P, true)
 
 // The X-interface.
-// The effective type for the owner field.
-enum { OWN_CALLER = false, OWN_AE = true };
-
 // The effective type for the last_action field.
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
@@ -441,7 +438,7 @@ struct x_string {
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
 // If it is owned by X, it will call one of the *_free() functions.
-   ALIGNED ae_int64_t owner;		// enum { OWN_CALLER = false, OWN_AE = true } owner;
+   ALIGNED ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
@@ -462,7 +459,7 @@ struct x_vector {
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
 // If it is owned by X, it will call one of the *_free() functions.
-   ae_int64_t owner;		// enum { OWN_CALLER = false, OWN_AE = true } owner;
+   ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
@@ -493,7 +490,7 @@ struct x_matrix {
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
 // If it is owned by X, it will call one of the *_free() functions.
-   ae_int64_t owner;		// enum { OWN_CALLER = false, OWN_AE = true } owner;
+   ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
@@ -712,8 +709,8 @@ double ae_exp(double x, ae_state *state);
 // Complex math functions:
 // *	basic arithmetic operations
 // *	standard functions
-complex complex_from_i(ae_int_t x, ae_int_t y = 0);
-complex complex_from_d(double x, double y = 0.0);
+inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (double)x, r.y = (double)y; return r; }
+inline complex complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
 
 complex ae_c_neg(complex lhs);
 complex conj(complex lhs, ae_state *state);
@@ -890,6 +887,9 @@ bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a,
 bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
+void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
+void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
 
 #if !defined ALGLIB_NO_FAST_KERNELS
 #   if defined _ALGLIB_IMPL_DEFINES
@@ -980,7 +980,7 @@ struct ap_error {
 #   define EndPoll(Q)		} catch(...) { ae_clean_up_before_breaking(&Q); throw; } }
 #else
 // Exception-free code.
-#   define ThrowErrorMsg(Q, X)	set_error_flag((Q).error_msg); return X
+#   define ThrowErrorMsg(Q, X)	set_error_msg(Q); return X
 //(@) The following restriction is unnecessary.
 // #   if AE_OS != AE_OTHER_OS
 // #      error Exception-free mode can not be combined with AE_OS definition
@@ -992,7 +992,9 @@ struct ap_error {
 #   define EndPoll(Q)	}
 // Set the error flag and (optionally) the error message.
 void set_error_flag(const char *Msg = NULL);
-// Get the error flag and optionally the error message (as *MsgP);
+// Set the error flag and the pending error message.
+void set_error_msg(alglib_impl::ae_state Q);
+// Get the error flag and (optionally) the error message (as *MsgP);
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
 bool get_error_flag(const char **MsgP = NULL);
 // Clear the error flag (it is not cleared until explicit call to this function).
@@ -1005,8 +1007,8 @@ void clear_error_flag();
 #define DecVal(X)	, X(Obj->X)
 #define DecVar(X)	, X(&Obj->X)
 #define DecComplex(X)	, X(*(complex *)&Obj->X)
-#define ConstT(T, Val)  (const_cast<alglib_impl::T *>((Val).c_ptr()))
-#define ComplexOf(Val)  (*reinterpret_cast<complex *>(&(Val)))
+#define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
+#define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
 
 #define DecClass(Type, Pars) \
 struct Type##I { \
@@ -1014,8 +1016,8 @@ struct Type##I { \
    Type##I(const Type##I &A); \
    Type##I &operator=(const Type##I &A); \
    virtual ~Type##I(); \
-   alglib_impl::Type *c_ptr(); \
-   alglib_impl::Type *c_ptr() const; \
+   alglib_impl::Type *c_ptr() { return Obj; } \
+   alglib_impl::Type *c_ptr() const { return const_cast<alglib_impl::Type *>(Obj); } \
 protected: \
    alglib_impl::Type *Obj; \
 }; \
@@ -1064,8 +1066,6 @@ Type##I &Type##I::operator=(const Type##I &A) { \
 Type##I::~Type##I() { \
    if (Obj != NULL) alglib_impl::Type##_free(Obj, false), ae_free(Obj); \
 } \
-alglib_impl::Type *Type##I::c_ptr() { return Obj; } \
-alglib_impl::Type *Type##I::c_ptr() const { return const_cast<alglib_impl::Type *>(Obj); } \
 Type::Type():Type##I() Vars { } \
 Type::Type(const Type &A):Type##I(A) Vars { } \
 Type &Type::operator=(const Type &A) { \
@@ -1107,10 +1107,10 @@ bool fp_isfinite(double x);
 
 // Complex number with double precision.
 struct complex {
-   complex ();
-   complex (const double &_x);
-   complex (const double &_x, const double &_y);
-   complex (const complex &z);
+   complex(): x(0.0), y(0.0) { }
+   complex(const double &X): x(X), y(0.0) { }
+   complex(const double &X, const double &Y): x(X), y(Y) { }
+   complex(const complex &Z): x(Z.x), y(Z.y) { }
    complex &operator=(const double &v);
    complex &operator=(const complex &z);
    complex &operator+=(const double &v);
@@ -1121,8 +1121,8 @@ struct complex {
    complex &operator*=(const complex &z);
    complex &operator/=(const double &v);
    complex &operator/=(const complex &z);
-   alglib_impl::complex *c_ptr();
-   const alglib_impl::complex *c_ptr() const;
+   alglib_impl::complex *c_ptr() { return (alglib_impl::complex *)this; }
+   const alglib_impl::complex *c_ptr() const { return (const alglib_impl::complex *)this; }
 #if !defined AE_NO_EXCEPTIONS
    std::string tostring(int dps) const;
 #endif
@@ -1246,14 +1246,14 @@ struct ae_vector_wrapper {
    ae_int_t length() const;
 // Access to the internal C-structure used by the C-core.
 // Not intended for external use.
-   const alglib_impl::ae_vector *c_ptr() const;
-   alglib_impl::ae_vector *c_ptr();
+   alglib_impl::ae_vector *c_ptr() { return This; }
+   const alglib_impl::ae_vector *c_ptr() const { return This; }
+#if 0 //(@) Not implemented.
 private:
    ae_vector_wrapper();
-#if 0 //(@) Not implemented.
    ae_vector_wrapper(const ae_vector_wrapper &rhs);
-#endif
    const ae_vector_wrapper &operator=(const ae_vector_wrapper &rhs);
+#endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
 // "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own memory of the vector).
@@ -1390,14 +1390,16 @@ struct ae_matrix_wrapper {
    ae_int_t rows() const;
    ae_int_t getstride() const;
    bool isempty() const;
-   const alglib_impl::ae_matrix *c_ptr() const;
-   alglib_impl::ae_matrix *c_ptr();
+// Access to the internal c-structure used by the c-core.
+// Not meant for external use.
+   alglib_impl::ae_matrix *c_ptr() { return This; }
+   const alglib_impl::ae_matrix *c_ptr() const { return This; }
+#if 0 //(@) Not implemented.
 private:
    ae_matrix_wrapper();
-#if 0 //(@) Not implemented.
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
-#endif
    const ae_matrix_wrapper &operator=(const ae_matrix_wrapper &rhs);
+#endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
 // "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own memory of the vector).

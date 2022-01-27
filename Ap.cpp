@@ -1504,7 +1504,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 //   do anything)
 // * for independent vectors of different sizes it allocates storage in  DST
 //   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+//   ACT_NEW_LOCATION, and DST->owner is set to true.
 // * for  independent  vectors   of  same  sizes  it does not perform memory
 //   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
 //   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
@@ -1524,15 +1524,14 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
       return;
    }
    if (dst->cnt != src->cnt || dst->datatype != src->datatype) {
-      if (dst->owner == OWN_AE)
-         ae_free(dst->x_ptr);
+      if (dst->owner) ae_free(dst->x_ptr);
       dst->x_ptr = ae_malloc((size_t)(src->cnt * ae_sizeof(src->datatype)), state);
       if (src->cnt != 0 && dst->x_ptr == NULL)
          ae_break(state, ERR_OUT_OF_MEMORY, "ae_malloc(): out of memory");
       dst->last_action = ACT_NEW_LOCATION;
       dst->cnt = src->cnt;
       dst->datatype = src->datatype;
-      dst->owner = OWN_AE;
+      dst->owner = true;
    } else {
       if (dst->last_action == ACT_UNCHANGED)
          dst->last_action = ACT_SAME_LOCATION;
@@ -1561,13 +1560,12 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
 // * this function doesn't need ae_state parameter because it can't fail
 //   (assuming correctly initialized src)
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
-   if (dst->owner == OWN_AE)
-      ae_free(dst->x_ptr);
+   if (dst->owner) ae_free(dst->x_ptr);
    dst->x_ptr = src->xX;
    dst->last_action = ACT_NEW_LOCATION;
    dst->cnt = src->cnt;
    dst->datatype = src->datatype;
-   dst->owner = OWN_CALLER;
+   dst->owner = false;
 }
 
 // This function clears x_vector. It does nothing  if vector is not owned by
@@ -1575,8 +1573,7 @@ void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
 //
 // dst                 vector
 void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
-   if (dst->owner == OWN_AE)
-      aligned_free(dst->x_ptr);
+   if (dst->owner) aligned_free(dst->x_ptr);
    dst->x_ptr = NULL;
    dst->cnt = 0;
 }
@@ -1680,7 +1677,7 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
 //   do anything)
 // * for independent matrices of different sizes it allocates storage in DST
 //   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+//   ACT_NEW_LOCATION, and DST->owner is set to true.
 // * for  independent  matrices  of  same  sizes  it does not perform memory
 //   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
 //   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
@@ -1704,8 +1701,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
       return;
    }
    if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
-      if (dst->owner == OWN_AE)
-         ae_free(dst->x_ptr);
+      if (dst->owner) ae_free(dst->x_ptr);
       dst->rows = src->rows;
       dst->cols = src->cols;
       dst->stride = src->cols;
@@ -1714,7 +1710,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
       if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr == NULL)
          ae_break(state, ERR_OUT_OF_MEMORY, "ae_malloc(): out of memory");
       dst->last_action = ACT_NEW_LOCATION;
-      dst->owner = OWN_AE;
+      dst->owner = true;
    } else {
       if (dst->last_action == ACT_UNCHANGED)
          dst->last_action = ACT_SAME_LOCATION;
@@ -1748,15 +1744,14 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
 // * this function doesn't need ae_state parameter because it can't fail
 //   (assuming correctly initialized src)
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
-   if (dst->owner == OWN_AE)
-      ae_free(dst->x_ptr);
+   if (dst->owner) ae_free(dst->x_ptr);
    dst->rows = src->rows;
    dst->cols = src->cols;
    dst->stride = src->stride;
    dst->datatype = src->datatype;
    dst->x_ptr = src->xyR[0];
    dst->last_action = ACT_NEW_LOCATION;
-   dst->owner = OWN_CALLER;
+   dst->owner = false;
 }
 
 static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-conquer x-matrix routines.
@@ -2221,28 +2216,28 @@ static bool x_force_hermitian(x_matrix *a) {
 
 bool ae_is_symmetric(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_is_symmetric(&x);
 }
 
 bool ae_is_hermitian(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_is_hermitian(&x);
 }
 
 bool ae_force_symmetric(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_force_symmetric(&x);
 }
 
 bool ae_force_hermitian(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_force_hermitian(&x);
 }
@@ -3939,20 +3934,6 @@ double ae_exp(double x, ae_state *state) {
 }
 
 // Complex math functions
-complex complex_from_i(ae_int_t x, ae_int_t y/* = 0*/) {
-   complex r;
-   r.x = (double)x;
-   r.y = (double)y;
-   return r;
-}
-
-complex complex_from_d(double x, double y/* = 0.0*/) {
-   complex r;
-   r.x = x;
-   r.y = y;
-   return r;
-}
-
 complex ae_c_neg(complex lhs) {
    complex result;
    result = complex_from_d(-lhs.x, -lhs.y);
@@ -8516,6 +8497,10 @@ void set_error_flag(const char *Msg) {
    _alglib_last_error = Msg;
 }
 
+void set_error_msg(alglib_impl::ae_state Q) {
+   _alglib_last_error = Q.error_msg;
+}
+
 bool get_error_flag(const char **MsgP) {
    if (_alglib_last_error == NULL)
       return false;
@@ -8645,18 +8630,6 @@ const double fp_posinf = get_aenv_posinf();
 const double fp_neginf = get_aenv_neginf();
 
 // Complex number with double precision.
-complex::complex ():x(0.0), y(0.0) {
-}
-
-complex::complex (const double &_x):x(_x), y(0.0) {
-}
-
-complex::complex (const double &_x, const double &_y):x(_x), y(_y) {
-}
-
-complex::complex (const complex &z):x(z.x), y(z.y) {
-}
-
 complex &complex::operator=(const double &v) {
    x = v;
    y = 0.0;
@@ -8730,14 +8703,6 @@ complex &complex::operator/=(const complex &z) {
 // alglib_impl-alglib gateway.
 static inline alglib_impl::complex complex_from_c(complex z) {
    return alglib_impl::complex_from_d(z.x, z.y);
-}
-
-alglib_impl::complex *complex::c_ptr() {
-   return (alglib_impl::complex *)this;
-}
-
-const alglib_impl::complex *complex::c_ptr() const {
-   return (const alglib_impl::complex *)this;
 }
 
 #if !defined AE_NO_EXCEPTIONS
@@ -9977,7 +9942,7 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
       ThrowErrorMsg(_state, );
 #else
       owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
+      set_error_msg(_state);
       return;
 #endif
    }
@@ -10006,7 +9971,7 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
       ThrowErrorMsg(_state, );
 #else
       owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
+      set_error_msg(_state);
       return;
 #endif
    }
@@ -10018,7 +9983,7 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
 
 ae_vector_wrapper::~ae_vector_wrapper() {
    if (This == &Obj)
-      ae_vector_free(This, true);
+      ae_vector_free(This, false);
 }
 
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
@@ -10034,17 +9999,9 @@ ae_int_t ae_vector_wrapper::length() const {
    return This == NULL ? 0 : This->cnt;
 }
 
-const alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() const {
-   return This;
-}
-
-alglib_impl::ae_vector *ae_vector_wrapper::c_ptr() {
-   return This;
-}
-
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state) {
    if (This == &Obj)
-      ae_vector_free(This, true);
+      ae_vector_free(This, false);
    owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init_attach_to_x(This, new_ptr, _state, false);
 }
 
@@ -10290,7 +10247,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
       ThrowErrorMsg(_state, );
 #else
       owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
+      set_error_msg(_state);
       return;
 #endif
    }
@@ -10298,7 +10255,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::ae_assert(iLen > 0, "ALGLIB: non-positive length for attach_to_ptr()", &_state);
    x.cnt = iLen;
    x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
+   x.owner = false;
    x.last_action = alglib_impl::ACT_UNCHANGED;
    x.x_ptr = pContent;
    attach_to(&x, &_state);
@@ -10374,7 +10331,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
       ThrowErrorMsg(_state, );
 #else
       owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
+      set_error_msg(_state);
       return;
 #endif
    }
@@ -10403,7 +10360,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
       ThrowErrorMsg(_state, );
 #else
       owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
+      set_error_msg(_state);
       return;
 #endif
    }
@@ -10417,7 +10374,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
 
 ae_matrix_wrapper::~ae_matrix_wrapper() {
    if (This == &Obj)
-      ae_matrix_free(This, true);
+      ae_matrix_free(This, false);
 }
 
 // TODO: automatic allocation of NULL pointer!!!!!
@@ -10446,17 +10403,9 @@ bool ae_matrix_wrapper::isempty() const {
    return rows() == 0 || cols() == 0;
 }
 
-const alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() const {
-   return This;
-}
-
-alglib_impl::ae_matrix *ae_matrix_wrapper::c_ptr() {
-   return This;
-}
-
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state) {
    if (This == &Obj)
-      ae_matrix_free(This, true);
+      ae_matrix_free(This, false);
    owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init_attach_to_x(This, new_ptr, _state, false);
 }
 
@@ -10725,7 +10674,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    x.cols = icols;
    x.stride = icols;
    x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
+   x.owner = false;
    x.last_action = alglib_impl::ACT_UNCHANGED;
    x.x_ptr = pContent;
    attach_to(&x, &_state);
