@@ -1057,10 +1057,10 @@ The most important constants (defined in the <code>Ap.h</code> header) from ALGL
 <li><code>alglib::machineepsilon</code>&nbsp;-&nbsp;small number which is <i>close</i> to the double precision &eps;, but is slightly larger</li>
 <li><code>alglib::maxrealnumber</code>&nbsp;-&nbsp;very large number which is <i>close</i> to the maximum real number, but is slightly smaller </li>
 <li><code>alglib::minrealnumber</code>&nbsp;-&nbsp;very small number which is <i>close</i> to the minimum nonzero real number, but is slightly larger</li>
-<li><code>alglib::fp_nan</code>&nbsp;-&nbsp;NAN (non-signalling under most platforms except for PA-RISC, where it is signalling;
+<li><code>std::NAN</code>&nbsp;-&nbsp;NAN (non-signalling under most platforms except for PA-RISC, where it is signalling;
 but when PA-RISC CPU is in its default state, it is silently converted to the quiet NAN)</li>
-<li><code>alglib::fp_posinf</code>&nbsp;-&nbsp;positive infinity</li>
-<li><code>alglib::fp_neginf</code>&nbsp;-&nbsp;negative infinity</li>
+<li><code>std::+INFINITY</code>&nbsp;-&nbsp;positive infinity</li>
+<li><code>std::-INFINITY</code>&nbsp;-&nbsp;negative infinity</li>
 </ul>
 
 <a name='gs_stdfunctions' class='sheader'></a><h2>5.5 Functions</h2>
@@ -1072,11 +1072,9 @@ The most important "basic" functions from ALGLIB namespace (<code>Ap.h</code> he
 <ul>
 <li><code>alglib::randomreal()</code>&nbsp;-&nbsp;returns random real number from [0,1)</li>
 <li><code>alglib::randominteger(mx)</code>&nbsp;-&nbsp;returns random integer number from [0,nx); <i>mx</i> must be less than RAND_MAX</li>
-<li><code>alglib::fp_isnan</code>&nbsp;-&nbsp;checks whether number is NAN</li>
-<li><code>alglib::fp_isposinf</code>&nbsp;-&nbsp;checks whether number is +INF</li>
-<li><code>alglib::fp_isneginf</code>&nbsp;-&nbsp;checks whether number is -INF</li>
-<li><code>alglib::fp_isinf</code>&nbsp;-&nbsp;checks whether number is +INF or -INF</li>
-<li><code>alglib::fp_isfinite</code>&nbsp;-&nbsp;checks whether number is finite value (possibly subnormalized)</li>
+<li><code>std::isnan(x)</code> &mdash; checks whether the number x is NAN</li>
+<li><code>isposinf(x)</code> &mdash; checks whether the number x is +INF</li>
+<li><code>isneginf(x)</code> &mdash; checks whether the number x is -INF</li>
 </ul>
 In addition, the following are inherited C++, itself, or from the native C++ library:
 <ul>

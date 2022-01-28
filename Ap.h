@@ -242,7 +242,7 @@ struct ae_state {
 // endianness type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
    ae_int_t endianness;
 // double values for NAN, +INFINITY and -INFINITY.
-   double v_nan, v_posinf, v_neginf;
+   const double v_nan = NAN, v_posinf = +INFINITY, v_neginf = -INFINITY;
 // pointer to the top block in a stack of frames which hold dynamically allocated objects
    ae_frame *volatile p_top_block;
    ae_frame last_block;
@@ -664,22 +664,12 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * IEEE-compliant floating point comparisons
-bool ae_isfinite_stateless(double x, ae_int_t endianness);
-bool ae_isnan_stateless(double x, ae_int_t endianness);
-bool ae_isinf_stateless(double x, ae_int_t endianness);
-bool ae_isposinf_stateless(double x, ae_int_t endianness);
-bool ae_isneginf_stateless(double x, ae_int_t endianness);
-bool ae_isfinite(double x, ae_state *state);
-bool ae_isnan(double x, ae_state *state);
-bool ae_isinf(double x, ae_state *state);
-bool ae_isposinf(double x, ae_state *state);
-bool ae_isneginf(double x, ae_state *state);
+bool isposinf(double x);
+bool isneginf(double x);
 
 // * standard functions
-double ae_fabs(double x, ae_state *state);
 ae_int_t ae_iabs(ae_int_t x, ae_state *state);
 double sqr(double x, ae_state *state);
-double ae_sqrt(double x, ae_state *state);
 ae_int_t sign(double x, ae_state *state);
 ae_int_t iround(double x, ae_state *state);
 ae_int_t itrunc(double x, ae_state *state);
@@ -692,19 +682,6 @@ double maxreal(double m1, double m2, ae_state *state);
 double minreal(double m1, double m2, ae_state *state);
 double randomreal(ae_state *state);
 ae_int_t randominteger(ae_int_t maxv, ae_state *state);
-double ae_sin(double x, ae_state *state);
-double ae_cos(double x, ae_state *state);
-double ae_tan(double x, ae_state *state);
-double ae_sinh(double x, ae_state *state);
-double ae_cosh(double x, ae_state *state);
-double ae_tanh(double x, ae_state *state);
-double ae_asin(double x, ae_state *state);
-double ae_acos(double x, ae_state *state);
-double ae_atan(double x, ae_state *state);
-double ae_atan2(double y, double x, ae_state *state);
-double ae_log(double x, ae_state *state);
-double ae_pow(double x, double y, ae_state *state);
-double ae_exp(double x, ae_state *state);
 
 // Complex math functions:
 // *	basic arithmetic operations
@@ -1081,7 +1058,6 @@ typedef alglib_impl::ae_int_t ae_int_t;
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 #endif
 
-extern const double fp_nan, fp_posinf, fp_neginf;
 extern const ae_int_t endianness;
 int sign(double x);
 
@@ -1099,11 +1075,8 @@ int minint(int m1, int m2);
 double maxreal(double m1, double m2);
 double minreal(double m1, double m2);
 
-bool fp_isnan(double x);
-bool fp_isposinf(double x);
-bool fp_isneginf(double x);
-bool fp_isinf(double x);
-bool fp_isfinite(double x);
+bool isposinf(double x);
+bool isneginf(double x);
 
 // Complex number with double precision.
 struct complex {

@@ -188,32 +188,32 @@ template<class T> void spoil_matrix_by_deleting_col(T &x) {
 
 template<class T> void spoil_vector_by_nan(T &x) {
    if (x.length() != 0)
-      x(randominteger(x.length())) = fp_nan;
+      x(randominteger(x.length())) = NAN;
 }
 
 template<class T> void spoil_vector_by_posinf(T &x) {
    if (x.length() != 0)
-      x(randominteger(x.length())) = fp_posinf;
+      x(randominteger(x.length())) = +INFINITY;
 }
 
 template<class T> void spoil_vector_by_neginf(T &x) {
    if (x.length() != 0)
-      x(randominteger(x.length())) = fp_neginf;
+      x(randominteger(x.length())) = -INFINITY;
 }
 
 template<class T> void spoil_matrix_by_nan(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
-      x(randominteger(x.rows()), randominteger(x.cols())) = fp_nan;
+      x(randominteger(x.rows()), randominteger(x.cols())) = NAN;
 }
 
 template<class T> void spoil_matrix_by_posinf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
-      x(randominteger(x.rows()), randominteger(x.cols())) = fp_posinf;
+      x(randominteger(x.rows()), randominteger(x.cols())) = +INFINITY;
 }
 
 template<class T> void spoil_matrix_by_neginf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
-      x(randominteger(x.rows()), randominteger(x.cols())) = fp_neginf;
+      x(randominteger(x.rows()), randominteger(x.cols())) = -INFINITY;
 }
 
 void function1_func(const real_1d_array &x, double &func, void *ptr) {
@@ -1434,25 +1434,25 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
             if (_spoil_scenario == 6)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 7)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 8)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 9)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 10)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 11)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 12)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 13)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 14)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
             minlbfgscreate(1, x, state);
@@ -1540,32 +1540,32 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
             if (_spoil_scenario == 6)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 7)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 8)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 9)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 10)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 11)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 12)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 13)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 14)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double stpmax = 0.1;
             if (_spoil_scenario == 15)
-               stpmax = fp_nan;
+               stpmax = NAN;
             if (_spoil_scenario == 16)
-               stpmax = fp_posinf;
+               stpmax = +INFINITY;
             if (_spoil_scenario == 17)
-               stpmax = fp_neginf;
+               stpmax = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
             minlbfgsreport rep;
@@ -1640,32 +1640,32 @@ int main() {
                spoil_vector_by_neginf(x);
             double epsg = 0.0000000001;
             if (_spoil_scenario == 3)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 4)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 5)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 6)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 7)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 8)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0;
             if (_spoil_scenario == 9)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 10)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 11)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double diffstep = 1.0e-6;
             if (_spoil_scenario == 12)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 13)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 14)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
             minlbfgsreport rep;
@@ -1742,25 +1742,25 @@ int main() {
                spoil_vector_by_deleting_element(bndu);
             double epsg = 0.0;
             if (_spoil_scenario == 11)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 12)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 13)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 14)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 15)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 16)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.000001;
             if (_spoil_scenario == 17)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 18)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 19)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbleicstate state;
             minbleiccreate(x, state);
@@ -1881,25 +1881,25 @@ int main() {
             minbleicstate state;
             double epsg = 0.0;
             if (_spoil_scenario == 13)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 14)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 15)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 16)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 17)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 18)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.000001;
             if (_spoil_scenario == 19)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 20)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 21)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbleiccreate(x, state);
             minbleicsetlc(state, c, ct);
@@ -2015,33 +2015,33 @@ int main() {
             minbleicstate state;
             double epsg = 0.0;
             if (_spoil_scenario == 11)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 12)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 13)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 14)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 15)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 16)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.000001;
             if (_spoil_scenario == 17)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 18)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 19)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             double diffstep = 1.0e-6;
             if (_spoil_scenario == 20)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 21)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 22)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             minbleiccreatef(x, diffstep, state);
             minbleicsetbc(state, bndl, bndu);
             minbleicsetscale(state, s);
@@ -2779,11 +2779,11 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
@@ -2856,11 +2856,11 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
          //
@@ -2948,11 +2948,11 @@ int main() {
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 3)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 4)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 5)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
@@ -3023,11 +3023,11 @@ int main() {
                spoil_vector_by_deleting_element(bndu);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 10)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 11)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 12)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
          //
@@ -3085,11 +3085,11 @@ int main() {
             real_1d_array x;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 0)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 1)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 2)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
@@ -3153,11 +3153,11 @@ int main() {
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 3)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 4)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 5)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
@@ -3193,11 +3193,11 @@ int main() {
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
             if (_spoil_scenario == 3)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 4)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 5)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
@@ -3254,25 +3254,25 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
             if (_spoil_scenario == 6)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 7)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 8)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 9)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 10)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 11)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 12)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 13)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 14)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
             mincgcreate(x, state);
@@ -3360,32 +3360,32 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
             if (_spoil_scenario == 6)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 7)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 8)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 9)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 10)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 11)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 12)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 13)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 14)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double stpmax = 0.1;
             if (_spoil_scenario == 15)
-               stpmax = fp_nan;
+               stpmax = NAN;
             if (_spoil_scenario == 16)
-               stpmax = fp_posinf;
+               stpmax = +INFINITY;
             if (_spoil_scenario == 17)
-               stpmax = fp_neginf;
+               stpmax = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
             mincgreport rep;
@@ -3476,32 +3476,32 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
             if (_spoil_scenario == 6)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 7)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 8)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 9)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 10)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 11)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.0000000001;
             if (_spoil_scenario == 12)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 13)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 14)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double diffstep = 1.0e-6;
             if (_spoil_scenario == 15)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 16)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 17)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
             mincgcreatef(x, diffstep, state);
@@ -3701,11 +3701,11 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             real_1d_array bndl = "[0,0]";
             real_1d_array bndu = "[+inf,+inf]";
@@ -3870,11 +3870,11 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minnlcstate state;
          //
@@ -4044,11 +4044,11 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minnlcstate state;
             minnlcreport rep;
@@ -4215,25 +4215,25 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double radius = 0.1;
             if (_spoil_scenario == 9)
-               radius = fp_nan;
+               radius = NAN;
             if (_spoil_scenario == 10)
-               radius = fp_posinf;
+               radius = +INFINITY;
             if (_spoil_scenario == 11)
-               radius = fp_neginf;
+               radius = -INFINITY;
             double rho = 0.0;
             if (_spoil_scenario == 12)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 13)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 14)
-               rho = fp_neginf;
+               rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
             minnsreport rep;
@@ -4361,32 +4361,32 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double diffstep = 0.000001;
             if (_spoil_scenario == 9)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 10)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 11)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             double radius = 0.1;
             if (_spoil_scenario == 12)
-               radius = fp_nan;
+               radius = NAN;
             if (_spoil_scenario == 13)
-               radius = fp_posinf;
+               radius = +INFINITY;
             if (_spoil_scenario == 14)
-               radius = fp_neginf;
+               radius = -INFINITY;
             double rho = 0.0;
             if (_spoil_scenario == 15)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 16)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 17)
-               rho = fp_neginf;
+               rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
             minnsreport rep;
@@ -4473,25 +4473,25 @@ int main() {
                spoil_vector_by_nan(bndu);
             double epsx = 0.00001;
             if (_spoil_scenario == 8)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 9)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 10)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double radius = 0.1;
             if (_spoil_scenario == 11)
-               radius = fp_nan;
+               radius = NAN;
             if (_spoil_scenario == 12)
-               radius = fp_posinf;
+               radius = +INFINITY;
             if (_spoil_scenario == 13)
-               radius = fp_neginf;
+               radius = -INFINITY;
             double rho = 0.0;
             if (_spoil_scenario == 14)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 15)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 16)
-               rho = fp_neginf;
+               rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
             minnsreport rep;
@@ -4625,25 +4625,25 @@ int main() {
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
             if (_spoil_scenario == 6)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 7)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 8)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             double radius = 0.1;
             if (_spoil_scenario == 9)
-               radius = fp_nan;
+               radius = NAN;
             if (_spoil_scenario == 10)
-               radius = fp_posinf;
+               radius = +INFINITY;
             if (_spoil_scenario == 11)
-               radius = fp_neginf;
+               radius = -INFINITY;
             double rho = 50.0;
             if (_spoil_scenario == 12)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 13)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 14)
-               rho = fp_neginf;
+               rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
             minnsreport rep;
@@ -4805,25 +4805,25 @@ int main() {
             minbcstate state;
             double epsg = 0.0;
             if (_spoil_scenario == 11)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 12)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 13)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 14)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 15)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 16)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.000001;
             if (_spoil_scenario == 17)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 18)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 19)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbccreate(x, state);
             minbcsetbc(state, bndl, bndu);
@@ -4933,33 +4933,33 @@ int main() {
             minbcstate state;
             double epsg = 0.0;
             if (_spoil_scenario == 11)
-               epsg = fp_nan;
+               epsg = NAN;
             if (_spoil_scenario == 12)
-               epsg = fp_posinf;
+               epsg = +INFINITY;
             if (_spoil_scenario == 13)
-               epsg = fp_neginf;
+               epsg = -INFINITY;
             double epsf = 0.0;
             if (_spoil_scenario == 14)
-               epsf = fp_nan;
+               epsf = NAN;
             if (_spoil_scenario == 15)
-               epsf = fp_posinf;
+               epsf = +INFINITY;
             if (_spoil_scenario == 16)
-               epsf = fp_neginf;
+               epsf = -INFINITY;
             double epsx = 0.000001;
             if (_spoil_scenario == 17)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 18)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 19)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             double diffstep = 1.0e-6;
             if (_spoil_scenario == 20)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 21)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 22)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
          //
          // Now we are ready to actually optimize something:
          // * first we create optimizer
@@ -5169,18 +5169,18 @@ int main() {
                spoil_vector_by_neginf(x);
             double eps = 0.00001;
             if (_spoil_scenario == 7)
-               eps = fp_nan;
+               eps = NAN;
             if (_spoil_scenario == 8)
-               eps = fp_posinf;
+               eps = +INFINITY;
             if (_spoil_scenario == 9)
-               eps = fp_neginf;
+               eps = -INFINITY;
             double h = 0.0;
             if (_spoil_scenario == 10)
-               h = fp_nan;
+               h = NAN;
             if (_spoil_scenario == 11)
-               h = fp_posinf;
+               h = +INFINITY;
             if (_spoil_scenario == 12)
-               h = fp_neginf;
+               h = -INFINITY;
             odesolverstate s;
             ae_int_t m;
             real_1d_array xtbl;
@@ -5606,18 +5606,18 @@ int main() {
          //
             double a = 0.0;
             if (_spoil_scenario == 0)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 1)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 2)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = 1.0;
             if (_spoil_scenario == 3)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 4)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 5)
-               b = fp_neginf;
+               b = -INFINITY;
             autogkstate s;
             double v;
             autogkreport rep;
@@ -5678,11 +5678,11 @@ int main() {
             _TestResult = _TestResult && doc_test_real(v, 20.5, 0.01);
             p = 0.5;
             if (_spoil_scenario == 3)
-               p = fp_nan;
+               p = NAN;
             if (_spoil_scenario == 4)
-               p = fp_posinf;
+               p = +INFINITY;
             if (_spoil_scenario == 5)
-               p = fp_neginf;
+               p = -INFINITY;
             samplepercentile(x, p, v);
             _TestResult = _TestResult && doc_test_real(v, 20.5, 0.01);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -5901,11 +5901,11 @@ int main() {
                spoil_vector_by_neginf(x4);
             p = 0.5;
             if (_spoil_scenario == 12)
-               p = fp_nan;
+               p = NAN;
             if (_spoil_scenario == 13)
-               p = fp_posinf;
+               p = +INFINITY;
             if (_spoil_scenario == 14)
-               p = fp_neginf;
+               p = -INFINITY;
             samplepercentile(x4, p, v);
          //
          // and then we test full form
@@ -5951,11 +5951,11 @@ int main() {
                spoil_vector_by_deleting_element(x8);
             p = 0.5;
             if (_spoil_scenario == 31)
-               p = fp_nan;
+               p = NAN;
             if (_spoil_scenario == 32)
-               p = fp_posinf;
+               p = +INFINITY;
             if (_spoil_scenario == 33)
-               p = fp_neginf;
+               p = -INFINITY;
             samplepercentile(x8, 10, p, v);
             _TestResult = _TestResult && (_spoil_scenario == -1);
          }
@@ -6484,9 +6484,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 10)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 11)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             double dv;
             double d2v;
@@ -6539,9 +6539,9 @@ int main() {
                spoil_vector_by_neginf(a);
             double t = 2.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             real_1d_array a2;
             double v;
             barycentricinterpolant p;
@@ -6638,9 +6638,9 @@ int main() {
          //
             double t = -2.0;
             if (_spoil_scenario == 9)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 10)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y_eqdist, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
@@ -6686,9 +6686,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 8)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 9)
-               t = fp_neginf;
+               t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuild(x, y, 3, p);
@@ -6723,9 +6723,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, 3, p);
@@ -6760,9 +6760,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb1(-1.0, +1.0, y, 3, p);
@@ -6797,23 +6797,23 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -2.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 6)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 7)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 8)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 9)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 10)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 11)
-               b = fp_neginf;
+               b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb2(a, b, y, 3, p);
@@ -6848,9 +6848,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
@@ -6883,23 +6883,23 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 6)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 7)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 8)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 9)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 10)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 11)
-               b = fp_neginf;
+               b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
@@ -6932,23 +6932,23 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = -2.0;
             if (_spoil_scenario == 4)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 5)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 6)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 7)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 8)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 9)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 10)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 11)
-               b = fp_neginf;
+               b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
@@ -6979,9 +6979,9 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -1.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, p);
@@ -7014,23 +7014,23 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -1.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 5)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 6)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 7)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 8)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 9)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 10)
-               b = fp_neginf;
+               b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb1(a, b, y, p);
@@ -7063,23 +7063,23 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -2.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 5)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 6)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 7)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 8)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 9)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 10)
-               b = fp_neginf;
+               b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb2(a, b, y, p);
@@ -7112,9 +7112,9 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -1.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
@@ -7145,23 +7145,23 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -1.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 5)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 6)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 7)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 8)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 9)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 10)
-               b = fp_neginf;
+               b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
@@ -7192,23 +7192,23 @@ int main() {
                spoil_vector_by_neginf(y);
             double t = -2.0;
             if (_spoil_scenario == 3)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 4)
-               t = fp_neginf;
+               t = -INFINITY;
             double a = -1.0;
             if (_spoil_scenario == 5)
-               a = fp_nan;
+               a = NAN;
             if (_spoil_scenario == 6)
-               a = fp_posinf;
+               a = +INFINITY;
             if (_spoil_scenario == 7)
-               a = fp_neginf;
+               a = -INFINITY;
             double b = +1.0;
             if (_spoil_scenario == 8)
-               b = fp_nan;
+               b = NAN;
             if (_spoil_scenario == 9)
-               b = fp_posinf;
+               b = +INFINITY;
             if (_spoil_scenario == 10)
-               b = fp_neginf;
+               b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
@@ -7258,9 +7258,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = 0.25;
             if (_spoil_scenario == 10)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 11)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             spline1dinterpolant s;
          // build spline
@@ -7319,9 +7319,9 @@ int main() {
                spoil_vector_by_deleting_element(y);
             double t = 0.25;
             if (_spoil_scenario == 8)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 9)
-               t = fp_neginf;
+               t = -INFINITY;
             double v;
             spline1dinterpolant s;
             ae_int_t natural_bound_type = 2;
@@ -7625,22 +7625,22 @@ int main() {
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
             if (_spoil_scenario == 13)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 14)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 15)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
             double diffstep = 0.0001;
             if (_spoil_scenario == 16)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 17)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 18)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
          //
          // Fitting without weights
          //
@@ -7725,11 +7725,11 @@ int main() {
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
             if (_spoil_scenario == 13)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 14)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 15)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
@@ -7818,11 +7818,11 @@ int main() {
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
             if (_spoil_scenario == 13)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 14)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 15)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
@@ -7930,22 +7930,22 @@ int main() {
                spoil_vector_by_deleting_element(bndu);
             double epsx = 0.000001;
             if (_spoil_scenario == 17)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 18)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 19)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
             double diffstep = 0.0001;
             if (_spoil_scenario == 20)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 21)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 22)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetbc(state, bndl, bndu);
             lsfitsetcond(state, epsx, maxits);
@@ -8027,11 +8027,11 @@ int main() {
                spoil_vector_by_neginf(c);
             double epsx = 1.0e-5;
             if (_spoil_scenario == 13)
-               epsx = fp_nan;
+               epsx = NAN;
             if (_spoil_scenario == 14)
-               epsx = fp_posinf;
+               epsx = +INFINITY;
             if (_spoil_scenario == 15)
-               epsx = fp_neginf;
+               epsx = -INFINITY;
             real_1d_array bndl = "[-inf, -10, 0.1]";
             if (_spoil_scenario == 16)
                spoil_vector_by_nan(bndl);
@@ -8057,11 +8057,11 @@ int main() {
             lsfitreport rep;
             double diffstep = 1.0e-5;
             if (_spoil_scenario == 24)
-               diffstep = fp_nan;
+               diffstep = NAN;
             if (_spoil_scenario == 25)
-               diffstep = fp_posinf;
+               diffstep = +INFINITY;
             if (_spoil_scenario == 26)
-               diffstep = fp_neginf;
+               diffstep = -INFINITY;
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
             lsfitsetbc(state, bndl, bndu);
@@ -8299,9 +8299,9 @@ int main() {
             ae_int_t m = 2;
             double t = 2.0;
             if (_spoil_scenario == 10)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 11)
-               t = fp_neginf;
+               t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
             polynomialfitreport rep;
@@ -8447,9 +8447,9 @@ int main() {
                spoil_vector_by_deleting_element(dc);
             double t = 2.0;
             if (_spoil_scenario == 27)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 28)
-               t = fp_neginf;
+               t = -INFINITY;
             ae_int_t m = 2;
             ae_int_t info;
             barycentricinterpolant p;
@@ -8518,11 +8518,11 @@ int main() {
          //
             rho = -5.0;
             if (_spoil_scenario == 10)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 11)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 12)
-               rho = fp_neginf;
+               rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             _TestResult = _TestResult && doc_test_int(info, 1);
             v = spline1dcalc(s, 0.0);
@@ -8536,11 +8536,11 @@ int main() {
          //
             rho = +10.0;
             if (_spoil_scenario == 13)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 14)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 15)
-               rho = fp_neginf;
+               rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             _TestResult = _TestResult && doc_test_int(info, 1);
             v = spline1dcalc(s, 1.0);
@@ -8551,11 +8551,11 @@ int main() {
          //
             rho = +3.0;
             if (_spoil_scenario == 16)
-               rho = fp_nan;
+               rho = NAN;
             if (_spoil_scenario == 17)
-               rho = fp_posinf;
+               rho = +INFINITY;
             if (_spoil_scenario == 18)
-               rho = fp_neginf;
+               rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && (_spoil_scenario == -1);
@@ -8597,9 +8597,9 @@ int main() {
             ae_int_t m = 2;
             double t = 2.0;
             if (_spoil_scenario == 8)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 9)
-               t = fp_neginf;
+               t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
             polynomialfitreport rep;
@@ -8658,9 +8658,9 @@ int main() {
             ae_int_t m = 2;
             double t = 2.0;
             if (_spoil_scenario == 12)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 13)
-               t = fp_neginf;
+               t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
             polynomialfitreport rep;
@@ -8737,9 +8737,9 @@ int main() {
             ae_int_t m = 2;
             double t = 2.0;
             if (_spoil_scenario == 21)
-               t = fp_posinf;
+               t = +INFINITY;
             if (_spoil_scenario == 22)
-               t = fp_neginf;
+               t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
             polynomialfitreport rep;
@@ -8937,9 +8937,9 @@ int main() {
             ae_int_t limitcnt = 0;
             double limiteps = 0.8;
             if (_spoil_scenario == 5)
-               limiteps = fp_posinf;
+               limiteps = +INFINITY;
             if (_spoil_scenario == 6)
-               limiteps = fp_neginf;
+               limiteps = -INFINITY;
             parametricrdpfixed(x, npoints, ndimensions, limitcnt, limiteps, y, idxy, nsections);
             _TestResult = _TestResult && doc_test_int(nsections, 2);
             _TestResult = _TestResult && doc_test_int_vector(idxy, "[0,2,3]");
@@ -8994,14 +8994,14 @@ int main() {
                spoil_vector_by_deleting_element(f);
             double vx = 0.25;
             if (_spoil_scenario == 12)
-               vx = fp_posinf;
+               vx = +INFINITY;
             if (_spoil_scenario == 13)
-               vx = fp_neginf;
+               vx = -INFINITY;
             double vy = 0.50;
             if (_spoil_scenario == 14)
-               vy = fp_posinf;
+               vy = +INFINITY;
             if (_spoil_scenario == 15)
-               vy = fp_neginf;
+               vy = -INFINITY;
             double v;
             spline2dinterpolant s;
          // build spline
@@ -9060,14 +9060,14 @@ int main() {
                spoil_vector_by_deleting_element(f);
             double vx = 0.25;
             if (_spoil_scenario == 12)
-               vx = fp_posinf;
+               vx = +INFINITY;
             if (_spoil_scenario == 13)
-               vx = fp_neginf;
+               vx = -INFINITY;
             double vy = 0.50;
             if (_spoil_scenario == 14)
-               vy = fp_posinf;
+               vy = +INFINITY;
             if (_spoil_scenario == 15)
-               vy = fp_neginf;
+               vy = -INFINITY;
             double v;
             double dx;
             double dy;
@@ -9433,19 +9433,19 @@ int main() {
                spoil_vector_by_deleting_element(f);
             double vx = 0.50;
             if (_spoil_scenario == 16)
-               vx = fp_posinf;
+               vx = +INFINITY;
             if (_spoil_scenario == 17)
-               vx = fp_neginf;
+               vx = -INFINITY;
             double vy = 0.50;
             if (_spoil_scenario == 18)
-               vy = fp_posinf;
+               vy = +INFINITY;
             if (_spoil_scenario == 19)
-               vy = fp_neginf;
+               vy = -INFINITY;
             double vz = 0.50;
             if (_spoil_scenario == 20)
-               vz = fp_posinf;
+               vz = +INFINITY;
             if (_spoil_scenario == 21)
-               vz = fp_neginf;
+               vz = -INFINITY;
             double v;
             spline3dinterpolant s;
          // build spline
@@ -9532,19 +9532,19 @@ int main() {
                spoil_vector_by_deleting_element(f);
             double vx = 0.50;
             if (_spoil_scenario == 16)
-               vx = fp_posinf;
+               vx = +INFINITY;
             if (_spoil_scenario == 17)
-               vx = fp_neginf;
+               vx = -INFINITY;
             double vy = 0.50;
             if (_spoil_scenario == 18)
-               vy = fp_posinf;
+               vy = +INFINITY;
             if (_spoil_scenario == 19)
-               vy = fp_neginf;
+               vy = -INFINITY;
             double vz = 0.50;
             if (_spoil_scenario == 20)
-               vz = fp_posinf;
+               vz = +INFINITY;
             if (_spoil_scenario == 21)
-               vz = fp_neginf;
+               vz = -INFINITY;
             spline3dinterpolant s;
          // build spline
             spline3dbuildtrilinearv(x, 2, y, 2, z, 2, f, 2, s);
@@ -11004,11 +11004,11 @@ int main() {
          // which means that iteration is performed with required probability.
             double updateits = 1.0;
             if (_spoil_scenario == 3)
-               updateits = fp_nan;
+               updateits = NAN;
             if (_spoil_scenario == 4)
-               updateits = fp_posinf;
+               updateits = +INFINITY;
             if (_spoil_scenario == 5)
-               updateits = fp_neginf;
+               updateits = -INFINITY;
             ssaappendpointandupdate(s1, 5.951, updateits);
             ssagetbasis(s1, a1, sv1, w, k);
             ssaappendpointandupdate(s1, 7.074, updateits);
@@ -11816,11 +11816,11 @@ int main() {
          //
             double wstep = 0.000;
             if (_spoil_scenario == 3)
-               wstep = fp_nan;
+               wstep = NAN;
             if (_spoil_scenario == 4)
-               wstep = fp_posinf;
+               wstep = +INFINITY;
             if (_spoil_scenario == 5)
-               wstep = fp_neginf;
+               wstep = -INFINITY;
             ae_int_t maxits = 100;
             mlpsetdecay(trn, 0.01);
             mlpsetcond(trn, wstep, maxits);

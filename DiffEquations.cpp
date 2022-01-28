@@ -64,9 +64,9 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    }
 // auto-select H if necessary
    if (h == 0.0) {
-      v = ae_fabs(x->xR[1] - x->xR[0], _state);
+      v = fabs(x->xR[1] - x->xR[0]);
       for (i = 2; i < m; i++) {
-         v = minreal(v, ae_fabs(x->xR[i] - x->xR[i - 1], _state), _state);
+         v = minreal(v, fabs(x->xR[i] - x->xR[i - 1]), _state);
       }
       h = 0.001 * v;
    }
@@ -74,7 +74,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    state->n = n;
    state->m = m;
    state->h = h;
-   state->eps = ae_fabs(eps, _state);
+   state->eps = fabs(eps);
    state->fraceps = eps < 0.0;
    ae_vector_set_length(&state->xg, m, _state);
    ae_v_move(state->xg.xR, 1, x->xR, 1, m);
@@ -145,9 +145,9 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
    ae_assert(x->cnt >= m, "ODESolverRKCK: Length(X)<M!", _state);
    ae_assert(isfinitevector(y, n, _state), "ODESolverRKCK: Y contains infinite or NaN values!", _state);
    ae_assert(isfinitevector(x, m, _state), "ODESolverRKCK: Y contains infinite or NaN values!", _state);
-   ae_assert(ae_isfinite(eps, _state), "ODESolverRKCK: Eps is not finite!", _state);
+   ae_assert(isfinite(eps), "ODESolverRKCK: Eps is not finite!", _state);
    ae_assert(eps != 0.0, "ODESolverRKCK: Eps is zero!", _state);
-   ae_assert(ae_isfinite(h, _state), "ODESolverRKCK: H is not finite!", _state);
+   ae_assert(isfinite(h), "ODESolverRKCK: H is not finite!", _state);
    odesolver_odesolverinit(0, y, n, x, m, eps, h, state, _state);
 }
 
@@ -220,7 +220,7 @@ bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    n = state->n;
    m = state->m;
    h = state->h;
-   maxgrowpow = ae_pow(odesolver_odesolvermaxgrow, 5.0, _state);
+   maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
    state->repnfev = 0;
 // some preliminary checks for internal errors
 // after this we assume that H>0 and M>1
@@ -306,7 +306,7 @@ lbl_6:
 // These maximums are initialized by zeros,
 // then updated every iterations.
    for (j = 0; j < n; j++) {
-      state->escale.xR[j] = maxreal(state->escale.xR[j], ae_fabs(state->yc.xR[j], _state), _state);
+      state->escale.xR[j] = maxreal(state->escale.xR[j], fabs(state->yc.xR[j]), _state);
    }
 // make one step:
 // 1. calculate all info needed to do step
@@ -352,21 +352,21 @@ lbl_10:
    for (j = 0; j < n; j++) {
       if (!state->fraceps) {
       // absolute error is estimated
-         err = maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state), _state);
+         err = maxreal(err, fabs(state->yn.xR[j] - state->yns.xR[j]), _state);
       } else {
       // Relative error is estimated
          v = state->escale.xR[j];
          if (v == 0.0) {
             v = 1.0;
          }
-         err = maxreal(err, ae_fabs(state->yn.xR[j] - state->yns.xR[j], _state) / v, _state);
+         err = maxreal(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v, _state);
       }
    }
 // calculate new step, restart if necessary
    if (maxgrowpow * err <= state->eps) {
       h2 = odesolver_odesolvermaxgrow * h;
    } else {
-      h2 = h * ae_pow(state->eps / err, 0.2, _state);
+      h2 = h * pow(state->eps / err, 0.2);
    }
    if (h2 < h / odesolver_odesolvermaxshrink) {
       h2 = h / odesolver_odesolvermaxshrink;

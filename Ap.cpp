@@ -791,7 +791,7 @@ static void *aligned_extract_ptr(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
 #else
-   return block == NULL? NULL: *(void **)((char *)block - sizeof(void *));
+   return block == NULL ? NULL : *(void **)((char *)block - sizeof(void *));
 #endif
 }
 
@@ -1405,7 +1405,7 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool i
    dst->ptr = new_ptr;
    dst->is_owner = not_null && is_owner;
    dst->is_dynamic = not_null && is_dynamic;
-   dst->free = not_null? free: NULL;
+   dst->free = not_null ? free : NULL;
    if (dst->subscriber != NULL)
       *(dst->subscriber) = dst->ptr;
 }
@@ -1835,7 +1835,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
          pcol = p2 + i;
          prow = p1 + i * a->stride;
          for (j = 0; j < len1; j++) {
-            if (!ae_isfinite(*pcol, _state) || !ae_isfinite(*prow, _state)) {
+            if (!isfinite(*pcol) || !isfinite(*prow)) {
                *nonfinite = true;
             } else {
                v = fabs(*pcol);
@@ -1883,7 +1883,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       pcol = p + i;
       prow = p + i * a->stride;
       for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!ae_isfinite(*pcol, _state) || !ae_isfinite(*prow, _state)) {
+         if (!isfinite(*pcol) || !isfinite(*prow)) {
             *nonfinite = true;
          } else {
             v = fabs(*pcol);
@@ -1959,7 +1959,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
          pcol = p2 + i;
          prow = p1 + i * a->stride;
          for (j = 0; j < len1; j++) {
-            if (!ae_isfinite(pcol->x, _state) || !ae_isfinite(pcol->y, _state) || !ae_isfinite(prow->x, _state) || !ae_isfinite(prow->y, _state)) {
+            if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
                *nonfinite = true;
             } else {
                v = x_safepythag2(pcol->x, pcol->y);
@@ -2007,7 +2007,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       pcol = p + i;
       prow = p + i * a->stride;
       for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!ae_isfinite(pcol->x, _state) || !ae_isfinite(pcol->y, _state) || !ae_isfinite(prow->x, _state) || !ae_isfinite(prow->y, _state)) {
+         if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
             *nonfinite = true;
          } else {
             v = x_safepythag2(pcol->x, pcol->y);
@@ -2018,7 +2018,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
             *err = *err > v ? *err : v;
          }
       }
-      if (!ae_isfinite(p[i + i * a->stride].x, _state) || !ae_isfinite(p[i + i * a->stride].y, _state)) {
+      if (!isfinite(p[i + i * a->stride].x) || !isfinite(p[i + i * a->stride].y)) {
          *nonfinite = true;
       } else {
          v = fabs(p[i + i * a->stride].x);
@@ -3558,17 +3558,17 @@ static void ae_double2str(double v, char *buf, ae_state *state) {
    ae_int_t i;
    ae_int_t sixbits[12];
 // handle special quantities
-   if (ae_isnan(v, state)) {
+   if (isnan(v)) {
       const char *s = ".nan_______";
       memmove(buf, s, strlen(s) + 1);
       return;
    }
-   if (ae_isposinf(v, state)) {
+   if (isposinf(v)) {
       const char *s = ".posinf____";
       memmove(buf, s, strlen(s) + 1);
       return;
    }
-   if (ae_isneginf(v, state)) {
+   if (isneginf(v)) {
       const char *s = ".neginf____";
       memmove(buf, s, strlen(s) + 1);
       return;
@@ -3709,113 +3709,12 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 }
 
 // Real math functions
-bool ae_isfinite_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN)
-      high = u.p[1];
-   else
-      high = u.p[0];
-   return (high & (ae_int32_t)0x7FF00000) != (ae_int32_t)0x7FF00000;
+bool isposinf(double x) {
+   return isinf(x) && !signbit(x);
 }
 
-bool ae_isnan_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-   return ((high & 0x7FF00000) == 0x7FF00000) && (((high & 0x000FFFFF) != 0) || (low != 0));
-}
-
-bool ae_isinf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-// 31 least significant bits of high are compared
-   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (low == 0);
-}
-
-bool ae_isposinf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-// all 32 bits of high are compared
-   return (high == (ae_int32_t)0x7FF00000) && (low == 0);
-}
-
-bool ae_isneginf_stateless(double x, ae_int_t endianness) {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   ae_int32_t high, low;
-   u.a = x;
-   if (endianness == AE_LITTLE_ENDIAN) {
-      high = u.p[1];
-      low = u.p[0];
-   } else {
-      high = u.p[0];
-      low = u.p[1];
-   }
-// this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers
-   return ((high & 0x7FFFFFFF) == 0x7FF00000) && (high != (ae_int32_t)0x7FF00000) && (low == 0);
-}
-
-bool ae_isfinite(double x, ae_state *state) {
-   return ae_isfinite_stateless(x, state->endianness);
-}
-
-bool ae_isnan(double x, ae_state *state) {
-   return ae_isnan_stateless(x, state->endianness);
-}
-
-bool ae_isinf(double x, ae_state *state) {
-   return ae_isinf_stateless(x, state->endianness);
-}
-
-bool ae_isposinf(double x, ae_state *state) {
-   return ae_isposinf_stateless(x, state->endianness);
-}
-
-bool ae_isneginf(double x, ae_state *state) {
-   return ae_isneginf_stateless(x, state->endianness);
-}
-
-double ae_fabs(double x, ae_state *state) {
-   return fabs(x);
+bool isneginf(double x) {
+   return isinf(x) && signbit(x);
 }
 
 ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
@@ -3824,10 +3723,6 @@ ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
 
 double sqr(double x, ae_state *state) {
    return x * x;
-}
-
-double ae_sqrt(double x, ae_state *state) {
-   return sqrt(x);
 }
 
 ae_int_t sign(double x, ae_state *state) {
@@ -3879,58 +3774,6 @@ double randomreal(ae_state *state) {
 
 ae_int_t randominteger(ae_int_t maxv, ae_state *state) {
    return rand() % maxv;
-}
-
-double ae_sin(double x, ae_state *state) {
-   return sin(x);
-}
-
-double ae_cos(double x, ae_state *state) {
-   return cos(x);
-}
-
-double ae_tan(double x, ae_state *state) {
-   return tan(x);
-}
-
-double ae_sinh(double x, ae_state *state) {
-   return sinh(x);
-}
-
-double ae_cosh(double x, ae_state *state) {
-   return cosh(x);
-}
-
-double ae_tanh(double x, ae_state *state) {
-   return tanh(x);
-}
-
-double ae_asin(double x, ae_state *state) {
-   return asin(x);
-}
-
-double ae_acos(double x, ae_state *state) {
-   return acos(x);
-}
-
-double ae_atan(double x, ae_state *state) {
-   return atan(x);
-}
-
-double ae_atan2(double y, double x, ae_state *state) {
-   return atan2(y, x);
-}
-
-double ae_log(double x, ae_state *state) {
-   return log(x);
-}
-
-double ae_pow(double x, double y, ae_state *state) {
-   return pow(x, y);
-}
-
-double ae_exp(double x, ae_state *state) {
-   return exp(x);
 }
 
 // Complex math functions
@@ -7614,7 +7457,7 @@ double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state) {
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xR, _state))
       result = 0.0;
    for (i = 0; i < n; i++) {
-      v = ae_fabs(x->xR[i], _state);
+      v = fabs(x->xR[i]);
       if (v > result) {
          result = v;
       }
@@ -7642,7 +7485,7 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state) {
       _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->xyR[rowidx], _state))
       result = 0.0;
    for (i = 0; i < n; i++) {
-      v = ae_fabs(x->xyR[rowidx][i], _state);
+      v = fabs(x->xyR[rowidx][i]);
       if (v > result) {
          result = v;
       }
@@ -8577,57 +8420,13 @@ double minreal(double m1, double m2) {
    return m1 > m2 ? m2 : m1;
 }
 
-bool fp_isnan(double x) {
-   return alglib_impl::ae_isnan_stateless(x, endianness);
+bool isposinf(double x) {
+   return isinf(x) && !signbit(x);
 }
 
-bool fp_isposinf(double x) {
-   return alglib_impl::ae_isposinf_stateless(x, endianness);
+bool isneginf(double x) {
+   return isinf(x) && signbit(x);
 }
-
-bool fp_isneginf(double x) {
-   return alglib_impl::ae_isneginf_stateless(x, endianness);
-}
-
-bool fp_isinf(double x) {
-   return alglib_impl::ae_isinf_stateless(x, endianness);
-}
-
-bool fp_isfinite(double x) {
-   return alglib_impl::ae_isfinite_stateless(x, endianness);
-}
-
-// Internal functions and constants.
-static double get_aenv_nan() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_nan;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-static double get_aenv_posinf() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_posinf;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-static double get_aenv_neginf() {
-   double r;
-   alglib_impl::ae_state _alglib_env_state;
-   alglib_impl::ae_state_init(&_alglib_env_state);
-   r = _alglib_env_state.v_neginf;
-   alglib_impl::ae_state_clear(&_alglib_env_state);
-   return r;
-}
-
-const double fp_nan = get_aenv_nan();
-const double fp_posinf = get_aenv_posinf();
-const double fp_neginf = get_aenv_neginf();
 
 // Complex number with double precision.
 complex &complex::operator=(const double &v) {
@@ -8715,9 +8514,9 @@ std::string complex::tostring(int _dps) const {
    if (dps <= 0 || dps >= 20)
       ThrowError("complex::tostring(): incorrect dps");
 // handle IEEE special quantities
-   if (fp_isnan(x) || fp_isnan(y))
+   if (isnan(x) || isnan(y))
       return "NAN";
-   if (fp_isinf(x) || fp_isinf(y))
+   if (isinf(x) || isinf(y))
       return "INF";
 // generate mask
    if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
@@ -9810,9 +9609,9 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
    // NAN, INF conversion
    //
       if (strimatch(buf, "nan"))
-         *result = fp_nan;
+         *result = NAN;
       if (strimatch(buf, "inf"))
-         *result = isign > 0 ? fp_posinf : fp_neginf;
+         *result = isign > 0 ? +INFINITY : -INFINITY;
       return true;
    }
 }
@@ -9904,14 +9703,14 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
       ThrowError("arraytostring(): buffer overflow");
    for (i = 0; i < n; i++) {
       buf[0] = 0;
-      if (fp_isfinite(ptr[i])) {
+      if (isfinite(ptr[i])) {
          if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof(buf))
             ThrowError("arraytostring(): buffer overflow");
-      } else if (fp_isnan(ptr[i]))
+      } else if (isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
-      else if (fp_isposinf(ptr[i]))
+      else if (isposinf(ptr[i]))
          strcpy(buf, i == 0 ? "+INF" : ",+INF");
-      else if (fp_isneginf(ptr[i]))
+      else if (isneginf(ptr[i]))
          strcpy(buf, i == 0 ? "-INF" : ",-INF");
       result += buf;
    }

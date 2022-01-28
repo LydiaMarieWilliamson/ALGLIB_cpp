@@ -176,7 +176,7 @@ void generatereflection(RVector *x, ae_int_t n, double *tau, ae_state *_state) {
 // calculations).
    mx = 0.0;
    for (j = 1; j <= n; j++) {
-      mx = maxreal(ae_fabs(x->xR[j], _state), mx, _state);
+      mx = maxreal(fabs(x->xR[j]), mx, _state);
    }
    s = 1.0;
    if (mx != 0.0) {
@@ -201,7 +201,7 @@ void generatereflection(RVector *x, ae_int_t n, double *tau, ae_state *_state) {
       for (j = 2; j <= n; j++) {
          xnorm += sqr(x->xR[j] / mx, _state);
       }
-      xnorm = ae_sqrt(xnorm, _state) * mx;
+      xnorm = sqrt(xnorm) * mx;
    }
    if (xnorm == 0.0) {
    // H  =  I
@@ -210,8 +210,8 @@ void generatereflection(RVector *x, ae_int_t n, double *tau, ae_state *_state) {
       return;
    }
 // general case
-   mx = maxreal(ae_fabs(alpha, _state), ae_fabs(xnorm, _state), _state);
-   beta = -mx * ae_sqrt(sqr(alpha / mx, _state) + sqr(xnorm / mx, _state), _state);
+   mx = maxreal(fabs(alpha), fabs(xnorm), _state);
+   beta = -mx * sqrt(sqr(alpha / mx, _state) + sqr(xnorm / mx, _state));
    if (alpha < 0.0) {
       beta = -beta;
    }
@@ -5639,17 +5639,17 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    }
    hqrndrandomize(&rs, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyR[i][j] = 0.0;
       }
    }
-   a->xyR[0][0] = ae_exp(l1, _state);
+   a->xyR[0][0] = exp(l1);
    for (i = 1; i < n - 1; i++) {
-      a->xyR[i][i] = ae_exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1, _state);
+      a->xyR[i][i] = exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1);
    }
-   a->xyR[n - 1][n - 1] = ae_exp(l2, _state);
+   a->xyR[n - 1][n - 1] = exp(l2);
    rmatrixrndorthogonalfromtheleft(a, n, n, _state);
    rmatrixrndorthogonalfromtheright(a, n, n, _state);
    ae_frame_leave(_state);
@@ -5688,17 +5688,17 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    }
    hqrndrandomize(&state, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = complex_from_d(ae_exp(l1, _state));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = complex_from_d(ae_exp(hqrnduniformr(&state, _state) * (l2 - l1) + l1, _state));
+      a->xyC[i][i] = complex_from_d(exp(hqrnduniformr(&state, _state) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = complex_from_d(ae_exp(l2, _state));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
    cmatrixrndorthogonalfromtheleft(a, n, n, _state);
    cmatrixrndorthogonalfromtheright(a, n, n, _state);
    ae_frame_leave(_state);
@@ -5855,17 +5855,17 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
 // Prepare matrix
    hqrndrandomize(&rs, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyR[i][j] = 0.0;
       }
    }
-   a->xyR[0][0] = ae_exp(l1, _state);
+   a->xyR[0][0] = exp(l1);
    for (i = 1; i < n - 1; i++) {
-      a->xyR[i][i] = (2 * hqrnduniformi(&rs, 2, _state) - 1) * ae_exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1, _state);
+      a->xyR[i][i] = (2 * hqrnduniformi(&rs, 2, _state) - 1) * exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1);
    }
-   a->xyR[n - 1][n - 1] = ae_exp(l2, _state);
+   a->xyR[n - 1][n - 1] = exp(l2);
 // Multiply
    smatrixrndmultiply(a, n, _state);
    ae_frame_leave(_state);
@@ -5902,17 +5902,17 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
 // Prepare matrix
    hqrndrandomize(&rs, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = complex_from_d(ae_exp(l1, _state));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = complex_from_d((2 * hqrnduniformi(&rs, 2, _state) - 1) * ae_exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1, _state));
+      a->xyC[i][i] = complex_from_d((2 * hqrnduniformi(&rs, 2, _state) - 1) * exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = complex_from_d(ae_exp(l2, _state));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
 // Multiply
    hmatrixrndmultiply(a, n, _state);
 // post-process to ensure that matrix diagonal is real
@@ -5956,17 +5956,17 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
 // Prepare matrix
    hqrndrandomize(&rs, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyR[i][j] = 0.0;
       }
    }
-   a->xyR[0][0] = ae_exp(l1, _state);
+   a->xyR[0][0] = exp(l1);
    for (i = 1; i < n - 1; i++) {
-      a->xyR[i][i] = ae_exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1, _state);
+      a->xyR[i][i] = exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1);
    }
-   a->xyR[n - 1][n - 1] = ae_exp(l2, _state);
+   a->xyR[n - 1][n - 1] = exp(l2);
 // Multiply
    smatrixrndmultiply(a, n, _state);
    ae_frame_leave(_state);
@@ -6006,17 +6006,17 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
 // Prepare matrix
    hqrndrandomize(&rs, _state);
    l1 = 0.0;
-   l2 = ae_log(1 / c, _state);
+   l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = complex_from_d(ae_exp(l1, _state));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = complex_from_d(ae_exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1, _state));
+      a->xyC[i][i] = complex_from_d(exp(hqrnduniformr(&rs, _state) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = complex_from_d(ae_exp(l2, _state));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
 // Multiply
    hmatrixrndmultiply(a, n, _state);
 // post-process to ensure that matrix diagonal is real
@@ -6754,7 +6754,7 @@ bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae
    bool result;
    ae_assert(0 <= i && i < s->m, "SparseRewriteExisting: invalid argument I(either I<0 or I >= S.M)", _state);
    ae_assert(0 <= j && j < s->n, "SparseRewriteExisting: invalid argument J(either J<0 or J >= S.N)", _state);
-   ae_assert(ae_isfinite(v, _state), "SparseRewriteExisting: invalid argument V(either V is infinite or V is NaN)", _state);
+   ae_assert(isfinite(v), "SparseRewriteExisting: invalid argument V(either V is infinite or V is NaN)", _state);
    result = false;
 // Hash-table matrix
    if (s->matrixtype == 0) {
@@ -6911,7 +6911,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
    ae_assert(i < s->m, "SparseSet: I >= M", _state);
    ae_assert(j >= 0, "SparseSet: J<0", _state);
    ae_assert(j < s->n, "SparseSet: J >= N", _state);
-   ae_assert(ae_isfinite(v, _state), "SparseSet: V is not finite number", _state);
+   ae_assert(isfinite(v), "SparseSet: V is not finite number", _state);
 // Hash-table matrix
    if (s->matrixtype == 0) {
       tcode = -1;
@@ -7005,7 +7005,7 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
    ae_assert(i < s->m, "SparseAdd: I >= M", _state);
    ae_assert(j >= 0, "SparseAdd: J<0", _state);
    ae_assert(j < s->n, "SparseAdd: J >= N", _state);
-   ae_assert(ae_isfinite(v, _state), "SparseAdd: V is not finite number", _state);
+   ae_assert(isfinite(v), "SparseAdd: V is not finite number", _state);
    if (v == 0.0) {
       return;
    }
@@ -8848,7 +8848,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
          // Next I
             i += stp;
          }
-         ae_assert(ae_isfinite(v0, _state), "SparseTRSV: overflow or division by exact zero", _state);
+         ae_assert(isfinite(v0), "SparseTRSV: overflow or division by exact zero", _state);
          return;
       }
       if (optype == 1) {
@@ -8905,7 +8905,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
          // Next I
             i += stp;
          }
-         ae_assert(ae_isfinite(v0, _state), "SparseTRSV: overflow or division by exact zero", _state);
+         ae_assert(isfinite(v0), "SparseTRSV: overflow or division by exact zero", _state);
          return;
       }
       ae_assert(false, "SparseTRSV: internal error", _state);
@@ -8945,7 +8945,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
             x->xR[i] = v;
             v0 = 0.25 * v0 + v;
          }
-         ae_assert(ae_isfinite(v0, _state), "SparseTRSV: overflow or division by exact zero", _state);
+         ae_assert(isfinite(v0), "SparseTRSV: overflow or division by exact zero", _state);
          return;
       }
       if ((optype == 1 && !isupper) || (optype == 0 && isupper)) {
@@ -8982,7 +8982,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
                x->xR[lt + j] -= v * s->vals.xR[lt1 + j];
             }
          }
-         ae_assert(ae_isfinite(v0, _state), "SparseTRSV: overflow or division by exact zero", _state);
+         ae_assert(isfinite(v0), "SparseTRSV: overflow or division by exact zero", _state);
          return;
       }
       ae_assert(false, "SparseTRSV: internal error", _state);
@@ -11769,9 +11769,9 @@ namespace alglib_impl {
 static double hsschur_extschursign(double a, double b, ae_state *_state) {
    double result;
    if (b >= 0.0) {
-      result = ae_fabs(a, _state);
+      result = fabs(a);
    } else {
-      result = -ae_fabs(a, _state);
+      result = -fabs(a);
    }
    return result;
 }
@@ -11833,15 +11833,15 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
          } else {
             temp = *a - (*d);
             p = 0.5 * temp;
-            bcmax = maxreal(ae_fabs(*b, _state), ae_fabs(*c, _state), _state);
-            bcmis = minreal(ae_fabs(*b, _state), ae_fabs(*c, _state), _state) * hsschur_extschursigntoone(*b, _state) * hsschur_extschursigntoone(*c, _state);
-            scl = maxreal(ae_fabs(p, _state), bcmax, _state);
+            bcmax = maxreal(fabs(*b), fabs(*c), _state);
+            bcmis = minreal(fabs(*b), fabs(*c), _state) * hsschur_extschursigntoone(*b, _state) * hsschur_extschursigntoone(*c, _state);
+            scl = maxreal(fabs(p), bcmax, _state);
             z = p / scl * p + bcmax / scl * bcmis;
          // If Z is of the order of the machine accuracy, postpone the
          // decision on the nature of eigenvalues
             if (z >= multpl * eps) {
             // Real eigenvalues. Compute A and D.
-               z = p + hsschur_extschursign(ae_sqrt(scl, _state) * ae_sqrt(z, _state), p, _state);
+               z = p + hsschur_extschursign(sqrt(scl) * sqrt(z), p, _state);
                *a = *d + z;
                *d -= bcmax / z * bcmis;
             // Compute B and the rotation matrix
@@ -11855,7 +11855,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
             // Make diagonal elements equal.
                sigma = *b + (*c);
                tau = pythag2(sigma, temp, _state);
-               *cs = ae_sqrt(0.5 * (1 + ae_fabs(sigma, _state) / tau), _state);
+               *cs = sqrt(0.5 * (1 + fabs(sigma) / tau));
                *sn = -p / (tau * (*cs)) * hsschur_extschursign(1.0, sigma, _state);
             // Compute [ AA  BB ] = [ A  B ] [ CS -SN ]
             //         [ CC  DD ]   [ C  D ] [ SN  CS ]
@@ -11876,10 +11876,10 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
                   if (*b != 0.0) {
                      if (hsschur_extschursigntoone(*b, _state) == hsschur_extschursigntoone(*c, _state)) {
                      // Real eigenvalues: reduce to upper triangular form
-                        sab = ae_sqrt(ae_fabs(*b, _state), _state);
-                        sac = ae_sqrt(ae_fabs(*c, _state), _state);
+                        sab = sqrt(fabs(*b));
+                        sac = sqrt(fabs(*c));
                         p = hsschur_extschursign(sab * sac, *c, _state);
-                        tau = 1 / ae_sqrt(ae_fabs(*b + (*c), _state), _state);
+                        tau = 1 / sqrt(fabs(*b + (*c)));
                         *a = temp + p;
                         *d = temp - p;
                         *b -= (*c);
@@ -11909,7 +11909,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
       *rt1i = 0.0;
       *rt2i = 0.0;
    } else {
-      *rt1i = ae_sqrt(ae_fabs(*b, _state), _state) * ae_sqrt(ae_fabs(*c, _state), _state);
+      *rt1i = sqrt(fabs(*b)) * sqrt(fabs(*c));
       *rt2i = -*rt1i;
    }
 }
@@ -12029,27 +12029,27 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
       for (its = 0; its <= itmax; its++) {
       // Look for a single small subdiagonal element.
          for (k = i; k >= l + 1; k--) {
-            if (ae_fabs(h->xyR[k][k - 1], _state) <= smlnum) {
+            if (fabs(h->xyR[k][k - 1]) <= smlnum) {
                break;
             }
-            tst = ae_fabs(h->xyR[k - 1][k - 1], _state) + ae_fabs(h->xyR[k][k], _state);
+            tst = fabs(h->xyR[k - 1][k - 1]) + fabs(h->xyR[k][k]);
             if (tst == 0.0) {
                if (k - 2 >= ilo) {
-                  tst += ae_fabs(h->xyR[k - 1][k - 2], _state);
+                  tst += fabs(h->xyR[k - 1][k - 2]);
                }
                if (k + 1 <= ihi) {
-                  tst += ae_fabs(h->xyR[k + 1][k], _state);
+                  tst += fabs(h->xyR[k + 1][k]);
                }
             }
          // ==== The following is a conservative small subdiagonal
          // .    deflation  criterion due to Ahues & Tisseur (LAWN 122,
          // .    1997). It has better mathematical foundation and
          // .    improves accuracy in some cases.  ====
-            if (ae_fabs(h->xyR[k][k - 1], _state) <= ulp * tst) {
-               ab = maxreal(ae_fabs(h->xyR[k][k - 1], _state), ae_fabs(h->xyR[k - 1][k], _state), _state);
-               ba = minreal(ae_fabs(h->xyR[k][k - 1], _state), ae_fabs(h->xyR[k - 1][k], _state), _state);
-               aa = maxreal(ae_fabs(h->xyR[k][k], _state), ae_fabs(h->xyR[k - 1][k - 1] - h->xyR[k][k], _state), _state);
-               bb = minreal(ae_fabs(h->xyR[k][k], _state), ae_fabs(h->xyR[k - 1][k - 1] - h->xyR[k][k], _state), _state);
+            if (fabs(h->xyR[k][k - 1]) <= ulp * tst) {
+               ab = maxreal(fabs(h->xyR[k][k - 1]), fabs(h->xyR[k - 1][k]), _state);
+               ba = minreal(fabs(h->xyR[k][k - 1]), fabs(h->xyR[k - 1][k]), _state);
+               aa = maxreal(fabs(h->xyR[k][k]), fabs(h->xyR[k - 1][k - 1] - h->xyR[k][k]), _state);
+               bb = minreal(fabs(h->xyR[k][k]), fabs(h->xyR[k - 1][k - 1] - h->xyR[k][k]), _state);
                s = aa + ab;
                if (ba * (ab / s) <= maxreal(smlnum, ulp * (bb * (aa / s)), _state)) {
                   break;
@@ -12076,7 +12076,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
       // Shifts
          if (its == 10) {
          // Exceptional shift.
-            s = ae_fabs(h->xyR[l + 1][l], _state) + ae_fabs(h->xyR[l + 2][l + 1], _state);
+            s = fabs(h->xyR[l + 1][l]) + fabs(h->xyR[l + 2][l + 1]);
             h11 = dat1 * s + h->xyR[l][l];
             h12 = dat2 * s;
             h21 = s;
@@ -12084,7 +12084,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
          } else {
             if (its == 20) {
             // Exceptional shift.
-               s = ae_fabs(h->xyR[i][i - 1], _state) + ae_fabs(h->xyR[i - 1][i - 2], _state);
+               s = fabs(h->xyR[i][i - 1]) + fabs(h->xyR[i - 1][i - 2]);
                h11 = dat1 * s + h->xyR[i][i];
                h12 = dat2 * s;
                h21 = s;
@@ -12098,7 +12098,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
                h22 = h->xyR[i][i];
             }
          }
-         s = ae_fabs(h11, _state) + ae_fabs(h12, _state) + ae_fabs(h21, _state) + ae_fabs(h22, _state);
+         s = fabs(h11) + fabs(h12) + fabs(h21) + fabs(h22);
          if (s == 0.0) {
             rt1r = 0.0;
             rt1i = 0.0;
@@ -12111,7 +12111,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
             h22 /= s;
             tr = (h11 + h22) / 2;
             det = (h11 - tr) * (h22 - tr) - h12 * h21;
-            rtdisc = ae_sqrt(ae_fabs(det, _state), _state);
+            rtdisc = sqrt(fabs(det));
             if (det >= 0.0) {
             // ==== complex conjugate shifts ====
                rt1r = tr * s;
@@ -12122,7 +12122,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
             // ==== real shifts (use only one of them)  ====
                rt1r = tr + rtdisc;
                rt2r = tr - rtdisc;
-               if (ae_fabs(rt1r - h22, _state) <= ae_fabs(rt2r - h22, _state)) {
+               if (fabs(rt1r - h22) <= fabs(rt2r - h22)) {
                   rt1r *= s;
                   rt2r = rt1r;
                } else {
@@ -12140,19 +12140,19 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
          // negligible.  (The following uses scaling to avoid
          // overflows and most underflows.)
             h21s = h->xyR[m + 1][m];
-            s = ae_fabs(h->xyR[m][m] - rt2r, _state) + ae_fabs(rt2i, _state) + ae_fabs(h21s, _state);
+            s = fabs(h->xyR[m][m] - rt2r) + fabs(rt2i) + fabs(h21s);
             h21s = h->xyR[m + 1][m] / s;
             workv3->xR[1] = h21s * h->xyR[m][m + 1] + (h->xyR[m][m] - rt1r) * ((h->xyR[m][m] - rt2r) / s) - rt1i * (rt2i / s);
             workv3->xR[2] = h21s * (h->xyR[m][m] + h->xyR[m + 1][m + 1] - rt1r - rt2r);
             workv3->xR[3] = h21s * h->xyR[m + 2][m + 1];
-            s = ae_fabs(workv3->xR[1], _state) + ae_fabs(workv3->xR[2], _state) + ae_fabs(workv3->xR[3], _state);
+            s = fabs(workv3->xR[1]) + fabs(workv3->xR[2]) + fabs(workv3->xR[3]);
             workv3->xR[1] /= s;
             workv3->xR[2] /= s;
             workv3->xR[3] /= s;
             if (m == l) {
                break;
             }
-            if (ae_fabs(h->xyR[m][m - 1], _state) * (ae_fabs(workv3->xR[2], _state) + ae_fabs(workv3->xR[3], _state)) <= ulp * ae_fabs(workv3->xR[1], _state) * (ae_fabs(h->xyR[m - 1][m - 1], _state) + ae_fabs(h->xyR[m][m], _state) + ae_fabs(h->xyR[m + 1][m + 1], _state))) {
+            if (fabs(h->xyR[m][m - 1]) * (fabs(workv3->xR[2]) + fabs(workv3->xR[3])) <= ulp * fabs(workv3->xR[1]) * (fabs(h->xyR[m - 1][m - 1]) + fabs(h->xyR[m][m]) + fabs(h->xyR[m + 1][m + 1]))) {
                break;
             }
          }
@@ -12475,11 +12475,11 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
       for (its = 0; its <= itn; its++) {
       // Look for a single small subdiagonal element.
          for (k = i; k >= l + 1; k--) {
-            tst1 = ae_fabs(h->xyR[k - 1][k - 1], _state) + ae_fabs(h->xyR[k][k], _state);
+            tst1 = fabs(h->xyR[k - 1][k - 1]) + fabs(h->xyR[k][k]);
             if (tst1 == 0.0) {
                tst1 = upperhessenberg1norm(h, l, i, l, i, &work, _state);
             }
-            if (ae_fabs(h->xyR[k][k - 1], _state) <= maxreal(ulp * tst1, smlnum, _state)) {
+            if (fabs(h->xyR[k][k - 1]) <= maxreal(ulp * tst1, smlnum, _state)) {
                break;
             }
          }
@@ -12499,7 +12499,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
          if (its == 20 || its == 30) {
          // Exceptional shifts.
             for (ii = i - ns + 1; ii <= i; ii++) {
-               wr->xR[ii] = cnst * (ae_fabs(h->xyR[ii][ii - 1], _state) + ae_fabs(h->xyR[ii][ii], _state));
+               wr->xR[ii] = cnst * (fabs(h->xyR[ii][ii - 1]) + fabs(h->xyR[ii][ii]));
                wi->xR[ii] = 0.0;
             }
          } else {
@@ -12543,7 +12543,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
                      ae_v_move(&vv.xR[1], 1, &v.xR[1], 1, p1);
                      matrixvectormultiply(h, l, l + nv, l, l + nv - 1, false, &v, 1, nv, 1.0, &vv, 1, nv + 1, -2 * wr->xR[j], _state);
                      itemp = vectoridxabsmax(&vv, 1, nv + 1, _state);
-                     temp = 1 / maxreal(ae_fabs(vv.xR[itemp], _state), smlnum, _state);
+                     temp = 1 / maxreal(fabs(vv.xR[itemp]), smlnum, _state);
                      p1 = nv + 1;
                      ae_v_muld(&vv.xR[1], 1, p1, temp);
                      absw = pythag2(wr->xR[j], wi->xR[j], _state);
@@ -12555,7 +12555,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
             // Scale V(1:NV) so that max(abs(V(i))) = 1. If V is zero,
             // reset it to the unit vector.
                itemp = vectoridxabsmax(&v, 1, nv, _state);
-               temp = ae_fabs(v.xR[itemp], _state);
+               temp = fabs(v.xR[itemp]);
                if (temp == 0.0) {
                   v.xR[1] = 1.0;
                   for (ii = 2; ii <= nv; ii++) {
@@ -12776,7 +12776,7 @@ static void evd_internalhsevdladiv(double a, double b, double c, double d, doubl
    double f;
    *p = 0;
    *q = 0;
-   if (ae_fabs(d, _state) < ae_fabs(c, _state)) {
+   if (fabs(d) < fabs(c)) {
       e = d / c;
       f = c + d * e;
       *p = (a + b * e) / f;
@@ -12905,7 +12905,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
       //
       // C = ca A - w D
          csr = ca * a->xyR[1][1] - wr * d1;
-         cnorm = ae_fabs(csr, _state);
+         cnorm = fabs(csr);
       // If | C | < SMINI, use C = SMINI
          if (cnorm < smini) {
             csr = smini;
@@ -12913,7 +12913,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             *info = 1;
          }
       // Check scaling for  X = B / C
-         bnorm = ae_fabs(b->xyR[1][1], _state);
+         bnorm = fabs(b->xyR[1][1]);
          if (cnorm < 1.0 && bnorm > 1.0) {
             if (bnorm > bignum * cnorm) {
                *scl = 1 / bnorm;
@@ -12921,14 +12921,14 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          }
       // Compute X
          x->xyR[1][1] = b->xyR[1][1] * (*scl) / csr;
-         *xnorm = ae_fabs(x->xyR[1][1], _state);
+         *xnorm = fabs(x->xyR[1][1]);
       } else {
       // Complex 1x1 system (w is complex)
       //
       // C = ca A - w D
          csr = ca * a->xyR[1][1] - wr * d1;
          csi = -wi * d1;
-         cnorm = ae_fabs(csr, _state) + ae_fabs(csi, _state);
+         cnorm = fabs(csr) + fabs(csi);
       // If | C | < SMINI, use C = SMINI
          if (cnorm < smini) {
             csr = smini;
@@ -12937,7 +12937,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             *info = 1;
          }
       // Check scaling for  X = B / C
-         bnorm = ae_fabs(b->xyR[1][1], _state) + ae_fabs(b->xyR[1][2], _state);
+         bnorm = fabs(b->xyR[1][1]) + fabs(b->xyR[1][2]);
          if (cnorm < 1.0 && bnorm > 1.0) {
             if (bnorm > bignum * cnorm) {
                *scl = 1 / bnorm;
@@ -12947,7 +12947,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          evd_internalhsevdladiv(*scl * b->xyR[1][1], *scl * b->xyR[1][2], csr, csi, &tmp1, &tmp2, _state);
          x->xyR[1][1] = tmp1;
          x->xyR[1][2] = tmp2;
-         *xnorm = ae_fabs(x->xyR[1][1], _state) + ae_fabs(x->xyR[1][2], _state);
+         *xnorm = fabs(x->xyR[1][1]) + fabs(x->xyR[1][2]);
       }
    } else {
    // 2x2 System
@@ -12969,14 +12969,14 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          cmax = 0.0;
          icmax = 0;
          for (j = 1; j <= 4; j++) {
-            if (ae_fabs(crv4->xR[j], _state) > cmax) {
-               cmax = ae_fabs(crv4->xR[j], _state);
+            if (fabs(crv4->xR[j]) > cmax) {
+               cmax = fabs(crv4->xR[j]);
                icmax = j;
             }
          }
       // If norm(C) < SMINI, use SMINI*identity.
          if (cmax < smini) {
-            bnorm = maxreal(ae_fabs(b->xyR[1][1], _state), ae_fabs(b->xyR[2][1], _state), _state);
+            bnorm = maxreal(fabs(b->xyR[1][1]), fabs(b->xyR[2][1]), _state);
             if (smini < 1.0 && bnorm > 1.0) {
                if (bnorm > bignum * smini) {
                   *scl = 1 / bnorm;
@@ -12998,7 +12998,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          lr21 = ur11r * cr21;
          ur22 = cr22 - ur12 * lr21;
       // If smaller pivot < SMINI, use SMINI
-         if (ae_fabs(ur22, _state) < smini) {
+         if (fabs(ur22) < smini) {
             ur22 = smini;
             *info = 1;
          }
@@ -13010,9 +13010,9 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             br2 = b->xyR[2][1];
          }
          br2 -= lr21 * br1;
-         bbnd = maxreal(ae_fabs(br1 * (ur22 * ur11r), _state), ae_fabs(br2, _state), _state);
-         if (bbnd > 1.0 && ae_fabs(ur22, _state) < 1.0) {
-            if (bbnd >= bignum * ae_fabs(ur22, _state)) {
+         bbnd = maxreal(fabs(br1 * (ur22 * ur11r)), fabs(br2), _state);
+         if (bbnd > 1.0 && fabs(ur22) < 1.0) {
+            if (bbnd >= bignum * fabs(ur22)) {
                *scl = 1 / bbnd;
             }
          }
@@ -13025,7 +13025,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             x->xyR[1][1] = xr1;
             x->xyR[2][1] = xr2;
          }
-         *xnorm = maxreal(ae_fabs(xr1, _state), ae_fabs(xr2, _state), _state);
+         *xnorm = maxreal(fabs(xr1), fabs(xr2), _state);
       // Further scaling if  norm(A) norm(X) > overflow
          if (*xnorm > 1.0 && cmax > 1.0) {
             if (*xnorm > bignum / cmax) {
@@ -13047,14 +13047,14 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          cmax = 0.0;
          icmax = 0;
          for (j = 1; j <= 4; j++) {
-            if (ae_fabs(crv4->xR[j], _state) + ae_fabs(civ4->xR[j], _state) > cmax) {
-               cmax = ae_fabs(crv4->xR[j], _state) + ae_fabs(civ4->xR[j], _state);
+            if (fabs(crv4->xR[j]) + fabs(civ4->xR[j]) > cmax) {
+               cmax = fabs(crv4->xR[j]) + fabs(civ4->xR[j]);
                icmax = j;
             }
          }
       // If norm(C) < SMINI, use SMINI*identity.
          if (cmax < smini) {
-            bnorm = maxreal(ae_fabs(b->xyR[1][1], _state) + ae_fabs(b->xyR[1][2], _state), ae_fabs(b->xyR[2][1], _state) + ae_fabs(b->xyR[2][2], _state), _state);
+            bnorm = maxreal(fabs(b->xyR[1][1]) + fabs(b->xyR[1][2]), fabs(b->xyR[2][1]) + fabs(b->xyR[2][2]), _state);
             if (smini < 1.0 && bnorm > 1.0) {
                if (bnorm > bignum * smini) {
                   *scl = 1 / bnorm;
@@ -13080,7 +13080,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          ci22 = civ4->xR[ipivot44->xyZ[4][icmax]];
          if (icmax == 1 || icmax == 4) {
          // Code when off-diagonals of pivoted C are real
-            if (ae_fabs(ur11, _state) > ae_fabs(ui11, _state)) {
+            if (fabs(ur11) > fabs(ui11)) {
                temp = ui11 / ur11;
                ur11r = 1 / (ur11 * (1 + sqr(temp, _state)));
                ui11r = -temp * ur11r;
@@ -13106,7 +13106,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             ur22 = cr22 - ur12 * lr21 + ui12 * li21;
             ui22 = -ur12 * li21 - ui12 * lr21;
          }
-         u22abs = ae_fabs(ur22, _state) + ae_fabs(ui22, _state);
+         u22abs = fabs(ur22) + fabs(ui22);
       // If smaller pivot < SMINI, use SMINI
          if (u22abs < smini) {
             ur22 = smini;
@@ -13126,7 +13126,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          }
          br2 -= lr21 * br1 - li21 * bi1;
          bi2 -= li21 * br1 + lr21 * bi1;
-         bbnd = maxreal((ae_fabs(br1, _state) + ae_fabs(bi1, _state)) * (u22abs * (ae_fabs(ur11r, _state) + ae_fabs(ui11r, _state))), ae_fabs(br2, _state) + ae_fabs(bi2, _state), _state);
+         bbnd = maxreal((fabs(br1) + fabs(bi1)) * (u22abs * (fabs(ur11r) + fabs(ui11r))), fabs(br2) + fabs(bi2), _state);
          if (bbnd > 1.0 && u22abs < 1.0) {
             if (bbnd >= bignum * u22abs) {
                *scl = 1 / bbnd;
@@ -13150,7 +13150,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
             x->xyR[1][2] = xi1;
             x->xyR[2][2] = xi2;
          }
-         *xnorm = maxreal(ae_fabs(xr1, _state) + ae_fabs(xi1, _state), ae_fabs(xr2, _state) + ae_fabs(xi2, _state), _state);
+         *xnorm = maxreal(fabs(xr1) + fabs(xi1), fabs(xr2) + fabs(xi2), _state);
       // Further scaling if  norm(A) norm(X) > overflow
          if (*xnorm > 1.0 && cmax > 1.0) {
             if (*xnorm > bignum / cmax) {
@@ -13327,7 +13327,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
    for (j = 2; j <= n; j++) {
       work.xR[j] = 0.0;
       for (i = 1; i < j; i++) {
-         work.xR[j] += ae_fabs(t->xyR[i][j], _state);
+         work.xR[j] += fabs(t->xyR[i][j]);
       }
    }
 // Index IP is used to specify the real or complex eigenvalue:
@@ -13366,9 +13366,9 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
             wr = t->xyR[ki][ki];
             wi = 0.0;
             if (ip != 0) {
-               wi = ae_sqrt(ae_fabs(t->xyR[ki][ki - 1], _state), _state) * ae_sqrt(ae_fabs(t->xyR[ki - 1][ki], _state), _state);
+               wi = sqrt(fabs(t->xyR[ki][ki - 1])) * sqrt(fabs(t->xyR[ki - 1][ki]));
             }
-            smin = maxreal(ulp * (ae_fabs(wr, _state) + ae_fabs(wi, _state)), smlnum, _state);
+            smin = maxreal(ulp * (fabs(wr) + fabs(wi)), smlnum, _state);
             if (ip == 0) {
             // Real right eigenvector
                work.xR[ki + n] = 1.0;
@@ -13462,7 +13462,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                   k2 = ki + n;
                   ae_v_move(&vr->xyR[1][iis], vr->stride, &work.xR[k1], 1, ki);
                   ii = columnidxabsmax(vr, 1, ki, iis, _state);
-                  remax = 1 / ae_fabs(vr->xyR[ii][iis], _state);
+                  remax = 1 / fabs(vr->xyR[ii][iis]);
                   ae_v_muld(&vr->xyR[1][iis], vr->stride, ki, remax);
                   for (k = ki + 1; k <= n; k++) {
                      vr->xyR[k][iis] = 0.0;
@@ -13474,7 +13474,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                      ae_v_move(&vr->xyR[1][ki], vr->stride, &temp.xR[1], 1, n);
                   }
                   ii = columnidxabsmax(vr, 1, n, ki, _state);
-                  remax = 1 / ae_fabs(vr->xyR[ii][ki], _state);
+                  remax = 1 / fabs(vr->xyR[ii][ki]);
                   ae_v_muld(&vr->xyR[1][ki], vr->stride, n, remax);
                }
             } else {
@@ -13483,7 +13483,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
             // Initial solve
             //     [ (T(KI-1,KI-1) T(KI-1,KI) ) - (WR + I* WI)]*X = 0.
             //     [ (T(KI,KI-1)   T(KI,KI)   )               ]
-               if (ae_fabs(t->xyR[ki - 1][ki], _state) >= ae_fabs(t->xyR[ki][ki - 1], _state)) {
+               if (fabs(t->xyR[ki - 1][ki]) >= fabs(t->xyR[ki][ki - 1])) {
                   work.xR[ki - 1 + n] = 1.0;
                   work.xR[ki + n2] = wi / t->xyR[ki - 1][ki];
                } else {
@@ -13602,7 +13602,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                   ae_v_move(&vr->xyR[1][iis], vr->stride, &work.xR[n2 + 1], 1, ki);
                   emax = 0.0;
                   for (k = 1; k <= ki; k++) {
-                     emax = maxreal(emax, ae_fabs(vr->xyR[k][iis - 1], _state) + ae_fabs(vr->xyR[k][iis], _state), _state);
+                     emax = maxreal(emax, fabs(vr->xyR[k][iis - 1]) + fabs(vr->xyR[k][iis]), _state);
                   }
                   remax = 1 / emax;
                   ae_v_muld(&vr->xyR[1][iis - 1], vr->stride, ki, remax);
@@ -13627,7 +13627,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                   }
                   emax = 0.0;
                   for (k = 1; k <= n; k++) {
-                     emax = maxreal(emax, ae_fabs(vr->xyR[k][ki - 1], _state) + ae_fabs(vr->xyR[k][ki], _state), _state);
+                     emax = maxreal(emax, fabs(vr->xyR[k][ki - 1]) + fabs(vr->xyR[k][ki]), _state);
                   }
                   remax = 1 / emax;
                   ae_v_muld(&vr->xyR[1][ki - 1], vr->stride, n, remax);
@@ -13672,9 +13672,9 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
             wr = t->xyR[ki][ki];
             wi = 0.0;
             if (ip != 0) {
-               wi = ae_sqrt(ae_fabs(t->xyR[ki][ki + 1], _state), _state) * ae_sqrt(ae_fabs(t->xyR[ki + 1][ki], _state), _state);
+               wi = sqrt(fabs(t->xyR[ki][ki + 1])) * sqrt(fabs(t->xyR[ki + 1][ki]));
             }
-            smin = maxreal(ulp * (ae_fabs(wr, _state) + ae_fabs(wi, _state)), smlnum, _state);
+            smin = maxreal(ulp * (fabs(wr) + fabs(wi)), smlnum, _state);
             if (ip == 0) {
             // Real left eigenvector.
                work.xR[ki + n] = 1.0;
@@ -13722,7 +13722,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                         ae_v_muld(&work.xR[ki + n], 1, n - ki + 1, scl);
                      }
                      work.xR[j + n] = x.xyR[1][1];
-                     vmax = maxreal(ae_fabs(work.xR[j + n], _state), vmax, _state);
+                     vmax = maxreal(fabs(work.xR[j + n]), vmax, _state);
                      vcrit = bignum / vmax;
                   } else {
                   // 2-by-2 diagonal block
@@ -13756,7 +13756,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                      }
                      work.xR[j + n] = x.xyR[1][1];
                      work.xR[j + 1 + n] = x.xyR[2][1];
-                     vmax = maxreal(ae_fabs(work.xR[j + n], _state), maxreal(ae_fabs(work.xR[j + 1 + n], _state), vmax, _state), _state);
+                     vmax = maxreal(fabs(work.xR[j + n]), maxreal(fabs(work.xR[j + 1 + n]), vmax, _state), _state);
                      vcrit = bignum / vmax;
                   }
                }
@@ -13764,7 +13764,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                if (!over) {
                   ae_v_move(&vl->xyR[ki][iis], vl->stride, &work.xR[ki + n], 1, n - ki + 1);
                   ii = columnidxabsmax(vl, ki, n, iis, _state);
-                  remax = 1 / ae_fabs(vl->xyR[ii][iis], _state);
+                  remax = 1 / fabs(vl->xyR[ii][iis]);
                   ae_v_muld(&vl->xyR[ki][iis], vl->stride, n - ki + 1, remax);
                   for (k = 1; k < ki; k++) {
                      vl->xyR[k][iis] = 0.0;
@@ -13776,7 +13776,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                      ae_v_move(&vl->xyR[1][ki], vl->stride, &temp.xR[1], 1, n);
                   }
                   ii = columnidxabsmax(vl, 1, n, ki, _state);
-                  remax = 1 / ae_fabs(vl->xyR[ii][ki], _state);
+                  remax = 1 / fabs(vl->xyR[ii][ki]);
                   ae_v_muld(&vl->xyR[1][ki], vl->stride, n, remax);
                }
             } else {
@@ -13785,7 +13785,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
             // Initial solve:
             //   ((T(KI,KI)    T(KI,KI+1) )' - (WR - I* WI))*X = 0.
             //   ((T(KI+1,KI) T(KI+1,KI+1))                )
-               if (ae_fabs(t->xyR[ki][ki + 1], _state) >= ae_fabs(t->xyR[ki + 1][ki], _state)) {
+               if (fabs(t->xyR[ki][ki + 1]) >= fabs(t->xyR[ki + 1][ki])) {
                   work.xR[ki + n] = wi / t->xyR[ki][ki + 1];
                   work.xR[ki + 1 + n2] = 1.0;
                } else {
@@ -13845,7 +13845,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                      }
                      work.xR[j + n] = x.xyR[1][1];
                      work.xR[j + n2] = x.xyR[1][2];
-                     vmax = maxreal(ae_fabs(work.xR[j + n], _state), maxreal(ae_fabs(work.xR[j + n2], _state), vmax, _state), _state);
+                     vmax = maxreal(fabs(work.xR[j + n]), maxreal(fabs(work.xR[j + n2]), vmax, _state), _state);
                      vcrit = bignum / vmax;
                   } else {
                   // 2-by-2 diagonal block
@@ -13889,10 +13889,10 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                      work.xR[j + n2] = x.xyR[1][2];
                      work.xR[j + 1 + n] = x.xyR[2][1];
                      work.xR[j + 1 + n2] = x.xyR[2][2];
-                     vmax = maxreal(ae_fabs(x.xyR[1][1], _state), vmax, _state);
-                     vmax = maxreal(ae_fabs(x.xyR[1][2], _state), vmax, _state);
-                     vmax = maxreal(ae_fabs(x.xyR[2][1], _state), vmax, _state);
-                     vmax = maxreal(ae_fabs(x.xyR[2][2], _state), vmax, _state);
+                     vmax = maxreal(fabs(x.xyR[1][1]), vmax, _state);
+                     vmax = maxreal(fabs(x.xyR[1][2]), vmax, _state);
+                     vmax = maxreal(fabs(x.xyR[2][1]), vmax, _state);
+                     vmax = maxreal(fabs(x.xyR[2][2]), vmax, _state);
                      vcrit = bignum / vmax;
                   }
                }
@@ -13902,7 +13902,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                   ae_v_move(&vl->xyR[ki][iis + 1], vl->stride, &work.xR[ki + n2], 1, n - ki + 1);
                   emax = 0.0;
                   for (k = ki; k <= n; k++) {
-                     emax = maxreal(emax, ae_fabs(vl->xyR[k][iis], _state) + ae_fabs(vl->xyR[k][iis + 1], _state), _state);
+                     emax = maxreal(emax, fabs(vl->xyR[k][iis]) + fabs(vl->xyR[k][iis + 1]), _state);
                   }
                   remax = 1 / emax;
                   ae_v_muld(&vl->xyR[ki][iis], vl->stride, n - ki + 1, remax);
@@ -13927,7 +13927,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
                   }
                   emax = 0.0;
                   for (k = 1; k <= n; k++) {
-                     emax = maxreal(emax, ae_fabs(vl->xyR[k][ki], _state) + ae_fabs(vl->xyR[k][ki + 1], _state), _state);
+                     emax = maxreal(emax, fabs(vl->xyR[k][ki]) + fabs(vl->xyR[k][ki + 1]), _state);
                   }
                   remax = 1 / emax;
                   ae_v_muld(&vl->xyR[1][ki], vl->stride, n, remax);
@@ -14054,10 +14054,10 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2, 
    *rt2 = 0;
    sm = a + c;
    df = a - c;
-   adf = ae_fabs(df, _state);
+   adf = fabs(df);
    tb = b + b;
-   ab = ae_fabs(tb, _state);
-   if (ae_fabs(a, _state) > ae_fabs(c, _state)) {
+   ab = fabs(tb);
+   if (fabs(a) > fabs(c)) {
       acmx = a;
       acmn = c;
    } else {
@@ -14065,13 +14065,13 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2, 
       acmn = a;
    }
    if (adf > ab) {
-      rt = adf * ae_sqrt(1 + sqr(ab / adf, _state), _state);
+      rt = adf * sqrt(1 + sqr(ab / adf, _state));
    } else {
       if (adf < ab) {
-         rt = ab * ae_sqrt(1 + sqr(adf / ab, _state), _state);
+         rt = ab * sqrt(1 + sqr(adf / ab, _state));
       } else {
       // Includes case AB=ADF=0
-         rt = ab * ae_sqrt(2.0, _state);
+         rt = ab * sqrt(2.0);
       }
    }
    if (sm < 0.0) {
@@ -14134,10 +14134,10 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
 // Compute the eigenvalues
    sm = a + c;
    df = a - c;
-   adf = ae_fabs(df, _state);
+   adf = fabs(df);
    tb = b + b;
-   ab = ae_fabs(tb, _state);
-   if (ae_fabs(a, _state) > ae_fabs(c, _state)) {
+   ab = fabs(tb);
+   if (fabs(a) > fabs(c)) {
       acmx = a;
       acmn = c;
    } else {
@@ -14145,13 +14145,13 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
       acmn = a;
    }
    if (adf > ab) {
-      rt = adf * ae_sqrt(1 + sqr(ab / adf, _state), _state);
+      rt = adf * sqrt(1 + sqr(ab / adf, _state));
    } else {
       if (adf < ab) {
-         rt = ab * ae_sqrt(1 + sqr(adf / ab, _state), _state);
+         rt = ab * sqrt(1 + sqr(adf / ab, _state));
       } else {
       // Includes case AB=ADF=0
-         rt = ab * ae_sqrt(2.0, _state);
+         rt = ab * sqrt(2.0);
       }
    }
    if (sm < 0.0) {
@@ -14184,10 +14184,10 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
       cs = df - rt;
       sgn2 = -1;
    }
-   acs = ae_fabs(cs, _state);
+   acs = fabs(cs);
    if (acs > ab) {
       ct = -tb / cs;
-      *sn1 = 1 / ae_sqrt(1 + ct * ct, _state);
+      *sn1 = 1 / sqrt(1 + ct * ct);
       *cs1 = ct * (*sn1);
    } else {
       if (ab == 0.0) {
@@ -14195,7 +14195,7 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
          *sn1 = 0.0;
       } else {
          tn = -cs / tb;
-         *cs1 = 1 / ae_sqrt(1 + tn * tn, _state);
+         *cs1 = 1 / sqrt(1 + tn * tn);
          *sn1 = tn * (*cs1);
       }
    }
@@ -14209,10 +14209,10 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
 // Internal routine
 static double evd_tdevdpythag(double a, double b, ae_state *_state) {
    double result;
-   if (ae_fabs(a, _state) < ae_fabs(b, _state)) {
-      result = ae_fabs(b, _state) * ae_sqrt(1 + sqr(a / b, _state), _state);
+   if (fabs(a) < fabs(b)) {
+      result = fabs(b) * sqrt(1 + sqr(a / b, _state));
    } else {
-      result = ae_fabs(a, _state) * ae_sqrt(1 + sqr(b / a, _state), _state);
+      result = fabs(a) * sqrt(1 + sqr(b / a, _state));
    }
    return result;
 }
@@ -14221,9 +14221,9 @@ static double evd_tdevdpythag(double a, double b, ae_state *_state) {
 static double evd_tdevdextsign(double a, double b, ae_state *_state) {
    double result;
    if (b >= 0.0) {
-      result = ae_fabs(a, _state);
+      result = fabs(a);
    } else {
-      result = -ae_fabs(a, _state);
+      result = -fabs(a);
    }
    return result;
 }
@@ -14312,8 +14312,8 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
    eps2 = sqr(eps, _state);
    safmin = minrealnumber;
    safmax = maxrealnumber;
-   ssfmax = ae_sqrt(safmax, _state) / 3;
-   ssfmin = ae_sqrt(safmin, _state) / eps2;
+   ssfmax = sqrt(safmax) / 3;
+   ssfmin = sqrt(safmin) / eps2;
 // Prepare Z
 //
 // Here we are using transposition to get rid of column operations
@@ -14375,12 +14375,12 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
       m = l1;
       if (l1 <= nm1) {
          for (m = l1; m <= nm1; m++) {
-            tst = ae_fabs(e->xR[m], _state);
+            tst = fabs(e->xR[m]);
             if (tst == 0.0) {
                gotoflag = true;
                break;
             }
-            if (tst <= ae_sqrt(ae_fabs(d->xR[m], _state), _state) * ae_sqrt(ae_fabs(d->xR[m + 1], _state), _state) * eps) {
+            if (tst <= sqrt(fabs(d->xR[m])) * sqrt(fabs(d->xR[m + 1])) * eps) {
                e->xR[m] = 0.0;
                gotoflag = true;
                break;
@@ -14401,11 +14401,11 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
       }
    // Scale submatrix in rows and columns L to LEND
       if (l == lend) {
-         anorm = ae_fabs(d->xR[l], _state);
+         anorm = fabs(d->xR[l]);
       } else {
-         anorm = maxreal(ae_fabs(d->xR[l], _state) + ae_fabs(e->xR[l], _state), ae_fabs(e->xR[lend - 1], _state) + ae_fabs(d->xR[lend], _state), _state);
+         anorm = maxreal(fabs(d->xR[l]) + fabs(e->xR[l]), fabs(e->xR[lend - 1]) + fabs(d->xR[lend]), _state);
          for (i = l + 1; i < lend; i++) {
-            anorm = maxreal(anorm, ae_fabs(d->xR[i], _state) + ae_fabs(e->xR[i], _state) + ae_fabs(e->xR[i - 1], _state), _state);
+            anorm = maxreal(anorm, fabs(d->xR[i]) + fabs(e->xR[i]) + fabs(e->xR[i - 1]), _state);
          }
       }
       iscale = 0;
@@ -14427,7 +14427,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
          ae_v_muld(&e->xR[l], 1, tmpint - l + 1, tmp);
       }
    // Choose between QL and QR iteration
-      if (ae_fabs(d->xR[lend], _state) < ae_fabs(d->xR[l], _state)) {
+      if (fabs(d->xR[lend]) < fabs(d->xR[l])) {
          lend = lsv;
          l = lendsv;
       }
@@ -14440,8 +14440,8 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
             if (l != lend) {
                lendm1 = lend - 1;
                for (m = l; m <= lendm1; m++) {
-                  tst = sqr(ae_fabs(e->xR[m], _state), _state);
-                  if (tst <= eps2 * ae_fabs(d->xR[m], _state) * ae_fabs(d->xR[m + 1], _state) + safmin) {
+                  tst = sqr(fabs(e->xR[m]), _state);
+                  if (tst <= eps2 * fabs(d->xR[m]) * fabs(d->xR[m + 1]) + safmin) {
                      gotoflag = true;
                      break;
                   }
@@ -14547,8 +14547,8 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
             if (l != lend) {
                lendp1 = lend + 1;
                for (m = l; m >= lendp1; m--) {
-                  tst = sqr(ae_fabs(e->xR[m - 1], _state), _state);
-                  if (tst <= eps2 * ae_fabs(d->xR[m], _state) * ae_fabs(d->xR[m - 1], _state) + safmin) {
+                  tst = sqr(fabs(e->xR[m - 1]), _state);
+                  if (tst <= eps2 * fabs(d->xR[m]) * fabs(d->xR[m - 1]) + safmin) {
                      gotoflag = true;
                      break;
                   }
@@ -14790,7 +14790,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
       for (ji = 1; ji <= minp; ji++) {
          for (jp = 1; jp <= 2; jp++) {
             tmp1 = d->xR[1] - ab->xyR[ji][jp];
-            if (ae_fabs(tmp1, _state) < pivmin) {
+            if (fabs(tmp1) < pivmin) {
                tmp1 = -pivmin;
             }
             nab->xyZ[ji][jp] = 0;
@@ -14799,7 +14799,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
             }
             for (j = 2; j <= n; j++) {
                tmp1 = d->xR[j] - e2->xR[j - 1] / tmp1 - ab->xyR[ji][jp];
-               if (ae_fabs(tmp1, _state) < pivmin) {
+               if (fabs(tmp1) < pivmin) {
                   tmp1 = -pivmin;
                }
                if (tmp1 <= 0.0) {
@@ -14911,8 +14911,8 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
    // Check for convergence
       kfnew = kf;
       for (ji = kf; ji <= kl; ji++) {
-         tmp1 = ae_fabs(ab->xyR[ji][2] - ab->xyR[ji][1], _state);
-         tmp2 = maxreal(ae_fabs(ab->xyR[ji][2], _state), ae_fabs(ab->xyR[ji][1], _state), _state);
+         tmp1 = fabs(ab->xyR[ji][2] - ab->xyR[ji][1]);
+         tmp2 = maxreal(fabs(ab->xyR[ji][2]), fabs(ab->xyR[ji][1]), _state);
          if (tmp1 < maxreal(abstol, maxreal(pivmin, reltol * tmp2, _state), _state) || nab->xyZ[ji][1] >= nab->xyZ[ji][2]) {
          // Converged -- Swap with position KFNEW,
          // then increment KFNEW
@@ -15109,17 +15109,17 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       return result;
    }
 // Scaling
-   t = ae_fabs(d->xR[n], _state);
+   t = fabs(d->xR[n]);
    for (j = 1; j < n; j++) {
-      t = maxreal(t, ae_fabs(d->xR[j], _state), _state);
-      t = maxreal(t, ae_fabs(e->xR[j], _state), _state);
+      t = maxreal(t, fabs(d->xR[j]), _state);
+      t = maxreal(t, fabs(e->xR[j]), _state);
    }
    scalefactor = 1.0;
    if (t != 0.0) {
-      if (t > ae_sqrt(ae_sqrt(minrealnumber, _state), _state) * ae_sqrt(maxrealnumber, _state)) {
+      if (t > sqrt(sqrt(minrealnumber)) * sqrt(maxrealnumber)) {
          scalefactor = t;
       }
-      if (t < ae_sqrt(ae_sqrt(maxrealnumber, _state), _state) * ae_sqrt(minrealnumber, _state)) {
+      if (t < sqrt(sqrt(maxrealnumber)) * sqrt(minrealnumber)) {
          scalefactor = t;
       }
       for (j = 1; j < n; j++) {
@@ -15134,7 +15134,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    pivmin = 1.0;
    for (j = 2; j <= n; j++) {
       tmp1 = sqr(e->xR[j - 1], _state);
-      if (ae_fabs(d->xR[j] * d->xR[j - 1], _state) * sqr(ulp, _state) + safemn > tmp1) {
+      if (fabs(d->xR[j] * d->xR[j - 1]) * sqr(ulp, _state) + safemn > tmp1) {
          isplit->xZ[*nsplit] = j - 1;
          ++*nsplit;
          work.xR[j - 1] = 0.0;
@@ -15156,18 +15156,18 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       gl = d->xR[1];
       tmp1 = 0.0;
       for (j = 1; j < n; j++) {
-         tmp2 = ae_sqrt(work.xR[j], _state);
+         tmp2 = sqrt(work.xR[j]);
          gu = maxreal(gu, d->xR[j] + tmp1 + tmp2, _state);
          gl = minreal(gl, d->xR[j] - tmp1 - tmp2, _state);
          tmp1 = tmp2;
       }
       gu = maxreal(gu, d->xR[n] + tmp1, _state);
       gl = minreal(gl, d->xR[n] - tmp1, _state);
-      tnorm = maxreal(ae_fabs(gl, _state), ae_fabs(gu, _state), _state);
+      tnorm = maxreal(fabs(gl), fabs(gu), _state);
       gl -= fudge * tnorm * ulp * n + fudge * 2 * pivmin;
       gu += fudge * tnorm * ulp * n + fudge * pivmin;
    // Compute Iteration parameters
-      itmax = iceil((ae_log(tnorm + pivmin, _state) - ae_log(pivmin, _state)) / ae_log(2.0, _state), _state) + 2;
+      itmax = iceil((log(tnorm + pivmin) - log(pivmin)) / log(2.0), _state) + 2;
       if (abstol <= 0.0) {
          atoli = ulp * tnorm;
       } else {
@@ -15238,9 +15238,9 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       }
    } else {
    // RANGE='A' or 'V' -- Set ATOLI
-      tnorm = maxreal(ae_fabs(d->xR[1], _state) + ae_fabs(e->xR[1], _state), ae_fabs(d->xR[n], _state) + ae_fabs(e->xR[n - 1], _state), _state);
+      tnorm = maxreal(fabs(d->xR[1]) + fabs(e->xR[1]), fabs(d->xR[n]) + fabs(e->xR[n - 1]), _state);
       for (j = 2; j < n; j++) {
-         tnorm = maxreal(tnorm, ae_fabs(d->xR[j], _state) + ae_fabs(e->xR[j - 1], _state) + ae_fabs(e->xR[j], _state), _state);
+         tnorm = maxreal(tnorm, fabs(d->xR[j]) + fabs(e->xR[j - 1]) + fabs(e->xR[j]), _state);
       }
       if (abstol <= 0.0) {
          atoli = ulp * tnorm;
@@ -15290,19 +15290,19 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          gl = d->xR[ibegin];
          tmp1 = 0.0;
          for (j = ibegin; j < iend; j++) {
-            tmp2 = ae_fabs(e->xR[j], _state);
+            tmp2 = fabs(e->xR[j]);
             gu = maxreal(gu, d->xR[j] + tmp1 + tmp2, _state);
             gl = minreal(gl, d->xR[j] - tmp1 - tmp2, _state);
             tmp1 = tmp2;
          }
          gu = maxreal(gu, d->xR[iend] + tmp1, _state);
          gl = minreal(gl, d->xR[iend] - tmp1, _state);
-         bnorm = maxreal(ae_fabs(gl, _state), ae_fabs(gu, _state), _state);
+         bnorm = maxreal(fabs(gl), fabs(gu), _state);
          gl -= fudge * bnorm * ulp * iin + fudge * pivmin;
          gu += fudge * bnorm * ulp * iin + fudge * pivmin;
       // Compute ATOLI for the current submatrix
          if (abstol <= 0.0) {
-            atoli = ulp * maxreal(ae_fabs(gl, _state), ae_fabs(gu, _state), _state);
+            atoli = ulp * maxreal(fabs(gl), fabs(gu), _state);
          } else {
             atoli = abstol;
          }
@@ -15355,7 +15355,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          nwu += iwork.xZ[iin + 1];
          iwoff = *m - iwork.xZ[1];
       // Compute Eigenvalues
-         itmax = iceil((ae_log(gu - gl + pivmin, _state) - ae_log(pivmin, _state)) / ae_log(2.0, _state), _state) + 2;
+         itmax = iceil((log(gu - gl + pivmin) - log(pivmin)) / log(2.0), _state) + 2;
       // Calling DLAEBZ
       //
       // CALL DLAEBZ( 2, ITMAX, IN, IN, 1, NB, ATOLI, RTOLI, PIVMIN,
@@ -15543,17 +15543,17 @@ static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVect
    }
    eps = machineepsilon;
    tl = maxreal(tol, eps, _state);
-   scale1 = ae_fabs(a->xR[1], _state) + ae_fabs(b->xR[1], _state);
+   scale1 = fabs(a->xR[1]) + fabs(b->xR[1]);
    for (k = 1; k < n; k++) {
       a->xR[k + 1] -= lambdav;
-      scale2 = ae_fabs(c->xR[k], _state) + ae_fabs(a->xR[k + 1], _state);
+      scale2 = fabs(c->xR[k]) + fabs(a->xR[k + 1]);
       if (k < n - 1) {
-         scale2 += ae_fabs(b->xR[k + 1], _state);
+         scale2 += fabs(b->xR[k + 1]);
       }
       if (a->xR[k] == 0.0) {
          piv1 = 0.0;
       } else {
-         piv1 = ae_fabs(a->xR[k], _state) / scale1;
+         piv1 = fabs(a->xR[k]) / scale1;
       }
       if (c->xR[k] == 0.0) {
          iin->xZ[k] = 0;
@@ -15563,7 +15563,7 @@ static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVect
             d->xR[k] = 0.0;
          }
       } else {
-         piv2 = ae_fabs(c->xR[k], _state) / scale2;
+         piv2 = fabs(c->xR[k]) / scale2;
          if (piv2 <= piv1) {
             iin->xZ[k] = 0;
             scale1 = scale2;
@@ -15590,7 +15590,7 @@ static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVect
          iin->xZ[n] = k;
       }
    }
-   if (ae_fabs(a->xR[n], _state) <= scale1 * tl && iin->xZ[n] == 0) {
+   if (fabs(a->xR[n]) <= scale1 * tl && iin->xZ[n] == 0) {
       iin->xZ[n] = n;
    }
 }
@@ -15617,12 +15617,12 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *
    sfmin = minrealnumber;
    bignum = 1 / sfmin;
    if (*tol <= 0.0) {
-      *tol = ae_fabs(a->xR[1], _state);
+      *tol = fabs(a->xR[1]);
       if (n > 1) {
-         *tol = maxreal(*tol, maxreal(ae_fabs(a->xR[2], _state), ae_fabs(b->xR[1], _state), _state), _state);
+         *tol = maxreal(*tol, maxreal(fabs(a->xR[2]), fabs(b->xR[1]), _state), _state);
       }
       for (k = 3; k <= n; k++) {
-         *tol = maxreal(*tol, maxreal(ae_fabs(a->xR[k], _state), maxreal(ae_fabs(b->xR[k - 1], _state), ae_fabs(d->xR[k - 2], _state), _state), _state), _state);
+         *tol = maxreal(*tol, maxreal(fabs(a->xR[k]), maxreal(fabs(b->xR[k - 1]), fabs(d->xR[k - 2]), _state), _state), _state);
       }
       *tol *= eps;
       if (*tol == 0.0) {
@@ -15649,15 +15649,15 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *
          }
       }
       ak = a->xR[k];
-      pert = ae_fabs(*tol, _state);
+      pert = fabs(*tol);
       if (ak < 0.0) {
          pert = -pert;
       }
       while (true) {
-         absak = ae_fabs(ak, _state);
+         absak = fabs(ak);
          if (absak < 1.0) {
             if (absak < sfmin) {
-               if (absak == 0.0 || ae_fabs(temp, _state) * sfmin > absak) {
+               if (absak == 0.0 || fabs(temp) * sfmin > absak) {
                   ak += pert;
                   pert *= 2;
                   continue;
@@ -15666,7 +15666,7 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *
                   ak *= bignum;
                }
             } else {
-               if (ae_fabs(temp, _state) > absak * bignum) {
+               if (fabs(temp) > absak * bignum) {
                   ak += pert;
                   pert *= 2;
                   continue;
@@ -15808,13 +15808,13 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
       if (blksiz != 1) {
       // Compute reorthogonalization criterion and stopping criterion.
          gpind = b1;
-         onenrm = ae_fabs(d->xR[b1], _state) + ae_fabs(e->xR[b1], _state);
-         onenrm = maxreal(onenrm, ae_fabs(d->xR[bn], _state) + ae_fabs(e->xR[bn - 1], _state), _state);
+         onenrm = fabs(d->xR[b1]) + fabs(e->xR[b1]);
+         onenrm = maxreal(onenrm, fabs(d->xR[bn]) + fabs(e->xR[bn - 1]), _state);
          for (i = b1 + 1; i < bn; i++) {
-            onenrm = maxreal(onenrm, ae_fabs(d->xR[i], _state) + ae_fabs(e->xR[i - 1], _state) + ae_fabs(e->xR[i], _state), _state);
+            onenrm = maxreal(onenrm, fabs(d->xR[i]) + fabs(e->xR[i - 1]) + fabs(e->xR[i]), _state);
          }
          ortol = 0.001 * onenrm;
-         dtpcrt = ae_sqrt(0.1 / blksiz, _state);
+         dtpcrt = sqrt(0.1 / blksiz);
       }
    // Loop through eigenvalues of block nblk.
       jblk = 0;
@@ -15832,7 +15832,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
          // If eigenvalues j and j-1 are too close, add a relatively
          // small perturbation.
             if (jblk > 1) {
-               eps1 = ae_fabs(eps * xj, _state);
+               eps1 = fabs(eps * xj);
                pertol = 10 * eps1;
                sep = xj - xjm;
                if (sep < pertol) {
@@ -15868,16 +15868,16 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
             // Normalize and scale the righthand side vector Pb.
                v = 0.0;
                for (ti = 1; ti <= blksiz; ti++) {
-                  v += ae_fabs(work1.xR[ti], _state);
+                  v += fabs(work1.xR[ti]);
                }
-               scl = blksiz * onenrm * maxreal(eps, ae_fabs(work4.xR[blksiz], _state), _state) / v;
+               scl = blksiz * onenrm * maxreal(eps, fabs(work4.xR[blksiz]), _state) / v;
                ae_v_muld(&work1.xR[1], 1, blksiz, scl);
             // Solve the system LU = Pb.
                evd_tdininternaldlagts(blksiz, &work4, &work2, &work3, &work5, &iwork, &work1, &tol, &iinfo, _state);
             // Reorthogonalize by modified Gram-Schmidt if eigenvalues are
             // close enough.
                if (jblk != 1) {
-                  if (ae_fabs(xj - xjm, _state) > ortol) {
+                  if (fabs(xj - xjm) > ortol) {
                      gpind = j;
                   }
                   if (gpind != j) {
@@ -15892,7 +15892,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
                }
             // Check the infinity norm of the iterate.
                jmax = vectoridxabsmax(&work1, 1, blksiz, _state);
-               nrm = ae_fabs(work1.xR[jmax], _state);
+               nrm = fabs(work1.xR[jmax]);
             // Continue for additional iterations after norm reaches
             // stopping criterion.
                tmpcriterion = false;
@@ -17105,7 +17105,7 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // API: void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits, const xparams _xparams = xdefault);
 void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits, ae_state *_state) {
    ae_assert(!state->running, "EigSubspaceSetCond: solver is already running", _state);
-   ae_assert(ae_isfinite(eps, _state) && eps >= 0.0, "EigSubspaceSetCond: Eps<0 or NAN/INF", _state);
+   ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps<0 or NAN/INF", _state);
    ae_assert(maxits >= 0, "EigSubspaceSetCond: MaxIts<0", _state);
    if (eps == 0.0 && maxits == 0) {
       eps = 1.0E-6;
@@ -17356,15 +17356,15 @@ lbl_0:
          ae_assert(false, "EigSubspace: direct eigensolver failed to converge", _state);
       }
       for (j = 0; j < nwork; j++) {
-         state->wrank.xR[j] = ae_fabs(state->wcur.xR[j], _state);
+         state->wrank.xR[j] = fabs(state->wcur.xR[j]);
       }
       rankxuntied(&state->wrank, nwork, &state->buf, _state);
       v = 0.0;
       vv = 0.0;
       for (j = 0; j < nwork; j++) {
          if (state->wrank.xR[j] >= (double)(nwork - k)) {
-            v = maxreal(v, ae_fabs(state->wcur.xR[j] - state->wprev.xR[j], _state), _state);
-            vv = maxreal(vv, ae_fabs(state->wcur.xR[j], _state), _state);
+            v = maxreal(v, fabs(state->wcur.xR[j] - state->wprev.xR[j]), _state);
+            vv = maxreal(vv, fabs(state->wcur.xR[j]), _state);
          }
       }
       if (vv == 0.0) {
@@ -17403,7 +17403,7 @@ lbl_2:
 // Then, we transform RZ to RQ (full N-dimensional representation).
 // After this part is done, RW and RQ contain solution.
    for (j = 0; j < nwork; j++) {
-      state->wrank.xR[j] = ae_fabs(state->tw.xR[j], _state);
+      state->wrank.xR[j] = fabs(state->tw.xR[j]);
    }
    rankxuntied(&state->wrank, nwork, &state->buf, _state);
    cnt = 0;
@@ -18096,7 +18096,7 @@ static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
    for (j = 0; j < minint(m, n, _state); j++) {
       jp = j;
       for (i = j + 1; i < n; i++) {
-         if (ae_fabs(a->xyR[offs + j][offs + i], _state) > ae_fabs(a->xyR[offs + j][offs + jp], _state)) {
+         if (fabs(a->xyR[offs + j][offs + i]) > fabs(a->xyR[offs + j][offs + jp])) {
             jp = i;
          }
       }
@@ -18260,7 +18260,7 @@ static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
    for (j = 0; j < minint(m, n, _state); j++) {
       jp = j;
       for (i = j + 1; i < m; i++) {
-         if (ae_fabs(a->xyR[offs + i][offs + j], _state) > ae_fabs(a->xyR[offs + jp][offs + j], _state)) {
+         if (fabs(a->xyR[offs + i][offs + j]) > fabs(a->xyR[offs + jp][offs + j])) {
             jp = i;
          }
       }
@@ -18793,7 +18793,7 @@ static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, 
    bbest = 0.0;
    entry = a->slscolptr.xZ[*jpiv];
    while (entry >= 0) {
-      s = ae_fabs(a->slsval.xR[entry], _state);
+      s = fabs(a->slsval.xR[entry]);
       if (*ipiv < 0 || s > bbest) {
          bbest = s;
          *ipiv = a->slsidx.xZ[entry * sptrf_slswidth + 4];
@@ -23597,7 +23597,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, a
                v -= analysis->outputstorage.xR[offss + k * sstride + i] * analysis->outputstorage.xR[offss + j * sstride + i];
             }
             analysis->outputstorage.xR[offss + k * sstride + j] = v;
-            vs += ae_fabs(v, _state);
+            vs += fabs(v);
          }
          if (controloverflow && vs > analysis->modparam1) {
          // Possible failure due to accumulation of numerical errors
@@ -23608,7 +23608,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, a
          v = analysis->outputstorage.xR[offss + j * sstride + j];
          if (controlpivot && v <= analysis->modparam0) {
          // Basic modified Cholesky
-            v = ae_sqrt(analysis->modparam0, _state);
+            v = sqrt(analysis->modparam0);
             analysis->diagd.xR[cols0 + j] = 1.0;
             analysis->outputstorage.xR[offss + j * sstride + j] = v;
             v = 1 / v;
@@ -23622,7 +23622,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, a
                return result;
             }
             analysis->diagd.xR[cols0 + j] = 1.0;
-            v = 1 / ae_sqrt(v, _state);
+            v = 1 / sqrt(v);
             for (k = j; k < blocksize + offdiagsize; k++) {
                analysis->outputstorage.xR[offss + k * sstride + j] *= v;
             }
@@ -23639,7 +23639,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx, a
                v -= analysis->outputstorage.xR[offss + k * sstride + i] * analysis->diagd.xR[cols0 + i] * analysis->outputstorage.xR[offss + j * sstride + i];
             }
             analysis->outputstorage.xR[offss + k * sstride + j] = v;
-            vs += ae_fabs(v, _state);
+            vs += fabs(v);
          }
          if (controloverflow && vs > analysis->modparam1) {
          // Possible failure due to accumulation of numerical errors
@@ -23712,7 +23712,7 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
             ae_frame_leave(_state);
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
       // Compute elements J+1:N-1 of row J.
          if (j < n - 1) {
@@ -23737,7 +23737,7 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
             ae_frame_leave(_state);
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
       // Compute elements J+1:N of column J.
          if (j < n - 1) {
@@ -23780,7 +23780,7 @@ static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_
          if (i == j) {
             densea.xyR[i][j] = 1.0;
          } else {
-            densea.xyR[i][j] = 0.01 * (ae_cos((double)(i + 1), _state) + 1.23 * ae_sin((double)(j + 1), _state)) / n;
+            densea.xyR[i][j] = 0.01 * (cos((double)(i + 1)) + 1.23 * sin((double)(j + 1))) / n;
          }
       }
    }
@@ -24037,10 +24037,10 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3, ae_state *_state) {
    ae_assert(modstrategy == 0 || modstrategy == 1, "SPSymmSetModificationStrategy: unexpected ModStrategy", _state);
-   ae_assert(ae_isfinite(p0, _state) && p0 >= 0.0, "SPSymmSetModificationStrategy: bad P0", _state);
-   ae_assert(ae_isfinite(p1, _state), "SPSymmSetModificationStrategy: bad P1", _state);
-   ae_assert(ae_isfinite(p2, _state), "SPSymmSetModificationStrategy: bad P2", _state);
-   ae_assert(ae_isfinite(p3, _state), "SPSymmSetModificationStrategy: bad P3", _state);
+   ae_assert(isfinite(p0) && p0 >= 0.0, "SPSymmSetModificationStrategy: bad P0", _state);
+   ae_assert(isfinite(p1), "SPSymmSetModificationStrategy: bad P1", _state);
+   ae_assert(isfinite(p2), "SPSymmSetModificationStrategy: bad P2", _state);
+   ae_assert(isfinite(p3), "SPSymmSetModificationStrategy: bad P3", _state);
    analysis->modtype = modstrategy;
    analysis->modparam0 = p0;
    analysis->modparam1 = p1;
@@ -24595,7 +24595,7 @@ void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
    mx = 0.0;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         mx = maxreal(mx, ae_fabs(a->xyR[i][j], _state), _state);
+         mx = maxreal(mx, fabs(a->xyR[i][j]), _state);
       }
    }
    if (mx != 0.0) {
@@ -24675,7 +24675,7 @@ void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
    mx = 0.0;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         mx = maxreal(mx, ae_fabs(a->xyR[i][j], _state), _state);
+         mx = maxreal(mx, fabs(a->xyR[i][j]), _state);
       }
    }
    if (mx != 0.0) {
@@ -24824,7 +24824,7 @@ static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bo
             result = false;
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
       // Compute elements J+1:N-1 of row J.
          if (j < n - 1) {
@@ -24848,7 +24848,7 @@ static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bo
             result = false;
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyR[offs + j][offs + j] = ajj;
       // Compute elements J+1:N of column J.
          if (j < n - 1) {
@@ -24903,7 +24903,7 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
             result = false;
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
       // Compute elements J+1:N-1 of row J.
          if (j < n - 1) {
@@ -24927,7 +24927,7 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
             result = false;
             return result;
          }
-         ajj = ae_sqrt(ajj, _state);
+         ajj = sqrt(ajj);
          aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
       // Compute elements J+1:N of column J.
          if (j < n - 1) {
@@ -24985,7 +24985,7 @@ bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, R
    }
    if (n == 1) {
       if (a->xyR[offs][offs] > 0.0) {
-         a->xyR[offs][offs] = ae_sqrt(a->xyR[offs][offs], _state);
+         a->xyR[offs][offs] = sqrt(a->xyR[offs][offs]);
          result = true;
       } else {
          result = false;
@@ -25055,7 +25055,7 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 //       minor part of overall running time for N>256.
    if (n == 1) {
       if (a->xyC[offs][offs].x > 0.0) {
-         a->xyC[offs][offs] = complex_from_d(ae_sqrt(a->xyC[offs][offs].x, _state));
+         a->xyC[offs][offs] = complex_from_d(sqrt(a->xyC[offs][offs].x));
          result = true;
       } else {
          result = false;
@@ -25776,7 +25776,7 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper, ae_state *
          result = false;
          return result;
       }
-      a->vals.xR[offsa] = ae_sqrt(v - a12, _state);
+      a->vals.xR[offsa] = sqrt(v - a12);
    // Increase size of the updated matrix
       inc(&nready, _state);
    }
@@ -26490,9 +26490,9 @@ namespace alglib_impl {
 static double bdsvd_extsignbdsqr(double a, double b, ae_state *_state) {
    double result;
    if (b >= 0.0) {
-      result = ae_fabs(a, _state);
+      result = fabs(a);
    } else {
-      result = -ae_fabs(a, _state);
+      result = -fabs(a);
    }
    return result;
 }
@@ -26509,9 +26509,9 @@ static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ss
    double ha;
    *ssmin = 0;
    *ssmax = 0;
-   fa = ae_fabs(f, _state);
-   ga = ae_fabs(g, _state);
-   ha = ae_fabs(h, _state);
+   fa = fabs(f);
+   ga = fabs(g);
+   ha = fabs(h);
    fhmn = minreal(fa, ha, _state);
    fhmx = maxreal(fa, ha, _state);
    if (fhmn == 0.0) {
@@ -26519,14 +26519,14 @@ static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ss
       if (fhmx == 0.0) {
          *ssmax = ga;
       } else {
-         *ssmax = maxreal(fhmx, ga, _state) * ae_sqrt(1 + sqr(minreal(fhmx, ga, _state) / maxreal(fhmx, ga, _state), _state), _state);
+         *ssmax = maxreal(fhmx, ga, _state) * sqrt(1 + sqr(minreal(fhmx, ga, _state) / maxreal(fhmx, ga, _state), _state));
       }
    } else {
       if (ga < fhmx) {
          aas = 1 + fhmn / fhmx;
          at = (fhmx - fhmn) / fhmx;
          au = sqr(ga / fhmx, _state);
-         c = 2 / (ae_sqrt(aas * aas + au, _state) + ae_sqrt(at * at + au, _state));
+         c = 2 / (sqrt(aas * aas + au) + sqrt(at * at + au));
          *ssmin = fhmn * c;
          *ssmax = fhmx / c;
       } else {
@@ -26540,7 +26540,7 @@ static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ss
          } else {
             aas = 1 + fhmn / fhmx;
             at = (fhmx - fhmn) / fhmx;
-            c = 1 / (ae_sqrt(1 + sqr(aas * au, _state), _state) + ae_sqrt(1 + sqr(at * au, _state), _state));
+            c = 1 / (sqrt(1 + sqr(aas * au, _state)) + sqrt(1 + sqr(at * au, _state)));
             *ssmin = fhmn * c * au;
             *ssmin += (*ssmin);
             *ssmax = ga / (c + c);
@@ -26582,9 +26582,9 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
    *snl = 0;
    *csl = 0;
    ft = f;
-   fa = ae_fabs(ft, _state);
+   fa = fabs(ft);
    ht = h;
-   ha = ae_fabs(h, _state);
+   ha = fabs(h);
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
    clt = 0.0;
@@ -26609,7 +26609,7 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
       ha = temp;
    }
    gt = g;
-   ga = ae_fabs(gt, _state);
+   ga = fabs(gt);
    if (ga == 0.0) {
    // Diagonal matrix
       *ssmin = ha;
@@ -26651,11 +26651,11 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
          t = 2 - l;
          mm = m * m;
          tt = t * t;
-         s = ae_sqrt(tt + mm, _state);
+         s = sqrt(tt + mm);
          if (l == 0.0) {
-            r = ae_fabs(m, _state);
+            r = fabs(m);
          } else {
-            r = ae_sqrt(l * l + mm, _state);
+            r = sqrt(l * l + mm);
          }
          a = 0.5 * (s + r);
          *ssmin = ha / a;
@@ -26670,7 +26670,7 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
          } else {
             t = (m / (s + t) + m / (r + l)) * (1 + a);
          }
-         l = ae_sqrt(t * t + 4, _state);
+         l = sqrt(t * t + 4);
          crt = 2 / l;
          srt = t / l;
          clt = (crt + srt * m) / a;
@@ -26840,35 +26840,35 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
 // Compute singular values to relative accuracy TOL
 // (By setting TOL to be negative, algorithm will compute
 // singular values to absolute accuracy ABS(TOL)*norm(input matrix))
-   tolmul = maxreal(10.0, minreal(100.0, ae_pow(eps, -0.125, _state), _state), _state);
+   tolmul = maxreal(10.0, minreal(100.0, pow(eps, -0.125), _state), _state);
    tol = tolmul * eps;
 // Compute approximate maximum, minimum singular values
    smax = 0.0;
    for (i = 1; i <= n; i++) {
-      smax = maxreal(smax, ae_fabs(d->xR[i], _state), _state);
+      smax = maxreal(smax, fabs(d->xR[i]), _state);
    }
    for (i = 1; i < n; i++) {
-      smax = maxreal(smax, ae_fabs(e->xR[i], _state), _state);
+      smax = maxreal(smax, fabs(e->xR[i]), _state);
    }
    sminl = 0.0;
    if (tol >= 0.0) {
    // Relative accuracy desired
-      sminoa = ae_fabs(d->xR[1], _state);
+      sminoa = fabs(d->xR[1]);
       if (sminoa != 0.0) {
          mu = sminoa;
          for (i = 2; i <= n; i++) {
-            mu = ae_fabs(d->xR[i], _state) * (mu / (mu + ae_fabs(e->xR[i - 1], _state)));
+            mu = fabs(d->xR[i]) * (mu / (mu + fabs(e->xR[i - 1])));
             sminoa = minreal(sminoa, mu, _state);
             if (sminoa == 0.0) {
                break;
             }
          }
       }
-      sminoa /= ae_sqrt((double)n, _state);
+      sminoa /= sqrt((double)n);
       thresh = maxreal(tol * sminoa, maxitr * n * n * unfl, _state);
    } else {
    // Absolute accuracy desired
-      thresh = maxreal(ae_fabs(tol, _state) * smax, maxitr * n * n * unfl, _state);
+      thresh = maxreal(fabs(tol) * smax, maxitr * n * n * unfl, _state);
    }
 // Prepare for main iteration loop for the singular values
 // (MAXIT is the maximum number of passes through the inner
@@ -26891,16 +26891,16 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
          return result;
       }
    // Find diagonal block of matrix to work on
-      if (tol < 0.0 && ae_fabs(d->xR[m], _state) <= thresh) {
+      if (tol < 0.0 && fabs(d->xR[m]) <= thresh) {
          d->xR[m] = 0.0;
       }
-      smax = ae_fabs(d->xR[m], _state);
+      smax = fabs(d->xR[m]);
       smin = smax;
       matrixsplitflag = false;
       for (lll = 1; lll < m; lll++) {
          ll = m - lll;
-         abss = ae_fabs(d->xR[ll], _state);
-         abse = ae_fabs(e->xR[ll], _state);
+         abss = fabs(d->xR[ll]);
+         abse = fabs(e->xR[ll]);
          if (tol < 0.0 && abss <= thresh) {
             d->xR[ll] = 0.0;
          }
@@ -26969,14 +26969,14 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    // fixed thanks to Michael Rolle < m@rolle.name >
    // Very strange that LAPACK still contains it.
       bchangedir = false;
-      if (idir == 1 && ae_fabs(d->xR[ll], _state) < 1.0E-3 * ae_fabs(d->xR[m], _state)) {
+      if (idir == 1 && fabs(d->xR[ll]) < 1.0E-3 * fabs(d->xR[m])) {
          bchangedir = true;
       }
-      if (idir == 2 && ae_fabs(d->xR[m], _state) < 1.0E-3 * ae_fabs(d->xR[ll], _state)) {
+      if (idir == 2 && fabs(d->xR[m]) < 1.0E-3 * fabs(d->xR[ll])) {
          bchangedir = true;
       }
       if ((ll != oldll || m != oldm) || bchangedir) {
-         if (ae_fabs(d->xR[ll], _state) >= ae_fabs(d->xR[m], _state)) {
+         if (fabs(d->xR[ll]) >= fabs(d->xR[m])) {
          // Chase bulge from top (big end) to bottom (small end)
             idir = 1;
          } else {
@@ -26988,23 +26988,23 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       if (idir == 1) {
       // Run convergence test in forward direction
       // First apply standard test to bottom of matrix
-         if (ae_fabs(e->xR[m - 1], _state) <= ae_fabs(tol, _state) * ae_fabs(d->xR[m], _state) || (tol < 0.0 && ae_fabs(e->xR[m - 1], _state) <= thresh)) {
+         if (fabs(e->xR[m - 1]) <= fabs(tol) * fabs(d->xR[m]) || (tol < 0.0 && fabs(e->xR[m - 1]) <= thresh)) {
             e->xR[m - 1] = 0.0;
             continue;
          }
          if (tol >= 0.0) {
          // If relative accuracy desired,
          // apply convergence criterion forward
-            mu = ae_fabs(d->xR[ll], _state);
+            mu = fabs(d->xR[ll]);
             sminl = mu;
             iterflag = false;
             for (lll = ll; lll < m; lll++) {
-               if (ae_fabs(e->xR[lll], _state) <= tol * mu) {
+               if (fabs(e->xR[lll]) <= tol * mu) {
                   e->xR[lll] = 0.0;
                   iterflag = true;
                   break;
                }
-               mu = ae_fabs(d->xR[lll + 1], _state) * (mu / (mu + ae_fabs(e->xR[lll], _state)));
+               mu = fabs(d->xR[lll + 1]) * (mu / (mu + fabs(e->xR[lll])));
                sminl = minreal(sminl, mu, _state);
             }
             if (iterflag) {
@@ -27014,23 +27014,23 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       } else {
       // Run convergence test in backward direction
       // First apply standard test to top of matrix
-         if (ae_fabs(e->xR[ll], _state) <= ae_fabs(tol, _state) * ae_fabs(d->xR[ll], _state) || (tol < 0.0 && ae_fabs(e->xR[ll], _state) <= thresh)) {
+         if (fabs(e->xR[ll]) <= fabs(tol) * fabs(d->xR[ll]) || (tol < 0.0 && fabs(e->xR[ll]) <= thresh)) {
             e->xR[ll] = 0.0;
             continue;
          }
          if (tol >= 0.0) {
          // If relative accuracy desired,
          // apply convergence criterion backward
-            mu = ae_fabs(d->xR[m], _state);
+            mu = fabs(d->xR[m]);
             sminl = mu;
             iterflag = false;
             for (lll = m - 1; lll >= ll; lll--) {
-               if (ae_fabs(e->xR[lll], _state) <= tol * mu) {
+               if (fabs(e->xR[lll]) <= tol * mu) {
                   e->xR[lll] = 0.0;
                   iterflag = true;
                   break;
                }
-               mu = ae_fabs(d->xR[lll], _state) * (mu / (mu + ae_fabs(e->xR[lll], _state)));
+               mu = fabs(d->xR[lll]) * (mu / (mu + fabs(e->xR[lll])));
                sminl = minreal(sminl, mu, _state);
             }
             if (iterflag) {
@@ -27048,10 +27048,10 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       } else {
       // Compute the shift from 2-by-2 block at end of matrix
          if (idir == 1) {
-            sll = ae_fabs(d->xR[ll], _state);
+            sll = fabs(d->xR[ll]);
             bdsvd_svd2x2(d->xR[m - 1], e->xR[m - 1], d->xR[m], &shift, &r, _state);
          } else {
-            sll = ae_fabs(d->xR[m], _state);
+            sll = fabs(d->xR[m]);
             bdsvd_svd2x2(d->xR[ll], e->xR[ll], d->xR[ll + 1], &shift, &r, _state);
          }
       // Test if shift negligible, and if so set to zero
@@ -27096,7 +27096,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp, _state);
             }
          // Test convergence
-            if (ae_fabs(e->xR[m - 1], _state) <= thresh) {
+            if (fabs(e->xR[m - 1]) <= thresh) {
                e->xR[m - 1] = 0.0;
             }
          } else {
@@ -27130,7 +27130,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(!fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work0, &work1, c, &ctemp, _state);
             }
          // Test convergence
-            if (ae_fabs(e->xR[ll], _state) <= thresh) {
+            if (fabs(e->xR[ll]) <= thresh) {
                e->xR[ll] = 0.0;
             }
          }
@@ -27139,7 +27139,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
          if (idir == 1) {
          // Chase bulge from top to bottom
          // Save cosines and sines for later singular vector updates
-            f = (ae_fabs(d->xR[ll], _state) - shift) * (bdsvd_extsignbdsqr(1.0, d->xR[ll], _state) + shift / d->xR[ll]);
+            f = (fabs(d->xR[ll]) - shift) * (bdsvd_extsignbdsqr(1.0, d->xR[ll], _state) + shift / d->xR[ll]);
             g = e->xR[ll];
             for (i = ll; i < m; i++) {
                generaterotation(f, g, &cosr, &sinr, &r, _state);
@@ -27175,13 +27175,13 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp, _state);
             }
          // Test convergence
-            if (ae_fabs(e->xR[m - 1], _state) <= thresh) {
+            if (fabs(e->xR[m - 1]) <= thresh) {
                e->xR[m - 1] = 0.0;
             }
          } else {
          // Chase bulge from bottom to top
          // Save cosines and sines for later singular vector updates
-            f = (ae_fabs(d->xR[m], _state) - shift) * (bdsvd_extsignbdsqr(1.0, d->xR[m], _state) + shift / d->xR[m]);
+            f = (fabs(d->xR[m]) - shift) * (bdsvd_extsignbdsqr(1.0, d->xR[m], _state) + shift / d->xR[m]);
             g = e->xR[m - 1];
             for (i = m; i >= ll + 1; i--) {
                generaterotation(f, g, &cosr, &sinr, &r, _state);
@@ -27207,7 +27207,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
             }
             e->xR[ll] = f;
          // Test convergence
-            if (ae_fabs(e->xR[ll], _state) <= thresh) {
+            if (fabs(e->xR[ll]) <= thresh) {
                e->xR[ll] = 0.0;
             }
          // Update singular vectors if desired
@@ -27681,7 +27681,7 @@ namespace alglib_impl {
 // be greater than underflow.
 double rcondthreshold(ae_state *_state) {
    double result;
-   result = ae_sqrt(ae_sqrt(minrealnumber, _state), _state);
+   result = sqrt(sqrt(minrealnumber));
    return result;
 }
 
@@ -27777,13 +27777,13 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
    if (isgn->xZ[posjump] == 1) {
       if (n == 1) {
          v->xR[1] = x->xR[1];
-         *est = ae_fabs(v->xR[1], _state);
+         *est = fabs(v->xR[1]);
          *kase = 0;
          return;
       }
       *est = 0.0;
       for (i = 1; i <= n; i++) {
-         *est += ae_fabs(x->xR[i], _state);
+         *est += fabs(x->xR[i]);
       }
       for (i = 1; i <= n; i++) {
          if (x->xR[i] >= 0.0) {
@@ -27802,7 +27802,7 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
    if (isgn->xZ[posjump] == 2) {
       isgn->xZ[posj] = 1;
       for (i = 2; i <= n; i++) {
-         if (ae_fabs(x->xR[i], _state) > ae_fabs(x->xR[isgn->xZ[posj]], _state)) {
+         if (fabs(x->xR[i]) > fabs(x->xR[isgn->xZ[posj]])) {
             isgn->xZ[posj] = i;
          }
       }
@@ -27823,7 +27823,7 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
       v->xR[posestold] = *est;
       *est = 0.0;
       for (i = 1; i <= n; i++) {
-         *est += ae_fabs(v->xR[i], _state);
+         *est += fabs(v->xR[i]);
       }
       flg = false;
       for (i = 1; i <= n; i++) {
@@ -27862,11 +27862,11 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
       isgn->xZ[posjlast] = isgn->xZ[posj];
       isgn->xZ[posj] = 1;
       for (i = 2; i <= n; i++) {
-         if (ae_fabs(x->xR[i], _state) > ae_fabs(x->xR[isgn->xZ[posj]], _state)) {
+         if (fabs(x->xR[i]) > fabs(x->xR[isgn->xZ[posj]])) {
             isgn->xZ[posj] = i;
          }
       }
-      if (x->xR[isgn->xZ[posjlast]] != ae_fabs(x->xR[isgn->xZ[posj]], _state) && isgn->xZ[positer] < itmax) {
+      if (x->xR[isgn->xZ[posjlast]] != fabs(x->xR[isgn->xZ[posj]]) && isgn->xZ[positer] < itmax) {
          isgn->xZ[positer]++;
          for (i = 1; i <= n; i++) {
             x->xR[i] = 0.0;
@@ -27891,7 +27891,7 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
    if (isgn->xZ[posjump] == 5) {
       v->xR[postemp] = 0.0;
       for (i = 1; i <= n; i++) {
-         v->xR[postemp] += ae_fabs(x->xR[i], _state);
+         v->xR[postemp] += fabs(x->xR[i]);
       }
       v->xR[postemp] = 2 * v->xR[postemp] / (3 * n);
       if (v->xR[postemp] > *est) {
@@ -28090,12 +28090,12 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
          j2 = i - 1;
       }
       for (j = j1; j <= j2; j++) {
-         s = maxreal(s, ae_fabs(a->xyR[i][j], _state), _state);
+         s = maxreal(s, fabs(a->xyR[i][j]), _state);
       }
       if (isunit) {
          s = maxreal(s, 1.0, _state);
       } else {
-         s = maxreal(s, ae_fabs(a->xyR[i][i], _state), _state);
+         s = maxreal(s, fabs(a->xyR[i][i]), _state);
       }
    }
    if (s == 0.0) {
@@ -28617,10 +28617,10 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    sl = 1.0;
    for (i = 0; i < n; i++) {
       for (j = 0; j < i; j++) {
-         sl = maxreal(sl, ae_fabs(lua->xyR[i][j], _state), _state);
+         sl = maxreal(sl, fabs(lua->xyR[i][j]), _state);
       }
       for (j = i; j < n; j++) {
-         su = maxreal(su, ae_fabs(lua->xyR[i][j], _state), _state);
+         su = maxreal(su, fabs(lua->xyR[i][j]), _state);
       }
    }
    if (su == 0.0) {
@@ -28947,7 +28947,7 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state) {
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         t.xR[j] += ae_fabs(a->xyR[i][j], _state);
+         t.xR[j] += fabs(a->xyR[i][j]);
       }
    }
    nrm = 0.0;
@@ -29040,7 +29040,7 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v += ae_fabs(a->xyR[i][j], _state);
+         v += fabs(a->xyR[i][j]);
       }
       nrm = maxreal(nrm, v, _state);
    }
@@ -29145,10 +29145,10 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
       }
       for (j = j1; j <= j2; j++) {
          if (i == j) {
-            t.xR[i] += ae_fabs(a->xyR[i][i], _state);
+            t.xR[i] += fabs(a->xyR[i][i]);
          } else {
-            t.xR[i] += ae_fabs(a->xyR[i][j], _state);
-            t.xR[j] += ae_fabs(a->xyR[i][j], _state);
+            t.xR[i] += fabs(a->xyR[i][j]);
+            t.xR[j] += fabs(a->xyR[i][j]);
          }
       }
    }
@@ -29283,12 +29283,12 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_sta
          j2 = i - 1;
       }
       for (j = j1; j <= j2; j++) {
-         t.xR[j] += ae_fabs(a->xyR[i][j], _state);
+         t.xR[j] += fabs(a->xyR[i][j]);
       }
       if (isunit) {
          t.xR[i]++;
       } else {
-         t.xR[i] += ae_fabs(a->xyR[i][i], _state);
+         t.xR[i] += fabs(a->xyR[i][i]);
       }
    }
    nrm = 0.0;
@@ -29404,12 +29404,12 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
       }
       v = 0.0;
       for (j = j1; j <= j2; j++) {
-         v += ae_fabs(a->xyR[i][j], _state);
+         v += fabs(a->xyR[i][j]);
       }
       if (isunit) {
          v++;
       } else {
-         v += ae_fabs(a->xyR[i][i], _state);
+         v += fabs(a->xyR[i][i]);
       }
       nrm = maxreal(nrm, v, _state);
    }
@@ -29940,7 +29940,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
    ae_v_sub(&buf->xR[offsrk], 1, &buf->xR[offstmp2], 1, n);
    rk2 = ae_v_dotproduct(&buf->xR[offsrk], 1, &buf->xR[offsrk], 1, n);
    ae_v_move(&buf->xR[offspk], 1, &buf->xR[offsrk], 1, n);
-   e1 = ae_sqrt(rk2, _state);
+   e1 = sqrt(rk2);
 // Cycle
    for (k = 0; k < n; k++) {
    // Calculate A*p(k) - store in Buf[OffsTmp2:OffsTmp2+N-1]
@@ -29968,7 +29968,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
       ae_v_move(&buf->xR[offsrk1], 1, &buf->xR[offsrk], 1, n);
       ae_v_subd(&buf->xR[offsrk1], 1, &buf->xR[offstmp2], 1, n, s);
       rk12 = ae_v_dotproduct(&buf->xR[offsrk1], 1, &buf->xR[offsrk1], 1, n);
-      if (ae_sqrt(rk12, _state) <= 100 * machineepsilon * ae_sqrt(rk2, _state)) {
+      if (sqrt(rk12) <= 100 * machineepsilon * sqrt(rk2)) {
       // X(k) = x(k+1) before exit -
       // - because we expect to find solution at x(k)
          ae_v_move(&buf->xR[offsxk], 1, &buf->xR[offsxk1], 1, n);
@@ -29994,7 +29994,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
    ae_v_move(&buf->xR[offsrk], 1, b->xR, 1, n);
    ae_v_sub(&buf->xR[offsrk], 1, &buf->xR[offstmp2], 1, n);
    v1 = ae_v_dotproduct(&buf->xR[offsrk], 1, &buf->xR[offsrk], 1, n);
-   e2 = ae_sqrt(v1, _state);
+   e2 = sqrt(v1);
 // Output result (if it was improved)
    if (e2 < e1) {
       ae_v_move(x->xR, 1, &buf->xR[offsxk], 1, n);
@@ -30135,7 +30135,7 @@ lbl_0:
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    rk2 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
    ae_v_move(state->pk.xR, 1, state->rk.xR, 1, n);
-   state->e1 = ae_sqrt(rk2, _state);
+   state->e1 = sqrt(rk2);
 // Cycle
    k = 0;
 lbl_3:
@@ -30152,7 +30152,7 @@ lbl_3:
 lbl_1:
    ae_v_move(state->tmp2.xR, 1, state->ax.xR, 1, n);
    pap = state->xax;
-   if (!ae_isfinite(pap, _state)) {
+   if (!isfinite(pap)) {
       goto lbl_5;
    }
    if (pap <= 0.0) {
@@ -30170,7 +30170,7 @@ lbl_1:
    ae_v_move(state->rk1.xR, 1, state->rk.xR, 1, n);
    ae_v_subd(state->rk1.xR, 1, state->tmp2.xR, 1, n, s);
    rk12 = ae_v_dotproduct(state->rk1.xR, 1, state->rk1.xR, 1, n);
-   if (ae_sqrt(rk12, _state) <= 100 * machineepsilon * state->e1) {
+   if (sqrt(rk12) <= 100 * machineepsilon * state->e1) {
    // X(k) = x(k+1) before exit -
    // - because we expect to find solution at x(k)
       ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
@@ -30202,7 +30202,7 @@ lbl_2:
    ae_v_move(state->rk.xR, 1, state->b.xR, 1, n);
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    v1 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
-   state->e2 = ae_sqrt(v1, _state);
+   state->e2 = sqrt(v1);
    result = false;
    return result;
 // Saving state
@@ -30249,8 +30249,8 @@ void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state, 
    ae_assert((n > 0 && k > 0) && k <= n, "FBLSGMRESCreate: incorrect params", _state);
    state->n = n;
    state->itscnt = k;
-   state->epsort = (1000 + ae_sqrt((double)n, _state)) * machineepsilon;
-   state->epsres = (1000 + ae_sqrt((double)n, _state)) * machineepsilon;
+   state->epsort = (1000 + sqrt((double)n)) * machineepsilon;
+   state->epsres = (1000 + sqrt((double)n)) * machineepsilon;
    state->epsred = 1.0;
    state->epsdiag = (10000 + n) * machineepsilon;
    state->itsperformed = 0;
@@ -30337,7 +30337,7 @@ bool fblsgmresiteration(fblsgmresstate *state, ae_state *_state) {
    state->retcode = 1;
 // Set up Q0
    rsetallocv(n, 0.0, &state->xs, _state);
-   bnrm = ae_sqrt(rdotv2(n, &state->b, _state), _state);
+   bnrm = sqrt(rdotv2(n, &state->b, _state));
    if (bnrm == 0.0) {
       result = false;
       return result;
@@ -30373,7 +30373,7 @@ lbl_1:
    goto lbl_rcomm;
 lbl_0:
    rcopyvr(n, &state->ax, &state->aqi, itidx, _state);
-   anrm = ae_sqrt(rdotv2(n, &state->ax, _state), _state);
+   anrm = sqrt(rdotv2(n, &state->ax, _state));
    if (anrm == 0.0) {
       state->retcode = 2;
       goto lbl_3;
@@ -30382,7 +30382,7 @@ lbl_0:
    rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp1, true, _state);
    raddvc(itidx + 1, 1.0, &state->tmp0, &state->h, itidx, _state);
    raddvc(itidx + 1, 1.0, &state->tmp1, &state->h, itidx, _state);
-   qnrm = ae_sqrt(rdotv2(n, &state->ax, _state), _state);
+   qnrm = sqrt(rdotv2(n, &state->ax, _state));
    state->h.xyR[itidx + 1][itidx] = qnrm;
    rmulv(n, 1 / coalesce(qnrm, 1.0, _state), &state->ax, _state);
    rcopyvr(n, &state->ax, &state->qi, itidx + 1, _state);
@@ -30402,7 +30402,7 @@ lbl_0:
    state->tmp1.xR[itidx] = v;
    state->tmp1.xR[itidx + 1] = 0.0;
    rmax = maxreal(rmax, rmaxabsv(itidx + 2, &state->tmp1, _state), _state);
-   rmindiag = minreal(rmindiag, ae_fabs(v, _state), _state);
+   rmindiag = minreal(rmindiag, fabs(v), _state);
    if (rmindiag <= rmax * state->epsdiag) {
       state->retcode = 3;
       goto lbl_3;
@@ -30418,7 +30418,7 @@ lbl_0:
    vv = state->hqb.xR[itidx + 1];
    state->hqb.xR[itidx + 0] = cs * v + sn * vv;
    state->hqb.xR[itidx + 1] = -sn * v + cs * vv;
-   resnrm = ae_fabs(state->hqb.xR[itidx + 1], _state);
+   resnrm = fabs(state->hqb.xR[itidx + 1]);
 // Previous attempt to extend R was successful (no small diagonal elements).
 // Increase Krylov subspace dimensionality.
    kdim++;
@@ -30794,7 +30794,7 @@ lbl_4:
          v += sqr(state->x0.xR[i], _state);
       }
    } while (v == 0.0);
-   v = 1 / ae_sqrt(v, _state);
+   v = 1 / sqrt(v);
    ae_v_muld(state->x0.xR, 1, n, v);
    ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
    state->needmv = true;
@@ -30813,9 +30813,9 @@ lbl_1:
    for (i = 0; i < n; i++) {
       v += sqr(state->x1.xR[i], _state);
    }
-   growth = ae_sqrt(ae_sqrt(v, _state), _state);
+   growth = sqrt(sqrt(v));
    if (growth > bestgrowth) {
-      v = 1 / ae_sqrt(v, _state);
+      v = 1 / sqrt(v);
       ae_v_moved(state->xbest.xR, 1, state->x1.xR, 1, n, v);
       bestgrowth = growth;
    }
@@ -30845,9 +30845,9 @@ lbl_3:
    for (i = 0; i < n; i++) {
       v += sqr(state->x1.xR[i], _state);
    }
-   state->repnorm = ae_sqrt(ae_sqrt(v, _state), _state);
+   state->repnorm = sqrt(sqrt(v));
    if (v != 0.0) {
-      v = 1 / ae_sqrt(v, _state);
+      v = 1 / sqrt(v);
       ae_v_moved(state->x0.xR, 1, state->x1.xR, 1, n, v);
    }
    itcnt++;
@@ -31992,7 +31992,7 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    *info = 1;
    f = true;
    for (i = 0; i < n; i++) {
-      f = f && ae_isfinite(a->xyR[i][i], _state);
+      f = f && isfinite(a->xyR[i][i]);
    }
    ae_assert(f, "SPDMatrixCholeskyInverse: A contains infinite or NaN values!", _state);
 // calculate condition numbers
@@ -32067,7 +32067,7 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A)<N!", _state);
    f = true;
    for (i = 0; i < n; i++) {
-      f = (f && ae_isfinite(a->xyC[i][i].x, _state)) && ae_isfinite(a->xyC[i][i].y, _state);
+      f = (f && isfinite(a->xyC[i][i].x)) && isfinite(a->xyC[i][i].y);
    }
    ae_assert(f, "HPDMatrixCholeskyInverse: A contains infinite or NaN values!", _state);
    *info = 1;
@@ -33407,7 +33407,7 @@ double spdmatrixcholeskydet(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_assert(a->cols >= n, "SPDMatrixCholeskyDet: cols(A)<N!", _state);
    f = true;
    for (i = 0; i < n; i++) {
-      f = f && ae_isfinite(a->xyR[i][i], _state);
+      f = f && isfinite(a->xyR[i][i]);
    }
    ae_assert(f, "SPDMatrixCholeskyDet: A contains infinite or NaN values!", _state);
    result = 1.0;

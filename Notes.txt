@@ -309,11 +309,11 @@ A6.2. Test Stages
 ─────────────────
 39	Integration of version 3.18.0 ― being done separately from the main branch.
 39	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
-39	Removed hook-stub routines:
+0-39	Removed hook-stub routines:
 	―	trypexec from DataAnalysis, Interpolation, LinAlg, Statistics,
 	―	notes are kept on the parallelism hooks.
 39	Topologically sorted all the functions: both static and external, except *alloc(), [un]serialize(), *_{init,copy,free}().
-39	Ap.{cpp,h}: Normalized translator-generated names across namespaces:
+0-39	Ap.{cpp,h}: Normalized translator-generated names across namespaces:
 		ae_machineepsilon → machineepsilon, ae_pi → pi, ae_maxrealnumber → maxrealnumber, ae_minrealnumber → minrealnumber,
 		ae_c_abs → abscomplex, ae_complex → complex, ae_c_conj → conj, ae_c_sqr → csqr, ae_sign → sign, ae_sqr → sqr,
 		ae_iceil → iceil, ae_ifloor → ifloor, ae_round → iround, ae_trunc → itrunc,
@@ -322,17 +322,17 @@ A6.2. Test Stages
 		ae_randommid → randommid, ae_randomreal → randomreal, ae_randombool → randombool, ae_randominteger → randominteger,
 		ae_tickcount → tickcount,
 		ae_complex_from_i → complex_from_i, ae_complex_from_d → complex_from_d
-39	Removed pi() from Ap.{cpp,h} (since it's already defined in Ap.h as a constant, ‟pi”).
-39	Synthesized the local ‟gateway” alglib_impl::complex → alglib::complex function complex_from_c() in Ap.cpp.
+0-39	Removed pi() from Ap.{cpp,h} (since it's already defined in Ap.h as a constant, ‟pi”).
+0-39	Synthesized the local ‟gateway” alglib_impl::complex → alglib::complex function complex_from_c() in Ap.cpp.
 	Generalized existing routines: complex_from_{d,i}(⋯) from (X) to (X, Y = 0.0).
 	Synthesized complex::complex(⋯) and complex_from_{d,i,c}(⋯) for Y ≠ 0.0.
-39	Move diagnostic functions to TestC.cpp and remove their declarations:
+0-39	Move diagnostic functions to TestC.cpp and remove their declarations:
 	―	seterrordiff() from AlgLibInternal.{cpp,h}
 	―	set_error_flag(), ae_get_last_error_file(), ae_get_last_error_line(), ae_get_last_error_xdesc() from Ap.{cpp,h}
 
 	−	sef_file, sef_line, sef_xdesc from Ap.cpp
 	―	Eliminate the ae_get_last_error_*() functions and replace them by the corresponding sef_* variables.
-39	Remove all comments on, references to and support for tracing/logging added in 3.16:
+0-39	Remove all comments on, references to and support for tracing/logging added in 3.16:
 	―	Ap.{cpp,h}:
 			ae_trace_file(), ae_trace_disable(), ae_is_trace_enabled(), ae_trace()
 	―	AlgLibInternal.{cpp,h}:
@@ -344,13 +344,13 @@ A6.2. Test Stages
 		3.17: The tracegamma vector and extendeddebug and dotimers flags & members and rep*time members are also removed.
 	―	Optimization.cpp, Manual.htm:
 			TRACING * SOLVER comments
-39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
+0-39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
 	Replaced i{floor,ceil,trunc,round}() by std::{floor,ceil,trunc,round}(), for floating point types.
-39	Synthesized increment operators:
+0-39	Synthesized increment operators:
 	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
 	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
 	―	X = X + 1.0 ⇒ X++;
-39	Synthesized update operators:
+0-39	Synthesized update operators:
 	―	X = X % Y ⇒ X %= Y (*)
 	―	X = X & Y ⇒ X &= Y
 	―	X = X + Y ⇒ X += Y
@@ -363,7 +363,7 @@ A6.2. Test Stages
 	―	X = X * Y / Z ⇒ X *= Y / Z, in some cases, where X, Y and Z are floating point.
 	(*) This was previous already done in its sole occurrence: in hqrnduniformi() in AlgLibMisc.cpp.
 	(‡) X = X - Y + Y' - Y" is specially optimized, since its occurrences all involved *max(⋯,⋯) on the right-hand side.
-39	Partial recoding of Ap.{cpp,h} to bring it in line with ALGLIB++:
+0-39	Partial recoding of Ap.{cpp,h} to bring it in line with ALGLIB++:
 	―	The declarations of ae_vector_wrapper::ae_vector_wrapper() and ae_vector_wrapper::operator=() in Ap.h were removed - unused.
 	―	The declarations of ae_matrix_wrapper::ae_matrix_wrapper() and ae_matrix_wrapper::operator=() in Ap.h were removed - unused.
 	―	*_free(⋯, true) changed to *_free(⋯, false) in:
@@ -382,6 +382,18 @@ A6.2. Test Stages
 	―	Added declarations of the global routines in Ap.cpp
 			_ialglib_pack_n2(), _ialglib_mm22(), _ialglib_mm22x2()
 		into Ap.h, alongside those of the other _ialglib_*() routines.
+0-39	Fully nativizing floating point constants and operations, replacing them by their standard forms:
+	―	ae_sin,ae_cos,ae_tan,ae_sinh,ae_cosh,ae_tanh,ae_asin,ae_acos,ae_atan,ae_atan2,ae_log,ae_pow,ae_exp ⇒ sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,atan2,log,pow,exp
+	―	ae_fabs,ae_sqrt ⇒ fabs,sqrt
+	―	ae_isfinite,ae_isfinite_stateless ⇒ isfinite,isfinite
+	―	ae_isnan,ae_isnan_stateless,fp_isnan ⇒ isnan
+	−	ae_isinf,ae_isinf_stateless,fp_isinf ⇒ isinf
+	―	ae_isneginf,ae_isposinf ⇒ isneginf,isposinf
+	―	Remove the definitions from Ap.cpp and declarations from Ap.h of those that have been nativized.
+	―	_*state->v_nan,fp_nan ⇒ NAN
+	―	_*state->v_posinf,fp_posinf ⇒ +INFINITY
+	―	_*state->v_neginf,fp_neginf ⇒ -INFINITY
+	―	_*state->v_{nan,posinf,neginf} are retained (for now) as in-line constant members.
 
 A6.3. Test Results
 ──────────────────
@@ -410,6 +422,7 @@ A6.3. Test Results
 39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
 39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&}= operators.
 39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators & set_error_msg(), etc.
+39	6803 1.1x 11629 1.0x 11909 1.0x 9143 1.0x 1643389187 (61f42103) 81 // Nativize floating point constants and operations.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -466,19 +479,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8000
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-SEQ-16   (MFLOPS)   6803
+* RGEMM-MTN-16              1.1x
+* RGEMM-SEQ-32   (MFLOPS)  11629
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  11909
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9100
+* RGEMM-SEQ-1024 (MFLOPS)   9143
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643326894
+SEED: 1643389187
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -578,4 +591,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 80 seconds
+Done in 81 seconds

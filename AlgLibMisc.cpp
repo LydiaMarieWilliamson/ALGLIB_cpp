@@ -203,7 +203,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
       if (s > 0.0 && s < 1.0) {
       // two Sqrt's instead of one to
       // avoid overflow when S is too small
-         s = ae_sqrt(-2 * ae_log(s, _state), _state) / ae_sqrt(s, _state);
+         s = sqrt(-2 * log(s)) / sqrt(s);
          *x1 = u * s;
          *x2 = v * s;
          return;
@@ -297,9 +297,9 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
    do {
       hqrndnormal2(state, x, y, _state);
    } while (!(*x != 0.0 || *y != 0.0));
-   mx = maxreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
-   mn = minreal(ae_fabs(*x, _state), ae_fabs(*y, _state), _state);
-   v = mx * ae_sqrt(1 + sqr(mn / mx, _state), _state);
+   mx = maxreal(fabs(*x), fabs(*y), _state);
+   mn = minreal(fabs(*x), fabs(*y), _state);
+   v = mx * sqrt(1 + sqr(mn / mx, _state));
    *x /= v;
    *y /= v;
 }
@@ -312,7 +312,7 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
    double result;
    ae_assert(lambdav > 0.0, "HQRNDExponential: LambdaV <= 0!", _state);
-   result = -ae_log(hqrnduniformr(state, _state), _state) / lambdav;
+   result = -log(hqrnduniformr(state, _state)) / lambdav;
    return result;
 }
 
@@ -916,7 +916,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyB[i][j] = ae_sin((double)(3 * i + 5 * j), _state) > 0.0;
+         a->xyB[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
       }
    }
 }
@@ -999,7 +999,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = sign(ae_sin((double)(3 * i + 5 * j), _state), _state);
+         a->xyZ[i][j] = sign(sin((double)(3 * i + 5 * j)), _state);
       }
    }
 }
@@ -1082,7 +1082,7 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyR[i][j] = ae_sin((double)(3 * i + 5 * j), _state);
+         a->xyR[i][j] = sin((double)(3 * i + 5 * j));
       }
    }
 }
@@ -1165,7 +1165,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, m, n, _state);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j] = complex_from_d(ae_sin((double)(3 * i + 5 * j), _state), ae_cos((double)(3 * i + 5 * j), _state));
+         a->xyC[i][j] = complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
       }
    }
 }
@@ -2082,12 +2082,12 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          nx = kdt->nx;
          if (kdt->normtype == 0) {
             for (j = 0; j < nx; j++) {
-               ptdist = maxreal(ptdist, ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state), _state);
+               ptdist = maxreal(ptdist, fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]), _state);
             }
          }
          if (kdt->normtype == 1) {
             for (j = 0; j < nx; j++) {
-               ptdist += ae_fabs(kdt->xy.xyR[i][j] - buf->x.xR[j], _state);
+               ptdist += fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]);
             }
          }
          if (kdt->normtype == 2) {
@@ -2572,7 +2572,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
 // API: ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
 ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
-   ae_assert(ae_isfinite(r, _state) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!", _state);
+   ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNN: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryRNN: X contains infinite or NaN values!", _state);
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, true, _state);
@@ -2670,7 +2670,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_st
 // API: ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = xdefault);
 ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
-   ae_assert(ae_isfinite(r, _state) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!", _state);
+   ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!", _state);
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNNU: Length(X)<NX!", _state);
    ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryRNNU: X contains infinite or NaN values!", _state);
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, false, _state);
@@ -3192,17 +3192,17 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // (generated during KFN requests)
    if (kdt->normtype == 0) {
       for (i = 0; i < k; i++) {
-         r->xR[i] = ae_fabs(buf->r.xR[i], _state);
+         r->xR[i] = fabs(buf->r.xR[i]);
       }
    }
    if (kdt->normtype == 1) {
       for (i = 0; i < k; i++) {
-         r->xR[i] = ae_fabs(buf->r.xR[i], _state);
+         r->xR[i] = fabs(buf->r.xR[i]);
       }
    }
    if (kdt->normtype == 2) {
       for (i = 0; i < k; i++) {
-         r->xR[i] = ae_sqrt(ae_fabs(buf->r.xR[i], _state), _state);
+         r->xR[i] = sqrt(fabs(buf->r.xR[i]));
       }
    }
 }
@@ -3411,7 +3411,7 @@ void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_i
    *nodege = kdt->nodes.xZ[node + 4];
    ae_assert(*d >= 0, "KDTreeExploreSplit: integrity failure", _state);
    ae_assert(*d < kdt->nx, "KDTreeExploreSplit: integrity failure", _state);
-   ae_assert(ae_isfinite(*s, _state), "KDTreeExploreSplit: integrity failure", _state);
+   ae_assert(isfinite(*s), "KDTreeExploreSplit: integrity failure", _state);
    ae_assert(*nodele >= 0, "KDTreeExploreSplit: integrity failure", _state);
    ae_assert(*nodele < kdt->nodes.cnt, "KDTreeExploreSplit: integrity failure", _state);
    ae_assert(*nodege >= 0, "KDTreeExploreSplit: integrity failure", _state);

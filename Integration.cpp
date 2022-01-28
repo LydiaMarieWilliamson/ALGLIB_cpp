@@ -77,7 +77,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
          ae_frame_leave(_state);
          return;
       }
-      e.xR[i - 1] = ae_sqrt(beta->xR[i], _state);
+      e.xR[i - 1] = sqrt(beta->xR[i]);
    }
    d.xR[n - 1] = alpha->xR[n - 1];
 // EVD
@@ -176,7 +176,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
          ae_frame_leave(_state);
          return;
       }
-      e.xR[i - 1] = ae_sqrt(beta->xR[i], _state);
+      e.xR[i - 1] = sqrt(beta->xR[i]);
    }
 // Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
    beta->xR[0] = 0.0;
@@ -201,7 +201,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    a22 = pim1b;
    b1 = a * pia;
    b2 = b * pib;
-   if (ae_fabs(a11, _state) > ae_fabs(a21, _state)) {
+   if (fabs(a11) > fabs(a21)) {
       a22 -= a12 * a21 / a11;
       b2 -= b1 * a21 / a11;
       bet = b2 / a22;
@@ -218,7 +218,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
       return;
    }
    d.xR[n + 1] = alph;
-   e.xR[n] = ae_sqrt(bet, _state);
+   e.xR[n] = sqrt(bet);
 // EVD
    if (!smatrixtdevd(&d, &e, n + 2, 3, &z, _state)) {
       *info = -3;
@@ -302,7 +302,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
          ae_frame_leave(_state);
          return;
       }
-      e.xR[i - 1] = ae_sqrt(beta->xR[i], _state);
+      e.xR[i - 1] = sqrt(beta->xR[i]);
    }
 // Caclulate Pn(a), Pn-1(a), and D[N+1]
    beta->xR[0] = 0.0;
@@ -434,13 +434,13 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    ae_vector_set_length(&b, n, _state);
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
-   if (t > ae_log(maxrealnumber, _state)) {
+   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
+   if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
    }
-   b.xR[0] = ae_exp(t, _state);
+   b.xR[0] = exp(t);
    if (n > 1) {
       alpha2 = sqr(alpha, _state);
       beta2 = sqr(beta, _state);
@@ -508,12 +508,12 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    ae_vector_set_length(&b, n, _state);
    a.xR[0] = alpha + 1;
    t = lngamma(alpha + 1, &s, _state);
-   if (t >= ae_log(maxrealnumber, _state)) {
+   if (t >= log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
    }
-   b.xR[0] = ae_exp(t, _state);
+   b.xR[0] = exp(t);
    if (n > 1) {
       for (i = 1; i < n; i++) {
          a.xR[i] = 2 * i + alpha + 1;
@@ -573,7 +573,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
    for (i = 0; i < n; i++) {
       a.xR[i] = 0.0;
    }
-   b.xR[0] = ae_sqrt(4 * ae_atan(1.0, _state), _state);
+   b.xR[0] = sqrt(4 * atan(1.0));
    if (n > 1) {
       for (i = 1; i < n; i++) {
          b.xR[i] = 0.5 * i;
@@ -1385,13 +1385,13 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    }
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * ae_log(2.0, _state) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
-   if (t > ae_log(maxrealnumber, _state)) {
+   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
+   if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave(_state);
       return;
    }
-   b.xR[0] = ae_exp(t, _state);
+   b.xR[0] = exp(t);
    if (clen > 1) {
       alpha2 = sqr(alpha, _state);
       beta2 = sqr(beta, _state);
@@ -1491,9 +1491,9 @@ static const ae_int_t autogk_maxsubintervals = 10000;
 // API: void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state, const xparams _xparams = xdefault);
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state) {
    SetObj(autogkstate, state);
-   ae_assert(ae_isfinite(a, _state), "AutoGKSmoothW: A is not finite!", _state);
-   ae_assert(ae_isfinite(b, _state), "AutoGKSmoothW: B is not finite!", _state);
-   ae_assert(ae_isfinite(xwidth, _state), "AutoGKSmoothW: XWidth is not finite!", _state);
+   ae_assert(isfinite(a), "AutoGKSmoothW: A is not finite!", _state);
+   ae_assert(isfinite(b), "AutoGKSmoothW: B is not finite!", _state);
+   ae_assert(isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!", _state);
    state->wrappermode = 0;
    state->a = a;
    state->b = b;
@@ -1527,8 +1527,8 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
 // API: void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams = xdefault);
 void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
    SetObj(autogkstate, state);
-   ae_assert(ae_isfinite(a, _state), "AutoGKSmooth: A is not finite!", _state);
-   ae_assert(ae_isfinite(b, _state), "AutoGKSmooth: B is not finite!", _state);
+   ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!", _state);
+   ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!", _state);
    autogksmoothw(a, b, 0.0, state, _state);
 }
 
@@ -1562,10 +1562,10 @@ void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
 // API: void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state, const xparams _xparams = xdefault);
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state) {
    SetObj(autogkstate, state);
-   ae_assert(ae_isfinite(a, _state), "AutoGKSingular: A is not finite!", _state);
-   ae_assert(ae_isfinite(b, _state), "AutoGKSingular: B is not finite!", _state);
-   ae_assert(ae_isfinite(alpha, _state), "AutoGKSingular: Alpha is not finite!", _state);
-   ae_assert(ae_isfinite(beta, _state), "AutoGKSingular: Beta is not finite!", _state);
+   ae_assert(isfinite(a), "AutoGKSingular: A is not finite!", _state);
+   ae_assert(isfinite(b), "AutoGKSingular: B is not finite!", _state);
+   ae_assert(isfinite(alpha), "AutoGKSingular: Alpha is not finite!", _state);
+   ae_assert(isfinite(beta), "AutoGKSingular: Beta is not finite!", _state);
    state->wrappermode = 1;
    state->a = a;
    state->b = b;
@@ -1746,14 +1746,14 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
    ae_vector_set_length(&state->wr, state->n, _state);
    for (i = 0; i < state->n; i++) {
       if (i == 0) {
-         state->wr.xR[i] = 0.5 * ae_fabs(state->qn.xR[1] - state->qn.xR[0], _state);
+         state->wr.xR[i] = 0.5 * fabs(state->qn.xR[1] - state->qn.xR[0]);
          continue;
       }
       if (i == state->n - 1) {
-         state->wr.xR[state->n - 1] = 0.5 * ae_fabs(state->qn.xR[state->n - 1] - state->qn.xR[state->n - 2], _state);
+         state->wr.xR[state->n - 1] = 0.5 * fabs(state->qn.xR[state->n - 1] - state->qn.xR[state->n - 2]);
          continue;
       }
-      state->wr.xR[i] = 0.5 * ae_fabs(state->qn.xR[i - 1] - state->qn.xR[i + 1], _state);
+      state->wr.xR[i] = 0.5 * fabs(state->qn.xR[i - 1] - state->qn.xR[i + 1]);
    }
 // special case
    if (state->a == state->b) {
@@ -1811,25 +1811,25 @@ lbl_0:
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta += ae_fabs(v, _state) * state->wr.xR[i];
+   inta += fabs(v) * state->wr.xR[i];
    i++;
    goto lbl_5;
 lbl_7:
    intk *= (state->b - state->a) * 0.5;
    intg *= (state->b - state->a) * 0.5;
    inta *= (state->b - state->a) * 0.5;
-   state->heap.xyR[0][0] = ae_fabs(intg - intk, _state);
+   state->heap.xyR[0][0] = fabs(intg - intk);
    state->heap.xyR[0][1] = intk;
    state->heap.xyR[0][2] = inta;
    state->heap.xyR[0][3] = state->a;
    state->heap.xyR[0][4] = state->b;
    state->sumerr = state->heap.xyR[0][0];
-   state->sumabs = ae_fabs(inta, _state);
+   state->sumabs = fabs(inta);
    goto lbl_4;
 lbl_3:
 // maximum subinterval should be no more than XWidth.
 // so we create Ceil((B-A)/XWidth)+1 small subintervals
-   ns = iceil(ae_fabs(state->b - state->a, _state) / state->xwidth, _state) + 1;
+   ns = iceil(fabs(state->b - state->a) / state->xwidth, _state) + 1;
    state->heapsize = ns;
    state->heapused = ns;
    state->heapwidth = 5;
@@ -1866,20 +1866,20 @@ lbl_1:
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta += ae_fabs(v, _state) * state->wr.xR[i];
+   inta += fabs(v) * state->wr.xR[i];
    i++;
    goto lbl_11;
 lbl_13:
    intk *= (tb - ta) * 0.5;
    intg *= (tb - ta) * 0.5;
    inta *= (tb - ta) * 0.5;
-   state->heap.xyR[j][0] = ae_fabs(intg - intk, _state);
+   state->heap.xyR[j][0] = fabs(intg - intk);
    state->heap.xyR[j][1] = intk;
    state->heap.xyR[j][2] = inta;
    state->heap.xyR[j][3] = ta;
    state->heap.xyR[j][4] = tb;
    state->sumerr += state->heap.xyR[j][0];
-   state->sumabs += ae_fabs(inta, _state);
+   state->sumabs += fabs(inta);
    j++;
    goto lbl_8;
 lbl_10:
@@ -1941,14 +1941,14 @@ lbl_2:
    }
 // Integral |F(x)|
 // Use rectangles method
-   inta += ae_fabs(v, _state) * state->wr.xR[i];
+   inta += fabs(v) * state->wr.xR[i];
    i++;
    goto lbl_19;
 lbl_21:
    intk *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
    intg *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
    inta *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   state->heap.xyR[j][0] = ae_fabs(intg - intk, _state);
+   state->heap.xyR[j][0] = fabs(intg - intk);
    state->heap.xyR[j][1] = intk;
    state->heap.xyR[j][2] = inta;
    state->sumerr += state->heap.xyR[j][0];
@@ -2122,7 +2122,7 @@ lbl_3:
 // first, integrate left half of [a,b]:
 //     integral(f(x)dx, a, (b+a)/2) =
 //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + alpha, _state), eps, state->xwidth, &state->internalstate, _state);
+   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate, _state);
 lbl_9:
    if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
       goto lbl_10;
@@ -2130,7 +2130,7 @@ lbl_9:
 // Fill State.X, State.XMinusA, State.BMinusX.
 // Latter two are filled correctly even if B<A.
    x = state->internalstate.x;
-   t = ae_pow(x, 1 / (1 + alpha), _state);
+   t = pow(x, 1 / (1 + alpha));
    state->x = a + t;
    if (s > 0.0) {
       state->xminusa = t;
@@ -2145,7 +2145,7 @@ lbl_9:
 lbl_1:
    state->needf = false;
    if (alpha != 0.0) {
-      state->internalstate.f = state->f * ae_pow(x, -alpha / (1 + alpha), _state) / (1 + alpha);
+      state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
    } else {
       state->internalstate.f = state->f;
    }
@@ -2157,7 +2157,7 @@ lbl_10:
 // then, integrate right half of [a,b]:
 //     integral(f(x)dx, (b+a)/2, b) =
 //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-   autogk_autogkinternalprepare(0.0, ae_pow(0.5 * (b - a), 1 + beta, _state), eps, state->xwidth, &state->internalstate, _state);
+   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate, _state);
 lbl_11:
    if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
       goto lbl_12;
@@ -2165,7 +2165,7 @@ lbl_11:
 // Fill State.X, State.XMinusA, State.BMinusX.
 // Latter two are filled correctly (X-A, B-X) even if B<A.
    x = state->internalstate.x;
-   t = ae_pow(x, 1 / (1 + beta), _state);
+   t = pow(x, 1 / (1 + beta));
    state->x = b - t;
    if (s > 0.0) {
       state->xminusa = b - t - a;
@@ -2180,7 +2180,7 @@ lbl_11:
 lbl_2:
    state->needf = false;
    if (beta != 0.0) {
-      state->internalstate.f = state->f * ae_pow(x, -beta / (1 + beta), _state) / (1 + beta);
+      state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
    } else {
       state->internalstate.f = state->f;
    }

@@ -477,7 +477,7 @@ double rmaxabsv_sse2(ae_int_t n, const Real *__restrict x, ae_state *__restrict 
    const double dMax = (pComps[0] > pComps[1]) ? pComps[0] : pComps[1];
    const ae_int_t tail = sse2len << 1;
    if (n - tail) {
-      const double candidate = ae_fabs(*(const double *)(pSrc + i), _state);
+      const double candidate = fabs(*(const double *)(pSrc + i));
       return (candidate > dMax) ? candidate : dMax;
    } else {
       return dMax;

@@ -78,7 +78,7 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
       if (*variance < 0.0) {
          *variance = 0.0;
       }
-      stddev = ae_sqrt(*variance, _state);
+      stddev = sqrt(*variance);
    }
 // Skewness and kurtosis
    if (stddev != 0.0) {
@@ -230,7 +230,7 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
    mean /= n;
 // ADev
    for (i = 0; i < n; i++) {
-      *adev += ae_fabs(x->xR[i] - mean, _state);
+      *adev += fabs(x->xR[i] - mean);
    }
    *adev /= n;
 }
@@ -382,7 +382,7 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
    ae_assert(n >= 0, "SamplePercentile: N<0", _state);
    ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, n, _state), "SamplePercentile: X is not finite vector", _state);
-   ae_assert(ae_isfinite(p, _state), "SamplePercentile: incorrect P!", _state);
+   ae_assert(isfinite(p), "SamplePercentile: incorrect P!", _state);
    ae_assert(p >= 0.0 && p <= 1.0, "SamplePercentile: incorrect P!", _state);
    tagsortfast(x, &rbuf, n, _state);
    if (p == 0.0) {
@@ -744,7 +744,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    if (xv == 0.0 || yv == 0.0) {
       result = 0.0;
    } else {
-      result = s / (ae_sqrt(xv, _state) * ae_sqrt(yv, _state));
+      result = s / (sqrt(xv) * sqrt(yv));
    }
    return result;
 }
@@ -923,7 +923,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
    covm(x, n, m, c, _state);
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
-         t.xR[i] = 1 / ae_sqrt(c->xyR[i][i], _state);
+         t.xR[i] = 1 / sqrt(c->xyR[i][i]);
       } else {
          t.xR[i] = 0.0;
       }
@@ -1026,7 +1026,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
-         t.xR[i] = 1 / ae_sqrt(c->xyR[i][i], _state);
+         t.xR[i] = 1 / sqrt(c->xyR[i][i]);
       } else {
          t.xR[i] = 0.0;
       }
@@ -1256,7 +1256,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       }
    }
    for (j = 0; j < m1; j++) {
-      sx.xR[j] = ae_sqrt(sx.xR[j] / (n - 1), _state);
+      sx.xR[j] = sqrt(sx.xR[j] / (n - 1));
    }
 // Repeat same steps for Y
    for (i = 0; i < m2; i++) {
@@ -1282,7 +1282,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       }
    }
    for (j = 0; j < m2; j++) {
-      sy.xR[j] = ae_sqrt(sy.xR[j] / (n - 1), _state);
+      sy.xR[j] = sqrt(sy.xR[j] / (n - 1));
    }
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
@@ -1416,7 +1416,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
             v2 += (vv - v) * (vv - v);
          }
       }
-      sx.xR[i] = ae_sqrt(v2 / (n - 1), _state);
+      sx.xR[i] = sqrt(v2 / (n - 1));
    }
    for (i = 0; i < m2; i++) {
       v = 0.0;
@@ -1440,7 +1440,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
             v2 += (vv - v) * (vv - v);
          }
       }
-      sy.xR[i] = ae_sqrt(v2 / (n - 1), _state);
+      sy.xR[i] = sqrt(v2 / (n - 1));
    }
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0, _state);
@@ -1965,7 +1965,7 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
       return;
    }
 // General case
-   t = r * ae_sqrt((n - 2) / (1 - sqr(r, _state)), _state);
+   t = r * sqrt((n - 2) / (1 - sqr(r, _state)));
    p = studenttdistribution(n - 2, t, _state);
    *bothtails = 2 * minreal(p, 1 - p, _state);
    *lefttail = p;
@@ -2416,7 +2416,7 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
       if (r <= -1.0) {
          t = -1.0E10;
       } else {
-         t = r * ae_sqrt((n - 2) / (1 - sqr(r, _state)), _state);
+         t = r * sqrt((n - 2) / (1 - sqr(r, _state)));
       }
    }
    if (t < 0.0) {
@@ -4088,7 +4088,7 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
       if (variance < 0.0) {
          variance = 0.0;
       }
-      stddev = ae_sqrt(variance, _state);
+      stddev = sqrt(variance);
    }
 // Skewness and kurtosis
    if (stddev != 0.0) {
@@ -4131,52 +4131,52 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
 // N = 5..20 are tabulated
    if (n >= 5 && n <= 20) {
       if (n == 5) {
-         result = ae_exp(jarquebera_jbtbl5(x, _state), _state);
+         result = exp(jarquebera_jbtbl5(x, _state));
       }
       if (n == 6) {
-         result = ae_exp(jarquebera_jbtbl6(x, _state), _state);
+         result = exp(jarquebera_jbtbl6(x, _state));
       }
       if (n == 7) {
-         result = ae_exp(jarquebera_jbtbl7(x, _state), _state);
+         result = exp(jarquebera_jbtbl7(x, _state));
       }
       if (n == 8) {
-         result = ae_exp(jarquebera_jbtbl8(x, _state), _state);
+         result = exp(jarquebera_jbtbl8(x, _state));
       }
       if (n == 9) {
-         result = ae_exp(jarquebera_jbtbl9(x, _state), _state);
+         result = exp(jarquebera_jbtbl9(x, _state));
       }
       if (n == 10) {
-         result = ae_exp(jarquebera_jbtbl10(x, _state), _state);
+         result = exp(jarquebera_jbtbl10(x, _state));
       }
       if (n == 11) {
-         result = ae_exp(jarquebera_jbtbl11(x, _state), _state);
+         result = exp(jarquebera_jbtbl11(x, _state));
       }
       if (n == 12) {
-         result = ae_exp(jarquebera_jbtbl12(x, _state), _state);
+         result = exp(jarquebera_jbtbl12(x, _state));
       }
       if (n == 13) {
-         result = ae_exp(jarquebera_jbtbl13(x, _state), _state);
+         result = exp(jarquebera_jbtbl13(x, _state));
       }
       if (n == 14) {
-         result = ae_exp(jarquebera_jbtbl14(x, _state), _state);
+         result = exp(jarquebera_jbtbl14(x, _state));
       }
       if (n == 15) {
-         result = ae_exp(jarquebera_jbtbl15(x, _state), _state);
+         result = exp(jarquebera_jbtbl15(x, _state));
       }
       if (n == 16) {
-         result = ae_exp(jarquebera_jbtbl16(x, _state), _state);
+         result = exp(jarquebera_jbtbl16(x, _state));
       }
       if (n == 17) {
-         result = ae_exp(jarquebera_jbtbl17(x, _state), _state);
+         result = exp(jarquebera_jbtbl17(x, _state));
       }
       if (n == 18) {
-         result = ae_exp(jarquebera_jbtbl18(x, _state), _state);
+         result = exp(jarquebera_jbtbl18(x, _state));
       }
       if (n == 19) {
-         result = ae_exp(jarquebera_jbtbl19(x, _state), _state);
+         result = exp(jarquebera_jbtbl19(x, _state));
       }
       if (n == 20) {
-         result = ae_exp(jarquebera_jbtbl20(x, _state), _state);
+         result = exp(jarquebera_jbtbl20(x, _state));
       }
       ae_frame_leave(_state);
       return result;
@@ -4198,7 +4198,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
@@ -4219,7 +4219,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
@@ -4240,7 +4240,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
@@ -4261,7 +4261,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
@@ -4282,17 +4282,17 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
 // Asymptotic expansion
    if (n > 1401) {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * ae_sqrt(1401.0 / n, _state);
+      result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * sqrt(1401.0 / n);
       if (result > 0.0) {
          result = 0.0;
       }
-      result = ae_exp(result, _state);
+      result = exp(result);
       ae_frame_leave(_state);
       return result;
    }
@@ -9137,7 +9137,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    ae_vector_set_length(&r, ns - 1 + 1, _state);
    ae_vector_set_length(&c, ns - 1 + 1, _state);
    for (i = 0; i < ns; i++) {
-      r.xR[i] = ae_fabs(x->xR[i] - e, _state);
+      r.xR[i] = fabs(x->xR[i] - e);
       c.xZ[i] = i;
    }
 // sort {R, C}
@@ -9220,14 +9220,14 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    }
 // Result
    mu = rmul2((double)ns, (double)(ns + 1), _state) / 4;
-   sigma = ae_sqrt(mu * (2 * ns + 1) / 6, _state);
+   sigma = sqrt(mu * (2 * ns + 1) / 6);
    s = (w - mu) / sigma;
    if (s <= 0.0) {
-      p = ae_exp(wsr_wsigma(-(w - mu) / sigma, ns, _state), _state);
-      mp = 1 - ae_exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state), _state);
+      p = exp(wsr_wsigma(-(w - mu) / sigma, ns, _state));
+      mp = 1 - exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state));
    } else {
-      mp = ae_exp(wsr_wsigma((w - mu) / sigma, ns, _state), _state);
-      p = 1 - ae_exp(wsr_wsigma((w + 1 - mu) / sigma, ns, _state), _state);
+      mp = exp(wsr_wsigma((w - mu) / sigma, ns, _state));
+      p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns, _state));
    }
    *lefttail = maxreal(p, 1.0E-4, _state);
    *righttail = maxreal(mp, 1.0E-4, _state);
@@ -12846,14 +12846,14 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    for (i = 0; i < tiecount; i++) {
       tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i], _state) - 1) / 12;
    }
-   sigma = ae_sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp, _state);
+   sigma = sqrt(rmul2((double)n, (double)m, _state) / ns / (ns - 1) * tmp);
    s = (u - mu) / sigma;
    if (s <= 0.0) {
-      p = ae_exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state), _state);
-      mp = 1 - ae_exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state), _state);
+      p = exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state));
+      mp = 1 - exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state));
    } else {
-      mp = ae_exp(mannwhitneyu_usigma((u - mu) / sigma, n, m, _state), _state);
-      p = 1 - ae_exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m, _state), _state);
+      mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m, _state));
+      p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m, _state));
    }
    *lefttail = boundval(maxreal(mp, 1.0E-4, _state), 0.0001, 0.2500, _state);
    *righttail = boundval(maxreal(p, 1.0E-4, _state), 0.0001, 0.2500, _state);
@@ -13057,7 +13057,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
       if (xvariance < 0.0) {
          xvariance = 0.0;
       }
-      xstddev = ae_sqrt(xvariance, _state);
+      xstddev = sqrt(xvariance);
    }
    if (xstddev == 0.0) {
       if (xmean == mean) {
@@ -13078,7 +13078,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
       return;
    }
 // Statistic
-   stat = (xmean - mean) / (xstddev / ae_sqrt((double)n, _state));
+   stat = (xmean - mean) / (xstddev / sqrt((double)n));
    s = studenttdistribution(n - 1, stat, _state);
    *bothtails = 2 * minreal(s, 1 - s, _state);
    *lefttail = s;
@@ -13180,7 +13180,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
       for (i = 0; i < m; i++) {
          s += sqr(y->xR[i] - ymean, _state);
       }
-      s = ae_sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2), _state);
+      s = sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2));
    }
    if (s == 0.0) {
       if (xmean == ymean) {
@@ -13349,7 +13349,7 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
       return;
    }
 // Statistic
-   stat = (xmean - ymean) / ae_sqrt(xvar / n + yvar / m, _state);
+   stat = (xmean - ymean) / sqrt(xvar / n + yvar / m);
    c = xvar / n / (xvar / n + yvar / m);
    df = rmul2((double)(n - 1), (double)(m - 1), _state) / ((m - 1) * sqr(c, _state) + (n - 1) * sqr(1 - c, _state));
    if (stat > 0.0) {

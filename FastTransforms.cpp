@@ -181,7 +181,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
          hn = complex_from_d(buf.xR[idx + 0], buf.xR[idx + 1]);
          idx = 2 * ((n2 - i) % n2);
          hmnc = complex_from_d(buf.xR[idx + 0], -buf.xR[idx + 1]);
-         v = complex_from_d(-ae_sin(-2 * pi * i / n, _state), ae_cos(-2 * pi * i / n, _state));
+         v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
          f->xC[i].x *= 0.5;
          f->xC[i].y *= 0.5;
@@ -242,13 +242,13 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
    ae_int_t Nq = n / 2, Nr = n % 2;
    ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
-   ae_assert(ae_isfinite(f->xC[0].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+   ae_assert(isfinite(f->xC[0].x), "FFTR1DInv: F contains infinite or NAN values!", _state);
    for (i = 1; i < Nq; i++) {
-      ae_assert(ae_isfinite(f->xC[i].x, _state) && ae_isfinite(f->xC[i].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+      ae_assert(isfinite(f->xC[i].x) && isfinite(f->xC[i].y), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
-   ae_assert(ae_isfinite(f->xC[Nq].x, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+   ae_assert(isfinite(f->xC[Nq].x), "FFTR1DInv: F contains infinite or NAN values!", _state);
    if (Nr) {
-      ae_assert(ae_isfinite(f->xC[Nq].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
+      ae_assert(isfinite(f->xC[Nq].y), "FFTR1DInv: F contains infinite or NAN values!", _state);
    }
 // Special case: N=1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
@@ -316,7 +316,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
       hn = complex_from_d(buf->xR[idx + 0], buf->xR[idx + 1]);
       idx = 2 * (n2 - i);
       hmnc = complex_from_d(buf->xR[idx + 0], -buf->xR[idx + 1]);
-      v = complex_from_d(-ae_sin(-2 * pi * i / n, _state), ae_cos(-2 * pi * i / n, _state));
+      v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
       v = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
       a->xR[2 * i + 0] = 0.5 * v.x;
       a->xR[2 * i + 1] = 0.5 * v.y;

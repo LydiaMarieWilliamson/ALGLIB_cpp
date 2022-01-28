@@ -231,7 +231,7 @@ int main() {
       x[1] = 1;
       y.setlength(2);
       y[0] = 2;
-      y[1] = fp_nan;
+      y[1] = NAN;
       passed = passed && !get_error_flag();
       spline1dbuildlinear(x, y, 2, s1);
       passed = passed && get_error_flag();

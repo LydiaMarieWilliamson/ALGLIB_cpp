@@ -398,7 +398,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
          v = b->xyR[i][j];
-         mxb = maxreal(mxb, ae_fabs(v, _state), _state);
+         mxb = maxreal(mxb, fabs(v), _state);
          x->xyR[i][j] = v;
       }
    }
@@ -431,7 +431,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
                xb.xR[n] = b->xyR[i][k];
                xdot(&xa, &xb, n + 1, &tx, &v, &verr, _state);
                y.xR[i] = -v;
-               smallerr = smallerr && ae_fabs(v, _state) < 4 * verr;
+               smallerr = smallerr && fabs(v) < 4 * verr;
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -3147,7 +3147,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
             tx.xR[ncols] = b->xR[i];
             xdot(&ta, &tx, ncols + 1, &buf, &v, &verr, _state);
             rp.xR[i] = -v;
-            smallerr = smallerr && ae_fabs(v, _state) < 4 * verr;
+            smallerr = smallerr && fabs(v) < 4 * verr;
          }
          if (smallerr) {
             terminatenexttime = true;
@@ -4055,7 +4055,7 @@ void sparsesolversetstartingpoint(sparsesolverstate *state, RVector *x, ae_state
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 // API: void sparsesolversetcond(const sparsesolverstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
 void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
-   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolverSetCond: EpsF is negative or contains infinite or NaN values", _state);
+   ae_assert(isfinite(epsf) && epsf >= 0.0, "SparseSolverSetCond: EpsF is negative or contains infinite or NaN values", _state);
    ae_assert(maxits >= 0, "SparseSolverSetCond: MaxIts is negative", _state);
    if (epsf == 0.0 && maxits == 0) {
       state->epsf = 1.0E-6;
@@ -4256,8 +4256,8 @@ lbl_8:
    outeridx = 0;
    state->repterminationtype = 5;
    state->repr2 = rdotv2(state->n, &state->wrkb, _state);
-   res0 = ae_sqrt(rdotv2(state->n, &state->b, _state), _state);
-   res = ae_sqrt(state->repr2, _state);
+   res0 = sqrt(rdotv2(state->n, &state->b, _state));
+   res = sqrt(state->repr2);
    if (!state->xrep) {
       goto lbl_9;
    }
@@ -4320,7 +4320,7 @@ lbl_3:
    raddv(state->n, -1.0, &state->ax, &state->wrkb, _state);
    state->repr2 = rdotv2(state->n, &state->wrkb, _state);
    prevres = res;
-   res = ae_sqrt(state->repr2, _state);
+   res = sqrt(state->repr2);
    if (!state->xrep) {
       goto lbl_15;
    }
@@ -4338,7 +4338,7 @@ lbl_15:
       state->repterminationtype = 1;
       goto lbl_12;
    }
-   if (res >= prevres * (1 - ae_sqrt(machineepsilon, _state))) {
+   if (res >= prevres * (1 - sqrt(machineepsilon))) {
    // The algorithm stagnated
       state->repterminationtype = 7;
       goto lbl_12;
@@ -4745,7 +4745,7 @@ void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int
    ae_assert(sparsegetncols(a, _state) == n, "SparseSolveSymmetricGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveSymmetricGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveSymmetricGMRES: B contains NAN/INF", _state);
-   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolveSymmetricGMRES: EpsF<0 or infinite", _state);
+   ae_assert(isfinite(epsf) && epsf >= 0.0, "SparseSolveSymmetricGMRES: EpsF<0 or infinite", _state);
    ae_assert(maxits >= 0, "SparseSolveSymmetricGMRES: MaxIts<0", _state);
    if (epsf == 0.0 && maxits == 0) {
       epsf = 1.0E-6;
@@ -4877,7 +4877,7 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    ae_assert(sparsegetncols(a, _state) == n, "SparseSolveGMRES: cols(A) != N", _state);
    ae_assert(b->cnt >= n, "SparseSolveGMRES: length(B)<N", _state);
    ae_assert(isfinitevector(b, n, _state), "SparseSolveGMRES: B contains NAN/INF", _state);
-   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "SparseSolveGMRES: EpsF<0 or infinite", _state);
+   ae_assert(isfinite(epsf) && epsf >= 0.0, "SparseSolveGMRES: EpsF<0 or infinite", _state);
    ae_assert(maxits >= 0, "SparseSolveGMRES: MaxIts<0", _state);
    if (epsf == 0.0 && maxits == 0) {
       epsf = 1.0E-6;
@@ -5307,7 +5307,7 @@ void lincgsetprecdiag(lincgstate *state, ae_state *_state) {
 // API: void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
 void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
    ae_assert(!state->running, "LinCGSetCond: you can not change stopping criteria when LinCGIteration() is running", _state);
-   ae_assert(ae_isfinite(epsf, _state) && epsf >= 0.0, "LinCGSetCond: EpsF is negative or contains infinite or NaN values", _state);
+   ae_assert(isfinite(epsf) && epsf >= 0.0, "LinCGSetCond: EpsF is negative or contains infinite or NaN values", _state);
    ae_assert(maxits >= 0, "LinCGSetCond: MaxIts is negative", _state);
    if (epsf == 0.0 && maxits == 0) {
       state->epsf = lincg_defaultprecision;
@@ -5404,7 +5404,7 @@ lbl_0:
       state->meritfunction += state->mv.xR[i] * state->rx.xR[i] - 2 * state->b.xR[i] * state->rx.xR[i];
       bnorm += state->b.xR[i] * state->b.xR[i];
    }
-   bnorm = ae_sqrt(bnorm, _state);
+   bnorm = sqrt(bnorm);
 // Output first report
    if (!state->xrep) {
       goto lbl_8;
@@ -5418,9 +5418,9 @@ lbl_1:
    state->xupdated = false;
 lbl_8:
 // Is x0 a solution?
-   if (!ae_isfinite(state->r2, _state) || ae_sqrt(state->r2, _state) <= state->epsf * bnorm) {
+   if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
       state->running = false;
-      if (ae_isfinite(state->r2, _state)) {
+      if (isfinite(state->r2)) {
          state->repterminationtype = 1;
       } else {
          state->repterminationtype = -4;
@@ -5457,11 +5457,11 @@ lbl_10:
    goto lbl_rcomm;
 lbl_3:
    state->needvmv = false;
-   if (!ae_isfinite(state->vmv, _state) || state->vmv <= 0.0) {
+   if (!isfinite(state->vmv) || state->vmv <= 0.0) {
    // a) Overflow when calculating VMV
    // b) non-positive VMV (non-SPD matrix)
       state->running = false;
-      if (ae_isfinite(state->vmv, _state)) {
+      if (isfinite(state->vmv)) {
          state->repterminationtype = -5;
       } else {
          state->repterminationtype = -4;
@@ -5474,7 +5474,7 @@ lbl_3:
       state->alpha += state->r.xR[i] * state->z.xR[i];
    }
    state->alpha /= state->vmv;
-   if (!ae_isfinite(state->alpha, _state)) {
+   if (!isfinite(state->alpha)) {
    // Overflow when calculating Alpha
       state->running = false;
       state->repterminationtype = -4;
@@ -5522,7 +5522,7 @@ lbl_4:
       goto lbl_14;
    }
    for (i = 0; i < state->n; i++) {
-      if (!ae_isfinite(state->rx.xR[i], _state)) {
+      if (!isfinite(state->rx.xR[i])) {
          state->running = false;
          state->repterminationtype = -4;
          result = false;
@@ -5570,9 +5570,9 @@ lbl_6:
 lbl_18:
 // stopping criterion
 // achieved the required precision
-   if (!ae_isfinite(state->r2, _state) || ae_sqrt(state->r2, _state) <= state->epsf * bnorm) {
+   if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
       state->running = false;
-      if (ae_isfinite(state->r2, _state)) {
+      if (isfinite(state->r2)) {
          state->repterminationtype = 1;
       } else {
          state->repterminationtype = -4;
@@ -5582,7 +5582,7 @@ lbl_18:
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
       for (i = 0; i < state->n; i++) {
-         if (!ae_isfinite(state->rx.xR[i], _state)) {
+         if (!isfinite(state->rx.xR[i])) {
             state->running = false;
             state->repterminationtype = -4;
             result = false;
@@ -5613,7 +5613,7 @@ lbl_7:
          uvar += state->z.xR[i] * state->r.xR[i];
       }
    // check that UVar is't INF or is't zero
-      if (!ae_isfinite(uvar, _state) || uvar == 0.0) {
+      if (!isfinite(uvar) || uvar == 0.0) {
          state->running = false;
          state->repterminationtype = -4;
          result = false;
@@ -5622,7 +5622,7 @@ lbl_7:
    // calculate .BETA
       state->beta /= uvar;
    // check that .BETA neither INF nor NaN
-      if (!ae_isfinite(state->beta, _state)) {
+      if (!isfinite(state->beta)) {
          state->running = false;
          state->repterminationtype = -1;
          result = false;
@@ -5703,7 +5703,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       for (i = 0; i < n; i++) {
          v = sparsegetdiagonal(a, i, _state);
          if (v > 0.0) {
-            state->tmpd.xR[i] = 1 / ae_sqrt(v, _state);
+            state->tmpd.xR[i] = 1 / sqrt(v);
          } else {
             state->tmpd.xR[i] = 1.0;
          }
@@ -6042,7 +6042,7 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
    state->prectype = 0;
    state->epsa = linlsqr_atol;
    state->epsb = linlsqr_btol;
-   state->epsc = 1 / ae_sqrt(machineepsilon, _state);
+   state->epsc = 1 / sqrt(machineepsilon);
    state->maxits = 0;
    state->lambdai = 0.0;
    state->xrep = false;
@@ -6167,7 +6167,7 @@ void linlsqrsetprecdiag(linlsqrstate *state, ae_state *_state) {
 // API: void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai, const xparams _xparams = xdefault);
 void linlsqrsetlambdai(linlsqrstate *state, double lambdai, ae_state *_state) {
    ae_assert(!state->running, "LinLSQRSetLambdaI: you can not set LambdaI, because function LinLSQRIteration is running", _state);
-   ae_assert(ae_isfinite(lambdai, _state) && lambdai >= 0.0, "LinLSQRSetLambdaI: LambdaI is infinite or NaN", _state);
+   ae_assert(isfinite(lambdai) && lambdai >= 0.0, "LinLSQRSetLambdaI: LambdaI is infinite or NaN", _state);
    state->lambdai = lambdai;
 }
 
@@ -6228,7 +6228,7 @@ bool linlsqriteration(linlsqrstate *state, ae_state *_state) {
 // Routine body
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B", _state);
    summn = state->m + state->n;
-   bnorm = ae_sqrt(state->bnorm2, _state);
+   bnorm = sqrt(state->bnorm2);
    state->userterminationneeded = false;
    state->running = true;
    state->repnmv = 0;
@@ -6346,7 +6346,7 @@ lbl_3:
    for (i = 0; i < state->n; i++) {
       state->alphai += state->mtv.xR[i] * state->mtv.xR[i];
    }
-   state->alphai = ae_sqrt(state->alphai, _state);
+   state->alphai = sqrt(state->alphai);
    if (state->alphai == 0.0) {
    // Orthogonality stopping criterion is met
       state->running = false;
@@ -6399,7 +6399,7 @@ lbl_4:
       state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
    }
    if (state->betaip1 != 0.0) {
-      state->betaip1 = ae_sqrt(state->betaip1, _state);
+      state->betaip1 = sqrt(state->betaip1);
       for (i = 0; i < summn; i++) {
          state->uip1.xR[i] /= state->betaip1;
       }
@@ -6421,7 +6421,7 @@ lbl_5:
       state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
    }
    if (state->alphaip1 != 0.0) {
-      state->alphaip1 = ae_sqrt(state->alphaip1, _state);
+      state->alphaip1 = sqrt(state->alphaip1);
       for (i = 0; i < state->n; i++) {
          state->vip1.xR[i] /= state->alphaip1;
       }
@@ -6448,7 +6448,7 @@ lbl_5:
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
       state->dnorm += state->d.xR[i] * state->d.xR[i];
    }
-   if (ae_sqrt(state->dnorm, _state) * state->anorm >= state->epsc) {
+   if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
       state->running = false;
       state->repterminationtype = 7;
       result = false;
@@ -6487,7 +6487,7 @@ lbl_17:
       result = false;
       return result;
    }
-   if (state->alphaip1 * ae_fabs(state->ci, _state) / state->anorm <= state->epsa) {
+   if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
    // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
       state->running = false;
       state->repterminationtype = 4;
@@ -6587,7 +6587,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
-            state->tmpd.xR[i] = 1 / ae_sqrt(state->tmpd.xR[i], _state);
+            state->tmpd.xR[i] = 1 / sqrt(state->tmpd.xR[i]);
          } else {
             state->tmpd.xR[i] = 1.0;
          }
@@ -6642,8 +6642,8 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
 // API: void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits, const xparams _xparams = xdefault);
 void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits, ae_state *_state) {
    ae_assert(!state->running, "LinLSQRSetCond: you can not call this function when LinLSQRIteration is running", _state);
-   ae_assert(ae_isfinite(epsa, _state) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN", _state);
-   ae_assert(ae_isfinite(epsb, _state) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN", _state);
+   ae_assert(isfinite(epsa) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN", _state);
+   ae_assert(isfinite(epsb) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN", _state);
    ae_assert(maxits >= 0, "LinLSQRSetCond: MaxIts is negative", _state);
    if ((epsa == 0.0 && epsb == 0.0) && maxits == 0) {
       state->epsa = linlsqr_atol;
@@ -6998,7 +6998,7 @@ namespace alglib_impl {
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 // API: void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
 void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits, ae_state *_state) {
-   ae_assert(ae_isfinite(epsf, _state), "NLEQSetCond: EpsF is not finite number!", _state);
+   ae_assert(isfinite(epsf), "NLEQSetCond: EpsF is not finite number!", _state);
    ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!", _state);
    ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!", _state);
    if (epsf == 0.0 && maxits == 0) {
@@ -7037,7 +7037,7 @@ void nleqsetxrep(nleqstate *state, bool needxrep, ae_state *_state) {
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 // API: void nleqsetstpmax(const nleqstate &state, const double stpmax, const xparams _xparams = xdefault);
 void nleqsetstpmax(nleqstate *state, double stpmax, ae_state *_state) {
-   ae_assert(ae_isfinite(stpmax, _state), "NLEQSetStpMax: StpMax is not finite!", _state);
+   ae_assert(isfinite(stpmax), "NLEQSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!", _state);
    state->stpmax = stpmax;
 }
@@ -7170,14 +7170,14 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
    double lnmax;
    bool result;
    result = false;
-   lnlambda = ae_log(*lambdav, _state);
-   lnlambdaup = ae_log(lambdaup, _state);
-   lnnu = ae_log(*nu, _state);
-   lnmax = 0.5 * ae_log(maxrealnumber, _state);
+   lnlambda = log(*lambdav);
+   lnlambdaup = log(lambdaup);
+   lnnu = log(*nu);
+   lnmax = 0.5 * log(maxrealnumber);
    if (lnlambda + lnlambdaup + lnnu > lnmax) {
       return result;
    }
-   if (lnnu + ae_log(2.0, _state) > lnmax) {
+   if (lnnu + log(2.0) > lnmax) {
       return result;
    }
    *lambdav *= lambdaup * (*nu);
@@ -7189,7 +7189,7 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae
 // Decreases lambda, but leaves it unchanged when there is danger of underflow.
 static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, ae_state *_state) {
    *nu = 1.0;
-   if (ae_log(*lambdav, _state) + ae_log(lambdadown, _state) < ae_log(minrealnumber, _state)) {
+   if (log(*lambdav) + log(lambdadown) < log(minrealnumber)) {
       *lambdav = minrealnumber;
    } else {
       *lambdav *= lambdadown;
@@ -7409,7 +7409,7 @@ lbl_4:
 lbl_11:
 // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
 // If one of the conditions is met, RepTerminationType is changed.
-   if (ae_sqrt(state->f, _state) <= state->epsf) {
+   if (sqrt(state->f) <= state->epsf) {
       state->repterminationtype = 1;
    }
    if (stepnorm == 0.0 && state->repterminationtype == 0) {
