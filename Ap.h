@@ -967,8 +967,6 @@ struct ap_error {
 #   endif
 #   define BegPoll	{
 #   define EndPoll(Q)	}
-// Set the error flag and (optionally) the error message.
-void set_error_flag(const char *Msg = NULL);
 // Set the error flag and the pending error message.
 void set_error_msg(alglib_impl::ae_state Q);
 // Get the error flag and (optionally) the error message (as *MsgP);
@@ -1004,7 +1002,7 @@ struct Type: public Type##I { \
    Type &operator=(const Type &A); \
    virtual ~Type(); \
    Pars \
-};
+}
 
 #define DefClass(Type, Vars) \
 Type##I::Type##I() { \
