@@ -798,7 +798,7 @@ static bool testablasfunit_testxdot(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
@@ -807,8 +807,8 @@ static bool testablasfunit_testxdot(ae_int_t maxn, double tol, ae_state *_state)
       iseed++;
    // Compute each rDot version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
-      ridx2 = randominteger(imax2(n, 1, _state), _state);
+      ridx = randominteger(imax2(n, 1, _state));
+      ridx2 = randominteger(imax2(n, 1, _state));
       set_error_flag(&result, fabs(rdotv(n, &s0.x0, &s0.x1, _state) - refrdotv(n, &s1.x0, &s1.x1, _state)) > tol, __FILE__, __LINE__, "testablasfunit.ap:142");
       set_error_flag(&result, fabs(rdotvr(n, &s0.x0, &s0.a0, ridx, _state) - refrdotvr(n, &s1.x0, &s1.a0, ridx, _state)) > tol, __FILE__, __LINE__, "testablasfunit.ap:143");
       set_error_flag(&result, fabs(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2, _state) - refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2, _state)) > tol, __FILE__, __LINE__, "testablasfunit.ap:144");
@@ -834,20 +834,20 @@ static bool testablasfunit_testxset(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xSetXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      m0 = randominteger(imax2(n, 1, _state), _state);
-      m1 = randominteger(imax2(n, 1, _state), _state);
-      ridx = randominteger(imax2(n, 1, _state), _state);
-      cidx = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(n / 2 + 1, _state);
-      alpha = 2 * randomreal(_state) - 1;
-      ialpha = randominteger(21, _state) - 10;
-      balpha = randomreal(_state) > 0.5;
+      m0 = randominteger(imax2(n, 1, _state));
+      m1 = randominteger(imax2(n, 1, _state));
+      ridx = randominteger(imax2(n, 1, _state));
+      cidx = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(n / 2 + 1);
+      alpha = randommid();
+      ialpha = randominteger(21) - 10;
+      balpha = randombool();
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       rsetv(n, alpha, &s0.x0, _state);
@@ -904,18 +904,18 @@ static bool testablasfunit_testxadd(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xAddXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
-      ridx2 = randominteger(imax2(n, 1, _state), _state);
-      cidx = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(n / 2 + 1, _state);
-      offsy = randominteger(n / 2 + 1, _state);
-      alpha = 2 * randomreal(_state) - 1;
+      ridx = randominteger(imax2(n, 1, _state));
+      ridx2 = randominteger(imax2(n, 1, _state));
+      cidx = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(n / 2 + 1);
+      offsy = randominteger(n / 2 + 1);
+      alpha = randommid();
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       raddv(n, alpha, &s0.x0, &s0.x1, _state);
@@ -964,15 +964,15 @@ static bool testablasfunit_testxmul(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xAddXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(n / 2 + 1, _state);
-      alpha = 2 * randomreal(_state) - 1;
+      ridx = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(n / 2 + 1);
+      alpha = randommid();
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       rmulv(n, alpha, &s0.x0, _state);
@@ -1004,13 +1004,13 @@ static bool testablasfunit_testxmax(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xAddXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
+      ridx = randominteger(imax2(n, 1, _state));
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       s0.v0 = rmaxv(n, &s0.x0, _state);
@@ -1047,13 +1047,13 @@ static bool testablasfunit_testxmerge(ae_int_t maxn, double tol, ae_state *_stat
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xAddXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
+      ridx = randominteger(imax2(n, 1, _state));
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       rmergemulv(n, &s0.x0, &s0.x1, _state);
@@ -1120,18 +1120,18 @@ static bool testablasfunit_testxcopy(ae_int_t maxn, double tol, ae_state *_state
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each xAddXX version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      ridx = randominteger(imax2(n, 1, _state), _state);
-      ridx2 = randominteger(imax2(n, 1, _state), _state);
-      cidx = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(n / 2 + 1, _state);
-      offsy = randominteger(n / 2 + 1, _state);
-      alpha = 2 * randomreal(_state) - 1;
+      ridx = randominteger(imax2(n, 1, _state));
+      ridx2 = randominteger(imax2(n, 1, _state));
+      cidx = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(n / 2 + 1);
+      offsy = randominteger(n / 2 + 1);
+      alpha = randommid();
       testablasfunit_initplayground(n, iseed, &s0, _state);
       testablasfunit_initplayground(n, iseed, &s1, _state);
       rcopyv(n, &s0.x0, &s0.x1, _state);
@@ -1221,21 +1221,21 @@ static bool testablasfunit_testxgemv(ae_int_t maxn, double tol, ae_state *_state
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each GEMV version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      padding = randominteger(10, _state);
-      m = randominteger(n + 1, _state);
-      offs0 = randominteger(imax2(n, 1, _state), _state);
-      offs1 = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(imax2(n, 1, _state), _state);
-      offsy = randominteger(imax2(n, 1, _state), _state);
-      alpha = (2 * randomreal(_state) - 1) * randominteger(2, _state);
-      beta = (2 * randomreal(_state) - 1) * randominteger(2, _state);
-      opa = randominteger(2, _state);
+      padding = randominteger(10);
+      m = randominteger(n + 1);
+      offs0 = randominteger(imax2(n, 1, _state));
+      offs1 = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(imax2(n, 1, _state));
+      offsy = randominteger(imax2(n, 1, _state));
+      alpha = randommid() * randominteger(2);
+      beta = randommid() * randominteger(2);
+      opa = randominteger(2);
       testablasfunit_initplayground(2 * n + padding, iseed, &s0, _state);
       testablasfunit_initplayground(2 * n + padding, iseed, &s1, _state);
       rgemv(m, n, alpha, &s0.a0, opa, &s0.x0, beta, &s0.x1, _state);
@@ -1283,15 +1283,15 @@ static bool testablasfunit_testxger(ae_int_t maxn, double tol, ae_state *_state)
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each GER version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      padding = randominteger(10, _state);
-      m = randominteger(n + 1, _state);
-      alpha = (2 * randomreal(_state) - 1) * randominteger(2, _state);
+      padding = randominteger(10);
+      m = randominteger(n + 1);
+      alpha = randommid() * randominteger(2);
       testablasfunit_initplayground(2 * n + padding, iseed, &s0, _state);
       testablasfunit_initplayground(2 * n + padding, iseed, &s1, _state);
       rger(m, n, alpha, &s0.x0, &s0.x1, &s0.a0, _state);
@@ -1324,19 +1324,19 @@ static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol, ae_state *_state
    ae_frame_make(_state, &_frame_block);
    NewObj(ablasfplayground, s0, _state);
    NewObj(ablasfplayground, s1, _state);
-   iseed = randominteger(10000, _state);
+   iseed = randominteger(10000);
    result = false;
    for (n = 0; n <= maxn; n++) {
    // Prepare two identical playground structures
    // Compute each GEMV version twice - reference vs library.
    // Compare playground snapshots - should be identical.
-      padding = randominteger(10, _state);
-      offs0 = randominteger(imax2(n, 1, _state), _state);
-      offs1 = randominteger(imax2(n, 1, _state), _state);
-      offsx = randominteger(imax2(n, 1, _state), _state);
-      opa = randominteger(2, _state);
-      isupper = randomreal(_state) > 0.5;
-      isunit = randomreal(_state) > 0.5;
+      padding = randominteger(10);
+      offs0 = randominteger(imax2(n, 1, _state));
+      offs1 = randominteger(imax2(n, 1, _state));
+      offsx = randominteger(imax2(n, 1, _state));
+      opa = randominteger(2);
+      isupper = randombool();
+      isunit = randombool();
       testablasfunit_initplayground(2 * n + padding, iseed, &s0, _state);
       testablasfunit_initplayground(2 * n + padding, iseed, &s1, _state);
       rtrsvx(n, &s0.a0, offs0, offs1, isupper, isunit, opa, &s0.x0, offsx, _state);
@@ -1472,7 +1472,7 @@ static bool hqrndcontinuoustest(bool silent, ae_state *_state) {
    result = false;
 // Test for sample size equal to 1
    ae_vector_set_length(&sample, 1, _state);
-   sample.xR[0] = randomreal(_state);
+   sample.xR[0] = randomreal();
    hqrndrandomize(&state, _state);
    result = result || hqrndcontinuous(&state, &sample, 1, _state) != sample.xR[0];
 // Test for larger samples
@@ -1489,9 +1489,9 @@ static bool hqrndcontinuoustest(bool silent, ae_state *_state) {
       nb = 3 * (samplesize - 1);
       sigma = sqrt(xp * (1.0 / nb) * (1 - 1.0 / nb));
       ae_vector_set_length(&sample, samplesize, _state);
-      sample.xR[0] = 2 * randomreal(_state) - 1;
+      sample.xR[0] = randommid();
       for (i = 0; i < samplesize - 1; i++) {
-         sample.xR[i + 1] = sample.xR[i] + 0.1 + randomreal(_state);
+         sample.xR[i + 1] = sample.xR[i] + 0.1 + randomreal();
       }
       ae_vector_set_length(&bins, nb, _state);
       ae_vector_set_length(&binbounds, nb + 1, _state);
@@ -1555,12 +1555,12 @@ static bool hqrnddiscretetest(bool silent, ae_state *_state) {
          nn.xZ[i] = 0;
       }
       ae_vector_set_length(&sample, binscount, _state);
-      sample.xR[0] = (max - min) * randomreal(_state) + min;
+      sample.xR[0] = (max - min) * randomreal() + min;
       for (i = 1; i < binscount; i++) {
-         sample.xR[i] = sample.xR[i - 1] + max * randomreal(_state) + 0.001;
+         sample.xR[i] = sample.xR[i - 1] + max * randomreal() + 0.001;
       }
-      s1 = 1 + randominteger(32000, _state);
-      s2 = 1 + randominteger(32000, _state);
+      s1 = 1 + randominteger(32000);
+      s2 = 1 + randominteger(32000);
       hqrndseed(s1, s2, &state, _state);
       for (i = 0; i < xp; i++) {
          tsample = hqrnddiscrete(&state, &sample, binscount, _state);
@@ -1688,7 +1688,7 @@ bool testhqrnd(bool silent, ae_state *_state) {
    NewObj(hqrndstate, state, _state);
    waserrors = false;
    sigmathreshold = 7.0;
-   samplesize = 100000 + randominteger(100, _state);
+   samplesize = 100000 + randominteger(100);
    passcount = 50;
    seederrors = false;
    urerrors = false;
@@ -1699,8 +1699,8 @@ bool testhqrnd(bool silent, ae_state *_state) {
    ae_vector_set_length(&x, samplesize - 1 + 1, _state);
 // Test seed errors
    for (pass = 1; pass <= passcount; pass++) {
-      s1 = 1 + randominteger(32000, _state);
-      s2 = 1 + randominteger(32000, _state);
+      s1 = 1 + randominteger(32000);
+      s2 = 1 + randominteger(32000);
       testhqrndunit_unsetstate(&state, _state);
       hqrndseed(s1, s2, &state, _state);
       i1 = hqrnduniformi(&state, 100, _state);
@@ -1838,7 +1838,7 @@ bool testhqrnd(bool silent, ae_state *_state) {
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - sqrt(2.0)) / coalesce(stddevs, 1.0, _state)), _state);
       set_error_flag(&normerrors, normsigmaerr > sigmathreshold, __FILE__, __LINE__, "testhqrndunit.ap:260");
    }
-   am = 1 + randominteger(iround(sqrt((double)samplesize), _state), _state);
+   am = 1 + randominteger(iround(sqrt((double)samplesize), _state));
    an = 1 + samplesize / am;
    hqrndnormalm(&state, am, an, &a, _state);
    set_error_flag(&normerrors, a.rows != am, __FILE__, __LINE__, "testhqrndunit.ap:265");
@@ -1884,7 +1884,7 @@ bool testhqrnd(bool silent, ae_state *_state) {
    testhqrndunit_unsetstate(&state, _state);
    hqrndrandomize(&state, _state);
    expsigmaerr = 0.0;
-   lambdav = 2 + 5 * randomreal(_state);
+   lambdav = 2 + 5 * randomreal();
    for (i = 0; i < samplesize; i++) {
       x.xR[i] = hqrndexponential(&state, lambdav, _state);
    }
@@ -2485,9 +2485,9 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randomreal(_state) > 0.5) {
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randombool()) {
          m = mx;
       } else {
          n = mx;
@@ -2501,11 +2501,11 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refra, 2 * m, 2 * m, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
-            refra.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+            refra.xyR[i][j] = 0.1 * randommid();
          }
       }
       for (i = 0; i < m; i++) {
-         refra.xyR[i][i] = (2 * randominteger(1, _state) - 1) * (2 * m + randomreal(_state));
+         refra.xyR[i][i] = (2 * randominteger(1) - 1) * (2 * m + randomreal());
       }
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
@@ -2517,11 +2517,11 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refca, 2 * m, 2 * m, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
-            refca.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
+            refca.xyC[i][j] = complex_from_d(0.1 * randommid(), 0.1 * randommid());
          }
       }
       for (i = 0; i < m; i++) {
-         refca.xyC[i][i] = complex_from_d((2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state)), (2 * randominteger(2, _state) - 1) * (2 * m + randomreal(_state)));
+         refca.xyC[i][i] = complex_from_d((2 * randominteger(2) - 1) * (2 * m + randomreal()), (2 * randominteger(2) - 1) * (2 * m + randomreal()));
       }
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
@@ -2537,25 +2537,25 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refrxr, n, m, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            refrxr.xyR[i][j] = 2 * randomreal(_state) - 1;
+            refrxr.xyR[i][j] = randommid();
          }
       }
       ae_matrix_set_length(&refrxl, m, n, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            refrxl.xyR[i][j] = 2 * randomreal(_state) - 1;
+            refrxl.xyR[i][j] = randommid();
          }
       }
       ae_matrix_set_length(&refcxr, n, m, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            refcxr.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refcxr.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       ae_matrix_set_length(&refcxl, m, n, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            refcxl.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refcxl.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -2573,13 +2573,13 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&cxr2, n, m, _state);
       ae_matrix_set_length(&cxl1, m, n, _state);
       ae_matrix_set_length(&cxl2, m, n, _state);
-      optype = randominteger(3, _state);
-      uppertype = randominteger(2, _state);
-      unittype = randominteger(2, _state);
-      xoffsi = randominteger(2, _state);
-      xoffsj = randominteger(2, _state);
-      aoffsitype = randominteger(2, _state);
-      aoffsjtype = randominteger(2, _state);
+      optype = randominteger(3);
+      uppertype = randominteger(2);
+      unittype = randominteger(2);
+      xoffsi = randominteger(2);
+      xoffsj = randominteger(2);
+      aoffsitype = randominteger(2);
+      aoffsjtype = randominteger(2);
       aoffsi = m * aoffsitype;
       aoffsj = m * aoffsjtype;
    // copy A, XR, XL (fill unused parts with random garbage)
@@ -2589,8 +2589,8 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                ca.xyC[i][j] = refca.xyC[i][j];
                ra.xyR[i][j] = refra.xyR[i][j];
             } else {
-               ca.xyC[i][j] = complex_from_d(randomreal(_state));
-               ra.xyR[i][j] = randomreal(_state);
+               ca.xyC[i][j] = complex_from_d(randomreal());
+               ra.xyR[i][j] = randomreal();
             }
          }
       }
@@ -2602,9 +2602,9 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                rxr1.xyR[i][j] = refrxr.xyR[i][j];
                rxr2.xyR[i][j] = refrxr.xyR[i][j];
             } else {
-               cxr1.xyC[i][j] = complex_from_d(randomreal(_state));
+               cxr1.xyC[i][j] = complex_from_d(randomreal());
                cxr2.xyC[i][j] = cxr1.xyC[i][j];
-               rxr1.xyR[i][j] = randomreal(_state);
+               rxr1.xyR[i][j] = randomreal();
                rxr2.xyR[i][j] = rxr1.xyR[i][j];
             }
          }
@@ -2617,9 +2617,9 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                rxl1.xyR[i][j] = refrxl.xyR[i][j];
                rxl2.xyR[i][j] = refrxl.xyR[i][j];
             } else {
-               cxl1.xyC[i][j] = complex_from_d(randomreal(_state));
+               cxl1.xyC[i][j] = complex_from_d(randomreal());
                cxl2.xyC[i][j] = cxl1.xyC[i][j];
-               rxl1.xyR[i][j] = randomreal(_state);
+               rxl1.xyR[i][j] = randomreal();
                rxl2.xyR[i][j] = rxl1.xyR[i][j];
             }
          }
@@ -2813,9 +2813,9 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
-      k = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randomreal(_state) > 0.5) {
+      k = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randombool()) {
          k = mx;
       } else {
          n = mx;
@@ -2828,11 +2828,11 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refra, 2 * n, 2 * n, _state);
       ae_matrix_set_length(&refca, 2 * n, 2 * n, _state);
       for (i = 0; i < n; i++) {
-         refra.xyR[i][i] = 2 * randomreal(_state) - 1;
-         refca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+         refra.xyR[i][i] = randommid();
+         refca.xyC[i][i] = complex_from_d(randommid());
          for (j = i + 1; j < n; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refra.xyR[i][j] = randommid();
+            refca.xyC[i][j] = complex_from_d(randommid(), randommid());
             refra.xyR[j][i] = refra.xyR[i][j];
             refca.xyC[j][i] = conj(refca.xyC[i][j], _state);
          }
@@ -2851,8 +2851,8 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refcc, n, k, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < k; j++) {
-            refrc.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refcc.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refrc.xyR[i][j] = randommid();
+            refcc.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -2868,17 +2868,17 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&rct, k, n, _state);
       ae_matrix_set_length(&cc, n, k, _state);
       ae_matrix_set_length(&cct, k, n, _state);
-      uppertype = randominteger(2, _state);
-      xoffsi = randominteger(2, _state);
-      xoffsj = randominteger(2, _state);
-      aoffsitype = randominteger(2, _state);
-      aoffsjtype = randominteger(2, _state);
-      alphatype = randominteger(2, _state);
-      betatype = randominteger(2, _state);
+      uppertype = randominteger(2);
+      xoffsi = randominteger(2);
+      xoffsj = randominteger(2);
+      aoffsitype = randominteger(2);
+      aoffsjtype = randominteger(2);
+      alphatype = randominteger(2);
+      betatype = randominteger(2);
       aoffsi = n * aoffsitype;
       aoffsj = n * aoffsjtype;
-      alpha = alphatype * (2 * randomreal(_state) - 1);
-      beta = betatype * (2 * randomreal(_state) - 1);
+      alpha = alphatype * randommid();
+      beta = betatype * randommid();
    // copy A, C (fill unused parts with random garbage)
       for (i = 0; i < 2 * n; i++) {
          for (j = 0; j < 2 * n; j++) {
@@ -2888,9 +2888,9 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                ra1.xyR[i][j] = refra.xyR[i][j];
                ra2.xyR[i][j] = refra.xyR[i][j];
             } else {
-               ca1.xyC[i][j] = complex_from_d(randomreal(_state));
+               ca1.xyC[i][j] = complex_from_d(randomreal());
                ca2.xyC[i][j] = ca1.xyC[i][j];
-               ra1.xyR[i][j] = randomreal(_state);
+               ra1.xyR[i][j] = randomreal();
                ra2.xyR[i][j] = ra1.xyR[i][j];
             }
          }
@@ -2903,16 +2903,16 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                cc.xyC[i][j] = refcc.xyC[i][j];
                cct.xyC[j][i] = refcc.xyC[i][j];
             } else {
-               rc.xyR[i][j] = randomreal(_state);
+               rc.xyR[i][j] = randomreal();
                rct.xyR[j][i] = rc.xyR[i][j];
-               cc.xyC[i][j] = complex_from_d(randomreal(_state));
+               cc.xyC[i][j] = complex_from_d(randomreal());
                cct.xyC[j][i] = cc.xyC[i][j]; //(@) Was cct.xyC[j][i] = cct.xyC[j][i];
             }
          }
       }
    // Test complex
    // Only one of transform types is selected and tested
-      if (randomreal(_state) > 0.5) {
+      if (randombool()) {
          cmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca1, aoffsi, aoffsj, uppertype == 0, _state);
          testablasunit_refcmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca2, aoffsi, aoffsj, uppertype == 0, _state);
       } else {
@@ -2926,7 +2926,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       }
    // Test old version of HERK (named SYRK)
    // Only one of transform types is selected and tested
-      if (randomreal(_state) > 0.5) {
+      if (randombool()) {
          cmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca1, aoffsi, aoffsj, uppertype == 0, _state);
          testablasunit_refcmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca2, aoffsi, aoffsj, uppertype == 0, _state);
       } else {
@@ -2940,7 +2940,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       }
    // Test real
    // Only one of transform types is selected and tested
-      if (randomreal(_state) > 0.5) {
+      if (randombool()) {
          rmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &rc, xoffsi, xoffsj, 0, beta, &ra1, aoffsi, aoffsj, uppertype == 0, _state);
          testablasunit_refrmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &rc, xoffsi, xoffsj, 0, beta, &ra2, aoffsi, aoffsj, uppertype == 0, _state);
       } else {
@@ -3095,10 +3095,10 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N/K in [1,MX] such that max(M,N,K)=MX
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      k = 1 + randominteger(mx, _state);
-      i = randominteger(3, _state);
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      k = 1 + randominteger(mx);
+      i = randominteger(3);
       if (i == 0) {
          m = mx;
       }
@@ -3117,12 +3117,12 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refcc, maxn + 1, maxn + 1, _state);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refrb.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refrc.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-            refcb.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-            refcc.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refra.xyR[i][j] = randommid();
+            refrb.xyR[i][j] = randommid();
+            refrc.xyR[i][j] = randommid();
+            refca.xyC[i][j] = complex_from_d(randommid(), randommid());
+            refcb.xyC[i][j] = complex_from_d(randommid(), randommid());
+            refcc.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -3134,25 +3134,25 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&rc2, maxn + 1, maxn + 1, _state);
       ae_matrix_set_length(&cc1, maxn + 1, maxn + 1, _state);
       ae_matrix_set_length(&cc2, maxn + 1, maxn + 1, _state);
-      aoffsi = randominteger(2, _state);
-      aoffsj = randominteger(2, _state);
-      aoptype = randominteger(3, _state);
-      aoptyper = randominteger(2, _state);
-      boffsi = randominteger(2, _state);
-      boffsj = randominteger(2, _state);
-      boptype = randominteger(3, _state);
-      boptyper = randominteger(2, _state);
-      coffsi = randominteger(2, _state);
-      coffsj = randominteger(2, _state);
-      alphar = randominteger(2, _state) * (2 * randomreal(_state) - 1);
-      betar = randominteger(2, _state) * (2 * randomreal(_state) - 1);
-      if (randomreal(_state) > 0.5) {
-         alphac = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      aoffsi = randominteger(2);
+      aoffsj = randominteger(2);
+      aoptype = randominteger(3);
+      aoptyper = randominteger(2);
+      boffsi = randominteger(2);
+      boffsj = randominteger(2);
+      boptype = randominteger(3);
+      boptyper = randominteger(2);
+      coffsi = randominteger(2);
+      coffsj = randominteger(2);
+      alphar = randominteger(2) * randommid();
+      betar = randominteger(2) * randommid();
+      if (randombool()) {
+         alphac = complex_from_d(randommid(), randommid());
       } else {
          alphac = complex_from_i(0);
       }
-      if (randomreal(_state) > 0.5) {
-         betac = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      if (randombool()) {
+         betac = complex_from_d(randommid(), randommid());
       } else {
          betac = complex_from_i(0);
       }
@@ -3215,15 +3215,15 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn, ae_state *_sta
    // Select random M/N in [1,MX] such that max(M,N)=MX
    // Generate random V1 and V2 which are used to fill
    // RefRB/RefCB with control values.
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randominteger(2, _state) == 0) {
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randominteger(2) == 0) {
          m = mx;
       } else {
          n = mx;
       }
-      v1 = randomreal(_state);
-      v2 = randomreal(_state);
+      v1 = randomreal();
+      v2 = randomreal();
    // Initialize A by random matrix with size (MaxN+1)*(MaxN+1)
    // Fill B with control values
       ae_matrix_set_length(&refra, maxn + 1, maxn + 1, _state);
@@ -3232,8 +3232,8 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn, ae_state *_sta
       ae_matrix_set_length(&refcb, maxn + 1, maxn + 1, _state);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refra.xyR[i][j] = randommid();
+            refca.xyC[i][j] = complex_from_d(randommid(), randommid());
             refrb.xyR[i][j] = i * v1 + j * v2;
             refcb.xyC[i][j] = complex_from_d(i * v1 + j * v2);
          }
@@ -3243,10 +3243,10 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn, ae_state *_sta
    // to avoid unnecessary slowdown we don't test ALL possible
    // combinations of operation types. We just generate one random
    // set of parameters and test it.
-      aoffsi = randominteger(2, _state);
-      aoffsj = randominteger(2, _state);
-      boffsi = randominteger(2, _state);
-      boffsj = randominteger(2, _state);
+      aoffsi = randominteger(2);
+      aoffsj = randominteger(2);
+      boffsi = randominteger(2);
+      boffsj = randominteger(2);
       rmatrixtranspose(m, n, &refra, aoffsi, aoffsj, &refrb, boffsi, boffsj, _state);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
@@ -3302,9 +3302,9 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn, ae_state *_sta
    threshold = 1000 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randominteger(2, _state) == 0) {
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randominteger(2) == 0) {
          m = mx;
       } else {
          n = mx;
@@ -3317,28 +3317,28 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn, ae_state *_sta
       ae_matrix_set_length(&refcb, maxn + maxn, maxn + maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refrb.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refcb.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refrb.xyR[i][j] = randommid();
+            refcb.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       ae_vector_set_length(&ru, 2 * m, _state);
       ae_vector_set_length(&cu, 2 * m, _state);
       for (i = 0; i < 2 * m; i++) {
-         ru.xR[i] = 2 * randomreal(_state) - 1;
-         cu.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         ru.xR[i] = randommid();
+         cu.xC[i] = complex_from_d(randommid(), randommid());
       }
       ae_vector_set_length(&rv, 2 * n, _state);
       ae_vector_set_length(&cv, 2 * n, _state);
       for (i = 0; i < 2 * n; i++) {
-         rv.xR[i] = 2 * randomreal(_state) - 1;
-         cv.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         rv.xR[i] = randommid();
+         cv.xC[i] = complex_from_d(randommid(), randommid());
       }
    // Generate random offsets of all operands and random coefficients.
-      aoffsi = randominteger(maxn, _state);
-      aoffsj = randominteger(maxn, _state);
-      uoffs = randominteger(m, _state);
-      voffs = randominteger(n, _state);
-      ralpha = randomreal(_state) - 0.5;
+      aoffsi = randominteger(maxn);
+      aoffsj = randominteger(maxn);
+      uoffs = randominteger(m);
+      voffs = randominteger(n);
+      ralpha = randomreal() - 0.5;
    // Test CMatrixRank1() and deprecated RMatrixRank1()
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
@@ -3426,9 +3426,9 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    threshold = 1000 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randominteger(2, _state) == 0) {
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randominteger(2) == 0) {
          m = mx;
       } else {
          n = mx;
@@ -3440,8 +3440,8 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&refca, maxn + maxn, maxn + maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            refca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            refra.xyR[i][j] = randommid();
+            refca.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       ae_vector_set_length(&rx, 2 * maxn, _state);
@@ -3449,22 +3449,22 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_vector_set_length(&ry, 2 * maxn, _state);
       ae_vector_set_length(&cy, 2 * maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.xR[i] = 2 * randomreal(_state) - 1;
-         cx.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         rx.xR[i] = randommid();
+         cx.xC[i] = complex_from_d(randommid(), randommid());
       }
    // Select random offsets and operations.
    //
    // To avoid unnecessary slowdown we don't test ALL possible
    // combinations of operation types. We just generate one random
    // set of parameters and test it.
-      aoffsi = randominteger(maxn, _state);
-      aoffsj = randominteger(maxn, _state);
-      xoffs = randominteger(maxn, _state);
-      yoffs = randominteger(maxn, _state);
-      opca = randominteger(3, _state);
-      opra = randominteger(2, _state);
-      ralpha = (randomreal(_state) - 0.5) * randominteger(2, _state);
-      rbeta = (randomreal(_state) - 0.5) * randominteger(2, _state);
+      aoffsi = randominteger(maxn);
+      aoffsj = randominteger(maxn);
+      xoffs = randominteger(maxn);
+      yoffs = randominteger(maxn);
+      opca = randominteger(3);
+      opra = randominteger(2);
+      ralpha = (randomreal() - 0.5) * randominteger(2);
+      rbeta = (randomreal() - 0.5) * randominteger(2);
    // Test CMatrixMV and deprecated RMatrixMV
       for (i = 0; i < 2 * maxn; i++) {
          cy.xC[i] = complex_from_i(i);
@@ -3638,27 +3638,27 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       ae_matrix_set_length(&refra, maxn + maxn, maxn + maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
+            refra.xyR[i][j] = randommid();
          }
       }
       ae_vector_set_length(&rx, 2 * maxn, _state);
       ae_vector_set_length(&ry, 2 * maxn, _state);
       ae_vector_set_length(&rz, 2 * maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.xR[i] = 2 * randomreal(_state) - 1;
+         rx.xR[i] = randommid();
       }
    // Select random offsets and operations.
    //
    // To avoid unnecessary slowdown we don't test ALL possible
    // combinations of operation types. We just generate one random
    // set of parameters and test it.
-      aoffsi = randominteger(maxn, _state);
-      aoffsj = randominteger(maxn, _state);
-      xoffs = randominteger(maxn, _state);
-      yoffs = randominteger(maxn, _state);
-      isuppera = randomreal(_state) > 0.5;
-      ralpha = (randomreal(_state) - 0.5) * randominteger(2, _state);
-      rbeta = (randomreal(_state) - 0.5) * randominteger(2, _state);
+      aoffsi = randominteger(maxn);
+      aoffsj = randominteger(maxn);
+      xoffs = randominteger(maxn);
+      yoffs = randominteger(maxn);
+      isuppera = randombool();
+      ralpha = (randomreal() - 0.5) * randominteger(2);
+      rbeta = (randomreal() - 0.5) * randominteger(2);
    // Test RMatrixSYMV()
       for (i = 0; i < 2 * maxn; i++) {
          ry.xR[i] = (double)i;
@@ -3711,13 +3711,13 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       ae_matrix_set_length(&refra, maxn + maxn, maxn + maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.xyR[i][j] = 2 * randomreal(_state) - 1;
+            refra.xyR[i][j] = randommid();
          }
       }
       ae_vector_set_length(&rx, 2 * maxn, _state);
       ae_vector_set_length(&ry, 2 * maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.xR[i] = (2 * randomreal(_state) - 1) * randominteger(3, _state);
+         rx.xR[i] = randommid() * randominteger(3);
       }
    // Select random offsets and operations.
    //
@@ -3727,12 +3727,12 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
    //
    // NOTE: in order to improve conditioning properties we add 10*Identity
    //       to purported diagonal of A
-      aoffsi = randominteger(maxn, _state);
-      aoffsj = randominteger(maxn, _state);
-      xoffs = randominteger(maxn, _state);
-      isuppera = randomreal(_state) > 0.5;
-      isunita = randomreal(_state) > 0.5;
-      opa = randominteger(2, _state);
+      aoffsi = randominteger(maxn);
+      aoffsj = randominteger(maxn);
+      xoffs = randominteger(maxn);
+      isuppera = randombool();
+      isunita = randombool();
+      opa = randominteger(2);
       for (i = 0; i < n; i++) {
          refra.xyR[aoffsi + i][aoffsj + i] += 10;
       }
@@ -3792,7 +3792,7 @@ static void testablasunit_spectest(bool *errorflag, ae_state *_state) {
 //
 // In order to perform this test we pass empty (unallocated) matrix
 // with large offset; incorrect implementation will crash on such data.
-   n = 128 + randominteger(65, _state) - 32;
+   n = 128 + randominteger(65) - 32;
    ae_matrix_set_length(&outputr2, n, n, _state);
    ae_matrix_set_length(&outputc2, n, n, _state);
    for (i = 0; i < n; i++) {
@@ -3802,18 +3802,18 @@ static void testablasunit_spectest(bool *errorflag, ae_state *_state) {
       }
    }
    for (pass = 0; pass <= 10; pass++) {
-      rmatrixgemm(n, n, 0, 1.0, &emptyr2, 35345, 23453, randominteger(2, _state), &emptyr2, 74764, 26845, randominteger(2, _state), 1.0 + randominteger(2, _state), &outputr2, 0, 0, _state);
-      rmatrixgemm(n, n, n, 0.0, &emptyr2, 35345, 23453, randominteger(2, _state), &emptyr2, 74764, 26845, randominteger(2, _state), 1.0 + randominteger(2, _state), &outputr2, 0, 0, _state);
-      cmatrixgemm(n, n, 0, complex_from_d(1.0), &emptyc2, 35345, 23453, randominteger(3, _state), &emptyc2, 74764, 26845, randominteger(3, _state), complex_from_d(1.0 + randominteger(2, _state)), &outputc2, 0, 0, _state);
-      cmatrixgemm(n, n, n, complex_from_d(0.0), &emptyc2, 35345, 23453, randominteger(3, _state), &emptyc2, 74764, 26845, randominteger(3, _state), complex_from_d(1.0 + randominteger(2, _state)), &outputc2, 0, 0, _state);
-      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2 * randominteger(2, _state), 1.0 + randominteger(2, _state), &outputr2, 0, 0, randomreal(_state) > 0.5, _state);
-      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2 * randominteger(2, _state), 1.0 + randominteger(2, _state), &outputr2, 0, 0, randomreal(_state) > 0.5, _state);
-      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2 * randominteger(2, _state), 1.0 + randominteger(2, _state), &outputc2, 0, 0, randomreal(_state) > 0.5, _state);
-      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2 * randominteger(2, _state), 1.0 + randominteger(2, _state), &outputc2, 0, 0, randomreal(_state) > 0.5, _state);
-      rmatrixrighttrsm(0, 0, &emptyr2, 63463, 36345, randomreal(_state) > 0.5, randomreal(_state) > 0.5, randominteger(2, _state), &outputr2, 0, 0, _state);
-      rmatrixlefttrsm(0, 0, &emptyr2, 63463, 36345, randomreal(_state) > 0.5, randomreal(_state) > 0.5, randominteger(2, _state), &outputr2, 0, 0, _state);
-      cmatrixrighttrsm(0, 0, &emptyc2, 63463, 36345, randomreal(_state) > 0.5, randomreal(_state) > 0.5, randominteger(3, _state), &outputc2, 0, 0, _state);
-      cmatrixlefttrsm(0, 0, &emptyc2, 63463, 36345, randomreal(_state) > 0.5, randomreal(_state) > 0.5, randominteger(3, _state), &outputc2, 0, 0, _state);
+      rmatrixgemm(n, n, 0, 1.0, &emptyr2, 35345, 23453, randominteger(2), &emptyr2, 74764, 26845, randominteger(2), 1.0 + randominteger(2), &outputr2, 0, 0, _state);
+      rmatrixgemm(n, n, n, 0.0, &emptyr2, 35345, 23453, randominteger(2), &emptyr2, 74764, 26845, randominteger(2), 1.0 + randominteger(2), &outputr2, 0, 0, _state);
+      cmatrixgemm(n, n, 0, complex_from_d(1.0), &emptyc2, 35345, 23453, randominteger(3), &emptyc2, 74764, 26845, randominteger(3), complex_from_d(1.0 + randominteger(2)), &outputc2, 0, 0, _state);
+      cmatrixgemm(n, n, n, complex_from_d(0.0), &emptyc2, 35345, 23453, randominteger(3), &emptyc2, 74764, 26845, randominteger(3), complex_from_d(1.0 + randominteger(2)), &outputc2, 0, 0, _state);
+      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2 * randominteger(2), 1.0 + randominteger(2), &outputr2, 0, 0, randombool(), _state);
+      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2 * randominteger(2), 1.0 + randominteger(2), &outputr2, 0, 0, randombool(), _state);
+      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2 * randominteger(2), 1.0 + randominteger(2), &outputc2, 0, 0, randombool(), _state);
+      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2 * randominteger(2), 1.0 + randominteger(2), &outputc2, 0, 0, randombool(), _state);
+      rmatrixrighttrsm(0, 0, &emptyr2, 63463, 36345, randombool(), randombool(), randominteger(2), &outputr2, 0, 0, _state);
+      rmatrixlefttrsm(0, 0, &emptyr2, 63463, 36345, randombool(), randombool(), randominteger(2), &outputr2, 0, 0, _state);
+      cmatrixrighttrsm(0, 0, &emptyc2, 63463, 36345, randombool(), randombool(), randominteger(3), &outputc2, 0, 0, _state);
+      cmatrixlefttrsm(0, 0, &emptyc2, 63463, 36345, randombool(), randombool(), randominteger(3), &outputc2, 0, 0, _state);
    }
    ae_frame_leave(_state);
 }
@@ -3843,9 +3843,9 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    threshold = 1000 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
-      m = 1 + randominteger(mx, _state);
-      n = 1 + randominteger(mx, _state);
-      if (randominteger(2, _state) == 0) {
+      m = 1 + randominteger(mx);
+      n = 1 + randominteger(mx);
+      if (randominteger(2) == 0) {
          m = mx;
       } else {
          n = mx;
@@ -3859,8 +3859,8 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn, ae_state *_stat
       ae_matrix_set_length(&cb, maxn + maxn, maxn + maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
             rb.xyR[i][j] = (double)(1 + 2 * i + 3 * j);
             cb.xyC[i][j] = complex_from_i(1 + 2 * i + 3 * j);
          }
@@ -3870,10 +3870,10 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn, ae_state *_stat
    // to avoid unnecessary slowdown we don't test ALL possible
    // combinations of operation types. We just generate one random
    // set of parameters and test it.
-      aoffsi = randominteger(maxn, _state);
-      aoffsj = randominteger(maxn, _state);
-      boffsi = randominteger(maxn, _state);
-      boffsj = randominteger(maxn, _state);
+      aoffsi = randominteger(maxn);
+      aoffsj = randominteger(maxn);
+      boffsi = randominteger(maxn);
+      boffsj = randominteger(maxn);
       cmatrixcopy(m, n, &ca, aoffsi, aoffsj, &cb, boffsi, boffsj, _state);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
@@ -3920,7 +3920,7 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err, ae_
       ae_vector_set_length(&ra, 2 * maxn, _state);
       ae_vector_set_length(&rb, 2 * maxn, _state);
       for (i = 0; i < 2 * maxn; i++) {
-         ra.xR[i] = 2 * randomreal(_state) - 1;
+         ra.xR[i] = randommid();
          rb.xR[i] = (double)(1 + 2 * i);
       }
    // test different offsets (zero or one)
@@ -3928,8 +3928,8 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err, ae_
    // to avoid unnecessary slowdown we don't test ALL possible
    // combinations of operation types. We just generate one random
    // set of parameters and test it.
-      aoffs = randominteger(maxn, _state);
-      boffs = randominteger(maxn, _state);
+      aoffs = randominteger(maxn);
+      boffs = randominteger(maxn);
       rvectorcopy(ss, &ra, aoffs, &rb, boffs, _state);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < boffs || i >= boffs + ss) {
@@ -3978,8 +3978,8 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
       for (n = 1; n <= 10; n++) {
          for (m = 1; m <= 10; m++) {
          // Task
-            n = 1 + randominteger(10, _state);
-            m = 1 + randominteger(10, _state);
+            n = 1 + randominteger(10);
+            m = 1 + randominteger(10);
             maxmn = imax2(m, n, _state);
          // Initialize
             ae_vector_set_length(&x, maxmn + 1, _state);
@@ -3999,7 +3999,7 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
                xscale = 1.0;
                if (tasktype == 0) {
                   for (i = 1; i <= n; i++) {
-                     x.xR[i] = 2 * randomreal(_state) - 1;
+                     x.xR[i] = randommid();
                   }
                }
                if (tasktype == 1) {
@@ -4008,20 +4008,20 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
                   }
                }
                if (tasktype == 2) {
-                  x.xR[1] = 2 * randomreal(_state) - 1;
+                  x.xR[1] = randommid();
                   for (i = 2; i <= n; i++) {
                      x.xR[i] = 0.0;
                   }
                }
                if (tasktype == 3) {
                   for (i = 1; i <= n; i++) {
-                     x.xR[i] = (randominteger(21, _state) - 10) * minrealnumber;
+                     x.xR[i] = (randominteger(21) - 10) * minrealnumber;
                   }
                   xscale = 10 * minrealnumber;
                }
                if (tasktype == 4) {
                   for (i = 1; i <= n; i++) {
-                     x.xR[i] = (2 * randomreal(_state) - 1) * maxrealnumber;
+                     x.xR[i] = randommid() * maxrealnumber;
                   }
                   xscale = maxrealnumber;
                }
@@ -4051,12 +4051,12 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
             }
          // ApplyReflectionFromTheLeft
             for (i = 1; i <= m; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
                v.xR[i] = x.xR[i];
             }
             for (i = 1; i <= m; i++) {
                for (j = 1; j <= n; j++) {
-                  a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  a.xyR[i][j] = randommid();
                   b.xyR[i][j] = a.xyR[i][j];
                }
             }
@@ -4088,12 +4088,12 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
             mel = rmax2(mel, err, _state);
          // ApplyReflectionFromTheRight
             for (i = 1; i <= n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
                v.xR[i] = x.xR[i];
             }
             for (i = 1; i <= m; i++) {
                for (j = 1; j <= n; j++) {
-                  a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  a.xyR[i][j] = randommid();
                   b.xyR[i][j] = a.xyR[i][j];
                }
             }
@@ -4130,7 +4130,7 @@ static void testablasunit_testreflections(bool *errorflag, ae_state *_state) {
    ae_vector_set_length(&x, 10 + 1, _state);
    ae_vector_set_length(&v, 10 + 1, _state);
    for (i = 1; i <= 10; i++) {
-      v.xR[i] = maxrealnumber * 0.01 * (2 * randomreal(_state) - 1);
+      v.xR[i] = maxrealnumber * 0.01 * randommid();
    }
    generatereflection(&v, 10, &tau, _state);
 // Result
@@ -4317,9 +4317,9 @@ bool testhblas(bool silent, ae_state *_state) {
       ae_vector_set_length(&y3, n + 1, _state);
    // fill A, UA, LA
       for (i = 1; i <= n; i++) {
-         a.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+         a.xyC[i][i] = complex_from_d(randommid());
          for (j = i + 1; j <= n; j++) {
-            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            a.xyC[i][j] = complex_from_d(randommid(), randommid());
             a.xyC[j][i] = conj(a.xyC[i][j], _state);
          }
       }
@@ -4348,9 +4348,9 @@ bool testhblas(bool silent, ae_state *_state) {
          for (i2 = i1; i2 <= n; i2++) {
          // Fill X, choose Alpha
             for (i = 1; i <= i2 - i1 + 1; i++) {
-               x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+               x.xC[i] = complex_from_d(randommid(), randommid());
             }
-            alpha = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            alpha = complex_from_d(randommid(), randommid());
          // calculate A*x, UA*x, LA*x
             for (i = i1; i <= i2; i++) {
                v = ae_v_cdotproduct(&a.xyC[i][i1], 1, "N", &x.xC[1], 1, "N", i2 - i1 + 1);
@@ -4421,8 +4421,8 @@ bool testcreflections(bool silent, ae_state *_state) {
    meg = 0.0;
    for (pass = 1; pass <= passcount; pass++) {
    // Task
-      n = 1 + randominteger(10, _state);
-      m = 1 + randominteger(10, _state);
+      n = 1 + randominteger(10);
+      m = 1 + randominteger(10);
       maxmn = imax2(m, n, _state);
    // Initialize
       ae_vector_set_length(&x, maxmn + 1, _state);
@@ -4434,7 +4434,7 @@ bool testcreflections(bool silent, ae_state *_state) {
       ae_matrix_set_length(&c, maxmn + 1, maxmn + 1, _state);
    // GenerateReflection
       for (i = 1; i <= n; i++) {
-         x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         x.xC[i] = complex_from_d(randommid(), randommid());
          v.xC[i] = x.xC[i];
       }
       complexgeneratereflection(&v, n, &tau, _state);
@@ -4462,12 +4462,12 @@ bool testcreflections(bool silent, ae_state *_state) {
       meg = rmax2(meg, err, _state);
    // ApplyReflectionFromTheLeft
       for (i = 1; i <= m; i++) {
-         x.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         x.xC[i] = complex_from_d(randommid(), randommid());
          v.xC[i] = x.xC[i];
       }
       for (i = 1; i <= m; i++) {
          for (j = 1; j <= n; j++) {
-            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            a.xyC[i][j] = complex_from_d(randommid(), randommid());
             b.xyC[i][j] = a.xyC[i][j];
          }
       }
@@ -4499,12 +4499,12 @@ bool testcreflections(bool silent, ae_state *_state) {
       mel = rmax2(mel, err, _state);
    // ApplyReflectionFromTheRight
       for (i = 1; i <= n; i++) {
-         x.xC[i] = complex_from_d(2 * randomreal(_state) - 1);
+         x.xC[i] = complex_from_d(randommid());
          v.xC[i] = x.xC[i];
       }
       for (i = 1; i <= m; i++) {
          for (j = 1; j <= n; j++) {
-            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+            a.xyC[i][j] = complex_from_d(randommid());
             b.xyC[i][j] = a.xyC[i][j];
          }
       }
@@ -4539,7 +4539,7 @@ bool testcreflections(bool silent, ae_state *_state) {
    ae_vector_set_length(&x, 10 + 1, _state);
    ae_vector_set_length(&v, 10 + 1, _state);
    for (i = 1; i <= 10; i++) {
-      v.xC[i] = complex_from_d(maxrealnumber * 0.01 * (2 * randomreal(_state) - 1));
+      v.xC[i] = complex_from_d(maxrealnumber * 0.01 * randommid());
    }
    complexgeneratereflection(&v, 10, &tau, _state);
 // report
@@ -4601,9 +4601,9 @@ bool testsblas(bool silent, ae_state *_state) {
       ae_vector_set_length(&y3, n + 1, _state);
    // fill A, UA, LA
       for (i = 1; i <= n; i++) {
-         a.xyR[i][i] = 2 * randomreal(_state) - 1;
+         a.xyR[i][i] = randommid();
          for (j = i + 1; j <= n; j++) {
-            a.xyR[i][j] = 2 * randomreal(_state) - 1;
+            a.xyR[i][j] = randommid();
             a.xyR[j][i] = a.xyR[i][j];
          }
       }
@@ -4632,9 +4632,9 @@ bool testsblas(bool silent, ae_state *_state) {
          for (i2 = i1; i2 <= n; i2++) {
          // Fill X, choose Alpha
             for (i = 1; i <= i2 - i1 + 1; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
-            alpha = 2 * randomreal(_state) - 1;
+            alpha = randommid();
          // calculate A*x, UA*x, LA*x
             for (i = i1; i <= i2; i++) {
                v = ae_v_dotproduct(&a.xyR[i][i1], 1, &x.xR[1], 1, i2 - i1 + 1);
@@ -4712,30 +4712,30 @@ static void testortfacunit_cmatrixmakeacopy(CMatrix *a, ae_int_t m, ae_int_t n, 
 }
 
 // Sparse fill
-static void testortfacunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparcity, ae_state *_state) {
+static void testortfacunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparsity, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (randomreal(_state) >= sparcity) {
-            a->xyR[i][j] = 2 * randomreal(_state) - 1;
-         } else {
+         if (randombool(sparsity)) {
             a->xyR[i][j] = 0.0;
+         } else {
+            a->xyR[i][j] = randommid();
          }
       }
    }
 }
 
 // Sparse fill
-static void testortfacunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, double sparcity, ae_state *_state) {
+static void testortfacunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, double sparsity, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (randomreal(_state) >= sparcity) {
-            a->xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-         } else {
+         if (randombool(sparsity)) {
             a->xyC[i][j] = complex_from_i(0);
+         } else {
+            a->xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
    }
@@ -4922,7 +4922,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       }
    }
 // Test for other errors
-   k = 1 + randominteger(m, _state);
+   k = 1 + randominteger(m);
    rmatrixqrunpackq(&b, m, n, &taub, k, &q2, _state);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
@@ -4971,7 +4971,7 @@ static void testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
       }
    }
 // Test for other errors
-   k = 1 + randominteger(m, _state);
+   k = 1 + randominteger(m);
    cmatrixqrunpackq(&b, m, n, &taub, k, &q2, _state);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
@@ -5020,7 +5020,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       }
    }
 // Test for other errors
-   k = 1 + randominteger(n, _state);
+   k = 1 + randominteger(n);
    rmatrixlqunpackq(&b, m, n, &taub, k, &q2, _state);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
@@ -5069,7 +5069,7 @@ static void testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
       }
    }
 // Test for other errors
-   k = 1 + randominteger(n, _state);
+   k = 1 + randominteger(n);
    cmatrixlqunpackq(&b, m, n, &taub, k, &q2, _state);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
@@ -5160,14 +5160,14 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       }
    }
 // Partial unpacking test
-   k = 1 + randominteger(m, _state);
+   k = 1 + randominteger(m);
    rmatrixbdunpackq(&t, m, n, &tauq, k, &r, _state);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
          *bderrors = *bderrors || fabs(r.xyR[i][j] - q.xyR[i][j]) > 10 * machineepsilon;
       }
    }
-   k = 1 + randominteger(n, _state);
+   k = 1 + randominteger(n);
    rmatrixbdunpackpt(&t, m, n, &taup, k, &r, _state);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
@@ -5181,10 +5181,10 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    ae_matrix_set_length(&r2, imax2(m, n, _state) - 1 + 1, imax2(m, n, _state) - 1 + 1, _state);
    for (i = 0; i < imax2(m, n, _state); i++) {
       for (j = 0; j < imax2(m, n, _state); j++) {
-         x.xyR[i][j] = 2 * randomreal(_state) - 1;
+         x.xyR[i][j] = randommid();
       }
    }
-   mtsize = 1 + randominteger(imax2(m, n, _state), _state);
+   mtsize = 1 + randominteger(imax2(m, n, _state));
    testortfacunit_rmatrixmakeacopy(&x, mtsize, m, &r, _state);
    testortfacunit_internalmatrixmatrixmultiply(&r, 0, mtsize - 1, 0, m - 1, false, &q, 0, m - 1, 0, m - 1, false, &r1, 0, mtsize - 1, 0, m - 1, _state);
    testortfacunit_rmatrixmakeacopy(&x, mtsize, m, &r2, _state);
@@ -5564,9 +5564,9 @@ bool testortfac(bool silent, ae_state *_state) {
    for (mx = 1; mx <= 3 * matrixtilesizea(_state) + 1; mx++) {
    // Rectangular factorizations: QR, LQ, bidiagonal
    // Matrix types: zero, dense, sparse
-      n = 1 + randominteger(mx, _state);
-      m = 1 + randominteger(mx, _state);
-      if (randomreal(_state) > 0.5) {
+      n = 1 + randominteger(mx);
+      m = 1 + randominteger(mx);
+      if (randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -5586,8 +5586,8 @@ bool testortfac(bool silent, ae_state *_state) {
       testortfacunit_testrbdproblem(&ra, m, n, threshold, &rbderrors, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors, _state);
@@ -5615,8 +5615,8 @@ bool testortfac(bool silent, ae_state *_state) {
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors, _state);
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors, _state);
@@ -5637,14 +5637,14 @@ bool testortfac(bool silent, ae_state *_state) {
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors, _state);
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
             ra.xyR[j][i] = ra.xyR[i][j];
             ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+         ca.xyC[i][i] = complex_from_d(randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors, _state);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors, _state);
@@ -5657,7 +5657,7 @@ bool testortfac(bool silent, ae_state *_state) {
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+         ca.xyC[i][i] = complex_from_d(randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors, _state);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors, _state);
@@ -5666,9 +5666,9 @@ bool testortfac(bool silent, ae_state *_state) {
    for (mx = 4 * matrixtilesizeb(_state); mx <= 4 * matrixtilesizeb(_state); mx++) {
    // Rectangular factorizations: QR, LQ, bidiagonal
    // Matrix types: dense
-      n = 1 + randominteger(mx, _state);
-      m = 1 + randominteger(mx, _state);
-      if (randomreal(_state) > 0.5) {
+      n = 1 + randominteger(mx);
+      m = 1 + randominteger(mx);
+      if (randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -5677,8 +5677,8 @@ bool testortfac(bool silent, ae_state *_state) {
       ae_matrix_set_length(&ca, m, n, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors, _state);
@@ -5692,8 +5692,8 @@ bool testortfac(bool silent, ae_state *_state) {
       ae_matrix_set_length(&ca, mx, mx, _state);
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors, _state);
@@ -5703,14 +5703,14 @@ bool testortfac(bool silent, ae_state *_state) {
       ae_matrix_set_length(&ca, mx, mx, _state);
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
-            ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-            ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ra.xyR[i][j] = randommid();
+            ca.xyC[i][j] = complex_from_d(randommid(), randommid());
             ra.xyR[j][i] = ra.xyR[i][j];
             ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+         ca.xyC[i][i] = complex_from_d(randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors, _state);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors, _state);
@@ -5785,13 +5785,13 @@ static const ae_int_t testmatgenunit_maxsvditerations = 60;
 // Unsets 2D array.
 static void testmatgenunit_unset2d(RMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1, _state);
-   a->xyR[0][0] = 2 * randomreal(_state) - 1;
+   a->xyR[0][0] = randommid();
 }
 
 // Unsets 2D array.
 static void testmatgenunit_unset2dc(CMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1, _state);
-   a->xyC[0][0] = complex_from_d(2 * randomreal(_state) - 1);
+   a->xyC[0][0] = complex_from_d(randommid());
 }
 
 // Test whether matrix is SPD
@@ -5927,9 +5927,9 @@ static bool testmatgenunit_testeult(ae_state *_state) {
    NewMatrix(a, 0, 0, DT_REAL, _state);
    NewMatrix(b, 0, 0, DT_COMPLEX, _state);
    eps = 2 * machineepsilon;
-   range = 100 * (2 * randomreal(_state) - 1);
+   range = 100 * randommid();
    for (n = 1; n <= 15; n++) {
-      c = 900 * randomreal(_state) + 100;
+      c = 900 * randomreal() + 100;
    // Generate symmetric matrix and check it
       smatrixrndcond(n, c, &a, _state);
       for (i = 0; i < n; i++) {
@@ -5974,7 +5974,7 @@ static bool testmatgenunit_testeult(ae_state *_state) {
    // Prepare symmetric matrix with real values
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            a.xyR[i][j] = range * (2 * randomreal(_state) - 1);
+            a.xyR[i][j] = range * randommid();
          }
       }
       for (i = 0; i < n - 1; i++) {
@@ -5995,7 +5995,7 @@ static bool testmatgenunit_testeult(ae_state *_state) {
    // Prepare symmetric matrix with complex values
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            b.xyC[i][j] = complex_from_d(range * (2 * randomreal(_state) - 1), i == j ? 0.0 : range * (2 * randomreal(_state) - 1));
+            b.xyC[i][j] = complex_from_d(range * randommid(), i == j ? 0.0 : range * randommid());
          }
       }
       for (i = 0; i < n; i++) {
@@ -6511,7 +6511,7 @@ bool testmatgen(bool silent, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               r2.xyR[i][j] = 2 * randomreal(_state) - 1;
+               r2.xyR[i][j] = randommid();
                r2.xyR[i + n][j] = r2.xyR[i][j];
             }
          }
@@ -6562,7 +6562,7 @@ bool testmatgen(bool silent, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               r1.xyR[i][j] = 2 * randomreal(_state) - 1;
+               r1.xyR[i][j] = randommid();
                r1.xyR[i][j + n] = r1.xyR[i][j];
             }
          }
@@ -6611,7 +6611,7 @@ bool testmatgen(bool silent, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               c2.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+               c2.xyC[i][j] = complex_from_d(randommid());
                c2.xyC[i + n][j] = c2.xyC[i][j];
             }
          }
@@ -6660,7 +6660,7 @@ bool testmatgen(bool silent, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               c1.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+               c1.xyC[i][j] = complex_from_d(randommid());
                c1.xyC[i][j + n] = c1.xyC[i][j];
             }
          }
@@ -6677,7 +6677,7 @@ bool testmatgen(bool silent, ae_state *_state) {
       for (pass = 1; pass <= passcount; pass++) {
       // real test
          testmatgenunit_unset2d(&a, _state);
-         cond = exp(log(1000.0) * randomreal(_state));
+         cond = exp(log(1000.0) * randomreal());
          rmatrixrndcond(n, cond, &a, _state);
          ae_matrix_set_length(&b, n + 1, n + 1, _state);
          for (i = 1; i <= n; i++) {
@@ -6710,7 +6710,7 @@ bool testmatgen(bool silent, ae_state *_state) {
       for (pass = 1; pass <= passcount; pass++) {
       // Generate A
          testmatgenunit_unset2d(&a, _state);
-         cond = exp(log(1000.0) * randomreal(_state));
+         cond = exp(log(1000.0) * randomreal());
          spdmatrixrndcond(n, cond, &a, _state);
       // test condition number
          spderr = spderr || testmatgenunit_svdcond(&a, n, _state) / cond - 1 > threshold;
@@ -6737,7 +6737,7 @@ bool testmatgen(bool silent, ae_state *_state) {
       for (pass = 1; pass <= passcount; pass++) {
       // Generate A
          testmatgenunit_unset2dc(&ca, _state);
-         cond = exp(log(1000.0) * randomreal(_state));
+         cond = exp(log(1000.0) * randomreal());
          hpdmatrixrndcond(n, cond, &ca, _state);
       // test HPD
          hpderr = hpderr || !testmatgenunit_ishpd(&ca, n, _state);
@@ -6762,7 +6762,7 @@ bool testmatgen(bool silent, ae_state *_state) {
       for (pass = 1; pass <= passcount; pass++) {
       // test condition number
          testmatgenunit_unset2d(&a, _state);
-         cond = exp(log(1000.0) * randomreal(_state));
+         cond = exp(log(1000.0) * randomreal());
          smatrixrndcond(n, cond, &a, _state);
          serr = serr || testmatgenunit_svdcond(&a, n, _state) / cond - 1 > threshold;
       // test for difference between A and B
@@ -6780,7 +6780,7 @@ bool testmatgen(bool silent, ae_state *_state) {
       for (pass = 1; pass <= passcount; pass++) {
       // Generate A
          testmatgenunit_unset2dc(&ca, _state);
-         cond = exp(log(1000.0) * randomreal(_state));
+         cond = exp(log(1000.0) * randomreal());
          hmatrixrndcond(n, cond, &ca, _state);
       // test that A is Hermitian
          for (i = 0; i < n; i++) {
@@ -6864,7 +6864,7 @@ bool testmatgen(bool silent, ae_state *_state) {
 // Unsets 1D array.
 static void testtsortunit_unset1di(ZVector *a, ae_state *_state) {
    ae_vector_set_length(a, 0 + 1, _state);
-   a->xZ[0] = randominteger(3, _state) - 1;
+   a->xZ[0] = randominteger(3) - 1;
 }
 
 static void testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector *p2, RVector *aoriginal, ae_int_t n, bool *waserrors, ae_state *_state) {
@@ -6968,7 +6968,7 @@ bool testtsort(bool silent, ae_state *_state) {
          ae_vector_set_length(&ar2, n, _state);
          ae_vector_set_length(&ai, n, _state);
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(100000000, _state);
+            a.xR[i] = (double)randominteger(100000000);
             a0.xR[i] = a.xR[i];
             a1.xR[i] = a.xR[i];
             a2.xR[i] = a.xR[i];
@@ -7111,7 +7111,7 @@ bool testtsort(bool silent, ae_state *_state) {
          ae_vector_set_length(&ar2, n, _state);
          ae_vector_set_length(&ai, n, _state);
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(2, _state);
+            a.xR[i] = (double)randominteger(2);
             a0.xR[i] = a.xR[i];
             a1.xR[i] = a.xR[i];
             a2.xR[i] = a.xR[i];
@@ -7142,14 +7142,14 @@ bool testtsort(bool silent, ae_state *_state) {
       // Special test for TagSortMiddleIR: sorting in the middle gives same results
       // as sorting in the beginning of the array
          m = 3 * n;
-         offs = randominteger(n, _state);
+         offs = randominteger(n);
          ae_vector_set_length(&i1, m, _state);
          ae_vector_set_length(&i2, m, _state);
          ae_vector_set_length(&i3, m, _state);
          ae_vector_set_length(&ar, m, _state);
          ae_vector_set_length(&ar2, m, _state);
          for (i = 0; i < m; i++) {
-            i1.xZ[i] = randominteger(100000000, _state);
+            i1.xZ[i] = randominteger(100000000);
             i2.xZ[i] = i1.xZ[i];
             i3.xZ[i] = i1.xZ[i];
             ar.xR[i] = (double)i;
@@ -7467,7 +7467,7 @@ static bool skstest(ae_state *_state) {
                set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:609");
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -7593,7 +7593,7 @@ static void crstest(bool *errorflag, ae_state *_state) {
                ae_frame_leave(_state);
                return;
             }
-         // Increase problem sparcity and try one more time.
+         // Increase problem sparsity and try one more time.
          // Stop after testing NZ=0.
             if (nz == 0) {
                break;
@@ -7692,7 +7692,7 @@ static void testserialize(bool *errorflag, ae_state *_state) {
                   ae_frame_leave(_state);
                   return;
                }
-            // Increase problem sparcity and try one more time.
+            // Increase problem sparsity and try one more time.
             // Stop after testing NZ=0.
                if (nz == 0) {
                   break;
@@ -7908,7 +7908,7 @@ lbl_4:
    g->rcs.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-// Increase problem sparcity and try one more time.
+// Increase problem sparsity and try one more time.
 // Stop after testing NZ=0.
    if (nz == 0) {
       goto lbl_5;
@@ -7969,7 +7969,7 @@ lbl_8:
    g->rcs.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-// Increase problem sparcity and try one more time.
+// Increase problem sparsity and try one more time.
 // Stop after testing NZ=0.
    if (nz == 0) {
       goto lbl_9;
@@ -8877,9 +8877,9 @@ static bool basicfuncrandomtest(ae_state *_state) {
       // Checking for Matrix with hash table type
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
-               temp = 2 * randominteger(mfigure, _state) - mfigure;
+               temp = 2 * randominteger(mfigure) - mfigure;
                a.xyR[i1][j1] = (double)temp;
-               if (randominteger(2, _state) == 0) {
+               if (randominteger(2) == 0) {
                   sparseset(&s, i1, j1, (double)temp, _state);
                   sparseset(&s, i1, j1, (double)temp, _state);
                } else {
@@ -8896,7 +8896,7 @@ static bool basicfuncrandomtest(ae_state *_state) {
       // Nulling all elements
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
-               if (randominteger(2, _state) == 0) {
+               if (randominteger(2) == 0) {
                   sparseset(&s, i1, j1, 0.0, _state);
                } else {
                   sparseadd(&s, i1, j1, -1 * sparseget(&s, i1, j1, _state), _state);
@@ -8906,9 +8906,9 @@ static bool basicfuncrandomtest(ae_state *_state) {
       // Again initialization of the matrix and check new values
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
-               temp = 2 * randominteger(mfigure, _state) - mfigure;
+               temp = 2 * randominteger(mfigure) - mfigure;
                a.xyR[i1][j1] = (double)temp;
-               if (randominteger(2, _state) == 0) {
+               if (randominteger(2) == 0) {
                   sparseset(&s, i1, j1, (double)temp, _state);
                } else {
                   sparseadd(&s, i1, j1, (double)temp, _state);
@@ -8987,18 +8987,18 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
    ae_assert(ckind >= -1 && ckind <= maxckind, "CreateRandom: incorrect parameters", _state);
    ae_assert(!(ckind == 2 && m != n), "CreateRandom: incorrect parameters", _state);
    if (pkind == -1) {
-      pkind = randominteger(maxpkind + 1, _state);
+      pkind = randominteger(maxpkind + 1);
       if (pkind == 0) {
-         p0 = randominteger(m * n, _state);
+         p0 = randominteger(m * n);
       }
       if (pkind == 1) {
-         p0 = randominteger(imin2(m, n, _state), _state);
-         p1 = randominteger(imin2(m, n, _state), _state);
+         p0 = randominteger(imin2(m, n, _state));
+         p1 = randominteger(imin2(m, n, _state));
       }
    }
    if (ckind == -1) {
       do {
-         ckind = randominteger(maxckind + 1, _state);
+         ckind = randominteger(maxckind + 1);
       } while (ckind == 2 && m != n);
    }
    if (pkind == 0) {
@@ -9013,10 +9013,10 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       // Create matrix in Hash format, convert to CRS or SKS
          sparsecreate(m, n, 1, sa, _state);
          for (k = 0; k < p0; k++) {
-            i = randominteger(m, _state);
-            j = randominteger(n, _state);
-            v = (double)(randominteger(17, _state) - 8) / 8.0;
-            if (randomreal(_state) > 0.5) {
+            i = randominteger(m);
+            j = randominteger(n);
+            v = (double)(randominteger(17) - 8) / 8.0;
+            if (randombool()) {
                da->xyR[i][j] = v;
                sparseset(sa, i, j, v, _state);
             } else {
@@ -9035,9 +9035,9 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       if (ckind == 1) {
       // Create matrix in CRS format
          for (k = 0; k < p0; k++) {
-            i = randominteger(m, _state);
-            j = randominteger(n, _state);
-            v = (double)(randominteger(17, _state) - 8) / 8.0;
+            i = randominteger(m);
+            j = randominteger(n);
+            v = (double)(randominteger(17) - 8) / 8.0;
             da->xyR[i][j] = v;
          }
          ae_vector_set_length(&rowsizes, m, _state);
@@ -9074,7 +9074,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       for (i = 0; i < m; i++) {
          for (j = imax2(i - p0, 0, _state); j <= i + p1 && j < n; j++) {
             do {
-               da->xyR[i][j] = (double)(randominteger(17, _state) - 8) / 8.0;
+               da->xyR[i][j] = (double)(randominteger(17) - 8) / 8.0;
             } while (da->xyR[i][j] == 0.0);
          }
          rowsizes.xZ[i] = imax2(imin2(i + p1, n - 1, _state) - imax2(i - p0, 0, _state) + 1, 0, _state);
@@ -9115,14 +9115,14 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
          }
       }
       for (i = 0; i < m; i++) {
-         c0.xZ[i] = randominteger(n, _state);
-         c1.xZ[i] = c0.xZ[i] + randominteger(n - c0.xZ[i] + 1, _state);
+         c0.xZ[i] = randominteger(n);
+         c1.xZ[i] = c0.xZ[i] + randominteger(n - c0.xZ[i] + 1);
          rowsizes.xZ[i] = c1.xZ[i] - c0.xZ[i];
       }
       for (i = 0; i < m; i++) {
          for (j = c0.xZ[i]; j < c1.xZ[i]; j++) {
             do {
-               da->xyR[i][j] = (double)(randominteger(17, _state) - 8) / 8.0;
+               da->xyR[i][j] = (double)(randominteger(17) - 8) / 8.0;
             } while (da->xyR[i][j] == 0.0);
          }
       }
@@ -9206,10 +9206,10 @@ static bool linearfunctionstest(ae_state *_state) {
          ae_vector_set_length(&x0, j, _state);
          ae_vector_set_length(&x1, i, _state);
          for (i1 = 0; i1 < j; i1++) {
-            x0.xR[i1] = (rb - lb) * randomreal(_state) + lb;
+            x0.xR[i1] = (rb - lb) * randomreal() + lb;
          }
          for (i1 = 0; i1 < i; i1++) {
-            x1.xR[i1] = (rb - lb) * randomreal(_state) + lb;
+            x1.xR[i1] = (rb - lb) * randomreal() + lb;
          }
       // Consider two cases: square matrix, and non-square matrix
          if (i != j) {
@@ -9317,8 +9317,8 @@ static bool linearfunctionsstest(ae_state *_state) {
       for (i1 = 0; i1 < i; i1++) {
          ty.xR[i1] = 0.0;
          tyt.xR[i1] = 0.0;
-         x0.xR[i1] = (rb - lb) * randomreal(_state) + lb;
-         x1.xR[i1] = (rb - lb) * randomreal(_state) + lb;
+         x0.xR[i1] = (rb - lb) * randomreal() + lb;
+         x1.xR[i1] = (rb - lb) * randomreal() + lb;
       }
    // Searching true result for upper and lower triangles
    // of the matrix
@@ -9404,12 +9404,12 @@ static bool linearfunctionsmmtest(ae_state *_state) {
          ae_matrix_set_length(&x1, i, kmax, _state);
          for (i1 = 0; i1 < j; i1++) {
             for (j1 = 0; j1 < kmax; j1++) {
-               x0.xyR[i1][j1] = (rb - lb) * randomreal(_state) + lb;
+               x0.xyR[i1][j1] = (rb - lb) * randomreal() + lb;
             }
          }
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < kmax; j1++) {
-               x1.xyR[i1][j1] = (rb - lb) * randomreal(_state) + lb;
+               x1.xyR[i1][j1] = (rb - lb) * randomreal() + lb;
             }
          }
          ae_matrix_set_length(&ty, i, kmax, _state);
@@ -9552,8 +9552,8 @@ static bool linearfunctionssmmtest(ae_state *_state) {
             for (j1 = 0; j1 < j; j1++) {
                ty.xyR[i1][j1] = 0.0;
                tyt.xyR[i1][j1] = 0.0;
-               x0.xyR[i1][j1] = (rb - lb) * randomreal(_state) + lb;
-               x1.xyR[i1][j1] = (rb - lb) * randomreal(_state) + lb;
+               x0.xyR[i1][j1] = (rb - lb) * randomreal() + lb;
+               x1.xyR[i1][j1] = (rb - lb) * randomreal() + lb;
             }
          }
       // Searching true result for upper and lower triangles
@@ -9779,10 +9779,10 @@ static bool copyfunctest(bool silent, ae_state *_state) {
             ae_vector_set_length(&x0, j, _state);
             ae_vector_set_length(&x1, i, _state);
             for (i1 = 0; i1 < j; i1++) {
-               x0.xR[i1] = (rb - lb) * randomreal(_state) + lb;
+               x0.xR[i1] = (rb - lb) * randomreal() + lb;
             }
             for (i1 = 0; i1 < i; i1++) {
-               x1.xR[i1] = (rb - lb) * randomreal(_state) + lb;
+               x1.xR[i1] = (rb - lb) * randomreal() + lb;
             }
          // Consider two cases: square matrix, and non-square matrix
             if (i != j) {
@@ -9959,12 +9959,12 @@ static bool testsparseunit_enumeratetest(ae_state *_state) {
          }
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               c = randominteger(2, _state);
+               c = randominteger(2);
                if (c == 0) {
                   a.xyR[i][j] = 0.0;
                } else {
                   do {
-                     a.xyR[i][j] = r * (2 * randomreal(_state) - 1);
+                     a.xyR[i][j] = r * randommid();
                   } while (a.xyR[i][j] == 0.0);
                // Number of non-zero elements
                   ne++;
@@ -10043,19 +10043,19 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
          ae_matrix_set_length(&a, m, n, _state);
          ae_matrix_set_length(&ta, m, n, _state);
          for (hashcrs = 0; hashcrs <= 1; hashcrs++) {
-            v = r * (2 * randomreal(_state) - 1);
+            v = r * randommid();
          // Creating and filling of the matrix
             ne = 0;
             sparsecreate(m, n, m * n, &spa, _state);
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c = randominteger(2, _state);
+                  c = randominteger(2);
                   if (c == 0) {
                      a.xyR[i][j] = 0.0;
                   }
                   if (c == 1) {
                      do {
-                        a.xyR[i][j] = r * (2 * randomreal(_state) - 1);
+                        a.xyR[i][j] = r * randommid();
                      } while (a.xyR[i][j] == 0.0);
                      sparseset(&spa, i, j, a.xyR[i][j], _state);
                      ne++;
@@ -10070,7 +10070,7 @@ static bool testsparseunit_rewriteexistingtest(ae_state *_state) {
             nr = 0;
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c = randominteger(2, _state);
+                  c = randominteger(2);
                   if (c == 1) {
                      ta.xyB[i][j] = sparserewriteexisting(&spa, i, j, v, _state);
                      if (ta.xyB[i][j]) {
@@ -10184,8 +10184,8 @@ static void testsparseunit_testgetrow(bool *err, ae_state *_state) {
             sparsecreate(m, n, 1, &s, _state);
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  if (randominteger(5, _state) == 3) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  if (randominteger(5) == 3) {
+                     a.xyR[i][j] = randommid();
                      sparseset(&s, i, j, a.xyR[i][j], _state);
                   } else {
                      a.xyR[i][j] = 0.0;
@@ -10277,10 +10277,10 @@ static bool testsparseunit_testconvertsm(ae_state *_state) {
             for (i = 0; i < m; i++) {
                ner.xZ[i] = 0;
                for (j = 0; j < n; j++) {
-                  if (randominteger(5, _state) == 3) {
+                  if (randominteger(5) == 3) {
                      ner.xZ[i]++;
                      do {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                      } while (a.xyR[i][j] == 0.0);
                   } else {
                      a.xyR[i][j] = 0.0;
@@ -10292,14 +10292,14 @@ static bool testsparseunit_testconvertsm(ae_state *_state) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (a.xyR[i][j] != 0.0) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                      sparseset(&s, i, j, a.xyR[i][j], _state);
                   }
                }
             }
          // Set matrix type(we have to be sure that all formats
          // converted correctly)
-            i = randominteger(2, _state);
+            i = randominteger(2);
             if (i == 0) {
                sparseconverttohash(&s, _state);
             }
@@ -10320,12 +10320,12 @@ static bool testsparseunit_testconvertsm(ae_state *_state) {
          // Change some elements in row
             if (vartf != 2) {
                for (i = 0; i < m; i++) {
-                  tmp = 2 * randomreal(_state) - 1;
-                  j = randominteger(n, _state);
+                  tmp = randommid();
+                  j = randominteger(n);
                   a.xyR[i][j] = tmp;
                   sparseset(&cs, i, j, tmp, _state);
-                  tmp = 2 * randomreal(_state) - 1;
-                  j = randominteger(n, _state);
+                  tmp = randommid();
+                  j = randominteger(n);
                   a.xyR[i][j] += tmp;
                   sparseadd(&cs, i, j, tmp, _state);
                }
@@ -10717,13 +10717,13 @@ bool testblas(bool silent, ae_state *_state) {
    scl2 = 0.5 * maxrealnumber;
    scl3 = 2 * minrealnumber;
    for (pass = 1; pass <= passcount; pass++) {
-      n = 1 + randominteger(1000, _state);
-      i1 = randominteger(10, _state);
+      n = 1 + randominteger(1000);
+      i1 = randominteger(10);
       i2 = n + i1 - 1;
       ae_vector_set_length(&x1, i2 + 1, _state);
       ae_vector_set_length(&x2, i2 + 1, _state);
       for (i = i1; i <= i2; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
       }
       v = 0.0;
       for (i = i1; i <= i2; i++) {
@@ -10756,22 +10756,22 @@ bool testblas(bool silent, ae_state *_state) {
    ae_matrix_set_length(&a, n + 1, n + 1, _state);
    for (i = 1; i <= n; i++) {
       for (j = 1; j <= n; j++) {
-         a.xyR[i][j] = 2 * randomreal(_state) - 1;
+         a.xyR[i][j] = randommid();
       }
    }
    was1 = false;
    was2 = false;
    for (pass = 1; pass <= 1000; pass++) {
-      j = 1 + randominteger(n, _state);
-      i1 = 1 + randominteger(n, _state);
-      i2 = i1 + randominteger(n + 1 - i1, _state);
+      j = 1 + randominteger(n);
+      i1 = 1 + randominteger(n);
+      i2 = i1 + randominteger(n + 1 - i1);
       ae_v_move(&x1.xR[i1], 1, &a.xyR[i1][j], a.stride, i2 - i1 + 1);
       if (vectoridxabsmax(&x1, i1, i2, _state) != columnidxabsmax(&a, i1, i2, j, _state)) {
          was1 = true;
       }
-      i = 1 + randominteger(n, _state);
-      j1 = 1 + randominteger(n, _state);
-      j2 = j1 + randominteger(n + 1 - j1, _state);
+      i = 1 + randominteger(n);
+      j1 = 1 + randominteger(n);
+      j2 = j1 + randominteger(n + 1 - j1);
       ae_v_move(&x1.xR[j1], 1, &a.xyR[i][j1], 1, j2 - j1 + 1);
       if (vectoridxabsmax(&x1, j1, j2, _state) != rowidxabsmax(&a, j1, j2, i, _state)) {
          was2 = true;
@@ -10825,15 +10825,15 @@ bool testblas(bool silent, ae_state *_state) {
    ae_vector_set_length(&x1, n - 1 + 1, _state);
    for (i = 1; i <= n; i++) {
       for (j = 1; j <= n; j++) {
-         a.xyR[i][j] = randomreal(_state);
+         a.xyR[i][j] = randomreal();
       }
    }
    passcount = 10000;
    was1 = false;
    for (pass = 1; pass <= passcount; pass++) {
-      i1 = 1 + randominteger(n, _state);
-      i2 = i1 + randominteger(n - i1 + 1, _state);
-      j1 = 1 + randominteger(n - (i2 - i1), _state);
+      i1 = 1 + randominteger(n);
+      i2 = i1 + randominteger(n - i1 + 1);
+      j1 = 1 + randominteger(n - (i2 - i1));
       j2 = j1 + (i2 - i1);
       copymatrix(&a, i1, i2, j1, j2, &b, i1, i2, j1, j2, _state);
       inplacetranspose(&b, i1, i2, j1, j2, &x1, _state);
@@ -10852,16 +10852,16 @@ bool testblas(bool silent, ae_state *_state) {
    ae_matrix_set_length(&b, n + 1, n + 1, _state);
    for (i = 1; i <= n; i++) {
       for (j = 1; j <= n; j++) {
-         a.xyR[i][j] = randomreal(_state);
+         a.xyR[i][j] = randomreal();
       }
    }
    passcount = 10000;
    was1 = false;
    for (pass = 1; pass <= passcount; pass++) {
-      i1 = 1 + randominteger(n, _state);
-      i2 = i1 + randominteger(n - i1 + 1, _state);
-      j1 = 1 + randominteger(n, _state);
-      j2 = j1 + randominteger(n - j1 + 1, _state);
+      i1 = 1 + randominteger(n);
+      i2 = i1 + randominteger(n - i1 + 1);
+      j1 = 1 + randominteger(n);
+      j2 = j1 + randominteger(n - j1 + 1);
       copyandtranspose(&a, i1, i2, j1, j2, &b, j1, j2, i1, i2, _state);
       for (i = i1; i <= i2; i++) {
          for (j = j1; j <= j2; j++) {
@@ -10882,8 +10882,8 @@ bool testblas(bool silent, ae_state *_state) {
    ae_vector_set_length(&x2, n + 1, _state);
    for (i = 1; i <= 2 * n; i++) {
       for (j = 1; j <= 2 * n; j++) {
-         a.xyR[i][j] = randomreal(_state);
-         b.xyR[i][j] = randomreal(_state);
+         a.xyR[i][j] = randomreal();
+         b.xyR[i][j] = randomreal();
       }
    }
    passcount = 1000;
@@ -10895,17 +10895,17 @@ bool testblas(bool silent, ae_state *_state) {
             c2.xyR[i][j] = c1.xyR[i][j];
          }
       }
-      l = 1 + randominteger(n, _state);
-      k = 1 + randominteger(n, _state);
-      r = 1 + randominteger(n, _state);
-      i1 = 1 + randominteger(n, _state);
-      j1 = 1 + randominteger(n, _state);
-      i2 = 1 + randominteger(n, _state);
-      j2 = 1 + randominteger(n, _state);
-      i3 = 1 + randominteger(n, _state);
-      j3 = 1 + randominteger(n, _state);
-      trans1 = randomreal(_state) > 0.5;
-      trans2 = randomreal(_state) > 0.5;
+      l = 1 + randominteger(n);
+      k = 1 + randominteger(n);
+      r = 1 + randominteger(n);
+      i1 = 1 + randominteger(n);
+      j1 = 1 + randominteger(n);
+      i2 = 1 + randominteger(n);
+      j2 = 1 + randominteger(n);
+      i3 = 1 + randominteger(n);
+      j3 = 1 + randominteger(n);
+      trans1 = randombool();
+      trans2 = randombool();
       if (trans1) {
          col1 = l;
          row1 = k;
@@ -10920,8 +10920,8 @@ bool testblas(bool silent, ae_state *_state) {
          col2 = r;
          row2 = k;
       }
-      scl1 = randomreal(_state);
-      scl2 = randomreal(_state);
+      scl1 = randomreal();
+      scl2 = randomreal();
       matrixmatrixmultiply(&a, i1, i1 + row1 - 1, j1, j1 + col1 - 1, trans1, &b, i2, i2 + row2 - 1, j2, j2 + col2 - 1, trans2, scl1, &c1, i3, i3 + l - 1, j3, j3 + r - 1, scl2, &x1, _state);
       testblasunit_naivematrixmatrixmultiply(&a, i1, i1 + row1 - 1, j1, j1 + col1 - 1, trans1, &b, i2, i2 + row2 - 1, j2, j2 + col2 - 1, trans2, scl1, &c2, i3, i3 + l - 1, j3, j3 + r - 1, scl2, _state);
       err = 0.0;
@@ -10997,48 +10997,48 @@ bool testblas(bool silent, ae_state *_state) {
 // === evd testing unit ===
 // Sparse fill
 //
-// Sparcity - sparcity level, in [0,1] (0=dense matrix).
+// Sparsity - sparsity level, in [0,1] (0=dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
-static void testevdunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparcity, double diagmag, ae_state *_state) {
+static void testevdunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparsity, double diagmag, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (randomreal(_state) >= sparcity) {
-            a->xyR[i][j] = 2 * randomreal(_state) - 1;
-         } else {
+         if (randombool(sparsity)) {
             a->xyR[i][j] = 0.0;
+         } else {
+            a->xyR[i][j] = randommid();
          }
       }
    }
    if (diagmag > 0.0) {
       for (i = 0; i < imin2(m, n, _state); i++) {
-         a->xyR[i][i] = diagmag * (2 * randomreal(_state) - 1);
+         a->xyR[i][i] = diagmag * randommid();
       }
    }
 }
 
 // Sparse fill
 //
-// Sparcity - sparcity level, in [0,1] (0=dense matrix).
+// Sparsity - sparsity level, in [0,1] (0=dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
-static void testevdunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, double sparcity, double diagmag, ae_state *_state) {
+static void testevdunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, double sparsity, double diagmag, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (randomreal(_state) >= sparcity) {
-            a->xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-         } else {
+         if (randombool(sparsity)) {
             a->xyC[i][j] = complex_from_i(0);
+         } else {
+            a->xyC[i][j] = complex_from_d(randommid(), randommid());
          }
       }
    }
    if (diagmag > 0.0) {
       for (i = 0; i < imin2(m, n, _state); i++) {
-         a->xyC[i][i] = complex_from_d(diagmag * (2 * randomreal(_state) - 1), diagmag * (2 * randomreal(_state) - 1));
+         a->xyC[i][i] = complex_from_d(diagmag * randommid(), diagmag * randommid());
       }
    }
 }
@@ -11050,10 +11050,10 @@ static void testevdunit_rmatrixsymmetricsplit(RMatrix *a, ae_int_t n, RMatrix *a
    ae_int_t j;
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         al->xyR[i][j] = 2 * randomreal(_state) - 1;
+         al->xyR[i][j] = randommid();
          al->xyR[j][i] = a->xyR[i][j];
          au->xyR[i][j] = a->xyR[i][j];
-         au->xyR[j][i] = 2 * randomreal(_state) - 1;
+         au->xyR[j][i] = randommid();
       }
       al->xyR[i][i] = a->xyR[i][i];
       au->xyR[i][i] = a->xyR[i][i];
@@ -11067,10 +11067,10 @@ static void testevdunit_cmatrixhermitiansplit(CMatrix *a, ae_int_t n, CMatrix *a
    ae_int_t j;
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         al->xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+         al->xyC[i][j] = complex_from_d(randommid());
          al->xyC[j][i] = conj(a->xyC[i][j], _state);
          au->xyC[i][j] = a->xyC[i][j];
-         au->xyC[j][i] = complex_from_d(2 * randomreal(_state) - 1);
+         au->xyC[j][i] = complex_from_d(randommid());
       }
       al->xyC[i][i] = a->xyC[i][i];
       au->xyC[i][i] = a->xyC[i][i];
@@ -11088,7 +11088,7 @@ static void testevdunit_unset2d(RMatrix *a, ae_state *_state) {
 // Unsets 2D array.
 static void testevdunit_cunset2d(CMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1, _state);
-   a->xyC[0][0] = complex_from_d(2 * randomreal(_state) - 1);
+   a->xyC[0][0] = complex_from_d(randommid());
 }
 
 // Unsets 1D array.
@@ -11432,8 +11432,8 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
 // If there are non-distinct eigenvalues at the boundaries,
 // we move indexes further until values splits. It is done to
 // avoid situations where we can't get definite answer.
-   i1 = randominteger(n, _state);
-   i2 = i1 + randominteger(n - i1, _state);
+   i1 = randominteger(n);
+   i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
       if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
          break;
@@ -11676,8 +11676,8 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
 // If there are non-distinct eigenvalues at the boundaries,
 // we move indexes further until values splits. It is done to
 // avoid situations where we can't get definite answer.
-   i1 = randominteger(n, _state);
-   i2 = i1 + randominteger(n - i1, _state);
+   i1 = randominteger(n);
+   i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
       if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
          break;
@@ -11956,7 +11956,7 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.xyR[i][j] = 2 * randomreal(_state) - 1;
+         a1.xyR[i][j] = randommid();
          a2.xyR[i][j] = a1.xyR[i][j];
       }
    }
@@ -12067,8 +12067,8 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
 // If there are non-distinct eigenvalues at the boundaries,
 // we move indexes further until values splits. It is done to
 // avoid situations where we can't get definite answer.
-   i1 = randominteger(n, _state);
-   i2 = i1 + randominteger(n - i1, _state);
+   i1 = randominteger(n);
+   i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
       if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
          break;
@@ -12136,7 +12136,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    ae_matrix_set_length(&a2, n - 1 + 1, n - 1 + 1, _state);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.xyR[i][j] = 2 * randomreal(_state) - 1;
+         a1.xyR[i][j] = randommid();
          a2.xyR[i][j] = a1.xyR[i][j];
       }
    }
@@ -12183,7 +12183,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    ae_matrix_set_length(&a2, n - 1 + 1, n - 1 + 1, _state);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.xyR[i][j] = 2 * randomreal(_state) - 1;
+         a1.xyR[i][j] = randommid();
          a2.xyR[i][j] = a1.xyR[i][j];
       }
    }
@@ -12526,13 +12526,13 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
 // Random matrix
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         ra.xyR[i][j] = randommid();
+         ca.xyC[i][j] = complex_from_d(randommid(), randommid());
          ra.xyR[j][i] = ra.xyR[i][j];
          ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
       }
-      ra.xyR[i][i] = 2 * randomreal(_state) - 1;
-      ca.xyC[i][i] = complex_from_d(2 * randomreal(_state) - 1);
+      ra.xyR[i][i] = randommid();
+      ca.xyC[i][i] = complex_from_d(randommid());
    }
    testevdunit_rmatrixsymmetricsplit(&ra, n, &ral, &rau, _state);
    testevdunit_cmatrixhermitiansplit(&ca, n, &cal, &cau, _state);
@@ -12541,13 +12541,13 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
 // Random diagonally dominant matrix with distinct eigenvalues
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         ra.xyR[i][j] = 0.1 * (2 * randomreal(_state) - 1) / n;
-         ca.xyC[i][j] = complex_from_d(0.1 * (2 * randomreal(_state) - 1) / n, 0.1 * (2 * randomreal(_state) - 1) / n);
+         ra.xyR[i][j] = 0.1 * randommid() / n;
+         ca.xyC[i][j] = complex_from_d(0.1 * randommid() / n, 0.1 * randommid() / n);
          ra.xyR[j][i] = ra.xyR[i][j];
          ca.xyC[j][i] = conj(ca.xyC[i][j], _state);
       }
-      ra.xyR[i][i] = 0.1 * (2 * randomreal(_state) - 1) + i;
-      ca.xyC[i][i] = complex_from_d(0.1 * (2 * randomreal(_state) - 1) + i);
+      ra.xyR[i][i] = 0.1 * randommid() + i;
+      ca.xyC[i][i] = complex_from_d(0.1 * randommid() + i);
    }
    testevdunit_rmatrixsymmetricsplit(&ra, n, &ral, &rau, _state);
    testevdunit_cmatrixhermitiansplit(&ca, n, &cal, &cau, _state);
@@ -12589,7 +12589,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
       if (mkind == 1) {
       // Diagonal matrix
          for (i = 0; i < n; i++) {
-            d.xR[i] = 2 * randomreal(_state) - 1;
+            d.xR[i] = randommid();
          }
          for (i = 0; i < n - 1; i++) {
             e.xR[i] = 0.0;
@@ -12601,16 +12601,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
             d.xR[i] = 0.0;
          }
          for (i = 0; i < n - 1; i++) {
-            e.xR[i] = 2 * randomreal(_state) - 1;
+            e.xR[i] = randommid();
          }
       }
       if (mkind == 3) {
       // Dense matrix with blocks
          for (i = 0; i < n; i++) {
-            d.xR[i] = 2 * randomreal(_state) - 1;
+            d.xR[i] = randommid();
          }
          for (i = 0; i < n - 1; i++) {
-            e.xR[i] = 2 * randomreal(_state) - 1;
+            e.xR[i] = randommid();
          }
          j = 1;
          i = 2;
@@ -12623,16 +12623,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
       if (mkind == 4) {
       // dense matrix
          for (i = 0; i < n; i++) {
-            d.xR[i] = 2 * randomreal(_state) - 1;
+            d.xR[i] = randommid();
          }
          for (i = 0; i < n - 1; i++) {
-            e.xR[i] = 2 * randomreal(_state) - 1;
+            e.xR[i] = randommid();
          }
       }
       if (mkind == 5) {
       // Diagonal matrix with distinct eigenvalues
          for (i = 0; i < n; i++) {
-            d.xR[i] = 0.1 * (2 * randomreal(_state) - 1) + i;
+            d.xR[i] = 0.1 * randommid() + i;
          }
          for (i = 0; i < n - 1; i++) {
             e.xR[i] = 0.0;
@@ -12644,16 +12644,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
             d.xR[i] = 0.0;
          }
          for (i = 0; i < n - 1; i++) {
-            e.xR[i] = 0.1 * (2 * randomreal(_state) - 1) + i + 1;
+            e.xR[i] = 0.1 * randommid() + i + 1;
          }
       }
       if (mkind == 7) {
       // dense matrix with distinct eigenvalues
          for (i = 0; i < n; i++) {
-            d.xR[i] = 0.1 * (2 * randomreal(_state) - 1) + i + 1;
+            d.xR[i] = 0.1 * randommid() + i + 1;
          }
          for (i = 0; i < n - 1; i++) {
-            e.xR[i] = 0.1 * (2 * randomreal(_state) - 1);
+            e.xR[i] = 0.1 * randommid();
          }
       }
       testevdunit_testtdevdproblem(&d, &e, n, threshold, tderrors, _state);
@@ -12672,8 +12672,8 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
    testevdunit_testnsevdproblem(&ra, n, threshold, nserrors, _state);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         ra.xyR[i][j] = 2 * randomreal(_state) - 1;
-         ca.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         ra.xyR[i][j] = randommid();
+         ca.xyC[i][j] = complex_from_d(randommid(), randommid());
       }
    }
    testevdunit_testnsevdproblem(&ra, n, threshold, nserrors, _state);
@@ -13201,7 +13201,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
    offscale = 1.0E-3;
    tol = 1.0E-8;
 // Modern Cholesky (SparseCholesky, SparseCholeskyP, Analyze/Factorize) tests:
-// performed for positive definite matrices of all sizes in 1..20 and all sparcity percentages.
+// performed for positive definite matrices of all sizes in 1..20 and all sparsity percentages.
    for (n = 1; n <= 30; n++) {
       nz = n * n - n;
       while (true) {
@@ -13230,7 +13230,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
             }
          }
       // Create matrix in hash-based storage format, convert it to random storage format.
-         isupper = randomreal(_state) > 0.5;
+         isupper = randombool();
          sparsecreate(n, n, 0, &sa, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -13423,7 +13423,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                set_error_flag(&result, sparsecholeskyp(&sc, isupper, &p0, _state), __FILE__, __LINE__, "testtrfacunit.ap:876");
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -13460,7 +13460,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
             }
          }
       // Create matrix in hash-based storage format, convert it to random storage format.
-         isupper = randomreal(_state) > 0.5;
+         isupper = randombool();
          sparsecreate(n, n, 0, &sa, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -13582,7 +13582,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                set_error_flag(&result, fabs(a.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1053");
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -13653,7 +13653,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
             ae_frame_leave(_state);
             return result;
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -13821,7 +13821,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
       }
    }
 // SparseCholeskySkyline test: performed for matrices
-// of all sizes in 1..20 and all sparcity percentages.
+// of all sizes in 1..20 and all sparsity percentages.
    for (n = 1; n <= 20; n++) {
       nz = n * n - n;
       while (true) {
@@ -13834,7 +13834,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
       //
       // Additionally, we create A1 - same as A, but one of the triangles is
       // asymmetrically spoiled. If IsUpper is True, we spoil lower one, or vice versa.
-         isupper = randomreal(_state) > 0.5;
+         isupper = randombool();
          if (n > 1) {
             pnz = (double)nz / (n * n - n);
          } else {
@@ -13952,7 +13952,7 @@ static bool sparserealcholeskytest(ae_state *_state) {
                }
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -14150,7 +14150,7 @@ static void sparsereallutest(bool *err, ae_state *_state) {
             }
             set_error_flag(err, success == haszero, __FILE__, __LINE__, "testtrfacunit.ap:1690");
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -14615,9 +14615,9 @@ bool testtrfac(bool silent, ae_state *_state) {
    for (mx = 1; mx <= maxmn; mx++) {
    // Initialize N/M, both are <= MX,
    // at least one of them is exactly equal to MX
-      n = 1 + randominteger(mx, _state);
-      m = 1 + randominteger(mx, _state);
-      if (randomreal(_state) > 0.5) {
+      n = 1 + randominteger(mx);
+      m = 1 + randominteger(mx);
+      if (randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -14643,8 +14643,8 @@ bool testtrfac(bool silent, ae_state *_state) {
          }
       }
       for (i = 0; i < imin2(m, n, _state); i++) {
-         ra.xyR[i][i] = 1 + 10 * randomreal(_state);
-         ca.xyC[i][i] = complex_from_d(1 + 10 * randomreal(_state));
+         ra.xyR[i][i] = 1 + 10 * randomreal();
+         ca.xyC[i][i] = complex_from_d(1 + 10 * randomreal());
       }
       cmatrixrndorthogonalfromtheleft(&ca, m, n, _state);
       cmatrixrndorthogonalfromtheright(&ca, m, n, _state);
@@ -14654,8 +14654,8 @@ bool testtrfac(bool silent, ae_state *_state) {
       testtrfacunit_testrluproblem(&ra, m, n, threshold, &rerr, &properr, _state);
    }
    for (pass = 1; pass <= 2; pass++) {
-      m = largemn + (randominteger(3, _state) - 1);
-      n = largemn + (randominteger(3, _state) - 1);
+      m = largemn + (randominteger(3) - 1);
+      n = largemn + (randominteger(3) - 1);
    // Random matrix with moderate condition number
       ae_matrix_set_length(&ra, m, n, _state);
       ae_matrix_set_length(&ca, m, n, _state);
@@ -14666,8 +14666,8 @@ bool testtrfac(bool silent, ae_state *_state) {
          }
       }
       for (i = 0; i < imin2(m, n, _state); i++) {
-         ra.xyR[i][i] = 1 + 10 * randomreal(_state);
-         ca.xyC[i][i] = complex_from_d(1 + 10 * randomreal(_state));
+         ra.xyR[i][i] = 1 + 10 * randomreal();
+         ca.xyC[i][i] = complex_from_d(1 + 10 * randomreal());
       }
       cmatrixrndorthogonalfromtheleft(&ca, m, n, _state);
       cmatrixrndorthogonalfromtheright(&ca, m, n, _state);
@@ -14680,7 +14680,7 @@ bool testtrfac(bool silent, ae_state *_state) {
    for (n = 1; n <= maxmn; n++) {
    // Load CA (HPD matrix with low condition number),
    //      CAL and CAU - its lower and upper triangles
-      hpdmatrixrndcond(n, 1 + 50 * randomreal(_state), &ca, _state);
+      hpdmatrixrndcond(n, 1 + 50 * randomreal(), &ca, _state);
       ae_matrix_set_length(&cal, n, n, _state);
       ae_matrix_set_length(&cau, n, n, _state);
       for (i = 0; i < n; i++) {
@@ -14734,7 +14734,7 @@ bool testtrfac(bool silent, ae_state *_state) {
    // After testing SPDMatrixCholesky() we compare results
    // returned by SparseCholeskyX() against ones returned
    // by SPDMatrixCholesky().
-      spdmatrixrndcond(n, 1 + 50 * randomreal(_state), &ra, _state);
+      spdmatrixrndcond(n, 1 + 50 * randomreal(), &ra, _state);
       ae_matrix_set_length(&ral, n, n, _state);
       ae_matrix_set_length(&rau, n, n, _state);
       for (i = 0; i < n; i++) {
@@ -14789,8 +14789,8 @@ bool testtrfac(bool silent, ae_state *_state) {
       }
       ra.xyR[n / 2][n / 2] = -1.0;
       ca.xyC[n / 2][n / 2] = complex_from_d(-1.0);
-      set_error_flag(&dspderr, spdmatrixcholesky(&ra, n, randomreal(_state) > 0.5, _state), __FILE__, __LINE__, "testtrfacunit.ap:509");
-      set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, randomreal(_state) > 0.5, _state), __FILE__, __LINE__, "testtrfacunit.ap:510");
+      set_error_flag(&dspderr, spdmatrixcholesky(&ra, n, randombool(), _state), __FILE__, __LINE__, "testtrfacunit.ap:509");
+      set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, randombool(), _state), __FILE__, __LINE__, "testtrfacunit.ap:510");
    }
 // report
    waserrors = ((((((rerr || srerr) || dspderr) || sspderr) || cerr) || hpderr) || properr) || dspdupderr;
@@ -14971,22 +14971,22 @@ static void testbdsvdunit_fillidentity(RMatrix *a, ae_int_t n, ae_state *_state)
    }
 }
 
-static void testbdsvdunit_fillsparsede(RVector *d, RVector *e, ae_int_t n, double sparcity, ae_state *_state) {
+static void testbdsvdunit_fillsparsede(RVector *d, RVector *e, ae_int_t n, double sparsity, ae_state *_state) {
    ae_int_t i;
    ae_vector_set_length(d, n - 1 + 1, _state);
    ae_vector_set_length(e, imax2(0, n - 2, _state) + 1, _state);
    for (i = 0; i < n; i++) {
-      if (randomreal(_state) >= sparcity) {
-         d->xR[i] = 2 * randomreal(_state) - 1;
-      } else {
+      if (randombool(sparsity)) {
          d->xR[i] = 0.0;
+      } else {
+         d->xR[i] = randommid();
       }
    }
    for (i = 0; i < n - 1; i++) {
-      if (randomreal(_state) >= sparcity) {
-         e->xR[i] = 2 * randomreal(_state) - 1;
-      } else {
+      if (randombool(sparsity)) {
          e->xR[i] = 0.0;
+      } else {
+         e->xR[i] = randommid();
       }
    }
 }
@@ -15320,10 +15320,10 @@ bool testbdsvd(bool silent, ae_state *_state) {
    for (n = 1; n <= maxn; n++) {
       for (pass = 1; pass <= 10; pass++) {
          for (i = 0; i < maxn; i++) {
-            d.xR[i] = 2 * randomreal(_state) - 1;
+            d.xR[i] = randommid();
          }
          for (i = 0; i < maxn - 1; i++) {
-            e.xR[i] = 2 * randomreal(_state) - 1;
+            e.xR[i] = randommid();
          }
          testbdsvdunit_testbdsvdproblem(&d, &e, n, &materr, &orterr, &wsorted, &wfailed, &failcount, &succcount, _state);
       }
@@ -15375,15 +15375,15 @@ bool testbdsvd(bool silent, ae_state *_state) {
 }
 
 // === svd testing unit ===
-static void testsvdunit_fillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparcity, ae_state *_state) {
+static void testsvdunit_fillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparsity, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (randomreal(_state) >= sparcity) {
-            a->xyR[i][j] = 2 * randomreal(_state) - 1;
-         } else {
+         if (randombool(sparsity)) {
             a->xyR[i][j] = 0.0;
+         } else {
+            a->xyR[i][j] = randommid();
          }
       }
    }
@@ -15555,7 +15555,7 @@ bool testsvd(bool silent, ae_state *_state) {
    // Long dense matrix
       for (i = 0; i < maxmn; i++) {
          for (j = 0; j < imin2(5, maxmn, _state); j++) {
-            a.xyR[i][j] = 2 * randomreal(_state) - 1;
+            a.xyR[i][j] = randommid();
          }
       }
       for (i = 1; i <= maxmn; i++) {
@@ -15565,7 +15565,7 @@ bool testsvd(bool silent, ae_state *_state) {
       }
       for (i = 0; i < imin2(5, maxmn, _state); i++) {
          for (j = 0; j < maxmn; j++) {
-            a.xyR[i][j] = 2 * randomreal(_state) - 1;
+            a.xyR[i][j] = randommid();
          }
       }
       for (i = 1; i <= imin2(5, maxmn, _state); i++) {
@@ -15578,7 +15578,7 @@ bool testsvd(bool silent, ae_state *_state) {
          for (n = 1; n <= imin2(10, maxmn, _state); n++) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  a.xyR[i][j] = randommid();
                }
             }
             testsvdunit_testsvdproblem(&a, m, n, &materr, &orterr, &othererr, &wsorted, &wfailed, &failcount, &succcount, _state);
@@ -15693,19 +15693,19 @@ bool testtrlinsolve(bool silent, ae_state *_state) {
                      if (isupper) {
                         for (i = 0; i < n; i++) {
                            for (j = i; j < n; j++) {
-                              aeffective.xyR[i][j] = 0.9 * (2 * randomreal(_state) - 1);
+                              aeffective.xyR[i][j] = 0.9 * randommid();
                               aparam.xyR[i][j] = aeffective.xyR[i][j];
                            }
-                           aeffective.xyR[i][i] = (2 * randominteger(2, _state) - 1) * (0.8 + randomreal(_state));
+                           aeffective.xyR[i][i] = (2 * randominteger(2) - 1) * (0.8 + randomreal());
                            aparam.xyR[i][i] = aeffective.xyR[i][i];
                         }
                      } else {
                         for (i = 0; i < n; i++) {
                            for (j = 0; j <= i; j++) {
-                              aeffective.xyR[i][j] = 0.9 * (2 * randomreal(_state) - 1);
+                              aeffective.xyR[i][j] = 0.9 * randommid();
                               aparam.xyR[i][j] = aeffective.xyR[i][j];
                            }
-                           aeffective.xyR[i][i] = (2 * randominteger(2, _state) - 1) * (0.8 + randomreal(_state));
+                           aeffective.xyR[i][i] = (2 * randominteger(2) - 1) * (0.8 + randomreal());
                            aparam.xyR[i][i] = aeffective.xyR[i][i];
                         }
                      }
@@ -15734,7 +15734,7 @@ bool testtrlinsolve(bool silent, ae_state *_state) {
                      }
                   // Prepare task, solve, compare
                      for (i = 0; i < n; i++) {
-                        xe.xR[i] = 2 * randomreal(_state) - 1;
+                        xe.xR[i] = randommid();
                      }
                      for (i = 0; i < n; i++) {
                         v = ae_v_dotproduct(aeffective.xyR[i], 1, xe.xR, 1, n);
@@ -15839,17 +15839,17 @@ bool testsafesolve(bool silent, ae_state *_state) {
    // 2. generate 'effective' A
    // 3. prepare task (exact X is stored in CXE, right part - in CXS),
    //    solve and compare CXS and CXE
-      isupper = randomreal(_state) > 0.5;
-      trans = randominteger(3, _state);
-      isunit = randomreal(_state) > 0.5;
-      scalea = randomreal(_state) + 0.5;
+      isupper = randombool();
+      trans = randominteger(3);
+      isunit = randombool();
+      scalea = randomreal() + 0.5;
       ae_matrix_set_length(&ca, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (i == j) {
-               ca.xyC[i][j] = complex_from_d((2 * randominteger(2, _state) - 1) * (5 + randomreal(_state)), (2 * randominteger(2, _state) - 1) * (5 + randomreal(_state)));
+               ca.xyC[i][j] = complex_from_d((2 * randominteger(2) - 1) * (5 + randomreal()), (2 * randominteger(2) - 1) * (5 + randomreal()));
             } else {
-               ca.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
+               ca.xyC[i][j] = complex_from_d(0.1 * randommid(), 0.1 * randommid());
             }
          }
       }
@@ -15883,7 +15883,7 @@ bool testsafesolve(bool silent, ae_state *_state) {
       }
       ae_vector_set_length(&cxe, n, _state);
       for (i = 0; i < n; i++) {
-         cxe.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         cxe.xC[i] = complex_from_d(randommid(), randommid());
       }
       ae_vector_set_length(&cxs, n, _state);
       for (i = 0; i < n; i++) {
@@ -15898,17 +15898,17 @@ bool testsafesolve(bool silent, ae_state *_state) {
          cerrors = true;
       }
    // same with real
-      isupper = randomreal(_state) > 0.5;
-      trans = randominteger(2, _state);
-      isunit = randomreal(_state) > 0.5;
-      scalea = randomreal(_state) + 0.5;
+      isupper = randombool();
+      trans = randominteger(2);
+      isunit = randombool();
+      scalea = randomreal() + 0.5;
       ae_matrix_set_length(&ra, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (i == j) {
-               ra.xyR[i][j] = (2 * randominteger(2, _state) - 1) * (5 + randomreal(_state));
+               ra.xyR[i][j] = (2 * randominteger(2) - 1) * (5 + randomreal());
             } else {
-               ra.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+               ra.xyR[i][j] = 0.1 * randommid();
             }
          }
       }
@@ -15939,7 +15939,7 @@ bool testsafesolve(bool silent, ae_state *_state) {
       }
       ae_vector_set_length(&rxe, n, _state);
       for (i = 0; i < n; i++) {
-         rxe.xR[i] = 2 * randomreal(_state) - 1;
+         rxe.xR[i] = randommid();
       }
       ae_vector_set_length(&rxs, n, _state);
       for (i = 0; i < n; i++) {
@@ -15970,8 +15970,8 @@ bool testsafesolve(bool silent, ae_state *_state) {
    ae_vector_set_length(&cxs, n, _state);
    cxs.xC[0] = complex_from_d(1.0);
    cxs.xC[1] = complex_from_d(0.5);
-   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randomreal(_state) > 0.5, randominteger(3, _state), false, 1.05 * rmax2(abscomplex(cxs.xC[1], _state) * growth, 1.0, _state), _state);
-   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randomreal(_state) > 0.5, randominteger(3, _state), false, 0.95 * rmax2(abscomplex(cxs.xC[1], _state) * growth, 1.0, _state), _state);
+   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randombool(), randominteger(3), false, 1.05 * rmax2(abscomplex(cxs.xC[1], _state) * growth, 1.0, _state), _state);
+   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randombool(), randominteger(3), false, 0.95 * rmax2(abscomplex(cxs.xC[1], _state) * growth, 1.0, _state), _state);
    ae_matrix_set_length(&ra, n, n, _state);
    ra.xyR[0][0] = 1.0;
    ra.xyR[0][1] = 0.0;
@@ -15980,8 +15980,8 @@ bool testsafesolve(bool silent, ae_state *_state) {
    ae_vector_set_length(&rxs, n, _state);
    rxs.xR[0] = 1.0;
    rxs.xR[1] = 0.5;
-   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randomreal(_state) > 0.5, randominteger(2, _state), false, 1.05 * rmax2(fabs(rxs.xR[1]) * growth, 1.0, _state), _state);
-   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randomreal(_state) > 0.5, randominteger(2, _state), false, 0.95 * rmax2(fabs(rxs.xR[1]) * growth, 1.0, _state), _state);
+   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randombool(), randominteger(2), false, 1.05 * rmax2(fabs(rxs.xR[1]) * growth, 1.0, _state), _state);
+   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randombool(), randominteger(2), false, 0.95 * rmax2(fabs(rxs.xR[1]) * growth, 1.0, _state), _state);
 // Special test with diagonal degenerate matrix:
 // * ability to solve it when resulting growth is less than threshold
 // * ability to stop solve when resulting growth is greater than threshold
@@ -15997,7 +15997,7 @@ bool testsafesolve(bool silent, ae_state *_state) {
    ae_vector_set_length(&cxs, n, _state);
    cxs.xC[0] = complex_from_d(1.0);
    cxs.xC[1] = complex_from_d(0.5);
-   cerrors = cerrors || cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randomreal(_state) > 0.5, randominteger(3, _state), false, sqrt(maxrealnumber), _state);
+   cerrors = cerrors || cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, randombool(), randominteger(3), false, sqrt(maxrealnumber), _state);
    ae_matrix_set_length(&ra, n, n, _state);
    ra.xyR[0][0] = 1.0;
    ra.xyR[0][1] = 0.0;
@@ -16006,7 +16006,7 @@ bool testsafesolve(bool silent, ae_state *_state) {
    ae_vector_set_length(&rxs, n, _state);
    rxs.xR[0] = 1.0;
    rxs.xR[1] = 0.5;
-   rerrors = rerrors || rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randomreal(_state) > 0.5, randominteger(2, _state), false, sqrt(maxrealnumber), _state);
+   rerrors = rerrors || rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randombool(), randominteger(2), false, sqrt(maxrealnumber), _state);
 // report
    waserrors = rerrors || cerrors;
    if (!silent) {
@@ -16561,8 +16561,8 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
    for (n = 1; n <= maxn; n++) {
    // special test for zero matrix
       testrcondunit_rmatrixgenzero(&a, n, _state);
-      errspec = errspec || rmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-      errspec = errspec || rmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+      errspec = errspec || rmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+      errspec = errspec || rmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
    // general test
       ae_matrix_set_length(&a, n, n, _state);
       for (i = 0; i <= 1; i++) {
@@ -16570,15 +16570,15 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         isupper = randomreal(_state) > 0.5;
-         isunit = randomreal(_state) > 0.5;
+         isupper = randombool();
+         isunit = randombool();
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = randomreal(_state) - 0.5;
+               a.xyR[i][j] = randomreal() - 0.5;
             }
          }
          for (i = 0; i < n; i++) {
-            a.xyR[i][i] = 1 + randomreal(_state);
+            a.xyR[i][i] = 1 + randomreal();
          }
          testrcondunit_rmatrixmakeacopy(&a, n, n, &ea, _state);
          for (i = 0; i < n; i++) {
@@ -16630,8 +16630,8 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          }
          a.xyR[0][0] = 1.0;
          a.xyR[n - 1][n - 1] = 1.0;
-         errspec = errspec || rmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-         errspec = errspec || rmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+         errspec = errspec || rmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+         errspec = errspec || rmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
       }
    // near-degenerate matrix test
       if (n >= 2) {
@@ -16644,10 +16644,10 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          for (i = 0; i < n; i++) {
             a.xyR[i][i] = 1.0;
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyR[i][i] = 0.1 * maxrealnumber;
-         errspec = errspec || rmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-         errspec = errspec || rmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+         errspec = errspec || rmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+         errspec = errspec || rmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
       }
    }
 // report
@@ -16690,8 +16690,8 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
    for (n = 1; n <= maxn; n++) {
    // special test for zero matrix
       testrcondunit_cmatrixgenzero(&a, n, _state);
-      errspec = errspec || cmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-      errspec = errspec || cmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+      errspec = errspec || cmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+      errspec = errspec || cmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
    // general test
       ae_matrix_set_length(&a, n, n, _state);
       for (i = 0; i <= 1; i++) {
@@ -16699,15 +16699,15 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         isupper = randomreal(_state) > 0.5;
-         isunit = randomreal(_state) > 0.5;
+         isupper = randombool();
+         isunit = randombool();
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.xyC[i][j] = complex_from_d(randomreal(_state) - 0.5, randomreal(_state) - 0.5);
+               a.xyC[i][j] = complex_from_d(randomreal() - 0.5, randomreal() - 0.5);
             }
          }
          for (i = 0; i < n; i++) {
-            a.xyC[i][i] = complex_from_d(1 + randomreal(_state), 1 + randomreal(_state));
+            a.xyC[i][i] = complex_from_d(1 + randomreal(), 1 + randomreal());
          }
          testrcondunit_cmatrixmakeacopy(&a, n, n, &ea, _state);
          for (i = 0; i < n; i++) {
@@ -16759,8 +16759,8 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          }
          a.xyC[0][0] = complex_from_i(1);
          a.xyC[n - 1][n - 1] = complex_from_i(1);
-         errspec = errspec || cmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-         errspec = errspec || cmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+         errspec = errspec || cmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+         errspec = errspec || cmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
       }
    // near-degenerate matrix test
       if (n >= 2) {
@@ -16773,10 +16773,10 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount, 
          for (i = 0; i < n; i++) {
             a.xyC[i][i] = complex_from_i(1);
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyC[i][i] = complex_from_d(0.1 * maxrealnumber);
-         errspec = errspec || cmatrixtrrcond1(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
-         errspec = errspec || cmatrixtrrcondinf(&a, n, randomreal(_state) > 0.5, false, _state) != 0.0;
+         errspec = errspec || cmatrixtrrcond1(&a, n, randombool(), false, _state) != 0.0;
+         errspec = errspec || cmatrixtrrcondinf(&a, n, randombool(), false, _state) != 0.0;
       }
    }
 // report
@@ -16828,7 +16828,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         rmatrixrndcond(n, exp(randomreal(_state) * log(1000.0)), &a, _state);
+         rmatrixrndcond(n, exp(randomreal() * log(1000.0)), &a, _state);
          testrcondunit_rmatrixmakeacopy(&a, n, n, &lua, _state);
          rmatrixlu(&lua, n, n, &p, _state);
          testrcondunit_rmatrixrefrcond(&a, n, &erc1, &ercinf, _state);
@@ -16899,7 +16899,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
          for (i = 0; i < n; i++) {
             a.xyR[i][i] = 1.0;
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyR[i][i] = 0.1 * maxrealnumber;
          errspec = errspec || rmatrixrcond1(&a, n, _state) != 0.0;
          errspec = errspec || rmatrixrcondinf(&a, n, _state) != 0.0;
@@ -16957,7 +16957,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         cmatrixrndcond(n, exp(randomreal(_state) * log(1000.0)), &a, _state);
+         cmatrixrndcond(n, exp(randomreal() * log(1000.0)), &a, _state);
          testrcondunit_cmatrixmakeacopy(&a, n, n, &lua, _state);
          cmatrixlu(&lua, n, n, &p, _state);
          testrcondunit_cmatrixrefrcond(&a, n, &erc1, &ercinf, _state);
@@ -17028,7 +17028,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount, ae
          for (i = 0; i < n; i++) {
             a.xyC[i][i] = complex_from_i(1);
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyC[i][i] = complex_from_d(0.1 * maxrealnumber);
          errspec = errspec || cmatrixrcond1(&a, n, _state) != 0.0;
          errspec = errspec || cmatrixrcondinf(&a, n, _state) != 0.0;
@@ -17071,7 +17071,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
    ae_vector_set_length(&q50, 2, _state);
    ae_vector_set_length(&q90, 2, _state);
    for (n = 1; n <= maxn; n++) {
-      isupper = randomreal(_state) > 0.5;
+      isupper = randombool();
    // general test
       ae_matrix_set_length(&a, n, n, _state);
       for (i = 0; i <= 1; i++) {
@@ -17079,7 +17079,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         spdmatrixrndcond(n, exp(randomreal(_state) * log(1000.0)), &a, _state);
+         spdmatrixrndcond(n, exp(randomreal() * log(1000.0)), &a, _state);
          testrcondunit_rmatrixrefrcond(&a, n, &erc1, &ercinf, _state);
          testrcondunit_rmatrixdrophalf(&a, n, isupper, _state);
          testrcondunit_rmatrixmakeacopy(&a, n, n, &cha, _state);
@@ -17131,7 +17131,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
          for (i = 0; i < n; i++) {
             a.xyR[i][i] = 1.0;
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyR[i][i] = 0.1 * maxrealnumber;
          errspec = errspec || spdmatrixrcond(&a, n, isupper, _state) != 0.0;
          errspec = errspec || spdmatrixcholeskyrcond(&a, n, isupper, _state) != 0.0;
@@ -17172,7 +17172,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
    ae_vector_set_length(&q50, 2, _state);
    ae_vector_set_length(&q90, 2, _state);
    for (n = 1; n <= maxn; n++) {
-      isupper = randomreal(_state) > 0.5;
+      isupper = randombool();
    // general test
       ae_matrix_set_length(&a, n, n, _state);
       for (i = 0; i <= 1; i++) {
@@ -17180,7 +17180,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
          q90.xR[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         hpdmatrixrndcond(n, exp(randomreal(_state) * log(1000.0)), &a, _state);
+         hpdmatrixrndcond(n, exp(randomreal() * log(1000.0)), &a, _state);
          testrcondunit_cmatrixrefrcond(&a, n, &erc1, &ercinf, _state);
          testrcondunit_cmatrixdrophalf(&a, n, isupper, _state);
          testrcondunit_cmatrixmakeacopy(&a, n, n, &cha, _state);
@@ -17232,7 +17232,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount, 
          for (i = 0; i < n; i++) {
             a.xyC[i][i] = complex_from_i(1);
          }
-         i = randominteger(n, _state);
+         i = randominteger(n);
          a.xyC[i][i] = complex_from_d(0.1 * maxrealnumber);
          errspec = errspec || hpdmatrixrcond(&a, n, isupper, _state) != 0.0;
          errspec = errspec || hpdmatrixcholeskyrcond(&a, n, isupper, _state) != 0.0;
@@ -17356,15 +17356,15 @@ bool testxblas(bool silent, ae_state *_state) {
          ae_vector_set_length(&ry, n, _state);
          ae_vector_set_length(&temp, n, _state);
          for (i = 0; i < n; i++) {
-            if (randomreal(_state) > 0.2) {
-               rx.xR[i] = 2 * randomreal(_state) - 1;
-            } else {
+            if (randombool(0.2)) {
                rx.xR[i] = 0.0;
-            }
-            if (randomreal(_state) > 0.2) {
-               ry.xR[i] = 2 * randomreal(_state) - 1;
             } else {
+               rx.xR[i] = randommid();
+            }
+            if (randombool(0.2)) {
                ry.xR[i] = 0.0;
+            } else {
+               ry.xR[i] = randommid();
             }
          }
          rv1 = ae_v_dotproduct(rx.xR, 1, ry.xR, 1, n);
@@ -17375,15 +17375,15 @@ bool testxblas(bool silent, ae_state *_state) {
          ae_vector_set_length(&cy, n, _state);
          ae_vector_set_length(&temp, 2 * n, _state);
          for (i = 0; i < n; i++) {
-            if (randomreal(_state) > 0.2) {
-               cx.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-            } else {
+            if (randombool(0.2)) {
                cx.xC[i] = complex_from_i(0);
-            }
-            if (randomreal(_state) > 0.2) {
-               cy.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
             } else {
+               cx.xC[i] = complex_from_d(randommid(), randommid());
+            }
+            if (randombool(0.2)) {
                cy.xC[i] = complex_from_i(0);
+            } else {
+               cy.xC[i] = complex_from_d(randommid(), randommid());
             }
          }
          cv1 = ae_v_cdotproduct(cx.xC, 1, "N", cy.xC, 1, "N", n);
@@ -17403,7 +17403,7 @@ bool testxblas(bool silent, ae_state *_state) {
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
-      ry.xR[0] = (2 * randomreal(_state) - 1) * s * sqrt(2 * randomreal(_state));
+      ry.xR[0] = randommid() * s * sqrt(2 * randomreal());
       for (i = 1; i < n; i++) {
          ry.xR[i] = ry.xR[0];
       }
@@ -17423,7 +17423,7 @@ bool testxblas(bool silent, ae_state *_state) {
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
-      ry.xR[0] = (2 * randomreal(_state) - 1) * s * sqrt(2 * randomreal(_state));
+      ry.xR[0] = randommid() * s * sqrt(2 * randomreal());
       for (i = 1; i < n; i++) {
          ry.xR[i] = ry.xR[0];
       }
@@ -17447,7 +17447,7 @@ bool testxblas(bool silent, ae_state *_state) {
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
-      cy.xC[0] = complex_from_d((2 * randomreal(_state) - 1) * s * sqrt(2 * randomreal(_state)), (2 * randomreal(_state) - 1) * s * sqrt(2 * randomreal(_state)));
+      cy.xC[0] = complex_from_d(randommid() * s * sqrt(2 * randomreal()), randommid() * s * sqrt(2 * randomreal()));
       for (i = 1; i < n; i++) {
          cy.xC[i] = cy.xC[0];
       }
@@ -17467,7 +17467,7 @@ bool testxblas(bool silent, ae_state *_state) {
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
-      cy.xC[0] = complex_from_d((2 * randomreal(_state) - 1) * s * sqrt(2 * randomreal(_state)));
+      cy.xC[0] = complex_from_d(randommid() * s * sqrt(2 * randomreal()));
       for (i = 1; i < n; i++) {
          cy.xC[i] = cy.xC[0];
       }
@@ -17848,25 +17848,25 @@ static void testdirectdensesolversunit_cmatrixdrophalf(CMatrix *a, ae_int_t n, b
 // Unsets real vector
 static void testdirectdensesolversunit_unset1d(RVector *x, ae_state *_state) {
    ae_vector_set_length(x, 1, _state);
-   x->xR[0] = 2 * randomreal(_state) - 1;
+   x->xR[0] = randommid();
 }
 
 // Unsets real vector
 static void testdirectdensesolversunit_cunset1d(CVector *x, ae_state *_state) {
    ae_vector_set_length(x, 1, _state);
-   x->xC[0] = complex_from_d(2 * randomreal(_state) - 1);
+   x->xC[0] = complex_from_d(randommid());
 }
 
 // Unsets real matrix
 static void testdirectdensesolversunit_unset2d(RMatrix *x, ae_state *_state) {
    ae_matrix_set_length(x, 1, 1, _state);
-   x->xyR[0][0] = 2 * randomreal(_state) - 1;
+   x->xyR[0][0] = randommid();
 }
 
 // Unsets real matrix
 static void testdirectdensesolversunit_cunset2d(CMatrix *x, ae_state *_state) {
    ae_matrix_set_length(x, 1, 1, _state);
-   x->xyC[0][0] = complex_from_d(2 * randomreal(_state) - 1);
+   x->xyC[0][0] = complex_from_d(randommid());
 }
 
 // Unsets report
@@ -17931,7 +17931,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  xe.xyR[i][j] = randommid();
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -17945,7 +17945,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep, _state);
             testdirectdensesolversunit_unset2d(&x, _state);
-            rmatrixsolvem(&a, n, &b, m, randomreal(_state) > 0.5, &info, &rep, &x, _state);
+            rmatrixsolvem(&a, n, &b, m, randombool(), &info, &rep, &x, _state);
             *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksolutionm(&xe, n, m, threshold, info, &rep, &x, _state);
             info = 0;
             ae_matrix_set_length(&x, n, m, _state);
@@ -18098,10 +18098,10 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_muld(&a.xyR[0][k], a.stride, n, 0);
                }
                if (taskkind == 2) {
@@ -18109,10 +18109,10 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_muld(a.xyR[k], 1, n, 0);
                }
                if (taskkind == 3) {
@@ -18123,10 +18123,10 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_move(a.xyR[0], a.stride, &a.xyR[0][k], a.stride, n);
                }
                if (taskkind == 4) {
@@ -18137,16 +18137,16 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_move(a.xyR[0], 1, a.xyR[k], 1, n);
                }
                ae_matrix_set_length(&xe, n, m, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     xe.xyR[i][j] = randommid();
                   }
                }
                ae_matrix_set_length(&b, n, m, _state);
@@ -18162,7 +18162,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                info = 0;
                testdirectdensesolversunit_unsetrep(&rep, _state);
                testdirectdensesolversunit_unset2d(&x, _state);
-               rmatrixsolvem(&a, n, &b, m, randomreal(_state) > 0.5, &info, &rep, &x, _state);
+               rmatrixsolvem(&a, n, &b, m, randombool(), &info, &rep, &x, _state);
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x, _state);
             // Test RMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
@@ -18264,11 +18264,11 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
       ae_vector_set_length(&xv, n, _state);
       ae_vector_set_length(&y, n, _state);
       for (i = 0; i < n; i++) {
-         xv.xR[i] = 2 * randomreal(_state) - 1;
+         xv.xR[i] = randommid();
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.xyR[i][j] = 2 * randomreal(_state) - 1;
+            a.xyR[i][j] = randommid();
          }
          ae_v_move(y.xR, 1, a.xyR[i], 1, n);
          xdot(&y, &xv, n, &tx, &v, &verr, _state);
@@ -18364,7 +18364,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                  xe.xyC[i][j] = complex_from_d(randommid(), randommid());
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -18378,7 +18378,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep, _state);
             testdirectdensesolversunit_cunset2d(&x, _state);
-            cmatrixsolvem(&a, n, &b, m, randomreal(_state) > 0.5, &info, &rep, &x, _state);
+            cmatrixsolvem(&a, n, &b, m, randombool(), &info, &rep, &x, _state);
             *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksolutionm(&xe, n, m, threshold, info, &rep, &x, _state);
             info = 0;
             ae_matrix_set_length(&x, n, m, _state);
@@ -18468,10 +18468,10 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
                }
                if (taskkind == 2) {
@@ -18479,10 +18479,10 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_cmuld(a.xyC[k], 1, n, 0);
                }
                if (taskkind == 3) {
@@ -18493,10 +18493,10 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_cmove(a.xyC[0], a.stride, &a.xyC[0][k], a.stride, "N", n);
                }
                if (taskkind == 4) {
@@ -18507,16 +18507,16 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_cmove(a.xyC[0], 1, a.xyC[k], 1, "N", n);
                }
                ae_matrix_set_length(&xe, n, m, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+                     xe.xyC[i][j] = complex_from_d(randommid());
                   }
                }
                ae_matrix_set_length(&b, n, m, _state);
@@ -18532,7 +18532,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                info = 0;
                testdirectdensesolversunit_unsetrep(&rep, _state);
                testdirectdensesolversunit_cunset2d(&x, _state);
-               cmatrixsolvem(&a, n, &b, m, randomreal(_state) > 0.5, &info, &rep, &x, _state);
+               cmatrixsolvem(&a, n, &b, m, randombool(), &info, &rep, &x, _state);
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x, _state);
             // Test CMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
@@ -18631,11 +18631,11 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
       ae_vector_set_length(&xv, n, _state);
       ae_vector_set_length(&y, n, _state);
       for (i = 0; i < n; i++) {
-         xv.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         xv.xC[i] = complex_from_d(randommid(), randommid());
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            a.xyC[i][j] = complex_from_d(randommid(), randommid());
          }
          ae_v_cmove(y.xC, 1, a.xyC[i], 1, "N", n);
          xcdot(&y, &xv, n, &tx, &v, &verr, _state);
@@ -18715,7 +18715,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
          // 2. generate random solution vector xe
          // 3. generate right part b=A*xe
          // 4. test different methods on original A
-            isupper = randomreal(_state) > 0.5;
+            isupper = randombool();
             spdmatrixrndcond(n, 1000.0, &a, _state);
             testdirectdensesolversunit_rmatrixmakeacopy(&a, n, n, &cha, _state);
             if (!spdmatrixcholesky(&cha, n, isupper, _state)) {
@@ -18726,7 +18726,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  xe.xyR[i][j] = randommid();
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -18820,11 +18820,11 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                         a.xyR[j][i] = a.xyR[i][j];
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_muld(&a.xyR[0][k], a.stride, n, 0);
                   ae_v_muld(a.xyR[k], 1, n, 0);
                }
@@ -18833,11 +18833,11 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                         a.xyR[j][i] = a.xyR[i][j];
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_muld(a.xyR[k], 1, n, 0);
                   ae_v_muld(&a.xyR[0][k], a.stride, n, 0);
                }
@@ -18849,18 +18849,18 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        a.xyR[i][j] = randommid();
                         a.xyR[j][i] = a.xyR[i][j];
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_move(a.xyR[0], a.stride, &a.xyR[0][k], a.stride, n);
                   ae_v_move(a.xyR[0], 1, a.xyR[k], 1, n);
                }
                ae_matrix_set_length(&xe, n, m, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     xe.xyR[i][j] = randommid();
                   }
                }
                ae_matrix_set_length(&b, n, m, _state);
@@ -18991,7 +18991,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
          // 2. generate random solution vector xe
          // 3. generate right part b=A*xe
          // 4. test different methods on original A
-            isupper = randomreal(_state) > 0.5;
+            isupper = randombool();
             hpdmatrixrndcond(n, 1000.0, &a, _state);
             testdirectdensesolversunit_cmatrixmakeacopy(&a, n, n, &cha, _state);
             if (!hpdmatrixcholesky(&cha, n, isupper, _state)) {
@@ -19002,7 +19002,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
             ae_matrix_set_length(&xe, n, m, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                  xe.xyC[i][j] = complex_from_d(randommid(), randommid());
                }
             }
             ae_matrix_set_length(&b, n, m, _state);
@@ -19096,14 +19096,14 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
                         a.xyC[j][i] = a.xyC[i][j];
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
                   ae_v_cmuld(a.xyC[k], 1, n, 0);
                }
@@ -19112,14 +19112,14 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
                         a.xyC[j][i] = a.xyC[i][j];
                      }
                   }
-                  k = randominteger(n, _state);
+                  k = randominteger(n);
                   ae_v_cmuld(a.xyC[k], 1, n, 0);
                   ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
                }
@@ -19131,21 +19131,21 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n, _state);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                        a.xyC[i][j] = complex_from_d(randommid(), randommid());
                         if (i == j) {
                            a.xyC[i][j].y = 0.0;
                         }
                         a.xyC[j][i] = a.xyC[i][j];
                      }
                   }
-                  k = 1 + randominteger(n - 1, _state);
+                  k = 1 + randominteger(n - 1);
                   ae_v_cmove(a.xyC[0], a.stride, &a.xyC[0][k], a.stride, "N", n);
                   ae_v_cmove(a.xyC[0], 1, a.xyC[k], 1, "N", n);
                }
                ae_matrix_set_length(&xe, n, m, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1);
+                     xe.xyC[i][j] = complex_from_d(randommid());
                   }
                }
                ae_matrix_set_length(&b, n, m, _state);
@@ -19833,18 +19833,18 @@ bool testfbls(bool silent, ae_state *_state) {
       // X is initialized in such way that is has no chances to be equal to XE.
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
             }
          }
-         alpha = randomreal(_state) + 0.1;
+         alpha = randomreal() + 0.1;
          for (i = 0; i < n; i++) {
-            b.xR[i] = 2 * randomreal(_state) - 1;
-            xe.xR[i] = 2 * randomreal(_state) - 1;
-            x.xR[i] = (2 * randominteger(2, _state) - 1) * (2 + randomreal(_state));
+            b.xR[i] = randommid();
+            xe.xR[i] = randommid();
+            x.xR[i] = (2 * randominteger(2) - 1) * (2 + randomreal());
          }
       // Test dense CG (which solves A'A*x=b and accepts dense A)
          for (i = 0; i < n; i++) {
-            x.xR[i] = (2 * randominteger(2, _state) - 1) * (2 + randomreal(_state));
+            x.xR[i] = (2 * randominteger(2) - 1) * (2 + randomreal());
          }
          rmatrixmv(m, n, &a, 0, 0, 0, &x, 0, &tmp1, 0, _state);
          rmatrixmv(n, m, &a, 0, 0, 1, &tmp1, 0, &tmp2, 0, _state);
@@ -19862,7 +19862,7 @@ bool testfbls(bool silent, ae_state *_state) {
          cgerrors = cgerrors || e2 > 0.001 * e1;
       // Test sparse CG (which relies on reverse communication)
          for (i = 0; i < n; i++) {
-            x.xR[i] = (2 * randominteger(2, _state) - 1) * (2 + randomreal(_state));
+            x.xR[i] = (2 * randominteger(2) - 1) * (2 + randomreal());
          }
          rmatrixmv(m, n, &a, 0, 0, 0, &x, 0, &tmp1, 0, _state);
          rmatrixmv(n, m, &a, 0, 0, 1, &tmp1, 0, &tmp2, 0, _state);
@@ -19906,18 +19906,18 @@ bool testfbls(bool silent, ae_state *_state) {
          ae_matrix_set_length(&a, m, n, _state);
          for (i = 0; i < m - n; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
             }
          }
          for (i = m - n; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 0.01 * (2 * randomreal(_state) - 1);
+               a.xyR[i][j] = 0.01 * randommid();
             }
             a.xyR[i][i - (m - n)] = 1.0;
          }
          ae_vector_set_length(&xe, n, _state);
          for (i = 0; i < n; i++) {
-            xe.xR[i] = 2 * randomreal(_state) - 1;
+            xe.xR[i] = randommid();
          }
          ae_vector_set_length(&b, m, _state);
          for (i = 0; i < m; i++) {
@@ -19941,13 +19941,13 @@ bool testfbls(bool silent, ae_state *_state) {
       ae_vector_set_length(&buf, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.xyR[i][j] = 0.01 * (randomreal(_state) - 0.5);
+            a.xyR[i][j] = 0.01 * (randomreal() - 0.5);
          }
-         a.xyR[i][i] = 1 + randomreal(_state);
-         xe.xR[i] = randomreal(_state) - 0.5;
+         a.xyR[i][i] = 1 + randomreal();
+         xe.xR[i] = randomreal() - 0.5;
       }
-      scalea = pow(10.0, randomreal(_state) * 4 - 2);
-      uppera = randomreal(_state) > 0.5;
+      scalea = pow(10.0, randomreal() * 4 - 2);
+      uppera = randombool();
       for (i = 0; i < n; i++) {
          if (uppera) {
             for (j = 0; j < i; j++) {
@@ -20458,16 +20458,16 @@ static bool testlincgunit_complextest(bool silent, ae_state *_state) {
    // * random A with norm NA (equal to 1.0),
    // * random right part B whose elements are uniformly distributed in [-MX,+MX]
    // * random starting point X0 whose elements are uniformly distributed in [-MX,+MX]
-      c = 15 + 15 * randomreal(_state);
+      c = 15 + 15 * randomreal();
       spdmatrixrndcond(sz, c, &a, _state);
       na = 1.0;
       ae_vector_set_length(&b, sz, _state);
       for (i = 0; i < sz; i++) {
-         b.xR[i] = mx * (2 * randomreal(_state) - 1);
+         b.xR[i] = mx * randommid();
       }
       ae_vector_set_length(&x0, sz, _state);
       for (i = 0; i < sz; i++) {
-         x0.xR[i] = mx * (2 * randomreal(_state) - 1);
+         x0.xR[i] = mx * randommid();
       }
       ae_matrix_set_length(&mtx, sz + 1, sz, _state);
    // Start optimization, record its progress for further analysis
@@ -20704,14 +20704,14 @@ static bool testlincgunit_complexres(bool silent, ae_state *_state) {
          // * random solution XS whose elements are uniformly distributed in [-MX,+MX]
          // * random starting point X0 whose elements are uniformly distributed in [-MX,+MX]
          // * B = A*Xs
-            c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+            c = (testlincgunit_maxcond - 1) * randomreal() + 1;
             spdmatrixrndcond(n, c, &a, _state);
             ae_vector_set_length(&b, n, _state);
             ae_vector_set_length(&x0, n, _state);
             ae_vector_set_length(&xs, n, _state);
             for (i = 0; i < n; i++) {
-               x0.xR[i] = mx * (2 * randomreal(_state) - 1);
-               xs.xR[i] = mx * (2 * randomreal(_state) - 1);
+               x0.xR[i] = mx * randommid();
+               xs.xR[i] = mx * randommid();
             }
             eps = 0.0;
             for (i = 0; i < n; i++) {
@@ -20823,15 +20823,15 @@ static bool testlincgunit_basictestx(bool silent, ae_state *_state) {
    // * random A with norm NA (equal to 1.0),
    // * random right part B whose elements are uniformly distributed in [-MX,+MX]
    // * random starting point X0 whose elements are uniformly distributed in [-MX,+MX]
-      c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+      c = (testlincgunit_maxcond - 1) * randomreal() + 1;
       spdmatrixrndcond(n, c, &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x0, n, _state);
       ae_vector_set_length(&x00, n, _state);
       ae_vector_set_length(&x01, n, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = mx * (2 * randomreal(_state) - 1);
-         b.xR[i] = mx * (2 * randomreal(_state) - 1);
+         x0.xR[i] = mx * randommid();
+         b.xR[i] = mx * randommid();
       }
    // Solve, save first and last reported points to x00 and x01
       lincgcreate(n, &s, _state);
@@ -20949,7 +20949,7 @@ static bool testlincgunit_testrcorrectness(bool silent, ae_state *_state) {
    spdmatrixrndcond(n, c, &a, _state);
    ae_vector_set_length(&b, n, _state);
    for (i = 0; i < n; i++) {
-      b.xR[i] = 2 * randomreal(_state) - 1;
+      b.xR[i] = randommid();
    }
    lincgcreate(n, &s, _state);
    lincgsetb(&s, &b, _state);
@@ -21032,13 +21032,13 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
    // * random A with norm NA (equal to 1.0),
    // * random right part B whose elements are uniformly distributed in [-MX,+MX]
    // * random starting point X0 whose elements are uniformly distributed in [-MX,+MX]
-      c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+      c = (testlincgunit_maxcond - 1) * randomreal() + 1;
       spdmatrixrndcond(n, c, &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x0, n, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = mx * (2 * randomreal(_state) - 1);
-         b.xR[i] = mx * (2 * randomreal(_state) - 1);
+         x0.xR[i] = mx * randommid();
+         b.xR[i] = mx * randommid();
       }
    // Solve
       lincgcreate(n, &s, _state);
@@ -21090,11 +21090,11 @@ static bool testlincgunit_basictestiters(bool silent, ae_state *_state) {
          return result;
       }
    // Restart problem
-      c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+      c = (testlincgunit_maxcond - 1) * randomreal() + 1;
       spdmatrixrndcond(n, c, &a, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = mx * (2 * randomreal(_state) - 1);
-         b.xR[i] = mx * (2 * randomreal(_state) - 1);
+         x0.xR[i] = mx * randommid();
+         b.xR[i] = mx * randommid();
       }
       lincgsetstartingpoint(&s, &x0, _state);
       lincgrestart(&s, _state);
@@ -21303,7 +21303,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
    //            thus analytic properties won't hold. Small cond(A), from the other side,
    //            will give us rapid convergence of the algorithm - in fact, too rapid.
    //            Krylov basis will be dominated by numerical noise and test may fail.
-      c = testlincgunit_maxcond * (0.5 * randomreal(_state) + 0.5);
+      c = testlincgunit_maxcond * (0.5 * randomreal() + 0.5);
       spdmatrixrndcond(n, c, &a, _state);
       ae_matrix_set_length(&mtx, n + 1, n, _state);
       ae_matrix_set_length(&ksr, n, n, _state);
@@ -21313,8 +21313,8 @@ static bool testlincgunit_krylovsubspacetest(bool silent, ae_state *_state) {
       ae_vector_set_length(&x0, n, _state);
       do {
          for (i = 0; i < n; i++) {
-            x0.xR[i] = mx * (2 * randomreal(_state) - 1);
-            b.xR[i] = mx * (2 * randomreal(_state) - 1);
+            x0.xR[i] = mx * randommid();
+            b.xR[i] = mx * randommid();
          }
          normr0 = 0.0;
          for (i = 0; i < n; i++) {
@@ -21445,12 +21445,12 @@ static bool testlincgunit_sparsetest(bool silent, ae_state *_state) {
    // * random A with unit norm
    // * random X0 (starting point) and XS (known solution)
    // Copy dense A to sparse SA
-      c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+      c = (testlincgunit_maxcond - 1) * randomreal() + 1;
       spdmatrixrndcond(n, c, &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&xs, n, _state);
       for (i = 0; i < n; i++) {
-         xs.xR[i] = mx * (2 * randomreal(_state) - 1);
+         xs.xR[i] = mx * randommid();
       }
       eps = 0.0;
       for (i = 0; i < n; i++) {
@@ -21562,7 +21562,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
    // * tA = rdE*A*rdE
    // * random x0 and b - for original preconditioned problem
    // * tx0 and tb - for modified problem
-      c = (testlincgunit_maxcond - 1) * randomreal(_state) + 1;
+      c = (testlincgunit_maxcond - 1) * randomreal() + 1;
       spdmatrixrndcond(n, c, &a, _state);
       ae_matrix_set_length(&ta, n, n, _state);
       ae_matrix_set_length(&mtx, n + 1, n, _state);
@@ -21571,7 +21571,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
       ae_vector_set_length(&de, n, _state);
       ae_vector_set_length(&rde, n, _state);
       for (i = 0; i < n; i++) {
-         m.xR[i] = randomreal(_state) + 0.5;
+         m.xR[i] = randomreal() + 0.5;
          de.xR[i] = sqrt(m.xR[i]);
          rde.xR[i] = 1 / de.xR[i];
       }
@@ -21586,8 +21586,8 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
       ae_vector_set_length(&tx0, n, _state);
       ae_vector_set_length(&err, n, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         b.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
+         b.xR[i] = randommid();
       }
       eps = 1.0E-5;
       for (i = 0; i < n; i++) {
@@ -21735,7 +21735,7 @@ static bool testlincgunit_precondtest(bool silent, ae_state *_state) {
    }
    ae_vector_set_length(&d, n, _state);
    for (i = 0; i < n; i++) {
-      d.xR[i] = pow(10.0, 100 * randomreal(_state) - 50);
+      d.xR[i] = pow(10.0, 50.0 * randommid());
    }
    ae_matrix_set_length(&a, n, n, _state);
    sparsecreate(n, n, n * n, &sa, _state);
@@ -21926,7 +21926,7 @@ bool testnormestimator(bool silent, ae_state *_state) {
          waserrors = waserrors || enorm != 0.0;
       // Choose random norm, try with non-zero matrix
       // with specified norm.
-         snorm = exp(10 * randomreal(_state) - 5);
+         snorm = exp(5.0 * randommid());
          sparsecreate(m, n, 1, &s, _state);
          if (m >= n) {
          // Generate random orthogonal M*M matrix,
@@ -21975,7 +21975,7 @@ bool testnormestimator(bool silent, ae_state *_state) {
    passcount = 2000;
    sigma = 5.0;
    for (pass = 1; pass <= passcount; pass++) {
-      snorm = pow(10.0, 2 * randomreal(_state) - 1);
+      snorm = pow(10.0, randommid());
       sparsecreate(n, n, 1, &s, _state);
       rmatrixrndcond(n, 2.0, &a, _state);
       for (i = 0; i < n; i++) {
@@ -22003,7 +22003,7 @@ bool testnormestimator(bool silent, ae_state *_state) {
    passcount = 2000;
    sigma = 5.0;
    for (pass = 1; pass <= passcount; pass++) {
-      snorm = pow(10.0, 2 * randomreal(_state) - 1);
+      snorm = pow(10.0, randommid());
       sparsecreate(n, n, 1, &s, _state);
       rmatrixrndcond(n, 2.0, &a, _state);
       for (i = 0; i < n; i++) {
@@ -22219,11 +22219,11 @@ static bool testlinlsqrunit_svdtest(bool silent, ae_state *_state) {
    for (m = 1; m <= szm; m++) {
       for (n = 1; n <= szn; n++) {
       // Prepare MxN matrix A, right part B, lambda
-         lambdai = randomreal(_state);
+         lambdai = randomreal();
          ae_matrix_set_length(&a, m, n, _state);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
             }
          }
          sparsecreate(m, n, 1, &spa, _state);
@@ -22235,7 +22235,7 @@ static bool testlinlsqrunit_svdtest(bool silent, ae_state *_state) {
          sparseconverttocrs(&spa, _state);
          ae_vector_set_length(&b, m, _state);
          for (i = 0; i < m; i++) {
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            b.xR[i] = randommid();
          }
       // Solve by calling LinLSQRIteration
          linlsqrcreate(m, n, &s, _state);
@@ -22343,7 +22343,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                   if (nlambdai == 3) {
                      lambdai = s0 * 1000;
                   }
-                  c = (10 - 1) * randomreal(_state) + 1;
+                  c = (10 - 1) * randomreal() + 1;
                   rmatrixrndcond(m, c, &a, _state);
                   for (i = 0; i < m; i++) {
                      for (j = 0; j < n; j++) {
@@ -22354,7 +22354,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent, ae_state *_state) {
                   do {
                      bnorm = 0.0;
                      for (i = 0; i < m; i++) {
-                        b.xR[i] = 2 * randomreal(_state) - 1;
+                        b.xR[i] = randommid();
                         bnorm += b.xR[i] * b.xR[i];
                      }
                      bnorm = sqrt(bnorm);
@@ -22463,7 +22463,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent, ae_state *_state) {
                         }
                      }
                      for (i = 0; i < n - nz; i++) {
-                        a.xyR[i][i] = s0 * (0.1 + 0.9 * randomreal(_state));
+                        a.xyR[i][i] = s0 * (0.1 + 0.9 * randomreal());
                      }
                      rmatrixrndorthogonalfromtheleft(&a, m, n, _state);
                      rmatrixrndorthogonalfromtheright(&a, m, n, _state);
@@ -22471,7 +22471,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent, ae_state *_state) {
                      do {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
-                           b.xR[i] = 2 * randomreal(_state) - 1;
+                           b.xR[i] = randommid();
                            bnorm += b.xR[i] * b.xR[i];
                         }
                         bnorm = sqrt(bnorm);
@@ -22545,7 +22545,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
    ae_int_t j;
    ae_int_t p;
    ae_int_t diag;
-   double pz;
+   double pnz;
    bool result;
    ae_frame_make(_state, &_frame_block);
    NewObj(linlsqrstate, s, _state);
@@ -22566,15 +22566,15 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                   // * bidiagonal A, with probability of having zero element at diagonal equal to PZ
                      s0 = pow(10.0, (double)(10 * ns0));
                      s1 = pow(10.0, (double)(10 * ns1));
-                     pz = 0.0;
+                     pnz = 1.0;
                      if (p == 0) {
-                        pz = 0.25;
+                        pnz = 0.75;
                      }
                      if (p == 1) {
-                        pz = 0.5;
+                        pnz = 0.5;
                      }
                      if (p == 2) {
-                        pz = 0.75;
+                        pnz = 0.25;
                      }
                      ae_matrix_set_length(&a, m, n, _state);
                      for (i = 0; i < m; i++) {
@@ -22583,17 +22583,17 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                         }
                      }
                      for (i = 0; i < minmn; i++) {
-                        if (randomreal(_state) >= pz) {
-                           a.xyR[i][i] = 2 * randomreal(_state) - 1;
+                        if (randombool(pnz)) {
+                           a.xyR[i][i] = randommid();
                         }
                      }
                      for (i = 1; i < minmn; i++) {
-                        if (randomreal(_state) >= pz) {
+                        if (randombool(pnz)) {
                            if (diag == 0) {
-                              a.xyR[i - 1][i] = 2 * randomreal(_state) - 1;
+                              a.xyR[i - 1][i] = randommid();
                            }
                            if (diag == 1) {
-                              a.xyR[i][i - 1] = 2 * randomreal(_state) - 1;
+                              a.xyR[i][i - 1] = randommid();
                            }
                         }
                      }
@@ -22606,7 +22606,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent, ae_state *_state) {
                      do {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
-                           b.xR[i] = 2 * randomreal(_state) - 1;
+                           b.xR[i] = randommid();
                            bnorm += b.xR[i] * b.xR[i];
                         }
                         bnorm = sqrt(bnorm);
@@ -22803,7 +22803,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent, ae_state *_state)
             rnorm = 0.0;
             for (i = 0; i < m + n; i++) {
                if (i < m) {
-                  b.xR[i] = (mx - mn) * randomreal(_state) + mn;
+                  b.xR[i] = (mx - mn) * randomreal() + mn;
                   rnorm += b.xR[i] * b.xR[i];
                } else {
                   b.xR[i] = 0.0;
@@ -22955,7 +22955,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
       ae_vector_set_length(&b, n, _state);
       bnorm = 0.0;
       for (i = 0; i < n; i++) {
-         b.xR[i] = (mx - mn) * randomreal(_state) + mn;
+         b.xR[i] = (mx - mn) * randomreal() + mn;
          bnorm += b.xR[i] * b.xR[i];
       }
       bnorm = sqrt(bnorm);
@@ -22964,7 +22964,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
    // NOTE: we do not check TerminationType because algorithm may terminate for
    // several reasons. The only thing which is guaranteed is that stopping condition
    // MaxIts holds.
-      maxits = 1 + randominteger(n, _state);
+      maxits = 1 + randominteger(n);
       linlsqrcreate(n, n, &s, _state);
       linlsqrsetb(&s, &b, _state);
       linlsqrsetcond(&s, 0.0, 0.0, maxits, _state);
@@ -23006,7 +23006,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
    // NOTE: we do not check TerminationType because algorithm may terminate for
    // several reasons. The only thing which is guaranteed is that stopping condition
    // EpsB holds.
-      eps = pow(10.0, (double)-(2 + randominteger(3, _state)));
+      eps = pow(10.0, (double)-(2 + randominteger(3)));
       epsmod = 1.1 * eps;
       ae_vector_set_length(&rk, n, _state);
       linlsqrcreate(n, n, &s, _state);
@@ -23076,7 +23076,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
                b.xR[j] = 0.0;
             }
             for (i = 0; i < n; i++) {
-               tmp = 1 + randomreal(_state);
+               tmp = 1 + randomreal();
                ae_v_addd(b.xR, 1, &a.xyR[0][i], a.stride, n, tmp);
             }
             tmp = 0.0;
@@ -23090,7 +23090,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent, ae_state *_state) 
          // NOTE: it is guaranteed that algorithm will terminate with correct
          // TerminationType because other stopping criteria (EpsB) won't be satisfied
          // on such system.
-            eps = pow(10.0, (double)-(2 + randominteger(3, _state)));
+            eps = pow(10.0, (double)-(2 + randominteger(3)));
             epsmod = 1.1 * eps;
             linlsqrcreate(n, n - 1, &s, _state);
             linlsqrsetb(&s, &b, _state);
@@ -23205,12 +23205,12 @@ static bool testlinlsqrunit_analytictest(bool silent, ae_state *_state) {
          ae_vector_set_length(&b, m, _state);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
             }
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            b.xR[i] = randommid();
          }
          for (i = 0; i < n; i++) {
-            a.xyR[i][i] = 10 * (1 + randomreal(_state));
+            a.xyR[i][i] = 10 * (1 + randomreal());
          }
       // Solve with LSQR, save trial points into XK[] array
          ae_matrix_set_length(&xk, smallk + 1, n, _state);
@@ -23442,7 +23442,7 @@ static bool testlinlsqrunit_preconditionertest(ae_state *_state) {
    }
    ae_vector_set_length(&d, n, _state);
    for (i = 0; i < n; i++) {
-      d.xR[i] = pow(10.0, 100 * randomreal(_state) - 50);
+      d.xR[i] = pow(10.0, 50.0 * randommid());
    }
    ae_matrix_set_length(&a, n, n, _state);
    sparsecreate(n, n, n * n, &sa, _state);
@@ -23753,8 +23753,8 @@ bool testnleq(bool silent, ae_state *_state) {
    for (pass = 0; pass < passcount; pass++) {
    // Ability to find correct result
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqcreatelm(2, 2, &x, &state, _state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0, _state);
@@ -23769,8 +23769,8 @@ bool testnleq(bool silent, ae_state *_state) {
       }
    // Ability to work after soft restart
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqcreatelm(2, 2, &x, &state, _state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0, _state);
@@ -23779,8 +23779,8 @@ bool testnleq(bool silent, ae_state *_state) {
       }
       nleqresults(&state, &x, &rep, _state);
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqrestartfrom(&state, &x, _state);
       while (nleqiteration(&state, _state)) {
          testnlequnit_testfunchbm(&state, _state);
@@ -23804,7 +23804,7 @@ bool testnleq(bool silent, ae_state *_state) {
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0, _state);
       nleqsetstpmax(&state, 0.01, _state);
-      k = 1 + randominteger(100, _state);
+      k = 1 + randominteger(100);
       for (i = 0; i < k; i++) {
          if (!nleqiteration(&state, _state)) {
             break;
@@ -23812,8 +23812,8 @@ bool testnleq(bool silent, ae_state *_state) {
          testnlequnit_testfunchbm(&state, _state);
       }
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqrestartfrom(&state, &x, _state);
       while (nleqiteration(&state, _state)) {
          testnlequnit_testfunchbm(&state, _state);
@@ -23833,8 +23833,8 @@ bool testnleq(bool silent, ae_state *_state) {
    for (pass = 0; pass < passcount; pass++) {
    // Ability to find correct result
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqcreatelm(2, 1, &x, &state, _state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0, _state);
@@ -23854,8 +23854,8 @@ bool testnleq(bool silent, ae_state *_state) {
    passcount = 100;
    for (pass = 0; pass < passcount; pass++) {
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = 20 * randomreal(_state) - 10;
-      x.xR[1] = 20 * randomreal(_state) - 10;
+      x.xR[0] = 10.0 * randommid();
+      x.xR[1] = 10.0 * randommid();
       nleqcreatelm(2, 3, &x, &state, _state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0, _state);
@@ -23875,8 +23875,8 @@ bool testnleq(bool silent, ae_state *_state) {
    n = 2;
    ae_vector_set_length(&x, n, _state);
    ae_vector_set_length(&xlast, n, _state);
-   x.xR[0] = 20 * randomreal(_state) - 10;
-   x.xR[1] = 20 * randomreal(_state) - 10;
+   x.xR[0] = 10.0 * randommid();
+   x.xR[1] = 10.0 * randommid();
    xlast.xR[0] = maxrealnumber;
    xlast.xR[1] = maxrealnumber;
    nleqcreatelm(n, 2, &x, &state, _state);
@@ -23930,11 +23930,11 @@ bool testnleq(bool silent, ae_state *_state) {
 // Test ability to set limit on algorithm steps
    ae_vector_set_length(&x, 2, _state);
    ae_vector_set_length(&xlast, 2, _state);
-   x.xR[0] = 20 * randomreal(_state) + 20;
-   x.xR[1] = 20 * randomreal(_state) + 20;
+   x.xR[0] = 20 * randomreal() + 20;
+   x.xR[1] = 20 * randomreal() + 20;
    xlast.xR[0] = x.xR[0];
    xlast.xR[1] = x.xR[1];
-   stpmax = 0.1 + 0.1 * randomreal(_state);
+   stpmax = 0.1 + 0.1 * randomreal();
    epsf = 1.0E-9;
    nleqcreatelm(2, 2, &x, &state, _state);
    nleqsetstpmax(&state, stpmax, _state);
@@ -24248,9 +24248,9 @@ static void testmatinvunit_testrtrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
                   if (i == j) {
-                     a.xyR[i][i] = 1 + randomreal(_state);
+                     a.xyR[i][i] = 1 + randomreal();
                   } else {
-                     a.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+                     a.xyR[i][j] = 0.1 * randommid();
                   }
                   b.xyR[i][j] = a.xyR[i][j];
                }
@@ -24342,9 +24342,9 @@ static void testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
                   if (i == j) {
-                     a.xyC[i][i] = complex_from_d(1 + randomreal(_state), 1 + randomreal(_state));
+                     a.xyC[i][i] = complex_from_d(1 + randomreal(), 1 + randomreal());
                   } else {
-                     a.xyC[i][j] = complex_from_d(0.2 * randomreal(_state) - 0.1, 0.2 * randomreal(_state) - 0.1);
+                     a.xyC[i][j] = complex_from_d(0.1 * randommid(), 0.1 * randommid());
                   }
                   b.xyC[i][j] = a.xyC[i][j];
                }
@@ -24410,13 +24410,13 @@ static void testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // Unsets real matrix
 static void testmatinvunit_unset2d(RMatrix *x, ae_state *_state) {
    ae_matrix_set_length(x, 1, 1, _state);
-   x->xyR[0][0] = 2 * randomreal(_state) - 1;
+   x->xyR[0][0] = randommid();
 }
 
 // Unsets real matrix
 static void testmatinvunit_cunset2d(CMatrix *x, ae_state *_state) {
    ae_matrix_set_length(x, 1, 1, _state);
-   x->xyC[0][0] = complex_from_d(2 * randomreal(_state) - 1);
+   x->xyC[0][0] = complex_from_d(randommid());
 }
 
 // Unsets report
@@ -24496,10 +24496,10 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_muld(&a.xyR[0][k], a.stride, n, 0);
             }
             if (taskkind == 2) {
@@ -24507,10 +24507,10 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_muld(a.xyR[k], 1, n, 0);
             }
             if (taskkind == 3) {
@@ -24521,10 +24521,10 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = 1 + randominteger(n - 1, _state);
+               k = 1 + randominteger(n - 1);
                ae_v_move(a.xyR[0], a.stride, &a.xyR[0][k], a.stride, n);
             }
             if (taskkind == 4) {
@@ -24535,10 +24535,10 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = 1 + randominteger(n - 1, _state);
+               k = 1 + randominteger(n - 1);
                ae_v_move(a.xyR[0], 1, a.xyR[k], 1, n);
             }
             testmatinvunit_rmatrixmakeacopy(&a, n, n, &lua, _state);
@@ -24628,10 +24628,10 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
             }
             if (taskkind == 2) {
@@ -24639,10 +24639,10 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_cmuld(a.xyC[k], 1, n, 0);
             }
             if (taskkind == 3) {
@@ -24653,10 +24653,10 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = 1 + randominteger(n - 1, _state);
+               k = 1 + randominteger(n - 1);
                ae_v_cmove(a.xyC[0], a.stride, &a.xyC[0][k], a.stride, "N", n);
             }
             if (taskkind == 4) {
@@ -24667,10 +24667,10 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = 1 + randominteger(n - 1, _state);
+               k = 1 + randominteger(n - 1);
                ae_v_cmove(a.xyC[0], 1, a.xyC[k], 1, "N", n);
             }
             testmatinvunit_cmatrixmakeacopy(&a, n, n, &lua, _state);
@@ -24711,7 +24711,7 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // * test least squares solver
    for (pass = 1; pass <= passcount; pass++) {
       for (n = minn; n <= maxn; n++) {
-         isupper = randomreal(_state) > 0.5;
+         isupper = randombool();
       // ********************************************************
       // WELL CONDITIONED TASKS
       // ability to find correct solution is tested
@@ -24763,10 +24763,10 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_muld(&a.xyR[0][k], a.stride, n, 0);
             }
             if (taskkind == 2) {
@@ -24774,10 +24774,10 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_muld(a.xyR[k], 1, n, 0);
             }
             info = 0;
@@ -24817,7 +24817,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // * test least squares solver
    for (pass = 1; pass <= passcount; pass++) {
       for (n = minn; n <= maxn; n++) {
-         isupper = randomreal(_state) > 0.5;
+         isupper = randombool();
       // ********************************************************
       // WELL CONDITIONED TASKS
       // ability to find correct solution is tested
@@ -24869,10 +24869,10 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
                ae_v_cmuld(a.xyC[k], 1, n, 0);
             }
@@ -24881,10 +24881,10 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyC[i][j] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                     a.xyC[i][j] = complex_from_d(randommid(), randommid());
                   }
                }
-               k = randominteger(n, _state);
+               k = randominteger(n);
                ae_v_cmuld(a.xyC[k], 1, n, 0);
                ae_v_cmuld(&a.xyC[0][k], a.stride, n, 0);
             }
@@ -25423,7 +25423,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
 // PKind    - zero for upper triangular preconditioner, one for lower triangular.
 // K        - number of repeated passes (should be large enough to average out random factors)
    for (n = 10; n <= 15; n++) {
-      pkind = randominteger(2, _state);
+      pkind = randominteger(2);
       ae_vector_set_length(&x, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = 0.0;
@@ -25434,7 +25434,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       cntb1 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25459,7 +25459,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       cntb2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25474,10 +25474,10 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (i == j) {
-               a.xyR[i][i] = (i * i + 1) * (0.8 + 0.4 * randomreal(_state));
+               a.xyR[i][i] = (i * i + 1) * (0.8 + 0.4 * randomreal());
             } else {
                if ((pkind == 0 && j > i) || (pkind == 1 && j < i)) {
-                  a.xyR[i][j] = 0.1 * randomreal(_state) - 0.05;
+                  a.xyR[i][j] = 0.05 * randommid();
                } else {
                   a.xyR[i][j] = _state->v_nan;
                }
@@ -25488,7 +25488,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       cntg1 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25501,13 +25501,13 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
    // Test it with perturbed diagonal preconditioner
       ae_vector_set_length(&diagh, n, _state);
       for (i = 0; i < n; i++) {
-         diagh.xR[i] = 2 * sqr((double)(i * i + 1), _state) * (0.8 + 0.4 * randomreal(_state));
+         diagh.xR[i] = 2 * sqr((double)(i * i + 1), _state) * (0.8 + 0.4 * randomreal());
       }
       minlbfgssetprecdiag(&state, &diagh, _state);
       cntg2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25538,14 +25538,14 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       minlbfgscreate(n, m, &x, &state, _state);
       ae_vector_set_length(&s, n, _state);
       for (i = 0; i < n; i++) {
-         s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal(_state)));
+         s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal()));
       }
       minlbfgssetprecdefault(&state, _state);
       minlbfgssetscale(&state, &s, _state);
       cntb2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25560,7 +25560,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
       cntg2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlbfgsrestartfrom(&state, &x, _state);
          while (minlbfgsiteration(&state, _state)) {
@@ -25714,8 +25714,8 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
 // optimizer evaluates function at +-DiffStep*S only.
    ae_vector_set_length(&x, 1, _state);
    ae_vector_set_length(&s, 1, _state);
-   diffstep = randomreal(_state) * 1.0E-6;
-   s.xR[0] = exp(randomreal(_state) * 4 - 2);
+   diffstep = randomreal() * 1.0E-6;
+   s.xR[0] = exp(randomreal() * 4 - 2);
    x.xR[0] = 0.0;
    minlbfgscreatef(1, 1, &x, diffstep, &state, _state);
    minlbfgssetcond(&state, 1.0E-6, 0.0, 0.0, 0, _state);
@@ -25733,7 +25733,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
    m = 1;
    ae_vector_set_length(&x, n, _state);
    x.xR[0] = 100.0;
-   stpmax = 0.05 + 0.05 * randomreal(_state);
+   stpmax = 0.05 + 0.05 * randomreal();
    minlbfgscreate(n, m, &x, &state, _state);
    minlbfgssetcond(&state, 1.0E-9, 0.0, 0.0, 0, _state);
    minlbfgssetstpmax(&state, stpmax, _state);
@@ -25771,10 +25771,10 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          ae_vector_set_length(&s, n, _state);
          ae_vector_set_length(&h, n, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = randomreal(_state) + 1;
-            a.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
-            s.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
-            h.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
+            x.xR[i] = randomreal() + 1;
+            a.xR[i] = exp(log(100.0) * randommid());
+            s.xR[i] = exp(log(100.0) * randommid());
+            h.xR[i] = exp(log(100.0) * randommid());
          }
          minlbfgscreate(n, m, &x, &state, _state);
          minlbfgssetscale(&state, &s, _state);
@@ -25787,7 +25787,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          }
       // Test gradient-based stopping condition
          for (i = 0; i < n; i++) {
-            x.xR[i] = randomreal(_state) + 1;
+            x.xR[i] = randomreal() + 1;
          }
          minlbfgssetcond(&state, tmpeps, 0.0, 0.0, 0, _state);
          minlbfgsrestartfrom(&state, &x, _state);
@@ -25814,7 +25814,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
          *err = *err || v > tmpeps;
       // Test step-based stopping condition
          for (i = 0; i < n; i++) {
-            x.xR[i] = randomreal(_state) + 1;
+            x.xR[i] = randomreal() + 1;
          }
          hasxlast = false;
          lastscaledstep = maxrealnumber;
@@ -25985,9 +25985,9 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
-      stopcallidx = randominteger(20, _state);
+      stopcallidx = randominteger(20);
       maxits = 25;
       minlbfgscreate(n, 1, &x, &state, _state);
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, maxits, _state);
@@ -26733,9 +26733,9 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       ae_vector_set_length(&x, 3, _state);
       n = 3;
       m = 2;
-      x.xR[0] = 100 * randomreal(_state) - 50;
-      x.xR[1] = 100 * randomreal(_state) - 50;
-      x.xR[2] = 100 * randomreal(_state) - 50;
+      x.xR[0] = 50.0 * randommid();
+      x.xR[1] = 50.0 * randommid();
+      x.xR[2] = 50.0 * randommid();
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
       }
@@ -26797,9 +26797,9 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       ae_vector_set_length(&x, 3, _state);
       n = 3;
       m = 2;
-      x.xR[0] = 10 + 10 * randomreal(_state);
-      x.xR[1] = 10 + 10 * randomreal(_state);
-      x.xR[2] = 10 + 10 * randomreal(_state);
+      x.xR[0] = 10 + 10 * randomreal();
+      x.xR[1] = 10 + 10 * randomreal();
+      x.xR[2] = 10 + 10 * randomreal();
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
       }
@@ -26814,18 +26814,18 @@ bool testminlbfgs(bool silent, ae_state *_state) {
          }
          testminlbfgsunit_testfunc2(&state, _state);
       }
-      x.xR[0] = 10 + 10 * randomreal(_state);
-      x.xR[1] = 10 + 10 * randomreal(_state);
-      x.xR[2] = 10 + 10 * randomreal(_state);
+      x.xR[0] = 10 + 10 * randomreal();
+      x.xR[1] = 10 + 10 * randomreal();
+      x.xR[2] = 10 + 10 * randomreal();
       minlbfgsrestartfrom(&state, &x, _state);
       while (minlbfgsiteration(&state, _state)) {
          testminlbfgsunit_testfunc2(&state, _state);
       }
       minlbfgsresults(&state, &x, &rep, _state);
       restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
-      x.xR[0] = 10 + 10 * randomreal(_state);
-      x.xR[1] = 10 + 10 * randomreal(_state);
-      x.xR[2] = 10 + 10 * randomreal(_state);
+      x.xR[0] = 10 + 10 * randomreal();
+      x.xR[1] = 10 + 10 * randomreal();
+      x.xR[2] = 10 + 10 * randomreal();
       minlbfgsrestartfrom(&state, &x, _state);
       while (minlbfgsiteration(&state, _state)) {
          testminlbfgsunit_testfunc2(&state, _state);
@@ -26842,11 +26842,11 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       ae_vector_set_length(&xe, n - 1 + 1, _state);
       ae_vector_set_length(&b, n - 1 + 1, _state);
       for (i = 0; i < n; i++) {
-         xe.xR[i] = 2 * randomreal(_state) - 1;
+         xe.xR[i] = randommid();
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.xyR[i][j] = 2 * randomreal(_state) - 1;
+            a.xyR[i][j] = randommid();
          }
          a.xyR[i][i] += 3 * sign(a.xyR[i][i], _state);
       }
@@ -26859,7 +26859,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
          for (dkind = 0; dkind <= 1; dkind++) {
          // Solve task
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             if (dkind == 0) {
                minlbfgscreate(n, m, &x, &state, _state);
@@ -26904,7 +26904,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       n = 3;
       m = 2;
       for (i = 0; i <= 2; i++) {
-         x.xR[i] = 6 * randomreal(_state) - 3;
+         x.xR[i] = 3.0 * randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
@@ -26919,7 +26919,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       minlbfgsresults(&state, &x, &rep, _state);
       converror = converror || rep.terminationtype != 4;
       for (i = 0; i <= 2; i++) {
-         x.xR[i] = 6 * randomreal(_state) - 3;
+         x.xR[i] = 3.0 * randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
@@ -26934,7 +26934,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       minlbfgsresults(&state, &x, &rep, _state);
       converror = converror || rep.terminationtype != 1;
       for (i = 0; i <= 2; i++) {
-         x.xR[i] = 6 * randomreal(_state) - 3;
+         x.xR[i] = 3.0 * randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
@@ -26949,7 +26949,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
       minlbfgsresults(&state, &x, &rep, _state);
       converror = converror || rep.terminationtype != 2;
       for (i = 0; i <= 2; i++) {
-         x.xR[i] = 2 * randomreal(_state) - 1;
+         x.xR[i] = randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state, _state);
@@ -26971,7 +26971,7 @@ bool testminlbfgs(bool silent, ae_state *_state) {
    m = 2;
    maxits = 10000;
    for (i = 0; i <= 2; i++) {
-      x.xR[i] = 6 * randomreal(_state) - 3;
+      x.xR[i] = 3.0 * randommid();
    }
    minlbfgscreate(n, m, &x, &state, _state);
    minlbfgssetcond(&state, 0.0, 0.0, 0.0, maxits, _state);
@@ -27118,28 +27118,28 @@ bool testcqmodels(bool silent, ae_state *_state) {
             ae_vector_set_length(&r, k, _state);
          }
       // Generate problem
-         alpha = randomreal(_state) + 1.0;
-         theta = randomreal(_state) + 1.0;
-         tau = randomreal(_state) * randominteger(2, _state);
+         alpha = randomreal() + 1.0;
+         theta = randomreal() + 1.0;
+         tau = randomreal() * randominteger(2);
          for (i = 0; i < n; i++) {
-            a.xyR[i][i] = 10 * (1 + randomreal(_state));
-            b.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = randomreal(_state) + 1;
+            a.xyR[i][i] = 10 * (1 + randomreal());
+            b.xR[i] = randommid();
+            d.xR[i] = randomreal() + 1;
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * randomreal(_state) - 0.05;
+               v = 0.05 * randommid();
                a.xyR[i][j] = v;
                a.xyR[j][i] = v;
             }
             for (j = 0; j < k; j++) {
-               q.xyR[j][i] = 2 * randomreal(_state) - 1;
+               q.xyR[j][i] = randommid();
             }
          }
          for (i = 0; i < k; i++) {
-            r.xR[i] = 2 * randomreal(_state) - 1;
+            r.xR[i] = randommid();
          }
       // Build model
          cqminit(n, &s, _state);
-         cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+         cqmseta(&s, &a, randombool(), alpha, _state);
          cqmsetb(&s, &b, _state);
          cqmsetq(&s, &q, &r, k, theta, _state);
          cqmsetd(&s, &d, tau, _state);
@@ -27150,7 +27150,7 @@ bool testcqmodels(bool silent, ae_state *_state) {
       // * ADXE       -   (alpha*A+tau*D)*x
       // * V          -   model value at X
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
             ge.xR[i] = 0.0;
          }
          v = 0.0;
@@ -27213,33 +27213,33 @@ bool testcqmodels(bool silent, ae_state *_state) {
             ae_vector_set_length(&r, k, _state);
          }
       // Generate problem
-         alpha = randomreal(_state) + 1.0;
-         theta = randomreal(_state) + 1.0;
+         alpha = randomreal() + 1.0;
+         theta = randomreal() + 1.0;
          for (i = 0; i < n; i++) {
-            a.xyR[i][i] = 10 * (1 + randomreal(_state));
-            b.xR[i] = 2 * randomreal(_state) - 1;
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            activeset.xB[i] = randomreal(_state) > 0.5;
+            a.xyR[i][i] = 10 * (1 + randomreal());
+            b.xR[i] = randommid();
+            xc.xR[i] = randommid();
+            activeset.xB[i] = randombool();
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * randomreal(_state) - 0.05;
+               v = 0.05 * randommid();
                a.xyR[i][j] = v;
                a.xyR[j][i] = v;
             }
             for (j = 0; j < k; j++) {
-               q.xyR[j][i] = 2 * randomreal(_state) - 1;
+               q.xyR[j][i] = randommid();
             }
          }
          for (i = 0; i < k; i++) {
-            r.xR[i] = 2 * randomreal(_state) - 1;
+            r.xR[i] = randommid();
          }
       // Build model, evaluate at random point X, compare
          cqminit(n, &s, _state);
-         cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+         cqmseta(&s, &a, randombool(), alpha, _state);
          cqmsetb(&s, &b, _state);
          cqmsetq(&s, &q, &r, k, theta, _state);
          cqmsetactiveset(&s, &xc, &activeset, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
             if (!activeset.xB[i]) {
                xc.xR[i] = x.xR[i];
             }
@@ -27280,12 +27280,12 @@ bool testcqmodels(bool silent, ae_state *_state) {
       alpha = 0.0;
       theta = 0.0;
       k = 0;
-      tau = 1.0 + randomreal(_state);
+      tau = 1.0 + randomreal();
       for (i = 0; i < n; i++) {
          activeset.xB[i] = false;
          d.xR[i] = 1.0;
          b.xR[i] = 0.0;
-         xc.xR[i] = 2 * randomreal(_state) - 1;
+         xc.xR[i] = randommid();
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = 0.0;
          }
@@ -27297,12 +27297,12 @@ bool testcqmodels(bool silent, ae_state *_state) {
       //
       // MKind is a random integer in [0,7] - number of specific
       // modification to apply.
-         mkind = (double)randominteger(8, _state);
+         mkind = (double)randominteger(8);
          if (mkind == 0.0) {
          // Set non-zero D
-            tau = 1.0 + randomreal(_state);
+            tau = 1.0 + randomreal();
             for (i = 0; i < n; i++) {
-               d.xR[i] = 2 * randomreal(_state) + 1;
+               d.xR[i] = 2 * randomreal() + 1;
             }
             cqmsetd(&s, &d, tau, _state);
          } else {
@@ -27310,17 +27310,17 @@ bool testcqmodels(bool silent, ae_state *_state) {
             // Set zero D.
             // In case Alpha=0, set non-zero A.
                if (alpha == 0.0) {
-                  alpha = 1.0 + randomreal(_state);
+                  alpha = 1.0 + randomreal();
                   for (i = 0; i < n; i++) {
                      for (j = i + 1; j < n; j++) {
-                        a.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+                        a.xyR[i][j] = 0.1 * randommid();
                         a.xyR[j][i] = a.xyR[i][j];
                      }
                   }
                   for (i = 0; i < n; i++) {
-                     a.xyR[i][i] = 4 + 2 * randomreal(_state);
+                     a.xyR[i][i] = 4 + 2 * randomreal();
                   }
-                  cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+                  cqmseta(&s, &a, randombool(), alpha, _state);
                }
                tau = 0.0;
                for (i = 0; i < n; i++) {
@@ -27330,25 +27330,25 @@ bool testcqmodels(bool silent, ae_state *_state) {
             } else {
                if (mkind == 2.0) {
                // Set non-zero A
-                  alpha = 1.0 + randomreal(_state);
+                  alpha = 1.0 + randomreal();
                   for (i = 0; i < n; i++) {
                      for (j = i + 1; j < n; j++) {
-                        a.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+                        a.xyR[i][j] = 0.1 * randommid();
                         a.xyR[j][i] = a.xyR[i][j];
                      }
                   }
                   for (i = 0; i < n; i++) {
-                     a.xyR[i][i] = 4 + 2 * randomreal(_state);
+                     a.xyR[i][i] = 4 + 2 * randomreal();
                   }
-                  cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+                  cqmseta(&s, &a, randombool(), alpha, _state);
                } else {
                   if (mkind == 3.0) {
                   // Set zero A.
                   // In case Tau=0, set non-zero D.
                      if (tau == 0.0) {
-                        tau = 1.0 + randomreal(_state);
+                        tau = 1.0 + randomreal();
                         for (i = 0; i < n; i++) {
-                           d.xR[i] = 2 * randomreal(_state) + 1;
+                           d.xR[i] = 2 * randomreal() + 1;
                         }
                         cqmsetd(&s, &d, tau, _state);
                      }
@@ -27358,23 +27358,23 @@ bool testcqmodels(bool silent, ae_state *_state) {
                            a.xyR[i][j] = 0.0;
                         }
                      }
-                     cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+                     cqmseta(&s, &a, randombool(), alpha, _state);
                   } else {
                      if (mkind == 4.0) {
                      // Set B.
                         for (i = 0; i < n; i++) {
-                           b.xR[i] = 2 * randomreal(_state) - 1;
+                           b.xR[i] = randommid();
                         }
                         cqmsetb(&s, &b, _state);
                      } else {
                         if (mkind == 5.0) {
                         // Set Q.
-                           k = randominteger(kmax + 1, _state);
-                           theta = 1.0 + randomreal(_state);
+                           k = randominteger(kmax + 1);
+                           theta = 1.0 + randomreal();
                            for (i = 0; i < k; i++) {
-                              r.xR[i] = 2 * randomreal(_state) - 1;
+                              r.xR[i] = randommid();
                               for (j = 0; j < n; j++) {
-                                 q.xyR[i][j] = 2 * randomreal(_state) - 1;
+                                 q.xyR[i][j] = randommid();
                               }
                            }
                            cqmsetq(&s, &q, &r, k, theta, _state);
@@ -27382,8 +27382,8 @@ bool testcqmodels(bool silent, ae_state *_state) {
                            if (mkind == 6.0) {
                            // Set active set
                               for (i = 0; i < n; i++) {
-                                 activeset.xB[i] = randomreal(_state) > 0.5;
-                                 xc.xR[i] = 2 * randomreal(_state) - 1;
+                                 activeset.xB[i] = randombool();
+                                 xc.xR[i] = randommid();
                               }
                               cqmsetactiveset(&s, &xc, &activeset, _state);
                            } else {
@@ -27393,7 +27393,7 @@ bool testcqmodels(bool silent, ae_state *_state) {
                                     alpha = 1.0;
                                  }
                                  for (i = 0; i < n; i++) {
-                                    tmp0.xR[i] = 1 + randomreal(_state);
+                                    tmp0.xR[i] = 1 + randomreal();
                                     a.xyR[i][i] = tmp0.xR[i] / alpha;
                                  }
                                  cqmrewritedensediagonal(&s, &tmp0, _state);
@@ -27408,7 +27408,7 @@ bool testcqmodels(bool silent, ae_state *_state) {
       // generate random point with respect to constraints,
       // test model at this point
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
             if (activeset.xB[i]) {
                x.xR[i] = xc.xR[i];
             }
@@ -27461,12 +27461,12 @@ bool testcqmodels(bool silent, ae_state *_state) {
       //   min f(x),
       //   f(x) = 0.5*(x-x0)'*A*(x-x0)
       //        = 0.5*x'*A*x + (-x0'*A)*x + 0.5*x0'*A*x0'
-         alpha = randomreal(_state) + 1.0;
+         alpha = randomreal() + 1.0;
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            a.xyR[i][i] = 10 * (1 + randomreal(_state));
+            x0.xR[i] = randommid();
+            a.xyR[i][i] = 10 * (1 + randomreal());
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * randomreal(_state) - 0.05;
+               v = 0.05 * randommid();
                a.xyR[i][j] = v;
                a.xyR[j][i] = v;
             }
@@ -27475,17 +27475,17 @@ bool testcqmodels(bool silent, ae_state *_state) {
             v = ae_v_dotproduct(a.xyR[i], 1, x0.xR, 1, n);
             b.xR[i] = -alpha * v;
          }
-         theta = randomreal(_state) + 1.0;
+         theta = randomreal() + 1.0;
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               q.xyR[i][j] = 2 * randomreal(_state) - 1;
+               q.xyR[i][j] = randommid();
             }
             v = ae_v_dotproduct(q.xyR[i], 1, x0.xR, 1, n);
             r.xR[i] = v;
          }
       // Build model, evaluate at random point X, compare
          cqminit(n, &s, _state);
-         cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+         cqmseta(&s, &a, randombool(), alpha, _state);
          cqmsetb(&s, &b, _state);
          cqmsetq(&s, &q, &r, k, theta, _state);
          cqmconstrainedoptimum(&s, &x, _state);
@@ -27511,28 +27511,28 @@ bool testcqmodels(bool silent, ae_state *_state) {
             ae_vector_set_length(&r, k, _state);
          }
       // Generate test problem with unknown solution.
-         alpha = randomreal(_state) + 1.0;
+         alpha = randomreal() + 1.0;
          for (i = 0; i < n; i++) {
-            a.xyR[i][i] = 10 * (1 + randomreal(_state));
-            b.xR[i] = 2 * randomreal(_state) - 1;
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            activeset.xB[i] = randomreal(_state) > 0.5;
+            a.xyR[i][i] = 10 * (1 + randomreal());
+            b.xR[i] = randommid();
+            xc.xR[i] = randommid();
+            activeset.xB[i] = randombool();
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * randomreal(_state) - 0.05;
+               v = 0.05 * randommid();
                a.xyR[i][j] = v;
                a.xyR[j][i] = v;
             }
          }
-         theta = randomreal(_state) + 1.0;
+         theta = randomreal() + 1.0;
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               q.xyR[i][j] = 2 * randomreal(_state) - 1;
+               q.xyR[i][j] = randommid();
             }
-            r.xR[i] = 2 * randomreal(_state) - 1;
+            r.xR[i] = randommid();
          }
       // Build model, find solution
          cqminit(n, &s, _state);
-         cqmseta(&s, &a, randomreal(_state) > 0.5, alpha, _state);
+         cqmseta(&s, &a, randombool(), alpha, _state);
          cqmsetb(&s, &b, _state);
          cqmsetq(&s, &q, &r, k, theta, _state);
          cqmsetactiveset(&s, &xc, &activeset, _state);
@@ -27583,18 +27583,18 @@ bool testcqmodels(bool silent, ae_state *_state) {
             ae_matrix_set_length(&q, k, n, _state);
             ae_vector_set_length(&r, k, _state);
          }
-         tau = 1 + randomreal(_state);
-         theta = 1 + randomreal(_state);
+         tau = 1 + randomreal();
+         theta = 1 + randomreal();
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = 1 + randomreal(_state);
+            x0.xR[i] = randommid();
+            d.xR[i] = 1 + randomreal();
             b.xR[i] = -x0.xR[i] * tau * d.xR[i];
-            activeset.xB[i] = randomreal(_state) > 0.5;
+            activeset.xB[i] = randombool();
          }
          for (i = 0; i < k; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               q.xyR[i][j] = 2 * randomreal(_state) - 1;
+               q.xyR[i][j] = randommid();
                v += q.xyR[i][j] * x0.xR[j];
             }
             r.xR[i] = v;
@@ -27618,7 +27618,7 @@ bool testcqmodels(bool silent, ae_state *_state) {
                if (activeset.xB[i]) {
                   x.xR[i] = x0.xR[i];
                } else {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                }
             }
             v = 0.0;
@@ -27799,7 +27799,7 @@ bool testsnnls(bool silent, ae_state *_state) {
                ae_matrix_set_length(&densea, nr, nd, _state);
                for (i = 0; i < nr; i++) {
                   for (j = 0; j < nd; j++) {
-                     densea.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     densea.xyR[i][j] = randommid();
                   }
                }
             }
@@ -27819,11 +27819,11 @@ bool testsnnls(bool silent, ae_state *_state) {
             }
             ae_vector_set_length(&b, nr, _state);
             for (i = 0; i < nr; i++) {
-               b.xR[i] = 2 * randomreal(_state) - 1;
+               b.xR[i] = randommid();
             }
             ae_vector_set_length(&isconstrained, ns + nd, _state);
             for (i = 0; i < ns + nd; i++) {
-               isconstrained.xB[i] = randomreal(_state) > 0.5;
+               isconstrained.xB[i] = randombool();
             }
          // Solve with SNNLS solver
             snnlsinit(0, 0, 0, &s, _state);
@@ -28305,7 +28305,7 @@ static void testminbleicunit_setrandompreconditioner(minbleicstate *state, ae_in
    if (preckind == 1) {
       ae_vector_set_length(&p, n, _state);
       for (i = 0; i < n; i++) {
-         p.xR[i] = exp(6 * randomreal(_state) - 3);
+         p.xR[i] = exp(3.0 * randommid());
       }
       minbleicsetprecdiag(state, &p, _state);
    } else {
@@ -28398,9 +28398,9 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&ct, 1, _state);
                   c.xyR[0][n] = 0.0;
                   for (i = 0; i < n; i++) {
-                     x.xR[i] = 2 * randomreal(_state) - 1;
-                     c.xyR[0][i] = 2 * randomreal(_state) - 1;
-                     v = 2 * randomreal(_state) - 1;
+                     x.xR[i] = randommid();
+                     c.xyR[0][i] = randommid();
+                     v = randommid();
                      c.xyR[0][n] += c.xyR[0][i] * v;
                   }
                   ct.xZ[0] = 0;
@@ -28498,13 +28498,13 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&ct, k, _state);
                   c.xyR[0][n] = 0.0;
                   for (i = 0; i < n; i++) {
-                     x.xR[i] = 2 * randomreal(_state) - 1;
-                     xs.xR[i] = 2 * randomreal(_state) - 1;
+                     x.xR[i] = randommid();
+                     xs.xR[i] = randommid();
                   }
                   do {
                      for (i = 0; i < k; i++) {
                         for (j = 0; j < n; j++) {
-                           c.xyR[i][j] = 2 * randomreal(_state) - 1;
+                           c.xyR[i][j] = randommid();
                         }
                         v = ae_v_dotproduct(c.xyR[i], 1, xs.xR, 1, n);
                         c.xyR[i][n] = v;
@@ -28587,8 +28587,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   for (i = 0; i < n; i++) {
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
-                     x.xR[i] = randomreal(_state);
-                     x0.xR[i] = 3 * randomreal(_state) - 1;
+                     x.xR[i] = randomreal();
+                     x0.xR[i] = 3.0 * randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -28662,15 +28662,15 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&x, n, _state);
                   ae_vector_set_length(&x0, n, _state);
                   for (i = 0; i < n; i++) {
-                     if (randomreal(_state) > 0.5) {
+                     if (randombool()) {
                         bl.xR[i] = 0.0;
                         bu.xR[i] = 1.0;
                      } else {
-                        bl.xR[i] = randomreal(_state);
+                        bl.xR[i] = randomreal();
                         bu.xR[i] = bl.xR[i];
                      }
-                     x.xR[i] = randomreal(_state);
-                     x0.xR[i] = 3 * randomreal(_state) - 1;
+                     x.xR[i] = randomreal();
+                     x0.xR[i] = 3.0 * randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -28744,8 +28744,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                ae_matrix_set_length(&c, 2 * n, n + 1, _state);
                ae_vector_set_length(&ct, 2 * n, _state);
                for (i = 0; i < n; i++) {
-                  x.xR[i] = randomreal(_state);
-                  x0.xR[i] = 3 * randomreal(_state) - 1;
+                  x.xR[i] = randomreal();
+                  x0.xR[i] = 3.0 * randomreal() - 1.0;
                   for (j = 0; j <= n; j++) {
                      c.xyR[2 * i + 0][j] = 0.0;
                      c.xyR[2 * i + 1][j] = 0.0;
@@ -28827,19 +28827,19 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&bl, n, _state);
                   ae_vector_set_length(&bu, n, _state);
                   for (i = 0; i < n; i++) {
-                     x0.xR[i] = 3 * randomreal(_state) - 1;
-                     xs.xR[i] = 3 * randomreal(_state) - 1;
-                     xc.xR[i] = 0.1 + 0.8 * randomreal(_state);
+                     x0.xR[i] = 3.0 * randomreal() - 1.0;
+                     xs.xR[i] = 3.0 * randomreal() - 1.0;
+                     xc.xR[i] = 0.1 + 0.8 * randomreal();
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
                   }
                   for (i = 0; i < k; i++) {
                      c.xyR[i][n] = 0.0;
                      for (j = 0; j < n; j++) {
-                        c.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        c.xyR[i][j] = randommid();
                         c.xyR[i][n] += c.xyR[i][j] * xc.xR[j];
                      }
-                     ct.xZ[i] = randominteger(3, _state) - 1;
+                     ct.xZ[i] = randominteger(3) - 1;
                   }
                // Create and optimize
                   minbleiccreate(n, &xs, &state, _state);
@@ -28913,10 +28913,10 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                for (i = 0; i < n; i++) {
                   bl.xR[i] = 0.0;
                   bu.xR[i] = 1.0;
-                  x.xR[i] = randomreal(_state);
-                  x0.xR[i] = 3 * randomreal(_state) - 1;
+                  x.xR[i] = randomreal();
+                  x0.xR[i] = 3.0 * randomreal() - 1.0;
                }
-               i = randominteger(n, _state);
+               i = randominteger(n);
                bl.xR[i] = 1.0;
                bu.xR[i] = 0.0;
             // Create and optimize
@@ -28968,11 +28968,11 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_matrix_set_length(&c, k + 1, n + 1, _state);
                   ae_vector_set_length(&ct, k + 1, _state);
                   for (i = 0; i < n; i++) {
-                     x.xR[i] = randomreal(_state);
+                     x.xR[i] = randomreal();
                   }
                   for (i = 0; i < k; i++) {
                      for (j = 0; j <= n; j++) {
-                        c.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        c.xyR[i][j] = randommid();
                      }
                      ct.xZ[i] = 0;
                   }
@@ -29157,7 +29157,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bu, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = 10.0;
-         bl.xR[i] = 2 * randomreal(_state) - 1;
+         bl.xR[i] = randommid();
          bu.xR[i] = _state->v_posinf;
       }
       minbleiccreate(n, &x, &state, _state);
@@ -29242,8 +29242,8 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
    for (pass = 1; pass <= passcount; pass++) {
       ae_vector_set_length(&x, 1, _state);
       ae_vector_set_length(&s, 1, _state);
-      diffstep = randomreal(_state) * 1.0E-6;
-      s.xR[0] = exp(randomreal(_state) * 4 - 2);
+      diffstep = randomreal() * 1.0E-6;
+      s.xR[0] = exp(randomreal() * 4 - 2);
       x.xR[0] = 0.0;
       minbleiccreatef(1, &x, diffstep, &state, _state);
       minbleicsetcond(&state, 1.0E-6, 0.0, epsx, 0, _state);
@@ -29264,9 +29264,9 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bl, n, _state);
       ae_vector_set_length(&bu, n, _state);
       x.xR[0] = 100.0;
-      bl.xR[0] = 2 * randomreal(_state) - 1;
+      bl.xR[0] = randommid();
       bu.xR[0] = _state->v_posinf;
-      stpmax = 0.05 + 0.05 * randomreal(_state);
+      stpmax = 0.05 + 0.05 * randomreal();
       minbleiccreate(n, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
       minbleicsetcond(&state, epsg, 0.0, epsx, 0, _state);
@@ -29291,7 +29291,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&bl, n, _state);
       ae_vector_set_length(&bu, n, _state);
-      bl.xR[0] = 4 * randomreal(_state) + 1;
+      bl.xR[0] = 4 * randomreal() + 1;
       bu.xR[0] = bl.xR[0] + 1;
       x.xR[0] = 0.5 * (bl.xR[0] + bu.xR[0]);
       minbleiccreate(n, &x, &state, _state);
@@ -29340,13 +29340,13 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
                ct.xZ[0] = 0;
                c.xyR[0][n] = 0.0;
                for (i = 0; i < n; i++) {
-                  x.xR[i] = randomreal(_state) + 1;
+                  x.xR[i] = randomreal() + 1;
                   bl.xR[i] = -100000.0;
                   bu.xR[i] = 100000.0;
                   c.xyR[0][i] = 0.0;
-                  a.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
-                  s.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
-                  h.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
+                  a.xR[i] = exp(log(10.0) * randommid());
+                  s.xR[i] = exp(log(10.0) * randommid());
+                  h.xR[i] = exp(log(10.0) * randommid());
                }
                minbleiccreate(n, &x, &state, _state);
                if (ckind == 1 || ckind == 3) {
@@ -29499,7 +29499,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
          }
          while (minbleiciteration(&state, _state)) {
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state) + 10000 * machineepsilon * randomreal(_state);
+               state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state) + 10000 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
@@ -29650,13 +29650,13 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
       ae_vector_set_length(&s, 3, _state);
       s.xR[0] = 0.00001;
       s.xR[1] = 0.00001;
       s.xR[2] = 10000.0;
-      stopcallidx = randominteger(20, _state);
+      stopcallidx = randominteger(20);
       maxits = 25;
       minbleiccreate(n, &x, &state, _state);
       minbleicsetcond(&state, 0.0, 0.0, 0.0, maxits, _state);
@@ -29919,8 +29919,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
    ct.xZ[3] = -1;
    for (pass = 1; pass <= passcount; pass++) {
    // f0
-      x.xR[0] = 0.2 * randomreal(_state) - 0.1;
-      x.xR[1] = 0.2 * randomreal(_state) - 0.1;
+      x.xR[0] = 0.1 * randommid();
+      x.xR[1] = 0.1 * randommid();
       minbleiccreate(2, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
       minbleicsetlc(&state, &c, &ct, 4, _state);
@@ -29940,8 +29940,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1939");
       }
    // f1
-      x.xR[0] = 0.2 * randomreal(_state) - 0.1;
-      x.xR[1] = 0.2 * randomreal(_state) - 0.1;
+      x.xR[0] = 0.1 * randommid();
+      x.xR[1] = 0.1 * randommid();
       minbleiccreate(2, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
       minbleicsetlc(&state, &c, &ct, 4, _state);
@@ -29961,8 +29961,8 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1966");
       }
    // f2
-      x.xR[0] = 0.2 * randomreal(_state) - 0.1;
-      x.xR[1] = 0.2 * randomreal(_state) - 0.1;
+      x.xR[0] = 0.1 * randommid();
+      x.xR[1] = 0.1 * randommid();
       minbleiccreate(2, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
       minbleicsetlc(&state, &c, &ct, 4, _state);
@@ -30018,7 +30018,7 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
          ae_vector_set_length(&xf, n, _state);
          for (i = 0; i < n; i++) {
             if (i < m) {
-               v = randomreal(_state);
+               v = randomreal();
                bl.xR[i] = v;
                bu.xR[i] = v;
                xf.xR[i] = v;
@@ -30027,11 +30027,11 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
             } else {
                bl.xR[i] = 0.0;
                bu.xR[i] = 1.0;
-               xf.xR[i] = randomreal(_state);
-               xs0.xR[i] = randomreal(_state);
-               xs1.xR[i] = randomreal(_state);
+               xf.xR[i] = randomreal();
+               xs0.xR[i] = randomreal();
+               xs1.xR[i] = randomreal();
             }
-            x.xR[i] = randomreal(_state);
+            x.xR[i] = randomreal();
          }
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
@@ -30052,13 +30052,13 @@ static void testminbleicunit_testconv(bool *err, ae_state *_state) {
                ct.xZ[i] = 0;
             } else {
                ct.xZ[i] = -1;
-               c.xyR[i][n] += 0.1 + 0.9 * randomreal(_state);
+               c.xyR[i][n] += 0.1 + 0.9 * randomreal();
             }
          }
          ae_matrix_set_length(&a, m, n + 1, _state);
          for (i = 0; i < m; i++) {
             for (j = 0; j <= n; j++) {
-               a.xyR[i][j] = randomreal(_state);
+               a.xyR[i][j] = randomreal();
             }
          }
       // Create and optimize
@@ -30571,9 +30571,9 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
          if (ckind == 2 || ckind == 3) {
             ae_matrix_set_length(&c, 1, n + 1, _state);
             ae_vector_set_length(&ct, 1, _state);
-            ct.xZ[0] = randominteger(3, _state) - 1;
+            ct.xZ[0] = randominteger(3) - 1;
             for (i = 0; i < n; i++) {
-               c.xyR[0][i] = 2 * randomreal(_state) - 1;
+               c.xyR[0][i] = randommid();
             }
             c.xyR[0][n] = 0.0;
             minbleicsetlc(&state, &c, &ct, 1, _state);
@@ -30584,7 +30584,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbleicrestartfrom(&state, &x, _state);
             while (minbleiciteration(&state, _state)) {
@@ -30596,14 +30596,14 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
          }
          ae_vector_set_length(&diagh, n, _state);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal(_state));
+            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal());
          }
          minbleicsetprecdiag(&state, &diagh, _state);
          minbleicsetscale(&state, &units, _state);
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbleicrestartfrom(&state, &x, _state);
             while (minbleiciteration(&state, _state)) {
@@ -30617,14 +30617,14 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
       // Test it with scale-based preconditioner
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal(_state)));
+            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal()));
          }
          minbleicsetprecdefault(&state, _state);
          minbleicsetscale(&state, &s, _state);
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbleicrestartfrom(&state, &x, _state);
             while (minbleiciteration(&state, _state)) {
@@ -30639,7 +30639,7 @@ static void testminbleicunit_testpreconditioning(bool *err, ae_state *_state) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbleicrestartfrom(&state, &x, _state);
             while (minbleiciteration(&state, _state)) {
@@ -30763,7 +30763,7 @@ static void testminbleicunit_testbugs(bool *err, ae_state *_state) {
       for (i = 0; i <= 1; i++) {
          c.xyR[i][9] = 0.0;
          for (j = 0; j < 9; j++) {
-            c.xyR[i][j] = 2 * randomreal(_state) - 1;
+            c.xyR[i][j] = randommid();
             c.xyR[i][9] += c.xyR[i][j] * (1.0 / 9.0);
          }
       }
@@ -30802,7 +30802,7 @@ static void testminbleicunit_testbugs(bool *err, ae_state *_state) {
       ae_matrix_set_length(&xy, 6, 3, _state);
       for (i = 0; i < xy.rows; i++) {
          for (j = 0; j < xy.cols; j++) {
-            xy.xyR[i][j] = randomreal(_state);
+            xy.xyR[i][j] = randomreal();
          }
       }
    // Optimize
@@ -31604,7 +31604,7 @@ bool testminbleic(bool silent, ae_state *_state) {
 // set random type of the QP solver, must support boundary constraints
 static void testminqpunit_setrandomalgobc(minqpstate *s, ae_state *_state) {
    ae_int_t i;
-   i = randominteger(2, _state);
+   i = randominteger(2);
    if (i == 0) {
       minqpsetalgoquickqp(s, 0.0, 0.0, 1.0E-13, 0, true, _state);
    }
@@ -31670,7 +31670,7 @@ static bool simpletest(ae_state *_state) {
                if (j != k) {
                   a.xyR[k][j] = 0.0;
                } else {
-                  a.xyR[k][j] = maxn * randomreal(_state) + 1;
+                  a.xyR[k][j] = maxn * randomreal() + 1;
                }
             }
          }
@@ -31678,24 +31678,24 @@ static bool simpletest(ae_state *_state) {
          testminqpunit_setrandomalgobc(&state, _state);
          minqpsetquadraticterm(&state, &a, false, _state);
          for (j = 0; j < sn; j++) {
-            infd = randominteger(5, _state);
+            infd = randominteger(5);
             if (infd == 0) {
                db.xR[j] = _state->v_neginf;
                ub.xR[j] = _state->v_posinf;
             } else {
                if (infd == 1) {
                   db.xR[j] = _state->v_neginf;
-                  ub.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+                  ub.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                } else {
                   if (infd == 2) {
-                     db.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+                     db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                      ub.xR[j] = _state->v_posinf;
                   } else {
                      if (infd == 3) {
-                        db.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
-                        ub.xR[j] = db.xR[j] + maxstb * randomreal(_state) + 0.01;
+                        db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
+                        ub.xR[j] = db.xR[j] + maxstb * randomreal() + 0.01;
                      } else {
-                        db.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+                        db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                         ub.xR[j] = db.xR[j];
                      }
                   }
@@ -31707,13 +31707,13 @@ static bool simpletest(ae_state *_state) {
       // initial value for 'XORi'
       // and searching true results
          for (j = 0; j < sn; j++) {
-            xori.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+            xori.xR[j] = (maxnb - minnb) * randomreal() + minnb;
             tx.xR[j] = rboundval(xori.xR[j], db.xR[j], ub.xR[j], _state);
          }
          minqpsetorigin(&state, &xori, _state);
       // initialization for starting point
          for (j = 0; j < sn; j++) {
-            stx.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+            stx.xR[j] = (maxnb - minnb) * randomreal() + minnb;
          }
          minqpsetstartingpoint(&state, &stx, _state);
       // optimize and get result
@@ -31777,12 +31777,12 @@ static bool functest1(ae_state *_state) {
       ae_vector_set_length(&stx, sn, _state);
       for (i = 0; i <= nexp; i++) {
       // create simmetric matrix 'A'
-         spdmatrixrndcond(sn, exp(randomreal(_state) * log((double)c2)), &a, _state);
+         spdmatrixrndcond(sn, exp(randomreal() * log((double)c2)), &a, _state);
          minqpcreate(sn, &state, _state);
          testminqpunit_setrandomalgobc(&state, _state);
          minqpsetquadraticterm(&state, &a, false, _state);
          for (j = 0; j < sn; j++) {
-            xoric.xR[j] = 2 * randomreal(_state) - 1;
+            xoric.xR[j] = randommid();
          }
       // create linear part
          for (j = 0; j < sn; j++) {
@@ -31796,13 +31796,13 @@ static bool functest1(ae_state *_state) {
       // initial value for 'XORi'
       // and searching true results
          for (j = 0; j < sn; j++) {
-            xori.xR[j] = 2 * randomreal(_state) - 1;
+            xori.xR[j] = randommid();
             tx.xR[j] = xori.xR[j] + xoric.xR[j];
          }
          minqpsetorigin(&state, &xori, _state);
       // initialization for starting point
          for (j = 0; j < sn; j++) {
-            stx.xR[j] = 2 * randomreal(_state) - 1;
+            stx.xR[j] = randommid();
          }
          minqpsetstartingpoint(&state, &stx, _state);
       // optimize and get result
@@ -31901,12 +31901,12 @@ static bool functest2(ae_state *_state) {
       ae_vector_set_length(&y1, sn, _state);
       for (i = 0; i <= nexp; i++) {
       // create simmetric matrix 'A'
-         spdmatrixrndcond(sn, exp(randomreal(_state) * log((double)c2)), &a, _state);
+         spdmatrixrndcond(sn, exp(randomreal() * log((double)c2)), &a, _state);
          minqpcreate(sn, &state, _state);
          testminqpunit_setrandomalgobc(&state, _state);
          minqpsetquadraticterm(&state, &a, false, _state);
          for (j = 0; j < sn; j++) {
-            xoric.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+            xoric.xR[j] = (maxnb - minnb) * randomreal() + minnb;
          }
       // create linear part
          for (j = 0; j < sn; j++) {
@@ -31917,21 +31917,21 @@ static bool functest2(ae_state *_state) {
          }
          minqpsetlinearterm(&state, &b, _state);
          for (j = 0; j < sn; j++) {
-            infd = randominteger(4, _state);
+            infd = randominteger(4);
             if (infd == 0) {
                db.xR[j] = _state->v_neginf;
                ub.xR[j] = _state->v_posinf;
             } else {
                if (infd == 1) {
                   db.xR[j] = _state->v_neginf;
-                  ub.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+                  ub.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                } else {
                   if (infd == 2) {
-                     db.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+                     db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                      ub.xR[j] = _state->v_posinf;
                   } else {
-                     db.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
-                     ub.xR[j] = db.xR[j] + maxstb * randomreal(_state) + 0.01;
+                     db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
+                     ub.xR[j] = db.xR[j] + maxstb * randomreal() + 0.01;
                   }
                }
             }
@@ -31941,7 +31941,7 @@ static bool functest2(ae_state *_state) {
       // initial value for 'XORi'
       // and searching true results
          for (j = 0; j < sn; j++) {
-            xori.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+            xori.xR[j] = (maxnb - minnb) * randomreal() + minnb;
          }
          minqpsetorigin(&state, &xori, _state);
          for (j = 0; j < sn; j++) {
@@ -31952,7 +31952,7 @@ static bool functest2(ae_state *_state) {
          }
       // initialization for starting point
          for (j = 0; j < sn; j++) {
-            stx.xR[j] = (maxnb - minnb) * randomreal(_state) + minnb;
+            stx.xR[j] = (maxnb - minnb) * randomreal() + minnb;
          }
          minqpsetstartingpoint(&state, &stx, _state);
       // optimize and get result
@@ -32107,7 +32107,7 @@ static void testminqpunit_densetosparse(RMatrix *a, ae_int_t n, sparsematrix *s,
          sparseset(&s0, i, j, a->xyR[i][j], _state);
       }
    }
-   sparsecopytobuf(&s0, randominteger(3, _state), s, _state);
+   sparsecopytobuf(&s0, randominteger(3), s, _state);
    ae_frame_leave(_state);
 }
 
@@ -32846,7 +32846,7 @@ static bool quickqptests(ae_state *_state) {
    eps = 1.0E-3;
    itscnt = 1;
    n = 20;
-   isupper = randomreal(_state) > 0.5;
+   isupper = randombool();
    spdmatrixrndcond(n, 1.0E3, &za, _state);
    sparsecreate(n, n, 0, &sa, _state);
    ae_matrix_set_length(&a, n, n, _state);
@@ -32953,7 +32953,7 @@ static bool quickqptests(ae_state *_state) {
    n = 40000;
    sparsecreate(n, n, 0, &sa, _state);
    for (i = 0; i < n; i++) {
-      sparseset(&sa, i, i, pow(10.0, -3 * randomreal(_state)), _state);
+      sparseset(&sa, i, i, pow(10.0, -3 * randomreal()), _state);
    }
    ae_vector_set_length(&b, n, _state);
    for (i = 0; i < n; i++) {
@@ -33017,7 +33017,7 @@ static bool bleictests(ae_state *_state) {
    eps = 1.0E-3;
    itscnt = 5;
    n = 20;
-   isupper = randomreal(_state) > 0.5;
+   isupper = randombool();
    spdmatrixrndcond(n, 1.0E3, &za, _state);
    sparsecreate(n, n, 0, &sa, _state);
    ae_matrix_set_length(&a, n, n, _state);
@@ -33117,7 +33117,7 @@ static bool bleictests(ae_state *_state) {
    n = 20000;
    sparsecreate(n, n, 0, &sa, _state);
    for (i = 0; i < n; i++) {
-      sparseset(&sa, i, i, pow(10.0, -3 * randomreal(_state)), _state);
+      sparseset(&sa, i, i, pow(10.0, -3 * randomreal()), _state);
    }
    ae_vector_set_length(&b, n, _state);
    for (i = 0; i < n; i++) {
@@ -33277,7 +33277,7 @@ static bool bleictests(ae_state *_state) {
    for (i = 0; i < n; i++) {
       bndl.xR[i] = -1.0;
       bndu.xR[i] = 1.0;
-      x.xR[i] = randomreal(_state) - 0.5;
+      x.xR[i] = randomreal() - 0.5;
    }
    minqpcreate(n, &state, _state);
    minqpsetalgobleic(&state, eps, 0.0, 0.0, 0, _state);
@@ -33292,7 +33292,7 @@ static bool bleictests(ae_state *_state) {
          set_error_flag(&result, xend0.xR[i] != -1.0 && xend0.xR[i] != 1.0, __FILE__, __LINE__, "testminqpunit.ap:6854");
       }
    }
-   i = randominteger(n, _state);
+   i = randominteger(n);
    bndl.xR[i] = _state->v_neginf;
    bndu.xR[i] = _state->v_posinf;
    minqpsetbc(&state, &bndl, &bndu, _state);
@@ -33330,7 +33330,7 @@ static bool bleictests(ae_state *_state) {
    }
    ae_vector_set_length(&x, n, _state);
    for (i = 0; i < n; i++) {
-      x.xR[i] = randomreal(_state) - 0.5;
+      x.xR[i] = randomreal() - 0.5;
    }
    minqpcreate(n, &state, _state);
    minqpsetalgobleic(&state, eps, 0.0, 0.0, 0, _state);
@@ -33510,9 +33510,9 @@ static ae_int_t testminqpunit_setrandomalgoallmodern(minqpstate *s, double *bcto
    ae_int_t result;
    *bctol = 0;
    *lctol = 0;
-   result = randominteger(5, _state) - 1;
+   result = randominteger(5) - 1;
    if (result == -1) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randomreal(_state) > 0.5, _state);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randombool(), _state);
       *bctol = 0.0;
       *lctol = 0.0;
    }
@@ -33542,12 +33542,12 @@ static ae_int_t testminqpunit_setrandomalgoallmodern(minqpstate *s, double *bcto
 // set random type of theQP solver
 static void testminqpunit_setrandomalgononconvex(minqpstate *s, ae_state *_state) {
    ae_int_t i;
-   i = 1 + randominteger(2, _state);
+   i = 1 + randominteger(2);
    if (i == 1) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0, _state);
    }
    if (i == 2) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randomreal(_state) > 0.5, _state);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randombool(), _state);
    }
 }
 
@@ -33556,14 +33556,14 @@ static void testminqpunit_setrandomalgosemidefinite(minqpstate *s, double *bctol
    ae_int_t i;
    *bctol = 0;
    *lctol = 0;
-   i = 1 + randominteger(4, _state);
+   i = 1 + randominteger(4);
    if (i == 1) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0, _state);
       *bctol = 0.0;
       *lctol = 1.0E-8;
    }
    if (i == 2) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randomreal(_state) > 0.5, _state);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randombool(), _state);
       *bctol = 0.0;
       *lctol = 0.0;
    }
@@ -33583,7 +33583,7 @@ static void testminqpunit_setrandomalgosemidefinite(minqpstate *s, double *bctol
 // must support convex problems with boundary/linear constraints
 static void testminqpunit_setrandomalgoconvexlc(minqpstate *s, ae_state *_state) {
    ae_int_t i;
-   i = randominteger(4, _state);
+   i = randominteger(4);
    if (i == 0) {
       minqpsetalgodenseaul(s, 1.0E-12, 10000.0, 15, _state);
    }
@@ -33602,7 +33602,7 @@ static void testminqpunit_setrandomalgoconvexlc(minqpstate *s, ae_state *_state)
 // must support nonconvex problems with boundary/linear constraints
 static void testminqpunit_setrandomalgononconvexlc(minqpstate *s, ae_state *_state) {
    ae_int_t i;
-   i = randominteger(1, _state);
+   i = randominteger(1);
    if (i == 0) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0, _state);
    }
@@ -34208,16 +34208,16 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = randommid();
             x1.xR[i] = x0.xR[i];
-            xstart.xR[i] = 2 * randomreal(_state) - 1;
+            xstart.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
             v = ae_v_dotproduct(q.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
             ct.xZ[i] = 0;
-            v = 2 * randomreal(_state) - 1;
+            v = randommid();
             ae_v_addd(x1.xR, 1, q.xyR[i], 1, n, v);
          }
          for (i = 0; i < n; i++) {
@@ -34228,7 +34228,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetlc(&state, &c, &ct, k, _state);
          minqpoptimize(&state, _state);
@@ -34258,7 +34258,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, CMatrix, x0, XStart
          rmatrixrndorthogonal(n, &q, _state);
-         spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&x0, n, _state);
          ae_vector_set_length(&x1, n, _state);
@@ -34266,9 +34266,9 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            xstart.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = randommid();
+            x1.xR[i] = randommid();
+            xstart.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
@@ -34284,7 +34284,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetlc(&state, &c, &ct, k, _state);
          minqpoptimize(&state, _state);
@@ -34344,7 +34344,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
    for (n = 4; n <= 6; n++) {
       for (k = 1; k < n - 2; k++) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
-         spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&bndl, n, _state);
          ae_vector_set_length(&bndu, n, _state);
@@ -34354,15 +34354,15 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = randomreal(_state);
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = randomreal();
+            x1.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2, _state);
+            xstart.xR[i] = (double)randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.xyR[i][j] = 2 * randomreal(_state) - 1;
+               c.xyR[i][j] = randommid();
             }
             v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
@@ -34376,7 +34376,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetbc(&state, &bndl, &bndu, _state);
          minqpsetlc(&state, &c, &ct, k, _state);
@@ -34413,7 +34413,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          }
          minqpcreate(n, &state2, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
-         minqpsetquadraticterm(&state2, &a2, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state2, &a2, randombool(), _state);
          minqpsetstartingpoint(&state2, &xstart, _state);
          minqpsetbc(&state2, &bndl, &bndu, _state);
          for (i = 1; i <= aulits; i++) {
@@ -34478,7 +34478,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart.
       // Additionally, we compute modified b: b2 = b-xorigin'*A
          rmatrixrndorthogonal(n, &q, _state);
-         spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&b2, n, _state);
          ae_vector_set_length(&bndl, n, _state);
@@ -34490,12 +34490,12 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = 0.1 + 0.8 * randomreal();
+            b.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2, _state);
-            xorigin.xR[i] = 2 * randomreal(_state) - 1;
+            xstart.xR[i] = (double)randominteger(2);
+            xorigin.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
@@ -34511,7 +34511,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetorigin(&state, &xorigin, _state);
          minqpsetbc(&state, &bndl, &bndu, _state);
@@ -34526,7 +34526,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
          minqpcreate(n, &state2, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state2, &b2, _state);
-         minqpsetquadraticterm(&state2, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state2, &a, randombool(), _state);
          minqpsetstartingpoint(&state2, &xstart, _state);
          minqpsetbc(&state2, &bndl, &bndu, _state);
          minqpsetlc(&state2, &c, &ct, k, _state);
@@ -34563,7 +34563,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
       k = 2 * n;
-      spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+      spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&bndl, n, _state);
       ae_vector_set_length(&bndu, n, _state);
@@ -34573,28 +34573,28 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       ae_matrix_set_length(&c, k, n + 1, _state);
       ae_vector_set_length(&ct, k, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = 0.1 + 0.8 * randomreal();
+         x1.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = (double)randominteger(2, _state);
+         xstart.xR[i] = (double)randominteger(2);
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.xyR[i][j] = 2 * randomreal(_state) - 1;
+            c.xyR[i][j] = randommid();
          }
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
          c.xyR[i][n] = v;
          ct.xZ[i] = 0;
       }
       for (i = 0; i < n; i++) {
-         b.xR[i] = 2 * randomreal(_state) - 1;
+         b.xR[i] = randommid();
       }
    // Create optimizer, solve
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetbc(&state, &bndl, &bndu, _state);
       minqpsetlc(&state, &c, &ct, k, _state);
@@ -34633,9 +34633,9 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
    eps = 1.0E-4;
    for (pass = 1; pass <= 50; pass++) {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, x1, XStart.
-      n = randominteger(5, _state) + 2;
-      k = randominteger(n - 1, _state) + 1;
-      spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+      n = randominteger(5) + 2;
+      k = randominteger(n - 1) + 1;
+      spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&b2, n, _state);
       ae_vector_set_length(&bndl, n, _state);
@@ -34646,16 +34646,16 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       ae_matrix_set_length(&c, k, n + 1, _state);
       ae_vector_set_length(&ct, k, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-         b.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = 0.1 + 0.8 * randomreal();
+         b.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = 4 * randomreal(_state) - 2;
-         xstart2.xR[i] = 4 * randomreal(_state) - 2;
+         xstart.xR[i] = 2.0 * randommid();
+         xstart2.xR[i] = 2.0 * randommid();
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.xyR[i][j] = 2 * randomreal(_state) - 1;
+            c.xyR[i][j] = randommid();
          }
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
          c.xyR[i][n] = v;
@@ -34665,7 +34665,7 @@ static bool testminqpunit_ecqptest(ae_state *_state) {
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetbc(&state, &bndl, &bndu, _state);
       minqpsetlc(&state, &c, &ct, k, _state);
@@ -34843,20 +34843,20 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
    for (n = 2; n <= 6; n++) {
       for (pass = 0; pass <= 4; pass++) {
       // Generate problem: A, b, CMatrix, x0, XStart
-         spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&x1, n, _state);
          ae_vector_set_length(&xstart, n, _state);
          ae_matrix_set_length(&c, 1, n + 1, _state);
          ae_vector_set_length(&ct, 1, _state);
          for (i = 0; i < n; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            xstart.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            xstart.xR[i] = randommid();
          }
          do {
             v = 0.0;
             for (i = 0; i < n; i++) {
-               c.xyR[0][i] = 2 * randomreal(_state) - 1;
+               c.xyR[0][i] = randommid();
                v += sqr(c.xyR[0][i], _state);
             }
             v = sqrt(v);
@@ -34874,7 +34874,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetlc(&state, &c, &ct, 1, _state);
          minqpoptimize(&state, _state);
@@ -34933,7 +34933,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart.
       // Additionally, we compute modified b: b2 = b-xorigin'*A
          rmatrixrndorthogonal(n, &q, _state);
-         spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&b2, n, _state);
          ae_vector_set_length(&bndl, n, _state);
@@ -34945,18 +34945,18 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = 0.1 + 0.8 * randomreal();
+            b.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2, _state);
-            xorigin.xR[i] = 2 * randomreal(_state) - 1;
+            xstart.xR[i] = (double)randominteger(2);
+            xorigin.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
             v = ae_v_dotproduct(q.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
-            ct.xZ[i] = randominteger(3, _state) - 1;
+            ct.xZ[i] = randominteger(3) - 1;
          }
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(a.xyR[i], 1, xorigin.xR, 1, n);
@@ -34966,7 +34966,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          minqpcreate(n, &state, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state, &b, _state);
-         minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state, &a, randombool(), _state);
          minqpsetstartingpoint(&state, &xstart, _state);
          minqpsetorigin(&state, &xorigin, _state);
          minqpsetbc(&state, &bndl, &bndu, _state);
@@ -34981,7 +34981,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          minqpcreate(n, &state2, _state);
          testminqpunit_setrandomalgoconvexlc(&state, _state);
          minqpsetlinearterm(&state2, &b2, _state);
-         minqpsetquadraticterm(&state2, &a, randomreal(_state) > 0.5, _state);
+         minqpsetquadraticterm(&state2, &a, randombool(), _state);
          minqpsetstartingpoint(&state2, &xstart, _state);
          minqpsetbc(&state2, &bndl, &bndu, _state);
          minqpsetlc(&state2, &c, &ct, k, _state);
@@ -35038,7 +35038,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
    eps = 1.0E-3;
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, x0, XStart, C, CT
-      spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+      spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x1, n, _state);
       ae_vector_set_length(&xstart, n, _state);
@@ -35047,10 +35047,10 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_vector_set_length(&bndl, n, _state);
       ae_vector_set_length(&bndu, n, _state);
       for (i = 0; i < n; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
-         xstart.xR[i] = 3 * randomreal(_state) - 1;
-         bndl.xR[i] = -(0.1 + 0.9 * randomreal(_state));
-         bndu.xR[i] = 0.1 + 0.9 * randomreal(_state);
+         x1.xR[i] = randommid();
+         xstart.xR[i] = 3.0 * randomreal() - 1.0;
+         bndl.xR[i] = -(0.1 + 0.9 * randomreal());
+         bndu.xR[i] = 0.1 + 0.9 * randomreal();
          for (j = 0; j < n; j++) {
             c.xyR[2 * i + 0][j] = 0.0;
             c.xyR[2 * i + 1][j] = 0.0;
@@ -35070,7 +35070,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetlc(&state, &c, &ct, 2 * n, _state);
       minqpoptimize(&state, _state);
@@ -35079,7 +35079,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       minqpcreate(n, &state2, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state2, &b, _state);
-      minqpsetquadraticterm(&state2, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state2, &a, randombool(), _state);
       minqpsetstartingpoint(&state2, &xstart, _state);
       minqpsetbc(&state2, &bndl, &bndu, _state);
       minqpoptimize(&state2, _state);
@@ -35119,8 +35119,8 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_matrix_set_length(&c, 2 * n, n + 1, _state);
       ae_vector_set_length(&ct, 2 * n, _state);
       for (i = 0; i < n; i++) {
-         xstart.xR[i] = randomreal(_state);
-         x0.xR[i] = 3 * randomreal(_state) - 1;
+         xstart.xR[i] = randomreal();
+         x0.xR[i] = 3.0 * randomreal() - 1.0;
          b.xR[i] = -x0.xR[i];
          for (j = 0; j <= n; j++) {
             c.xyR[2 * i + 0][j] = 0.0;
@@ -35147,7 +35147,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlc(&state, &c, &ct, 2 * n, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpoptimize(&state, _state);
       minqpresults(&state, &xend, &rep, _state);
@@ -35178,7 +35178,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
       k = 2 * n;
-      spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+      spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&bndl, n, _state);
       ae_vector_set_length(&bndu, n, _state);
@@ -35188,18 +35188,18 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_matrix_set_length(&c, k, n + 1, _state);
       ae_vector_set_length(&ct, k, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = 0.1 + 0.8 * randomreal();
+         x1.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = (double)randominteger(2, _state);
+         xstart.xR[i] = (double)randominteger(2);
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.xyR[i][j] = 2 * randomreal(_state) - 1;
+            c.xyR[i][j] = randommid();
          }
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
-         ct.xZ[i] = randominteger(3, _state) - 1;
+         ct.xZ[i] = randominteger(3) - 1;
          if (ct.xZ[i] == 0) {
             c.xyR[i][n] = v;
          }
@@ -35211,13 +35211,13 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
          }
       }
       for (i = 0; i < n; i++) {
-         b.xR[i] = 2 * randomreal(_state) - 1;
+         b.xR[i] = randommid();
       }
    // Create optimizer, solve
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetbc(&state, &bndl, &bndu, _state);
       minqpsetlc(&state, &c, &ct, k, _state);
@@ -35261,23 +35261,23 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
    // Generate problem
       ae_vector_set_length(&da, n, _state);
       ae_matrix_set_length(&a, n, n, _state);
-      rmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &t2, _state);
+      rmatrixrndcond(n, pow(10.0, 2 * randomreal()), &t2, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x0, n, _state);
       ae_vector_set_length(&xstart, n, _state);
       ae_matrix_set_length(&c, n, n + 1, _state);
       ae_vector_set_length(&ct, n, _state);
       for (i = 0; i < n; i++) {
-         da.xR[i] = exp(8 * randomreal(_state) - 4);
+         da.xR[i] = exp(4.0 * randommid());
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = 0.0;
          }
          a.xyR[i][i] = da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         b.xR[i] = 2 * randomreal(_state) - 1;
-         xstart.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
+         b.xR[i] = randommid();
+         xstart.xR[i] = randommid();
       }
       for (i = 0; i < n; i++) {
          ae_v_move(c.xyR[i], 1, t2.xyR[i], 1, n);
@@ -35289,7 +35289,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetlc(&state, &c, &ct, n, _state);
       minqpoptimize(&state, _state);
@@ -35369,9 +35369,9 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
    eps = 1.0E-4;
    for (pass = 1; pass <= 50; pass++) {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, x1, XStart.
-      n = randominteger(5, _state) + 2;
-      k = randominteger(2 * n, _state) + 1;
-      spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+      n = randominteger(5) + 2;
+      k = randominteger(2 * n) + 1;
+      spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&b2, n, _state);
       ae_vector_set_length(&bndl, n, _state);
@@ -35382,22 +35382,22 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_matrix_set_length(&c, k, n + 1, _state);
       ae_vector_set_length(&ct, k, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-         b.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = 0.1 + 0.8 * randomreal();
+         b.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = 4 * randomreal(_state) - 2;
-         xstart2.xR[i] = 4 * randomreal(_state) - 2;
+         xstart.xR[i] = 2.0 * randommid();
+         xstart2.xR[i] = 2.0 * randommid();
       }
       for (i = 0; i < k; i++) {
       // Generate I-th row of C
       // Avoid excessive (more than N/2) equality constraints.
          for (j = 0; j < n; j++) {
-            c.xyR[i][j] = 2 * randomreal(_state) - 1;
+            c.xyR[i][j] = randommid();
          }
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
          c.xyR[i][n] = v;
-         ct.xZ[i] = randominteger(3, _state) - 1;
+         ct.xZ[i] = randominteger(3) - 1;
          if ((double)i >= 0.5 * n && ct.xZ[i] == 0) {
             ct.xZ[i] = 1;
          }
@@ -35414,7 +35414,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       minqpcreate(n, &state, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
       minqpsetlinearterm(&state, &b, _state);
-      minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+      minqpsetquadraticterm(&state, &a, randombool(), _state);
       minqpsetstartingpoint(&state, &xstart, _state);
       minqpsetbc(&state, &bndl, &bndu, _state);
       minqpsetlc(&state, &c, &ct, k, _state);
@@ -35569,7 +35569,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
                minqpsetbc(&state, &bl, &bu, _state);
                minqpsetlc(&state, &c, &ct, ccnt, _state);
                minqpsetlinearterm(&state, &b, _state);
-               minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+               minqpsetquadraticterm(&state, &a, randombool(), _state);
                minqpoptimize(&state, _state);
                minqpresults(&state, &xs0, &rep, _state);
                set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:3000");
@@ -35710,7 +35710,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
             minqpsetbc(&state, &bl, &bu, _state);
             minqpsetlc(&state, &c, &ct, ccnt, _state);
             minqpsetlinearterm(&state, &b, _state);
-            minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+            minqpsetquadraticterm(&state, &a, randombool(), _state);
             minqpoptimize(&state, _state);
             minqpresults(&state, &xs0, &rep, _state);
             set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:3159");
@@ -36195,7 +36195,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
    // as dense, sparse or mixed ones.
       for (n = 1; n <= 10; n++) {
       // Generate random A, b and xs
-         spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &rawa, _state);
+         spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &rawa, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&xs, n, _state);
          for (i = 0; i < n; i++) {
@@ -36405,20 +36405,20 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       for (n = 2; n <= 6; n++) {
          for (pass = 0; pass <= 4; pass++) {
          // Generate problem: A, b, CMatrix, x0, XStart
-            spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+            spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
             ae_vector_set_length(&b, n, _state);
             ae_vector_set_length(&xs, n, _state);
             ae_vector_set_length(&xstart, n, _state);
             ae_matrix_set_length(&rawc, 1, n + 1, _state);
             ae_vector_set_length(&rawct, 1, _state);
             for (i = 0; i < n; i++) {
-               xs.xR[i] = 2 * randomreal(_state) - 1;
-               xstart.xR[i] = 2 * randomreal(_state) - 1;
+               xs.xR[i] = randommid();
+               xstart.xR[i] = randommid();
             }
             do {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  rawc.xyR[0][i] = 2 * randomreal(_state) - 1;
+                  rawc.xyR[0][i] = randommid();
                   v += sqr(rawc.xyR[0][i], _state);
                }
                v = sqrt(v);
@@ -36504,7 +36504,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       xtol = 1.0E-5;
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, x0, XStart, C, CT
-         spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&x1, n, _state);
          ae_vector_set_length(&xstart, n, _state);
@@ -36513,10 +36513,10 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&bndl, n, _state);
          ae_vector_set_length(&bndu, n, _state);
          for (i = 0; i < n; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            xstart.xR[i] = 3 * randomreal(_state) - 1;
-            bndl.xR[i] = -(0.1 + 0.9 * randomreal(_state));
-            bndu.xR[i] = 0.1 + 0.9 * randomreal(_state);
+            x1.xR[i] = randommid();
+            xstart.xR[i] = 3.0 * randomreal() - 1.0;
+            bndl.xR[i] = -(0.1 + 0.9 * randomreal());
+            bndu.xR[i] = 0.1 + 0.9 * randomreal();
             for (j = 0; j < n; j++) {
                rawc.xyR[2 * i + 0][j] = 0.0;
                rawc.xyR[2 * i + 1][j] = 0.0;
@@ -36851,7 +36851,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart.
          // Additionally, we compute modified b: b2 = b-xorigin'*A
             rmatrixrndorthogonal(n, &q, _state);
-            spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+            spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
             ae_vector_set_length(&b, n, _state);
             ae_vector_set_length(&b2, n, _state);
             ae_vector_set_length(&bndl, n, _state);
@@ -36863,18 +36863,18 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             ae_matrix_set_length(&rawc, k, n + 1, _state);
             ae_vector_set_length(&rawct, k, _state);
             for (i = 0; i < n; i++) {
-               x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-               b.xR[i] = 2 * randomreal(_state) - 1;
+               x0.xR[i] = 0.1 + 0.8 * randomreal();
+               b.xR[i] = randommid();
                bndl.xR[i] = 0.0;
                bndu.xR[i] = 1.0;
-               xstart.xR[i] = (double)randominteger(2, _state);
-               xorigin.xR[i] = 2 * randomreal(_state) - 1;
+               xstart.xR[i] = (double)randominteger(2);
+               xorigin.xR[i] = randommid();
             }
             for (i = 0; i < k; i++) {
                ae_v_move(rawc.xyR[i], 1, q.xyR[i], 1, n);
                v = ae_v_dotproduct(q.xyR[i], 1, x0.xR, 1, n);
                rawc.xyR[i][n] = v;
-               rawct.xZ[i] = randominteger(3, _state) - 1;
+               rawct.xZ[i] = randominteger(3) - 1;
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, xorigin.xR, 1, n);
@@ -36997,7 +36997,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          // Solve it immediately.
          //
          // NOTE: we make sure that there exists at least one feasible point X0.
-            spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
+            spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
             ae_vector_set_length(&b, n, _state);
             ae_vector_set_length(&bndl, n, _state);
             ae_vector_set_length(&bndu, n, _state);
@@ -37120,10 +37120,10 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             }
             minqpsetlinearterm(&state, &b, _state);
             if (akind == 0) {
-               minqpsetquadraticterm(&state, &a, randomreal(_state) > 0.5, _state);
+               minqpsetquadraticterm(&state, &a, randombool(), _state);
             }
             if (akind == 1) {
-               minqpsetquadratictermsparse(&state, &sa, randomreal(_state) > 0.5, _state);
+               minqpsetquadratictermsparse(&state, &sa, randombool(), _state);
             }
             minqpsetstartingpoint(&state, &xstart, _state);
             minqpsetorigin(&state, &xorigin, _state);
@@ -37165,23 +37165,23 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       // Generate problem
          ae_vector_set_length(&da, n, _state);
          ae_matrix_set_length(&a, n, n, _state);
-         rmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &t2, _state);
+         rmatrixrndcond(n, pow(10.0, 2 * randomreal()), &t2, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&x0, n, _state);
          ae_vector_set_length(&xstart, n, _state);
          ae_matrix_set_length(&rawc, n, n + 1, _state);
          ae_vector_set_length(&rawct, n, _state);
          for (i = 0; i < n; i++) {
-            da.xR[i] = exp(6 * randomreal(_state) - 3);
+            da.xR[i] = exp(3.0 * randommid());
             for (j = 0; j < n; j++) {
                a.xyR[i][j] = 0.0;
             }
             a.xyR[i][i] = da.xR[i];
          }
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            b.xR[i] = 2 * randomreal(_state) - 1;
-            xstart.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = randommid();
+            b.xR[i] = randommid();
+            xstart.xR[i] = randommid();
          }
          for (i = 0; i < n; i++) {
             ae_v_move(rawc.xyR[i], 1, t2.xyR[i], 1, n);
@@ -37296,7 +37296,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          }
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
          k = 2 * n;
-         spdmatrixrndcond(n, pow(10.0, 3 * randomreal(_state)), &a, _state);
+         spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&bndl, n, _state);
          ae_vector_set_length(&bndu, n, _state);
@@ -37306,18 +37306,18 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_matrix_set_length(&rawc, k, n + 1, _state);
          ae_vector_set_length(&rawct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = 0.1 + 0.8 * randomreal();
+            x1.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2, _state);
+            xstart.xR[i] = (double)randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               rawc.xyR[i][j] = 2 * randomreal(_state) - 1;
+               rawc.xyR[i][j] = randommid();
             }
             v = ae_v_dotproduct(rawc.xyR[i], 1, x0.xR, 1, n);
-            rawct.xZ[i] = randominteger(3, _state) - 1;
+            rawct.xZ[i] = randominteger(3) - 1;
             if (rawct.xZ[i] == 0) {
                rawc.xyR[i][n] = v;
             }
@@ -37329,7 +37329,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             }
          }
          for (i = 0; i < n; i++) {
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            b.xR[i] = randommid();
          }
       // Create optimizer, solve
          minqpcreate(n, &state, _state);
@@ -37407,8 +37407,8 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&rawct, 2 * n, _state);
          k = 2 * n;
          for (i = 0; i < n; i++) {
-            xstart.xR[i] = randomreal(_state);
-            x0.xR[i] = 3 * randomreal(_state) - 1;
+            xstart.xR[i] = randomreal();
+            x0.xR[i] = 3.0 * randomreal() - 1.0;
             b.xR[i] = -x0.xR[i];
             for (j = 0; j <= n; j++) {
                rawc.xyR[2 * i + 0][j] = 0.0;
@@ -37881,17 +37881,17 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
             ae_assert(false, "unexpected solver type", _state);
          }
       }
-      spdmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &a, _state);
-      rmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &t2, _state);
+      spdmatrixrndcond(n, pow(10.0, 2 * randomreal()), &a, _state);
+      rmatrixrndcond(n, pow(10.0, 2 * randomreal()), &t2, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x0, n, _state);
       ae_vector_set_length(&xstart, n, _state);
       ae_matrix_set_length(&rawc, rawccnt, n + 1, _state);
       ae_vector_set_length(&rawct, rawccnt, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         b.xR[i] = 2 * randomreal(_state) - 1;
-         xstart.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
+         b.xR[i] = randommid();
+         xstart.xR[i] = randommid();
       }
       for (i = 0; i < rawccnt; i++) {
          ae_v_move(rawc.xyR[i], 1, t2.xyR[i], 1, n);
@@ -37976,23 +37976,23 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       }
       ae_vector_set_length(&da, n, _state);
       ae_matrix_set_length(&a, n, n, _state);
-      rmatrixrndcond(n, pow(10.0, 2 * randomreal(_state)), &t2, _state);
+      rmatrixrndcond(n, pow(10.0, 2 * randomreal()), &t2, _state);
       ae_vector_set_length(&b, n, _state);
       ae_vector_set_length(&x0, n, _state);
       ae_vector_set_length(&xstart, n, _state);
       ae_matrix_set_length(&rawc, rawccnt, n + 1, _state);
       ae_vector_set_length(&rawct, rawccnt, _state);
       for (i = 0; i < n; i++) {
-         da.xR[i] = exp(8 * randomreal(_state) - 4);
+         da.xR[i] = exp(4.0 * randommid());
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = 0.0;
          }
          a.xyR[i][i] = da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         b.xR[i] = 2 * randomreal(_state) - 1;
-         xstart.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
+         b.xR[i] = randommid();
+         xstart.xR[i] = randommid();
       }
       for (i = 0; i < rawccnt; i++) {
          ae_v_move(rawc.xyR[i], 1, t2.xyR[i], 1, n);
@@ -39600,9 +39600,9 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
    m = 3;
    h = 0.0001;
    for (rkind = -2; rkind <= 5; rkind++) {
-      x.xR[0] = 100 * randomreal(_state) - 50;
-      x.xR[1] = 100 * randomreal(_state) - 50;
-      x.xR[2] = 100 * randomreal(_state) - 50;
+      x.xR[0] = 50.0 * randommid();
+      x.xR[1] = 50.0 * randommid();
+      x.xR[2] = 50.0 * randommid();
       if (rkind == -2) {
          minlmcreatev(n, m, &x, h, &state, _state);
          minlmsetacctype(&state, 1, _state);
@@ -39689,7 +39689,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       n = 1;
       m = 1;
       h = 0.00001;
-      x.xR[0] = 100 * randomreal(_state) - 50;
+      x.xR[0] = 50.0 * randommid();
       if (rkind == -2) {
          minlmcreatev(n, m, &x, h, &state, _state);
          minlmsetacctype(&state, 1, _state);
@@ -39751,7 +39751,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       ae_vector_set_length(&xe, n, _state);
       ae_vector_set_length(&b, n, _state);
       for (i = 0; i < n; i++) {
-         xe.xR[i] = 2 * randomreal(_state) - 1;
+         xe.xR[i] = randommid();
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(a.xyR[i], 1, xe.xR, 1, n);
@@ -39764,7 +39764,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       for (rkind = -2; rkind <= 5; rkind++) {
       // Solve task (first attempt)
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          if (rkind == -2) {
             minlmcreatev(n, n, &x, h, &state, _state);
@@ -39810,7 +39810,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          }
       // Now we try to restart algorithm from new point
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          minlmrestartfrom(&state, &x, _state);
          while (minlmiteration(&state, _state)) {
@@ -40013,8 +40013,8 @@ static void testminlmunit_testbc(bool *errorflag, ae_state *_state) {
          for (i = 0; i < n; i++) {
             bl.xR[i] = 0.0;
             bu.xR[i] = 1.0;
-            xe.xR[i] = 3 * randomreal(_state) - 1;
-            x.xR[i] = randomreal(_state);
+            xe.xR[i] = 3.0 * randomreal() - 1.0;
+            x.xR[i] = randomreal();
          }
          if (tmpkind == 0) {
             minlmcreatefgh(n, &x, &state, _state);
@@ -40647,7 +40647,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
       if (rkind == 0) {
          minlmcreatefj(n, m, &x, &state, _state);
@@ -40734,7 +40734,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
    n = 1;
    ae_vector_set_length(&x, n, _state);
    x.xR[0] = 100.0;
-   stpmax = 0.05 + 0.05 * randomreal(_state);
+   stpmax = 0.05 + 0.05 * randomreal();
    minlmcreatefgh(n, &x, &state, _state);
    minlmsetcond(&state, 1.0E-12, 0, _state);
    minlmsetstpmax(&state, stpmax, _state);
@@ -40765,9 +40765,9 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
-      stopcallidx = randominteger(20, _state);
+      stopcallidx = randominteger(20);
       maxits = 25;
       minlmcreatevj(n, m, &x, &state, _state);
       minlmsetcond(&state, 0.0, maxits, _state);
@@ -40846,7 +40846,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             mx = rmax2(mx, fabs(state.x.xR[i] - 1), _state);
          }
          if (mx < 1.0E-2) {
-            i = randominteger(3, _state);
+            i = randominteger(3);
             v = _state->v_nan;
             if (i == 1) {
                v = _state->v_posinf;
@@ -40854,10 +40854,10 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             if (i == 2) {
                v = _state->v_neginf;
             }
-            if (randomreal(_state) > 0.5) {
-               state.fi.xR[randominteger(m, _state)] = v;
+            if (randombool()) {
+               state.fi.xR[randominteger(m)] = v;
             } else {
-               state.j.xyR[randominteger(m, _state)][randominteger(n, _state)] = v;
+               state.j.xyR[randominteger(m)][randominteger(n)] = v;
             }
             spoilcnt++;
          }
@@ -40873,7 +40873,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             mx = rmax2(mx, fabs(state.x.xR[i] - 1), _state);
          }
          if (mx < 1.0E-2) {
-            i = randominteger(3, _state);
+            i = randominteger(3);
             v = _state->v_nan;
             if (i == 1) {
                v = _state->v_posinf;
@@ -40881,7 +40881,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             if (i == 2) {
                v = _state->v_neginf;
             }
-            state.fi.xR[randominteger(m, _state)] = v;
+            state.fi.xR[randominteger(m)] = v;
             spoilcnt++;
          }
          continue;
@@ -41384,8 +41384,8 @@ static void testother(bool *err, ae_state *_state) {
    // optimizer evaluates function at +-DiffStep*S only.
       ae_vector_set_length(&x, 1, _state);
       ae_vector_set_length(&s, 1, _state);
-      diffstep = randomreal(_state) * 1.0E-6;
-      s.xR[0] = exp(randomreal(_state) * 4 - 2);
+      diffstep = randomreal() * 1.0E-6;
+      s.xR[0] = exp(randomreal() * 4 - 2);
       x.xR[0] = 0.0;
       mincgcreatef(1, &x, diffstep, &state, _state);
       mincgsetcond(&state, 1.0E-6, 0.0, 0.0, 0, _state);
@@ -41402,7 +41402,7 @@ static void testother(bool *err, ae_state *_state) {
       n = 1;
       ae_vector_set_length(&x, n, _state);
       x.xR[0] = 100.0;
-      stpmax = 0.05 + 0.05 * randomreal(_state);
+      stpmax = 0.05 + 0.05 * randomreal();
       mincgcreate(n, &x, &state, _state);
       mincgsetcond(&state, 1.0E-9, 0.0, 0.0, 0, _state);
       mincgsetstpmax(&state, stpmax, _state);
@@ -41439,10 +41439,10 @@ static void testother(bool *err, ae_state *_state) {
             ae_vector_set_length(&s, n, _state);
             ae_vector_set_length(&h, n, _state);
             for (i = 0; i < n; i++) {
-               x.xR[i] = randomreal(_state) + 1;
-               a.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
-               s.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
-               h.xR[i] = exp(log(100.0) * (2 * randomreal(_state) - 1));
+               x.xR[i] = randomreal() + 1;
+               a.xR[i] = exp(log(100.0) * randommid());
+               s.xR[i] = exp(log(100.0) * randommid());
+               h.xR[i] = exp(log(100.0) * randommid());
             }
             mincgcreate(n, &x, &state, _state);
             mincgsetscale(&state, &s, _state);
@@ -41455,7 +41455,7 @@ static void testother(bool *err, ae_state *_state) {
             }
          // Test gradient-based stopping condition
             for (i = 0; i < n; i++) {
-               x.xR[i] = randomreal(_state) + 1;
+               x.xR[i] = randomreal() + 1;
             }
             mincgsetcond(&state, tmpeps, 0.0, 0.0, 0, _state);
             mincgrestartfrom(&state, &x, _state);
@@ -41482,7 +41482,7 @@ static void testother(bool *err, ae_state *_state) {
             *err = *err || v > tmpeps;
          // Test step-based stopping condition
             for (i = 0; i < n; i++) {
-               x.xR[i] = randomreal(_state) + 1;
+               x.xR[i] = randomreal() + 1;
             }
             hasxlast = false;
             mincgsetcond(&state, 0.0, 0.0, tmpeps, 0, _state);
@@ -41649,9 +41649,9 @@ static void testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
-      stopcallidx = randominteger(20, _state);
+      stopcallidx = randominteger(20);
       maxits = 25;
       mincgcreate(n, &x, &state, _state);
       mincgsetcond(&state, 0.0, 0.0, 0.0, maxits, _state);
@@ -41849,7 +41849,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             mincgrestartfrom(&state, &x, _state);
             while (mincgiteration(&state, _state)) {
@@ -41862,13 +41862,13 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
       // Test it with perturbed diagonal preconditioner
          ae_vector_set_length(&diagh, n, _state);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * sqr((double)(i * i + 1), _state) * (0.8 + 0.4 * randomreal(_state));
+            diagh.xR[i] = 2 * sqr((double)(i * i + 1), _state) * (0.8 + 0.4 * randomreal());
          }
          mincgsetprecdiag(&state, &diagh, _state);
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             mincgrestartfrom(&state, &x, _state);
             while (mincgiteration(&state, _state)) {
@@ -41900,17 +41900,17 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
             ae_vector_set_length(&d, n, _state);
             for (i = 0; i < n; i++) {
                x.xR[i] = 0.0;
-               x0.xR[i] = 2 * randomreal(_state) - 1;
-               d.xR[i] = exp(2 * randomreal(_state));
+               x0.xR[i] = randommid();
+               d.xR[i] = exp(2 * randomreal());
             }
             if (vs > 0) {
                ae_matrix_set_length(&v, vs, n, _state);
                ae_vector_set_length(&vd, vs, _state);
                for (i = 0; i < vs; i++) {
                   for (j = 0; j < n; j++) {
-                     v.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     v.xyR[i][j] = randommid();
                   }
-                  vd.xR[i] = exp(2 * randomreal(_state));
+                  vd.xR[i] = exp(2 * randomreal());
                }
             }
             mincgcreate(n, &x, &state, _state);
@@ -41920,7 +41920,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
             cntb1 = 0;
             for (pass = 0; pass < k; pass++) {
                for (i = 0; i < n; i++) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                }
                mincgrestartfrom(&state, &x, _state);
                while (mincgiteration(&state, _state)) {
@@ -41935,7 +41935,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
             cntg1 = 0;
             for (pass = 0; pass < k; pass++) {
                for (i = 0; i < n; i++) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                }
                mincgrestartfrom(&state, &x, _state);
                while (mincgiteration(&state, _state)) {
@@ -41964,14 +41964,14 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
          mincgcreate(n, &x, &state, _state);
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal(_state)));
+            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal()));
          }
          mincgsetprecdefault(&state, _state);
          mincgsetscale(&state, &s, _state);
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             mincgrestartfrom(&state, &x, _state);
             while (mincgiteration(&state, _state)) {
@@ -41986,7 +41986,7 @@ static void testmincgunit_testpreconditioning(bool *err, ae_state *_state) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             mincgrestartfrom(&state, &x, _state);
             while (mincgiteration(&state, _state)) {
@@ -42708,9 +42708,9 @@ bool testmincg(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, 2 + 1, _state);
          n = 3;
          diffstep = 1.0E-6;
-         x.xR[0] = 100 * randomreal(_state) - 50;
-         x.xR[1] = 100 * randomreal(_state) - 50;
-         x.xR[2] = 100 * randomreal(_state) - 50;
+         x.xR[0] = 50.0 * randommid();
+         x.xR[1] = 50.0 * randommid();
+         x.xR[2] = 50.0 * randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
          }
@@ -42738,9 +42738,9 @@ bool testmincg(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, 3, _state);
          n = 3;
          diffstep = 1.0E-6;
-         x.xR[0] = 10 + 10 * randomreal(_state);
-         x.xR[1] = 10 + 10 * randomreal(_state);
-         x.xR[2] = 10 + 10 * randomreal(_state);
+         x.xR[0] = 10 + 10 * randomreal();
+         x.xR[1] = 10 + 10 * randomreal();
+         x.xR[2] = 10 + 10 * randomreal();
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
          }
@@ -42756,18 +42756,18 @@ bool testmincg(bool silent, ae_state *_state) {
             }
             testmincgunit_testfunc2(&state, _state);
          }
-         x.xR[0] = 10 + 10 * randomreal(_state);
-         x.xR[1] = 10 + 10 * randomreal(_state);
-         x.xR[2] = 10 + 10 * randomreal(_state);
+         x.xR[0] = 10 + 10 * randomreal();
+         x.xR[1] = 10 + 10 * randomreal();
+         x.xR[2] = 10 + 10 * randomreal();
          mincgrestartfrom(&state, &x, _state);
          while (mincgiteration(&state, _state)) {
             testmincgunit_testfunc2(&state, _state);
          }
          mincgresults(&state, &x, &rep, _state);
          restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
-         x.xR[0] = 10 + 10 * randomreal(_state);
-         x.xR[1] = 10 + 10 * randomreal(_state);
-         x.xR[2] = 10 + 10 * randomreal(_state);
+         x.xR[0] = 10 + 10 * randomreal();
+         x.xR[1] = 10 + 10 * randomreal();
+         x.xR[2] = 10 + 10 * randomreal();
          mincgrestartfrom(&state, &x, _state);
          while (mincgiteration(&state, _state)) {
             testmincgunit_testfunc2(&state, _state);
@@ -42778,7 +42778,7 @@ bool testmincg(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, 0 + 1, _state);
          n = 1;
          diffstep = 1.0E-6;
-         x.xR[0] = 100 * randomreal(_state) - 50;
+         x.xR[0] = 50.0 * randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
          }
@@ -42800,7 +42800,7 @@ bool testmincg(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, 0 + 1, _state);
          n = 1;
          diffstep = 1.0E-6;
-         x.xR[0] = 100 * randomreal(_state) - 50;
+         x.xR[0] = 50.0 * randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
          }
@@ -42827,11 +42827,11 @@ bool testmincg(bool silent, ae_state *_state) {
             ae_vector_set_length(&xe, n - 1 + 1, _state);
             ae_vector_set_length(&b, n - 1 + 1, _state);
             for (i = 0; i < n; i++) {
-               xe.xR[i] = 2 * randomreal(_state) - 1;
+               xe.xR[i] = randommid();
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                  a.xyR[i][j] = randommid();
                }
                a.xyR[i][i] += 3 * sign(a.xyR[i][i], _state);
             }
@@ -42841,7 +42841,7 @@ bool testmincg(bool silent, ae_state *_state) {
             }
          // Solve task
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             if (difftype == 0) {
                mincgcreate(n, &x, &state, _state);
@@ -42882,7 +42882,7 @@ bool testmincg(bool silent, ae_state *_state) {
          n = 3;
          ae_vector_set_length(&x, n, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = 6 * randomreal(_state) - 3;
+            x.xR[i] = 3.0 * randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
@@ -42898,7 +42898,7 @@ bool testmincg(bool silent, ae_state *_state) {
          mincgresults(&state, &x, &rep, _state);
          converror = converror || rep.terminationtype != 4;
          for (i = 0; i < n; i++) {
-            x.xR[i] = 6 * randomreal(_state) - 3;
+            x.xR[i] = 3.0 * randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
@@ -42914,7 +42914,7 @@ bool testmincg(bool silent, ae_state *_state) {
          mincgresults(&state, &x, &rep, _state);
          converror = converror || rep.terminationtype != 1;
          for (i = 0; i < n; i++) {
-            x.xR[i] = 6 * randomreal(_state) - 3;
+            x.xR[i] = 3.0 * randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
@@ -42930,7 +42930,7 @@ bool testmincg(bool silent, ae_state *_state) {
          mincgresults(&state, &x, &rep, _state);
          converror = converror || rep.terminationtype != 2;
          for (i = 0; i < n; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state, _state);
@@ -43106,7 +43106,7 @@ static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *b
 // This function selects random LP solver
 static void testminlpunit_selectrandomsolver(minlpstate *state, ae_state *_state) {
    ae_int_t k;
-   k = randominteger(2, _state);
+   k = randominteger(2);
    if (k == 0) {
       minlpsetalgodss(state, 0.0, _state);
    }
@@ -44980,16 +44980,16 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
                ae_matrix_set_length(&c, k, n + 1, _state);
                ae_vector_set_length(&ct, k, _state);
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = 2 * randomreal(_state) - 1;
+                  x0.xR[i] = randommid();
                   xm.xR[i] = x0.xR[i];
-                  xstart.xR[i] = 2 * randomreal(_state) - 1;
+                  xstart.xR[i] = randommid();
                }
                for (i = 0; i < k; i++) {
                   ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
                   v = ae_v_dotproduct(q.xyR[i], 1, x0.xR, 1, n);
                   c.xyR[i][n] = v;
                   ct.xZ[i] = 0;
-                  v = 2 * randomreal(_state) - 1;
+                  v = randommid();
                   ae_v_addd(xm.xR, 1, q.xyR[i], 1, n, v);
                }
                for (i = 0; i < n; i++) {
@@ -45110,13 +45110,13 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             ae_matrix_set_length(&c, 1, n + 1, _state);
             ae_vector_set_length(&ct, 1, _state);
             for (i = 0; i < n; i++) {
-               xm.xR[i] = 2 * randomreal(_state) - 1;
-               xstart.xR[i] = 2 * randomreal(_state) - 1;
+               xm.xR[i] = randommid();
+               xstart.xR[i] = randommid();
             }
             do {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  c.xyR[0][i] = 2 * randomreal(_state) - 1;
+                  c.xyR[0][i] = randommid();
                   v += sqr(c.xyR[0][i], _state);
                }
                v = sqrt(v);
@@ -45257,9 +45257,9 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
             ae_matrix_set_length(&c, k, n + 1, _state);
             ae_vector_set_length(&ct, k, _state);
             for (i = 0; i < n; i++) {
-               x0.xR[i] = 2 * randomreal(_state) - 1;
-               xm.xR[i] = 2 * randomreal(_state) - 1;
-               xstart.xR[i] = 2 * randomreal(_state) - 1;
+               x0.xR[i] = randommid();
+               xm.xR[i] = randommid();
+               xstart.xR[i] = randommid();
             }
             for (i = 0; i < k; i++) {
                ae_v_move(c.xyR[i], 1, q.xyR[i], 1, n);
@@ -45369,10 +45369,10 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          ae_vector_set_length(&bndl, n, _state);
          ae_vector_set_length(&bndu, n, _state);
          for (i = 0; i < n; i++) {
-            xm.xR[i] = 2 * randomreal(_state) - 1;
-            x0.xR[i] = 3 * randomreal(_state) - 1;
-            bndl.xR[i] = -(0.1 + 0.9 * randomreal(_state));
-            bndu.xR[i] = 0.1 + 0.9 * randomreal(_state);
+            xm.xR[i] = randommid();
+            x0.xR[i] = 3.0 * randomreal() - 1.0;
+            bndl.xR[i] = -(0.1 + 0.9 * randomreal());
+            bndu.xR[i] = 0.1 + 0.9 * randomreal();
             for (j = 0; j < n; j++) {
                c.xyR[2 * i + 0][j] = 0.0;
                c.xyR[2 * i + 1][j] = 0.0;
@@ -45511,22 +45511,22 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-            xm.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = 0.1 + 0.8 * randomreal();
+            xm.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2, _state);
+            xstart.xR[i] = (double)randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.xyR[i][j] = 2 * randomreal(_state) - 1;
+               c.xyR[i][j] = randommid();
             }
             v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
             ct.xZ[i] = 0;
          }
          for (i = 0; i < n; i++) {
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            b.xR[i] = randommid();
          }
       // Create optimizer, solve
          minnlccreate(n, &xstart, &state, _state);
@@ -45609,11 +45609,11 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            xm.xR[i] = 0.1 + 0.8 * randomreal(_state);
+            xm.xR[i] = 0.1 + 0.8 * randomreal();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            x0.xR[i] = (double)randominteger(2, _state);
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = (double)randominteger(2);
+            b.xR[i] = randommid();
          }
          for (i = 0; i < n / 2; i++) {
             v = 0.0;
@@ -45724,8 +45724,8 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
       aulits = 10;
       for (pass = 1; pass <= 50; pass++) {
       // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, xm, XStart.
-         n = randominteger(5, _state) + 2;
-         k = 1 + randominteger(n - 1, _state);
+         n = randominteger(5) + 2;
+         k = 1 + randominteger(n - 1);
          spdmatrixrndcond(n, 1.0E2, &fulla, _state);
          ae_vector_set_length(&b, n, _state);
          ae_vector_set_length(&bndl, n, _state);
@@ -45735,14 +45735,14 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          ae_matrix_set_length(&c, k, n + 1, _state);
          ae_vector_set_length(&ct, k, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 0.1 + 0.8 * randomreal(_state);
-            b.xR[i] = 2 * randomreal(_state) - 1;
+            x0.xR[i] = 0.1 + 0.8 * randomreal();
+            b.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.xyR[i][j] = 2 * randomreal(_state) - 1;
+               c.xyR[i][j] = randommid();
             }
             c.xyR[i][i] += 4;
             v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
@@ -45751,7 +45751,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          }
       // Start from first point
          for (i = 0; i < n; i++) {
-            xstart.xR[i] = 4 * randomreal(_state) - 2;
+            xstart.xR[i] = 2.0 * randommid();
          }
          minnlccreate(n, &xstart, &state, _state);
          if (solvertype == 0) {
@@ -45801,7 +45801,7 @@ static void testminnlcunit_testlc(bool *wereerrors, ae_state *_state) {
          }
       // Start from another point
          for (i = 0; i < n; i++) {
-            xstart.xR[i] = 4 * randomreal(_state) - 2;
+            xstart.xR[i] = 2.0 * randommid();
          }
          minnlcrestartfrom(&state, &xstart, _state);
          while (minnlciteration(&state, _state)) {
@@ -46270,7 +46270,7 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
       n = 2;
       ae_vector_set_length(&x0, n, _state);
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
       }
       minnlccreate(n, &x0, &state, _state);
       if (solvertype == 0) {
@@ -49404,8 +49404,8 @@ static void testminnsunit_basictest0uc(bool *errors, ae_state *_state) {
    ae_vector_set_length(&d, n, _state);
    for (pass = 1; pass <= 10; pass++) {
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         d.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
+         x0.xR[i] = randommid();
+         d.xR[i] = pow(10.0, randommid());
       }
       minnscreate(n, &x0, &s, _state);
       minnssetalgoags(&s, 0.1, 0.0, _state);
@@ -49517,10 +49517,10 @@ static void testminnsunit_basictest0bc(bool *errors, ae_state *_state) {
    ae_vector_set_length(&d, n, _state);
    for (pass = 1; pass <= 10; pass++) {
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         d.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
-         v0 = 2 * randomreal(_state) - 1;
-         v1 = 2 * randomreal(_state) - 1;
+         x0.xR[i] = randommid();
+         d.xR[i] = pow(10.0, randommid());
+         v0 = randommid();
+         v1 = randommid();
          bl.xR[i] = rmin2(v0, v1, _state);
          bu.xR[i] = rmax2(v0, v1, _state);
       }
@@ -49639,12 +49639,12 @@ static void testminnsunit_basictest0lc(bool *errors, ae_state *_state) {
    for (pass = 1; pass <= 10; pass++) {
       nc = 0;
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         if (randomreal(_state) < 0.5) {
+         x0.xR[i] = randommid();
+         if (randombool()) {
             for (j = 0; j <= n; j++) {
                c.xyR[nc][j] = 0.0;
             }
-            c.xyR[nc][i] = 1.0 + randomreal(_state);
+            c.xyR[nc][i] = 1.0 + randomreal();
             ct.xZ[nc] = 0;
             nc++;
          } else {
@@ -49652,8 +49652,8 @@ static void testminnsunit_basictest0lc(bool *errors, ae_state *_state) {
                c.xyR[nc + 0][j] = 0.0;
                c.xyR[nc + 1][j] = 0.0;
             }
-            c.xyR[nc + 0][i] = 1.0 + randomreal(_state);
-            c.xyR[nc + 1][i] = 1.0 + randomreal(_state);
+            c.xyR[nc + 0][i] = 1.0 + randomreal();
+            c.xyR[nc + 1][i] = 1.0 + randomreal();
             ct.xZ[nc + 0] = 1;
             ct.xZ[nc + 1] = -1;
             nc += 2;
@@ -49780,20 +49780,20 @@ static void testminnsunit_basictest0nlc(bool *errors, ae_state *_state) {
       nec = 0;
       nic = 0;
       for (i = 0; i < n; i++) {
-         x0.xR[i] = 2 * randomreal(_state) - 1;
-         if (randomreal(_state) < 0.5) {
+         x0.xR[i] = randommid();
+         if (randombool()) {
             for (j = 0; j <= n; j++) {
                ec.xyR[nec][j] = 0.0;
             }
-            ec.xyR[nec][i] = 1.0 + randomreal(_state);
+            ec.xyR[nec][i] = 1.0 + randomreal();
             nec++;
          } else {
             for (j = 0; j <= n; j++) {
                ic.xyR[nic + 0][j] = 0.0;
                ic.xyR[nic + 1][j] = 0.0;
             }
-            ic.xyR[nic + 0][i] = 1.0 + randomreal(_state);
-            ic.xyR[nic + 1][i] = -1.0 - randomreal(_state);
+            ic.xyR[nic + 0][i] = 1.0 + randomreal();
+            ic.xyR[nic + 1][i] = -1.0 - randomreal();
             nic += 2;
          }
       }
@@ -49881,13 +49881,13 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&xrfirst, n, _state);
          ae_vector_set_length(&xrlast, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
-            s.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
+            x0.xR[i] = 10 * randommid();
+            xc.xR[i] = randommid();
+            d.xR[i] = pow(10.0, 2 * randommid());
+            s.xR[i] = pow(10.0, 2 * randommid());
          }
-         requirexrep = randomreal(_state) > 0.5;
-         xtol = 0.01 * pow(10.0, -1 * randomreal(_state));
+         requirexrep = randombool();
+         xtol = 0.01 * pow(10.0, -1 * randomreal());
          epsrad = xtol / 100;
          minnscreate(n, &x0, &state, _state);
          minnssetalgoags(&state, 0.1, 0.0, _state);
@@ -49947,12 +49947,12 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&s, n, _state);
          ae_vector_set_length(&xrlast, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
-            s.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
+            x0.xR[i] = 10 * randommid();
+            xc.xR[i] = randommid();
+            d.xR[i] = pow(10.0, 2 * randommid());
+            s.xR[i] = pow(10.0, 2 * randommid());
          }
-         xtol = 0.01 * pow(10.0, -1 * randomreal(_state));
+         xtol = 0.01 * pow(10.0, -1 * randomreal());
          epsrad = xtol / 100;
          minnscreatef(n, &x0, epsrad / 100, &state, _state);
          minnssetalgoags(&state, 0.1, 0.0, _state);
@@ -50009,10 +50009,10 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&s, n, _state);
          ae_vector_set_length(&xrlast, n, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
-            d.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            xc.xR[i] = 2 * randomreal(_state) - 1;
+            s.xR[i] = pow(10.0, randommid());
+            d.xR[i] = pow(10.0, randommid());
+            x0.xR[i] = randommid();
+            xc.xR[i] = randommid();
             x0s.xR[i] = x0.xR[i] * s.xR[i];
          }
          minnscreate(n, &x0, &state, _state);
@@ -50127,32 +50127,32 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&xrfirst, n, _state);
          ae_vector_set_length(&xrlast, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
-            s.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
+            x0.xR[i] = 10 * randommid();
+            xc.xR[i] = randommid();
+            d.xR[i] = pow(10.0, 2 * randommid());
+            s.xR[i] = pow(10.0, 2 * randommid());
             bndl.xR[i] = _state->v_neginf;
             bndu.xR[i] = _state->v_posinf;
-            k = randominteger(5, _state);
+            k = randominteger(5);
             if (k == 1) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
             }
             if (k == 2) {
-               bndu.xR[i] = 2 * randomreal(_state) - 1;
+               bndu.xR[i] = randommid();
             }
             if (k == 3) {
-               v0 = 2 * randomreal(_state) - 1;
-               v1 = 2 * randomreal(_state) - 1;
+               v0 = randommid();
+               v1 = randommid();
                bndl.xR[i] = rmin2(v0, v1, _state);
                bndu.xR[i] = rmax2(v0, v1, _state);
             }
             if (k == 4) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
                bndu.xR[i] = bndl.xR[i];
             }
          }
-         requirexrep = randomreal(_state) > 0.5;
-         xtol = 0.01 * pow(10.0, -1 * randomreal(_state));
+         requirexrep = randombool();
+         xtol = 0.01 * pow(10.0, -1 * randomreal());
          epsrad = xtol / 100;
          minnscreate(n, &x0, &state, _state);
          minnssetalgoags(&state, 0.1, 0.0, _state);
@@ -50229,7 +50229,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
       ae_vector_set_length(&b, n, _state);
       for (i = 0; i < n; i++) {
          x0.xR[i] = 1.0;
-         b.xR[i] = randomreal(_state) - 0.5;
+         b.xR[i] = randomreal() - 0.5;
          bndl.xR[i] = 0.0;
          bndu.xR[i] = _state->v_posinf;
       }
@@ -50296,7 +50296,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&bndl, n, _state);
          ae_vector_set_length(&bndu, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = randomreal(_state) - 0.5;
+            x0.xR[i] = randomreal() - 0.5;
             bndl.xR[i] = -1.0;
             bndu.xR[i] = 1.0;
          }
@@ -50343,31 +50343,31 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&s, n, _state);
          ae_vector_set_length(&xrlast, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
-            s.xR[i] = pow(10.0, 2 * (2 * randomreal(_state) - 1));
+            x0.xR[i] = 10 * randommid();
+            xc.xR[i] = randommid();
+            d.xR[i] = pow(10.0, 2 * randommid());
+            s.xR[i] = pow(10.0, 2 * randommid());
             bndl.xR[i] = _state->v_neginf;
             bndu.xR[i] = _state->v_posinf;
-            k = randominteger(5, _state);
+            k = randominteger(5);
             if (k == 1) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
             }
             if (k == 2) {
-               bndu.xR[i] = 2 * randomreal(_state) - 1;
+               bndu.xR[i] = randommid();
             }
             if (k == 3) {
-               v0 = 2 * randomreal(_state) - 1;
-               v1 = 2 * randomreal(_state) - 1;
+               v0 = randommid();
+               v1 = randommid();
                bndl.xR[i] = rmin2(v0, v1, _state);
                bndu.xR[i] = rmax2(v0, v1, _state);
             }
             if (k == 4) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
                bndu.xR[i] = bndl.xR[i];
             }
          }
-         xtol = 0.01 * pow(10.0, -2 * randomreal(_state));
+         xtol = 0.01 * pow(10.0, -2 * randomreal());
          epsrad = xtol / 100;
          minnscreatef(n, &x0, epsrad / 100, &state, _state);
          minnssetalgoags(&state, 0.1, 0.0, _state);
@@ -50437,28 +50437,28 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&scaledbndl, n, _state);
          ae_vector_set_length(&scaledbndu, n, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(2.0, (double)(randominteger(5, _state) - 2));
-            d.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            xc.xR[i] = 2 * randomreal(_state) - 1;
+            s.xR[i] = pow(2.0, (double)(randominteger(5) - 2));
+            d.xR[i] = pow(10.0, randomreal() - 0.5);
+            x0.xR[i] = randommid();
+            xc.xR[i] = randommid();
             x0s.xR[i] = x0.xR[i] * s.xR[i];
             bndl.xR[i] = _state->v_neginf;
             bndu.xR[i] = _state->v_posinf;
-            k = randominteger(5, _state);
+            k = randominteger(5);
             if (k == 1) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
             }
             if (k == 2) {
-               bndu.xR[i] = 2 * randomreal(_state) - 1;
+               bndu.xR[i] = randommid();
             }
             if (k == 3) {
-               v0 = 2 * randomreal(_state) - 1;
-               v1 = 2 * randomreal(_state) - 1;
+               v0 = randommid();
+               v1 = randommid();
                bndl.xR[i] = rmin2(v0, v1, _state);
                bndu.xR[i] = rmax2(v0, v1, _state);
             }
             if (k == 4) {
-               bndl.xR[i] = 2 * randomreal(_state) - 1;
+               bndl.xR[i] = randommid();
                bndu.xR[i] = bndl.xR[i];
             }
             scaledbndl.xR[i] = bndl.xR[i] * s.xR[i];
@@ -50572,19 +50572,19 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_vector_set_length(&d, n, _state);
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
-            xc.xR[i] = 2 * randomreal(_state) - 1;
-            d.xR[i] = 1 + randomreal(_state);
-            s.xR[i] = 1 + randomreal(_state);
+            x0.xR[i] = 10 * randommid();
+            xc.xR[i] = randommid();
+            d.xR[i] = 1 + randomreal();
+            s.xR[i] = 1 + randomreal();
          }
-         nc = randominteger((n + 1) / 2, _state);
+         nc = randominteger((n + 1) / 2);
          if (nc > 0) {
             ae_matrix_set_length(&c, nc, n + 1, _state);
             ae_vector_set_length(&ct, nc, _state);
             for (i = 0; i < nc; i++) {
-               ct.xZ[i] = randominteger(3, _state) - 1;
+               ct.xZ[i] = randominteger(3) - 1;
                for (j = 0; j <= n; j++) {
-                  c.xyR[i][j] = randomreal(_state) - 0.5;
+                  c.xyR[i][j] = randomreal() - 0.5;
                }
             }
          }
@@ -50683,7 +50683,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
          ae_matrix_set_length(&c, 2 * n, n + 1, _state);
          ae_vector_set_length(&ct, 2 * n, _state);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = randomreal(_state) - 0.5;
+            x0.xR[i] = randomreal() - 0.5;
             for (j = 0; j < n; j++) {
                c.xyR[2 * i + 0][j] = 0.0;
                c.xyR[2 * i + 1][j] = 0.0;
@@ -50751,25 +50751,25 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             }
          }
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
-            d.xR[i] = pow(10.0, 2 * randomreal(_state) - 1);
-            x0.xR[i] = 2 * randomreal(_state) - 1;
-            xc.xR[i] = 2 * randomreal(_state) - 1;
+            s.xR[i] = pow(10.0, randommid());
+            d.xR[i] = pow(10.0, randommid());
+            x0.xR[i] = randommid();
+            xc.xR[i] = randommid();
             x0s.xR[i] = x0.xR[i] * s.xR[i];
-            k = randominteger(5, _state);
+            k = randominteger(5);
             if (k == 1) {
                c.xyR[2 * i + 0][i] = 1.0;
-               c.xyR[2 * i + 0][n] = 2 * randomreal(_state) - 1;
+               c.xyR[2 * i + 0][n] = randommid();
                ct.xZ[2 * i + 0] = 1;
             }
             if (k == 2) {
                c.xyR[2 * i + 0][i] = 1.0;
-               c.xyR[2 * i + 0][n] = 2 * randomreal(_state) - 1;
+               c.xyR[2 * i + 0][n] = randommid();
                ct.xZ[2 * i + 0] = -1;
             }
             if (k == 3) {
-               v0 = 2 * randomreal(_state) - 1;
-               v1 = 2 * randomreal(_state) - 1;
+               v0 = randommid();
+               v1 = randommid();
                c.xyR[2 * i + 0][i] = 1.0;
                c.xyR[2 * i + 0][n] = rmin2(v0, v1, _state);
                c.xyR[2 * i + 1][i] = 1.0;
@@ -50779,7 +50779,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
             }
             if (k == 4) {
                c.xyR[2 * i + 0][i] = 1.0;
-               c.xyR[2 * i + 0][n] = 2 * randomreal(_state) - 1;
+               c.xyR[2 * i + 0][n] = randommid();
                ct.xZ[2 * i + 0] = 0;
             }
          }
@@ -50899,11 +50899,11 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                ae_vector_set_length(&r, n, _state);
                ae_vector_set_length(&s, n, _state);
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = 2 * randomreal(_state) - 1;
-                  xc.xR[i] = 2 * randomreal(_state) - 1;
-                  d.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  s.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  r.xR[i] = (2 * randominteger(2, _state) - 1) * (0.1 + randomreal(_state));
+                  x0.xR[i] = randommid();
+                  xc.xR[i] = randommid();
+                  d.xR[i] = pow(10.0, randomreal() - 0.5);
+                  s.xR[i] = pow(10.0, randomreal() - 0.5);
+                  r.xR[i] = (2 * randominteger(2) - 1) * (0.1 + randomreal());
                }
                xtol = 0.01;
                epsrad = xtol / 100;
@@ -50967,11 +50967,11 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                ae_vector_set_length(&r, n, _state);
                ae_vector_set_length(&s, n, _state);
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = 2 * randomreal(_state) - 1;
-                  xc.xR[i] = 2 * randomreal(_state) - 1;
-                  d.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  s.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  r.xR[i] = (2 * randominteger(2, _state) - 1) * (0.1 + randomreal(_state));
+                  x0.xR[i] = randommid();
+                  xc.xR[i] = randommid();
+                  d.xR[i] = pow(10.0, randomreal() - 0.5);
+                  s.xR[i] = pow(10.0, randomreal() - 0.5);
+                  r.xR[i] = (2 * randominteger(2) - 1) * (0.1 + randomreal());
                }
                xtol = 0.01;
                epsrad = xtol / 100;
@@ -51049,11 +51049,11 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors, ae_sta
                ae_vector_set_length(&r, n, _state);
                ae_vector_set_length(&s, n, _state);
                for (i = 0; i < n; i++) {
-                  x0.xR[i] = 2 * randomreal(_state) - 1;
-                  xc.xR[i] = 2 * randomreal(_state) - 1;
-                  d.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  s.xR[i] = pow(10.0, randomreal(_state) - 0.5);
-                  r.xR[i] = (2 * randominteger(2, _state) - 1) * (0.1 + randomreal(_state));
+                  x0.xR[i] = randommid();
+                  xc.xR[i] = randommid();
+                  d.xR[i] = pow(10.0, randomreal() - 0.5);
+                  s.xR[i] = pow(10.0, randomreal() - 0.5);
+                  r.xR[i] = (2 * randominteger(2) - 1) * (0.1 + randomreal());
                   x0s.xR[i] = x0.xR[i] * s.xR[i];
                }
                minnscreate(n, &x0, &state, _state);
@@ -51290,7 +51290,7 @@ static void testminbcunit_setrandompreconditioner(minbcstate *state, ae_int_t n,
    if (preckind == 1) {
       ae_vector_set_length(&p, n, _state);
       for (i = 0; i < n; i++) {
-         p.xR[i] = exp(6 * randomreal(_state) - 3);
+         p.xR[i] = exp(3.0 * randommid());
       }
       minbcsetprecdiag(state, &p, _state);
    } else {
@@ -51367,8 +51367,8 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   for (i = 0; i < n; i++) {
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
-                     x.xR[i] = randomreal(_state);
-                     x0.xR[i] = 3 * randomreal(_state) - 1;
+                     x.xR[i] = randomreal();
+                     x0.xR[i] = 3.0 * randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -51442,15 +51442,15 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   ae_vector_set_length(&x, n, _state);
                   ae_vector_set_length(&x0, n, _state);
                   for (i = 0; i < n; i++) {
-                     if (randomreal(_state) > 0.5) {
+                     if (randombool()) {
                         bl.xR[i] = 0.0;
                         bu.xR[i] = 1.0;
                      } else {
-                        bl.xR[i] = randomreal(_state);
+                        bl.xR[i] = randomreal();
                         bu.xR[i] = bl.xR[i];
                      }
-                     x.xR[i] = randomreal(_state);
-                     x0.xR[i] = 3 * randomreal(_state) - 1;
+                     x.xR[i] = randomreal();
+                     x0.xR[i] = 3.0 * randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -51522,10 +51522,10 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                for (i = 0; i < n; i++) {
                   bl.xR[i] = 0.0;
                   bu.xR[i] = 1.0;
-                  x.xR[i] = randomreal(_state);
-                  x0.xR[i] = 3 * randomreal(_state) - 1;
+                  x.xR[i] = randomreal();
+                  x0.xR[i] = 3.0 * randomreal() - 1.0;
                }
-               i = randominteger(n, _state);
+               i = randominteger(n);
                bl.xR[i] = 1.0;
                bu.xR[i] = 0.0;
             // Create and optimize
@@ -51674,7 +51674,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bu, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = 10.0;
-         bl.xR[i] = 2 * randomreal(_state) - 1;
+         bl.xR[i] = randommid();
          bu.xR[i] = _state->v_posinf;
       }
       minbccreate(n, &x, &state, _state);
@@ -51759,8 +51759,8 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
    for (pass = 1; pass <= passcount; pass++) {
       ae_vector_set_length(&x, 1, _state);
       ae_vector_set_length(&s, 1, _state);
-      diffstep = randomreal(_state) * 1.0E-6;
-      s.xR[0] = exp(randomreal(_state) * 4 - 2);
+      diffstep = randomreal() * 1.0E-6;
+      s.xR[0] = exp(randomreal() * 4 - 2);
       x.xR[0] = 0.0;
       minbccreatef(1, &x, diffstep, &state, _state);
       minbcsetcond(&state, 1.0E-6, 0.0, epsx, 0, _state);
@@ -51781,9 +51781,9 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bl, n, _state);
       ae_vector_set_length(&bu, n, _state);
       x.xR[0] = 100.0;
-      bl.xR[0] = 2 * randomreal(_state) - 1;
+      bl.xR[0] = randommid();
       bu.xR[0] = _state->v_posinf;
-      stpmax = 0.05 + 0.05 * randomreal(_state);
+      stpmax = 0.05 + 0.05 * randomreal();
       minbccreate(n, &x, &state, _state);
       minbcsetbc(&state, &bl, &bu, _state);
       minbcsetcond(&state, epsg, 0.0, epsx, 0, _state);
@@ -51808,7 +51808,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&bl, n, _state);
       ae_vector_set_length(&bu, n, _state);
-      bl.xR[0] = 4 * randomreal(_state) + 1;
+      bl.xR[0] = 4 * randomreal() + 1;
       bu.xR[0] = bl.xR[0] + 1;
       x.xR[0] = 0.5 * (bl.xR[0] + bu.xR[0]);
       minbccreate(n, &x, &state, _state);
@@ -51851,12 +51851,12 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
                ae_vector_set_length(&bl, n, _state);
                ae_vector_set_length(&bu, n, _state);
                for (i = 0; i < n; i++) {
-                  x.xR[i] = randomreal(_state) + 1;
+                  x.xR[i] = randomreal() + 1;
                   bl.xR[i] = -100000.0;
                   bu.xR[i] = 100000.0;
-                  a.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
-                  s.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
-                  h.xR[i] = exp(log(10.0) * (2 * randomreal(_state) - 1));
+                  a.xR[i] = exp(log(10.0) * randommid());
+                  s.xR[i] = exp(log(10.0) * randommid());
+                  h.xR[i] = exp(log(10.0) * randommid());
                }
                minbccreate(n, &x, &state, _state);
                if (ckind == 1) {
@@ -52006,7 +52006,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
          }
          while (minbciteration(&state, _state)) {
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state) + 10000 * machineepsilon * randomreal(_state);
+               state.f = sqr(state.x.xR[0] + 1, _state) + sqr(state.x.xR[1] + 1, _state) + 10000 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
@@ -52157,13 +52157,13 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&xlast, n, _state);
       for (i = 0; i < n; i++) {
-         x.xR[i] = 6 + randomreal(_state);
+         x.xR[i] = 6 + randomreal();
       }
       ae_vector_set_length(&s, 3, _state);
       s.xR[0] = 0.00001;
       s.xR[1] = 0.00001;
       s.xR[2] = 10000.0;
-      stopcallidx = randominteger(20, _state);
+      stopcallidx = randominteger(20);
       maxits = 25;
       minbccreate(n, &x, &state, _state);
       minbcsetcond(&state, 0.0, 0.0, 0.0, maxits, _state);
@@ -52277,7 +52277,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbcrestartfrom(&state, &x, _state);
             while (minbciteration(&state, _state)) {
@@ -52289,14 +52289,14 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
          }
          ae_vector_set_length(&diagh, n, _state);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal(_state));
+            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal());
          }
          minbcsetprecdiag(&state, &diagh, _state);
          minbcsetscale(&state, &units, _state);
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbcrestartfrom(&state, &x, _state);
             while (minbciteration(&state, _state)) {
@@ -52310,14 +52310,14 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
       // Test it with scale-based preconditioner
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal(_state)));
+            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal()));
          }
          minbcsetprecdefault(&state, _state);
          minbcsetscale(&state, &s, _state);
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbcrestartfrom(&state, &x, _state);
             while (minbciteration(&state, _state)) {
@@ -52332,7 +52332,7 @@ static void testminbcunit_testpreconditioning(bool *err, ae_state *_state) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             minbcrestartfrom(&state, &x, _state);
             while (minbciteration(&state, _state)) {
@@ -53127,7 +53127,7 @@ static bool testnearestneighborunit_kdtresultsdifferent(RMatrix *refxy, ae_int_t
 static double testnearestneighborunit_vnorm(RVector *x, ae_int_t n, ae_int_t normtype, ae_state *_state) {
    ae_int_t i;
    double result;
-   result = randomreal(_state);
+   result = randomreal();
    if (normtype == 0) {
       result = 0.0;
       for (i = 0; i < n; i++) {
@@ -53244,18 +53244,18 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
 //   then all points not in result must be not closer than R.
    for (q = 1; q <= qcount; q++) {
    // Select K: 1..N
-      if (randomreal(_state) > 0.5) {
-         k = 1 + randominteger(n, _state);
+      if (randombool()) {
+         k = 1 + randominteger(n);
       } else {
          k = 1;
       }
    // Select point (either one of the points, or random)
-      if (randomreal(_state) > 0.5) {
-         i = randominteger(n, _state);
+      if (randombool()) {
+         i = randominteger(n);
          ae_v_move(ptx.xR, 1, xy->xyR[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.xR[i] = 2 * randomreal(_state) - 1;
+            ptx.xR[i] = randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -53463,20 +53463,20 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
 //   then all points not in result must be not closer than R/(1+Eps).
    for (q = 1; q <= qcount; q++) {
    // Select K: 1..N
-      if (randomreal(_state) > 0.5) {
-         k = 1 + randominteger(n, _state);
+      if (randombool()) {
+         k = 1 + randominteger(n);
       } else {
          k = 1;
       }
    // Select Eps
-      eps = 0.5 + randomreal(_state);
+      eps = 0.5 + randomreal();
    // Select point (either one of the points, or random)
-      if (randomreal(_state) > 0.5) {
-         i = randominteger(n, _state);
+      if (randombool()) {
+         i = randominteger(n);
          ae_v_move(ptx.xR, 1, xy->xyR[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.xR[i] = 2 * randomreal(_state) - 1;
+            ptx.xR[i] = randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -53599,20 +53599,20 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
 //   then all points not in result must be not closer than R.
    for (q = 1; q <= qcount; q++) {
    // Use ordering?
-      orderedrnn = randomreal(_state) > 0.5;
+      orderedrnn = randombool();
    // Select R
-      if (randomreal(_state) > 0.3) {
-         r = rmax2(randomreal(_state), machineepsilon, _state);
-      } else {
+      if (randombool(0.3)) {
          r = machineepsilon;
+      } else {
+         r = rmax2(randomreal(), machineepsilon, _state);
       }
    // Select point (either one of the points, or random)
-      if (randomreal(_state) > 0.5) {
-         i = randominteger(n, _state);
+      if (randombool()) {
+         i = randominteger(n);
          ae_v_move(ptx.xR, 1, xy->xyR[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.xR[i] = 2 * randomreal(_state) - 1;
+            ptx.xR[i] = randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -53738,7 +53738,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
    // More than one exactly equal point may be found.
    // Only thread-safe version is tested.
       kdtreecreaterequestbuffer(&treext, &bufxt, _state);
-      k = randominteger(n, _state);
+      k = randominteger(n);
       for (j = 0; j < nx; j++) {
          qmin.xR[j] = xy->xyR[k][j];
          qmax.xR[j] = xy->xyR[k][j];
@@ -53766,9 +53766,9 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       }
    // Test for randomly generated box (thread-safe version)
       for (j = 0; j < nx; j++) {
-         qmin.xR[j] = boxmin.xR[j] + randomreal(_state) * (boxmax.xR[j] - boxmin.xR[j]);
+         qmin.xR[j] = boxmin.xR[j] + randomreal() * (boxmax.xR[j] - boxmin.xR[j]);
          qmax.xR[j] = qmin.xR[j];
-         v = spread * pow(10.0, -2 * randomreal(_state));
+         v = spread * pow(10.0, -2 * randomreal());
          qmin.xR[j] -= v;
          qmax.xR[j] += v;
       }
@@ -53802,9 +53802,9 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       }
    // Test for randomly generated box (non-thread-safe version)
       for (j = 0; j < nx; j++) {
-         qmin.xR[j] = boxmin.xR[j] + randomreal(_state) * (boxmax.xR[j] - boxmin.xR[j]);
+         qmin.xR[j] = boxmin.xR[j] + randomreal() * (boxmax.xR[j] - boxmin.xR[j]);
          qmax.xR[j] = qmin.xR[j];
-         v = spread * pow(10.0, -2 * randomreal(_state));
+         v = spread * pow(10.0, -2 * randomreal());
          qmin.xR[j] -= v;
          qmax.xR[j] += v;
       }
@@ -53913,9 +53913,9 @@ static void testnearestneighborunit_testkdtreeserialization(bool *err, ae_state 
                ae_vector_set_length(&tags, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < nx + ny; j++) {
-                     xy.xyR[i][j] = randomreal(_state);
+                     xy.xyR[i][j] = randomreal();
                   }
-                  tags.xZ[i] = randominteger(100, _state);
+                  tags.xZ[i] = randominteger(100);
                }
             // Build tree, pass it through serializer
                kdtreebuildtagged(&xy, &tags, n, nx, ny, normtype, &tree0, _state);
@@ -54009,7 +54009,7 @@ static bool testnearestneighborunit_testspecialcases(ae_state *_state) {
       for (ny = 0; ny <= 3; ny++) {
          for (normtype = 0; normtype <= 2; normtype++) {
          // Build tree
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                kdtreebuildtagged(&xy, &tags, 0, nx, ny, normtype, &kdt, _state);
             } else {
                kdtreebuild(&xy, 0, nx, ny, normtype, &kdt, _state);
@@ -54017,7 +54017,7 @@ static bool testnearestneighborunit_testspecialcases(ae_state *_state) {
          // Test different queries
             ae_vector_set_length(&x, nx, _state);
             for (i = 0; i < nx; i++) {
-               x.xR[i] = randomreal(_state);
+               x.xR[i] = randomreal();
             }
             result = result || kdtreequeryknn(&kdt, &x, 1, true, _state) > 0;
             result = result || kdtreequeryrnn(&kdt, &x, 1.0E6, true, _state) > 0;
@@ -54035,7 +54035,7 @@ static bool testnearestneighborunit_testspecialcases(ae_state *_state) {
    ny = 1;
    n = 100000;
    nk = 100;
-   v = randomreal(_state);
+   v = randomreal();
    ae_matrix_set_length(&xy, n, nx + ny, _state);
    ae_vector_set_length(&x, nx, _state);
    for (i = 0; i < n; i++) {
@@ -54050,7 +54050,7 @@ static bool testnearestneighborunit_testspecialcases(ae_state *_state) {
    result = result || kdtreequeryrnn(&kdt, &x, 0.0001, true, _state) != n;
    for (i = 0; i < nk; i++) {
       for (j = 0; j < nx + ny; j++) {
-         xy.xyR[i][j] = randomreal(_state);
+         xy.xyR[i][j] = randomreal();
       }
    }
    kdtreebuild(&xy, n, nx, ny, 2, &kdt, _state);
@@ -54092,34 +54092,34 @@ bool testnearestneighbor(bool silent, ae_state *_state) {
             ae_matrix_set_length(&xy, largen, nx + ny, _state);
             for (i = 0; i < largen; i++) {
                for (j = 0; j < nx + ny; j++) {
-                  xy.xyR[i][j] = 10 * randomreal(_state) - 5;
+                  xy.xyR[i][j] = 5.0 * randommid();
                }
             }
             for (n = 1; n <= 10; n++) {
-               testnearestneighborunit_testkdtuniform(&xy, n, nx, randominteger(ny + 1, _state), normtype, &kdterrors, _state);
+               testnearestneighborunit_testkdtuniform(&xy, n, nx, randominteger(ny + 1), normtype, &kdterrors, _state);
             }
-            testnearestneighborunit_testkdtuniform(&xy, largen, nx, randominteger(ny + 1, _state), normtype, &kdterrors, _state);
+            testnearestneighborunit_testkdtuniform(&xy, largen, nx, randominteger(ny + 1), normtype, &kdterrors, _state);
          // Test clustered (2*N points, pairs of equal points)
             ae_matrix_set_length(&xy, 2 * smalln, nx + ny, _state);
             for (i = 0; i < smalln; i++) {
                for (j = 0; j < nx + ny; j++) {
-                  xy.xyR[2 * i + 0][j] = 10 * randomreal(_state) - 5;
+                  xy.xyR[2 * i + 0][j] = 5.0 * randommid();
                   xy.xyR[2 * i + 1][j] = xy.xyR[2 * i + 0][j];
                }
             }
-            testnearestneighborunit_testkdtuniform(&xy, 2 * smalln, nx, randominteger(ny + 1, _state), normtype, &kdterrors, _state);
+            testnearestneighborunit_testkdtuniform(&xy, 2 * smalln, nx, randominteger(ny + 1), normtype, &kdterrors, _state);
          // Test degenerate case: all points are same except for one
             ae_matrix_set_length(&xy, smalln, nx + ny, _state);
-            v = randomreal(_state);
+            v = randomreal();
             for (i = 0; i < smalln - 1; i++) {
                for (j = 0; j < nx + ny; j++) {
                   xy.xyR[i][j] = v;
                }
             }
             for (j = 0; j < nx + ny; j++) {
-               xy.xyR[smalln - 1][j] = 10 * randomreal(_state) - 5;
+               xy.xyR[smalln - 1][j] = 5.0 * randommid();
             }
-            testnearestneighborunit_testkdtuniform(&xy, smalln, nx, randominteger(ny + 1, _state), normtype, &kdterrors, _state);
+            testnearestneighborunit_testkdtuniform(&xy, smalln, nx, randominteger(ny + 1), normtype, &kdterrors, _state);
          }
       }
    }
@@ -54187,17 +54187,17 @@ bool testodesolver(bool silent, ae_state *_state) {
          }
          ae_vector_set_length(&y, 2, _state);
          for (i = 0; i <= 1; i++) {
-            y.xR[i] = 2 * randomreal(_state) - 1;
+            y.xR[i] = randommid();
          }
-         m = 2 + randominteger(10, _state);
+         m = 2 + randominteger(10);
          ae_vector_set_length(&xg, m, _state);
-         xg.xR[0] = (m - 1) * randomreal(_state);
+         xg.xR[0] = (m - 1) * randomreal();
          for (i = 1; i < m; i++) {
-            xg.xR[i] = xg.xR[i - 1] + randomreal(_state);
+            xg.xR[i] = xg.xR[i - 1] + randomreal();
          }
          v = 2 * pi / (xg.xR[m - 1] - xg.xR[0]);
          ae_v_muld(xg.xR, 1, m, v);
-         if (randomreal(_state) > 0.5) {
+         if (randombool()) {
             ae_v_muld(xg.xR, 1, m, -1);
          }
          mynfev = 0;
@@ -54401,8 +54401,8 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix *a0, ae
       do {
          i = 1;
          while (i <= s) {
-            u1 = 2 * randomreal(_state) - 1;
-            u2 = 2 * randomreal(_state) - 1;
+            u1 = randommid();
+            u2 = randommid();
             sm = u1 * u1 + u2 * u2;
             if (sm == 0.0 || sm > 1.0) {
                continue;
@@ -54457,7 +54457,7 @@ static void testinverseupdateunit_generaterandommatrixcond(RMatrix *a0, ae_int_t
    l2 = log(1 / c);
    cc.xR[0] = exp(l1);
    for (i = 1; i < n - 1; i++) {
-      cc.xR[i] = exp(randomreal(_state) * (l2 - l1) + l1);
+      cc.xR[i] = exp(randomreal() * (l2 - l1) + l1);
    }
    cc.xR[n - 1] = exp(l2);
    ae_matrix_set_length(a0, n - 1 + 1, n - 1 + 1, _state);
@@ -54698,7 +54698,7 @@ bool testinverseupdate(bool silent, ae_state *_state) {
       ae_vector_set_length(&u, n - 1 + 1, _state);
       ae_vector_set_length(&v, n - 1 + 1, _state);
       for (pass = 1; pass <= passcount; pass++) {
-         c = exp(randomreal(_state) * log(10.0));
+         c = exp(randomreal() * log(10.0));
          testinverseupdateunit_generaterandommatrixcond(&a, n, c, _state);
          testinverseupdateunit_makeacopy(&a, n, n, &inva, _state);
          if (!testinverseupdateunit_invmat(&inva, n, _state)) {
@@ -54706,9 +54706,9 @@ bool testinverseupdate(bool silent, ae_state *_state) {
             break;
          }
       // Test simple update
-         updrow = randominteger(n, _state);
-         updcol = randominteger(n, _state);
-         val = 0.1 * (2 * randomreal(_state) - 1);
+         updrow = randominteger(n);
+         updcol = randominteger(n);
+         val = 0.1 * randommid();
          for (i = 0; i < n; i++) {
             if (i == updrow) {
                u.xR[i] = val;
@@ -54730,14 +54730,14 @@ bool testinverseupdate(bool silent, ae_state *_state) {
          rmatrixinvupdatesimple(&b2, n, updrow, updcol, val, _state);
          set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n, _state) > threshold * testinverseupdateunit_normalizednrm(&b1, n, _state), __FILE__, __LINE__, "testinverseupdateunit.ap:671");
       // Test row update
-         updrow = randominteger(n, _state);
+         updrow = randominteger(n);
          for (i = 0; i < n; i++) {
             if (i == updrow) {
                u.xR[i] = 1.0;
             } else {
                u.xR[i] = 0.0;
             }
-            v.xR[i] = 0.1 * (2 * randomreal(_state) - 1);
+            v.xR[i] = 0.1 * randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1, _state);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n, _state)) {
@@ -54748,14 +54748,14 @@ bool testinverseupdate(bool silent, ae_state *_state) {
          rmatrixinvupdaterow(&b2, n, updrow, &v, _state);
          set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n, _state) > threshold * testinverseupdateunit_normalizednrm(&b1, n, _state), __FILE__, __LINE__, "testinverseupdateunit.ap:693");
       // Test column update
-         updcol = randominteger(n, _state);
+         updcol = randominteger(n);
          for (i = 0; i < n; i++) {
             if (i == updcol) {
                v.xR[i] = 1.0;
             } else {
                v.xR[i] = 0.0;
             }
-            u.xR[i] = 0.1 * (2 * randomreal(_state) - 1);
+            u.xR[i] = 0.1 * randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1, _state);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n, _state)) {
@@ -54767,8 +54767,8 @@ bool testinverseupdate(bool silent, ae_state *_state) {
          set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n, _state) > threshold * testinverseupdateunit_normalizednrm(&b1, n, _state), __FILE__, __LINE__, "testinverseupdateunit.ap:715");
       // Test full update
          for (i = 0; i < n; i++) {
-            v.xR[i] = 0.1 * (2 * randomreal(_state) - 1);
-            u.xR[i] = 0.1 * (2 * randomreal(_state) - 1);
+            v.xR[i] = 0.1 * randommid();
+            u.xR[i] = 0.1 * randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1, _state);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n, _state)) {
@@ -54912,7 +54912,7 @@ bool testschur(bool silent, ae_state *_state) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
             }
          }
          testschurunit_testschurproblem(&a, n, &materr, &orterr, &errstruct, &wfailed, _state);
@@ -55005,7 +55005,7 @@ bool testspdgevd(bool silent, ae_state *_state) {
                ae_matrix_set_length(&l, n - 1 + 1, n - 1 + 1, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     a.xyR[i][j] = randommid();
                      a.xyR[j][i] = a.xyR[i][j];
                      afull.xyR[i][j] = a.xyR[i][j];
                      afull.xyR[j][i] = a.xyR[i][j];
@@ -55013,10 +55013,10 @@ bool testspdgevd(bool silent, ae_state *_state) {
                }
                for (i = 0; i < n; i++) {
                   for (j = i + 1; j < n; j++) {
-                     l.xyR[i][j] = randomreal(_state);
+                     l.xyR[i][j] = randomreal();
                      l.xyR[j][i] = l.xyR[i][j];
                   }
-                  l.xyR[i][i] = 1.5 + randomreal(_state);
+                  l.xyR[i][i] = 1.5 + randomreal();
                }
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
@@ -55032,20 +55032,20 @@ bool testspdgevd(bool silent, ae_state *_state) {
                   for (j = 0; j < n; j++) {
                      if (isuppera) {
                         if (j < i) {
-                           a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                           a.xyR[i][j] = randommid();
                         }
                      } else {
                         if (i < j) {
-                           a.xyR[i][j] = 2 * randomreal(_state) - 1;
+                           a.xyR[i][j] = randommid();
                         }
                      }
                      if (isupperb) {
                         if (j < i) {
-                           b.xyR[i][j] = 2 * randomreal(_state) - 1;
+                           b.xyR[i][j] = randommid();
                         }
                      } else {
                         if (i < j) {
-                           b.xyR[i][j] = 2 * randomreal(_state) - 1;
+                           b.xyR[i][j] = randommid();
                         }
                      }
                   }
@@ -56093,8 +56093,8 @@ bool testautogk(bool silent, ae_state *_state) {
    waserrors = false;
    errtol = 10000 * machineepsilon;
 // Simple test: integral(exp(x),+-1,+-2), no maximum width requirements
-   a = (2 * randominteger(2, _state) - 1) * 1.0;
-   b = (2 * randominteger(2, _state) - 1) * 2.0;
+   a = (2 * randominteger(2) - 1) * 1.0;
+   b = (2 * randominteger(2) - 1) * 2.0;
    autogksmooth(a, b, &state, _state);
    while (autogkiteration(&state, _state)) {
       state.f = exp(state.x);
@@ -56108,8 +56108,8 @@ bool testautogk(bool silent, ae_state *_state) {
       simpleerrors = simpleerrors || fabs(exact - v) > errtol * eabs;
    }
 // Simple test: integral(exp(x),+-1,+-2), XWidth=0.1
-   a = (2 * randominteger(2, _state) - 1) * 1.0;
-   b = (2 * randominteger(2, _state) - 1) * 2.0;
+   a = (2 * randominteger(2) - 1) * 1.0;
+   b = (2 * randominteger(2) - 1) * 2.0;
    autogksmoothw(a, b, 0.1, &state, _state);
    while (autogkiteration(&state, _state)) {
       state.f = exp(state.x);
@@ -56514,10 +56514,10 @@ static void testbasestatunit_testranking(bool *err, ae_state *_state) {
       ae_matrix_set_length(&xy2, npoints, nfeatures, _state);
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nfeatures; j++) {
-            xy0.xyR[i][j] = j + 0.2 * randomreal(_state) - 0.1;
+            xy0.xyR[i][j] = j + 0.1 * randommid();
          }
          for (j = 0; j < nfeatures - 1; j++) {
-            k = randominteger(nfeatures - j, _state);
+            k = randominteger(nfeatures - j);
             if (k != 0) {
                v = xy0.xyR[i][j];
                xy0.xyR[i][j] = xy0.xyR[i][j + k];
@@ -56777,24 +56777,24 @@ bool testbasestat(bool silent, ae_state *_state) {
                   ae_matrix_set_length(&my, n, ky, _state);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < kx; j++) {
-                        mx.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        mx.xyR[i][j] = randommid();
                      }
                      for (j = 0; j < ky; j++) {
-                        my.xyR[i][j] = 2 * randomreal(_state) - 1;
+                        my.xyR[i][j] = randommid();
                      }
                   }
                   if (ctype == 1) {
-                     cidxx = randominteger(kx, _state);
-                     cidxy = randominteger(ky, _state);
+                     cidxx = randominteger(kx);
+                     cidxy = randominteger(ky);
                      for (i = 0; i < n; i++) {
                         mx.xyR[i][cidxx] = 0.0;
                         my.xyR[i][cidxy] = 0.0;
                      }
                   }
                   if (ctype == 2) {
-                     cidxx = randominteger(kx, _state);
-                     cidxy = randominteger(ky, _state);
-                     v = sqrt((double)(randominteger(kx, _state) + 1) / kx);
+                     cidxx = randominteger(kx);
+                     cidxy = randominteger(ky);
+                     v = sqrt((double)(randominteger(kx) + 1) / kx);
                      for (i = 0; i < n; i++) {
                         mx.xyR[i][cidxx] = v;
                         my.xyR[i][cidxy] = v;
@@ -57467,8 +57467,8 @@ bool teststudentttests(bool silent, ae_state *_state) {
    ae_vector_set_length(&xa, n, _state);
    ae_vector_set_length(&ya, n, _state);
    for (i = 0; i < n; i++) {
-      xa.xR[i] = randomreal(_state);
-      ya.xR[i] = randomreal(_state);
+      xa.xR[i] = randomreal();
+      ya.xR[i] = randomreal();
    }
    unequalvariancettest(&xa, n, &ya, n, &tailb, &taill, &tailr, _state);
 //
@@ -57590,10 +57590,10 @@ bool testratint(bool silent, ae_state *_state) {
    // randomized tests
       for (pass = 1; pass <= passcount; pass++) {
       // generate weights from polynomial interpolation
-         v0 = 1 + 0.4 * randomreal(_state) - 0.2;
-         v1 = 2 * randomreal(_state) - 1;
-         v2 = 2 * randomreal(_state) - 1;
-         v3 = 2 * randomreal(_state) - 1;
+         v0 = 1 + 0.2 * randommid();
+         v1 = randommid();
+         v2 = randommid();
+         v3 = randommid();
          ae_vector_set_length(&x, n, _state);
          ae_vector_set_length(&y, n, _state);
          ae_vector_set_length(&w, n, _state);
@@ -57619,19 +57619,19 @@ bool testratint(bool silent, ae_state *_state) {
          barycentricunpack(&b1, &n2, &x2, &y2, &w2, _state);
          bcerrors = bcerrors || n2 != n;
          barycentricbuildxyw(&x2, &y2, &w2, n2, &b2, _state);
-         t = 2 * randomreal(_state) - 1;
+         t = randommid();
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, t, _state) - barycentriccalc(&b2, t, _state)) > threshold;
       // copy, compare
          testratintunit_brcunset(&b2, _state);
          barycentriccopy(&b1, &b2, _state);
-         t = 2 * randomreal(_state) - 1;
+         t = randommid();
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, t, _state) - barycentriccalc(&b2, t, _state)) > threshold;
       // test interpolation properties
          for (i = 0; i < n; i++) {
          // test interpolation at nodes
             bcerrors = bcerrors || fabs(barycentriccalc(&b1, x.xR[i], _state) - y.xR[i]) > threshold * fabs(y.xR[i]);
          // compare with polynomial interpolation
-            t = 2 * randomreal(_state) - 1;
+            t = randommid();
             testratintunit_poldiff2(&x, &y, n, t, &v0, &v1, &v2, _state);
             bcerrors = bcerrors || fabs(barycentriccalc(&b1, t, _state) - v0) > threshold * rmax2(fabs(v0), 1.0, _state);
          // test continuity between nodes
@@ -57658,7 +57658,7 @@ bool testratint(bool silent, ae_state *_state) {
          }
       // test differentiation properties
          for (i = 0; i < n; i++) {
-            t = 2 * randomreal(_state) - 1;
+            t = randommid();
             testratintunit_poldiff2(&x, &y, n, t, &v0, &v1, &v2, _state);
             d0 = 0.0;
             d1 = 0.0;
@@ -57675,21 +57675,21 @@ bool testratint(bool silent, ae_state *_state) {
             bcerrors = bcerrors || fabs(v2 - d2) > sqrt(threshold) * rmax2(fabs(v2), 1.0, _state);
          }
       // test linear translation
-         t = 2 * randomreal(_state) - 1;
-         a = 2 * randomreal(_state) - 1;
-         b = 2 * randomreal(_state) - 1;
+         t = randommid();
+         a = randommid();
+         b = randommid();
          testratintunit_brcunset(&b2, _state);
          barycentriccopy(&b1, &b2, _state);
          barycentriclintransx(&b2, a, b, _state);
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b, _state) - barycentriccalc(&b2, t, _state)) > threshold;
          a = 0.0;
-         b = 2 * randomreal(_state) - 1;
+         b = randommid();
          testratintunit_brcunset(&b2, _state);
          barycentriccopy(&b1, &b2, _state);
          barycentriclintransx(&b2, a, b, _state);
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b, _state) - barycentriccalc(&b2, t, _state)) > threshold;
-         a = 2 * randomreal(_state) - 1;
-         b = 2 * randomreal(_state) - 1;
+         a = randommid();
+         b = randommid();
          testratintunit_brcunset(&b2, _state);
          barycentriccopy(&b1, &b2, _state);
          barycentriclintransy(&b2, a, b, _state);
@@ -57794,10 +57794,10 @@ bool testratint(bool silent, ae_state *_state) {
    for (pass = 1; pass < passcount; pass++) {
       ae_vector_set_length(&x, 1, _state);
       ae_vector_set_length(&y, 1, _state);
-      x.xR[0] = 2 * randomreal(_state) - 1;
-      y.xR[0] = 2 * randomreal(_state) - 1;
+      x.xR[0] = randommid();
+      y.xR[0] = randommid();
       barycentricbuildfloaterhormann(&x, &y, 1, 1, &b1, _state);
-      maxerr = rmax2(maxerr, fabs(barycentriccalc(&b1, 2 * randomreal(_state) - 1, _state) - y.xR[0]), _state);
+      maxerr = rmax2(maxerr, fabs(barycentriccalc(&b1, randommid(), _state) - y.xR[0]), _state);
    }
    for (n = 2; n <= 10; n++) {
    // compare interpolant built by subroutine
@@ -57809,13 +57809,13 @@ bool testratint(bool silent, ae_state *_state) {
    // D=1, non-equidistant nodes
       for (pass = 1; pass <= passcount; pass++) {
       // Initialize X, Y, W
-         a = -1 - 1 * randomreal(_state);
-         b = 1 + 1 * randomreal(_state);
+         a = -1 - 1 * randomreal();
+         b = 1 + 1 * randomreal();
          for (i = 0; i < n; i++) {
             x.xR[i] = atan((b - a) * i / (n - 1) + a);
          }
          for (i = 0; i < n; i++) {
-            y.xR[i] = 2 * randomreal(_state) - 1;
+            y.xR[i] = randommid();
          }
          w.xR[0] = -1 / (x.xR[1] - x.xR[0]);
          s = 1.0;
@@ -57825,7 +57825,7 @@ bool testratint(bool silent, ae_state *_state) {
          }
          w.xR[n - 1] = s / (x.xR[n - 1] - x.xR[n - 2]);
          for (i = 0; i < n; i++) {
-            k = randominteger(n, _state);
+            k = randominteger(n);
             if (k != i) {
                t = x.xR[i];
                x.xR[i] = x.xR[k];
@@ -57842,7 +57842,7 @@ bool testratint(bool silent, ae_state *_state) {
          barycentricbuildfloaterhormann(&x, &y, n, 1, &b1, _state);
          barycentricbuildxyw(&x, &y, &w, n, &b2, _state);
          for (i = 1; i <= 2 * n; i++) {
-            t = a + (b - a) * randomreal(_state);
+            t = a + (b - a) * randomreal();
             maxerr = rmax2(maxerr, fabs(barycentriccalc(&b1, t, _state) - barycentriccalc(&b2, t, _state)), _state);
          }
       }
@@ -57854,13 +57854,13 @@ bool testratint(bool silent, ae_state *_state) {
                continue;
             }
          // Initialize X, Y, W
-            a = -1 - 1 * randomreal(_state);
-            b = 1 + 1 * randomreal(_state);
+            a = -1 - 1 * randomreal();
+            b = 1 + 1 * randomreal();
             for (i = 0; i < n; i++) {
                x.xR[i] = (b - a) * i / (n - 1) + a;
             }
             for (i = 0; i < n; i++) {
-               y.xR[i] = 2 * randomreal(_state) - 1;
+               y.xR[i] = randommid();
             }
             s = 1.0;
             if (d == 0) {
@@ -57889,7 +57889,7 @@ bool testratint(bool silent, ae_state *_state) {
             }
          // Mix
             for (i = 0; i < n; i++) {
-               k = randominteger(n, _state);
+               k = randominteger(n);
                if (k != i) {
                   t = x.xR[i];
                   x.xR[i] = x.xR[k];
@@ -57906,7 +57906,7 @@ bool testratint(bool silent, ae_state *_state) {
             barycentricbuildfloaterhormann(&x, &y, n, d, &b1, _state);
             barycentricbuildxyw(&x, &y, &w, n, &b2, _state);
             for (i = 1; i <= 2 * n; i++) {
-               t = a + (b - a) * randomreal(_state);
+               t = a + (b - a) * randomreal();
                maxerr = rmax2(maxerr, fabs(barycentriccalc(&b1, t, _state) - barycentriccalc(&b2, t, _state)), _state);
             }
          }
@@ -58820,10 +58820,10 @@ bool testpolint(bool silent, ae_state *_state) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * randomreal(_state) - 1;
-            b = 2 * randomreal(_state) - 1;
+            a = randommid();
+            b = randommid();
          } while (fabs(a - b) <= 0.2);
-         t = a + (1.2 * randomreal(_state) - 0.1) * (b - a);
+         t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dequidist(a, b, n, &x, &y, _state);
       // test "fast" equidistant interpolation (no barycentric model)
          interrors = interrors || fabs(polynomialcalceqdist(a, b, &y, n, t, _state) - testpolintunit_internalpolint(&x, &y, n, t, _state)) > threshold;
@@ -58845,10 +58845,10 @@ bool testpolint(bool silent, ae_state *_state) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * randomreal(_state) - 1;
-            b = 2 * randomreal(_state) - 1;
+            a = randommid();
+            b = randommid();
          } while (fabs(a - b) <= 0.2);
-         t = a + (1.2 * randomreal(_state) - 0.1) * (b - a);
+         t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dcheb1(a, b, n, &x, &y, _state);
       // test "fast" interpolation (no barycentric model)
          interrors = interrors || fabs(polynomialcalccheb1(a, b, &y, n, t, _state) - testpolintunit_internalpolint(&x, &y, n, t, _state)) > threshold;
@@ -58870,10 +58870,10 @@ bool testpolint(bool silent, ae_state *_state) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * randomreal(_state) - 1;
-            b = 2 * randomreal(_state) - 1;
+            a = randommid();
+            b = randommid();
          } while (fabs(a - b) <= 0.2);
-         t = a + (1.2 * randomreal(_state) - 0.1) * (b - a);
+         t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dcheb2(a, b, n, &x, &y, _state);
       // test "fast" interpolation (no barycentric model)
          interrors = interrors || fabs(polynomialcalccheb2(a, b, &y, n, t, _state) - testpolintunit_internalpolint(&x, &y, n, t, _state)) > threshold;
@@ -58894,11 +58894,11 @@ bool testpolint(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, k, _state);
          ae_vector_set_length(&y, k, _state);
       // Generate problem
-         a = 2 * randomreal(_state) - 1;
-         b = a + (0.1 + randomreal(_state)) * (2 * randominteger(2, _state) - 1);
-         v0 = 2 * randomreal(_state) - 1;
-         v1 = 2 * randomreal(_state) - 1;
-         v2 = 2 * randomreal(_state) - 1;
+         a = randommid();
+         b = a + (0.1 + randomreal()) * (2 * randominteger(2) - 1);
+         v0 = randommid();
+         v1 = randommid();
+         v2 = randommid();
          if (k == 1) {
             x.xR[0] = 0.5 * (a + b);
             y.xR[0] = v0;
@@ -58933,7 +58933,7 @@ bool testpolint(bool silent, ae_state *_state) {
          }
       // Test backward conversion
          polynomialcheb2bar(&c, k, a, b, &p2, _state);
-         v = a + randomreal(_state) * (b - a);
+         v = a + randomreal() * (b - a);
          interrors = interrors || fabs(barycentriccalc(&p, v, _state) - barycentriccalc(&p2, v, _state)) > threshold;
       }
    }
@@ -58944,13 +58944,13 @@ bool testpolint(bool silent, ae_state *_state) {
          ae_vector_set_length(&x, k, _state);
          ae_vector_set_length(&y, k, _state);
       // Generate problem
-         poffset = 2 * randomreal(_state) - 1;
-         pscale = (0.1 + randomreal(_state)) * (2 * randominteger(2, _state) - 1);
-         v0 = 2 * randomreal(_state) - 1;
-         v1 = 2 * randomreal(_state) - 1;
-         v2 = 2 * randomreal(_state) - 1;
-         v3 = 2 * randomreal(_state) - 1;
-         v4 = 2 * randomreal(_state) - 1;
+         poffset = randommid();
+         pscale = (0.1 + randomreal()) * (2 * randominteger(2) - 1);
+         v0 = randommid();
+         v1 = randommid();
+         v2 = randommid();
+         v3 = randommid();
+         v4 = randommid();
          if (k == 1) {
             x.xR[0] = poffset;
             y.xR[0] = v0;
@@ -59013,7 +59013,7 @@ bool testpolint(bool silent, ae_state *_state) {
          }
       // Test backward conversion
          polynomialpow2bar(&c, k, poffset, pscale, &p2, _state);
-         v = poffset + (2 * randomreal(_state) - 1) * pscale;
+         v = poffset + randommid() * pscale;
          interrors = interrors || fabs(barycentriccalc(&p, v, _state) - barycentriccalc(&p2, v, _state)) > threshold;
       }
    }
@@ -59038,11 +59038,11 @@ bool testpolint(bool silent, ae_state *_state) {
    ae_vector_set_length(&x, n, _state);
    ae_vector_set_length(&x2, n, _state);
    ae_vector_set_length(&y, n, _state);
-   x.xR[0] = randomreal(_state) - 0.5;
-   y.xR[0] = randomreal(_state) - 0.5;
+   x.xR[0] = randomreal() - 0.5;
+   y.xR[0] = randomreal() - 0.5;
    for (i = 1; i < n; i++) {
-      x.xR[i] = x.xR[i - 1] + randomreal(_state) + 0.1;
-      y.xR[i] = randomreal(_state) - 0.5;
+      x.xR[i] = x.xR[i - 1] + randomreal() + 0.1;
+      y.xR[i] = randomreal() - 0.5;
    }
    polynomialbuild(&x, &y, n, &p, _state);
    polynomialbar2pow(&p, 0.0, 1.0, &c0, _state);
@@ -59177,7 +59177,7 @@ static bool testspline1dunit_enumerateallsplines(RVector *x, RVector *y, ae_int_
             spline1dbuildcubic(x, y, n, -1, 0.0, -1, 0.0, s, _state);
          } else {
          // Non-periodic spline
-            spline1dbuildcubic(x, y, n, idxoffs / 3, 2 * randomreal(_state) - 1, idxoffs % 3, 2 * randomreal(_state) - 1, s, _state);
+            spline1dbuildcubic(x, y, n, idxoffs / 3, randommid(), idxoffs % 3, randommid(), s, _state);
          }
          ++*splineindex;
          result = true;
@@ -59206,7 +59206,7 @@ static bool testspline1dunit_testunpack(spline1dinterpolant *c, RVector *x, ae_s
    spline1dunpack(c, &n, &tbl, _state);
    for (i = 0; i < n - 1; i++) {
       for (pass = 1; pass <= passcount; pass++) {
-         t = randomreal(_state) * (tbl.xyR[i][1] - tbl.xyR[i][0]);
+         t = randomreal() * (tbl.xyR[i][1] - tbl.xyR[i][0]);
          v1 = tbl.xyR[i][2] + t * tbl.xyR[i][3] + sqr(t, _state) * tbl.xyR[i][4] + t * sqr(t, _state) * tbl.xyR[i][5];
          v2 = spline1dcalc(c, tbl.xyR[i][0] + t, _state);
          err = rmax2(err, fabs(v1 - v2), _state);
@@ -59235,11 +59235,11 @@ static void testspline1dunit_unsetspline1d(spline1dinterpolant *c, ae_state *_st
    ae_vector_set_length(&y, 2, _state);
    ae_vector_set_length(&d, 2, _state);
    x.xR[0] = -1.0;
-   y.xR[0] = randomreal(_state);
-   d.xR[0] = randomreal(_state);
+   y.xR[0] = randomreal();
+   d.xR[0] = randomreal();
    x.xR[1] = 1.0;
-   y.xR[1] = randomreal(_state);
-   d.xR[1] = randomreal(_state);
+   y.xR[1] = randomreal();
+   d.xR[1] = randomreal();
    spline1dbuildhermite(&x, &y, &d, 2, c, _state);
    ae_frame_leave(_state);
 }
@@ -59247,11 +59247,11 @@ static void testspline1dunit_unsetspline1d(spline1dinterpolant *c, ae_state *_st
 // Unset spline, i.e. initialize it with random garbage
 static void testspline1dunit_unsetreport(spline1dfitreport *rep, ae_state *_state) {
    SetObj(spline1dfitreport, rep);
-   rep->taskrcond = randomreal(_state);
-   rep->rmserror = randomreal(_state);
-   rep->avgerror = randomreal(_state);
-   rep->avgrelerror = randomreal(_state);
-   rep->maxerror = randomreal(_state);
+   rep->taskrcond = randomreal();
+   rep->rmserror = randomreal();
+   rep->avgerror = randomreal();
+   rep->avgrelerror = randomreal();
+   rep->maxerror = randomreal();
 }
 
 // Tests that built spline is monotone.
@@ -59299,15 +59299,15 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
    ae_vector_set_length(&x, 2, _state);
    ae_vector_set_length(&y, 2, _state);
    ae_vector_set_length(&d, 2, _state);
-   x.xR[0] = -0.1 - randomreal(_state);
-   y.xR[0] = 2 * randomreal(_state) - 1;
+   x.xR[0] = -0.1 - randomreal();
+   y.xR[0] = randommid();
    d.xR[0] = 0.0;
-   x.xR[1] = 0.1 + randomreal(_state);
+   x.xR[1] = 0.1 + randomreal();
    y.xR[1] = y.xR[0];
    d.xR[1] = 0.0;
    spline1dbuildmonotone(&x, &y, 2, &c, _state);
    spline1dbuildhermite(&x, &y, &d, 2, &s2, _state);
-   v = 2 * randomreal(_state) - 1;
+   v = randommid();
    if (fabs(spline1dcalc(&c, v, _state) - spline1dcalc(&s2, v, _state)) > eps) {
       result = true;
       ae_frame_leave(_state);
@@ -59413,34 +59413,34 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
    npoints = 15;
    passcount = 30;
    for (pass = 1; pass <= passcount; pass++) {
-      tp = randominteger(6, _state) + 4;
-      r = (double)(randominteger(76, _state) + 25);
-      m = randominteger(nseg, _state) + 1;
+      tp = randominteger(6) + 4;
+      r = (double)(randominteger(76) + 25);
+      m = randominteger(nseg) + 1;
       ae_vector_set_length(&n, m, _state);
       alln = 0;
       for (i = 0; i < m; i++) {
-         n.xZ[i] = randominteger(npoints, _state) + 2;
+         n.xZ[i] = randominteger(npoints) + 2;
          alln += n.xZ[i];
       }
       ae_vector_set_length(&x, alln, _state);
       ae_vector_set_length(&y, alln, _state);
-      x.xR[0] = r * (2 * randomreal(_state) - 1);
-      y.xR[0] = r * (2 * randomreal(_state) - 1);
+      x.xR[0] = r * randommid();
+      y.xR[0] = r * randommid();
    // Builds monotone function
-      st = 0.1 + 0.7 * randomreal(_state);
+      st = 0.1 + 0.7 * randomreal();
       shift = 0;
       sign0 = pow(-1.0, 0.0);
       for (i = 0; i < m; i++) {
          for (j = 1; j < n.xZ[i]; j++) {
-            x.xR[shift + j] = x.xR[shift + j - 1] + st + randomreal(_state);
+            x.xR[shift + j] = x.xR[shift + j - 1] + st + randomreal();
             delta = rmax2(delta, x.xR[shift + j] - x.xR[shift + j - 1], _state);
-            y.xR[shift + j] = y.xR[shift + j - 1] + sign0 * (st + randomreal(_state));
+            y.xR[shift + j] = y.xR[shift + j - 1] + sign0 * (st + randomreal());
          }
          shift += n.xZ[i];
          if (i != m - 1) {
             sign0 = pow(-1.0, (double)(i + 1));
-            x.xR[shift] = x.xR[shift - 1] + st + randomreal(_state);
-            y.xR[shift] = y.xR[shift - 1] + sign0 * randomreal(_state);
+            x.xR[shift] = x.xR[shift - 1] + st + randomreal();
+            y.xR[shift] = y.xR[shift - 1] + sign0 * randomreal();
          }
       }
       delta *= 3;
@@ -59484,7 +59484,7 @@ static bool testspline1dunit_testmonotonespline(ae_state *_state) {
          return result;
       }
    // Builds constant function
-      y.xR[0] = r * (2 * randomreal(_state) - 1);
+      y.xR[0] = r * randommid();
       for (i = 1; i < alln; i++) {
          y.xR[i] = y.xR[0];
       }
@@ -59577,16 +59577,16 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
          ae_vector_set_length(&x, 2, _state);
          ae_vector_set_length(&y, 2, _state);
          ae_vector_set_length(&w, 2, _state);
-         x.xR[0] = -0.5 - randomreal(_state);
-         y.xR[0] = 0.5 + randomreal(_state);
-         w.xR[0] = 1 + randomreal(_state);
-         x.xR[1] = 0.5 + randomreal(_state);
-         y.xR[1] = 0.5 + randomreal(_state);
-         w.xR[1] = 1 + randomreal(_state);
+         x.xR[0] = -0.5 - randomreal();
+         y.xR[0] = 0.5 + randomreal();
+         w.xR[0] = 1 + randomreal();
+         x.xR[1] = 0.5 + randomreal();
+         y.xR[1] = 0.5 + randomreal();
+         w.xR[1] = 1 + randomreal();
          testspline1dunit_unsetspline1d(&c, _state);
          testspline1dunit_unsetreport(&rep, _state);
          spline1dfit(&x, &y, 2, m, pow(10.0, rho), &c, &rep, _state);
-         v = 2 * randomreal(_state) - 1;
+         v = randommid();
          v1 = (v - x.xR[0]) / (x.xR[1] - x.xR[0]) * y.xR[1] + (v - x.xR[1]) / (x.xR[0] - x.xR[1]) * y.xR[0];
          set_error_flag(fiterrors, fabs(v1 - spline1dcalc(&c, v, _state)) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1509");
          set_error_flag(fiterrors, rep.rmserror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1510");
@@ -59608,7 +59608,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
       ae_vector_set_length(&y, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = (double)i / (n - 1);
-         y.xR[i] = randomreal(_state) - 0.5;
+         y.xR[i] = randomreal() - 0.5;
       }
       testspline1dunit_unsetspline1d(&c, _state);
       testspline1dunit_unsetreport(&rep, _state);
@@ -59636,8 +59636,8 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
       ae_vector_set_length(&w, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = (double)i / (n - 1);
-         y.xR[i] = randomreal(_state);
-         w.xR[i] = 0.1 + randomreal(_state);
+         y.xR[i] = randomreal();
+         w.xR[i] = 0.1 + randomreal();
       }
       testspline1dunit_unsetspline1d(&c, _state);
       testspline1dunit_unsetreport(&rep, _state);
@@ -59768,9 +59768,9 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors, ae_state *_state
          v2 = 0.0;
          v = 0.0;
       } else {
-         v1 = randomreal(_state);
-         v2 = randomreal(_state);
-         v = 1 + randomreal(_state);
+         v1 = randomreal();
+         v2 = randomreal();
+         v = 1 + randomreal();
       }
       ae_vector_set_length(&x, 4, _state);
       ae_vector_set_length(&y, 4, _state);
@@ -59915,10 +59915,10 @@ bool testspline1d(bool silent, ae_state *_state) {
       // * X contains abscissas from [A,B]
       // * Y contains function values
       // * YP contains periodic function values
-         a = -1 - randomreal(_state);
-         b = 1 + randomreal(_state);
-         bl = 2 * randomreal(_state) - 1;
-         br = 2 * randomreal(_state) - 1;
+         a = -1 - randomreal();
+         b = 1 + randomreal();
+         bl = randommid();
+         br = randommid();
          for (i = 0; i < n; i++) {
             x.xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(pi * (2 * i + 1) / (2 * n));
             if (i == 0) {
@@ -59933,7 +59933,7 @@ bool testspline1d(bool silent, ae_state *_state) {
          }
          yp.xR[n - 1] = yp.xR[0];
          for (i = 0; i < n; i++) {
-            k = randominteger(n, _state);
+            k = randominteger(n);
             if (k != i) {
                t = x.xR[i];
                x.xR[i] = x.xR[k];
@@ -59995,7 +59995,7 @@ bool testspline1d(bool silent, ae_state *_state) {
                // * we also test for periodicity of derivatives
                   for (i = 0; i < n; i++) {
                      v = x.xR[i];
-                     vm = v + (b - a) * (randominteger(5, _state) - 2);
+                     vm = v + (b - a) * (randominteger(5) - 2);
                      t = yp.xR[i] - spline1dcalc(&c, vm, _state);
                      err = rmax2(err, fabs(t), _state);
                      spline1ddiff(&c, v, &s, &ds, &d2s, _state);
@@ -60005,8 +60005,8 @@ bool testspline1d(bool silent, ae_state *_state) {
                      err = rmax2(err, fabs(d2s - d2s2), _state);
                   }
                // periodicity between nodes
-                  v = a + (b - a) * randomreal(_state);
-                  vm = v + (b - a) * (randominteger(5, _state) - 2);
+                  v = a + (b - a) * randomreal();
+                  vm = v + (b - a) * (randominteger(5) - 2);
                   err = rmax2(err, fabs(spline1dcalc(&c, v, _state) - spline1dcalc(&c, vm, _state)), _state);
                   spline1ddiff(&c, v, &s, &ds, &d2s, _state);
                   spline1ddiff(&c, vm, &s2, &ds2, &d2s2, _state);
@@ -60094,10 +60094,10 @@ bool testspline1d(bool silent, ae_state *_state) {
                }
                set_error_flag(&cserrors, err > threshold, __FILE__, __LINE__, "testspline1dunit.ap:309");
             // compare spline1dconv()/convdiff()/convdiff2() and spline1ddiff() results
-               n2 = 2 + randominteger(2 * n, _state);
+               n2 = 2 + randominteger(2 * n);
                ae_vector_set_length(&tmpx, n2, _state);
                for (i = 0; i < n2; i++) {
-                  tmpx.xR[i] = 0.5 * (a + b) + (a - b) * (2 * randomreal(_state) - 1);
+                  tmpx.xR[i] = 0.5 * (a + b) + (a - b) * randommid();
                }
                err = 0.0;
                if (periodiccond) {
@@ -60143,14 +60143,14 @@ bool testspline1d(bool silent, ae_state *_state) {
          for (bltype = -1; bltype <= 0; bltype++) {
             periodiccond = bltype == -1;
          // select random tension value, then build
-            if (randomreal(_state) > 0.5) {
-               if (randomreal(_state) > 0.5) {
+            if (randombool()) {
+               if (randombool()) {
                   tension = 0.0;
                } else {
                   tension = 1.0;
                }
             } else {
-               tension = randomreal(_state);
+               tension = randomreal();
             }
             if (periodiccond) {
                spline1dbuildcatmullrom(&x, &yp, n, bltype, tension, &c, _state);
@@ -60165,7 +60165,7 @@ bool testspline1d(bool silent, ae_state *_state) {
             // * we also test for periodicity of first derivative
                for (i = 0; i < n; i++) {
                   v = x.xR[i];
-                  vm = v + (b - a) * (randominteger(5, _state) - 2);
+                  vm = v + (b - a) * (randominteger(5) - 2);
                   t = yp.xR[i] - spline1dcalc(&c, vm, _state);
                   err = rmax2(err, fabs(t), _state);
                   spline1ddiff(&c, v, &s, &ds, &d2s, _state);
@@ -60174,8 +60174,8 @@ bool testspline1d(bool silent, ae_state *_state) {
                   err = rmax2(err, fabs(ds - ds2), _state);
                }
             // periodicity between nodes
-               v = a + (b - a) * randomreal(_state);
-               vm = v + (b - a) * (randominteger(5, _state) - 2);
+               v = a + (b - a) * randomreal();
+               vm = v + (b - a) * (randominteger(5) - 2);
                err = rmax2(err, fabs(spline1dcalc(&c, v, _state) - spline1dcalc(&c, vm, _state)), _state);
                spline1ddiff(&c, v, &s, &ds, &d2s, _state);
                spline1ddiff(&c, vm, &s2, &ds2, &d2s2, _state);
@@ -60266,7 +60266,7 @@ bool testspline1d(bool silent, ae_state *_state) {
       b = 1.0;
       for (i = 0; i < n; i++) {
          x.xR[i] = a + (b - a) * i / (n - 1);
-         y.xR[i] = 2 * randomreal(_state) - 1;
+         y.xR[i] = randommid();
       }
       spline1dbuildlinear(&x, &y, n, &c, _state);
    // Test
@@ -60275,7 +60275,7 @@ bool testspline1d(bool silent, ae_state *_state) {
          a = x.xR[k];
          b = x.xR[k + 1];
          for (pass = 1; pass <= passcount; pass++) {
-            t = a + (b - a) * randomreal(_state);
+            t = a + (b - a) * randomreal();
             v = y.xR[k] + (t - a) / (b - a) * (y.xR[k + 1] - y.xR[k]);
             err = rmax2(err, fabs(spline1dcalc(&c, t, _state) - v), _state);
          }
@@ -60308,7 +60308,7 @@ bool testspline1d(bool silent, ae_state *_state) {
             a = -1.0;
             b = x.xR[k - 3];
             for (pass = 1; pass <= passcount; pass++) {
-               t = a + (b - a) * randomreal(_state);
+               t = a + (b - a) * randomreal();
                err = rmax2(err, fabs(spline1dcalc(&c, t, _state) - spline1dcalc(&c2, t, _state)), _state);
             }
          }
@@ -60317,7 +60317,7 @@ bool testspline1d(bool silent, ae_state *_state) {
             a = x.xR[k + 3];
             b = 1.0;
             for (pass = 1; pass <= passcount; pass++) {
-               t = a + (b - a) * randomreal(_state);
+               t = a + (b - a) * randomreal();
                err = rmax2(err, fabs(spline1dcalc(&c, t, _state) - spline1dcalc(&c2, t, _state)), _state);
             }
          }
@@ -60329,8 +60329,8 @@ bool testspline1d(bool silent, ae_state *_state) {
       ae_vector_set_length(&x, n - 1 + 1, _state);
       ae_vector_set_length(&y, n - 1 + 1, _state);
    // Prepare cubic spline
-      a = -1 - randomreal(_state);
-      b = 1 + randomreal(_state);
+      a = -1 - randomreal();
+      b = 1 + randomreal();
       for (i = 0; i < n; i++) {
          x.xR[i] = a + (b - a) * i / (n - 1);
          y.xR[i] = cos(1.3 * pi * x.xR[i] + 0.4);
@@ -60339,7 +60339,7 @@ bool testspline1d(bool silent, ae_state *_state) {
    // Test diff
       err = 0.0;
       for (pass = 1; pass <= passcount; pass++) {
-         t = a + (b - a) * randomreal(_state);
+         t = a + (b - a) * randomreal();
          spline1ddiff(&c, t, &s, &ds, &d2s, _state);
          vl = spline1dcalc(&c, t - h, _state);
          vm = spline1dcalc(&c, t, _state);
@@ -60354,7 +60354,7 @@ bool testspline1d(bool silent, ae_state *_state) {
       spline1dcopy(&c, &c2, _state);
       err = 0.0;
       for (pass = 1; pass <= passcount; pass++) {
-         t = a + (b - a) * randomreal(_state);
+         t = a + (b - a) * randomreal();
          err = rmax2(err, fabs(spline1dcalc(&c, t, _state) - spline1dcalc(&c2, t, _state)), _state);
       }
       cperrors = cperrors || err > threshold;
@@ -60368,11 +60368,11 @@ bool testspline1d(bool silent, ae_state *_state) {
    // * XTest - test points
       ae_vector_set_length(&x, n, _state);
       ae_vector_set_length(&y, n, _state);
-      a = -1 - randomreal(_state);
-      b = 1 + randomreal(_state);
+      a = -1 - randomreal();
+      b = 1 + randomreal();
       for (i = 0; i < n; i++) {
-         x.xR[i] = a + (b - a) * (i + 0.2 * randomreal(_state) - 0.1) / (n - 1);
-         y.xR[i] = 2 * randomreal(_state) - 1;
+         x.xR[i] = a + (b - a) * (i + 0.1 * randommid()) / (n - 1);
+         y.xR[i] = randommid();
       }
       ae_vector_set_length(&xtest, 5 * n + 2, _state);
       for (i = 0; i < xtest.cnt; i++) {
@@ -60381,23 +60381,23 @@ bool testspline1d(bool silent, ae_state *_state) {
       splineindex = 0;
       while (testspline1dunit_enumerateallsplines(&x, &y, n, &splineindex, &c, _state)) {
       // LinTransX, general A
-         sa = 4 * randomreal(_state) - 2;
-         sb = 2 * randomreal(_state) - 1;
+         sa = 2.0 * randommid();
+         sb = randommid();
          spline1dcopy(&c, &c2, _state);
          spline1dlintransx(&c2, sa, sb, _state);
          for (i = 0; i < xtest.cnt; i++) {
             lterrors = lterrors || fabs(spline1dcalc(&c, xtest.xR[i], _state) - spline1dcalc(&c2, (xtest.xR[i] - sb) / sa, _state)) > threshold;
          }
       // LinTransX, special case: A=0
-         sb = 2 * randomreal(_state) - 1;
+         sb = randommid();
          spline1dcopy(&c, &c2, _state);
          spline1dlintransx(&c2, 0.0, sb, _state);
          for (i = 0; i < xtest.cnt; i++) {
             lterrors = lterrors || fabs(spline1dcalc(&c, sb, _state) - spline1dcalc(&c2, xtest.xR[i], _state)) > threshold;
          }
       // LinTransY
-         sa = 2 * randomreal(_state) - 1;
-         sb = 2 * randomreal(_state) - 1;
+         sa = randommid();
+         sb = randommid();
          spline1dcopy(&c, &c2, _state);
          spline1dlintransy(&c2, sa, sb, _state);
          for (i = 0; i < xtest.cnt; i++) {
@@ -60427,8 +60427,8 @@ bool testspline1d(bool silent, ae_state *_state) {
       ae_vector_set_length(&y, n - 1 + 1, _state);
       for (pass = 1; pass <= passcount; pass++) {
       // Prepare cubic spline
-         a = -1 - 0.2 * randomreal(_state);
-         b = 1 + 0.2 * randomreal(_state);
+         a = -1 - 0.2 * randomreal();
+         b = 1 + 0.2 * randomreal();
          for (i = 0; i < n; i++) {
             x.xR[i] = a + (b - a) * i / (n - 1);
             y.xR[i] = sin(pi * x.xR[i] + 0.4) + exp(x.xR[i]);
@@ -60437,7 +60437,7 @@ bool testspline1d(bool silent, ae_state *_state) {
          br = pi * cos(pi * b + 0.4) + exp(b);
          spline1dbuildcubic(&x, &y, n, 1, bl, 1, br, &c, _state);
       // Test
-         t = a + (b - a) * randomreal(_state);
+         t = a + (b - a) * randomreal();
          v = -cos(pi * a + 0.4) / pi + exp(a);
          v = -cos(pi * t + 0.4) / pi + exp(t) - v;
          v -= spline1dintegrate(&c, t, _state);
@@ -60445,11 +60445,11 @@ bool testspline1d(bool silent, ae_state *_state) {
       }
    }
    ierrors = ierrors || err > 0.001;
-   p0 = 2 * randomreal(_state) - 1;
-   p1 = 2 * randomreal(_state) - 1;
-   p2 = 2 * randomreal(_state) - 1;
-   a = -randomreal(_state) - 0.5;
-   b = randomreal(_state) + 0.5;
+   p0 = randommid();
+   p1 = randommid();
+   p2 = randommid();
+   a = -randomreal() - 0.5;
+   b = randomreal() + 0.5;
    n = 2;
    ae_vector_set_length(&x, n, _state);
    ae_vector_set_length(&y, n, _state);
@@ -60465,7 +60465,7 @@ bool testspline1d(bool silent, ae_state *_state) {
    br = rmin2(a, b, _state) + fabs(b - a);
    err = 0.0;
    for (pass = 1; pass <= 100; pass++) {
-      t = bl + (br - bl) * randomreal(_state);
+      t = bl + (br - bl) * randomreal();
       v = p0 * t + p1 * sqr(t, _state) / 2 + p2 * sqr(t, _state) * t / 3 - (p0 * a + p1 * sqr(a, _state) / 2 + p2 * sqr(a, _state) * a / 3);
       v -= spline1dintegrate(&c, t, _state);
       err = rmax2(err, fabs(v), _state);
@@ -60482,7 +60482,7 @@ bool testspline1d(bool silent, ae_state *_state) {
    y.xR[n - 1] = 2.0;
    spline1dbuildcubic(&x, &y, n, -1, 0.0, -1, 0.0, &c, _state);
    intab = spline1dintegrate(&c, 1.0, _state);
-   v = randomreal(_state);
+   v = randomreal();
    vr = spline1dintegrate(&c, v, _state);
    ierrors = ierrors || fabs(intab - 1) > 0.001;
    for (i = -10; i <= 10; i++) {
@@ -60650,7 +60650,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
             for (i = 0; i < n - k; i++) {
                x.xR[i] = xfull.xR[i];
                y.xR[i] = yfull.xR[i];
-               w.xR[i] = 1 + randomreal(_state);
+               w.xR[i] = 1 + randomreal();
             }
             for (i = 0; i < k; i++) {
                xc.xR[i] = xfull.xR[n - k + i];
@@ -60682,13 +60682,13 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
                   ae_vector_set_length(&yc, 2, _state);
                   ae_vector_set_length(&dc, 2, _state);
                   for (i = 0; i < n; i++) {
-                     w.xR[i] = 1 + randomreal(_state);
+                     w.xR[i] = 1 + randomreal();
                   }
                   xc.xR[0] = 0.0;
-                  yc.xR[0] = 2 * randomreal(_state) - 1;
+                  yc.xR[0] = randommid();
                   dc.xZ[0] = 0;
                   xc.xR[1] = 0.0;
-                  yc.xR[1] = 2 * randomreal(_state) - 1;
+                  yc.xR[1] = randommid();
                   dc.xZ[1] = 1;
                   polynomialfitwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &p1, &rep, _state);
                   if (info <= 0) {
@@ -60718,7 +60718,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
          xmin = 0.0;
          xmax = 2 * pi;
          for (i = 0; i < n; i++) {
-            x2.xR[i] = 2 * pi * randomreal(_state);
+            x2.xR[i] = 2 * pi * randomreal();
             y2.xR[i] = sin(x2.xR[i]);
             w2.xR[i] = 1.0;
          }
@@ -60751,8 +60751,8 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
          ae_vector_set_length(&y, n, _state);
          ae_vector_set_length(&w, n, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = i + (randomreal(_state) - 0.5);
-            y.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = i + (randomreal() - 0.5);
+            y.xR[i] = randommid();
             w.xR[i] = 1.0;
          }
          polynomialfitwc(&x, &y, &w, n, &xc, &yc, &dc, 0, m, &info, &p1, &rep, _state);
@@ -60762,7 +60762,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
          } else {
          // calculate P1 (interpolant), compare with P2 error
          // compare RMS errors
-            t = 2 * randomreal(_state) - 1;
+            t = randommid();
             v1 = barycentriccalc(&p1, t, _state);
             v2 = barycentriccalc(&p2, t, _state);
             *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12, _state);
@@ -60789,9 +60789,9 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors, ae_state *_stat
             v2 = 0.0;
             v = 0.0;
          } else {
-            v1 = randomreal(_state);
-            v2 = randomreal(_state);
-            v = 1 + randomreal(_state);
+            v1 = randomreal();
+            v2 = randomreal();
+            v = 1 + randomreal();
          }
          ae_vector_set_length(&x, n, _state);
          ae_vector_set_length(&y, n, _state);
@@ -60896,12 +60896,12 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
             }
             for (i = 0; i < n - k; i++) {
                x.xR[i] = (double)i / (n - 1);
-               y.xR[i] = 2 * randomreal(_state) - 1;
-               w.xR[i] = 1 + randomreal(_state);
+               y.xR[i] = randommid();
+               w.xR[i] = 1 + randomreal();
             }
             for (i = 0; i < k; i++) {
                xc.xR[i] = (double)(n - k + i) / (n - 1);
-               yc.xR[i] = 2 * randomreal(_state) - 1;
+               yc.xR[i] = randommid();
                dc.xZ[i] = 0;
             }
             barycentricfitfloaterhormannwc(&x, &y, &w, n - k, &xc, &yc, &dc, k, n, &info, &b1, &rep, _state);
@@ -60929,15 +60929,15 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
                ae_vector_set_length(&yc, 2, _state);
                ae_vector_set_length(&dc, 2, _state);
                for (i = 0; i < n; i++) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
-                  y.xR[i] = 2 * randomreal(_state) - 1;
-                  w.xR[i] = 1 + randomreal(_state);
+                  x.xR[i] = randommid();
+                  y.xR[i] = randommid();
+                  w.xR[i] = 1 + randomreal();
                }
                xc.xR[0] = -1.0;
-               yc.xR[0] = 2 * randomreal(_state) - 1;
+               yc.xR[0] = randommid();
                dc.xZ[0] = 0;
                xc.xR[1] = 1.0;
-               yc.xR[1] = 2 * randomreal(_state) - 1;
+               yc.xR[1] = randommid();
                dc.xZ[1] = 0;
                barycentricfitfloaterhormannwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &b1, &rep, _state);
                if (info <= 0) {
@@ -60965,7 +60965,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
          xmin = maxrealnumber;
          xmax = -maxrealnumber;
          for (i = 0; i < n; i++) {
-            x2.xR[i] = 2 * pi * randomreal(_state);
+            x2.xR[i] = 2 * pi * randomreal();
             y2.xR[i] = sin(x2.xR[i]);
             w2.xR[i] = 1.0;
             xmin = rmin2(xmin, x2.xR[i], _state);
@@ -61000,8 +61000,8 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
          ae_vector_set_length(&y, n, _state);
          ae_vector_set_length(&w, n, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = i + (randomreal(_state) - 0.5);
-            y.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = i + (randomreal() - 0.5);
+            y.xR[i] = randommid();
             w.xR[i] = 1.0;
          }
          barycentricfitfloaterhormannwc(&x, &y, &w, n, &xc, &yc, &dc, 0, m, &info, &b1, &rep, _state);
@@ -61011,7 +61011,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
          } else {
          // calculate B1 (interpolant), compare with B2
          // compare RMS errors
-            t = 2 * randomreal(_state) - 1;
+            t = randommid();
             v1 = barycentriccalc(&b1, t, _state);
             v2 = barycentriccalc(&b2, t, _state);
             *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12, _state);
@@ -61037,9 +61037,9 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors, ae_state *_state)
          v2 = 0.0;
          v = 0.0;
       } else {
-         v1 = randomreal(_state);
-         v2 = randomreal(_state);
-         v = 1 + randomreal(_state);
+         v1 = randomreal();
+         v2 = randomreal();
+         v = 1 + randomreal();
       }
       ae_vector_set_length(&x, 4, _state);
       ae_vector_set_length(&y, 4, _state);
@@ -61141,24 +61141,24 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
             ae_vector_set_length(&xc, 4, _state);
             ae_vector_set_length(&yc, 4, _state);
             ae_vector_set_length(&dc, 4, _state);
-            sa = 1 + randomreal(_state);
-            sb = 2 * randomreal(_state) - 1;
+            sa = 1 + randomreal();
+            sb = randommid();
             for (i = 0; i < n; i++) {
-               x.xR[i] = sa * randomreal(_state) + sb;
-               y.xR[i] = 2 * randomreal(_state) - 1;
-               w.xR[i] = 1 + randomreal(_state);
+               x.xR[i] = sa * randomreal() + sb;
+               y.xR[i] = randommid();
+               w.xR[i] = 1 + randomreal();
             }
             xc.xR[0] = sb;
-            yc.xR[0] = 2 * randomreal(_state) - 1;
+            yc.xR[0] = randommid();
             dc.xZ[0] = 0;
             xc.xR[1] = sb;
-            yc.xR[1] = 2 * randomreal(_state) - 1;
+            yc.xR[1] = randommid();
             dc.xZ[1] = 1;
             xc.xR[2] = sa + sb;
-            yc.xR[2] = 2 * randomreal(_state) - 1;
+            yc.xR[2] = randommid();
             dc.xZ[2] = 0;
             xc.xR[3] = sa + sb;
-            yc.xR[3] = 2 * randomreal(_state) - 1;
+            yc.xR[3] = randommid();
             dc.xZ[3] = 1;
             spline1dfitcubicwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &c, &rep, _state);
             if (info <= 0) {
@@ -61190,16 +61190,16 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
          ae_vector_set_length(&xc, 1, _state);
          ae_vector_set_length(&yc, 1, _state);
          ae_vector_set_length(&dc, 1, _state);
-         sa = 1 + randomreal(_state);
-         sb = 2 * randomreal(_state) - 1;
+         sa = 1 + randomreal();
+         sb = randommid();
          for (i = 0; i < n; i++) {
-            x.xR[i] = sa * randomreal(_state) + sb;
-            y.xR[i] = 2 * randomreal(_state) - 1;
-            w.xR[i] = 1 + randomreal(_state);
+            x.xR[i] = sa * randomreal() + sb;
+            y.xR[i] = randommid();
+            w.xR[i] = 1 + randomreal();
          }
-         xc.xR[0] = sa * randomreal(_state) + sb;
-         yc.xR[0] = 2 * randomreal(_state) - 1;
-         dc.xZ[0] = randominteger(2, _state);
+         xc.xR[0] = sa * randomreal() + sb;
+         yc.xR[0] = randommid();
+         dc.xZ[0] = randominteger(2);
          spline1dfitcubicwc(&x, &y, &w, n, &xc, &yc, &dc, 1, m, &info, &c, &rep, _state);
          if (info <= 0) {
             *fiterrors = true;
@@ -61234,24 +61234,24 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
             ae_vector_set_length(&xc, 4, _state);
             ae_vector_set_length(&yc, 4, _state);
             ae_vector_set_length(&dc, 4, _state);
-            sa = 1 + randomreal(_state);
-            sb = 2 * randomreal(_state) - 1;
+            sa = 1 + randomreal();
+            sb = randommid();
             for (i = 0; i < n; i++) {
-               x.xR[i] = sa * randomreal(_state) + sb;
-               y.xR[i] = 2 * randomreal(_state) - 1;
-               w.xR[i] = 1 + randomreal(_state);
+               x.xR[i] = sa * randomreal() + sb;
+               y.xR[i] = randommid();
+               w.xR[i] = 1 + randomreal();
             }
             xc.xR[0] = sb;
-            yc.xR[0] = 2 * randomreal(_state) - 1;
+            yc.xR[0] = randommid();
             dc.xZ[0] = 0;
             xc.xR[1] = sb;
-            yc.xR[1] = 2 * randomreal(_state) - 1;
+            yc.xR[1] = randommid();
             dc.xZ[1] = 1;
             xc.xR[2] = sa + sb;
-            yc.xR[2] = 2 * randomreal(_state) - 1;
+            yc.xR[2] = randommid();
             dc.xZ[2] = 0;
             xc.xR[3] = sa + sb;
-            yc.xR[3] = 2 * randomreal(_state) - 1;
+            yc.xR[3] = randommid();
             dc.xZ[3] = 1;
             spline1dfithermitewc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &c, &rep, _state);
             if (info <= 0) {
@@ -61286,16 +61286,16 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
          ae_vector_set_length(&xc, 1, _state);
          ae_vector_set_length(&yc, 1, _state);
          ae_vector_set_length(&dc, 1, _state);
-         sa = 1 + randomreal(_state);
-         sb = 2 * randomreal(_state) - 1;
+         sa = 1 + randomreal();
+         sb = randommid();
          for (i = 0; i < n; i++) {
-            x.xR[i] = sa * randomreal(_state) + sb;
-            y.xR[i] = 2 * randomreal(_state) - 1;
-            w.xR[i] = 1 + randomreal(_state);
+            x.xR[i] = sa * randomreal() + sb;
+            y.xR[i] = randommid();
+            w.xR[i] = 1 + randomreal();
          }
-         xc.xR[0] = sa * randomreal(_state) + sb;
-         yc.xR[0] = 2 * randomreal(_state) - 1;
-         dc.xZ[0] = randominteger(2, _state);
+         xc.xR[0] = sa * randomreal() + sb;
+         yc.xR[0] = randommid();
+         dc.xZ[0] = randominteger(2);
          spline1dfithermitewc(&x, &y, &w, n, &xc, &yc, &dc, 1, m, &info, &c, &rep, _state);
          if (info <= 0) {
             *fiterrors = true;
@@ -61326,16 +61326,16 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
          //   ideal fit should be equal to C2
          // * fit, store in C
          // * compare C and C2
-            sa = 1 + randomreal(_state);
-            sb = 2 * randomreal(_state) - 1;
+            sa = 1 + randomreal();
+            sb = randommid();
             if (stype == 0) {
                ae_vector_set_length(&x, m - 2, _state);
                ae_vector_set_length(&y, m - 2, _state);
                for (i = 0; i < m - 2; i++) {
                   x.xR[i] = sa * i / (m - 2 - 1) + sb;
-                  y.xR[i] = 2 * randomreal(_state) - 1;
+                  y.xR[i] = randommid();
                }
-               spline1dbuildcubic(&x, &y, m - 2, 1, 2 * randomreal(_state) - 1, 1, 2 * randomreal(_state) - 1, &c2, _state);
+               spline1dbuildcubic(&x, &y, m - 2, 1, randommid(), 1, randommid(), &c2, _state);
             }
             if (stype == 1) {
                ae_vector_set_length(&x, m / 2, _state);
@@ -61343,8 +61343,8 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
                ae_vector_set_length(&d, m / 2, _state);
                for (i = 0; i < m / 2; i++) {
                   x.xR[i] = sa * i / (m / 2 - 1) + sb;
-                  y.xR[i] = 2 * randomreal(_state) - 1;
-                  d.xR[i] = 2 * randomreal(_state) - 1;
+                  y.xR[i] = randommid();
+                  d.xR[i] = randommid();
                }
                spline1dbuildhermite(&x, &y, &d, m / 2, &c2, _state);
             }
@@ -61356,8 +61356,8 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
             // "if i=0" and "if i=1" are needed to
             // synchronize interval size for C2 and
             // spline being fitted (i.e. C).
-               t = randomreal(_state);
-               x.xR[i] = sa * randomreal(_state) + sb;
+               t = randomreal();
+               x.xR[i] = sa * randomreal() + sb;
                if (i == 0) {
                   x.xR[i] = sb;
                }
@@ -61366,7 +61366,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
                }
                v = spline1dcalc(&c2, x.xR[i], _state);
                y.xR[i] = v + t;
-               w.xR[i] = 1 + randomreal(_state);
+               w.xR[i] = 1 + randomreal();
                x.xR[n + i] = x.xR[i];
                y.xR[n + i] = v - t;
                w.xR[n + i] = w.xR[i];
@@ -61382,7 +61382,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
                *fiterrors = true;
             } else {
                for (i = 0; i < n; i++) {
-                  v = sa * randomreal(_state) + sb;
+                  v = sa * randomreal() + sb;
                   *fiterrors = *fiterrors || fabs(spline1dcalc(&c, v, _state) - spline1dcalc(&c2, v, _state)) > threshold;
                }
             }
@@ -61392,13 +61392,13 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
    for (m = 4; m <= 8; m++) {
       for (pass = 1; pass <= passcount; pass++) {
       // prepare points/weights
-         n = 10 + randominteger(10, _state);
+         n = 10 + randominteger(10);
          ae_vector_set_length(&x, n, _state);
          ae_vector_set_length(&y, n, _state);
          ae_vector_set_length(&w, n, _state);
          for (i = 0; i < n; i++) {
-            x.xR[i] = i + (randomreal(_state) - 0.5);
-            y.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = i + (randomreal() - 0.5);
+            y.xR[i] = randommid();
             w.xR[i] = 1.0;
          }
       // Fit cubic with unity weights, without weights, then compare
@@ -61409,7 +61409,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
                *fiterrors = true;
             } else {
                for (i = 0; i < n; i++) {
-                  v = randomreal(_state) * (n - 1);
+                  v = randomreal() * (n - 1);
                   *fiterrors = *fiterrors || !approxequal(spline1dcalc(&c, v, _state), spline1dcalc(&c2, v, _state), 1.0E-12, _state);
                   *fiterrors = *fiterrors || !approxequal(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond, _state), _state);
                   *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror, _state), _state);
@@ -61427,7 +61427,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
                *fiterrors = true;
             } else {
                for (i = 0; i < n; i++) {
-                  v = randomreal(_state) * (n - 1);
+                  v = randomreal() * (n - 1);
                   *fiterrors = *fiterrors || !approxequal(spline1dcalc(&c, v, _state), spline1dcalc(&c2, v, _state), 1.0E-12, _state);
                   *fiterrors = *fiterrors || !approxequal(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond, _state), _state);
                   *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror, _state), _state);
@@ -61455,9 +61455,9 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors, ae_state *_state) {
          v2 = 0.0;
          v = 0.0;
       } else {
-         v1 = randomreal(_state);
-         v2 = randomreal(_state);
-         v = 1 + randomreal(_state);
+         v1 = randomreal();
+         v2 = randomreal();
+         v = 1 + randomreal();
       }
       ae_vector_set_length(&x, 4, _state);
       ae_vector_set_length(&y, 4, _state);
@@ -62657,15 +62657,15 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
             ae_vector_set_length(&x, n, _state);
             ae_vector_set_length(&y, n, _state);
             ae_vector_set_length(&w, n, _state);
-            xscale = 0.9 + 0.1 * randomreal(_state);
+            xscale = 0.9 + 0.1 * randomreal();
             for (i = 0; i < n; i++) {
                if (n == 1) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                } else {
                   x.xR[i] = xscale * ((double)(2 * i) / (n - 1) - 1);
                }
                y.xR[i] = 3 * x.xR[i] + exp(x.xR[i]);
-               w.xR[i] = 1 + randomreal(_state);
+               w.xR[i] = 1 + randomreal();
                a.xyR[i][0] = 1.0;
                if (m > 1) {
                   a.xyR[i][1] = x.xR[i];
@@ -62724,7 +62724,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
             // test function/gradient/Hessian-based weighted fitting
                lsfitlinearw(&y, &w, &a, n, m, &info, &c, &rep, _state);
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
                lsfitcreatewf(&a, &y, &w, &c2, n, m, m, diffstep, &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
@@ -62738,9 +62738,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
-               lsfitcreatewfg(&a, &y, &w, &c2, n, m, m, randomreal(_state) > 0.5, &state, _state);
+               lsfitcreatewfg(&a, &y, &w, &c2, n, m, m, randombool(), &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors, _state);
                lsfitresults(&state, &info, &c2, &rep2, _state);
@@ -62752,7 +62752,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
                lsfitcreatewfgh(&a, &y, &w, &c2, n, m, m, &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
@@ -62768,7 +62768,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
             // test gradient-only or Hessian-based fitting without weights
                lsfitlinear(&y, &a, n, m, &info, &c, &rep, _state);
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
                lsfitcreatef(&a, &y, &c2, n, m, m, diffstep, &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
@@ -62782,9 +62782,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
-               lsfitcreatefg(&a, &y, &c2, n, m, m, randomreal(_state) > 0.5, &state, _state);
+               lsfitcreatefg(&a, &y, &c2, n, m, m, randombool(), &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors, _state);
                lsfitresults(&state, &info, &c2, &rep2, _state);
@@ -62796,7 +62796,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.xR[i] = 2 * randomreal(_state) - 1;
+                  c2.xR[i] = randommid();
                }
                lsfitcreatefgh(&a, &y, &c2, n, m, m, &state, _state);
                lsfitsetcond(&state, nlthreshold, 0, _state);
@@ -62820,12 +62820,12 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
       v1 = maxrealnumber;
       v2 = minrealnumber;
       for (i = 0; i < n; i++) {
-         x.xR[i] = 0.1 + 0.9 * randomreal(_state);
-         y.xR[i] = 0.1 + 0.9 * randomreal(_state);
+         x.xR[i] = 0.1 + 0.9 * randomreal();
+         y.xR[i] = 0.1 + 0.9 * randomreal();
          w.xR[i] = 1.0;
          for (j = 0; j < n; j++) {
             if (i == j) {
-               a.xyR[i][i] = 0.1 + 0.9 * randomreal(_state);
+               a.xyR[i][i] = 0.1 + 0.9 * randomreal();
                v1 = rmin2(v1, a.xyR[i][i], _state);
                v2 = rmax2(v2, a.xyR[i][i], _state);
             } else {
@@ -62852,15 +62852,15 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                ae_vector_set_length(&x, n, _state);
                ae_vector_set_length(&y, n, _state);
                ae_vector_set_length(&w, n, _state);
-               xscale = 0.9 + 0.1 * randomreal(_state);
+               xscale = 0.9 + 0.1 * randomreal();
                for (i = 0; i < n; i++) {
                   if (n == 1) {
-                     x.xR[i] = 2 * randomreal(_state) - 1;
+                     x.xR[i] = randommid();
                   } else {
                      x.xR[i] = xscale * ((double)(2 * i) / (n - 1) - 1);
                   }
                   y.xR[i] = 3 * x.xR[i] + exp(x.xR[i]);
-                  w.xR[i] = 1 + randomreal(_state);
+                  w.xR[i] = 1 + randomreal();
                   a.xyR[i][0] = 1.0;
                   if (m > 1) {
                      a.xyR[i][1] = x.xR[i];
@@ -62872,7 +62872,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
                ae_matrix_set_length(&cm, k, m + 1, _state);
                for (i = 0; i < k; i++) {
                   for (j = 0; j <= m; j++) {
-                     cm.xyR[i][j] = 2 * randomreal(_state) - 1;
+                     cm.xyR[i][j] = randommid();
                   }
                }
             // Solve constrained task
@@ -62908,11 +62908,11 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
 //     C(true) = 2.
    n = 100;
    ae_vector_set_length(&c, 1, _state);
-   c.xR[0] = 1 + 2 * randomreal(_state);
+   c.xR[0] = 1 + 2 * randomreal();
    ae_matrix_set_length(&a, n, 1, _state);
    ae_vector_set_length(&y, n, _state);
    for (i = 0; i < n; i++) {
-      a.xyR[i][0] = 4 * randomreal(_state) - 2;
+      a.xyR[i][0] = 2.0 * randommid();
       y.xR[i] = 1 / (1 + 2 * sqr(a.xyR[i][0], _state));
    }
    lsfitcreatefg(&a, &y, &c, n, 1, 1, true, &state, _state);
@@ -62937,11 +62937,11 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
    for (pass = 1; pass <= passcount; pass++) {
    // test on task with non-zero Yi
       n = 4;
-      v1 = randomreal(_state);
-      v2 = randomreal(_state);
-      v = 1 + randomreal(_state);
+      v1 = randomreal();
+      v2 = randomreal();
+      v = 1 + randomreal();
       ae_vector_set_length(&c, 1, _state);
-      c.xR[0] = 1 + 2 * randomreal(_state);
+      c.xR[0] = 1 + 2 * randomreal();
       ae_matrix_set_length(&a, 4, 1, _state);
       ae_vector_set_length(&y, 4, _state);
       a.xyR[0][0] = 1.0;
@@ -63068,7 +63068,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
          // * SKind=2 - linear constrained with empty set of constraints
             info = -1;
             if (skind == 0) {
-               if (randomreal(_state) > 0.5) {
+               if (randombool()) {
                   lsfitcreatefg(&a, &y, &cstart, a.rows, n, n, true, &state, _state);
                } else {
                   lsfitcreatef(&a, &y, &cstart, a.rows, n, n, 0.001 * cscale, &state, _state);
@@ -63187,7 +63187,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
       }
    // Solve problem #1 (with zero weights).
    // We randomly choose between analytic gradient and numerical differentiation.
-      if (randomreal(_state) > 0.5) {
+      if (randombool()) {
          lsfitcreatewfg(&a, &y, &w, &cstart, a.rows, n, n, true, &state, _state);
       } else {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows, n, n, 0.001 * cscale, &state, _state);
@@ -63211,7 +63211,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors, a
       lsfitresults(&state, &info, &c2, &rep, _state);
    // Solve problem #2 (only points with non-zero weights).
    // We randomly choose between analytic gradient and numerical differentiation.
-      if (randomreal(_state) > 0.5) {
+      if (randombool()) {
          lsfitcreatewfg(&a, &y, &w, &cstart, a.rows / 2, n, n, true, &state, _state);
       } else {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows / 2, n, n, 0.001 * cscale, &state, _state);
@@ -64063,42 +64063,42 @@ static void testlsfitunit_testgradientcheck(bool *testg, ae_state *_state) {
    spp = 1.0;
    teststep = 0.001;
    for (pass = 1; pass <= passcount; pass++) {
-      m = randominteger(5, _state) + 1;
+      m = randominteger(5) + 1;
       ae_vector_set_length(&x0, m, _state);
-      k = randominteger(5, _state) + 1;
+      k = randominteger(5) + 1;
       ae_vector_set_length(&c, k, _state);
       ae_vector_set_length(&bl, k, _state);
       ae_vector_set_length(&bu, k, _state);
    // Prepare test's parameters
-      func = randominteger(3, _state) + 1;
-      n = randominteger(8, _state) + 3;
+      func = randominteger(3) + 1;
+      n = randominteger(8) + 3;
       ae_matrix_set_length(&x, n, m, _state);
       ae_vector_set_length(&y, n, _state);
-      nbrcomp = randominteger(k, _state);
-      noise = (double)(2 * randominteger(2, _state) - 1);
+      nbrcomp = randominteger(k);
+      noise = (double)(2 * randominteger(2) - 1);
    // Prepare function's parameters
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x.xyR[i][j] = spp * (2 * randomreal(_state) - 1);
+            x.xyR[i][j] = spp * randommid();
          }
-         y.xR[i] = spp * (2 * randomreal(_state) - 1);
+         y.xR[i] = spp * randommid();
       }
       for (i = 0; i < k; i++) {
-         c.xR[i] = spp * (2 * randomreal(_state) - 1);
+         c.xR[i] = spp * randommid();
       }
       for (i = 0; i < m; i++) {
-         x0.xR[i] = 10 * (2 * randomreal(_state) - 1);
+         x0.xR[i] = 10 * randommid();
       }
    // Prepare boundary parameters
       for (i = 0; i < k; i++) {
-         bl.xR[i] = -randomreal(_state) - spp;
-         bu.xR[i] = randomreal(_state) + spp;
+         bl.xR[i] = -randomreal() - spp;
+         bu.xR[i] = randomreal() + spp;
       }
-      infcomp = randominteger(k + 1, _state);
+      infcomp = randominteger(k + 1);
       if (infcomp < k) {
          bl.xR[infcomp] = _state->v_neginf;
       }
-      infcomp = randominteger(k + 1, _state);
+      infcomp = randominteger(k + 1);
       if (infcomp < k) {
          bu.xR[infcomp] = _state->v_posinf;
       }
@@ -65151,37 +65151,37 @@ bool testparametric(bool silent, ae_state *_state) {
                // periodicity at nodes
                   for (i = 0; i < n; i++) {
                   // 2-dimensional test
-                     pspline2calc(&p2, t2.xR[i] + randominteger(10, _state) - 5, &vx, &vy, _state);
+                     pspline2calc(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vy, _state);
                      p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
                      p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
-                     pspline2diff(&p2, t2.xR[i] + randominteger(10, _state) - 5, &vx, &vdx, &vy, &vdy, _state);
+                     pspline2diff(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vdx, &vy, &vdy, _state);
                      p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
                      p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
-                     pspline2diff2(&p2, t2.xR[i] + randominteger(10, _state) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, _state);
+                     pspline2diff2(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, _state);
                      p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
                      p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
                   // 3-dimensional test
-                     pspline3calc(&p3, t3.xR[i] + randominteger(10, _state) - 5, &vx, &vy, &vz, _state);
+                     pspline3calc(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vy, &vz, _state);
                      p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
-                     pspline3diff(&p3, t3.xR[i] + randominteger(10, _state) - 5, &vx, &vdx, &vy, &vdy, &vz, &vdz, _state);
+                     pspline3diff(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vdx, &vy, &vdy, &vz, &vdz, _state);
                      p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
-                     pspline3diff2(&p3, t3.xR[i] + randominteger(10, _state) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, &vz, &vdz, &vd2z, _state);
+                     pspline3diff2(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, &vz, &vdz, &vd2z, _state);
                      p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
                      p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
                   }
                // periodicity between nodes
-                  v0 = randomreal(_state);
+                  v0 = randomreal();
                   pspline2calc(&p2, v0, &vx, &vy, _state);
-                  pspline2calc(&p2, v0 + randominteger(10, _state) - 5, &vx2, &vy2, _state);
+                  pspline2calc(&p2, v0 + randominteger(10) - 5, &vx2, &vy2, _state);
                   p2errors = p2errors || fabs(vx - vx2) > threshold;
                   p2errors = p2errors || fabs(vy - vy2) > threshold;
                   pspline3calc(&p3, v0, &vx, &vy, &vz, _state);
-                  pspline3calc(&p3, v0 + randominteger(10, _state) - 5, &vx2, &vy2, &vz2, _state);
+                  pspline3calc(&p3, v0 + randominteger(10) - 5, &vx2, &vy2, &vz2, _state);
                   p3errors = p3errors || fabs(vx - vx2) > threshold;
                   p3errors = p3errors || fabs(vy - vy2) > threshold;
                   p3errors = p3errors || fabs(vz - vz2) > threshold;
@@ -65285,7 +65285,7 @@ bool testparametric(bool silent, ae_state *_state) {
    // * compare with Spline2Calc/Spline2Diff/Spline2Diff2
    // Because of task properties both variants should
    // return same answer.
-      v0 = randomreal(_state);
+      v0 = randomreal();
       spline1dbuildcubic(&t, &x, n, 0, 0.0, 0, 0.0, &s, _state);
       spline1ddiff(&s, v0, &vx2, &vdx2, &vd2x2, _state);
       spline1dbuildcubic(&t, &y, n, 0, 0.0, 0, 0.0, &s, _state);
@@ -65355,8 +65355,8 @@ bool testparametric(bool silent, ae_state *_state) {
       }
       pspline2build(&xy, n, 1, 0, &p2, _state);
       pspline3build(&xyz, n, 1, 0, &p3, _state);
-      a = randomreal(_state);
-      b = randomreal(_state);
+      a = randomreal();
+      b = randomreal();
       p2errors = p2errors || fabs(pspline2arclength(&p2, a, b, _state) - (b - a) * sqrt(2.0) * (n - 1)) > nonstrictthreshold;
       p3errors = p3errors || fabs(pspline3arclength(&p3, a, b, _state) - (b - a) * sqrt(3.0) * (n - 1)) > nonstrictthreshold;
    }
@@ -65505,8 +65505,8 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector *lx, RVe
       for (j = 0; j < n - 1; j++) {
          for (pass = 1; pass <= passcount; pass++) {
             p = (n - 1) * i + j;
-            tx = (0.001 + 0.999 * randomreal(_state)) * (tbl.xyR[p][1] - tbl.xyR[p][0]);
-            ty = (0.001 + 0.999 * randomreal(_state)) * (tbl.xyR[p][3] - tbl.xyR[p][2]);
+            tx = (0.001 + 0.999 * randomreal()) * (tbl.xyR[p][1] - tbl.xyR[p][0]);
+            ty = (0.001 + 0.999 * randomreal()) * (tbl.xyR[p][3] - tbl.xyR[p][2]);
          // Interpolation properties
             v1 = 0.0;
             for (ci = 0; ci <= 3; ci++) {
@@ -65558,29 +65558,29 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
          for (pass = 1; pass <= passcount; pass++) {
          // Prepare
             do {
-               a1 = 2 * randomreal(_state) - 1;
+               a1 = randommid();
             } while (a1 == 0.0);
             a1 *= xjob;
-            b1 = 2 * randomreal(_state) - 1;
+            b1 = randommid();
             do {
-               a2 = 2 * randomreal(_state) - 1;
+               a2 = randommid();
             } while (a2 == 0.0);
             a2 *= yjob;
-            b2 = 2 * randomreal(_state) - 1;
+            b2 = randommid();
          // Test XY
             spline2dcopy(c, &c2, _state);
             spline2dlintransxy(&c2, a1, b1, a2, b2, _state);
-            tx = ax + randomreal(_state) * (bx - ax);
-            ty = ay + randomreal(_state) * (by - ay);
+            tx = ax + randomreal() * (bx - ax);
+            ty = ay + randomreal() * (by - ay);
             if (xjob == 0) {
                tx = b1;
-               vx = ax + randomreal(_state) * (bx - ax);
+               vx = ax + randomreal() * (bx - ax);
             } else {
                vx = (tx - b1) / a1;
             }
             if (yjob == 0) {
                ty = b2;
-               vy = ay + randomreal(_state) * (by - ay);
+               vy = ay + randomreal() * (by - ay);
             } else {
                vy = (ty - b2) / a2;
             }
@@ -65592,8 +65592,8 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
          // Test F
             spline2dcopy(c, &c2, _state);
             spline2dlintransf(&c2, a1, b1, _state);
-            tx = ax + randomreal(_state) * (bx - ax);
-            ty = ay + randomreal(_state) * (by - ay);
+            tx = ax + randomreal() * (bx - ax);
+            ty = ay + randomreal() * (by - ay);
             spline2dcalcv(c, tx, ty, &v1, _state);
             spline2dcalcv(&c2, tx, ty, &v2, _state);
             for (di = 0; di < d; di++) {
@@ -65686,27 +65686,27 @@ static bool testspline2dunit_testspline2dvf(bool silent, ae_state *_state) {
    result = false;
    for (pass = 1; pass <= passcount; pass++) {
       for (variant = 1; variant <= 2; variant++) {
-         range = (double)(randominteger(71, _state) + 30);
-         m = randominteger(4, _state) + 2;
-         n = randominteger(4, _state) + 2;
-         d = randominteger(3, _state) + 1;
+         range = (double)(randominteger(71) + 30);
+         m = randominteger(4) + 2;
+         n = randominteger(4) + 2;
+         d = randominteger(3) + 1;
          vectorsetlengthatleast(&x, n, _state);
          vectorsetlengthatleast(&y, m, _state);
          vectorsetlengthatleast(&f, n * m * d, _state);
          matrixsetlengthatleast(&ef, m, n, _state);
       // Build a grid for spline
-         x.xR[0] = range * (2 * randomreal(_state) - 1);
-         y.xR[0] = range * (2 * randomreal(_state) - 1);
+         x.xR[0] = range * randommid();
+         y.xR[0] = range * randommid();
          for (i = 1; i < n; i++) {
-            x.xR[i] = x.xR[i - 1] + st + randomreal(_state);
+            x.xR[i] = x.xR[i - 1] + st + randomreal();
          }
          for (i = 1; i < m; i++) {
-            y.xR[i] = y.xR[i - 1] + st + randomreal(_state);
+            y.xR[i] = y.xR[i - 1] + st + randomreal();
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
                for (k = 0; k < d; k++) {
-                  f.xR[d * (n * j + i) + k] = range * (2 * randomreal(_state) - 1);
+                  f.xR[d * (n * j + i) + k] = range * randommid();
                }
             }
          }
@@ -65807,8 +65807,8 @@ static bool testspline2dunit_testspline2dvf(bool silent, ae_state *_state) {
             }
          // Test at random points
             for (i = 0; i < n * m; i++) {
-               rndx = xmin + (xmax - xmin) * randomreal(_state);
-               rndy = ymin + (ymax - ymin) * randomreal(_state);
+               rndx = xmin + (xmax - xmin) * randomreal();
+               rndy = ymin + (ymax - ymin) * randomreal();
             // Test calculation at random points
                spline2dcalcv(&vc, rndx, rndy, &resf, _state);
                resef = spline2dcalc(&sc, rndx, rndy, _state);
@@ -67253,7 +67253,7 @@ bool testspline2d(bool silent, ae_state *_state) {
 // Test: bilinear, bicubic
    for (n = 2; n <= 7; n++) {
       for (m = 2; m <= 7; m++) {
-         d = randominteger(2, _state) + 2;
+         d = randominteger(2) + 2;
          ae_vector_set_length(&x, n, _state);
          ae_vector_set_length(&y, m, _state);
          ae_vector_set_length(&lx, 2 * n - 1, _state);
@@ -67267,10 +67267,10 @@ bool testspline2d(bool silent, ae_state *_state) {
          // * X and Y stores grid
          // * F stores function values
          // * LX and LY stores twice dense grid (for Lipschitz testing)
-            ax = -1 - randomreal(_state);
-            bx = 1 + randomreal(_state);
-            ay = -1 - randomreal(_state);
-            by = 1 + randomreal(_state);
+            ax = -1 - randomreal();
+            bx = 1 + randomreal();
+            ay = -1 - randomreal();
+            by = 1 + randomreal();
             for (j = 0; j < n; j++) {
                x.xR[j] = 0.5 * (bx + ax) - 0.5 * (bx - ax) * cos(pi * (2 * j + 1) / (2 * n));
                if (j == 0) {
@@ -67285,7 +67285,7 @@ bool testspline2d(bool silent, ae_state *_state) {
                }
             }
             for (j = 0; j < n; j++) {
-               k = randominteger(n, _state);
+               k = randominteger(n);
                if (k != j) {
                   t = x.xR[j];
                   x.xR[j] = x.xR[k];
@@ -67306,7 +67306,7 @@ bool testspline2d(bool silent, ae_state *_state) {
                }
             }
             for (i = 0; i < m; i++) {
-               k = randominteger(m, _state);
+               k = randominteger(m);
                if (k != i) {
                   t = y.xR[i];
                   y.xR[i] = y.xR[k];
@@ -67415,7 +67415,7 @@ bool testspline2d(bool silent, ae_state *_state) {
             spline2dbuildbicubicv(&x, n, &y, m, &fvd, d, &c, _state);
             lterrors = lterrors || !testspline2dunit_testlintrans(&c, d, ax, bx, ay, by, _state);
          // Copy test
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c, _state);
             } else {
                spline2dbuildbilinear(&x, &y, &f, m, n, &c, _state);
@@ -67424,13 +67424,13 @@ bool testspline2d(bool silent, ae_state *_state) {
             spline2dcopy(&c, &c2, _state);
             err = 0.0;
             for (i = 1; i <= 5; i++) {
-               t1 = ax + (bx - ax) * randomreal(_state);
-               t2 = ay + (by - ay) * randomreal(_state);
+               t1 = ax + (bx - ax) * randomreal();
+               t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2, _state) - spline2dcalc(&c2, t1, t2, _state)), _state);
             }
             cperrors = cperrors || err > 10000 * machineepsilon;
          // Serialization test
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c, _state);
             } else {
                spline2dbuildbilinear(&x, &y, &f, m, n, &c, _state);
@@ -67458,8 +67458,8 @@ bool testspline2d(bool silent, ae_state *_state) {
             }
             err = 0.0;
             for (i = 1; i <= 5; i++) {
-               t1 = ax + (bx - ax) * randomreal(_state);
-               t2 = ay + (by - ay) * randomreal(_state);
+               t1 = ax + (bx - ax) * randomreal();
+               t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2, _state) - spline2dcalc(&c2, t1, t2, _state)), _state);
             }
             set_error_flag(&sererrors, err > 10000 * machineepsilon, __FILE__, __LINE__, "testspline2dunit.ap:292");
@@ -67481,8 +67481,8 @@ bool testspline2d(bool silent, ae_state *_state) {
                }
             // Test
                for (i = 1; i <= 10; i++) {
-                  t1 = ax + (bx - ax) * randomreal(_state);
-                  t2 = ay + (by - ay) * randomreal(_state);
+                  t1 = ax + (bx - ax) * randomreal();
+                  t2 = ay + (by - ay) * randomreal();
                   err = rmax2(err, fabs(spline2dcalc(&c, t1, t2, _state) - spline2dcalc(&c2, t2, t1, _state)), _state);
                }
             }
@@ -67685,11 +67685,11 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
    SetVector(z);
    SetVector(f);
    st = 0.3;
-   *m = randominteger(4, _state) + 2;
-   *n = randominteger(4, _state) + 2;
-   *l = randominteger(4, _state) + 2;
+   *m = randominteger(4) + 2;
+   *n = randominteger(4) + 2;
+   *l = randominteger(4) + 2;
    if (isvect) {
-      *d = randominteger(3, _state) + 1;
+      *d = randominteger(3) + 1;
    } else {
       *d = 1;
    }
@@ -67700,17 +67700,17 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
 // Fill X
    x->xR[0] = 0.0;
    for (i = 1; i < *n; i++) {
-      x->xR[i] = x->xR[i - 1] + st + randomreal(_state);
+      x->xR[i] = x->xR[i - 1] + st + randomreal();
    }
-   minv = -0.5 - randomreal(_state);
-   maxv = 0.5 + randomreal(_state);
+   minv = -0.5 - randomreal();
+   maxv = 0.5 + randomreal();
    mx = x->xR[*n - 1];
    for (i = 0; i < *n; i++) {
       x->xR[i] = x->xR[i] / mx * (maxv - minv) + minv;
    }
    if (reorder) {
       for (i = 0; i < *n; i++) {
-         k = randominteger(*n, _state);
+         k = randominteger(*n);
          v = x->xR[i];
          x->xR[i] = x->xR[k];
          x->xR[k] = v;
@@ -67719,17 +67719,17 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
 // Fill Y
    y->xR[0] = 0.0;
    for (i = 1; i < *m; i++) {
-      y->xR[i] = y->xR[i - 1] + st + randomreal(_state);
+      y->xR[i] = y->xR[i - 1] + st + randomreal();
    }
-   minv = -0.5 - randomreal(_state);
-   maxv = 0.5 + randomreal(_state);
+   minv = -0.5 - randomreal();
+   maxv = 0.5 + randomreal();
    mx = y->xR[*m - 1];
    for (i = 0; i < *m; i++) {
       y->xR[i] = y->xR[i] / mx * (maxv - minv) + minv;
    }
    if (reorder) {
       for (i = 0; i < *m; i++) {
-         k = randominteger(*m, _state);
+         k = randominteger(*m);
          v = y->xR[i];
          y->xR[i] = y->xR[k];
          y->xR[k] = v;
@@ -67738,17 +67738,17 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
 // Fill Z
    z->xR[0] = 0.0;
    for (i = 1; i < *l; i++) {
-      z->xR[i] = z->xR[i - 1] + st + randomreal(_state);
+      z->xR[i] = z->xR[i - 1] + st + randomreal();
    }
-   minv = -0.5 - randomreal(_state);
-   maxv = 0.5 + randomreal(_state);
+   minv = -0.5 - randomreal();
+   maxv = 0.5 + randomreal();
    mx = z->xR[*l - 1];
    for (i = 0; i < *l; i++) {
       z->xR[i] = z->xR[i] / mx * (maxv - minv) + minv;
    }
    if (reorder) {
       for (i = 0; i < *l; i++) {
-         k = randominteger(*l, _state);
+         k = randominteger(*l);
          v = z->xR[i];
          z->xR[i] = z->xR[k];
          z->xR[k] = v;
@@ -67759,7 +67759,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
       for (j = 0; j < *m; j++) {
          for (k = 0; k < *l; k++) {
             for (di = 0; di < *d; di++) {
-               f->xR[*d * (*n * (*m * k + j) + i) + di] = 2 * randomreal(_state) - 1;
+               f->xR[*d * (*n * (*m * k + j) + i) + di] = randommid();
             }
          }
       }
@@ -67808,9 +67808,9 @@ static bool testspline3dunit_basictest(ae_state *_state) {
 // We generate random test function, build spline, then evaluate
 // it in the random test point.
    for (d = 1; d <= 3; d++) {
-      n = 2 + randominteger(4, _state);
-      m = 2 + randominteger(4, _state);
-      l = 2 + randominteger(4, _state);
+      n = 2 + randominteger(4);
+      m = 2 + randominteger(4);
+      l = 2 + randominteger(4);
       ae_vector_set_length(&x, n, _state);
       for (i = 0; i < n; i++) {
          x.xR[i] = (double)i;
@@ -67825,11 +67825,11 @@ static bool testspline3dunit_basictest(ae_state *_state) {
       }
       ae_vector_set_length(&vf, l * m * n * d, _state);
       offs = 0;
-      ax = 2 * randomreal(_state) - 1;
-      ay = 2 * randomreal(_state) - 1;
-      az = 2 * randomreal(_state) - 1;
-      axy = 2 * randomreal(_state) - 1;
-      ayz = 2 * randomreal(_state) - 1;
+      ax = randommid();
+      ay = randommid();
+      az = randommid();
+      axy = randommid();
+      ayz = randommid();
       for (k = 0; k < l; k++) {
          for (j = 0; j < m; j++) {
             for (i = 0; i < n; i++) {
@@ -67841,9 +67841,9 @@ static bool testspline3dunit_basictest(ae_state *_state) {
          }
       }
       spline3dbuildtrilinearv(&x, n, &y, m, &z, l, &vf, d, &c, _state);
-      vx = randomreal(_state) * n;
-      vy = randomreal(_state) * m;
-      vz = randomreal(_state) * l;
+      vx = randomreal() * n;
+      vy = randomreal() * m;
+      vz = randomreal() * l;
       spline3dcalcv(&c, vx, vy, vz, &vf, _state);
       for (di = 0; di < d; di++) {
          if (fabs(di + ax * vx + ay * vy + az * vz + axy * vx * vy + ayz * vy * vz - vf.xR[di]) > eps) {
@@ -67978,9 +67978,9 @@ static bool testspline3dunit_testunpack(ae_state *_state) {
                      ae_frame_leave(_state);
                      return result;
                   }
-                  tx = (0.001 + 0.999 * randomreal(_state)) * (tbl1.xyR[p1][1] - tbl1.xyR[p1][0]);
-                  ty = (0.001 + 0.999 * randomreal(_state)) * (tbl1.xyR[p1][3] - tbl1.xyR[p1][2]);
-                  tz = (0.001 + 0.999 * randomreal(_state)) * (tbl1.xyR[p1][5] - tbl1.xyR[p1][4]);
+                  tx = (0.001 + 0.999 * randomreal()) * (tbl1.xyR[p1][1] - tbl1.xyR[p1][0]);
+                  ty = (0.001 + 0.999 * randomreal()) * (tbl1.xyR[p1][3] - tbl1.xyR[p1][2]);
+                  tz = (0.001 + 0.999 * randomreal()) * (tbl1.xyR[p1][5] - tbl1.xyR[p1][4]);
                // Interpolation properties for:
                //  *scalar function;
                   v1 = 0.0;
@@ -68060,41 +68060,41 @@ static bool testspline3dunit_testlintrans(ae_state *_state) {
             for (zjob = 0; zjob <= 1; zjob++) {
             // Prepare
                do {
-                  a1 = 2.0 * randomreal(_state) - 1.0;
+                  a1 = randommid();
                } while (a1 == 0.0);
                a1 *= xjob;
-               b1 = x.xR[0] + randomreal(_state) * (x.xR[n - 1] - x.xR[0] + 2.0) - 1.0;
+               b1 = x.xR[0] + randomreal() * (x.xR[n - 1] - x.xR[0] + 2.0) - 1.0;
                do {
-                  a2 = 2.0 * randomreal(_state) - 1.0;
+                  a2 = randommid();
                } while (a2 == 0.0);
                a2 *= yjob;
-               b2 = y.xR[0] + randomreal(_state) * (y.xR[m - 1] - y.xR[0] + 2.0) - 1.0;
+               b2 = y.xR[0] + randomreal() * (y.xR[m - 1] - y.xR[0] + 2.0) - 1.0;
                do {
-                  a3 = 2.0 * randomreal(_state) - 1.0;
+                  a3 = randommid();
                } while (a3 == 0.0);
                a3 *= zjob;
-               b3 = z.xR[0] + randomreal(_state) * (z.xR[l - 1] - z.xR[0] + 2.0) - 1.0;
+               b3 = z.xR[0] + randomreal() * (z.xR[l - 1] - z.xR[0] + 2.0) - 1.0;
             // Test XYZ
                spline3dcopy(&c, &c2, _state);
                spline3dlintransxyz(&c2, a1, b1, a2, b2, a3, b3, _state);
-               tx = x.xR[0] + randomreal(_state) * (x.xR[n - 1] - x.xR[0]);
-               ty = y.xR[0] + randomreal(_state) * (y.xR[m - 1] - y.xR[0]);
-               tz = z.xR[0] + randomreal(_state) * (z.xR[l - 1] - z.xR[0]);
+               tx = x.xR[0] + randomreal() * (x.xR[n - 1] - x.xR[0]);
+               ty = y.xR[0] + randomreal() * (y.xR[m - 1] - y.xR[0]);
+               tz = z.xR[0] + randomreal() * (z.xR[l - 1] - z.xR[0]);
                if (xjob == 0) {
                   tx = b1;
-                  vx = x.xR[0] + randomreal(_state) * (x.xR[n - 1] - x.xR[0]);
+                  vx = x.xR[0] + randomreal() * (x.xR[n - 1] - x.xR[0]);
                } else {
                   vx = (tx - b1) / a1;
                }
                if (yjob == 0) {
                   ty = b2;
-                  vy = y.xR[0] + randomreal(_state) * (y.xR[m - 1] - y.xR[0]);
+                  vy = y.xR[0] + randomreal() * (y.xR[m - 1] - y.xR[0]);
                } else {
                   vy = (ty - b2) / a2;
                }
                if (zjob == 0) {
                   tz = b3;
-                  vz = z.xR[0] + randomreal(_state) * (z.xR[l - 1] - z.xR[0]);
+                  vz = z.xR[0] + randomreal() * (z.xR[l - 1] - z.xR[0]);
                } else {
                   vz = (tz - b3) / a3;
                }
@@ -68111,9 +68111,9 @@ static bool testspline3dunit_testlintrans(ae_state *_state) {
             // Test F
                spline3dcopy(&c, &c2, _state);
                spline3dlintransf(&c2, a1, b1, _state);
-               tx = x.xR[0] + randomreal(_state) * (x.xR[n - 1] - x.xR[0]);
-               ty = y.xR[0] + randomreal(_state) * (y.xR[m - 1] - y.xR[0]);
-               tz = z.xR[0] + randomreal(_state) * (z.xR[l - 1] - z.xR[0]);
+               tx = x.xR[0] + randomreal() * (x.xR[n - 1] - x.xR[0]);
+               ty = y.xR[0] + randomreal() * (y.xR[m - 1] - y.xR[0]);
+               tz = z.xR[0] + randomreal() * (z.xR[l - 1] - z.xR[0]);
                spline3dcalcv(&c, tx, ty, tz, &v1, _state);
                spline3dcalcv(&c2, tx, ty, tz, &v2, _state);
                for (i = 0; i < d; i++) {
@@ -68157,12 +68157,12 @@ static bool testspline3dunit_testtrilinearresample(ae_state *_state) {
    result = false;
    passcount = 20;
    for (pass = 1; pass <= passcount; pass++) {
-      n = randominteger(4, _state) + 2;
-      m = randominteger(4, _state) + 2;
-      l = randominteger(4, _state) + 2;
-      n2 = randominteger(4, _state) + 2;
-      m2 = randominteger(4, _state) + 2;
-      l2 = randominteger(4, _state) + 2;
+      n = randominteger(4) + 2;
+      m = randominteger(4) + 2;
+      l = randominteger(4) + 2;
+      n2 = randominteger(4) + 2;
+      m2 = randominteger(4) + 2;
+      l2 = randominteger(4) + 2;
       vectorsetlengthatleast(&x, n, _state);
       vectorsetlengthatleast(&y, m, _state);
       vectorsetlengthatleast(&z, l, _state);
@@ -68179,7 +68179,7 @@ static bool testspline3dunit_testtrilinearresample(ae_state *_state) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             for (k = 0; k < l; k++) {
-               f.xR[n * (m * k + j) + i] = 2 * randomreal(_state) - 1;
+               f.xR[n * (m * k + j) + i] = randommid();
             }
          }
       }
@@ -68329,19 +68329,19 @@ static bool sqrdegmatrixrbftest(bool silent, ae_state *_state) {
    ny = 1;
    for (nx = 2; nx <= 3; nx++) {
    // prepare test problem
-      sx = pow(zx, px * (randominteger(3, _state) - 1));
-      sy = pow(zy, py * (randominteger(3, _state) - 1));
+      sx = pow(zx, px * (randominteger(3) - 1));
+      sy = pow(zy, py * (randominteger(3) - 1));
       ae_vector_set_length(&x, nx, _state);
       ae_vector_set_length(&y, ny, _state);
       ae_vector_set_length(&point, nx, _state);
       rbfcreate(nx, ny, &s, _state);
       rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits, _state);
-      q = 0.25 + randomreal(_state);
-      z = 4.5 + randomreal(_state);
+      q = 0.25 + randomreal();
+      z = 4.5 + randomreal();
       rbfsetalgoqnn(&s, q, z, _state);
    // start points for grid
       for (i = 0; i < nx; i++) {
-         point.xR[i] = sx * (2 * randomreal(_state) - 1);
+         point.xR[i] = sx * randommid();
       }
       if (nx == 2) {
          for (k0 = 2; k0 <= 4; k0++) {
@@ -68355,7 +68355,7 @@ static bool sqrdegmatrixrbftest(bool silent, ae_state *_state) {
                gp.xyR[i][0] = point.xR[0] + sx * i * d0.xR[0];
                gp.xyR[i][1] = point.xR[1] + sx * i * d0.xR[1];
                for (k = 0; k < ny; k++) {
-                  gp.xyR[i][nx + k] = sy * (2 * randomreal(_state) - 1);
+                  gp.xyR[i][nx + k] = sy * randommid();
                }
             }
             rbfsetpoints(&s, &gp, np, _state);
@@ -68391,7 +68391,7 @@ static bool sqrdegmatrixrbftest(bool silent, ae_state *_state) {
                         gp.xyR[i][1] = point.xR[1] + sx * i * d0.xR[1];
                         gp.xyR[i][2] = point.xR[2] + sx * i * d0.xR[2];
                         for (k = 0; k < ny; k++) {
-                           gp.xyR[i][nx + k] = sy * (2 * randomreal(_state) - 1);
+                           gp.xyR[i][nx + k] = sy * randommid();
                         }
                      }
                   }
@@ -68406,7 +68406,7 @@ static bool sqrdegmatrixrbftest(bool silent, ae_state *_state) {
                            gp.xyR[i * k1 + j][1] = sx * i * d0.xR[1] + sx * j * d1.xR[1];
                            gp.xyR[i * k1 + j][2] = sx * i * d0.xR[2] + sx * j * d1.xR[2];
                            for (k = 0; k < ny; k++) {
-                              gp.xyR[i * k1 + j][nx + k] = sy * (2 * randomreal(_state) - 1);
+                              gp.xyR[i * k1 + j][nx + k] = sy * randommid();
                            }
                         }
                      }
@@ -68579,9 +68579,9 @@ static bool basicmultilayerrbf1dtest(ae_state *_state) {
    }
    r = 1.0;
    for (pass = 0; pass < passcount; pass++) {
-      nx = randominteger(2, _state) + 2;
-      ny = randominteger(3, _state) + 1;
-      linterm = randominteger(3, _state) + 1;
+      nx = randominteger(2) + 2;
+      ny = randominteger(3) + 1;
+      linterm = randominteger(3) + 1;
       ae_vector_set_length(&x, nx, _state);
       ae_vector_set_length(&y, ny, _state);
       ae_vector_set_length(&a1, ny, _state);
@@ -68590,8 +68590,8 @@ static bool basicmultilayerrbf1dtest(ae_state *_state) {
       ae_matrix_set_length(&mody0, n, ny, _state);
       ae_matrix_set_length(&mody1, n, ny, _state);
       for (i = 0; i < ny; i++) {
-         a1.xR[i] = a + 0.01 * a * (2 * randomreal(_state) - 1);
-         b1.xR[i] = b + 0.01 * b * (2 * randomreal(_state) - 1);
+         a1.xR[i] = a + 0.01 * a * randommid();
+         b1.xR[i] = b + 0.01 * b * randommid();
          delta.xR[i] = 0.35 * b1.xR[i];
       }
       ae_matrix_set_length(&gp, n, nx + ny, _state);
@@ -68750,7 +68750,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
    for (nx = 1; nx <= 4; nx++) {
       for (ny = 1; ny <= 3; ny++) {
          rbfcreate(nx, ny, &s, _state);
-         if (randomreal(_state) > 0.5) {
+         if (randombool()) {
             rbfbuildmodel(&s, &rep, _state);
             if (rep.terminationtype <= 0) {
                set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:202");
@@ -68761,7 +68761,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          ae_vector_set_length(&x, nx, _state);
          ae_vector_set_length(&y, 1, _state);
          for (i = 0; i < nx; i++) {
-            x.xR[i] = 2 * randomreal(_state) - 1;
+            x.xR[i] = randommid();
          }
          rbfcalc(&s, &x, &y, _state);
          if (y.cnt != ny) {
@@ -68795,7 +68795,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
             }
             ae_matrix_set_length(&xy, 1, nx + ny, _state);
             for (i = 0; i < nx + ny; i++) {
-               xy.xyR[0][i] = 2 * randomreal(_state) - 1;
+               xy.xyR[0][i] = randommid();
             }
             rbfsetpoints(&s, &xy, 1, _state);
             rbfbuildmodel(&s, &rep, _state);
@@ -68824,7 +68824,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
             }
          // Second, test that model is constant
             for (i = 0; i < nx; i++) {
-               x.xR[i] = 2 * randomreal(_state) - 1;
+               x.xR[i] = randommid();
             }
             rbfcalc(&s, &x, &y, _state);
             if (y.cnt != ny) {
@@ -68859,7 +68859,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
             }
             ae_matrix_set_length(&xy, 2, nx + ny, _state);
             for (i = 0; i < nx + ny; i++) {
-               xy.xyR[0][i] = 2 * randomreal(_state) - 1;
+               xy.xyR[0][i] = randommid();
             }
             for (i = 0; i < nx + ny; i++) {
                xy.xyR[1][i] = xy.xyR[0][i] + 1.0;
@@ -68899,7 +68899,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
 // Radii filtering should place a bound on the radius of outlier.
    for (nx = 2; nx <= 3; nx++) {
       for (ny = 1; ny <= 3; ny++) {
-         sx = exp(-5 + 10 * randomreal(_state));
+         sx = exp(-5 + 10 * randomreal());
          rbfcreate(nx, ny, &s, _state);
          ae_matrix_set_length(&xy, 20, nx + ny, _state);
          for (i = 0; i < xy.rows; i++) {
@@ -68908,13 +68908,13 @@ static bool testrbfunit_specialtest(ae_state *_state) {
                xy.xyR[i][j] = 0.0;
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state);
+               xy.xyR[i][nx + j] = randomreal();
             }
          }
          xy.xyR[xy.rows - 1][0] = -1000 * sx;
          rbfsetpoints(&s, &xy, xy.rows, _state);
       // Try random Z from [1,5]
-         z = 1 + randomreal(_state) * 4;
+         z = 1 + randomreal() * 4;
          rbfsetalgoqnn(&s, 1.0, z, _state);
          rbfbuildmodel(&s, &rep, _state);
          if (rep.terminationtype <= 0) {
@@ -68949,10 +68949,10 @@ static bool testrbfunit_specialtest(ae_state *_state) {
 // reproduce such function.
    n = 5;
    for (ny = 1; ny <= 3; ny++) {
-      va = 2 * randomreal(_state) - 1;
-      vb = 2 * randomreal(_state) - 1;
-      vc = 2 * randomreal(_state) - 1;
-      vd = 2 * randomreal(_state) - 1;
+      va = randommid();
+      vb = randommid();
+      vc = randommid();
+      vd = randommid();
    // Test NX=2.
    // Generate linear function using random coefficients VA/VB/VC.
    // Function is K-dimensional vector-valued, each component has slightly
@@ -68977,8 +68977,8 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          return result;
       }
       ae_vector_set_length(&x, 2, _state);
-      x.xR[0] = (n - 1) * randomreal(_state);
-      x.xR[1] = (n - 1) * randomreal(_state);
+      x.xR[0] = (n - 1) * randomreal();
+      x.xR[1] = (n - 1) * randomreal();
       if (ny == 1 && fabs(rbfcalc2(&s, x.xR[0], x.xR[1], _state) - (va * x.xR[0] + vb * x.xR[1] + vc)) > errtol) {
          result = true;
          ae_frame_leave(_state);
@@ -69019,9 +69019,9 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          return result;
       }
       ae_vector_set_length(&x, 3, _state);
-      x.xR[0] = (n - 1) * randomreal(_state);
-      x.xR[1] = (n - 1) * randomreal(_state);
-      x.xR[2] = (n - 1) * randomreal(_state);
+      x.xR[0] = (n - 1) * randomreal();
+      x.xR[1] = (n - 1) * randomreal();
+      x.xR[2] = (n - 1) * randomreal();
       if (ny == 1 && fabs(rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2], _state) - (va * x.xR[0] + vb * x.xR[1] + vc * x.xR[2] + vd)) > errtol) {
          result = true;
          ae_frame_leave(_state);
@@ -69047,13 +69047,13 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          ae_matrix_set_length(&vf, ny, nx + 1, _state);
          for (i = 0; i < ny; i++) {
             for (j = 0; j <= nx; j++) {
-               vf.xyR[i][j] = 2 * randomreal(_state) - 1;
+               vf.xyR[i][j] = randommid();
             }
          }
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = randomreal(_state);
+               xy.xyR[i][j] = randomreal();
             }
             for (j = 0; j < ny; j++) {
                xy.xyR[i][nx + j] = vf.xyR[j][nx];
@@ -69073,7 +69073,7 @@ static bool testrbfunit_specialtest(ae_state *_state) {
          }
          ae_vector_set_length(&x, nx, _state);
          for (i = 0; i < nx; i++) {
-            x.xR[i] = randomreal(_state);
+            x.xR[i] = randomreal();
          }
          rbfcalc(&s, &x, &y, _state);
          for (k = 0; k < ny; k++) {
@@ -69150,15 +69150,15 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
       for (ny = 1; ny <= 3; ny++) {
          for (linterm = 1; linterm <= 3; linterm++) {
          // prepare test problem
-            sx = pow(zx, px * (randominteger(3, _state) - 1));
-            sy = pow(zy, py * (randominteger(3, _state) - 1));
+            sx = pow(zx, px * (randominteger(3) - 1));
+            sy = pow(zy, py * (randominteger(3) - 1));
             ae_vector_set_length(&x, nx, _state);
             ae_vector_set_length(&y, ny, _state);
             ae_vector_set_length(&point, nx, _state);
             rbfcreate(nx, ny, &s, _state);
             rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits, _state);
-            q = 0.25 + randomreal(_state);
-            z = 4.5 + randomreal(_state);
+            q = 0.25 + randomreal();
+            z = 4.5 + randomreal();
             rbfsetalgoqnn(&s, q, z, _state);
             if (linterm == 1) {
                rbfsetlinterm(&s, _state);
@@ -69171,7 +69171,7 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
             }
          // start points for grid
             for (i = 0; i < nx; i++) {
-               point.xR[i] = sx * (2 * randomreal(_state) - 1);
+               point.xR[i] = sx * randommid();
             }
          // 2-dimensional test problem
             if (nx == 2) {
@@ -69185,7 +69185,7 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
                            gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i;
                            gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j;
                            for (k = 0; k < ny; k++) {
-                              gp.xyR[i * k1 + j][nx + k] = sy * (2 * randomreal(_state) - 1);
+                              gp.xyR[i * k1 + j][nx + k] = sy * randommid();
                            }
                         }
                      }
@@ -69223,7 +69223,7 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
                      // may hide deficiencies in the function).
                         x.xR[0] = gp.xyR[i][0];
                         x.xR[1] = gp.xyR[i][1];
-                        fidx = randominteger(4, _state);
+                        fidx = randominteger(4);
                         if (fidx == 0 && ny == 1) {
                            y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1], _state);
                            if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
@@ -69317,7 +69317,7 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
                                  gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j;
                                  gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k;
                                  for (l = 0; l < ny; l++) {
-                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * (2 * randomreal(_state) - 1);
+                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
                                  }
                               }
                            }
@@ -69337,7 +69337,7 @@ static bool testrbfunit_basicrbftest(ae_state *_state) {
                            x.xR[0] = gp.xyR[i][0];
                            x.xR[1] = gp.xyR[i][1];
                            x.xR[2] = gp.xyR[i][2];
-                           fidx = randominteger(4, _state);
+                           fidx = randominteger(4);
                            if (fidx == 0 && ny == 1) {
                               y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2], _state);
                               if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
@@ -69479,15 +69479,15 @@ static bool testrbfunit_irregularrbftest(ae_state *_state) {
       for (ny = 1; ny <= 3; ny++) {
          for (linterm = 1; linterm <= 3; linterm++) {
          // prepare test problem
-            sx = pow(zx, px * (randominteger(3, _state) - 1));
-            sy = pow(zy, py * (randominteger(3, _state) - 1));
+            sx = pow(zx, px * (randominteger(3) - 1));
+            sy = pow(zy, py * (randominteger(3) - 1));
             ae_vector_set_length(&x, nx, _state);
             ae_vector_set_length(&y, ny, _state);
             ae_vector_set_length(&point, nx, _state);
             rbfcreate(nx, ny, &s, _state);
             rbfsetcond(&s, testrbfunit_heps, testrbfunit_heps, testrbfunit_mxits, _state);
-            q = 0.25 + randomreal(_state);
-            z = 4.5 + randomreal(_state);
+            q = 0.25 + randomreal();
+            z = 4.5 + randomreal();
             rbfsetalgoqnn(&s, q, z, _state);
             if (linterm == 1) {
                rbfsetlinterm(&s, _state);
@@ -69500,7 +69500,7 @@ static bool testrbfunit_irregularrbftest(ae_state *_state) {
             }
          // start points for grid
             for (i = 0; i < nx; i++) {
-               point.xR[i] = sx * (2 * randomreal(_state) - 1);
+               point.xR[i] = sx * randommid();
             }
          // 2-dimensional test problems
             if (nx == 2) {
@@ -69511,10 +69511,10 @@ static bool testrbfunit_irregularrbftest(ae_state *_state) {
                   // create grid
                      for (i = 0; i < k0; i++) {
                         for (j = 0; j < k1; j++) {
-                           gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i + noiselevel * sx * (2 * randomreal(_state) - 1);
-                           gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j + noiselevel * sx * (2 * randomreal(_state) - 1);
+                           gp.xyR[i * k1 + j][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
+                           gp.xyR[i * k1 + j][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
                            for (k = 0; k < ny; k++) {
-                              gp.xyR[i * k1 + j][nx + k] = sy * (2 * randomreal(_state) - 1);
+                              gp.xyR[i * k1 + j][nx + k] = sy * randommid();
                            }
                         }
                      }
@@ -69562,11 +69562,11 @@ static bool testrbfunit_irregularrbftest(ae_state *_state) {
                         for (i = 0; i < k0; i++) {
                            for (j = 0; j < k1; j++) {
                               for (k = 0; k < k2; k++) {
-                                 gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i + noiselevel * sx * (2 * randomreal(_state) - 1);
-                                 gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j + noiselevel * sx * (2 * randomreal(_state) - 1);
-                                 gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k + noiselevel * sx * (2 * randomreal(_state) - 1);
+                                 gp.xyR[(i * k1 + j) * k2 + k][0] = point.xR[0] + sx * i + noiselevel * sx * randommid();
+                                 gp.xyR[(i * k1 + j) * k2 + k][1] = point.xR[1] + sx * j + noiselevel * sx * randommid();
+                                 gp.xyR[(i * k1 + j) * k2 + k][2] = point.xR[2] + sx * k + noiselevel * sx * randommid();
                                  for (l = 0; l < ny; l++) {
-                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * (2 * randomreal(_state) - 1);
+                                    gp.xyR[(i * k1 + j) * k2 + k][nx + l] = sy * randommid();
                                  }
                               }
                            }
@@ -69660,29 +69660,29 @@ static bool testrbfunit_linearitymodelrbftest(ae_state *_state) {
    for (nx = 2; nx <= 3; nx++) {
       for (linterm = 1; linterm <= 3; linterm++) {
       // prepare test problem
-         sx = pow(zx, px * (randominteger(3, _state) - 1));
-         sy = pow(zy, py * (randominteger(3, _state) - 1));
+         sx = pow(zx, px * (randominteger(3) - 1));
+         sy = pow(zy, py * (randominteger(3) - 1));
          ae_vector_set_length(&x, nx, _state);
          ae_vector_set_length(&y, ny, _state);
          ae_vector_set_length(&point, nx, _state);
          rbfcreate(nx, ny, &s, _state);
-         q = 0.25 + randomreal(_state);
-         z = 4.5 + randomreal(_state);
+         q = 0.25 + randomreal();
+         z = 4.5 + randomreal();
          rbfsetalgoqnn(&s, q, z, _state);
          ae_vector_set_length(&a, nx + 1, _state);
          if (linterm == 1) {
             rbfsetlinterm(&s, _state);
             for (i = 0; i < nx; i++) {
-               a.xR[i] = sy * (2 * randomreal(_state) - 1) / sx;
+               a.xR[i] = sy * randommid() / sx;
             }
-            a.xR[nx] = sy * (2 * randomreal(_state) - 1);
+            a.xR[nx] = sy * randommid();
          }
          if (linterm == 2) {
             rbfsetconstterm(&s, _state);
             for (i = 0; i < nx; i++) {
                a.xR[i] = 0.0;
             }
-            a.xR[nx] = sy * (2 * randomreal(_state) - 1);
+            a.xR[nx] = sy * randommid();
          }
          if (linterm == 3) {
             rbfsetzeroterm(&s, _state);
@@ -69692,7 +69692,7 @@ static bool testrbfunit_linearitymodelrbftest(ae_state *_state) {
          }
       // start points for grid
          for (i = 0; i < nx; i++) {
-            point.xR[i] = sx * (2 * randomreal(_state) - 1);
+            point.xR[i] = sx * randommid();
          }
          if (nx == 2) {
             for (k0 = 2; k0 <= 4; k0++) {
@@ -69847,43 +69847,43 @@ static bool testrbfunit_serializationtest(ae_state *_state) {
          rbfsetlinterm(&s, _state);
          if (nx == 2) {
          // 2-dimensional problem
-            k0 = 2 + randominteger(4, _state);
-            k1 = 2 + randominteger(4, _state);
+            k0 = 2 + randominteger(4);
+            k1 = 2 + randominteger(4);
             ae_matrix_set_length(&xy, k0 * k1, nx + ny, _state);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
-                  xy.xyR[i0 * k1 + i1][0] = i0 + 0.1 * (2 * randomreal(_state) - 1);
-                  xy.xyR[i0 * k1 + i1][1] = i1 + 0.1 * (2 * randomreal(_state) - 1);
+                  xy.xyR[i0 * k1 + i1][0] = i0 + 0.1 * randommid();
+                  xy.xyR[i0 * k1 + i1][1] = i1 + 0.1 * randommid();
                   for (j = 0; j < ny; j++) {
-                     xy.xyR[i0 * k1 + i1][nx + j] = 2 * randomreal(_state) - 1;
+                     xy.xyR[i0 * k1 + i1][nx + j] = randommid();
                   }
                }
             }
             ae_vector_set_length(&testpoint, nx, _state);
-            testpoint.xR[0] = randomreal(_state) * (k0 - 1);
-            testpoint.xR[1] = randomreal(_state) * (k1 - 1);
+            testpoint.xR[0] = randomreal() * (k0 - 1);
+            testpoint.xR[1] = randomreal() * (k1 - 1);
          } else {
          // 3-dimensional problem
-            k0 = 2 + randominteger(4, _state);
-            k1 = 2 + randominteger(4, _state);
-            k2 = 2 + randominteger(4, _state);
+            k0 = 2 + randominteger(4);
+            k1 = 2 + randominteger(4);
+            k2 = 2 + randominteger(4);
             ae_matrix_set_length(&xy, k0 * k1 * k2, nx + ny, _state);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
                   for (i2 = 0; i2 < k2; i2++) {
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * (2 * randomreal(_state) - 1);
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * (2 * randomreal(_state) - 1);
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * (2 * randomreal(_state) - 1);
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * randommid();
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * randommid();
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * randommid();
                      for (j = 0; j < ny; j++) {
-                        xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = 2 * randomreal(_state) - 1;
+                        xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = randommid();
                      }
                   }
                }
             }
             ae_vector_set_length(&testpoint, nx, _state);
-            testpoint.xR[0] = randomreal(_state) * (k0 - 1);
-            testpoint.xR[1] = randomreal(_state) * (k1 - 1);
-            testpoint.xR[2] = randomreal(_state) * (k2 - 1);
+            testpoint.xR[0] = randomreal() * (k0 - 1);
+            testpoint.xR[1] = randomreal() * (k1 - 1);
+            testpoint.xR[2] = randomreal() * (k2 - 1);
          }
          rbfsetpoints(&s, &xy, xy.rows, _state);
       // Build model, serialize, compare
@@ -69959,43 +69959,43 @@ static bool testrbfunit_serializationtest(ae_state *_state) {
          rbfsetlinterm(&s, _state);
          if (nx == 2) {
          // 2-dimensional problem
-            k0 = 2 + randominteger(4, _state);
-            k1 = 2 + randominteger(4, _state);
+            k0 = 2 + randominteger(4);
+            k1 = 2 + randominteger(4);
             ae_matrix_set_length(&xy, k0 * k1, nx + ny, _state);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
-                  xy.xyR[i0 * k1 + i1][0] = i0 + 0.1 * (2 * randomreal(_state) - 1);
-                  xy.xyR[i0 * k1 + i1][1] = i1 + 0.1 * (2 * randomreal(_state) - 1);
+                  xy.xyR[i0 * k1 + i1][0] = i0 + 0.1 * randommid();
+                  xy.xyR[i0 * k1 + i1][1] = i1 + 0.1 * randommid();
                   for (j = 0; j < ny; j++) {
-                     xy.xyR[i0 * k1 + i1][nx + j] = 2 * randomreal(_state) - 1;
+                     xy.xyR[i0 * k1 + i1][nx + j] = randommid();
                   }
                }
             }
             ae_vector_set_length(&testpoint, nx, _state);
-            testpoint.xR[0] = randomreal(_state) * (k0 - 1);
-            testpoint.xR[1] = randomreal(_state) * (k1 - 1);
+            testpoint.xR[0] = randomreal() * (k0 - 1);
+            testpoint.xR[1] = randomreal() * (k1 - 1);
          } else {
          // 3-dimensional problem
-            k0 = 2 + randominteger(4, _state);
-            k1 = 2 + randominteger(4, _state);
-            k2 = 2 + randominteger(4, _state);
+            k0 = 2 + randominteger(4);
+            k1 = 2 + randominteger(4);
+            k2 = 2 + randominteger(4);
             ae_matrix_set_length(&xy, k0 * k1 * k2, nx + ny, _state);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
                   for (i2 = 0; i2 < k2; i2++) {
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * (2 * randomreal(_state) - 1);
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * (2 * randomreal(_state) - 1);
-                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * (2 * randomreal(_state) - 1);
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * randommid();
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * randommid();
+                     xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * randommid();
                      for (j = 0; j < ny; j++) {
-                        xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = 2 * randomreal(_state) - 1;
+                        xy.xyR[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = randommid();
                      }
                   }
                }
             }
             ae_vector_set_length(&testpoint, nx, _state);
-            testpoint.xR[0] = randomreal(_state) * (k0 - 1);
-            testpoint.xR[1] = randomreal(_state) * (k1 - 1);
-            testpoint.xR[2] = randomreal(_state) * (k2 - 1);
+            testpoint.xR[0] = randomreal() * (k0 - 1);
+            testpoint.xR[1] = randomreal() * (k1 - 1);
+            testpoint.xR[2] = randomreal() * (k2 - 1);
          }
          rbfsetpoints(&s, &xy, xy.rows, _state);
       // Build model, serialize, compare
@@ -70073,7 +70073,7 @@ static bool testrbfunit_serializationtest(ae_state *_state) {
          rbase = 0.33;
          nlayers = 5;
          gridsize = iround(pow((double)n, 1.0 / nx), _state) + 1;
-         bf = randominteger(2, _state);
+         bf = randominteger(2);
          n = iround(pow((double)gridsize, (double)nx), _state);
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          ae_assert(gridsize > 1, "Assertion failed", _state);
@@ -70085,23 +70085,23 @@ static bool testrbfunit_serializationtest(ae_state *_state) {
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
             }
          }
          ae_vector_set_length(&testpoint, nx, _state);
          for (j = 0; j < nx; j++) {
-            testpoint.xR[j] = randomreal(_state);
+            testpoint.xR[j] = randomreal();
          }
          ae_vector_set_length(&scalevec, nx, _state);
          for (j = 0; j < nx; j++) {
-            scalevec.xR[j] = pow(2.0, 2 * randomreal(_state) - 1);
+            scalevec.xR[j] = pow(2.0, randommid());
          }
       // prepare test problem
          rbfcreate(nx, ny, &s, _state);
          rbfsetv2bf(&s, bf, _state);
          rbfsetalgohierarchical(&s, rbase, nlayers, 0.0, _state);
          rbfsetlinterm(&s, _state);
-         if (randomreal(_state) > 0.5) {
+         if (randombool()) {
             rbfsetpoints(&s, &xy, xy.rows, _state);
          } else {
             rbfsetpointsandscales(&s, &xy, xy.rows, &scalevec, _state);
@@ -70219,14 +70219,14 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
 // target function.
    for (pass = 0; pass < passcount; pass++) {
    // prepare test problem
-      k0 = 6 + randominteger(3, _state);
-      k1 = 6 + randominteger(3, _state);
-      k2 = 6 + randominteger(3, _state);
-      s1 = pow((double)range, (double)(randominteger(3, _state) - 1));
-      s2 = pow((double)range, (double)(randominteger(3, _state) - 1));
-      nx = randominteger(2, _state) + 2;
-      ny = randominteger(2, _state) + 1;
-      linterm = randominteger(3, _state) + 1;
+      k0 = 6 + randominteger(3);
+      k1 = 6 + randominteger(3);
+      k2 = 6 + randominteger(3);
+      s1 = pow((double)range, (double)(randominteger(3) - 1));
+      s2 = pow((double)range, (double)(randominteger(3) - 1));
+      nx = randominteger(2) + 2;
+      ny = randominteger(2) + 1;
+      linterm = randominteger(3) + 1;
       layers = 5;
       gstep = s1 / 6;
       q = s1;
@@ -70246,7 +70246,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
          rbfsetzeroterm(&s, _state);
       }
       for (i = 0; i < nx; i++) {
-         point.xR[i] = s1 * (2 * randomreal(_state) - 1);
+         point.xR[i] = s1 * randommid();
       }
    // 2-dimensional test problem
       if (nx == 2) {
@@ -70258,7 +70258,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
                gp.xyR[i * k1 + j][0] = point.xR[0] + gstep * i;
                gp.xyR[i * k1 + j][1] = point.xR[1] + gstep * j;
                for (k = 0; k < ny; k++) {
-                  gp.xyR[i * k1 + j][nx + k] = s2 * (2 * randomreal(_state) - 1);
+                  gp.xyR[i * k1 + j][nx + k] = s2 * randommid();
                }
             }
          }
@@ -70292,7 +70292,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
          // may hide deficiencies in the function).
             x.xR[0] = gp.xyR[i][0];
             x.xR[1] = gp.xyR[i][1];
-            fidx = randominteger(4, _state);
+            fidx = randominteger(4);
             if (fidx == 0 && ny != 1) {
                continue;
             }
@@ -70337,7 +70337,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
                   gp.xyR[(i * k1 + j) * k2 + k][1] = gpgx1.xR[j];
                   gp.xyR[(i * k1 + j) * k2 + k][2] = gpgx2.xR[k];
                   for (l = 0; l < ny; l++) {
-                     gp.xyR[(i * k1 + j) * k2 + k][nx + l] = s2 * (2 * randomreal(_state) - 1);
+                     gp.xyR[(i * k1 + j) * k2 + k][nx + l] = s2 * randommid();
                   }
                }
             }
@@ -70358,7 +70358,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
             x.xR[0] = gp.xyR[i][0];
             x.xR[1] = gp.xyR[i][1];
             x.xR[2] = gp.xyR[i][2];
-            fidx = randominteger(4, _state);
+            fidx = randominteger(4);
             if (fidx == 0 && ny != 1) {
                continue;
             }
@@ -70419,7 +70419,7 @@ static bool testrbfunit_basicmultilayerrbftest(ae_state *_state) {
       for (j = 0; j < gridsize; j++) {
          gp.xyR[i * gridsize + j][0] = (double)i;
          gp.xyR[i * gridsize + j][1] = (double)j;
-         gp.xyR[i * gridsize + j][2] = 0.10 * randomreal(_state) - 0.05 + (2 * ((i + j) % 2) - 1);
+         gp.xyR[i * gridsize + j][2] = 0.05 * randommid() + (2 * ((i + j) % 2) - 1);
       }
    }
    rbfsetpoints(&s, &gp, gridsize * gridsize, _state);
@@ -70681,8 +70681,8 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          rbase = 0.33;
          nlayers = 10;
          gridsize = iround(pow((double)n, 1.0 / nx), _state) + 1;
-         linterm = 1 + randominteger(3, _state);
-         bf = randominteger(2, _state);
+         linterm = 1 + randominteger(3);
+         bf = randominteger(2);
          n = iround(pow((double)gridsize, (double)nx), _state);
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          ae_assert(gridsize > 1, "Assertion failed", _state);
@@ -70694,7 +70694,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
             }
          }
       // Build model
@@ -70735,7 +70735,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                x.xR[j] = xy.xyR[i][j];
             }
             rbfcalc(&s, &xzero, &y, _state);
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                ae_vector_set_length(&yref, ny + 1, _state);
             }
             rbfcalc(&s, &x, &yref, _state);
@@ -70756,7 +70756,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                set_error_flag(&result, rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2], _state) != yref.xR[0], __FILE__, __LINE__, "testrbfunit.ap:2733");
             }
             rbfcalc(&s, &xzero, &y, _state);
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                ae_vector_set_length(&y, ny + 1, _state);
                rbfcalcbuf(&s, &x, &y, _state);
                set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit.ap:2742");
@@ -70769,7 +70769,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                set_error_flag(&result, y.xR[j] != yref.xR[j], __FILE__, __LINE__, "testrbfunit.ap:2751");
             }
             rbfcalc(&s, &xzero, &y, _state);
-            if (randomreal(_state) > 0.5) {
+            if (randombool()) {
                ae_vector_set_length(&y, ny + 1, _state);
                rbftscalcbuf(&s, &tsbuf, &x, &y, _state);
                set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit.ap:2759");
@@ -70788,7 +70788,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          ae_vector_set_length(&x, nx, _state);
          if (linterm == 2) {
             for (j = 0; j < nx; j++) {
-               if (randomreal(_state) > 0.5) {
+               if (randombool()) {
                   x.xR[j] = 1 + 1000 * rbase;
                } else {
                   x.xR[j] = 0 - 1000 * rbase;
@@ -70796,7 +70796,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
             }
             rbfcalc(&s, &x, &y, _state);
             for (j = 0; j < nx; j++) {
-               if (randomreal(_state) > 0.5) {
+               if (randombool()) {
                   x.xR[j] = 1 + 1000 * rbase;
                } else {
                   x.xR[j] = 0 - 1000 * rbase;
@@ -70809,7 +70809,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          }
          if (linterm == 3) {
             for (j = 0; j < nx; j++) {
-               if (randomreal(_state) > 0.5) {
+               if (randombool()) {
                   x.xR[j] = 1 + 1000 * rbase;
                } else {
                   x.xR[j] = 0 - 1000 * rbase;
@@ -70830,8 +70830,8 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          rbase = 0.33;
          nlayers = 5;
          gridsize = iround(pow((double)n, 1.0 / nx), _state) + 1;
-         linterm = 1 + randominteger(3, _state);
-         bf = randominteger(2, _state);
+         linterm = 1 + randominteger(3);
+         bf = randominteger(2);
          n = iround(pow((double)gridsize, (double)nx), _state);
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          ae_assert(gridsize > 1, "Assertion failed", _state);
@@ -70843,14 +70843,14 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
             }
          }
-         hasscale = randominteger(2, _state) == 0;
+         hasscale = randominteger(2) == 0;
          ae_vector_set_length(&scalevec, nx, _state);
          if (hasscale) {
             for (j = 0; j < nx; j++) {
-               scalevec.xR[j] = pow(2.0, 2 * randomreal(_state) - 1);
+               scalevec.xR[j] = pow(2.0, randommid());
             }
          }
       // Build model
@@ -70912,7 +70912,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          ae_vector_set_length(&y, ny, _state);
          for (i = 0; i <= 9; i++) {
             for (j = 0; j < nx; j++) {
-               x.xR[j] = randomreal(_state);
+               x.xR[j] = randomreal();
             }
             rbfcalc(&s, &x, &yref, _state);
             for (j = 0; j < ny; j++) {
@@ -71016,7 +71016,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                }
                ae_matrix_set_length(&xy, n, 2, _state);
                for (i = 0; i < n; i++) {
-                  v = shaketype * 0.25 * (randomreal(_state) - 0.5);
+                  v = shaketype * 0.25 * (randomreal() - 0.5);
                   v = (i + v) / (n - 1);
                   v = 2 * v - 1;
                   xy.xyR[i][0] = width * v;
@@ -71071,7 +71071,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
                   }
                }
             // Build model
-               bf = randominteger(2, _state);
+               bf = randominteger(2);
                rbfcreate(1, 1, &s, _state);
                rbfsetv2bf(&s, bf, _state);
                rbfsetalgohierarchical(&s, rbase, nlayers, 0.0, _state);
@@ -71123,12 +71123,12 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
    // problem setup
       n = 150;
       rbase = 0.33;
-      nlayers = randominteger(4, _state);
-      scalefactor = pow(1024.0, (double)(2 * randominteger(2, _state) - 1));
+      nlayers = randominteger(4);
+      scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
       gridsize = iround(pow((double)n, 1.0 / nx), _state) + 1;
-      ny = 1 + randominteger(3, _state);
-      linterm = 1 + randominteger(3, _state);
-      bf = randominteger(2, _state);
+      ny = 1 + randominteger(3);
+      linterm = 1 + randominteger(3);
+      bf = randominteger(2);
       n = iround(pow((double)gridsize, (double)nx), _state);
       ae_matrix_set_length(&xy, n, nx + ny, _state);
       ae_matrix_set_length(&xy2, n, nx + ny, _state);
@@ -71142,7 +71142,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
             k /= gridsize;
          }
          for (j = 0; j < ny; j++) {
-            xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+            xy.xyR[i][nx + j] = randomreal() - 0.5;
             xy2.xyR[i][nx + j] = xy.xyR[i][nx + j];
          }
       }
@@ -71213,12 +71213,12 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < nx + ny; j++) {
-               xy.xyR[i][j] = randomreal(_state) - 0.5;
+               xy.xyR[i][j] = randomreal() - 0.5;
             }
          }
          ae_vector_set_length(&scalevec, nx, _state);
          for (j = 0; j < nx; j++) {
-            scalevec.xR[j] = pow(2.0, 2 * randomreal(_state) - 1);
+            scalevec.xR[j] = pow(2.0, randommid());
          }
       // prepare test problem
          rbfcreate(nx, ny, &s, _state);
@@ -71259,7 +71259,7 @@ static bool testrbfunit_basichrbftest(ae_state *_state) {
          for (j = 0; j < gridsize; j++) {
             xy.xyR[i * gridsize + j][0] = (double)i;
             xy.xyR[i * gridsize + j][1] = (double)j;
-            xy.xyR[i * gridsize + j][2] = 0.01 * (randomreal(_state) - 0.5) + (2 * ((i + j) % 2) - 1);
+            xy.xyR[i * gridsize + j][2] = 0.01 * (randomreal() - 0.5) + (2 * ((i + j) % 2) - 1);
          }
       }
       rbfsetpoints(&s, &xy, gridsize * gridsize, _state);
@@ -71340,41 +71340,41 @@ static bool testrbfunit_scaledhrbftest(ae_state *_state) {
                errtol = 0.0;
                ae_vector_set_length(&scalex, nx, _state);
                for (i = 0; i < nx; i++) {
-                  scalex.xR[i] = pow(16.0, (double)(randominteger(3, _state) - 1));
+                  scalex.xR[i] = pow(16.0, (double)(randominteger(3) - 1));
                }
                ae_vector_set_length(&scaley, ny, _state);
                for (i = 0; i < ny; i++) {
-                  scaley.xR[i] = pow(16.0, (double)(randominteger(3, _state) - 1));
+                  scaley.xR[i] = pow(16.0, (double)(randominteger(3) - 1));
                }
             } else {
                errtol = 1.0E-3;
                ae_vector_set_length(&scalex, nx, _state);
                for (i = 0; i < nx; i++) {
-                  scalex.xR[i] = pow(4.0, 2 * randomreal(_state) - 1);
+                  scalex.xR[i] = pow(4.0, randommid());
                }
                ae_vector_set_length(&scaley, ny, _state);
                for (i = 0; i < ny; i++) {
-                  scaley.xR[i] = pow(4.0, 2 * randomreal(_state) - 1);
+                  scaley.xR[i] = pow(4.0, randommid());
                }
             }
             n = 150;
             rbase = 0.33;
             nlayers = 2;
             gridsize = iround(pow((double)n, 1.0 / nx), _state) + 1;
-            linterm = 1 + randominteger(3, _state);
-            bf = randominteger(2, _state);
-            lambdav = 1.0E-3 * randominteger(2, _state);
+            linterm = 1 + randominteger(3);
+            bf = randominteger(2);
+            lambdav = 1.0E-3 * randominteger(2);
             n = iround(pow((double)gridsize, (double)nx), _state);
             ae_matrix_set_length(&xy, n, nx + ny, _state);
             ae_assert(gridsize > 1, "Assertion failed", _state);
             ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed", _state);
             ae_vector_set_length(&c0, nx, _state);
             for (j = 0; j < nx; j++) {
-               c0.xR[j] = randomreal(_state) - 0.5;
+               c0.xR[j] = randomreal() - 0.5;
             }
             ae_vector_set_length(&c1, ny, _state);
             for (j = 0; j < ny; j++) {
-               c1.xR[j] = randomreal(_state) - 0.5;
+               c1.xR[j] = randomreal() - 0.5;
             }
             for (i = 0; i < n; i++) {
                k = i;
@@ -71457,7 +71457,7 @@ static bool testrbfunit_scaledhrbftest(ae_state *_state) {
             ae_vector_set_length(&x, nx, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < nx; j++) {
-                  x.xR[j] = randomreal(_state);
+                  x.xR[j] = randomreal();
                }
                rbfcalc(&s, &x, &y, _state);
                for (j = 0; j < nx; j++) {
@@ -71667,24 +71667,24 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // problem setup
          n = 150;
          rbase = 0.10;
-         nlayers = randominteger(3, _state);
-         linterm = 1 + randominteger(3, _state);
-         lambdav = 1.0E-3 * randominteger(2, _state);
-         bf = randominteger(2, _state);
+         nlayers = randominteger(3);
+         linterm = 1 + randominteger(3);
+         lambdav = 1.0E-3 * randominteger(2);
+         bf = randominteger(2);
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = randomreal(_state);
+               xy.xyR[i][j] = randomreal();
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
             }
          }
-         hasscale = randominteger(2, _state) == 0;
+         hasscale = randominteger(2) == 0;
          if (hasscale) {
             ae_vector_set_length(&scalevec, nx, _state);
             for (j = 0; j < nx; j++) {
-               scalevec.xR[j] = pow(2.0, 2 * randomreal(_state) - 1);
+               scalevec.xR[j] = pow(2.0, randommid());
             }
          }
       // Build model
@@ -71712,10 +71712,10 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             return result;
          }
       // Prepare grid to test
-         n0 = 1 + randominteger(50, _state);
-         n1 = 1 + randominteger(50, _state);
+         n0 = 1 + randominteger(50);
+         n1 = 1 + randominteger(50);
          if (nkind == 1) {
-            k = randominteger(2, _state);
+            k = randominteger(2);
             if (k == 0) {
                n0 = 1;
             }
@@ -71731,19 +71731,19 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             }
          }
          ae_vector_set_length(&x0, n0, _state);
-         x0.xR[0] = randomreal(_state);
+         x0.xR[0] = randomreal();
          for (i = 1; i < n0; i++) {
-            x0.xR[i] = x0.xR[i - 1] + randomreal(_state) / n0;
+            x0.xR[i] = x0.xR[i - 1] + randomreal() / n0;
          }
          ae_vector_set_length(&x1, n1, _state);
-         x1.xR[0] = randomreal(_state);
+         x1.xR[0] = randomreal();
          for (i = 1; i < n1; i++) {
-            x1.xR[i] = x1.xR[i - 1] + randomreal(_state) / n1;
+            x1.xR[i] = x1.xR[i - 1] + randomreal() / n1;
          }
          ae_vector_set_length(&needy, n0 * n1, _state);
-         v = pow(10.0, -3 * randomreal(_state));
+         v = pow(10.0, -3 * randomreal());
          for (i = 0; i < n0 * n1; i++) {
-            needy.xB[i] = randomreal(_state) < v;
+            needy.xB[i] = randombool(v);
          }
       // Test at grid
          ae_vector_set_length(&x, nx, _state);
@@ -71785,7 +71785,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // Test that scaling RBase, XY, X0, X1 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2, _state) - 1));
+         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
          ae_matrix_set_length(&xy2, n, nx + ny, _state);
          ae_vector_set_length(&x02, n0, _state);
          ae_vector_set_length(&x12, n1, _state);
@@ -71825,7 +71825,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2, _state) - 1));
+         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
          ae_vector_set_length(&scalevec2, nx, _state);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -71859,24 +71859,24 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // problem setup
          n = 150;
          rbase = 0.10;
-         lambdav = 1.0E-3 * randominteger(2, _state);
-         nlayers = randominteger(3, _state);
-         linterm = 1 + randominteger(3, _state);
-         bf = randominteger(2, _state);
+         lambdav = 1.0E-3 * randominteger(2);
+         nlayers = randominteger(3);
+         linterm = 1 + randominteger(3);
+         bf = randominteger(2);
          ae_matrix_set_length(&xy, n, nx + ny, _state);
          for (i = 0; i < n; i++) {
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = randomreal(_state);
+               xy.xyR[i][j] = randomreal();
             }
             for (j = 0; j < ny; j++) {
-               xy.xyR[i][nx + j] = randomreal(_state) - 0.5;
+               xy.xyR[i][nx + j] = randomreal() - 0.5;
             }
          }
-         hasscale = randominteger(2, _state) == 0;
+         hasscale = randominteger(2) == 0;
          if (hasscale) {
             ae_vector_set_length(&scalevec, nx, _state);
             for (j = 0; j < nx; j++) {
-               scalevec.xR[j] = pow(2.0, 2 * randomreal(_state) - 1);
+               scalevec.xR[j] = pow(2.0, randommid());
             }
          }
       // Build model
@@ -71904,11 +71904,11 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             return result;
          }
       // Prepare grid to test
-         n0 = 1 + randominteger(50, _state);
-         n1 = 1 + randominteger(50, _state);
-         n2 = 1 + randominteger(50, _state);
+         n0 = 1 + randominteger(50);
+         n1 = 1 + randominteger(50);
+         n2 = 1 + randominteger(50);
          if (nkind == 1) {
-            k = randominteger(3, _state);
+            k = randominteger(3);
             if (k == 0) {
                n0 = 1;
             }
@@ -71928,24 +71928,24 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
             }
          }
          ae_vector_set_length(&x0, n0, _state);
-         x0.xR[0] = randomreal(_state);
+         x0.xR[0] = randomreal();
          for (i = 1; i < n0; i++) {
-            x0.xR[i] = x0.xR[i - 1] + randomreal(_state) / n0;
+            x0.xR[i] = x0.xR[i - 1] + randomreal() / n0;
          }
          ae_vector_set_length(&x1, n1, _state);
-         x1.xR[0] = randomreal(_state);
+         x1.xR[0] = randomreal();
          for (i = 1; i < n1; i++) {
-            x1.xR[i] = x1.xR[i - 1] + randomreal(_state) / n1;
+            x1.xR[i] = x1.xR[i - 1] + randomreal() / n1;
          }
          ae_vector_set_length(&x2, n2, _state);
-         x2.xR[0] = randomreal(_state);
+         x2.xR[0] = randomreal();
          for (i = 1; i < n2; i++) {
-            x2.xR[i] = x2.xR[i - 1] + randomreal(_state) / n2;
+            x2.xR[i] = x2.xR[i - 1] + randomreal() / n2;
          }
          ae_vector_set_length(&needy, n0 * n1 * n2, _state);
-         v = pow(10.0, -3 * randomreal(_state));
+         v = pow(10.0, -3 * randomreal());
          for (i = 0; i < n0 * n1 * n2; i++) {
-            needy.xB[i] = randomreal(_state) < v;
+            needy.xB[i] = randombool(v);
          }
       // Test at grid
          ae_vector_set_length(&x, nx, _state);
@@ -71991,7 +71991,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // Test that scaling RBase, XY, X0, X1 and X2 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2, _state) - 1));
+         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
          ae_matrix_set_length(&xy2, n, nx + ny, _state);
          ae_vector_set_length(&x02, n0, _state);
          ae_vector_set_length(&x12, n1, _state);
@@ -72035,7 +72035,7 @@ static bool testrbfunit_gridhrbftest(ae_state *_state) {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2, _state) - 1));
+         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
          ae_vector_set_length(&scalevec2, nx, _state);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -72338,12 +72338,12 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr, a
    ae_vector_set_length(&a0, n, _state);
    ae_vector_set_length(&a1, n, _state);
    for (i = 0; i < n; i++) {
-      a0.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      a0.xC[i] = complex_from_d(randommid(), randommid());
       a1.xC[i] = a0.xC[i];
    }
    fftc1d(&a0, n, _state);
    for (i = 0; i < k; i++) {
-      idx = randominteger(n, _state);
+      idx = randominteger(n);
       v = complex_from_i(0);
       for (j = 0; j < n; j++) {
          re = a1.xC[j].x;
@@ -72407,7 +72407,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a2, n, _state);
       ae_vector_set_length(&a3, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         a1.xC[i] = complex_from_d(randommid(), randommid());
          a2.xC[i] = a1.xC[i];
          a3.xC[i] = a1.xC[i];
       }
@@ -72423,7 +72423,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&r1, n, _state);
       ae_vector_set_length(&r2, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
       }
       fftr1d(&r2, n, &a1, _state);
@@ -72444,7 +72444,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a1, n, _state);
       ae_vector_set_length(&a2, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         a1.xC[i] = complex_from_d(randommid(), randommid());
          a2.xC[i] = a1.xC[i];
       }
       fftc1d(&a1, n, _state);
@@ -72456,7 +72456,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&a1, n, _state);
       ae_vector_set_length(&a2, n, _state);
       for (i = 0; i < n; i++) {
-         a1.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         a1.xC[i] = complex_from_d(randommid(), randommid());
          a2.xC[i] = a1.xC[i];
       }
       fftc1dinv(&a1, n, _state);
@@ -72472,7 +72472,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&r1, n, _state);
       ae_vector_set_length(&r2, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
       }
       fftr1d(&r1, n, &a1, _state);
@@ -72484,9 +72484,9 @@ bool testfft(bool silent, ae_state *_state) {
       for (i = 0; i <= n / 2; i++) {
          a3.xC[i] = a2.xC[i];
       }
-      a3.xC[0].y = 2 * randomreal(_state) - 1;
+      a3.xC[0].y = randommid();
       if (n % 2 == 0) {
-         a3.xC[n / 2].y = 2 * randomreal(_state) - 1;
+         a3.xC[n / 2].y = randommid();
       }
       for (i = 0; i < n; i++) {
          r1.xR[i] = 0.0;
@@ -72527,7 +72527,7 @@ bool testfft(bool silent, ae_state *_state) {
       ae_vector_set_length(&r1, n, _state);
       ae_vector_set_length(&r2, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
       }
       ftcomplexfftplan(n / 2, 1, &plan, _state);
@@ -72543,7 +72543,7 @@ bool testfft(bool silent, ae_state *_state) {
    // Real backward FFT
       ae_vector_set_length(&r1, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
       }
       ae_vector_set_length(&a2, n / 2 + 1, _state);
       a2.xC[0] = complex_from_d(r1.xR[0]);
@@ -72675,7 +72675,7 @@ bool testfht(bool silent, ae_state *_state) {
       ae_vector_set_length(&r2, n, _state);
       ae_vector_set_length(&r3, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
          r3.xR[i] = r1.xR[i];
       }
@@ -72696,7 +72696,7 @@ bool testfht(bool silent, ae_state *_state) {
       ae_vector_set_length(&r1, n, _state);
       ae_vector_set_length(&r2, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
       }
       fhtr1d(&r1, n, _state);
@@ -72708,7 +72708,7 @@ bool testfht(bool silent, ae_state *_state) {
       ae_vector_set_length(&r1, n, _state);
       ae_vector_set_length(&r2, n, _state);
       for (i = 0; i < n; i++) {
-         r1.xR[i] = 2 * randomreal(_state) - 1;
+         r1.xR[i] = randommid();
          r2.xR[i] = r1.xR[i];
       }
       fhtr1dinv(&r1, n, _state);
@@ -72879,11 +72879,11 @@ bool testconv(bool silent, ae_state *_state) {
             // Complex convolution
                ae_vector_set_length(&ca, m, _state);
                for (i = 0; i < m; i++) {
-                  ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                  ca.xC[i] = complex_from_d(randommid(), randommid());
                }
                ae_vector_set_length(&cb, n, _state);
                for (i = 0; i < n; i++) {
-                  cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+                  cb.xC[i] = complex_from_d(randommid(), randommid());
                }
                ae_vector_set_length(&cr1, 1, _state);
                if (rkind == -3) {
@@ -72923,11 +72923,11 @@ bool testconv(bool silent, ae_state *_state) {
             // Real convolution
                ae_vector_set_length(&ra, m, _state);
                for (i = 0; i < m; i++) {
-                  ra.xR[i] = 2 * randomreal(_state) - 1;
+                  ra.xR[i] = randommid();
                }
                ae_vector_set_length(&rb, n, _state);
                for (i = 0; i < n; i++) {
-                  rb.xR[i] = 2 * randomreal(_state) - 1;
+                  rb.xR[i] = randommid();
                }
                ae_vector_set_length(&rr1, 1, _state);
                if (rkind == -3) {
@@ -72976,11 +72976,11 @@ bool testconv(bool silent, ae_state *_state) {
       // Complex circilar and non-circular
          ae_vector_set_length(&ca, m, _state);
          for (i = 0; i < m; i++) {
-            ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ca.xC[i] = complex_from_d(randommid(), randommid());
          }
          ae_vector_set_length(&cb, n, _state);
          for (i = 0; i < n; i++) {
-            cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            cb.xC[i] = complex_from_d(randommid(), randommid());
          }
          ae_vector_set_length(&cr1, 1, _state);
          ae_vector_set_length(&cr2, 1, _state);
@@ -72999,11 +72999,11 @@ bool testconv(bool silent, ae_state *_state) {
       // Real circilar and non-circular
          ae_vector_set_length(&ra, m, _state);
          for (i = 0; i < m; i++) {
-            ra.xR[i] = 2 * randomreal(_state) - 1;
+            ra.xR[i] = randommid();
          }
          ae_vector_set_length(&rb, n, _state);
          for (i = 0; i < n; i++) {
-            rb.xR[i] = 2 * randomreal(_state) - 1;
+            rb.xR[i] = randommid();
          }
          ae_vector_set_length(&rr1, 1, _state);
          ae_vector_set_length(&rr2, 1, _state);
@@ -73207,11 +73207,11 @@ bool testcorr(bool silent, ae_state *_state) {
       // Complex correlation
          ae_vector_set_length(&ca, m, _state);
          for (i = 0; i < m; i++) {
-            ca.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            ca.xC[i] = complex_from_d(randommid(), randommid());
          }
          ae_vector_set_length(&cb, n, _state);
          for (i = 0; i < n; i++) {
-            cb.xC[i] = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+            cb.xC[i] = complex_from_d(randommid(), randommid());
          }
          ae_vector_set_length(&cr1, 1, _state);
          corrc1d(&ca, m, &cb, n, &cr1, _state);
@@ -73228,11 +73228,11 @@ bool testcorr(bool silent, ae_state *_state) {
       // Real correlation
          ae_vector_set_length(&ra, m, _state);
          for (i = 0; i < m; i++) {
-            ra.xR[i] = 2 * randomreal(_state) - 1;
+            ra.xR[i] = randommid();
          }
          ae_vector_set_length(&rb, n, _state);
          for (i = 0; i < n; i++) {
-            rb.xR[i] = 2 * randomreal(_state) - 1;
+            rb.xR[i] = randommid();
          }
          ae_vector_set_length(&rr1, 1, _state);
          corrr1d(&ra, m, &rb, n, &rr1, _state);
@@ -73364,10 +73364,10 @@ bool testchebyshev(bool silent, ae_state *_state) {
    ae_vector_set_length(&c, maxn + 1, _state);
    for (k = 1; k <= 2; k++) {
       for (pass = 1; pass <= 10; pass++) {
-         x = 2 * randomreal(_state) - 1;
+         x = randommid();
          v = 0.0;
          for (n = 0; n <= maxn; n++) {
-            c.xR[n] = 2 * randomreal(_state) - 1;
+            c.xR[n] = randommid();
             v += chebyshevcalculate(k, n, x, _state) * c.xR[n];
             sumerr = rmax2(sumerr, fabs(v - chebyshevsum(&c, k, n, x, _state)), _state);
          }
@@ -73423,7 +73423,7 @@ bool testchebyshev(bool silent, ae_state *_state) {
             p1.xR[i] = 0.0;
          }
          for (i = 0; i <= n; i++) {
-            c.xR[i] = 2 * randomreal(_state) - 1;
+            c.xR[i] = randommid();
             v = c.xR[i];
             ae_v_addd(p1.xR, 1, a.xyR[i], 1, i + 1, v);
          }
@@ -73499,10 +73499,10 @@ bool testhermite(bool silent, ae_state *_state) {
    maxn = 10;
    ae_vector_set_length(&c, maxn + 1, _state);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * randomreal(_state) - 1;
+      x = randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.xR[n] = 2 * randomreal(_state) - 1;
+         c.xR[n] = randommid();
          v += hermitecalculate(n, x, _state) * c.xR[n];
          sumerr = rmax2(sumerr, fabs(v - hermitesum(&c, n, x, _state)), _state);
       }
@@ -73589,7 +73589,7 @@ bool testlegendre(bool silent, ae_state *_state) {
    for (n = 0; n <= 10; n++) {
       legendrecoefficients(n, &c, _state);
       for (pass = 1; pass <= 10; pass++) {
-         x = 2 * randomreal(_state) - 1;
+         x = randommid();
          v = legendrecalculate(n, x, _state);
          t = 1.0;
          for (i = 0; i <= n; i++) {
@@ -73603,10 +73603,10 @@ bool testlegendre(bool silent, ae_state *_state) {
    maxn = 20;
    ae_vector_set_length(&c, maxn + 1, _state);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * randomreal(_state) - 1;
+      x = randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.xR[n] = 2 * randomreal(_state) - 1;
+         c.xR[n] = randommid();
          v += legendrecalculate(n, x, _state) * c.xR[n];
          sumerr = rmax2(sumerr, fabs(v - legendresum(&c, n, x, _state)), _state);
       }
@@ -73714,10 +73714,10 @@ bool testlaguerre(bool silent, ae_state *_state) {
    maxn = 20;
    ae_vector_set_length(&c, maxn + 1, _state);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * randomreal(_state) - 1;
+      x = randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.xR[n] = 2 * randomreal(_state) - 1;
+         c.xR[n] = randommid();
          v += laguerrecalculate(n, x, _state) * c.xR[n];
          sumerr = rmax2(sumerr, fabs(v - laguerresum(&c, n, x, _state)), _state);
       }
@@ -73887,11 +73887,11 @@ bool testpca(bool silent, ae_state *_state) {
          ae_matrix_set_length(&x, n - 1 + 1, m - 1 + 1, _state);
          ae_vector_set_length(&means, m - 1 + 1, _state);
          for (j = 0; j < m; j++) {
-            means.xR[j] = 1.5 * randomreal(_state) - 0.75;
+            means.xR[j] = 0.75 * randommid();
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-               x.xyR[i][j] = means.xR[j] + (2 * randomreal(_state) - 1);
+               x.xyR[i][j] = means.xR[j] + randommid();
             }
          }
       // Solve
@@ -74275,7 +74275,7 @@ bool testpca(bool silent, ae_state *_state) {
 // Unsets 1D array.
 static void testbdssunit_unset1di(ZVector *a, ae_state *_state) {
    ae_vector_set_length(a, 0 + 1, _state);
-   a->xZ[0] = randominteger(3, _state) - 1;
+   a->xZ[0] = randominteger(3) - 1;
 }
 
 // Testing BDSS operations
@@ -74347,12 +74347,12 @@ bool testbdss(bool silent, ae_state *_state) {
          ae_vector_set_length(&a0, n - 1 + 1, _state);
          ae_vector_set_length(&at, n - 1 + 1, _state);
          ae_vector_set_length(&tmp, n - 1 + 1, _state);
-         a.xR[0] = 2 * randomreal(_state) - 1;
-         tmp.xR[0] = randomreal(_state);
+         a.xR[0] = randommid();
+         tmp.xR[0] = randomreal();
          for (i = 1; i < n; i++) {
          // A is randomly permuted
-            a.xR[i] = a.xR[i - 1] + 0.1 * randomreal(_state) + 0.1;
-            tmp.xR[i] = randomreal(_state);
+            a.xR[i] = a.xR[i - 1] + 0.1 * randomreal() + 0.1;
+            tmp.xR[i] = randomreal();
          }
          tagsortfastr(&tmp, &a, &sortrbuf, &sortrbuf2, n, _state);
          for (i = 0; i < n; i++) {
@@ -74382,7 +74382,7 @@ bool testbdss(bool silent, ae_state *_state) {
          c1 = 0;
          c0 = 0;
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(2, _state);
+            a.xR[i] = (double)randominteger(2);
             if (a.xR[i] == 0.0) {
                c0++;
             } else {
@@ -74760,7 +74760,7 @@ bool testbdss(bool silent, ae_state *_state) {
             a.xR[i] = (double)n;
             c.xZ[i] = i % 2;
          }
-         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != -3) {
             optimalsplitkerrors = true;
             continue;
@@ -74781,7 +74781,7 @@ bool testbdss(bool silent, ae_state *_state) {
                c1++;
             }
          }
-         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != 1) {
             optimalsplitkerrors = true;
             continue;
@@ -74792,7 +74792,7 @@ bool testbdss(bool silent, ae_state *_state) {
       }
    // test #2
       if (n > 2) {
-         c0 = 1 + randominteger(n - 1, _state);
+         c0 = 1 + randominteger(n - 1);
          c1 = n - c0;
          for (i = 0; i < n; i++) {
             if (i < c0) {
@@ -74803,7 +74803,7 @@ bool testbdss(bool silent, ae_state *_state) {
                c.xZ[i] = 1;
             }
          }
-         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != 1) {
             optimalsplitkerrors = true;
             continue;
@@ -74831,7 +74831,7 @@ bool testbdss(bool silent, ae_state *_state) {
             a.xR[j] = (double)j;
             c.xZ[j] = nc - 1;
          }
-         dsoptimalsplitk(&a, &c, n, nc, nc + randominteger(nc, _state), &info, &thresholds, &ni, &cve, _state);
+         dsoptimalsplitk(&a, &c, n, nc, nc + randominteger(nc), &info, &thresholds, &ni, &cve, _state);
          if (info != 1) {
             optimalsplitkerrors = true;
             continue;
@@ -74857,7 +74857,7 @@ bool testbdss(bool silent, ae_state *_state) {
             a.xR[i] = 99.0;
             c.xZ[i] = i % 2;
          }
-         dssplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dssplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != -3) {
             splitkerrors = true;
             continue;
@@ -74878,7 +74878,7 @@ bool testbdss(bool silent, ae_state *_state) {
                c1++;
             }
          }
-         dssplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dssplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != 1) {
             splitkerrors = true;
             continue;
@@ -74891,7 +74891,7 @@ bool testbdss(bool silent, ae_state *_state) {
       }
    // test #2
       if (n > 2) {
-         c0 = 1 + randominteger(n - 1, _state);
+         c0 = 1 + randominteger(n - 1);
          c1 = n - c0;
          for (i = 0; i < n; i++) {
             if (i < c0) {
@@ -74902,7 +74902,7 @@ bool testbdss(bool silent, ae_state *_state) {
                c.xZ[i] = 1;
             }
          }
-         dssplitk(&a, &c, n, 2, 2 + randominteger(5, _state), &info, &thresholds, &ni, &cve, _state);
+         dssplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve, _state);
          if (info != 1) {
             splitkerrors = true;
             continue;
@@ -74923,7 +74923,7 @@ bool testbdss(bool silent, ae_state *_state) {
                   c.xZ[j] = i;
                }
             }
-            dssplitk(&a, &c, n, nc, nc + randominteger(nc, _state), &info, &thresholds, &ni, &cve, _state);
+            dssplitk(&a, &c, n, nc, nc + randominteger(nc), &info, &thresholds, &ni, &cve, _state);
             if (info != 1) {
                splitkerrors = true;
                continue;
@@ -75028,7 +75028,7 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
    ae_assert(((nin > 0 && nhid1 >= 0) && nhid2 >= 0) && nout > 0, "CreateNetwork error", _state);
    ae_assert(nhid1 != 0 || nhid2 == 0, "CreateNetwork error", _state);
    ae_assert(nkind != 1 || nout >= 2, "CreateNetwork error", _state);
-   mkind = randominteger(3, _state);
+   mkind = randominteger(3);
    if (nhid1 == 0) {
    // No hidden layers
       if (nkind == 0) {
@@ -75510,11 +75510,11 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    }
    ae_vector_set_length(&x, nin, _state);
    for (i = 0; i < nin; i++) {
-      x.xR[i] = 2 * randomreal(_state) - 1;
+      x.xR[i] = randommid();
    }
    ae_vector_set_length(&y, nout, _state);
    for (i = 0; i < nout; i++) {
-      y.xR[i] = 2 * randomreal(_state) - 1;
+      y.xR[i] = randommid();
    }
    for (j = 0; j < nin; j++) {
       mlpgetinputscaling(&network, j, &mean, &sigma, _state);
@@ -75584,12 +75584,12 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout, _state);
    mlpproperties(&network, &n1, &n2, &wcount, _state);
@@ -75600,7 +75600,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    ae_vector_set_length(&y1, nout, _state);
    ae_vector_set_length(&y2, nout, _state);
 // Initialize sets
-   npoints = randominteger(11, _state) + 10;
+   npoints = randominteger(11) + 10;
    if (iscls) {
       ae_matrix_set_length(&densexy, npoints, nin + 1, _state);
       sparsecreate(npoints, nin + 1, npoints, &sparsexy, _state);
@@ -75620,12 +75620,12 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       }
    // Same inputs leads to same outputs
       for (i = 0; i < nin; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       mlpprocess(&network, &x1, &y1, _state);
       mlpprocess(&network, &x2, &y2, _state);
@@ -75635,14 +75635,14 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // * using MLPCopy
    // * using MLPCopyShared
       for (i = 0; i < nin; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
       }
       for (i = 0; i < nout; i++) {
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y2.xR[i] = randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2, _state);
       mlpcopy(&network, &network2, _state);
@@ -75650,7 +75650,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpprocess(&network2, &x2, &y2, _state);
       set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0, _state) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:534");
       for (i = 0; i < nout; i++) {
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y2.xR[i] = randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2, _state);
       mlpcopyshared(&network, &network2, _state);
@@ -75667,14 +75667,14 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    //      MLPImportTunableParameters - we export parameters
    //      to P1, copy PCount elements to P2, then test import.
       for (i = 0; i < nin; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
       }
       for (i = 0; i < nout; i++) {
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y2.xR[i] = randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2, _state);
       mlpcopy(&network, &network2, _state);
@@ -75684,7 +75684,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpprocess(&network2, &x2, &y2, _state);
       set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0, _state) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:571");
       for (i = 0; i < nout; i++) {
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y2.xR[i] = randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2, _state);
       mlpcopy(&network, &network2, _state);
@@ -75722,12 +75722,12 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          ae_frame_leave(_state);
       }
       for (i = 0; i < nin; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       mlpprocess(&network, &x1, &y1, _state);
       mlpprocess(&network2, &x2, &y2, _state);
@@ -75739,11 +75739,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Different inputs leads to different outputs (non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            x2.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            x2.xR[i] = randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
             y2.xR[i] = y1.xR[i];
          }
          mlpprocess(&network, &x1, &y1, _state);
@@ -75757,11 +75757,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Randomization changes outputs (when inputs are unchanged, non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            x2.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            x2.xR[i] = randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
             y2.xR[i] = y1.xR[i];
          }
          mlpcopy(&network, &network2, _state);
@@ -75777,11 +75777,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Full randomization changes outputs (when inputs are unchanged, non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            x2.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            x2.xR[i] = randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
             y2.xR[i] = y1.xR[i];
          }
          mlpcopy(&network, &network2, _state);
@@ -75798,7 +75798,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 1) {
       // Classifier network outputs are normalized
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
          }
          mlpprocess(&network, &x1, &y1, _state);
          v = 0.0;
@@ -75811,7 +75811,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 2) {
       // B-type network outputs are bounded from above/below
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
          }
          mlpprocess(&network, &x1, &y1, _state);
          for (i = 0; i < nout; i++) {
@@ -75825,7 +75825,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 3) {
       // R-type network outputs are within [A1,A2] (or [A2,A1])
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
          }
          mlpprocess(&network, &x1, &y1, _state);
          for (i = 0; i < nout; i++) {
@@ -75838,16 +75838,16 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (iscls) {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               densexy.xyR[i][j] = 2 * randomreal(_state) - 1;
+               densexy.xyR[i][j] = randommid();
                sparseset(&sparsexy, i, j, densexy.xyR[i][j], _state);
             }
-            densexy.xyR[i][nin] = (double)randominteger(nout, _state);
+            densexy.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sparsexy, i, j, densexy.xyR[i][nin], _state);
          }
       } else {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin + nout; j++) {
-               densexy.xyR[i][j] = 2 * randomreal(_state) - 1;
+               densexy.xyR[i][j] = randommid();
                sparseset(&sparsexy, i, j, densexy.xyR[i][j], _state);
             }
          }
@@ -75856,10 +75856,10 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpcopy(&network, &network2, _state);
       mlpinitpreprocessor(&network, &densexy, npoints, _state);
       mlpinitpreprocessorsparse(&network2, &sparsexy, npoints, _state);
-      subnp = randominteger(npoints, _state);
+      subnp = randominteger(npoints);
       for (i = 0; i < subnp; i++) {
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 2 * randomreal(_state) - 1;
+            x1.xR[j] = randommid();
          }
          mlpprocess(&network, &x1, &y1, _state);
          mlpprocess(&network2, &x1, &y2, _state);
@@ -75922,12 +75922,12 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout, _state);
    mlpproperties(&network, &n1, &n2, &wcount, _state);
@@ -75954,13 +75954,13 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    //       which allows us to avoid oversaturated network.
    //       In 10% of cases we use zero weights.
       mlprandomizefull(&network, _state);
-      if (randomreal(_state) <= 0.1) {
+      if (randombool(0.1)) {
          for (i = 0; i < wcount; i++) {
             network.weights.xR[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount; i++) {
-            network.weights.xR[i] = 0.2 * randomreal(_state) - 0.1;
+            network.weights.xR[i] = 0.1 * randommid();
          }
       }
    // Test MLPError(), MLPErrorSparse(), MLPGrad() for single-element dataset:
@@ -75972,7 +75972,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       ae_matrix_set_length(&xy, 1, nin + nout, _state);
       sparsecreate(1, nin + nout, nin + nout, &sparsexy, _state);
       for (i = 0; i < nin; i++) {
-         x.xR[i] = 4 * randomreal(_state) - 2;
+         x.xR[i] = 2.0 * randommid();
       }
       ae_v_move(xy.xyR[0], 1, x.xR, 1, nin);
       for (i = 0; i < nin; i++) {
@@ -75982,12 +75982,12 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          for (i = 0; i < nout; i++) {
             y.xR[i] = 0.0;
          }
-         xy.xyR[0][nin] = (double)randominteger(nout, _state);
+         xy.xyR[0][nin] = (double)randominteger(nout);
          sparseset(&sparsexy, 0, nin, xy.xyR[0][nin], _state);
          y.xR[iround(xy.xyR[0][nin], _state)] = 1.0;
       } else {
          for (i = 0; i < nout; i++) {
-            y.xR[i] = 4 * randomreal(_state) - 2;
+            y.xR[i] = 2.0 * randommid();
             sparseset(&sparsexy, 0, nin + i, y.xR[i], _state);
          }
          ae_v_move(&xy.xyR[0][nin], 1, y.xR, 1, nout);
@@ -76036,18 +76036,18 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    // NOTE: because we use inexact 2-point formula, we perform gradient test with NonStrictTolerance
       ae_matrix_set_length(&xy, 1, nin + nout, _state);
       for (i = 0; i < nin; i++) {
-         x.xR[i] = 4 * randomreal(_state) - 2;
+         x.xR[i] = 2.0 * randommid();
       }
       ae_v_move(xy.xyR[0], 1, x.xR, 1, nin);
       if (mlpissoftmax(&network, _state)) {
          for (i = 0; i < nout; i++) {
             y.xR[i] = 0.0;
          }
-         xy.xyR[0][nin] = (double)randominteger(nout, _state);
+         xy.xyR[0][nin] = (double)randominteger(nout);
          y.xR[iround(xy.xyR[0][nin], _state)] = 1.0;
       } else {
          for (i = 0; i < nout; i++) {
-            y.xR[i] = 4 * randomreal(_state) - 2;
+            y.xR[i] = 2.0 * randommid();
          }
          ae_v_move(&xy.xyR[0][nin], 1, y.xR, 1, nout);
       }
@@ -76128,7 +76128,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    // * test results returned by MLPGradBatch/MLPGradBatchSparse against reference ones
    //
    // NOTE: about 10% of tests are performed with zero SSize
-      ssize = sizemin + randominteger(sizemax - sizemin + 1, _state);
+      ssize = sizemin + randominteger(sizemax - sizemin + 1);
       ae_matrix_set_length(&xy, imax2(ssize, 1, _state), nin + nout, _state);
       sparsecreate(imax2(ssize, 1, _state), nin + nout, ssize * (nin + nout), &sparsexy, _state);
       for (i = 0; i < wcount; i++) {
@@ -76137,7 +76137,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 4 * randomreal(_state) - 2;
+            x1.xR[j] = 2.0 * randommid();
             sparseset(&sparsexy, i, j, x1.xR[j], _state);
          }
          ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
@@ -76145,12 +76145,12 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout, _state);
+            xy.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin], _state);
             y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.xR[j] = 4 * randomreal(_state) - 2;
+               y1.xR[j] = 2.0 * randommid();
                sparseset(&sparsexy, i, nin + j, y1.xR[j], _state);
             }
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
@@ -76179,12 +76179,12 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    //   * SubsetSize<0 - subset is a full dataset
    //   * SubsetSize=0 - subset is empty
    //   * SubsetSize>0 - random subset
-      ssize = sizemin + randominteger(sizemax - sizemin + 1, _state);
+      ssize = sizemin + randominteger(sizemax - sizemin + 1);
       ae_matrix_set_length(&xy, imax2(ssize, 1, _state), nin + nout, _state);
       sparsecreate(imax2(ssize, 1, _state), nin + nout, ssize * (nin + nout), &sparsexy, _state);
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 4 * randomreal(_state) - 2;
+            x1.xR[j] = 2.0 * randommid();
             sparseset(&sparsexy, i, j, x1.xR[j], _state);
          }
          ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
@@ -76192,12 +76192,12 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout, _state);
+            xy.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin], _state);
             y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.xR[j] = 4 * randomreal(_state) - 2;
+               y1.xR[j] = 2.0 * randommid();
                sparseset(&sparsexy, i, nin + j, y1.xR[j], _state);
             }
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
@@ -76205,7 +76205,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       }
       sparseconverttocrs(&sparsexy, _state);
       if (ssize > 0) {
-         subsetsize = 1 + randominteger(10, _state);
+         subsetsize = 1 + randominteger(10);
          ae_matrix_set_length(&xy2, subsetsize, nin + nout, _state);
          ae_vector_set_length(&idx, subsetsize, _state);
          sparsecreate(subsetsize, nin + nout, subsetsize * (nin + nout), &sparsexy2, _state);
@@ -76215,7 +76215,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             rowsize = nin + nout;
          }
          for (i = 0; i < subsetsize; i++) {
-            k = randominteger(ssize, _state);
+            k = randominteger(ssize);
             idx.xZ[i] = k;
             for (j = 0; j < rowsize; j++) {
                xy2.xyR[i][j] = xy.xyR[k][j];
@@ -76268,7 +76268,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    // * calculate "reference" error/gradient using MLPGrad(), which was tested in previous
    //   section and is assumed to work correctly
    // * test results returned by MLPGradNBatch against reference ones
-      ssize = sizemin + randominteger(sizemax - sizemin + 1, _state);
+      ssize = sizemin + randominteger(sizemax - sizemin + 1);
       ae_matrix_set_length(&xy, ssize, nin + nout, _state);
       for (i = 0; i < wcount; i++) {
          referenceg.xR[i] = 0.0;
@@ -76276,18 +76276,18 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 4 * randomreal(_state) - 2;
+            x1.xR[j] = 2.0 * randommid();
          }
          ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
          if (mlpissoftmax(&network, _state)) {
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout, _state);
+            xy.xyR[i][nin] = (double)randominteger(nout);
             y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.xR[j] = 4 * randomreal(_state) - 2;
+               y1.xR[j] = 2.0 * randommid();
             }
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
          }
@@ -76339,12 +76339,12 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout, _state);
    mlpproperties(&network, &n1, &n2, &wcount, _state);
@@ -76372,7 +76372,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
    //
    // E2, Grad2 and H2 contains corresponing values calculated using MLPHessianBatch/MLPHessianNBatch
       for (hkind = 0; hkind <= 1; hkind++) {
-         ssize = 1 + randominteger(10, _state);
+         ssize = 1 + randominteger(10);
          ae_matrix_set_length(&xy, ssize - 1 + 1, nin + nout - 1 + 1, _state);
          for (i = 0; i < wcount; i++) {
             grad1.xR[i] = 0.0;
@@ -76386,18 +76386,18 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          for (i = 0; i < ssize; i++) {
          // X, Y
             for (j = 0; j < nin; j++) {
-               x1.xR[j] = 4 * randomreal(_state) - 2;
+               x1.xR[j] = 2.0 * randommid();
             }
             ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
             if (mlpissoftmax(&network, _state)) {
                for (j = 0; j < nout; j++) {
                   y1.xR[j] = 0.0;
                }
-               xy.xyR[i][nin] = (double)randominteger(nout, _state);
+               xy.xyR[i][nin] = (double)randominteger(nout);
                y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
             } else {
                for (j = 0; j < nout; j++) {
-                  y1.xR[j] = 4 * randomreal(_state) - 2;
+                  y1.xR[j] = 2.0 * randommid();
                }
                ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
             }
@@ -76514,12 +76514,12 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout, _state);
    mlpproperties(&network, &n1, &n2, &wcount, _state);
@@ -76537,20 +76537,20 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    //       which allows us to avoid oversaturated network.
    //       In 10% of cases we use zero weights.
       mlprandomizefull(&network, _state);
-      if (randomreal(_state) <= 0.1) {
+      if (randombool(0.1)) {
          for (i = 0; i < wcount; i++) {
             network.weights.xR[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount; i++) {
-            network.weights.xR[i] = 0.2 * randomreal(_state) - 0.1;
+            network.weights.xR[i] = 0.1 * randommid();
          }
       }
    // Generate random dataset.
    // Calculate reference errors.
    //
    // NOTE: about 10% of tests are performed with zero SSize
-      ssize = sizemin + randominteger(sizemax - sizemin + 1, _state);
+      ssize = sizemin + randominteger(sizemax - sizemin + 1);
       if (mlpissoftmax(&network, _state)) {
          ae_matrix_set_length(&xy, imax2(ssize, 1, _state), nin + 1, _state);
          sparsecreate(imax2(ssize, 1, _state), nin + 1, 0, &sparsexy, _state);
@@ -76567,7 +76567,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
       for (i = 0; i < ssize; i++) {
       // Fill I-th row
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 4 * randomreal(_state) - 2;
+            x1.xR[j] = 2.0 * randommid();
             sparseset(&sparsexy, i, j, x1.xR[j], _state);
          }
          ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
@@ -76575,12 +76575,12 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout, _state);
+            xy.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin], _state);
             y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.xR[j] = 4 * randomreal(_state) - 2;
+               y1.xR[j] = 2.0 * randommid();
                if (y1.xR[j] >= 0.0) {
                   y1.xR[j] += 0.1;
                } else {
@@ -76659,14 +76659,14 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    // We perform only limited test for RMS error, assuming that either all errors
    // are calculated correctly (subject to subset given by Idx) - or none of them.
       if (ssize > 0) {
-         subsetsize = randominteger(10, _state);
+         subsetsize = randominteger(10);
       } else {
          subsetsize = 0;
       }
       ae_vector_set_length(&idx, subsetsize, _state);
       refrmserror = 0.0;
       for (i = 0; i < subsetsize; i++) {
-         k = randominteger(ssize, _state);
+         k = randominteger(ssize);
          idx.xZ[i] = k;
          ae_v_move(x1.xR, 1, xy.xyR[k], 1, nin);
          if (mlpissoftmax(&network, _state)) {
@@ -76796,25 +76796,25 @@ static bool testmlpbaseunit_testmlpgbsubset(ae_state *_state) {
    maxssize = 96;
    for (ssize = 0; ssize <= maxssize; ssize++) {
       ae_vector_set_length(&idx, ssize, _state);
-      nkind = randominteger(4, _state);
+      nkind = randominteger(4);
       a1 = 0.0;
       a2 = 0.0;
       if (nkind == 2) {
-         a1 = 1000 * randomreal(_state) - 500;
-         a2 = 2 * randomreal(_state) - 1;
+         a1 = 500.0 * randommid();
+         a2 = randommid();
       }
       if (nkind == 3) {
-         a1 = 1000 * randomreal(_state) - 500;
-         a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+         a1 = 500.0 * randommid();
+         a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
       }
-      nin = randominteger(20, _state) + 1;
-      nhid1 = randominteger(5, _state);
+      nin = randominteger(20) + 1;
+      nhid1 = randominteger(5);
       if (nhid1 == 0) {
          nhid2 = 0;
       } else {
-         nhid2 = randominteger(5, _state);
+         nhid2 = randominteger(5);
       }
-      nout = randominteger(20, _state) + 2;
+      nout = randominteger(20) + 2;
       testmlpbaseunit_createnetwork(&net, nkind, a1, a2, nin, nhid1, nhid2, nout, _state);
       mlpproperties(&net, &n1, &n2, &wcount, _state);
       if (mlpissoftmax(&net, _state)) {
@@ -76828,12 +76828,12 @@ static bool testmlpbaseunit_testmlpgbsubset(ae_state *_state) {
          }
          for (i = 0; i < ssize; i++) {
             for (j = 0; j < w; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
                sparseset(&sa, i, j, a.xyR[i][j], _state);
             }
          }
          for (i = 0; i < ssize; i++) {
-            a.xyR[i][nin] = (double)randominteger(nout, _state);
+            a.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sa, i, nin, a.xyR[i][nin], _state);
          }
       } else {
@@ -76847,7 +76847,7 @@ static bool testmlpbaseunit_testmlpgbsubset(ae_state *_state) {
          }
          for (i = 0; i < ssize; i++) {
             for (j = 0; j < w; j++) {
-               a.xyR[i][j] = 2 * randomreal(_state) - 1;
+               a.xyR[i][j] = randommid();
                sparseset(&sa, i, j, a.xyR[i][j], _state);
             }
          }
@@ -76868,10 +76868,10 @@ static bool testmlpbaseunit_testmlpgbsubset(ae_state *_state) {
             if (ssize == 0) {
                sbsize = 0;
             } else {
-               sbsize = randominteger(ssize, _state);
+               sbsize = randominteger(ssize);
             }
             for (i = 0; i < sbsize; i++) {
-               idx.xZ[i] = randominteger(ssize, _state);
+               idx.xZ[i] = randominteger(ssize);
             }
          }
          ae_assert(sbsize >= 0, "mlpbase test: integrity check failed", _state);
@@ -77151,12 +77151,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
 // Initialize arrays
    ae_vector_set_length(&x1, nin - 1 + 1, _state);
@@ -77225,12 +77225,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          }
       // Same inputs leads to same outputs
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
             x2.xR[i] = x1.xR[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
-            y2.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
+            y2.xR[i] = randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1, _state);
          mlpeprocess(&ensemble, &x2, &y2, _state);
@@ -77244,12 +77244,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          testmlpeunit_unsetensemble(&ensemble2, _state);
          mlpecopy(&ensemble, &ensemble2, _state);
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
             x2.xR[i] = x1.xR[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
-            y2.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
+            y2.xR[i] = randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1, _state);
          mlpeprocess(&ensemble2, &x2, &y2, _state);
@@ -77281,12 +77281,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             ae_frame_leave(_state);
          }
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
             x2.xR[i] = x1.xR[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
-            y2.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
+            y2.xR[i] = randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1, _state);
          mlpeprocess(&ensemble2, &x2, &y2, _state);
@@ -77297,11 +77297,11 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          *err = *err || !allsame;
       // Different inputs leads to different outputs (non-zero network)
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            x2.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            x2.xR[i] = randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
             y2.xR[i] = y1.xR[i];
          }
          mlpeprocess(&ensemble, &x1, &y1, _state);
@@ -77313,11 +77313,11 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          *err = *err || allsame;
       // Randomization changes outputs (when inputs are unchanged, non-zero network)
          for (i = 0; i < nin; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
-            x2.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
+            x2.xR[i] = randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.xR[i] = 2 * randomreal(_state) - 1;
+            y1.xR[i] = randommid();
             y2.xR[i] = y1.xR[i];
          }
          mlpecopy(&ensemble, &ensemble2, _state);
@@ -77333,7 +77333,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 1) {
          // Classifier network outputs are normalized
             for (i = 0; i < nin; i++) {
-               x1.xR[i] = 2 * randomreal(_state) - 1;
+               x1.xR[i] = randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1, _state);
             v = 0.0;
@@ -77346,7 +77346,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 2) {
          // B-type network outputs are bounded from above/below
             for (i = 0; i < nin; i++) {
-               x1.xR[i] = 2 * randomreal(_state) - 1;
+               x1.xR[i] = randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1, _state);
             for (i = 0; i < nout; i++) {
@@ -77360,7 +77360,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 3) {
          // R-type network outputs are within [A1,A2] (or [A2,A1])
             for (i = 0; i < nin; i++) {
-               x1.xR[i] = 2 * randomreal(_state) - 1;
+               x1.xR[i] = randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1, _state);
             for (i = 0; i < nout; i++) {
@@ -77413,12 +77413,12 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = 2 * randomreal(_state) - 1;
+      a1 = 500.0 * randommid();
+      a2 = randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * randomreal(_state) - 500;
-      a2 = a1 + (2 * randominteger(2, _state) - 1) * (0.1 + 0.9 * randomreal(_state));
+      a1 = 500.0 * randommid();
+      a2 = a1 + (2 * randominteger(2) - 1) * (0.1 + 0.9 * randomreal());
    }
    testmlpeunit_createensemble(&ensemble, nkind, a1, a2, nin, nhid1, nhid2, nout, ec, _state);
    mlpproperties(&ensemble.network, &n1, &n2, &wcount, _state);
@@ -77436,20 +77436,20 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
    //       which allows us to avoid oversaturated Ensemble.
    //       In 10% of cases we use zero weights.
       mlperandomize(&ensemble, _state);
-      if (randomreal(_state) <= 0.1) {
+      if (randombool(0.1)) {
          for (i = 0; i < wcount * ec; i++) {
             ensemble.weights.xR[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount * ec; i++) {
-            ensemble.weights.xR[i] = 0.2 * randomreal(_state) - 0.1;
+            ensemble.weights.xR[i] = 0.1 * randommid();
          }
       }
    // Generate random dataset.
    // Calculate reference errors.
    //
    // NOTE: about 10% of tests are performed with zero SSize
-      ssize = sizemin + randominteger(sizemax - sizemin + 1, _state);
+      ssize = sizemin + randominteger(sizemax - sizemin + 1);
       if (mlpeissoftmax(&ensemble, _state)) {
          ae_matrix_set_length(&xy, imax2(ssize, 1, _state), nin + 1, _state);
          sparsecreate(imax2(ssize, 1, _state), nin + 1, 0, &sparsexy, _state);
@@ -77466,7 +77466,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
       for (i = 0; i < ssize; i++) {
       // Fill I-th row
          for (j = 0; j < nin; j++) {
-            x1.xR[j] = 4 * randomreal(_state) - 2;
+            x1.xR[j] = 2.0 * randommid();
             sparseset(&sparsexy, i, j, x1.xR[j], _state);
          }
          ae_v_move(xy.xyR[i], 1, x1.xR, 1, nin);
@@ -77474,12 +77474,12 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout, _state);
+            xy.xyR[i][nin] = (double)randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin], _state);
             y1.xR[iround(xy.xyR[i][nin], _state)] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.xR[j] = 4 * randomreal(_state) - 2;
+               y1.xR[j] = 2.0 * randommid();
                sparseset(&sparsexy, i, nin + j, y1.xR[j], _state);
             }
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
@@ -78059,8 +78059,8 @@ static bool testclusteringunit_basicahctests(ae_state *_state) {
    }
 // Test on problem with one point
    ae_matrix_set_length(&xy, 1, 2, _state);
-   xy.xyR[0][0] = randomreal(_state);
-   xy.xyR[0][1] = randomreal(_state);
+   xy.xyR[0][0] = randomreal();
+   xy.xyR[0][1] = randomreal();
    clusterizercreate(&s, _state);
    clusterizersetpoints(&s, &xy, 1, 2, 0, _state);
    clusterizerrunahc(&s, &rep, _state);
@@ -78070,10 +78070,10 @@ static bool testclusteringunit_basicahctests(ae_state *_state) {
    }
 // Test on problem with two points
    ae_matrix_set_length(&xy, 2, 2, _state);
-   xy.xyR[0][0] = randomreal(_state);
-   xy.xyR[0][1] = randomreal(_state);
-   xy.xyR[1][0] = randomreal(_state);
-   xy.xyR[1][1] = randomreal(_state);
+   xy.xyR[0][0] = randomreal();
+   xy.xyR[0][1] = randomreal();
+   xy.xyR[1][0] = randomreal();
+   xy.xyR[1][1] = randomreal();
    clusterizercreate(&s, _state);
    clusterizersetpoints(&s, &xy, 2, 2, 0, _state);
    clusterizerrunahc(&s, &rep, _state);
@@ -78705,7 +78705,7 @@ static bool testclusteringunit_advancedahctests(ae_state *_state) {
 // definition of the clustering algorithm.
    for (d = 2; d <= 5; d++) {
       for (ahcalgo = 0; ahcalgo <= 4; ahcalgo++) {
-         n = iround(pow(3.0, (double)randominteger(3, _state)), _state);
+         n = iround(pow(3.0, (double)randominteger(3)), _state);
          npoints = d * n;
       // 1. generate dataset.
       // 2. fill Idx (array of cluster indexes):
@@ -78716,13 +78716,13 @@ static bool testclusteringunit_advancedahctests(ae_state *_state) {
          ae_vector_set_length(&idx, n * d + d * (n - 1), _state);
          for (i = 0; i < n * d; i++) {
             for (j = 0; j < d; j++) {
-               xy.xyR[i][j] = 0.2 * randomreal(_state) - 0.1;
+               xy.xyR[i][j] = 0.1 * randommid();
             }
             xy.xyR[i][i % d]++;
             idx.xZ[i] = i % d;
          }
          for (i = 0; i < n * d; i++) {
-            k = randominteger(n * d, _state);
+            k = randominteger(n * d);
             if (k != i) {
                for (j = 0; j < d; j++) {
                   v = xy.xyR[i][j];
@@ -78786,7 +78786,7 @@ static bool testclusteringunit_advancedahctests(ae_state *_state) {
          }
       // Clusterize one more time, now with distance matrix
          clusterizercreate(&s, _state);
-         clusterizersetdistances(&s, &dm, n * d, randomreal(_state) > 0.5, _state);
+         clusterizersetdistances(&s, &dm, n * d, randombool(), _state);
          clusterizersetahcalgo(&s, ahcalgo, _state);
          clusterizerrunahc(&s, &rep, _state);
       // Tests:
@@ -78851,13 +78851,13 @@ static bool testclusteringunit_advancedahctests(ae_state *_state) {
          if (ahcalgo == 4 && disttype != 2) {
             continue;
          }
-         npoints = iround(pow(2.0, (double)randominteger(5, _state)), _state);
-         d = 2 + randominteger(4, _state);
+         npoints = iround(pow(2.0, (double)randominteger(5)), _state);
+         d = 2 + randominteger(4);
       // Generate dataset and distance matrix
          ae_matrix_set_length(&xy, npoints, d, _state);
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < d; j++) {
-               xy.xyR[i][j] = randomreal(_state);
+               xy.xyR[i][j] = randomreal();
             }
          }
          ae_matrix_set_length(&dm, npoints, npoints, _state);
@@ -78906,8 +78906,8 @@ static double testclusteringunit_rnormal(ae_state *_state) {
    double x1;
    double result;
    while (true) {
-      u = 2 * randomreal(_state) - 1;
-      v = 2 * randomreal(_state) - 1;
+      u = randommid();
+      v = randommid();
       s = sqr(u, _state) + sqr(v, _state);
       if (s > 0.0 && s < 1.0) {
          s = sqrt(-2 * log(s) / s);
@@ -78927,7 +78927,7 @@ static void testclusteringunit_rsphere(RMatrix *xy, ae_int_t n, ae_int_t i, ae_s
       xy->xyR[i][j] = testclusteringunit_rnormal(_state);
    }
    v = ae_v_dotproduct(xy->xyR[i], 1, xy->xyR[i], 1, n);
-   v = randomreal(_state) / sqrt(v);
+   v = randomreal() / sqrt(v);
    ae_v_muld(xy->xyR[i], 1, n, v);
 }
 
@@ -78958,7 +78958,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
    for (pass = 1; pass <= passcount; pass++) {
    // Fill
       ae_matrix_set_length(&xy, npoints - 1 + 1, nvars - 1 + 1, _state);
-      majoraxis = randominteger(nvars, _state);
+      majoraxis = randominteger(nvars);
       for (i = 0; i < npoints; i++) {
          testclusteringunit_rsphere(&xy, nvars, i, _state);
          xy.xyR[i][majoraxis] *= nc;
@@ -79267,7 +79267,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors, ae_state *_
       clusterizersetpoints(&s, &xy, npoints, nfeatures, 2, _state);
       clusterizersetkmeanslimits(&s, 1, 1, _state);
       clusterizersetkmeansinit(&s, initalgo, _state);
-      clusterizersetseed(&s, -randominteger(3, _state), _state);
+      clusterizersetseed(&s, -randominteger(3), _state);
       allsame = true;
       for (pass = 0; pass <= 10; pass++) {
          clusterizerrunkmeans(&s, nclusters, &rep, _state);
@@ -79302,7 +79302,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors, ae_state *_
       clusterizersetpoints(&s, &xy, npoints, nfeatures, 2, _state);
       clusterizersetkmeanslimits(&s, 1, 1, _state);
       clusterizersetkmeansinit(&s, initalgo, _state);
-      clusterizersetseed(&s, 1 + randominteger(3, _state), _state);
+      clusterizersetseed(&s, 1 + randominteger(3), _state);
       allsame = true;
       for (pass = 0; pass <= 10; pass++) {
          clusterizerrunkmeans(&s, nclusters, &rep, _state);
@@ -79389,7 +79389,7 @@ static void testclusteringunit_kmeansinfinitelooptest(bool *othererrors, ae_stat
    restarts = 5;
    ae_matrix_set_length(&xy, npoints, nfeatures, _state);
    for (j = 0; j < nfeatures; j++) {
-      xy.xyR[0][j] = randomreal(_state);
+      xy.xyR[0][j] = randomreal();
    }
    for (i = 1; i < npoints; i++) {
       for (j = 0; j < nfeatures; j++) {
@@ -79727,7 +79727,7 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       ntrees = 1 + hqrnduniformi(&rs, 4, _state);
       foresttype = hqrnduniformi(&rs, 3, _state);
    // Initialize arrays and data
-      npoints = 10 + randominteger(50, _state);
+      npoints = 10 + randominteger(50);
       ae_vector_set_length(&x1, nvars, _state);
       ae_vector_set_length(&x2, nvars, _state);
       ae_vector_set_length(&y1, nclasses, _state);
@@ -79736,22 +79736,22 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nvars; j++) {
             if (j % 2 == 0) {
-               xy.xyR[i][j] = 2 * randomreal(_state) - 1;
+               xy.xyR[i][j] = randommid();
             } else {
-               xy.xyR[i][j] = (double)randominteger(2, _state);
+               xy.xyR[i][j] = (double)randominteger(2);
             }
          }
          if (nclasses == 1) {
-            xy.xyR[i][nvars] = 2 * randomreal(_state) - 1;
+            xy.xyR[i][nvars] = randommid();
          } else {
-            xy.xyR[i][nvars] = (double)randominteger(nclasses, _state);
+            xy.xyR[i][nvars] = (double)randominteger(nclasses);
          }
       }
    // create forest
       dfbuildercreate(&builder, _state);
       dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses, _state);
-      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
-      dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1, _state), _state);
+      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
+      dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1), _state);
       if (foresttype == 0) {
       // Build uncompressed random forest
          dfbuilderbuildrandomforest(&builder, ntrees, &df1, &rep, _state);
@@ -79769,12 +79769,12 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       dfcreatebuffer(&df1, &buf, _state);
    // Same inputs leads to same outputs
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       dfprocess(&df1, &x1, &y1, _state);
       dfprocess(&df1, &x2, &y2, _state);
@@ -79818,12 +79818,12 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       }
    // DFTsProcess() works as expected
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       dfprocess(&df1, &x1, &y1, _state);
       dftsprocess(&df1, &buf, &x2, &y2, _state);
@@ -79837,12 +79837,12 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       testdforestunit_unsetdf(&df2, _state);
       dfcopy(&df1, &df2, _state);
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       dfprocess(&df1, &x1, &y1, _state);
       dfprocess(&df2, &x2, &y2, _state);
@@ -79852,12 +79852,12 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       }
       *err = *err || !allsame;
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       set_error_flag(err, fabs(dfprocess0(&df1, &x1, _state) - dfprocess0(&df2, &x2, _state)) > 100 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:303");
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       set_error_flag(err, dfclassify(&df1, &x1, _state) != dfclassify(&df2, &x2, _state), __FILE__, __LINE__, "testdforestunit.ap:309");
@@ -79885,12 +79885,12 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
          ae_frame_leave(_state);
       }
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.xR[i] = 2 * randomreal(_state) - 1;
-         y2.xR[i] = 2 * randomreal(_state) - 1;
+         y1.xR[i] = randommid();
+         y2.xR[i] = randommid();
       }
       dfprocess(&df1, &x1, &y1, _state);
       dfprocess(&df2, &x2, &y2, _state);
@@ -79900,19 +79900,19 @@ static void testdforestunit_testprocessing(bool *err, ae_state *_state) {
       }
       *err = *err || !allsame;
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       set_error_flag(err, fabs(dfprocess0(&df1, &x1, _state) - dfprocess0(&df2, &x2, _state)) > 100 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:339");
       for (i = 0; i < nvars; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       set_error_flag(err, dfclassify(&df1, &x1, _state) != dfclassify(&df2, &x2, _state), __FILE__, __LINE__, "testdforestunit.ap:345");
    // Normalization properties
       if (nclasses > 1) {
          for (i = 0; i < nvars; i++) {
-            x1.xR[i] = 2 * randomreal(_state) - 1;
+            x1.xR[i] = randommid();
          }
          dfprocess(&df1, &x1, &y1, _state);
          v = 0.0;
@@ -79992,13 +79992,13 @@ static void testdforestunit_basictest1(bool *err, ae_state *_state) {
                dfbuildercreate(&builder, _state);
                dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses, _state);
                dfbuildersetsubsampleratio(&builder, 1.0, _state);
-               if (randomreal(_state) > 0.5) {
+               if (randombool()) {
                   dfbuildersetrndvars(&builder, nvars, _state);
                } else {
                   dfbuildersetrndvarsratio(&builder, 1.0, _state);
                }
-               dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
-               dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1, _state), _state);
+               dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
+               dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1), _state);
                dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
             } else {
             // Test old interface
@@ -80164,7 +80164,7 @@ static void testdforestunit_basictest2(bool *err, ae_state *_state) {
       dfbuildercreate(&builder, _state);
       dfbuildersetdataset(&builder, &xy, npoints, 1, 2, _state);
       dfbuildersetsubsampleratio(&builder, 0.05, _state);
-      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
+      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
    // Check report fields
       set_error_flag(err, fabs(rep.oobrelclserror - 1.0 / 12.0) > 0.50 * (1.0 / 12.0), __FILE__, __LINE__, "testdforestunit.ap:684");
@@ -80256,7 +80256,7 @@ static void testdforestunit_basictest3(bool *err, ae_state *_state) {
          dfbuildercreate(&builder, _state);
          dfbuildersetdataset(&builder, &xy, npoints, 2, 2, _state);
          dfbuildersetsubsampleratio(&builder, 0.10, _state);
-         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
+         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
       } else {
       // Test old interface
@@ -80345,7 +80345,7 @@ static void testdforestunit_basictest4(bool *err, ae_state *_state) {
          dfbuildercreate(&builder, _state);
          dfbuildersetdataset(&builder, &xy, npoints, 2, 1, _state);
          dfbuildersetsubsampleratio(&builder, 0.10, _state);
-         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
+         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
       } else {
       // Test old interface
@@ -80438,8 +80438,8 @@ static void testdforestunit_basictest5(bool *err, ae_state *_state) {
    dfbuildercreate(&builder, _state);
    dfbuildersetdataset(&builder, &xy, npoints, nvars, 1, _state);
    dfbuildersetsubsampleratio(&builder, 1.00, _state);
-   dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
-   dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1, _state), _state);
+   dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
+   dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1), _state);
    dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
 // Test
    set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:1039");
@@ -80536,8 +80536,8 @@ static void testdforestunit_basictestrandom(bool *err, ae_state *_state) {
          if (j < 0) {
             dfbuildersetrndvarsratio(&builder, hqrnduniformr(&rs, _state), _state);
          }
-         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
-         dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1, _state), _state);
+         dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
+         dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1), _state);
          set_error_flag(err, dfbuildergetprogress(&builder, _state) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1139");
          set_error_flag(err, dfbuilderpeekprogress(&builder, _state) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1140");
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
@@ -80695,8 +80695,8 @@ static void testdforestunit_basictestallsame(bool *err, ae_state *_state) {
       if (j < 0) {
          dfbuildersetrndvarsratio(&builder, hqrnduniformr(&rs, _state), _state);
       }
-      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1, _state), _state);
-      dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1, _state), _state);
+      dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1), _state);
+      dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1), _state);
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep, _state);
       refavgce = 0.0;
       refrms = 0.0;
@@ -81448,12 +81448,12 @@ static void testlinregunit_generaterandomtask(double xl, double xr, bool randomx
    ae_vector_set_length(s, n - 1 + 1, _state);
    for (i = 0; i < n; i++) {
       if (randomx) {
-         xy->xyR[i][0] = xl + (xr - xl) * randomreal(_state);
+         xy->xyR[i][0] = xl + (xr - xl) * randomreal();
       } else {
          xy->xyR[i][0] = xl + (xr - xl) * i / (n - 1);
       }
-      xy->xyR[i][1] = ymin + (ymax - ymin) * randomreal(_state);
-      s->xR[i] = smin + (smax - smin) * randomreal(_state);
+      xy->xyR[i][1] = ymin + (ymax - ymin) * randomreal();
+      s->xR[i] = smin + (smax - smin) * randomreal();
    }
 }
 
@@ -81465,8 +81465,8 @@ static double testlinregunit_generatenormal(double mean, double sigma, ae_state 
    double result;
    result = mean;
    while (true) {
-      u = (2 * randominteger(2, _state) - 1) * randomreal(_state);
-      v = (2 * randominteger(2, _state) - 1) * randomreal(_state);
+      u = (2 * randominteger(2) - 1) * randomreal();
+      v = (2 * randominteger(2) - 1) * randomreal();
       sum = u * u + v * v;
       if (sum < 1.0 && sum > 0.0) {
          sum = sqrt(-2 * log(sum) / sum);
@@ -81484,11 +81484,11 @@ static void testlinregunit_generatetask(double a, double b, double xl, double xr
    ae_vector_set_length(s, n - 1 + 1, _state);
    for (i = 0; i < n; i++) {
       if (randomx) {
-         xy->xyR[i][0] = xl + (xr - xl) * randomreal(_state);
+         xy->xyR[i][0] = xl + (xr - xl) * randomreal();
       } else {
          xy->xyR[i][0] = xl + (xr - xl) * i / (n - 1);
       }
-      s->xR[i] = smin + (smax - smin) * randomreal(_state);
+      s->xR[i] = smin + (smax - smin) * randomreal();
       xy->xyR[i][1] = a + b * xy->xyR[i][0] + testlinregunit_generatenormal(0.0, s->xR[i], _state);
    }
 }
@@ -81705,9 +81705,9 @@ bool testlinreg(bool silent, ae_state *_state) {
    // Multipass tests
       for (pass = 1; pass <= passcount; pass++) {
       // Test S variant against non-S variant
-         ea = 2 * randomreal(_state) - 1;
-         eb = 2 * randomreal(_state) - 1;
-         testlinregunit_generatetask(ea, eb, -5 * randomreal(_state), 5 * randomreal(_state), randomreal(_state) > 0.5, 1.0, 1.0, n, &xy, &s, _state);
+         ea = randommid();
+         eb = randommid();
+         testlinregunit_generatetask(ea, eb, -5 * randomreal(), 5 * randomreal(), randombool(), 1.0, 1.0, n, &xy, &s, _state);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p, _state);
          lrline(&xy, n, &info2, &a2, &b2, _state);
          if (info != 1 || info2 != 1) {
@@ -81719,11 +81719,11 @@ bool testlinreg(bool silent, ae_state *_state) {
       //
       // Generate task with exact, non-perturbed y[i],
       // then make non-zero s[i]
-         ea = 2 * randomreal(_state) - 1;
-         eb = 2 * randomreal(_state) - 1;
-         testlinregunit_generatetask(ea, eb, -5 * randomreal(_state), 5 * randomreal(_state), n > 4, 0.0, 0.0, n, &xy, &s, _state);
+         ea = randommid();
+         eb = randommid();
+         testlinregunit_generatetask(ea, eb, -5 * randomreal(), 5 * randomreal(), n > 4, 0.0, 0.0, n, &xy, &s, _state);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 + randomreal(_state);
+            s.xR[i] = 1 + randomreal();
          }
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p, _state);
          if (info != 1) {
@@ -81735,9 +81735,9 @@ bool testlinreg(bool silent, ae_state *_state) {
          for (i = 0; i < qcnt; i++) {
             qvals.xR[i] = 0.0;
          }
-         ea = 2 * randomreal(_state) - 1;
-         eb = 2 * randomreal(_state) - 1;
-         testlinregunit_generatetask(ea, eb, -5 * randomreal(_state), 5 * randomreal(_state), n > 4, 1.0, 2.0, n, &xy, &s, _state);
+         ea = randommid();
+         eb = randommid();
+         testlinregunit_generatetask(ea, eb, -5 * randomreal(), 5 * randomreal(), n > 4, 1.0, 2.0, n, &xy, &s, _state);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p, _state);
          if (info != 1) {
             slcerrors = true;
@@ -81778,9 +81778,9 @@ bool testlinreg(bool silent, ae_state *_state) {
          }
       // Additional tests for P: correlation with fit quality
          if (n > 2) {
-            testlinregunit_generatetask(ea, eb, -5 * randomreal(_state), 5 * randomreal(_state), false, 0.0, 0.0, n, &xy, &s, _state);
+            testlinregunit_generatetask(ea, eb, -5 * randomreal(), 5 * randomreal(), false, 0.0, 0.0, n, &xy, &s, _state);
             for (i = 0; i < n; i++) {
-               s.xR[i] = 1 + randomreal(_state);
+               s.xR[i] = 1 + randomreal();
             }
             lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p, _state);
             if (info != 1) {
@@ -81788,7 +81788,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                continue;
             }
             slerrors = slerrors || p < 0.999;
-            testlinregunit_generatetask(0.0, 0.0, -5 * randomreal(_state), 5 * randomreal(_state), false, 1.0, 1.0, n, &xy, &s, _state);
+            testlinregunit_generatetask(0.0, 0.0, -5 * randomreal(), 5 * randomreal(), false, 1.0, 1.0, n, &xy, &s, _state);
             for (i = 0; i < n; i++) {
                if (i % 2 == 0) {
                   xy.xyR[i][1] = 5.0;
@@ -81817,9 +81817,9 @@ bool testlinreg(bool silent, ae_state *_state) {
    // b. no sigmas
       ae_matrix_set_length(&xy, n - 1 + 1, 1 + 1, _state);
       for (i = 0; i < n; i++) {
-         xy.xyR[i][0] = 2 * randomreal(_state) - 1;
-         xy.xyR[i][1] = 2 * randomreal(_state) - 1;
-         s.xR[i] = 1 + randomreal(_state);
+         xy.xyR[i][0] = randommid();
+         xy.xyR[i][1] = randommid();
+         s.xR[i] = 1 + randomreal();
       }
       lrbuilds(&xy, &s, n, 1, &info, &wt, &ar, _state);
       if (info != 1) {
@@ -81847,12 +81847,12 @@ bool testlinreg(bool silent, ae_state *_state) {
 // S covariance versus S-less covariance.
 // Slightly skewed task, large sample size.
 // Will S-less subroutine estimate covariance matrix good enough?
-   n = 1000 + randominteger(3000, _state);
-   sigma = 0.1 + randomreal(_state) * 1.9;
+   n = 1000 + randominteger(3000);
+   sigma = 0.1 + randomreal() * 1.9;
    ae_matrix_set_length(&xy, n - 1 + 1, 1 + 1, _state);
    ae_vector_set_length(&s, n - 1 + 1, _state);
    for (i = 0; i < n; i++) {
-      xy.xyR[i][0] = 1.5 * randomreal(_state) - 0.5;
+      xy.xyR[i][0] = 1.5 * randomreal() - 0.5;
       xy.xyR[i][1] = 1.2 * xy.xyR[i][0] - 0.3 + testlinregunit_generatenormal(0.0, sigma, _state);
       s.xR[i] = sigma;
    }
@@ -81908,7 +81908,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                n2 = m + 20;
             }
             if (tasktype == 1) {
-               n1 = 70 + randominteger(70, _state);
+               n1 = 70 + randominteger(70);
                n2 = n1;
             }
             if (tasktype == 2 || tasktype == 3) {
@@ -81924,14 +81924,14 @@ bool testlinreg(bool silent, ae_state *_state) {
             // Prepare task
                if (tasktype == 0) {
                   for (i = 0; i < n; i++) {
-                     xy.xyR[i][0] = 2 * randomreal(_state) - 1;
+                     xy.xyR[i][0] = randommid();
                   }
                   for (i = 0; i < n; i++) {
                      for (j = 1; j < m; j++) {
                         xy.xyR[i][j] = xy.xyR[i][0] * xy.xyR[i][j - 1];
                      }
                   }
-                  sinshift = randomreal(_state) * pi;
+                  sinshift = randomreal() * pi;
                   for (i = 0; i < n; i++) {
                      xy0.xR[i] = sin(sinshift + pi * 0.5 * (xy.xyR[i][0] + 1));
                      xy.xyR[i][m] = xy0.xR[i] + noiselevel * testlinregunit_generatenormal(0.0, 1.0, _state);
@@ -81987,7 +81987,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  s.xR[i] = 1 + randomreal(_state);
+                  s.xR[i] = 1 + randomreal();
                }
             // Solve (using S-variant, non-S-variant is not tested)
                if (modeltype == 0) {
@@ -82004,7 +82004,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                ae_vector_set_length(&x, m - 1 + 1, _state);
                v = tmpweights.xR[m];
                for (i = 0; i < m; i++) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                   v += tmpweights.xR[i] * x.xR[i];
                }
                grothererrors = grothererrors || fabs(v - lrprocess(&wt, &x, _state)) / rmax2(fabs(v), 1.0, _state) > threshold;
@@ -82012,7 +82012,7 @@ bool testlinreg(bool silent, ae_state *_state) {
                lrpack(&tmpweights, m, &wt2, _state);
                ae_vector_set_length(&x, m - 1 + 1, _state);
                for (i = 0; i < m; i++) {
-                  x.xR[i] = 2 * randomreal(_state) - 1;
+                  x.xR[i] = randommid();
                }
                v = lrprocess(&wt, &x, _state);
                grothererrors = grothererrors || fabs(v - lrprocess(&wt2, &x, _state)) / fabs(v) > threshold;
@@ -82156,8 +82156,8 @@ bool testlinreg(bool silent, ae_state *_state) {
    for (pass = 1; pass <= 50; pass++) {
       n = 2;
       do {
-         noiselevel = randomreal(_state) + 0.1;
-         tasklevel = 2 * randomreal(_state) - 1;
+         noiselevel = randomreal() + 0.1;
+         tasklevel = randommid();
       } while (fabs(noiselevel - tasklevel) <= 0.05);
       ae_matrix_set_length(&xy, 3 * n - 1 + 1, 1 + 1, _state);
       for (i = 0; i < n; i++) {
@@ -82199,12 +82199,12 @@ bool testlinreg(bool silent, ae_state *_state) {
       }
    }
    for (pass = 1; pass <= 10; pass++) {
-      m = 1 + randominteger(5, _state);
-      n = 10 + randominteger(10, _state);
+      m = 1 + randominteger(5);
+      n = 10 + randominteger(10);
       ae_matrix_set_length(&xy, n - 1 + 1, m + 1, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j <= m; j++) {
-            xy.xyR[i][j] = 2 * randomreal(_state) - 1;
+            xy.xyR[i][j] = randommid();
          }
       }
       lrbuild(&xy, n, m, &info, &w, &ar, _state);
@@ -82219,7 +82219,7 @@ bool testlinreg(bool silent, ae_state *_state) {
       testlinregunit_unsetlr(&wt, _state);
       lrcopy(&w, &wt, _state);
       for (i = 0; i < m; i++) {
-         x1.xR[i] = 2 * randomreal(_state) - 1;
+         x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
       y1 = lrprocess(&w, &x1, _state);
@@ -84652,8 +84652,8 @@ static double testldaunit_generatenormal(double mean, double sigma, ae_state *_s
    double result;
    result = mean;
    while (true) {
-      u = (2 * randominteger(2, _state) - 1) * randomreal(_state);
-      v = (2 * randominteger(2, _state) - 1) * randomreal(_state);
+      u = (2 * randominteger(2) - 1) * randomreal();
+      v = (2 * randominteger(2) - 1) * randomreal();
       sum = u * u + v * v;
       if (sum < 1.0 && sum > 0.0) {
          sum = sqrt(-2 * log(sum) / sum);
@@ -84922,8 +84922,8 @@ bool testlda(bool silent, ae_state *_state) {
       for (nc = 2; nc <= maxnc; nc++) {
          for (pass = 1; pass <= passcount; pass++) {
          // Simple test for LDA-N/LDA-1
-            axis = randominteger(nf, _state);
-            ns = maxns / 2 + randominteger(maxns / 2, _state);
+            axis = randominteger(nf);
+            ns = maxns / 2 + randominteger(maxns / 2);
             testldaunit_gensimpleset(nf, nc, ns, axis, &xy, _state);
             fisherldan(&xy, ns, nf, nc, &info, &wn, _state);
             if (info != 1) {
@@ -84938,10 +84938,10 @@ bool testlda(bool silent, ae_state *_state) {
             }
          // Degenerate test for LDA-N
             if (nf >= 3) {
-               ns = maxns / 2 + randominteger(maxns / 2, _state);
+               ns = maxns / 2 + randominteger(maxns / 2);
             // there are two duplicate features,
             // axis is oriented along non-duplicate feature
-               axis = randominteger(nf - 2, _state);
+               axis = randominteger(nf - 2);
                testldaunit_gendeg1set(nf, nc, ns, axis, &xy, _state);
                fisherldan(&xy, ns, nf, nc, &info, &wn, _state);
                if (info != 2) {
@@ -85020,11 +85020,11 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       ae_matrix_set_length(&pexact, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            pexact.xyR[i][j] = randomreal(_state);
+            pexact.xyR[i][j] = randomreal();
          }
       }
       for (j = 0; j < n; j++) {
-         i = randominteger(n, _state);
+         i = randominteger(n);
          pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
@@ -85080,11 +85080,11 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       ae_matrix_set_length(&pexact, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            pexact.xyR[i][j] = randomreal(_state);
+            pexact.xyR[i][j] = randomreal();
          }
       }
       for (j = 0; j < n; j++) {
-         i = randominteger(n, _state);
+         i = randominteger(n);
          pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
@@ -85154,11 +85154,11 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
       ae_matrix_set_length(&pexact, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            pexact.xyR[i][j] = randomreal(_state);
+            pexact.xyR[i][j] = randomreal();
          }
       }
       for (j = 0; j < n; j++) {
-         i = randominteger(n, _state);
+         i = randominteger(n);
          pexact.xyR[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
@@ -85180,7 +85180,7 @@ static void testmcpdunit_testsimple(bool *err, ae_state *_state) {
             xy.xyR[0][j] = 0.0;
          }
       // "main" element
-         v0 = 9 * randomreal(_state) + 1;
+         v0 = 9 * randomreal() + 1;
          xy.xyR[0][i] = v0 * (1.0 - 2 * offdiagonal);
          for (j = 0; j < n; j++) {
             xy.xyR[1][j] = v0 * (1.0 - 2 * offdiagonal) * pexact.xyR[j][i];
@@ -85251,12 +85251,12 @@ static void testmcpdunit_testentryexit(bool *err, ae_state *_state) {
                   if (entrykind == 0) {
                      entrystate = -1;
                   } else {
-                     entrystate = randominteger(n, _state);
+                     entrystate = randominteger(n);
                   }
                   if (exitkind == 0) {
                      exitstate = -1;
                   } else {
-                     exitstate = randominteger(n, _state);
+                     exitstate = randominteger(n);
                   }
                } while (!((entrystate == -1 || exitstate == -1) || entrystate != exitstate));
             // Generate transition matrix P such that:
@@ -85266,7 +85266,7 @@ static void testmcpdunit_testentryexit(bool *err, ae_state *_state) {
                ae_matrix_set_length(&pexact, n, n, _state);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     pexact.xyR[i][j] = (double)(1 + randominteger(5, _state));
+                     pexact.xyR[i][j] = (double)(1 + randominteger(5));
                      if (i == entrystate) {
                         pexact.xyR[i][j] = 0.0;
                      }
@@ -85310,18 +85310,18 @@ static void testmcpdunit_testentryexit(bool *err, ae_state *_state) {
             // population data, depending on PopKind variable.
                for (k = 0; k < n; k++) {
                // Generate track whose length is in 2..4
-                  ae_matrix_set_length(&xy, 2 + randominteger(3, _state), n, _state);
+                  ae_matrix_set_length(&xy, 2 + randominteger(3), n, _state);
                   for (j = 0; j < n; j++) {
-                     xy.xyR[0][j] = 0.05 * randomreal(_state);
+                     xy.xyR[0][j] = 0.05 * randomreal();
                   }
-                  xy.xyR[0][k] = 1 + randomreal(_state);
+                  xy.xyR[0][k] = 1 + randomreal();
                   for (i = 1; i < xy.rows; i++) {
                      for (j = 0; j < n; j++) {
                         if (j != entrystate) {
                            v = ae_v_dotproduct(pexact.xyR[j], 1, xy.xyR[i - 1], 1, n);
                            xy.xyR[i][j] = v;
                         } else {
-                           xy.xyR[i][j] = randomreal(_state);
+                           xy.xyR[i][j] = randomreal();
                         }
                      }
                   }
@@ -85424,7 +85424,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
             ae_matrix_set_length(&xy, 2 * n, n, _state);
             for (i = 0; i < xy.rows; i++) {
                for (j = 0; j < xy.cols; j++) {
-                  xy.xyR[i][j] = randomreal(_state);
+                  xy.xyR[i][j] = randomreal();
                }
             }
          // Test that single equality constraint on non-entry
@@ -85433,9 +85433,9 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
          // NOTE: this test needs N >= 4 because smaller values
          // can give us inconsistent constraints
             ae_assert(n >= 4, "TestEC: expectation failed", _state);
-            ic = 1 + randominteger(n - 2, _state);
-            jc = 1 + randominteger(n - 2, _state);
-            vc = randomreal(_state);
+            ic = 1 + randominteger(n - 2);
+            jc = 1 + randominteger(n - 2);
+            vc = randomreal();
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
             mcpdaddec(&s, ic, jc, vc, _state);
@@ -85461,7 +85461,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
          //    "exit state" constraint.
          // 2. this test needs N >= 3
             ae_assert(n >= 3, "TestEC: expectation failed", _state);
-            jc = randominteger(n - 1, _state);
+            jc = randominteger(n - 1);
             vc = 0.95;
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
@@ -85479,7 +85479,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
          // * zero equality constraint, which must be consistent
          // * non-zero equality constraint, which must be inconsistent
             if (entrystate >= 0) {
-               jc = randominteger(n, _state);
+               jc = randominteger(n);
                testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
                mcpdaddtrack(&s, &xy, xy.rows, _state);
                mcpdaddec(&s, entrystate, jc, 0.0, _state);
@@ -85501,7 +85501,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
          // * zero equality constraint, which must be consistent
          // * non-zero equality constraint, which must be inconsistent
             if (exitstate >= 0) {
-               ic = randominteger(n, _state);
+               ic = randominteger(n);
                testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
                mcpdaddtrack(&s, &xy, xy.rows, _state);
                mcpdaddec(&s, ic, exitstate, 0.0, _state);
@@ -85525,7 +85525,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
                }
             }
             for (j = 1; j < n - 1; j++) {
-               ec.xyR[1 + randominteger(n - 2, _state)][j] = 0.1 + 0.1 * randomreal(_state);
+               ec.xyR[1 + randominteger(n - 2)][j] = 0.1 + 0.1 * randomreal();
             }
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
@@ -85596,7 +85596,7 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
             ae_matrix_set_length(&xy, 2 * n, n, _state);
             for (i = 0; i < xy.rows; i++) {
                for (j = 0; j < xy.cols; j++) {
-                  xy.xyR[i][j] = randomreal(_state);
+                  xy.xyR[i][j] = randomreal();
                }
             }
          // Test that single bound constraint on non-entry
@@ -85605,15 +85605,15 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
          // NOTE 1: this test needs N >= 4 because smaller values
          // can give us inconsistent constraints
             ae_assert(n >= 4, "TestBC: expectation failed", _state);
-            ic = 1 + randominteger(n - 2, _state);
-            jc = 1 + randominteger(n - 2, _state);
-            if (randomreal(_state) > 0.5) {
-               vl = 0.3 * randomreal(_state);
+            ic = 1 + randominteger(n - 2);
+            jc = 1 + randominteger(n - 2);
+            if (randombool()) {
+               vl = 0.3 * randomreal();
             } else {
                vl = _state->v_neginf;
             }
-            if (randomreal(_state) > 0.5) {
-               vu = 0.5 + 0.3 * randomreal(_state);
+            if (randombool()) {
+               vu = 0.5 + 0.3 * randomreal();
             } else {
                vu = _state->v_posinf;
             }
@@ -85643,7 +85643,7 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
          //    "exit state" constraint.
          // 2. this test needs N >= 3
             ae_assert(n >= 3, "TestEC: expectation failed", _state);
-            jc = randominteger(n - 1, _state);
+            jc = randominteger(n - 1);
             vl = 0.85;
             vu = 0.95;
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
@@ -85662,7 +85662,7 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
          // * bound constraint with zero lower bound, which must be consistent
          // * bound constraint with non-zero lower bound, which must be inconsistent
             if (entrystate >= 0) {
-               jc = randominteger(n, _state);
+               jc = randominteger(n);
                testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
                mcpdaddtrack(&s, &xy, xy.rows, _state);
                mcpdaddbc(&s, entrystate, jc, 0.0, 1.0, _state);
@@ -85684,7 +85684,7 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
          // * bound constraint with zero lower bound, which must be consistent
          // * bound constraint with non-zero lower bound, which must be inconsistent
             if (exitstate >= 0) {
-               ic = randominteger(n, _state);
+               ic = randominteger(n);
                testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
                mcpdaddtrack(&s, &xy, xy.rows, _state);
                mcpdaddbc(&s, ic, exitstate, 0.0, 1.0, _state);
@@ -85710,9 +85710,9 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
                }
             }
             for (j = 1; j < n - 1; j++) {
-               i = 1 + randominteger(n - 2, _state);
-               bndl.xyR[i][j] = 0.5 - 0.1 * randomreal(_state);
-               bndu.xyR[i][j] = 0.5 + 0.1 * randomreal(_state);
+               i = 1 + randominteger(n - 2);
+               bndl.xyR[i][j] = 0.5 - 0.1 * randomreal();
+               bndu.xyR[i][j] = 0.5 + 0.1 * randomreal();
             }
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
@@ -85784,7 +85784,7 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
             ae_matrix_set_length(&xy, 2 * n, n, _state);
             for (i = 0; i < xy.rows; i++) {
                for (j = 0; j < xy.cols; j++) {
-                  xy.xyR[i][j] = randomreal(_state);
+                  xy.xyR[i][j] = randomreal();
                }
             }
          // Test that single linear equality/inequality constraint
@@ -85806,13 +85806,13 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
                   if (((i == 0 || i == n - 1) || j == 0) || j == n - 1) {
                      c.xyR[0][i * n + j] = 0.0;
                   } else {
-                     c.xyR[0][i * n + j] = randomreal(_state);
+                     c.xyR[0][i * n + j] = randomreal();
                      v += c.xyR[0][i * n + j] * (1.0 / n);
                   }
                }
             }
             c.xyR[0][n * n] = v;
-            ct.xZ[0] = randominteger(3, _state) - 1;
+            ct.xZ[0] = randominteger(3) - 1;
             if (ct.xZ[0] < 0) {
                c.xyR[0][n * n] += 0.1;
             }
@@ -85856,7 +85856,7 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
          // NOTE:
          // 1. this test needs N >= 2
             ae_assert(n >= 2, "TestLC: expectation failed", _state);
-            jc = randominteger(n - 1, _state);
+            jc = randominteger(n - 1);
             ae_matrix_set_length(&c, 1, n * n + 1, _state);
             ae_vector_set_length(&ct, 1, _state);
             for (i = 0; i < n * n; i++) {
@@ -85963,7 +85963,7 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
          ae_matrix_set_length(&xy, 2 * n, n, _state);
          for (i = 0; i < xy.rows; i++) {
             for (j = 0; j < xy.cols; j++) {
-               xy.xyR[i][j] = randomreal(_state);
+               xy.xyR[i][j] = randomreal();
             }
          }
       // Generate random constraints
@@ -85973,10 +85973,10 @@ static void testmcpdunit_testlc(bool *err, ae_state *_state) {
          // Generate constraint and its right part
             c.xyR[i][n * n] = 0.0;
             for (j = 0; j < n * n; j++) {
-               c.xyR[i][j] = 2 * randomreal(_state) - 1;
+               c.xyR[i][j] = randommid();
                c.xyR[i][n * n] += c.xyR[i][j] * (1.0 / n);
             }
-            ct.xZ[i] = randominteger(3, _state) - 1;
+            ct.xZ[i] = randominteger(3) - 1;
          // If we have inequality constraint, we "shift" right part
          // in order to make feasible some neighborhood of P=(1/N ... 1/N).
             if (ct.xZ[i] < 0) {
@@ -86108,7 +86108,7 @@ static void testknnunit_unsetknn(knnmodel *model, ae_state *_state) {
    NewObj(knnreport, rep, _state);
    ae_matrix_set_length(&xy, 1, 2, _state);
    xy.xyR[0][0] = 0.0;
-   xy.xyR[0][1] = randomreal(_state) - 0.5;
+   xy.xyR[0][1] = randomreal() - 0.5;
    knnbuildercreate(&builder, _state);
    knnbuildersetdatasetreg(&builder, &xy, 1, 1, 1, _state);
    knnbuilderbuildknnmodel(&builder, 1, 0.0, model, &rep, _state);
@@ -86832,7 +86832,7 @@ static bool testmlptrainunit_testmlptraines(ae_state *_state) {
       ae_vector_set_length(&y, 1, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j <= 1; j++) {
-            trnxy.xyR[i][j] = 2 * randomreal(_state) - 1;
+            trnxy.xyR[i][j] = randommid();
             valxy.xyR[i][j] = trnxy.xyR[i][j];
             x.xR[j] = trnxy.xyR[i][j];
          }
@@ -87131,18 +87131,18 @@ static bool testmlptrainunit_testmlptrainclass(ae_state *_state) {
       // Initialization:
       //  * create negative part of the set;
          for (i = 0; i < n / 2; i++) {
-            xy.xyR[i][0] = -1 * ((mxc - mnc) * randomreal(_state) + mnc);
+            xy.xyR[i][0] = -1 * ((mxc - mnc) * randomreal() + mnc);
             xy.xyR[i][1] = 0.0;
          }
       //  * create positive part of the set;
          for (i = n / 2; i < n; i++) {
-            xy.xyR[i][0] = (mxc - mnc) * randomreal(_state) + mnc;
+            xy.xyR[i][0] = (mxc - mnc) * randomreal() + mnc;
             xy.xyR[i][1] = 1.0;
          }
       //  * mix two parts.
          for (i = 0; i < n; i++) {
             do {
-               rndind = randominteger(n, _state);
+               rndind = randominteger(n);
             } while (rndind == i);
             tmp = xy.xyR[i][0];
             xy.xyR[i][0] = xy.xyR[rndind][0];
@@ -87194,7 +87194,7 @@ static bool testmlptrainunit_testmlptrainclass(ae_state *_state) {
          }
       // Test on random set
          for (i = 0; i < n; i++) {
-            x.xR[0] = pow(-1.0, (double)randominteger(2, _state)) * ((mxc - mnc) * randomreal(_state) + mnc);
+            x.xR[0] = pow(-1.0, (double)randominteger(2)) * ((mxc - mnc) * randomreal() + mnc);
             mlpprocess(&net, &x, &y, _state);
             if (x.xR[0] < 0.0 ? y.xR[0] < 0.95 && y.xR[1] > 0.05 : y.xR[0] > 0.05 && y.xR[1] < 0.95) {
                set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:745");
@@ -87398,25 +87398,25 @@ static bool testmlptrainunit_testmlpzeroweights(ae_state *_state) {
    sparseconverttocrs(&sds, _state);
    nxp = 10;
    for (xp = 1; xp <= nxp; xp++) {
-      c = randominteger(2, _state);
+      c = randominteger(2);
       iscls = c == 1;
-      c = randominteger(2, _state);
+      c = randominteger(2);
       issparse = c == 1;
    // Create trainer and network
       if (!iscls) {
       // Regression
-         nin = randominteger(mxnin, _state) + 1;
-         nout = randominteger(mxnout, _state) + 1;
+         nin = randominteger(mxnin) + 1;
+         nout = randominteger(mxnout) + 1;
          mlpcreatetrainer(nin, nout, &trainer, _state);
          mlpcreate0(nin, nout, &net, _state);
       } else {
       // Classification
-         nin = randominteger(mxnin, _state) + 1;
-         nout = randominteger(mxnout, _state) + 2;
+         nin = randominteger(mxnin) + 1;
+         nout = randominteger(mxnout) + 2;
          mlpcreatetrainercls(nin, nout, &trainer, _state);
          mlpcreatec0(nin, nout, &net, _state);
       }
-      n = randominteger(2, _state) - 1;
+      n = randominteger(2) - 1;
       if (n == 0) {
          if (!issparse) {
             mlpsetdataset(&trainer, &dds, n, _state);
@@ -87426,7 +87426,7 @@ static bool testmlptrainunit_testmlpzeroweights(ae_state *_state) {
       }
       mlpsetdecay(&trainer, vdecay, _state);
       mlpsetcond(&trainer, traineps, trainits, _state);
-      c = randominteger(2, _state);
+      c = randominteger(2);
       if (c == 0) {
          mlpstarttraining(&trainer, &net, true, _state);
          while (mlpcontinuetraining(&trainer, &net, _state)) {
@@ -87519,8 +87519,8 @@ static bool testmlptrainunit_testmlprestarts(ae_state *_state) {
       for (xp = 1; xp <= numxp; xp++) {
       // Create a train set
          for (i = 0; i < n; i++) {
-            xy.xyR[i][0] = 2 * randomreal(_state) - 1;
-            xy.xyR[i][1] = 2 * randomreal(_state) - 1;
+            xy.xyR[i][0] = randommid();
+            xy.xyR[i][1] = randommid();
          }
       // Create and train a neural network
          mlpcreate1(1, nneurons, 1, &net0, _state);
@@ -87622,7 +87622,7 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
    wstep = 0.0;
    foldscount = 5;
    nneedrest = 1;
-   ntest = randominteger(4, _state);
+   ntest = randominteger(4);
    nxp = 1000;
    maxits = 50;
    nin = 1;
@@ -87662,7 +87662,7 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
    mean = nxp / 2.0;
    numsigma = 3.0 * sqrt((double)nxp / 4.0);
    diffms = mean - numsigma;
-   issparse = randominteger(2, _state);
+   issparse = randominteger(2);
    if (isregr) {
       mlpcreate0(nin, nout, &net, _state);
       mlpcreatetrainer(nin, nout, &trainer, _state);
@@ -87689,19 +87689,19 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
       // Create training set
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               trainingset.xyR[i][j] = 2 * randomreal(_state) - 1;
+               trainingset.xyR[i][j] = randommid();
             }
          }
          if (isregr) {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = 2 * randomreal(_state) + 1;
+                  trainingset.xyR[i][j] = 2 * randomreal() + 1;
                }
             }
          } else {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = (double)randominteger(nout, _state);
+                  trainingset.xyR[i][j] = (double)randominteger(nout);
                }
             }
          }
@@ -87713,19 +87713,19 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
       // Create training set
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               sparseset(&sptrainingset, i, j, 2 * randomreal(_state) - 1, _state);
+               sparseset(&sptrainingset, i, j, randommid(), _state);
             }
          }
          if (isregr) {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  sparseset(&sptrainingset, i, j, 2 * randomreal(_state) + 1, _state);
+                  sparseset(&sptrainingset, i, j, 2 * randomreal() + 1, _state);
                }
             }
          } else {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  sparseset(&sptrainingset, i, j, (double)randominteger(nout, _state), _state);
+                  sparseset(&sptrainingset, i, j, (double)randominteger(nout), _state);
                }
             }
          }
@@ -87736,19 +87736,19 @@ static bool testmlptrainunit_testmlpcverror(ae_state *_state) {
    // Create test set
       for (i = 0; i < ntstpoints; i++) {
          for (j = 0; j < nin; j++) {
-            testset.xyR[i][j] = 2 * randomreal(_state) - 1;
+            testset.xyR[i][j] = randommid();
          }
       }
       if (isregr) {
          for (i = 0; i < ntstpoints; i++) {
             for (j = nin; j < rowsz; j++) {
-               testset.xyR[i][j] = 2 * randomreal(_state) + 1;
+               testset.xyR[i][j] = 2 * randomreal() + 1;
             }
          }
       } else {
          for (i = 0; i < ntstpoints; i++) {
             for (j = nin; j < rowsz; j++) {
-               testset.xyR[i][j] = (double)randominteger(nout, _state);
+               testset.xyR[i][j] = (double)randominteger(nout);
             }
          }
       }
@@ -87886,10 +87886,10 @@ static bool testmlptrainunit_testmlptrainens(ae_state *_state) {
                      xy.xyR[i][nin + j] = hqrndnormal(&rs, _state) + rdotrr(nin, &hf, j, &xy, i, _state);
                   }
                }
-               mlpecreate1(nin, nhid, nout, 1 + randominteger(3, _state), &ensemble, _state);
+               mlpecreate1(nin, nhid, nout, 1 + randominteger(3), &ensemble, _state);
             } else {
                ae_matrix_set_length(&xy, npoints, nin + 1, _state);
-               nclasses = 2 + randominteger(2, _state);
+               nclasses = 2 + randominteger(2);
                ae_assert(nclasses <= nin, "MLPTrain: bug in test", _state);
                for (i = 0; i < npoints; i++) {
                   for (j = 0; j < nin; j++) {
@@ -87907,7 +87907,7 @@ static bool testmlptrainunit_testmlptrainens(ae_state *_state) {
                      xy.xyR[i][nin] = (double)hqrnduniformi(&rs, nclasses, _state);
                   }
                }
-               mlpecreatec1(nin, nhid, nclasses, 1 + randominteger(3, _state), &ensemble, _state);
+               mlpecreatec1(nin, nhid, nclasses, 1 + randominteger(3), &ensemble, _state);
             }
             e = mlpermserror(&ensemble, &xy, npoints, _state);
             if (algtype == 0) {
@@ -87982,25 +87982,25 @@ static bool testmlptrainunit_testmlptrainensregr(ae_state *_state) {
    nout = 1;
    enssize = 100;
    for (xp = 1; xp <= 2; xp++) {
-      nin = randominteger(3, _state) + 1;
+      nin = randominteger(3) + 1;
       vectorsetlengthatleast(&x, nin, _state);
       mlpcreatetrainer(nin, nout, &trainer, _state);
       mlpsetdecay(&trainer, decay, _state);
       mlpsetcond(&trainer, wstep, maxits, _state);
       matrixsetlengthatleast(&xytrain, ntrain, nin + nout, _state);
       matrixsetlengthatleast(&xytest, ntest, nin + nout, _state);
-      withtrainer = randominteger(2, _state);
+      withtrainer = randominteger(2);
       issparse = 0;
       if (withtrainer == 0) {
          issparse = 0;
       }
       if (withtrainer == 1) {
-         issparse = randominteger(2, _state);
+         issparse = randominteger(2);
       }
    // Training set
       for (i = 0; i < ntrain; i++) {
          for (j = 0; j < nin; j++) {
-            xytrain.xyR[i][j] = (mxval - mnval) * randomreal(_state) + mnval;
+            xytrain.xyR[i][j] = (mxval - mnval) * randomreal() + mnval;
          }
          xytrain.xyR[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
@@ -88028,7 +88028,7 @@ static bool testmlptrainunit_testmlptrainensregr(ae_state *_state) {
    // Test set
       for (i = 0; i < ntest; i++) {
          for (j = 0; j < nin; j++) {
-            xytest.xyR[i][j] = (mxval - mnval) * randomreal(_state) + mnval;
+            xytest.xyR[i][j] = (mxval - mnval) * randomreal() + mnval;
          }
          xytest.xyR[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
@@ -88151,19 +88151,19 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
    mlpsetcond(&trainer, wstep, maxits, _state);
    nxp = 5;
    for (xp = 1; xp <= nxp; xp++) {
-      enssize = iround(pow(10.0, (double)(randominteger(2, _state) + 1)), _state);
-      withtrainer = randominteger(2, _state);
+      enssize = iround(pow(10.0, (double)(randominteger(2) + 1)), _state);
+      withtrainer = randominteger(2);
       issparse = 0;
       if (withtrainer == 0) {
          issparse = 0;
       }
       if (withtrainer == 1) {
-         issparse = randominteger(2, _state);
+         issparse = randominteger(2);
       }
       for (i = 0; i < ntrain; i++) {
          val = i % nin;
          for (j = 0; j < nin; j++) {
-            xytrain.xyR[i][j] = delta * (randomreal(_state) - 1);
+            xytrain.xyR[i][j] = delta * (randomreal() - 1);
          }
          xytrain.xyR[i][val]++;
          xytrain.xyR[i][nin] = (double)val;
@@ -88187,9 +88187,9 @@ static bool testmlptrainunit_testmlptrainenscls(ae_state *_state) {
       }
    // Create test set
       for (i = 0; i < ntest; i++) {
-         val = randominteger(nin, _state);
+         val = randominteger(nin);
          for (j = 0; j < nin; j++) {
-            xytest.xyR[i][j] = delta * (randomreal(_state) - 1);
+            xytest.xyR[i][j] = delta * (randomreal() - 1);
          }
          xytest.xyR[i][val]++;
          xytest.xyR[i][nin] = (double)val;
@@ -88605,15 +88605,15 @@ static void testalglibbasicsunit_createpoolandrecords(poolrec2 *seedrec2, poolre
    SetObj(poolrec2, seedrec2);
    SetObj(poolrec2, seedrec2copy);
    SetObj(ae_shared_pool, pool);
-   seedrec2->bval = randomreal(_state) > 0.5;
-   seedrec2->recval.bval = randomreal(_state) > 0.5;
-   seedrec2->recval.ival = randominteger(10, _state);
-   seedrec2->recval.rval = randomreal(_state);
-   seedrec2->recval.cval = complex_from_d(randomreal(_state), randomreal(_state));
+   seedrec2->bval = randombool();
+   seedrec2->recval.bval = randombool();
+   seedrec2->recval.ival = randominteger(10);
+   seedrec2->recval.rval = randomreal();
+   seedrec2->recval.cval = complex_from_d(randomreal(), randomreal());
    ae_vector_set_length(&seedrec2->recval.i1val, 3, _state);
-   seedrec2->recval.i1val.xZ[0] = randominteger(10, _state);
-   seedrec2->recval.i1val.xZ[1] = randominteger(10, _state);
-   seedrec2->recval.i1val.xZ[2] = randominteger(10, _state);
+   seedrec2->recval.i1val.xZ[0] = randominteger(10);
+   seedrec2->recval.i1val.xZ[1] = randominteger(10);
+   seedrec2->recval.i1val.xZ[2] = randominteger(10);
    seedrec2copy->bval = seedrec2->bval;
    seedrec2copy->recval.bval = seedrec2->recval.bval;
    seedrec2copy->recval.ival = seedrec2->recval.ival;
@@ -89027,7 +89027,7 @@ static bool testalglibbasicsunit_performtestsort0(ae_state *_state) {
       a.xZ[i] = i;
    }
    for (i = 0; i < n; i++) {
-      k = randominteger(n, _state);
+      k = randominteger(n);
       if (k != i) {
          t = a.xZ[i];
          a.xZ[i] = a.xZ[k];
@@ -89110,7 +89110,7 @@ static bool testalglibbasicsunit_performtestsort1(ae_state *_state) {
    }
 // round 0: parallel sorting of randomly permuted array
    for (i = 0; i < n; i++) {
-      k = randominteger(n, _state);
+      k = randominteger(n);
       if (k != i) {
          t = a.xZ[i];
          a.xZ[i] = a.xZ[k];
@@ -89120,7 +89120,7 @@ static bool testalglibbasicsunit_performtestsort1(ae_state *_state) {
    testalglibbasicsunit_testsort1func(&a, &buf, 0, n, true, _state);
 // round 1: result is randomly shuffled and sequentially sorted
    for (i = 0; i < n; i++) {
-      k = randominteger(n, _state);
+      k = randominteger(n);
       if (k != i) {
          t = a.xZ[i];
          a.xZ[i] = a.xZ[k];
@@ -89130,7 +89130,7 @@ static bool testalglibbasicsunit_performtestsort1(ae_state *_state) {
    testalglibbasicsunit_testsort1func(&a, &buf, 0, n, false, _state);
 // round 2: result is randomly shuffled (again) and sorted in parallel mode (again)
    for (i = 0; i < n; i++) {
-      k = randominteger(n, _state);
+      k = randominteger(n);
       if (k != i) {
          t = a.xZ[i];
          a.xZ[i] = a.xZ[k];
@@ -89155,7 +89155,7 @@ static void testalglibbasicsunit_testsort2func(ZVector *a, ZVector *buf, ae_int_
    if (idx2 <= idx0 + 1) {
       return;
    }
-   idx1 = idx0 + 1 + randominteger(idx2 - idx0 - 1, _state);
+   idx1 = idx0 + 1 + randominteger(idx2 - idx0 - 1);
    testalglibbasicsunit_testsort0func(a, buf, idx0, idx1, _state);
    testalglibbasicsunit_testsort0func(a, buf, idx1, idx2, _state);
    testalglibbasicsunit_mergesortedarrays(a, buf, idx0, idx1, idx2, _state);
@@ -89181,7 +89181,7 @@ static bool testalglibbasicsunit_performtestsort2(ae_state *_state) {
       a.xZ[i] = i;
    }
    for (i = 0; i < n; i++) {
-      k = randominteger(n, _state);
+      k = randominteger(n);
       if (k != i) {
          t = a.xZ[i];
          a.xZ[i] = a.xZ[k];
@@ -89239,14 +89239,14 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
    divrc = true;
    for (pass = 1; pass <= passcount; pass++) {
    // Test AbsC
-      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      ca = complex_from_d(randommid(), randommid());
       ra = abscomplex(ca, _state);
       absc = absc && fabs(ra - sqrt(sqr(ca.x, _state) + sqr(ca.y, _state))) < threshold;
    // test Add
-      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      ra = 2 * randomreal(_state) - 1;
-      rb = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(randommid(), randommid());
+      cb = complex_from_d(randommid(), randommid());
+      ra = randommid();
+      rb = randommid();
       res = ae_c_add(ca, cb);
       addcc = (addcc && fabs(res.x - ca.x - cb.x) < threshold) && fabs(res.y - ca.y - cb.y) < threshold;
       res = ae_c_add_d(ca, rb);
@@ -89254,10 +89254,10 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_add_d(cb, ra);
       addrc = (addrc && fabs(res.x - ra - cb.x) < threshold) && fabs(res.y - cb.y) < threshold;
    // test Sub
-      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      ra = 2 * randomreal(_state) - 1;
-      rb = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(randommid(), randommid());
+      cb = complex_from_d(randommid(), randommid());
+      ra = randommid();
+      rb = randommid();
       res = ae_c_sub(ca, cb);
       subcc = (subcc && fabs(res.x - (ca.x - cb.x)) < threshold) && fabs(res.y - (ca.y - cb.y)) < threshold;
       res = ae_c_sub_d(ca, rb);
@@ -89265,10 +89265,10 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_d_sub(ra, cb);
       subrc = (subrc && fabs(res.x - (ra - cb.x)) < threshold) && fabs(res.y + cb.y) < threshold;
    // test Mul
-      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
-      ra = 2 * randomreal(_state) - 1;
-      rb = 2 * randomreal(_state) - 1;
+      ca = complex_from_d(randommid(), randommid());
+      cb = complex_from_d(randommid(), randommid());
+      ra = randommid();
+      rb = randommid();
       res = ae_c_mul(ca, cb);
       mulcc = (mulcc && fabs(res.x - (ca.x * cb.x - ca.y * cb.y)) < threshold) && fabs(res.y - (ca.x * cb.y + ca.y * cb.x)) < threshold;
       res = ae_c_mul_d(ca, rb);
@@ -89276,13 +89276,13 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent, ae_state *_
       res = ae_c_mul_d(cb, ra);
       mulrc = (mulrc && fabs(res.x - ra * cb.x) < threshold) && fabs(res.y - ra * cb.y) < threshold;
    // test Div
-      ca = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+      ca = complex_from_d(randommid(), randommid());
       do {
-         cb = complex_from_d(2 * randomreal(_state) - 1, 2 * randomreal(_state) - 1);
+         cb = complex_from_d(randommid(), randommid());
       } while (abscomplex(cb, _state) <= 0.5);
-      ra = 2 * randomreal(_state) - 1;
+      ra = randommid();
       do {
-         rb = 2 * randomreal(_state) - 1;
+         rb = randommid();
       } while (fabs(rb) <= 0.5);
       res = ae_c_div(ca, cb);
       divcc = (divcc && fabs(ae_c_mul(res, cb).x - ca.x) < threshold) && fabs(ae_c_mul(res, cb).y - ca.y) < threshold;
@@ -89882,15 +89882,15 @@ static bool testalglibbasicsunit_testserializationfunctions(bool silent, ae_stat
          for (nr = 1; nr <= 4; nr++) {
             ae_vector_set_length(&r0.b, nb, _state);
             for (i = 0; i < nb; i++) {
-               r0.b.xB[i] = randominteger(2, _state) != 0;
+               r0.b.xB[i] = randominteger(2) != 0;
             }
             ae_vector_set_length(&r0.i, ni, _state);
             for (i = 0; i < ni; i++) {
-               r0.i.xZ[i] = randominteger(10, _state) - 5;
+               r0.i.xZ[i] = randominteger(10) - 5;
             }
             ae_vector_set_length(&r0.r, nr, _state);
             for (i = 0; i < nr; i++) {
-               r0.r.xR[i] = 2 * randomreal(_state) - 1;
+               r0.r.xR[i] = randommid();
             }
             {
             // This code passes data structure through serializers

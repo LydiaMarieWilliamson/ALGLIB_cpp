@@ -5311,7 +5311,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n, ae_sta
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (n == 1) {
    // Special case
-      tau = (double)(2 * randominteger(2, _state) - 1);
+      tau = (double)(2 * randominteger(2) - 1);
       for (i = 0; i < m; i++) {
          a->xyR[i][0] *= tau;
       }
@@ -5435,7 +5435,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n, ae_stat
    ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!", _state);
    if (m == 1) {
    // special case
-      tau = (double)(2 * randominteger(2, _state) - 1);
+      tau = (double)(2 * randominteger(2) - 1);
       for (j = 0; j < n; j++) {
          a->xyR[0][j] *= tau;
       }
@@ -5633,7 +5633,7 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, n, n, _state);
    if (n == 1) {
    // special case
-      a->xyR[0][0] = (double)(2 * randominteger(2, _state) - 1);
+      a->xyR[0][0] = (double)(2 * randominteger(2) - 1);
       ae_frame_leave(_state);
       return;
    }
@@ -5848,7 +5848,7 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, n, n, _state);
    if (n == 1) {
    // special case
-      a->xyR[0][0] = (double)(2 * randominteger(2, _state) - 1);
+      a->xyR[0][0] = (double)(2 * randominteger(2) - 1);
       ae_frame_leave(_state);
       return;
    }
@@ -5895,7 +5895,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_matrix_set_length(a, n, n, _state);
    if (n == 1) {
    // special case
-      a->xyC[0][0] = complex_from_i(2 * randominteger(2, _state) - 1);
+      a->xyC[0][0] = complex_from_i(2 * randominteger(2) - 1);
       ae_frame_leave(_state);
       return;
    }
@@ -11837,7 +11837,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
                *a = *d + z;
                *d -= bcmax / z * bcmis;
             // Compute B and the rotation matrix
-               tau = pythag2(*c, z, _state);
+               tau = safepythag2(*c, z, _state);
                *cs = z / tau;
                *sn = *c / tau;
                *b -= (*c);
@@ -11846,7 +11846,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
             // Complex eigenvalues, or real (almost) equal eigenvalues.
             // Make diagonal elements equal.
                sigma = *b + (*c);
-               tau = pythag2(sigma, temp, _state);
+               tau = safepythag2(sigma, temp, _state);
                *cs = sqrt(0.5 * (1 + fabs(sigma) / tau));
                *sn = -p / (tau * (*cs)) * hsschur_extschursign(1.0, sigma, _state);
             // Compute [ AA  BB ] = [ A  B ] [ CS -SN ]
@@ -12536,7 +12536,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
                      temp = 1 / rmax2(fabs(vv.xR[itemp]), smlnum, _state);
                      p1 = nv + 1;
                      ae_v_muld(&vv.xR[1], 1, p1, temp);
-                     absw = pythag2(wr->xR[j], wi->xR[j], _state);
+                     absw = safepythag2(wr->xR[j], wi->xR[j], _state);
                      temp *= absw * absw;
                      matrixvectormultiply(h, l, l + nv + 1, l, l + nv, false, &vv, 1, nv + 1, 1.0, &v, 1, nv + 2, temp, _state);
                      nv += 2;

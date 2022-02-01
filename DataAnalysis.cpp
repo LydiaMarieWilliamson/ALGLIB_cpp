@@ -2008,8 +2008,8 @@ void mlprandomizefull(multilayerperceptron *network, ae_state *_state) {
 // Process network
    mlprandomize(network, _state);
    for (i = 0; i < nin; i++) {
-      network->columnmeans.xR[i] = randomreal(_state) - 0.5;
-      network->columnsigmas.xR[i] = randomreal(_state) + 0.5;
+      network->columnmeans.xR[i] = randomreal() - 0.5;
+      network->columnsigmas.xR[i] = randomreal() + 0.5;
    }
    if (!mlpissoftmax(network, _state)) {
       for (i = 0; i < nout; i++) {
@@ -2017,12 +2017,12 @@ void mlprandomizefull(multilayerperceptron *network, ae_state *_state) {
          ntype = network->structinfo.xZ[offs + 0];
          if (ntype == 0) {
          // Shifts are changed only for linear outputs neurons
-            network->columnmeans.xR[nin + i] = 2 * randomreal(_state) - 1;
+            network->columnmeans.xR[nin + i] = randommid();
          }
          if (ntype == 0 || ntype == 3) {
          // Scales are changed only for linear or bounded outputs neurons.
          // Note that scale randomization preserves sign.
-            network->columnsigmas.xR[nin + i] = sign(network->columnsigmas.xR[nin + i], _state) * (1.5 * randomreal(_state) + 0.5);
+            network->columnsigmas.xR[nin + i] = sign(network->columnsigmas.xR[nin + i], _state) * (1.5 * randomreal() + 0.5);
          }
       }
    }
@@ -7623,7 +7623,7 @@ void mlpecreatefromnetwork(multilayerperceptron *network, ae_int_t ensemblesize,
    ae_vector_set_length(&ensemble->columnmeans, ensemblesize * ccount, _state);
    ae_vector_set_length(&ensemble->columnsigmas, ensemblesize * ccount, _state);
    for (i = 0; i < ensemblesize * wcount; i++) {
-      ensemble->weights.xR[i] = randomreal(_state) - 0.5;
+      ensemble->weights.xR[i] = randomreal() - 0.5;
    }
    for (i = 0; i < ensemblesize; i++) {
       ae_v_move(&ensemble->columnmeans.xR[i * ccount], 1, network->columnmeans.xR, 1, ccount);
@@ -7829,7 +7829,7 @@ void mlperandomize(mlpensemble *ensemble, ae_state *_state) {
    ae_int_t wcount;
    wcount = mlpgetweightscount(&ensemble->network, _state);
    for (i = 0; i < ensemble->ensemblesize * wcount; i++) {
-      ensemble->weights.xR[i] = randomreal(_state) - 0.5;
+      ensemble->weights.xR[i] = randomreal() - 0.5;
    }
 }
 
@@ -12382,7 +12382,7 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
    if (s->rdfglobalseed > 0) {
       hqrndseed(s->rdfglobalseed, 1 + treeidx, &rs, _state);
    } else {
-      hqrndseed(randominteger(30000, _state), 1 + treeidx, &rs, _state);
+      hqrndseed(randominteger(30000), 1 + treeidx, &rs, _state);
    }
 // Retrieve buffers.
    ae_shared_pool_retrieve(&s->workpool, &_workbuf, _state);
@@ -12847,7 +12847,7 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s, ae_sta
    if (s->rdfglobalseed > 0) {
       hqrndseed(s->rdfglobalseed, 3532, &rs, _state);
    } else {
-      hqrndseed(randominteger(30000, _state), 3532, &rs, _state);
+      hqrndseed(randominteger(30000), 3532, &rs, _state);
    }
 // Generic processing
    ae_assert(npoints >= 1, "BuildRandomForest: integrity check failed", _state);
@@ -13749,7 +13749,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
 // combination of session and local seeds).
    sessionseed = s->rdfglobalseed;
    if (s->rdfglobalseed <= 0) {
-      sessionseed = randominteger(30000, _state);
+      sessionseed = randominteger(30000);
    }
 // Prepare In-and-Out-of-Bag matrix, if needed
    s->neediobmatrix = s->rdfimportance == dforest_needpermutation;
@@ -21416,7 +21416,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    mlpinitpreprocessor(&network, xy, npoints, _state);
    mlpproperties(&network, &nin, &nout, &wcount, _state);
    for (i = 0; i < wcount; i++) {
-      network.weights.xR[i] = (2 * randomreal(_state) - 1) / nvars;
+      network.weights.xR[i] = randommid() / nvars;
    }
    ae_vector_set_length(&g, wcount - 1 + 1, _state);
    ae_matrix_set_length(&h, wcount - 1 + 1, wcount - 1 + 1, _state);
@@ -24590,8 +24590,9 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
          do {
             trnsubsetsize = 0;
             valsubsetsize = 0;
+            const double pv = 2.0/3.0; // Randomly assign samples to training or validation sets with 2:1 odds.
             for (i = 0; i < s->npoints; i++) {
-               if (randomreal(_state) < 0.66) {
+               if (randombool(pv)) {
                // Assign sample to training set
                   psession->trnsubset.xZ[trnsubsetsize] = i;
                   trnsubsetsize++;
@@ -25629,12 +25630,13 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    rep->ncholesky = 0;
 // train networks
    for (k = 0; k < ensemble->ensemblesize; k++) {
+      const double pv = 2.0/3.0; // Randomly assign samples to training or validation sets with 2:1 odds.
    // Split set
       do {
          trnsize = 0;
          valsize = 0;
          for (i = 0; i < npoints; i++) {
-            if (randomreal(_state) < 0.66) {
+            if (randombool(pv)) {
             // Assign sample to training set
                ae_v_move(trnxy.xyR[trnsize], 1, xy->xyR[i], 1, ccount);
                trnsize++;

@@ -3839,17 +3839,23 @@ double rboundval(double x, double b1, double b2, ae_state *_state) {
    return result;
 }
 
-double randomreal(ae_state *state) {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)RAND_MAX + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
+double randomreal() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
 }
 
-ae_int_t randominteger(ae_int_t maxv, ae_state *state) {
+double randommid() {
+   const double mx = (double)RAND_MAX + 1.0; 
+   return 2.0 * (rand() + rand() / mx) / mx - 1.0;
+}  
+
+ae_int_t randominteger(ae_int_t maxv) {
    return rand() % maxv;
+}
+   
+bool randombool(double p/* = 0.5*/) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p * mx;
 }
 
 // Complex math functions
@@ -8448,16 +8454,22 @@ int sign(double x) {
 }
 
 double randomreal() {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)RAND_MAX + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
+}
+
+double randommid() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return 2.0 * (rand() + rand() / mx) / mx - 1.0;
 }
 
 ae_int_t randominteger(ae_int_t maxv) {
    return (ae_int_t)rand() % maxv;
+}
+
+bool randombool(double p/* = 0.5*/) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p * mx;
 }
 
 int round(double x) {

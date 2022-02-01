@@ -1834,7 +1834,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgstate state;
          mincgreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20 * randomreal() - 10;
+         double x0 = 10.0 * randommid();
          double epsx = 1.0E-9;
          mincgcreate(1, x, state);
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
@@ -1852,7 +1852,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmstate state;
          minlmreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20 * randomreal() - 10;
+         double x0 = 10.0 * randommid();
          double epsx = 1.0E-9;
          minlmcreatevj(1, 2, x, state);
          minlmsetcond(state, epsx, 0);

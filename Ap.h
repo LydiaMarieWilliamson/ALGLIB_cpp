@@ -688,8 +688,21 @@ double sqr(double x, ae_state *state);
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state);
 double rboundval(double x, double b1, double b2, ae_state *_state);
 
-double randomreal(ae_state *state);
-ae_int_t randominteger(ae_int_t maxv, ae_state *state);
+// Debug-support.
+#if 0 //(@) Not used anywhere, and not useful for debugging.
+// Flush the console.
+#   define flushconsole(s) fflush(stdout)
+#endif
+
+// Debug-enabled random number functions:
+// TODO:
+// ∙  ae_set_seed():          set the seed of the debug random number generator (NOT thread-safe!!!).
+// ∙  ae_get_seed():          the seed value of the debug random number generator (NOT thread-safe!!!).
+// ∙  ae_debugrng():          a random number generated with a high-quality random number generator.
+double randomreal();
+double randommid();
+ae_int_t randominteger(ae_int_t maxv);
+bool randombool(double p = 0.5);
 
 // Complex math functions:
 // *	basic arithmetic operations
@@ -1066,19 +1079,10 @@ extern const double machineepsilon, maxrealnumber, minrealnumber;
 extern const ae_int_t endianness;
 int sign(double x);
 
-// Debug-support.
-#if 0 //(@) Not used anywhere, and not useful for debugging.
-// Flush the console.
-#   define flushconsole(s) fflush(stdout)
-#endif
-
-// Debug-enabled random number functions:
-// TODO:
-// *  ae_set_seed():          set the seed of the debug random number generator (NOT thread-safe!!!).
-// *  ae_get_seed():          the seed value of the debug random number generator (NOT thread-safe!!!).
-// *  ae_debugrng():          a random number generated with a high-quality random number generator.
 double randomreal();
+double randommid();
 ae_int_t randominteger(ae_int_t maxv);
+bool randombool(double p = 0.5);
 
 int round(double x);
 int trunc(double x);

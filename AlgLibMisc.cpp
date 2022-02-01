@@ -54,8 +54,8 @@ void hqrndrandomize(hqrndstate *state, ae_state *_state) {
    ae_int_t s0;
    ae_int_t s1;
    SetObj(hqrndstate, state);
-   s0 = randominteger(hqrnd_hqrndm1, _state);
-   s1 = randominteger(hqrnd_hqrndm2, _state);
+   s0 = randominteger(hqrnd_hqrndm1);
+   s1 = randominteger(hqrnd_hqrndm2);
    hqrndseed(s0, s1, state, _state);
 }
 

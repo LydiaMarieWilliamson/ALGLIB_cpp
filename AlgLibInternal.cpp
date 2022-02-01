@@ -85,19 +85,19 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_sta
    ae_vector_set_length(y, n, _state);
    if (n > 1) {
       x->xR[0] = a;
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
          if (i != n - 1) {
-            x->xR[i] = a + (i + 0.2 * (2 * randomreal(_state) - 1)) * h;
+            x->xR[i] = a + (i + 0.2 * randommid()) * h;
          } else {
             x->xR[i] = b;
          }
-         y->xR[i] = y->xR[i - 1] + (2 * randomreal(_state) - 1) * (x->xR[i] - x->xR[i - 1]);
+         y->xR[i] = y->xR[i - 1] + randommid() * (x->xR[i] - x->xR[i - 1]);
       }
    } else {
       x->xR[0] = 0.5 * (a + b);
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
    }
 }
 
@@ -116,15 +116,15 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y
    ae_vector_set_length(y, n, _state);
    if (n > 1) {
       x->xR[0] = a;
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
          x->xR[i] = a + i * h;
-         y->xR[i] = y->xR[i - 1] + (2 * randomreal(_state) - 1) * h;
+         y->xR[i] = y->xR[i - 1] + randommid() * h;
       }
    } else {
       x->xR[0] = 0.5 * (a + b);
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
    }
 }
 
@@ -144,14 +144,14 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y, a
       for (i = 0; i < n; i++) {
          x->xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(pi * (2 * i + 1) / (2 * n));
          if (i == 0) {
-            y->xR[i] = 2 * randomreal(_state) - 1;
+            y->xR[i] = randommid();
          } else {
-            y->xR[i] = y->xR[i - 1] + (2 * randomreal(_state) - 1) * (x->xR[i] - x->xR[i - 1]);
+            y->xR[i] = y->xR[i - 1] + randommid() * (x->xR[i] - x->xR[i - 1]);
          }
       }
    } else {
       x->xR[0] = 0.5 * (a + b);
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
    }
 }
 
@@ -171,14 +171,14 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y, a
       for (i = 0; i < n; i++) {
          x->xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(pi * i / (n - 1));
          if (i == 0) {
-            y->xR[i] = 2 * randomreal(_state) - 1;
+            y->xR[i] = randommid();
          } else {
-            y->xR[i] = y->xR[i - 1] + (2 * randomreal(_state) - 1) * (x->xR[i] - x->xR[i - 1]);
+            y->xR[i] = y->xR[i - 1] + randommid() * (x->xR[i] - x->xR[i - 1]);
          }
       }
    } else {
       x->xR[0] = 0.5 * (a + b);
-      y->xR[0] = 2 * randomreal(_state) - 1;
+      y->xR[0] = randommid();
    }
 }
 
@@ -876,8 +876,8 @@ double randomnormal(ae_state *_state) {
    double s;
    double result;
    while (true) {
-      u = 2 * randomreal(_state) - 1;
-      v = 2 * randomreal(_state) - 1;
+      u = randommid();
+      v = randommid();
       s = sqr(u, _state) + sqr(v, _state);
       if (s > 0.0 && s < 1.0) {
       // two Sqrt's instead of one to
@@ -6431,24 +6431,6 @@ void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_
          ae_v_addd(&y->xR[iy1], 1, &a->xyR[i][j1], 1, iy2 - iy1 + 1, v);
       }
    }
-}
-
-double pythag2(double x, double y, ae_state *_state) {
-   double w;
-   double xabs;
-   double yabs;
-   double z;
-   double result;
-   xabs = fabs(x);
-   yabs = fabs(y);
-   w = rmax2(xabs, yabs, _state);
-   z = rmin2(xabs, yabs, _state);
-   if (z == 0.0) {
-      result = w;
-   } else {
-      result = w * sqrt(1 + sqr(z / w, _state));
-   }
-   return result;
 }
 
 void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work, ae_state *_state) {

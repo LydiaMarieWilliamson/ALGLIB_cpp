@@ -424,6 +424,12 @@ A6.2. Test Stages
 	―	Removed the unused or redundant types s{boolean,integer,real,complex}[array] from AlgLibInternal.{cpp,h};
 	―	Converted sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector;
 	―	Redefined and replaced srealarray_{init,copy,free} by RVector_{init,copy,free}.
+0-39	Recode random*():
+	―	Synthesize new routines: randombool(), randommid().
+	―	Remove the state variable from alglib_impl::randominteger() and alglib_impl::randomreal().
+∙	Recode *pythag2():
+	―	Removed pythag2() from AlgLibInternal.{cpp,h} - it is a duplicate of safepythag2();
+		replaced pythag2() in LinAlg.cpp by safepythag2().
 
 A6.3. Test Results
 ──────────────────
@@ -455,6 +461,7 @@ A6.3. Test Results
 39	6803 1.1x 11629 1.0x 11909 1.0x 9143 1.0x 1643389187 (61f42103) 81 // Nativize floating point constants and operations.
 39	7752 1.0x 12501 1.0x 12199 1.0x 9608 1.0x 1643680716 (61f893cc) // Remove translator-artifacts. (Crashed in TestC at testspline2d.)
 39	8000 1.0x 12196 1.0x 12199 1.0x 9187 1.0x 1643685611 (61f8a6eb) 80 // Remove translator-artifacts. (Corrected.)
+39	7937 1.0x 12501 1.0x 10873 0.9x 9172 1.1x 1643757812 (61f9c0f4) 80 // Recode random*() and *pythag2().
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -511,19 +518,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8000
+* RGEMM-SEQ-16   (MFLOPS)   7937
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12196
+* RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
-* RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9187
-* RGEMM-MTN-1024            1.0x
+* RGEMM-SEQ-64   (MFLOPS)  10873
+* RGEMM-MTN-64              0.9x
+* RGEMM-SEQ-1024 (MFLOPS)   9172
+* RGEMM-MTN-1024            1.1x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643685611
+SEED: 1643757812
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
