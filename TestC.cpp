@@ -2906,7 +2906,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn, ae_state *_stat
                rc.xyR[i][j] = randomreal(_state);
                rct.xyR[j][i] = rc.xyR[i][j];
                cc.xyC[i][j] = complex_from_d(randomreal(_state));
-               cct.xyC[j][i] = cct.xyC[j][i];
+               cct.xyC[j][i] = cc.xyC[i][j]; //(@) Was cct.xyC[j][i] = cct.xyC[j][i];
             }
          }
       }
