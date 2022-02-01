@@ -785,9 +785,9 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       y = -y;
       s = (double)sign(rho, _state);
       if (s > 0.0) {
-         fxys = normalcdf(-maxreal(x, y, _state), _state);
+         fxys = normalcdf(-rmax2(x, y, _state), _state);
       } else {
-         fxys = maxreal(0.0, normalcdf(-x, _state) - normalcdf(y, _state), _state);
+         fxys = rmax2(0.0, normalcdf(-x, _state) - normalcdf(y, _state), _state);
       }
       rangea = 0.0;
       rangeb = sqrt((1 - rho) * (1 + rho));
@@ -822,8 +822,8 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       v1 = v1 * 0.5 * (rangeb - rangea) / (2 * pi);
       result = fxys - s * (v0 + v1);
    }
-   result = maxreal(result, 0.0, _state);
-   result = minreal(result, 1.0, _state);
+   result = rmax2(result, 0.0, _state);
+   result = rmin2(result, 1.0, _state);
    return result;
 }
 } // end of namespace alglib_impl

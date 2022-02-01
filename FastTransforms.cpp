@@ -831,7 +831,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    // main overlap-add cycle
       i = 0;
       while (i < m) {
-         p = minint(q, m - i, _state);
+         p = imin2(q, m - i, _state);
          for (j = 0; j < p; j++) {
             buf.xR[2 * j + 0] = a->xC[i + j].x;
             buf.xR[2 * j + 1] = a->xC[i + j].y;
@@ -854,7 +854,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftapplyplan(&plan, &buf, 0, 1, _state);
          t = 1.0 / (q + n - 1);
          if (circular) {
-            j1 = minint(i + p + n - 2, m - 1, _state) - i;
+            j1 = imin2(i + p + n - 2, m - 1, _state) - i;
             j2 = j1 + 1;
          } else {
             j1 = p + n - 2;
@@ -1032,7 +1032,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(buf.xC, 1, &r->xC[i1], 1, "N", j2 + 1);
          i1 += m;
@@ -1094,7 +1094,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(cbuf.xC, 1, &b->xC[i1], 1, "N", j2 + 1);
          i1 += m;
@@ -1187,7 +1187,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
 // handle special cases
-   if (minint(m, n, _state) <= 2) {
+   if (imin2(m, n, _state) <= 2) {
       alg = 0;
    }
 // Auto-select
@@ -1408,7 +1408,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    // main overlap-add cycle
       i = 0;
       while (i < m) {
-         p = minint(q, m - i, _state);
+         p = imin2(q, m - i, _state);
          ae_v_move(buf.xR, 1, &a->xR[i], 1, p);
          for (j = p; j < q + n - 1; j++) {
             buf.xR[j] = 0.0;
@@ -1428,7 +1428,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          }
          fftr1dinvinternaleven(&buf, q + n - 1, &buf3, &plan, _state);
          if (circular) {
-            j1 = minint(i + p + n - 2, m - 1, _state) - i;
+            j1 = imin2(i + p + n - 2, m - 1, _state) - i;
             j2 = j1 + 1;
          } else {
             j1 = p + n - 2;
@@ -1581,7 +1581,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &r->xR[i1], 1, j2 + 1);
          i1 += m;
@@ -1645,7 +1645,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(buf.xR, 1, &b->xR[i1], 1, j2 + 1);
          i1 += m;
@@ -1873,7 +1873,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_cadd(b.xC, 1, &pattern->xC[i1], 1, "N", j2 + 1);
          i1 += m;
@@ -1993,7 +1993,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
       }
       i1 = 0;
       while (i1 < n) {
-         i2 = minint(i1 + m - 1, n - 1, _state);
+         i2 = imin2(i1 + m - 1, n - 1, _state);
          j2 = i2 - i1;
          ae_v_add(b.xR, 1, &pattern->xR[i1], 1, j2 + 1);
          i1 += m;

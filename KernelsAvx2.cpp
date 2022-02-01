@@ -503,7 +503,7 @@ void rmergeminv_avx2(ae_int_t n, const Real *__restrict y, Real *__restrict x, a
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) = minreal(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
+         *(double *)(pDest + i) = rmin2(*(const double *)(pSrc + i), *(const double *)(pDest + i), _state);
          break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_min_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));

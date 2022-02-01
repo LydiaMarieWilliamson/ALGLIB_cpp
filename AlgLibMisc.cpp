@@ -297,8 +297,8 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
    do {
       hqrndnormal2(state, x, y, _state);
    } while (!(*x != 0.0 || *y != 0.0));
-   mx = maxreal(fabs(*x), fabs(*y), _state);
-   mn = minreal(fabs(*x), fabs(*y), _state);
+   mx = rmax2(fabs(*x), fabs(*y), _state);
+   mn = rmin2(fabs(*x), fabs(*y), _state);
    v = mx * sqrt(1 + sqr(mn / mx, _state));
    *x /= v;
    *y /= v;
@@ -377,8 +377,6 @@ double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_sta
 }
 
 void hqrndstate_init(void *_p, ae_state *_state, bool make_automatic) {
-   hqrndstate *p = (hqrndstate *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -390,8 +388,6 @@ void hqrndstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 }
 
 void hqrndstate_free(void *_p, bool make_automatic) {
-   hqrndstate *p = (hqrndstate *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -1199,7 +1195,6 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix 
 
 void xdebugrecord1_init(void *_p, ae_state *_state, bool make_automatic) {
    xdebugrecord1 *p = (xdebugrecord1 *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->a, 0, DT_REAL, _state, make_automatic);
 }
 
@@ -1213,7 +1208,6 @@ void xdebugrecord1_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 
 void xdebugrecord1_free(void *_p, bool make_automatic) {
    xdebugrecord1 *p = (xdebugrecord1 *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->a, make_automatic);
 }
 } // end of namespace alglib_impl
@@ -1824,7 +1818,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *
    ae_vector_set_length(&buf->boxmax, kdt->nx, _state);
    ae_vector_set_length(&buf->idx, kdt->n, _state);
    ae_vector_set_length(&buf->r, kdt->n, _state);
-   ae_vector_set_length(&buf->buf, maxint(kdt->n, kdt->nx, _state), _state);
+   ae_vector_set_length(&buf->buf, imax2(kdt->n, kdt->nx, _state), _state);
    ae_vector_set_length(&buf->curboxmin, kdt->nx, _state);
    ae_vector_set_length(&buf->curboxmax, kdt->nx, _state);
    buf->kcur = 0;
@@ -1903,8 +1897,8 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    ae_v_move(kdt->boxmax.xR, 1, kdt->xy.xyR[0], 1, nx);
    for (i = 1; i < n; i++) {
       for (j = 0; j < nx; j++) {
-         kdt->boxmin.xR[j] = minreal(kdt->boxmin.xR[j], kdt->xy.xyR[i][j], _state);
-         kdt->boxmax.xR[j] = maxreal(kdt->boxmax.xR[j], kdt->xy.xyR[i][j], _state);
+         kdt->boxmin.xR[j] = rmin2(kdt->boxmin.xR[j], kdt->xy.xyR[i][j], _state);
+         kdt->boxmax.xR[j] = rmax2(kdt->boxmax.xR[j], kdt->xy.xyR[i][j], _state);
       }
    }
 // Generate tree
@@ -1980,7 +1974,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
    ae_assert(buf->x.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->idx.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->r.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
-   ae_assert(buf->buf.cnt >= maxint(kdt->n, kdt->nx, _state), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
+   ae_assert(buf->buf.cnt >= imax2(kdt->n, kdt->nx, _state), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->curboxmin.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
    ae_assert(buf->curboxmax.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure", _state);
 }
@@ -2006,10 +2000,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
          buf->curboxmin.xR[i] = vmin;
          buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = maxreal(buf->curdist, vmin - vx, _state);
+            buf->curdist = rmax2(buf->curdist, vmin - vx, _state);
          } else {
             if (vx > vmax) {
-               buf->curdist = maxreal(buf->curdist, vx - vmax, _state);
+               buf->curdist = rmax2(buf->curdist, vx - vmax, _state);
             }
          }
       }
@@ -2082,7 +2076,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          nx = kdt->nx;
          if (kdt->normtype == 0) {
             for (j = 0; j < nx; j++) {
-               ptdist = maxreal(ptdist, fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]), _state);
+               ptdist = rmax2(ptdist, fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]), _state);
             }
          }
          if (kdt->normtype == 1) {
@@ -2164,13 +2158,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             v = buf->curboxmin.xR[d];
             if (t1 <= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = maxreal(buf->curdist, s - t1, _state);
+                  buf->curdist = rmax2(buf->curdist, s - t1, _state);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= maxreal(v, t1, _state) - s;
+                  buf->curdist -= rmax2(v, t1, _state) - s;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= sqr(maxreal(v - t1, 0.0, _state), _state) - sqr(s - t1, _state);
+                  buf->curdist -= sqr(rmax2(v - t1, 0.0, _state), _state) - sqr(s - t1, _state);
                }
             }
             buf->curboxmin.xR[d] = s;
@@ -2180,13 +2174,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             v = buf->curboxmax.xR[d];
             if (t1 >= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = maxreal(buf->curdist, t1 - s, _state);
+                  buf->curdist = rmax2(buf->curdist, t1 - s, _state);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= s - minreal(v, t1, _state);
+                  buf->curdist -= s - rmin2(v, t1, _state);
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= sqr(maxreal(t1 - v, 0.0, _state), _state) - sqr(t1 - s, _state);
+                  buf->curdist -= sqr(rmax2(t1 - v, 0.0, _state), _state) - sqr(t1 - s, _state);
                }
             }
             buf->curboxmax.xR[d] = s;
@@ -2282,7 +2276,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
 // Check consistency of request buffer
    nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
 // Prepare parameters
-   k = minint(k, kdt->n, _state);
+   k = imin2(k, kdt->n, _state);
    buf->kneeded = k;
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
@@ -3306,8 +3300,8 @@ void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r, ae_state *_state) {
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state *_state) {
    ae_int_t i;
-   rvectorsetlengthatleast(boxmin, kdt->nx, _state);
-   rvectorsetlengthatleast(boxmax, kdt->nx, _state);
+   vectorsetlengthatleast(boxmin, kdt->nx, _state);
+   vectorsetlengthatleast(boxmax, kdt->nx, _state);
    for (i = 0; i < kdt->nx; i++) {
       boxmin->xR[i] = kdt->boxmin.xR[i];
       boxmax->xR[i] = kdt->boxmax.xR[i];
@@ -3371,7 +3365,7 @@ void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k, ae_
    offs = kdt->nodes.xZ[node + 1];
    ae_assert(offs >= 0, "KDTreeExploreLeaf: integrity error", _state);
    ae_assert(offs + (*k) - 1 < kdt->xy.rows, "KDTreeExploreLeaf: integrity error", _state);
-   rmatrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny, _state);
+   matrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny, _state);
    for (i = 0; i < *k; i++) {
       for (j = 0; j < kdt->nx + kdt->ny; j++) {
          xy->xyR[i][j] = kdt->xy.xyR[offs + i][kdt->nx + j];
@@ -3484,15 +3478,15 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
    ae_int_t i1;
    SetObj(kdtree, tree);
 // check correctness of header
-   ae_serializer_unserialize_int(s, &i0, _state);
+   i0 = ae_serializer_unserialize_int(s, _state);
    ae_assert(i0 == getkdtreeserializationcode(_state), "KDTreeUnserialize: stream header corrupted", _state);
-   ae_serializer_unserialize_int(s, &i1, _state);
+   i1 = ae_serializer_unserialize_int(s, _state);
    ae_assert(i1 == nearestneighbor_kdtreefirstversion, "KDTreeUnserialize: stream header corrupted", _state);
 // Unserialize data
-   ae_serializer_unserialize_int(s, &tree->n, _state);
-   ae_serializer_unserialize_int(s, &tree->nx, _state);
-   ae_serializer_unserialize_int(s, &tree->ny, _state);
-   ae_serializer_unserialize_int(s, &tree->normtype, _state);
+   tree->n = ae_serializer_unserialize_int(s, _state);
+   tree->nx = ae_serializer_unserialize_int(s, _state);
+   tree->ny = ae_serializer_unserialize_int(s, _state);
+   tree->normtype = ae_serializer_unserialize_int(s, _state);
    unserializerealmatrix(s, &tree->xy, _state);
    unserializeintegerarray(s, &tree->tags, _state);
    unserializerealarray(s, &tree->boxmin, _state);
@@ -3504,7 +3498,6 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree, ae_state *_state) {
 
 void kdtreerequestbuffer_init(void *_p, ae_state *_state, bool make_automatic) {
    kdtreerequestbuffer *p = (kdtreerequestbuffer *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->boxmin, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->boxmax, 0, DT_REAL, _state, make_automatic);
@@ -3536,7 +3529,6 @@ void kdtreerequestbuffer_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void kdtreerequestbuffer_free(void *_p, bool make_automatic) {
    kdtreerequestbuffer *p = (kdtreerequestbuffer *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->boxmin, make_automatic);
    ae_vector_free(&p->boxmax, make_automatic);
@@ -3549,7 +3541,6 @@ void kdtreerequestbuffer_free(void *_p, bool make_automatic) {
 
 void kdtree_init(void *_p, ae_state *_state, bool make_automatic) {
    kdtree *p = (kdtree *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->xy, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->tags, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->boxmin, 0, DT_REAL, _state, make_automatic);
@@ -3578,7 +3569,6 @@ void kdtree_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) 
 
 void kdtree_free(void *_p, bool make_automatic) {
    kdtree *p = (kdtree *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->xy, make_automatic);
    ae_vector_free(&p->tags, make_automatic);
    ae_vector_free(&p->boxmin, make_automatic);

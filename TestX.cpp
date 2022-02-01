@@ -37,7 +37,6 @@ struct innerrec {
 
 void innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *p = (innerrec *)_p;
-   alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, _state, make_automatic);
 }
 
@@ -53,7 +52,6 @@ void innerrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool m
 
 void innerrec_free(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *)_p;
-   alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
@@ -65,7 +63,6 @@ struct seedrec {
 
 void seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *p = (seedrec *)_p;
-   alglib_impl::ae_touch_ptr((void *)p);
    innerrec_init(&p->recval, _state, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, _state, make_automatic);
 }
@@ -80,7 +77,6 @@ void seedrec_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool ma
 
 void seedrec_free(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *)_p;
-   alglib_impl::ae_touch_ptr((void *)p);
    innerrec_free(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
 }

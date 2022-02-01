@@ -187,7 +187,6 @@ bool optguardallclear(optguardreport *rep, ae_state *_state) {
 
 void optguardreport_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardreport *p = (optguardreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->badgradxbase, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->badgraduser, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->badgradnum, 0, 0, DT_REAL, _state, make_automatic);
@@ -215,7 +214,6 @@ void optguardreport_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void optguardreport_free(void *_p, bool make_automatic) {
    optguardreport *p = (optguardreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->badgradxbase, make_automatic);
    ae_matrix_free(&p->badgraduser, make_automatic);
    ae_matrix_free(&p->badgradnum, make_automatic);
@@ -223,7 +221,6 @@ void optguardreport_free(void *_p, bool make_automatic) {
 
 void optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc0report *p = (optguardnonc0report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stp, 0, DT_REAL, _state, make_automatic);
@@ -247,7 +244,6 @@ void optguardnonc0report_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void optguardnonc0report_free(void *_p, bool make_automatic) {
    optguardnonc0report *p = (optguardnonc0report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x0, make_automatic);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->stp, make_automatic);
@@ -256,7 +252,6 @@ void optguardnonc0report_free(void *_p, bool make_automatic) {
 
 void optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test0report *p = (optguardnonc1test0report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stp, 0, DT_REAL, _state, make_automatic);
@@ -280,7 +275,6 @@ void optguardnonc1test0report_copy(void *_dst, void *_src, ae_state *_state, boo
 
 void optguardnonc1test0report_free(void *_p, bool make_automatic) {
    optguardnonc1test0report *p = (optguardnonc1test0report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x0, make_automatic);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->stp, make_automatic);
@@ -289,7 +283,6 @@ void optguardnonc1test0report_free(void *_p, bool make_automatic) {
 
 void optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test1report *p = (optguardnonc1test1report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stp, 0, DT_REAL, _state, make_automatic);
@@ -314,7 +307,6 @@ void optguardnonc1test1report_copy(void *_dst, void *_src, ae_state *_state, boo
 
 void optguardnonc1test1report_free(void *_p, bool make_automatic) {
    optguardnonc1test1report *p = (optguardnonc1test1report *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x0, make_automatic);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->stp, make_automatic);
@@ -649,7 +641,7 @@ void checklcviolation(RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t 
       if (i < nec) {
          cx = fabs(cx);
       } else {
-         cx = maxreal(cx, 0.0, _state);
+         cx = rmax2(cx, 0.0, _state);
       }
       if (cx > *lcerr) {
          *lcerr = cx;
@@ -680,7 +672,7 @@ void checknlcviolation(RVector *fi, ae_int_t ng, ae_int_t nh, double *nlcerr, ae
       if (i < ng) {
          v = fabs(v);
       } else {
-         v = maxreal(v, 0.0, _state);
+         v = rmax2(v, 0.0, _state);
       }
       if (v > *nlcerr) {
          *nlcerr = v;
@@ -708,7 +700,7 @@ void unscaleandchecknlcviolation(RVector *fi, RVector *fscales, ae_int_t ng, ae_
       if (i < ng) {
          v = fabs(v);
       } else {
-         v = maxreal(v, 0.0, _state);
+         v = rmax2(v, 0.0, _state);
       }
       if (v > *nlcerr) {
          *nlcerr = v;
@@ -1169,7 +1161,7 @@ ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, B
 static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *tmp0, ae_state *_state) {
    ae_int_t i;
    double result;
-   rvectorsetlengthatleast(tmp0, k, _state);
+   vectorsetlengthatleast(tmp0, k, _state);
    for (i = 0; i < k; i++) {
       tmp0->xR[i] = -ce->xyR[i][nmain + nslack];
    }
@@ -1204,7 +1196,7 @@ static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain
    double v;
    *err = 0;
    ae_assert(grad->cnt >= nmain + nslack, "FeasibilityErrorGrad: integrity check failed", _state);
-   rvectorsetlengthatleast(tmp0, k, _state);
+   vectorsetlengthatleast(tmp0, k, _state);
    rmatrixgemv(k, nmain + nslack, 1.0, ce, 0, 0, 0, x, 0, 0.0, tmp0, 0, _state);
    *err = 0.0;
    for (i = 0; i < k; i++) {
@@ -1330,7 +1322,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    for (i = 0; i < k; i++) {
       v = 0.0;
       for (j = 0; j < nmain + nslack; j++) {
-         v = maxreal(v, fabs(ce->xyR[i][j]), _state);
+         v = rmax2(v, fabs(ce->xyR[i][j]), _state);
       }
       if (v != 0.0) {
          v = 1 / v;
@@ -1370,7 +1362,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    itscount = 0;
    while (true) {
    // Dynamically adjust infeasibility error tolerance
-      infeasibilityincreasetolerance = maxreal(rmaxabsv(nmain + nslack, x, _state), 1.0, _state) * (1000 + nmain) * machineepsilon;
+      infeasibilityincreasetolerance = rmax2(rmaxabsv(nmain + nslack, x, _state), 1.0, _state) * (1000 + nmain) * machineepsilon;
    // Stage 0: check for exact convergence
       converged = true;
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk, _state);
@@ -1392,7 +1384,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
          mx = 0.0;
          v = -ce->xyR[i][nmain + nslack];
          for (j = 0; j < nmain + nslack; j++) {
-            mx = maxreal(mx, fabs(ce->xyR[i][j] * x->xR[j]), _state);
+            mx = rmax2(mx, fabs(ce->xyR[i][j] * x->xR[j]), _state);
             v += ce->xyR[i][j] * x->xR[j];
          }
          converged = converged && fabs(v) <= 100 * machineepsilon * mx;
@@ -1400,8 +1392,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       feaserr0 = feaserr;
       if (converged) {
          result = feaserr <= epsi;
-         ae_frame_leave(_state);
-         return result;
+         break;
       }
    // Stage 1: equality constrained quadratic programming
    //
@@ -1478,7 +1469,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             break;
          }
          if (vartofreeze >= 0) {
-            armijostep = minreal(1.0, maxsteplen, _state);
+            armijostep = rmin2(1.0, maxsteplen, _state);
          } else {
             armijostep = 1.0;
          }
@@ -1583,7 +1574,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             rmatrixlqunpackq(&permce, k, nfree, &tau, k, &q, _state);
             v = 0.0;
             for (i = 0; i < k; i++) {
-               v = maxreal(v, fabs(permce.xyR[i][i]), _state);
+               v = rmax2(v, fabs(permce.xyR[i][i]), _state);
             }
             v = coalesce(v, 1.0, _state);
             for (i = 0; i < k; i++) {
@@ -1603,7 +1594,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             rmatrixqr(&permce, k, nfree, &tau, _state);
             v = 0.0;
             for (i = 0; i < nfree; i++) {
-               v = maxreal(v, fabs(permce.xyR[i][i]), _state);
+               v = rmax2(v, fabs(permce.xyR[i][i]), _state);
             }
             v = coalesce(v, 1.0, _state);
             for (i = 0; i < nfree; i++) {
@@ -1645,7 +1636,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             break;
          }
          if (vartofreeze >= 0) {
-            v = minreal(1.0, maxsteplen, _state);
+            v = rmin2(1.0, maxsteplen, _state);
          } else {
             v = 1.0;
          }
@@ -1756,7 +1747,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             return result;
          }
          if (vartofreeze >= 0) {
-            v = minreal(stp, maxsteplen, _state);
+            v = rmin2(stp, maxsteplen, _state);
          } else {
             v = stp;
          }
@@ -1782,31 +1773,20 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk, _state);
       feaserr1 = feaserr;
       if (feaserr1 >= feaserr0 - infeasibilityincreasetolerance) {
-         inc(&badits, _state);
+         badits++;
       } else {
          badits = 0;
       }
       if (feaserr <= epsi) {
-         inc(&itswithintolerance, _state);
+         itswithintolerance++;
       } else {
          itswithintolerance = 0;
       }
       if ((!werechangesinconstraints || itswithintolerance >= maxitswithintolerance) || badits >= maxbadits) {
          result = feaserr <= epsi;
-         ae_frame_leave(_state);
-         return result;
-      }
-      itscount++;
-   // Block below is never executed; it is necessary just to avoid
-   // "unreachable code" warning about automatically generated code.
-   //
-   // We just need a way to transfer control to the end of the function,
-   // even a fake way which is never actually traversed.
-      if (alwaysfalse(_state)) {
-         result = false;
-         ae_assert(false, "Assertion failed", _state);
          break;
       }
+      itscount++;
    }
    ae_frame_leave(_state);
    return result;
@@ -1844,11 +1824,11 @@ bool derivativecheck(double f0, double df0, double f1, double df1, double f, dou
 // * magnitudes of derivatives and secants
 // * magnitudes of input data times sqrt(machine_epsilon)
    s = 0.0;
-   s = maxreal(s, fabs(df0), _state);
-   s = maxreal(s, fabs(df1), _state);
-   s = maxreal(s, fabs(f1 - f0), _state);
-   s = maxreal(s, sqrt(machineepsilon) * fabs(f0), _state);
-   s = maxreal(s, sqrt(machineepsilon) * fabs(f1), _state);
+   s = rmax2(s, fabs(df0), _state);
+   s = rmax2(s, fabs(df1), _state);
+   s = rmax2(s, fabs(f1 - f0), _state);
+   s = rmax2(s, sqrt(machineepsilon) * fabs(f0), _state);
+   s = rmax2(s, sqrt(machineepsilon) * fabs(f1), _state);
 // Compute H and dH/dX at the middle of interval
    h = 0.5 * (f0 + f1) + 0.125 * (df0 - df1);
    dh = 1.5 * (f1 - f0) - 0.250 * (df0 + df1);
@@ -1992,11 +1972,11 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
    double v1;
    double vx;
    double vy;
-   rvectorsetlengthatleast(&buf->norms, k, _state);
-   rvectorsetlengthatleast(&buf->alpha, k, _state);
-   rvectorsetlengthatleast(&buf->rho, k, _state);
-   rmatrixsetlengthatleast(&buf->yk, k, n, _state);
-   ivectorsetlengthatleast(&buf->idx, k, _state);
+   vectorsetlengthatleast(&buf->norms, k, _state);
+   vectorsetlengthatleast(&buf->alpha, k, _state);
+   vectorsetlengthatleast(&buf->rho, k, _state);
+   matrixsetlengthatleast(&buf->yk, k, n, _state);
+   vectorsetlengthatleast(&buf->idx, k, _state);
 // Check inputs
    for (i = 0; i < n; i++) {
       ae_assert(d->xR[i] > 0.0, "InexactLBFGSPreconditioner: D[] <= 0", _state);
@@ -2093,10 +2073,10 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
       ae_assert(c->xR[i] >= 0.0, "PrepareLowRankPreconditioner: C[]<0", _state);
    }
 // Prepare buffer structure; skip zero entries of update.
-   rvectorsetlengthatleast(&buf->d, n, _state);
-   rmatrixsetlengthatleast(&buf->v, k, n, _state);
-   rvectorsetlengthatleast(&buf->bufc, k, _state);
-   rmatrixsetlengthatleast(&buf->bufw, k + 1, n, _state);
+   vectorsetlengthatleast(&buf->d, n, _state);
+   matrixsetlengthatleast(&buf->v, k, n, _state);
+   vectorsetlengthatleast(&buf->bufc, k, _state);
+   matrixsetlengthatleast(&buf->bufw, k + 1, n, _state);
    buf->n = n;
    buf->k = 0;
    for (i = 0; i < k; i++) {
@@ -2116,7 +2096,7 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
          buf->v.xyR[buf->k][j] = w->xyR[i][j];
          buf->bufw.xyR[buf->k][j] = w->xyR[i][j];
       }
-      inc(&buf->k, _state);
+      buf->k++;
    }
 // Reset K (for convenience)
    k = buf->k;
@@ -2128,7 +2108,7 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
       return;
    }
 // Use Woodbury matrix identity
-   rmatrixsetlengthatleast(&buf->bufz, k, k, _state);
+   matrixsetlengthatleast(&buf->bufz, k, k, _state);
    for (i = 0; i < k; i++) {
       for (j = 0; j < k; j++) {
          buf->bufz.xyR[i][j] = 0.0;
@@ -2167,7 +2147,7 @@ void applylowrankpreconditioner(RVector *s, precbuflowrank *buf, ae_state *_stat
    double v;
    n = buf->n;
    k = buf->k;
-   rvectorsetlengthatleast(&buf->tmp, n, _state);
+   vectorsetlengthatleast(&buf->tmp, n, _state);
    for (j = 0; j < n; j++) {
       buf->tmp.xR[j] = buf->d.xR[j] * s->xR[j];
    }
@@ -2199,7 +2179,7 @@ void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, a
    monitor->linesearchstarted = false;
    monitor->enqueuedcnt = 0;
    monitor->sortedcnt = 0;
-   rvectorsetlengthatleast(&monitor->s, n, _state);
+   vectorsetlengthatleast(&monitor->s, n, _state);
    for (i = 0; i < n; i++) {
       monitor->s.xR[i] = s->xR[i];
    }
@@ -2304,9 +2284,9 @@ void smoothnessmonitorstartlinesearch1u(smoothnessmonitor *monitor, RVector *s, 
       return;
    }
    ae_assert(k == 1, "SmoothnessMonitorStartLineSearch1: K != 1", _state);
-   rvectorsetlengthatleast(&monitor->xu, n, _state);
-   rvectorsetlengthatleast(&monitor->f0, 1, _state);
-   rmatrixsetlengthatleast(&monitor->j0, 1, n, _state);
+   vectorsetlengthatleast(&monitor->xu, n, _state);
+   vectorsetlengthatleast(&monitor->f0, 1, _state);
+   matrixsetlengthatleast(&monitor->j0, 1, n, _state);
    monitor->f0.xR[0] = f0;
    for (i = 0; i < n; i++) {
       monitor->xu.xR[i] = x->xR[i] * invs->xR[i];
@@ -2343,7 +2323,7 @@ static void optserv_testc0continuity(double f0, double f1, double f2, double f3,
 // Compute Lipschitz constant for the interval [StpIdx+1,StpIdx+2],
 // SUBTRACT noise correction in order to get decreased estimate (makes
 // comparison below more conservative).
-   lipschitz12 = maxreal(fabs(f2 - f1) - (noise1 + noise2), 0.0, _state) / delta1;
+   lipschitz12 = rmax2(fabs(f2 - f1) - (noise1 + noise2), 0.0, _state) / delta1;
 // Compute Lipschitz constant for the interval [StpIdx+2,StpIdx+3]
 // using special algorithm:
 // a) if F3<F2-Noise23, Lipschitz constant is assumed to be zero
@@ -2359,8 +2339,8 @@ static void optserv_testc0continuity(double f0, double f1, double f2, double f3,
       lipschitz23 = (fabs(f3 - f2) + (noise2 + noise3)) / delta2;
    }
 // Compute rating (ratio of two Lipschitz constants)
-   ae_assert(maxreal(lipschitz01, lipschitz23, _state) > 0, "OptGuard: integrity check failed", _state);
-   *rating = lipschitz12 / maxreal(lipschitz01, lipschitz23, _state);
+   ae_assert(rmax2(lipschitz01, lipschitz23, _state) > 0, "OptGuard: integrity check failed", _state);
+   *rating = lipschitz12 / rmax2(lipschitz01, lipschitz23, _state);
    *lipschitz = lipschitz12;
 }
 
@@ -2421,12 +2401,12 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
    f3 = monitor->f.xR[stpidx + 3];
    f4 = monitor->f.xR[stpidx + 4];
    f5 = monitor->f.xR[stpidx + 5];
-   noise0 = optserv_ognoiselevelf * maxreal(fabs(f0), 1.0, _state);
-   noise1 = optserv_ognoiselevelf * maxreal(fabs(f1), 1.0, _state);
-   noise2 = optserv_ognoiselevelf * maxreal(fabs(f2), 1.0, _state);
-   noise3 = optserv_ognoiselevelf * maxreal(fabs(f3), 1.0, _state);
-   noise4 = optserv_ognoiselevelf * maxreal(fabs(f4), 1.0, _state);
-   noise5 = optserv_ognoiselevelf * maxreal(fabs(f5), 1.0, _state);
+   noise0 = optserv_ognoiselevelf * rmax2(fabs(f0), 1.0, _state);
+   noise1 = optserv_ognoiselevelf * rmax2(fabs(f1), 1.0, _state);
+   noise2 = optserv_ognoiselevelf * rmax2(fabs(f2), 1.0, _state);
+   noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0, _state);
+   noise4 = optserv_ognoiselevelf * rmax2(fabs(f4), 1.0, _state);
+   noise5 = optserv_ognoiselevelf * rmax2(fabs(f5), 1.0, _state);
    delta0 = monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx + 0];
    delta1 = monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1];
    delta2 = monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2];
@@ -2469,14 +2449,14 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
          monitor->nonc1test0strrep.cnt = sortedcnt;
          monitor->nonc1test0strrep.stpidxa = stpidx + 1;
          monitor->nonc1test0strrep.stpidxb = stpidx + 4;
-         rvectorsetlengthatleast(&monitor->nonc1test0strrep.x0, n, _state);
-         rvectorsetlengthatleast(&monitor->nonc1test0strrep.d, n, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0strrep.x0, n, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0strrep.d, n, _state);
          for (i = 0; i < n; i++) {
             monitor->nonc1test0strrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
             monitor->nonc1test0strrep.d.xR[i] = monitor->dcur.xR[i];
          }
-         rvectorsetlengthatleast(&monitor->nonc1test0strrep.stp, sortedcnt, _state);
-         rvectorsetlengthatleast(&monitor->nonc1test0strrep.f, sortedcnt, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0strrep.stp, sortedcnt, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0strrep.f, sortedcnt, _state);
          for (i = 0; i < sortedcnt; i++) {
             monitor->nonc1test0strrep.stp.xR[i] = monitor->sortedstp.xR[i];
             monitor->nonc1test0strrep.f.xR[i] = monitor->f.xR[i];
@@ -2488,7 +2468,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
          nrm += sqr(monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i] - monitor->enqueuedx.xR[monitor->sortedidx.xZ[sortedcnt - 1] * n + i], _state);
       }
       nrm = sqrt(nrm);
-      nrm = minreal(nrm, 1.0, _state);
+      nrm = rmin2(nrm, 1.0, _state);
       nrm = coalesce(nrm, machineepsilon, _state);
       lengthrating = sortedcnt + log(nrm) / log(100.0);
       if (lengthrating > monitor->nonc1test0lngrating) {
@@ -2499,14 +2479,14 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
          monitor->nonc1test0lngrep.cnt = sortedcnt;
          monitor->nonc1test0lngrep.stpidxa = stpidx + 1;
          monitor->nonc1test0lngrep.stpidxb = stpidx + 4;
-         rvectorsetlengthatleast(&monitor->nonc1test0lngrep.x0, n, _state);
-         rvectorsetlengthatleast(&monitor->nonc1test0lngrep.d, n, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0lngrep.x0, n, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0lngrep.d, n, _state);
          for (i = 0; i < n; i++) {
             monitor->nonc1test0lngrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
             monitor->nonc1test0lngrep.d.xR[i] = monitor->dcur.xR[i];
          }
-         rvectorsetlengthatleast(&monitor->nonc1test0lngrep.stp, sortedcnt, _state);
-         rvectorsetlengthatleast(&monitor->nonc1test0lngrep.f, sortedcnt, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0lngrep.stp, sortedcnt, _state);
+         vectorsetlengthatleast(&monitor->nonc1test0lngrep.f, sortedcnt, _state);
          for (i = 0; i < sortedcnt; i++) {
             monitor->nonc1test0lngrep.stp.xR[i] = monitor->sortedstp.xR[i];
             monitor->nonc1test0lngrep.f.xR[i] = monitor->f.xR[i];
@@ -2549,10 +2529,10 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
       f1 = monitor->g.xR[(stpidx + 1) * n + varidx];
       f2 = monitor->g.xR[(stpidx + 2) * n + varidx];
       f3 = monitor->g.xR[(stpidx + 3) * n + varidx];
-      noise0 = optserv_ognoiselevelg * maxreal(fabs(f0), 1.0, _state);
-      noise1 = optserv_ognoiselevelg * maxreal(fabs(f1), 1.0, _state);
-      noise2 = optserv_ognoiselevelg * maxreal(fabs(f2), 1.0, _state);
-      noise3 = optserv_ognoiselevelg * maxreal(fabs(f3), 1.0, _state);
+      noise0 = optserv_ognoiselevelg * rmax2(fabs(f0), 1.0, _state);
+      noise1 = optserv_ognoiselevelg * rmax2(fabs(f1), 1.0, _state);
+      noise2 = optserv_ognoiselevelg * rmax2(fabs(f2), 1.0, _state);
+      noise3 = optserv_ognoiselevelg * rmax2(fabs(f3), 1.0, _state);
       optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx + 0], monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1], monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2], false, &rating, &lipschitz, _state);
    // Store results
       if (rating > optserv_ogminrating1) {
@@ -2574,14 +2554,14 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1strrep.cnt = sortedcnt;
             monitor->nonc1test1strrep.stpidxa = stpidx + 0;
             monitor->nonc1test1strrep.stpidxb = stpidx + 3;
-            rvectorsetlengthatleast(&monitor->nonc1test1strrep.x0, n, _state);
-            rvectorsetlengthatleast(&monitor->nonc1test1strrep.d, n, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1strrep.x0, n, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1strrep.d, n, _state);
             for (i = 0; i < n; i++) {
                monitor->nonc1test1strrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
                monitor->nonc1test1strrep.d.xR[i] = monitor->dcur.xR[i];
             }
-            rvectorsetlengthatleast(&monitor->nonc1test1strrep.stp, sortedcnt, _state);
-            rvectorsetlengthatleast(&monitor->nonc1test1strrep.g, sortedcnt, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1strrep.stp, sortedcnt, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1strrep.g, sortedcnt, _state);
             for (i = 0; i < sortedcnt; i++) {
                monitor->nonc1test1strrep.stp.xR[i] = monitor->sortedstp.xR[i];
                monitor->nonc1test1strrep.g.xR[i] = monitor->g.xR[i * n + varidx];
@@ -2593,7 +2573,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             nrm += sqr(monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i] - monitor->enqueuedx.xR[monitor->sortedidx.xZ[sortedcnt - 1] * n + i], _state);
          }
          nrm = sqrt(nrm);
-         nrm = minreal(nrm, 1.0, _state);
+         nrm = rmin2(nrm, 1.0, _state);
          nrm = coalesce(nrm, machineepsilon, _state);
          lengthrating = sortedcnt + log(nrm) / log(100.0);
          if (lengthrating > monitor->nonc1test1lngrating) {
@@ -2605,14 +2585,14 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1lngrep.cnt = sortedcnt;
             monitor->nonc1test1lngrep.stpidxa = stpidx + 0;
             monitor->nonc1test1lngrep.stpidxb = stpidx + 3;
-            rvectorsetlengthatleast(&monitor->nonc1test1lngrep.x0, n, _state);
-            rvectorsetlengthatleast(&monitor->nonc1test1lngrep.d, n, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1lngrep.x0, n, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1lngrep.d, n, _state);
             for (i = 0; i < n; i++) {
                monitor->nonc1test1lngrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
                monitor->nonc1test1lngrep.d.xR[i] = monitor->dcur.xR[i];
             }
-            rvectorsetlengthatleast(&monitor->nonc1test1lngrep.stp, sortedcnt, _state);
-            rvectorsetlengthatleast(&monitor->nonc1test1lngrep.g, sortedcnt, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1lngrep.stp, sortedcnt, _state);
+            vectorsetlengthatleast(&monitor->nonc1test1lngrep.g, sortedcnt, _state);
             for (i = 0; i < sortedcnt; i++) {
                monitor->nonc1test1lngrep.stp.xR[i] = monitor->sortedstp.xR[i];
                monitor->nonc1test1lngrep.g.xR[i] = monitor->g.xR[i * n + varidx];
@@ -2674,7 +2654,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
       return;
    }
 // Enqueue
-   inc(&monitor->enqueuedcnt, _state);
+   monitor->enqueuedcnt++;
    enqueuedcnt = monitor->enqueuedcnt;
    rvectorgrowto(&monitor->dcur, n, _state);
    rvectorgrowto(&monitor->enqueuedstp, enqueuedcnt, _state);
@@ -2703,7 +2683,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
       hasduplicates = hasduplicates || monitor->sortedstp.xR[i] == stp;
    }
    if (!hasduplicates) {
-      inc(&monitor->sortedcnt, _state);
+      monitor->sortedcnt++;
       sortedcnt = monitor->sortedcnt;
       rvectorgrowto(&monitor->sortedstp, sortedcnt, _state);
       ivectorgrowto(&monitor->sortedidx, sortedcnt, _state);
@@ -2723,8 +2703,8 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
    }
 // Scan sorted representation, check for C0 and C1 continuity
 // violations.
-   rvectorsetlengthatleast(&monitor->f, sortedcnt, _state);
-   rvectorsetlengthatleast(&monitor->g, sortedcnt * n, _state);
+   vectorsetlengthatleast(&monitor->f, sortedcnt, _state);
+   vectorsetlengthatleast(&monitor->g, sortedcnt * n, _state);
    for (funcidx = 0; funcidx < k; funcidx++) {
    // Fetch current function and its gradient to the contiguous storage
       for (i = 0; i < sortedcnt; i++) {
@@ -2750,10 +2730,10 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
             f1 = monitor->f.xR[stpidx + 1];
             f2 = monitor->f.xR[stpidx + 2];
             f3 = monitor->f.xR[stpidx + 3];
-            noise0 = optserv_ognoiselevelf * maxreal(fabs(f0), 1.0, _state);
-            noise1 = optserv_ognoiselevelf * maxreal(fabs(f1), 1.0, _state);
-            noise2 = optserv_ognoiselevelf * maxreal(fabs(f2), 1.0, _state);
-            noise3 = optserv_ognoiselevelf * maxreal(fabs(f3), 1.0, _state);
+            noise0 = optserv_ognoiselevelf * rmax2(fabs(f0), 1.0, _state);
+            noise1 = optserv_ognoiselevelf * rmax2(fabs(f1), 1.0, _state);
+            noise2 = optserv_ognoiselevelf * rmax2(fabs(f2), 1.0, _state);
+            noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0, _state);
             if (!(f1 < f0 + (noise0 + noise1) && f1 < f2)) {
                continue;
             }
@@ -2776,14 +2756,14 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0strrep.cnt = sortedcnt;
                   monitor->nonc0strrep.stpidxa = stpidx + 0;
                   monitor->nonc0strrep.stpidxb = stpidx + 3;
-                  rvectorsetlengthatleast(&monitor->nonc0strrep.x0, n, _state);
-                  rvectorsetlengthatleast(&monitor->nonc0strrep.d, n, _state);
+                  vectorsetlengthatleast(&monitor->nonc0strrep.x0, n, _state);
+                  vectorsetlengthatleast(&monitor->nonc0strrep.d, n, _state);
                   for (i = 0; i < n; i++) {
                      monitor->nonc0strrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
                      monitor->nonc0strrep.d.xR[i] = monitor->dcur.xR[i];
                   }
-                  rvectorsetlengthatleast(&monitor->nonc0strrep.stp, sortedcnt, _state);
-                  rvectorsetlengthatleast(&monitor->nonc0strrep.f, sortedcnt, _state);
+                  vectorsetlengthatleast(&monitor->nonc0strrep.stp, sortedcnt, _state);
+                  vectorsetlengthatleast(&monitor->nonc0strrep.f, sortedcnt, _state);
                   for (i = 0; i < sortedcnt; i++) {
                      monitor->nonc0strrep.stp.xR[i] = monitor->sortedstp.xR[i];
                      monitor->nonc0strrep.f.xR[i] = monitor->f.xR[i];
@@ -2795,7 +2775,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   nrm += sqr(monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i] - monitor->enqueuedx.xR[monitor->sortedidx.xZ[sortedcnt - 1] * n + i], _state);
                }
                nrm = sqrt(nrm);
-               nrm = minreal(nrm, 1.0, _state);
+               nrm = rmin2(nrm, 1.0, _state);
                nrm = coalesce(nrm, machineepsilon, _state);
                lengthrating = sortedcnt + log(nrm) / log(100.0);
                if (lengthrating > monitor->nonc0lngrating) {
@@ -2806,14 +2786,14 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0lngrep.cnt = sortedcnt;
                   monitor->nonc0lngrep.stpidxa = stpidx + 0;
                   monitor->nonc0lngrep.stpidxb = stpidx + 3;
-                  rvectorsetlengthatleast(&monitor->nonc0lngrep.x0, n, _state);
-                  rvectorsetlengthatleast(&monitor->nonc0lngrep.d, n, _state);
+                  vectorsetlengthatleast(&monitor->nonc0lngrep.x0, n, _state);
+                  vectorsetlengthatleast(&monitor->nonc0lngrep.d, n, _state);
                   for (i = 0; i < n; i++) {
                      monitor->nonc0lngrep.x0.xR[i] = monitor->enqueuedx.xR[monitor->sortedidx.xZ[0] * n + i];
                      monitor->nonc0lngrep.d.xR[i] = monitor->dcur.xR[i];
                   }
-                  rvectorsetlengthatleast(&monitor->nonc0lngrep.stp, sortedcnt, _state);
-                  rvectorsetlengthatleast(&monitor->nonc0lngrep.f, sortedcnt, _state);
+                  vectorsetlengthatleast(&monitor->nonc0lngrep.stp, sortedcnt, _state);
+                  vectorsetlengthatleast(&monitor->nonc0lngrep.f, sortedcnt, _state);
                   for (i = 0; i < sortedcnt; i++) {
                      monitor->nonc0lngrep.stp.xR[i] = monitor->sortedstp.xR[i];
                      monitor->nonc0lngrep.f.xR[i] = monitor->f.xR[i];
@@ -2828,8 +2808,8 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
          f2 = monitor->f.xR[stpidx + 2];
          f3 = monitor->f.xR[stpidx + 3];
          f4 = monitor->f.xR[stpidx + 4];
-         noise2 = optserv_ognoiselevelf * maxreal(fabs(f2), 1.0, _state);
-         noise3 = optserv_ognoiselevelf * maxreal(fabs(f3), 1.0, _state);
+         noise2 = optserv_ognoiselevelf * rmax2(fabs(f2), 1.0, _state);
+         noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0, _state);
       // Decide whether we want to test this interval or not; for target
       // function we test intervals around minimum, for constraints we
       // test intervals of sign change.
@@ -2854,10 +2834,10 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
          f1 = monitor->f.xR[stpidx + 1];
          f2 = monitor->f.xR[stpidx + 2];
          f3 = monitor->f.xR[stpidx + 3];
-         noise0 = optserv_ognoiselevelf * maxreal(fabs(f0), 1.0, _state);
-         noise1 = optserv_ognoiselevelf * maxreal(fabs(f1), 1.0, _state);
-         noise2 = optserv_ognoiselevelf * maxreal(fabs(f2), 1.0, _state);
-         noise3 = optserv_ognoiselevelf * maxreal(fabs(f3), 1.0, _state);
+         noise0 = optserv_ognoiselevelf * rmax2(fabs(f0), 1.0, _state);
+         noise1 = optserv_ognoiselevelf * rmax2(fabs(f1), 1.0, _state);
+         noise2 = optserv_ognoiselevelf * rmax2(fabs(f2), 1.0, _state);
+         noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0, _state);
       // Decide whether we want to test this interval or not; for target
       // function we test intervals around minimum, for constraints we
       // test intervals of sign change.
@@ -2891,10 +2871,10 @@ void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVe
       return;
    }
    ae_assert(k == 1, "SmoothnessMonitorEnqueuePoint1: K != 1", _state);
-   rvectorsetlengthatleast(&monitor->xu, n, _state);
-   rvectorsetlengthatleast(&monitor->du, n, _state);
-   rvectorsetlengthatleast(&monitor->f0, 1, _state);
-   rmatrixsetlengthatleast(&monitor->j0, 1, n, _state);
+   vectorsetlengthatleast(&monitor->xu, n, _state);
+   vectorsetlengthatleast(&monitor->du, n, _state);
+   vectorsetlengthatleast(&monitor->f0, 1, _state);
+   matrixsetlengthatleast(&monitor->j0, 1, n, _state);
    monitor->f0.xR[0] = f0;
    for (i = 0; i < n; i++) {
       monitor->xu.xR[i] = x->xR[i] * invs->xR[i];
@@ -2918,7 +2898,7 @@ void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae
    monitor->probingnstepsstored = 0;
    monitor->probingstepmax = stpmax;
    monitor->probingstepscale = stepscale;
-   rvectorsetlengthatleast(&monitor->probingf, nvalues, _state);
+   vectorsetlengthatleast(&monitor->probingf, nvalues, _state);
    ae_vector_set_length(&monitor->probingrcomm.ia, 2 + 1, _state);
    ae_vector_set_length(&monitor->probingrcomm.ra, 3 + 1, _state);
    monitor->probingrcomm.stage = -1;
@@ -3030,7 +3010,7 @@ lbl_0:
       monitor->probingvalues.xyR[monitor->probingnstepsstored][j] = monitor->probingf.xR[j];
       monitor->probingslopes.xyR[monitor->probingnstepsstored][j] = 0.0;
    }
-   inc(&monitor->probingnstepsstored, _state);
+   monitor->probingnstepsstored++;
 // Resort
    for (j = monitor->probingnstepsstored - 1; j >= 1; j--) {
       if (monitor->probingsteps.xR[j - 1] <= monitor->probingsteps.xR[j]) {
@@ -3144,22 +3124,22 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
    }
    teststep = fabs(teststep);
 // Allocate storage
-   rvectorsetlengthatleast(&monitor->x, n, _state);
-   rvectorsetlengthatleast(&monitor->fi, k, _state);
-   rmatrixsetlengthatleast(&monitor->j, k, n, _state);
-   rvectorsetlengthatleast(&monitor->xbase, n, _state);
-   rvectorsetlengthatleast(&monitor->fbase, k, _state);
-   rvectorsetlengthatleast(&monitor->fm, k, _state);
-   rvectorsetlengthatleast(&monitor->fc, k, _state);
-   rvectorsetlengthatleast(&monitor->fp, k, _state);
-   rvectorsetlengthatleast(&monitor->jm, k, _state);
-   rvectorsetlengthatleast(&monitor->jc, k, _state);
-   rvectorsetlengthatleast(&monitor->jp, k, _state);
-   rmatrixsetlengthatleast(&monitor->jbaseusr, k, n, _state);
-   rmatrixsetlengthatleast(&monitor->jbasenum, k, n, _state);
-   rvectorsetlengthatleast(&monitor->rep.badgradxbase, n, _state);
-   rmatrixsetlengthatleast(&monitor->rep.badgraduser, k, n, _state);
-   rmatrixsetlengthatleast(&monitor->rep.badgradnum, k, n, _state);
+   vectorsetlengthatleast(&monitor->x, n, _state);
+   vectorsetlengthatleast(&monitor->fi, k, _state);
+   matrixsetlengthatleast(&monitor->j, k, n, _state);
+   vectorsetlengthatleast(&monitor->xbase, n, _state);
+   vectorsetlengthatleast(&monitor->fbase, k, _state);
+   vectorsetlengthatleast(&monitor->fm, k, _state);
+   vectorsetlengthatleast(&monitor->fc, k, _state);
+   vectorsetlengthatleast(&monitor->fp, k, _state);
+   vectorsetlengthatleast(&monitor->jm, k, _state);
+   vectorsetlengthatleast(&monitor->jc, k, _state);
+   vectorsetlengthatleast(&monitor->jp, k, _state);
+   matrixsetlengthatleast(&monitor->jbaseusr, k, n, _state);
+   matrixsetlengthatleast(&monitor->jbasenum, k, n, _state);
+   vectorsetlengthatleast(&monitor->rep.badgradxbase, n, _state);
+   matrixsetlengthatleast(&monitor->rep.badgraduser, k, n, _state);
+   matrixsetlengthatleast(&monitor->rep.badgradnum, k, n, _state);
 // Set XBase/Jacobian presence flag
    monitor->badgradhasxj = true;
 // Determine reference point, compute function vector and user-supplied Jacobian
@@ -3283,7 +3263,6 @@ lbl_rcomm:
 
 void precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->norms, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->alpha, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rho, 0, DT_REAL, _state, make_automatic);
@@ -3307,7 +3286,6 @@ void precbuflbfgs_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 
 void precbuflbfgs_free(void *_p, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->norms, make_automatic);
    ae_vector_free(&p->alpha, make_automatic);
    ae_vector_free(&p->rho, make_automatic);
@@ -3319,7 +3297,6 @@ void precbuflbfgs_free(void *_p, bool make_automatic) {
 
 void precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflowrank *p = (precbuflowrank *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->v, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bufc, 0, DT_REAL, _state, make_automatic);
@@ -3343,7 +3320,6 @@ void precbuflowrank_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void precbuflowrank_free(void *_p, bool make_automatic) {
    precbuflowrank *p = (precbuflowrank *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->d, make_automatic);
    ae_matrix_free(&p->v, make_automatic);
    ae_vector_free(&p->bufc, make_automatic);
@@ -3354,7 +3330,6 @@ void precbuflowrank_free(void *_p, bool make_automatic) {
 
 void smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dcur, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->enqueuedstp, 0, DT_REAL, _state, make_automatic);
@@ -3476,7 +3451,6 @@ void smoothnessmonitor_copy(void *_dst, void *_src, ae_state *_state, bool make_
 
 void smoothnessmonitor_free(void *_p, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->dcur, make_automatic);
    ae_vector_free(&p->enqueuedstp, make_automatic);
@@ -3707,19 +3681,19 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
    allocatemem = flags % 2 == 0;
    flags /= 2;
    if (allocatemem) {
-      rvectorsetlengthatleast(&state->rho, m, _state);
-      rvectorsetlengthatleast(&state->theta, m, _state);
-      rmatrixsetlengthatleast(&state->yk, m, n, _state);
-      rmatrixsetlengthatleast(&state->sk, m, n, _state);
-      rvectorsetlengthatleast(&state->d, n, _state);
-      rvectorsetlengthatleast(&state->xp, n, _state);
-      rvectorsetlengthatleast(&state->x, n, _state);
-      rvectorsetlengthatleast(&state->xbase, n, _state);
-      rvectorsetlengthatleast(&state->s, n, _state);
-      rvectorsetlengthatleast(&state->invs, n, _state);
-      rvectorsetlengthatleast(&state->lastscaleused, n, _state);
-      rvectorsetlengthatleast(&state->g, n, _state);
-      rvectorsetlengthatleast(&state->work, n, _state);
+      vectorsetlengthatleast(&state->rho, m, _state);
+      vectorsetlengthatleast(&state->theta, m, _state);
+      matrixsetlengthatleast(&state->yk, m, n, _state);
+      matrixsetlengthatleast(&state->sk, m, n, _state);
+      vectorsetlengthatleast(&state->d, n, _state);
+      vectorsetlengthatleast(&state->xp, n, _state);
+      vectorsetlengthatleast(&state->x, n, _state);
+      vectorsetlengthatleast(&state->xbase, n, _state);
+      vectorsetlengthatleast(&state->s, n, _state);
+      vectorsetlengthatleast(&state->invs, n, _state);
+      vectorsetlengthatleast(&state->lastscaleused, n, _state);
+      vectorsetlengthatleast(&state->g, n, _state);
+      vectorsetlengthatleast(&state->work, n, _state);
    }
    for (i = 0; i < n; i++) {
       state->s.xR[i] = 1.0;
@@ -3892,7 +3866,7 @@ void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper, ae_
    ae_assert(isfinitertrmatrix(p, state->n, isupper, _state), "MinLBFGSSetPrecCholesky: P contains infinite or NAN values!", _state);
    mx = 0.0;
    for (i = 0; i < state->n; i++) {
-      mx = maxreal(mx, fabs(p->xyR[i][i]), _state);
+      mx = rmax2(mx, fabs(p->xyR[i][i]), _state);
    }
    ae_assert(mx > 0.0, "MinLBFGSSetPrecCholesky: P is strictly singular!", _state);
    if (state->denseh.rows < state->n || state->denseh.cols < state->n) {
@@ -3929,7 +3903,7 @@ void minlbfgssetprecdiag(minlbfgsstate *state, RVector *d, ae_state *_state) {
       ae_assert(isfinite(d->xR[i]), "MinLBFGSSetPrecDiag: D contains infinite or NAN elements", _state);
       ae_assert(d->xR[i] > 0.0, "MinLBFGSSetPrecDiag: D contains non-positive elements", _state);
    }
-   rvectorsetlengthatleast(&state->diagh, state->n, _state);
+   vectorsetlengthatleast(&state->diagh, state->n, _state);
    state->prectype = 2;
    for (i = 0; i < state->n; i++) {
       state->diagh.xR[i] = d->xR[i];
@@ -3991,9 +3965,9 @@ void minlbfgssetprecrankklbfgsfast(minlbfgsstate *state, RVector *d, RVector *c,
    n = state->n;
    state->prectype = 4;
    state->preck = cnt;
-   rvectorsetlengthatleast(&state->precc, cnt, _state);
-   rvectorsetlengthatleast(&state->precd, n, _state);
-   rmatrixsetlengthatleast(&state->precw, cnt, n, _state);
+   vectorsetlengthatleast(&state->precc, cnt, _state);
+   vectorsetlengthatleast(&state->precd, n, _state);
+   matrixsetlengthatleast(&state->precw, cnt, n, _state);
    for (i = 0; i < n; i++) {
       state->precd.xR[i] = d->xR[i];
    }
@@ -4120,7 +4094,7 @@ bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
    state->repiterationscount = 0;
    state->repnfev = 0;
    smoothnessmonitorinit(&state->smonitor, &state->s, n, 1, state->smoothnessguardlevel > 0, _state);
-   rvectorsetlengthatleast(&state->invs, n, _state);
+   vectorsetlengthatleast(&state->invs, n, _state);
    for (i = 0; i < n; i++) {
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
@@ -4241,9 +4215,9 @@ lbl_24:
       v = ae_v_dotproduct(state->g.xR, 1, state->g.xR, 1, n);
       v = sqrt(v);
       if (state->stpmax == 0.0) {
-         state->stp = minreal(1.0 / v, 1.0, _state);
+         state->stp = rmin2(1.0 / v, 1.0, _state);
       } else {
-         state->stp = minreal(1.0 / v, state->stpmax, _state);
+         state->stp = rmin2(1.0 / v, state->stpmax, _state);
       }
    }
    if (state->prectype == 1) {
@@ -4283,7 +4257,7 @@ lbl_26:
    }
 // Main cycle: prepare to 1-D line search
    state->p = state->k % m;
-   state->q = minint(state->k, m - 1, _state);
+   state->q = imin2(state->k, m - 1, _state);
 // Store X[k], G[k]
    ae_v_move(state->xp.xR, 1, state->x.xR, 1, n);
    ae_v_moveneg(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
@@ -4403,7 +4377,7 @@ lbl_35:
       result = false;
       return result;
    }
-   if (state->fold - state->f <= state->epsf * maxreal(fabs(state->fold), maxreal(fabs(state->f), 1.0, _state), _state)) {
+   if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0, _state), _state)) {
    // F(k+1)-F(k) is small enough
       state->repterminationtype = 1;
       result = false;
@@ -4899,7 +4873,6 @@ void minlbfgsrequesttermination(minlbfgsstate *state, ae_state *_state) {
 
 void minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlbfgsstate *p = (minlbfgsstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rho, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->yk, 0, 0, DT_REAL, _state, make_automatic);
@@ -4992,7 +4965,6 @@ void minlbfgsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 
 void minlbfgsstate_free(void *_p, bool make_automatic) {
    minlbfgsstate *p = (minlbfgsstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->rho, make_automatic);
    ae_matrix_free(&p->yk, make_automatic);
@@ -5020,8 +4992,6 @@ void minlbfgsstate_free(void *_p, bool make_automatic) {
 }
 
 void minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minlbfgsreport *p = (minlbfgsreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minlbfgsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -5033,8 +5003,6 @@ void minlbfgsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 }
 
 void minlbfgsreport_free(void *_p, bool make_automatic) {
-   minlbfgsreport *p = (minlbfgsreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -5377,14 +5345,14 @@ void cqminit(ae_int_t n, convexquadraticmodel *s, ae_state *_state) {
    s->issecondarytermchanged = true;
    s->islineartermchanged = true;
    s->isactivesetchanged = true;
-   bvectorsetlengthatleast(&s->activeset, n, _state);
-   rvectorsetlengthatleast(&s->xc, n, _state);
-   rvectorsetlengthatleast(&s->eb, n, _state);
-   rvectorsetlengthatleast(&s->tq1, n, _state);
-   rvectorsetlengthatleast(&s->txc, n, _state);
-   rvectorsetlengthatleast(&s->tb, n, _state);
-   rvectorsetlengthatleast(&s->b, s->n, _state);
-   rvectorsetlengthatleast(&s->tk1, s->n, _state);
+   vectorsetlengthatleast(&s->activeset, n, _state);
+   vectorsetlengthatleast(&s->xc, n, _state);
+   vectorsetlengthatleast(&s->eb, n, _state);
+   vectorsetlengthatleast(&s->tq1, n, _state);
+   vectorsetlengthatleast(&s->txc, n, _state);
+   vectorsetlengthatleast(&s->tb, n, _state);
+   vectorsetlengthatleast(&s->b, s->n, _state);
+   vectorsetlengthatleast(&s->tk1, s->n, _state);
    for (i = 0; i < n; i++) {
       s->activeset.xB[i] = false;
       s->xc.xR[i] = 0.0;
@@ -5408,9 +5376,9 @@ void cqmseta(convexquadraticmodel *s, RMatrix *a, bool isupper, double alpha, ae
    ae_assert(alpha == 0.0 || isfinitertrmatrix(a, s->n, isupper, _state), "CQMSetA: A is not finite NxN matrix", _state);
    s->alpha = alpha;
    if (alpha > 0.0) {
-      rmatrixsetlengthatleast(&s->a, s->n, s->n, _state);
-      rmatrixsetlengthatleast(&s->ecadense, s->n, s->n, _state);
-      rmatrixsetlengthatleast(&s->tq2dense, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->a, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->ecadense, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->tq2dense, s->n, s->n, _state);
       for (i = 0; i < s->n; i++) {
          for (j = i; j < s->n; j++) {
             if (isupper) {
@@ -5442,7 +5410,7 @@ void cqmgeta(convexquadraticmodel *s, RMatrix *a, ae_state *_state) {
    double v;
    ae_int_t n;
    n = s->n;
-   rmatrixsetlengthatleast(a, n, n, _state);
+   matrixsetlengthatleast(a, n, n, _state);
    if (s->alpha > 0.0) {
       v = s->alpha;
       for (i = 0; i < n; i++) {
@@ -5477,9 +5445,9 @@ void cqmrewritedensediagonal(convexquadraticmodel *s, RVector *z, ae_state *_sta
    ae_int_t j;
    n = s->n;
    if (s->alpha == 0.0) {
-      rmatrixsetlengthatleast(&s->a, s->n, s->n, _state);
-      rmatrixsetlengthatleast(&s->ecadense, s->n, s->n, _state);
-      rmatrixsetlengthatleast(&s->tq2dense, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->a, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->ecadense, s->n, s->n, _state);
+      matrixsetlengthatleast(&s->tq2dense, s->n, s->n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             s->a.xyR[i][j] = 0.0;
@@ -5506,9 +5474,9 @@ void cqmsetd(convexquadraticmodel *s, RVector *d, double tau, ae_state *_state) 
    ae_assert(tau == 0.0 || isfinitevector(d, s->n, _state), "CQMSetD: D is not finite Nx1 vector", _state);
    s->tau = tau;
    if (tau > 0.0) {
-      rvectorsetlengthatleast(&s->d, s->n, _state);
-      rvectorsetlengthatleast(&s->ecadiag, s->n, _state);
-      rvectorsetlengthatleast(&s->tq2diag, s->n, _state);
+      vectorsetlengthatleast(&s->d, s->n, _state);
+      vectorsetlengthatleast(&s->ecadiag, s->n, _state);
+      vectorsetlengthatleast(&s->tq2diag, s->n, _state);
       for (i = 0; i < s->n; i++) {
          ae_assert(d->xR[i] >= 0.0, "CQMSetD: D[i]<0", _state);
          s->d.xR[i] = d->xR[i];
@@ -5535,7 +5503,7 @@ void cqmdropa(convexquadraticmodel *s, ae_state *_state) {
 void cqmsetb(convexquadraticmodel *s, RVector *b, ae_state *_state) {
    ae_int_t i;
    ae_assert(isfinitevector(b, s->n, _state), "CQMSetB: B is not finite vector", _state);
-   rvectorsetlengthatleast(&s->b, s->n, _state);
+   vectorsetlengthatleast(&s->b, s->n, _state);
    for (i = 0; i < s->n; i++) {
       s->b.xR[i] = b->xR[i];
    }
@@ -5561,11 +5529,11 @@ void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double
 // General case: both Theta>0 and K>0
    s->k = k;
    s->theta = theta;
-   rmatrixsetlengthatleast(&s->q, s->k, s->n, _state);
-   rvectorsetlengthatleast(&s->r, s->k, _state);
-   rmatrixsetlengthatleast(&s->eq, s->k, s->n, _state);
-   rmatrixsetlengthatleast(&s->eccm, s->k, s->k, _state);
-   rmatrixsetlengthatleast(&s->tk2, s->k, s->n, _state);
+   matrixsetlengthatleast(&s->q, s->k, s->n, _state);
+   vectorsetlengthatleast(&s->r, s->k, _state);
+   matrixsetlengthatleast(&s->eq, s->k, s->n, _state);
+   matrixsetlengthatleast(&s->eccm, s->k, s->k, _state);
+   matrixsetlengthatleast(&s->tk2, s->k, s->n, _state);
    for (i = 0; i < s->k; i++) {
       for (j = 0; j < s->n; j++) {
          s->q.xyR[i][j] = q->xyR[i][j];
@@ -5667,7 +5635,7 @@ void cqmevalx(convexquadraticmodel *s, RVector *x, double *r, double *noise, ae_
          for (j = 0; j < n; j++) {
             v = s->alpha * 0.5 * x->xR[i] * s->a.xyR[i][j] * x->xR[j];
             *r += v;
-            *noise = maxreal(*noise, eps * fabs(v), _state);
+            *noise = rmax2(*noise, eps * fabs(v), _state);
          }
       }
    }
@@ -5675,7 +5643,7 @@ void cqmevalx(convexquadraticmodel *s, RVector *x, double *r, double *noise, ae_
       for (i = 0; i < n; i++) {
          v = 0.5 * sqr(x->xR[i], _state) * s->tau * s->d.xR[i];
          *r += v;
-         *noise = maxreal(*noise, eps * fabs(v), _state);
+         *noise = rmax2(*noise, eps * fabs(v), _state);
       }
    }
 // secondary quadratic term
@@ -5693,16 +5661,16 @@ void cqmevalx(convexquadraticmodel *s, RVector *x, double *r, double *noise, ae_
          for (j = 0; j < n; j++) {
             v2 = s->q.xyR[i][j] * x->xR[j];
             v += v2;
-            mxq = maxreal(mxq, fabs(v2), _state);
+            mxq = rmax2(mxq, fabs(v2), _state);
          }
          *r += 0.5 * s->theta * sqr(v - s->r.xR[i], _state);
-         *noise = maxreal(*noise, eps * mxq * (2 * fabs(v - s->r.xR[i]) + eps * mxq), _state);
+         *noise = rmax2(*noise, eps * mxq * (2 * fabs(v - s->r.xR[i]) + eps * mxq), _state);
       }
    }
 // linear term
    for (i = 0; i < s->n; i++) {
       *r += x->xR[i] * s->b.xR[i];
-      *noise = maxreal(*noise, eps * fabs(x->xR[i] * s->b.xR[i]), _state);
+      *noise = rmax2(*noise, eps * fabs(x->xR[i] * s->b.xR[i]), _state);
    }
 // Final update of the noise
    *noise *= n;
@@ -5723,7 +5691,7 @@ void cqmgradunconstrained(convexquadraticmodel *s, RVector *x, RVector *g, ae_st
    double v;
    n = s->n;
    ae_assert(isfinitevector(x, n, _state), "CQMEvalGradUnconstrained: X is not finite vector", _state);
-   rvectorsetlengthatleast(g, n, _state);
+   vectorsetlengthatleast(g, n, _state);
    for (i = 0; i < n; i++) {
       g->xR[i] = 0.0;
    }
@@ -5789,7 +5757,7 @@ void cqmadx(convexquadraticmodel *s, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
    n = s->n;
    ae_assert(isfinitevector(x, n, _state), "CQMEval: X is not finite vector", _state);
-   rvectorsetlengthatleast(y, n, _state);
+   vectorsetlengthatleast(y, n, _state);
 // main quadratic term
    for (i = 0; i < n; i++) {
       y->xR[i] = 0.0;
@@ -6020,8 +5988,8 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
       if (s->k > 0 && s->theta > 0.0) {
       // Split Q into Qf and Qc
       // Calculate Qc*xc-r, store in Tmp0
-         rvectorsetlengthatleast(&s->tmp0, k, _state);
-         rvectorsetlengthatleast(&s->tmp1, k, _state);
+         vectorsetlengthatleast(&s->tmp0, k, _state);
+         vectorsetlengthatleast(&s->tmp1, k, _state);
          cidx0 = 0;
          cidx1 = nfree;
          for (i = 0; i < k; i++) {
@@ -6125,7 +6093,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
    //      = I + (EQ*ECA^(-1))*(EQ*ECA^(-1))'
    //
    // Then we perform Cholesky decomposition of CM.
-      rmatrixsetlengthatleast(&s->tmp2, k, n, _state);
+      matrixsetlengthatleast(&s->tmp2, k, n, _state);
       rmatrixcopy(k, nfree, &s->eq, 0, 0, &s->tmp2, 0, 0, _state);
       ae_assert(s->ecakind == 0 || s->ecakind == 1, "CQMRebuild: unexpected ECAKind", _state);
       if (s->ecakind == 0) {
@@ -6228,7 +6196,7 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state
 // Calculate initial point for the iterative refinement:
 // * free components are set to zero
 // * constrained components are set to their constrained values
-   rvectorsetlengthatleast(x, n, _state);
+   vectorsetlengthatleast(x, n, _state);
    for (i = 0; i < n; i++) {
       if (s->activeset.xB[i]) {
          x->xR[i] = s->xc.xR[i];
@@ -6265,8 +6233,8 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state
    // Then, we account for rank-K correction.
    // Woodbury matrix identity is used.
       if (s->k > 0 && s->theta > 0.0) {
-         rvectorsetlengthatleast(&s->tmp0, maxint(nfree, k, _state), _state);
-         rvectorsetlengthatleast(&s->tmp1, maxint(nfree, k, _state), _state);
+         vectorsetlengthatleast(&s->tmp0, imax2(nfree, k, _state), _state);
+         vectorsetlengthatleast(&s->tmp1, imax2(nfree, k, _state), _state);
          ae_v_moveneg(s->tmp1.xR, 1, s->tmpg.xR, 1, nfree);
          cqmodels_cqmsolveea(s, &s->tmp1, &s->tmp0, _state);
          for (i = 0; i < k; i++) {
@@ -6354,7 +6322,7 @@ void cqmgetdiaga(convexquadraticmodel *s, RVector *x, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    n = s->n;
-   rvectorsetlengthatleast(x, n, _state);
+   vectorsetlengthatleast(x, n, _state);
    for (i = 0; i < n; i++) {
       if (s->alpha > 0.0) {
          x->xR[i] = s->a.xyR[i][i];
@@ -6524,7 +6492,6 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x, ae_state *_
 
 void convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic) {
    convexquadraticmodel *p = (convexquadraticmodel *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->a, 0, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->q, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
@@ -6594,7 +6561,6 @@ void convexquadraticmodel_copy(void *_dst, void *_src, ae_state *_state, bool ma
 
 void convexquadraticmodel_free(void *_p, bool make_automatic) {
    convexquadraticmodel *p = (convexquadraticmodel *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->a, make_automatic);
    ae_matrix_free(&p->q, make_automatic);
    ae_vector_free(&p->b, make_automatic);
@@ -6877,7 +6843,7 @@ void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int
    double v;
    double vv;
    if (neednorms) {
-      rvectorsetlengthatleast(rownorms, m, _state);
+      vectorsetlengthatleast(rownorms, m, _state);
    }
    for (i = 0; i < m; i++) {
       vv = 0.0;
@@ -6951,7 +6917,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
    double maxnrm2;
    ae_assert(msparse == 0 || ((sparsea->matrixtype == 1 && sparsea->m == msparse) && sparsea->n == n), "ScaleShiftMixedBRLCInplace: non-CRS sparse constraint matrix!", _state);
    if (neednorms) {
-      rvectorsetlengthatleast(rownorms, mdense + msparse, _state);
+      vectorsetlengthatleast(rownorms, mdense + msparse, _state);
    }
 // First round of normalization - normalize row 2-norms subject to limited amplification status
    maxnrm2 = 0.0;
@@ -6964,9 +6930,9 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
          vv += v * v;
       }
       vv = sqrt(vv);
-      maxnrm2 = maxreal(maxnrm2, vv, _state);
+      maxnrm2 = rmax2(maxnrm2, vv, _state);
       if (limitedamplification) {
-         vv = maxreal(vv, 1.0, _state);
+         vv = rmax2(vv, 1.0, _state);
       }
       if (neednorms) {
          rownorms->xR[i] = vv;
@@ -6989,9 +6955,9 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
          vv += v * v;
       }
       vv = sqrt(vv);
-      maxnrm2 = maxreal(maxnrm2, vv, _state);
+      maxnrm2 = rmax2(maxnrm2, vv, _state);
       if (limitedamplification) {
-         vv = maxreal(vv, 1.0, _state);
+         vv = rmax2(vv, 1.0, _state);
       }
       if (neednorms) {
          rownorms->xR[msparse + i] = vv;
@@ -7071,11 +7037,11 @@ double normalizedenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RV
          j1 = i;
       }
       for (j = j0; j <= j1; j++) {
-         mx = maxreal(mx, fabs(densea->xyR[i][j]), _state);
+         mx = rmax2(mx, fabs(densea->xyR[i][j]), _state);
       }
    }
    for (i = 0; i < ntotal; i++) {
-      mx = maxreal(mx, fabs(denseb->xR[i]), _state);
+      mx = rmax2(mx, fabs(denseb->xR[i]), _state);
    }
    result = mx;
    if (mx == 0.0) {
@@ -7139,9 +7105,9 @@ double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *de
          k1 = sparsea->didx.xZ[i];
       }
       for (k = k0; k <= k1; k++) {
-         mx = maxreal(mx, fabs(sparsea->vals.xR[k]), _state);
+         mx = rmax2(mx, fabs(sparsea->vals.xR[k]), _state);
       }
-      mx = maxreal(mx, fabs(denseb->xR[i]), _state);
+      mx = rmax2(mx, fabs(denseb->xR[i]), _state);
    }
    result = mx;
    if (mx == 0.0) {
@@ -7207,10 +7173,10 @@ void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s, a
    s->ns = 0;
    s->nd = 0;
    s->nr = 0;
-   rmatrixsetlengthatleast(&s->densea, nrmax, ndmax, _state);
-   rmatrixsetlengthatleast(&s->tmpca, nrmax, ndmax, _state);
-   rvectorsetlengthatleast(&s->b, nrmax, _state);
-   bvectorsetlengthatleast(&s->nnc, nsmax + ndmax, _state);
+   matrixsetlengthatleast(&s->densea, nrmax, ndmax, _state);
+   matrixsetlengthatleast(&s->tmpca, nrmax, ndmax, _state);
+   vectorsetlengthatleast(&s->b, nrmax, _state);
+   vectorsetlengthatleast(&s->nnc, nsmax + ndmax, _state);
    s->debugflops = 0.0;
    s->debugmaxinnerits = 0;
 }
@@ -7262,14 +7228,14 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
    s->nd = nd;
    s->nr = nr;
    if (nd > 0) {
-      rmatrixsetlengthatleast(&s->densea, nr, nd, _state);
+      matrixsetlengthatleast(&s->densea, nr, nd, _state);
       for (i = 0; i < nr; i++) {
          ae_v_move(s->densea.xyR[i], 1, a->xyR[i], 1, nd);
       }
    }
-   rvectorsetlengthatleast(&s->b, nr, _state);
+   vectorsetlengthatleast(&s->b, nr, _state);
    ae_v_move(s->b.xR, 1, b->xR, 1, nr);
-   bvectorsetlengthatleast(&s->nnc, ns + nd, _state);
+   vectorsetlengthatleast(&s->nnc, ns + nd, _state);
    for (i = 0; i < ns + nd; i++) {
       s->nnc.xB[i] = true;
    }
@@ -7368,9 +7334,9 @@ static void snnls_trdprepare(snnlssolver *s, RVector *x, RVector *diag, double l
    nd = s->nd;
    nr = s->nr;
 // Triangular reduction
-   rvectorsetlengthatleast(trdd, ns, _state);
-   rmatrixsetlengthatleast(trda, ns + nd, nd, _state);
-   rmatrixsetlengthatleast(tmplq, nd, nr + nd, _state);
+   vectorsetlengthatleast(trdd, ns, _state);
+   matrixsetlengthatleast(trda, ns + nd, nd, _state);
+   matrixsetlengthatleast(tmplq, nd, nr + nd, _state);
    for (i = 0; i < ns; i++) {
    // Apply rotation to I-th row and corresponding row of
    // regularizer. Here V is diagonal element of I-th row,
@@ -7410,9 +7376,9 @@ static void snnls_trdprepare(snnlssolver *s, RVector *x, RVector *diag, double l
       }
       tmplq->xyR[i][nr + i] = lambdav * diag->xR[i];
    }
-   rvectorsetlengthatleast(tmp0, nr + nd + 1, _state);
-   rvectorsetlengthatleast(tmp1, nr + nd + 1, _state);
-   rvectorsetlengthatleast(tmp2, nr + nd + 1, _state);
+   vectorsetlengthatleast(tmp0, nr + nd + 1, _state);
+   vectorsetlengthatleast(tmp1, nr + nd + 1, _state);
+   vectorsetlengthatleast(tmp2, nr + nd + 1, _state);
    rmatrixlqbasecase(tmplq, nd, nr + nd, tmp0, tmp1, tmp2, _state);
    for (i = 0; i < nd; i++) {
       if (tmplq->xyR[i][i] < 0.0) {
@@ -7486,7 +7452,7 @@ static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_i
    ae_assert(ns + nd > 0, "TRDFixVariable: integrity error", _state);
    ae_assert(idx >= 0, "TRDFixVariable: integrity error", _state);
    ae_assert(idx < ns + nd, "TRDFixVariable: integrity error", _state);
-   rvectorsetlengthatleast(tmp, nd, _state);
+   vectorsetlengthatleast(tmp, nd, _state);
 // Depending on variable index, two situations are possible
    if (idx < ns) {
    // We fix variable in the diagonal part of the model. It means
@@ -7684,26 +7650,26 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
       return;
    }
    if (nd == 0) {
-      rvectorsetlengthatleast(x, ns, _state);
+      vectorsetlengthatleast(x, ns, _state);
       for (i = 0; i < ns; i++) {
          x->xR[i] = s->b.xR[i];
          if (s->nnc.xB[i]) {
-            x->xR[i] = maxreal(x->xR[i], 0.0, _state);
+            x->xR[i] = rmax2(x->xR[i], 0.0, _state);
          }
       }
       return;
    }
 // Main cycle of BLEIC-SNNLS algorithm.
 // Below we assume that ND>0.
-   rvectorsetlengthatleast(x, ns + nd, _state);
-   rvectorsetlengthatleast(&s->xn, ns + nd, _state);
-   rvectorsetlengthatleast(&s->xp, ns + nd, _state);
-   rvectorsetlengthatleast(&s->g, ns + nd, _state);
-   rvectorsetlengthatleast(&s->d, ns + nd, _state);
-   rvectorsetlengthatleast(&s->r, nr, _state);
-   rvectorsetlengthatleast(&s->diagaa, nd, _state);
-   rvectorsetlengthatleast(&s->regdiag, ns + nd, _state);
-   rvectorsetlengthatleast(&s->dx, ns + nd, _state);
+   vectorsetlengthatleast(x, ns + nd, _state);
+   vectorsetlengthatleast(&s->xn, ns + nd, _state);
+   vectorsetlengthatleast(&s->xp, ns + nd, _state);
+   vectorsetlengthatleast(&s->g, ns + nd, _state);
+   vectorsetlengthatleast(&s->d, ns + nd, _state);
+   vectorsetlengthatleast(&s->r, nr, _state);
+   vectorsetlengthatleast(&s->diagaa, nd, _state);
+   vectorsetlengthatleast(&s->regdiag, ns + nd, _state);
+   vectorsetlengthatleast(&s->dx, ns + nd, _state);
    for (i = 0; i < ns + nd; i++) {
       x->xR[i] = 0.0;
       s->regdiag.xR[i] = 1.0;
@@ -7807,11 +7773,11 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
          }
       // Perform constrained step and update X
       // and triangular model.
-         stp = minreal(1.0, stpmax, _state);
+         stp = rmin2(1.0, stpmax, _state);
          for (i = 0; i < ns + nd; i++) {
             v = x->xR[i] + stp * s->d.xR[i];
             if (s->nnc.xB[i]) {
-               v = maxreal(v, 0.0, _state);
+               v = rmax2(v, 0.0, _state);
             }
             s->xn.xR[i] = v;
          }
@@ -7830,7 +7796,7 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
          }
       // Increment iterations counter.
       // Terminate if no constraint was activated.
-         inc(&innerits, _state);
+         innerits++;
          if (!wasactivation) {
             break;
          }
@@ -7840,7 +7806,7 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
    // Break if necessary:
    // * maximum number of outer iterations performed
    // * relative change in X is small enough
-      inc(&outerits, _state);
+      outerits++;
       if (outerits >= maxouterits) {
          break;
       }
@@ -7849,7 +7815,7 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
          v0 = fabs(s->xp.xR[i]);
          v1 = fabs(x->xR[i]);
          if (v0 != 0.0 || v1 != 0.0) {
-            v = maxreal(v, fabs(x->xR[i] - s->xp.xR[i]) / maxreal(v0, v1, _state), _state);
+            v = rmax2(v, fabs(x->xR[i] - s->xp.xR[i]) / rmax2(v0, v1, _state), _state);
          }
       }
       if (v <= xtol) {
@@ -7860,7 +7826,6 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
 
 void snnlssolver_init(void *_p, ae_state *_state, bool make_automatic) {
    snnlssolver *p = (snnlssolver *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->nnc, 0, DT_BOOL, _state, make_automatic);
@@ -7923,7 +7888,6 @@ void snnlssolver_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void snnlssolver_free(void *_p, bool make_automatic) {
    snnlssolver *p = (snnlssolver *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->densea, make_automatic);
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->nnc, make_automatic);
@@ -7992,10 +7956,10 @@ void sasinit(ae_int_t n, sactiveset *s, ae_state *_state) {
    s->constraintschanged = true;
    s->nec = 0;
    s->nic = 0;
-   rvectorsetlengthatleast(&s->bndl, n, _state);
-   bvectorsetlengthatleast(&s->hasbndl, n, _state);
-   rvectorsetlengthatleast(&s->bndu, n, _state);
-   bvectorsetlengthatleast(&s->hasbndu, n, _state);
+   vectorsetlengthatleast(&s->bndl, n, _state);
+   vectorsetlengthatleast(&s->hasbndl, n, _state);
+   vectorsetlengthatleast(&s->bndu, n, _state);
+   vectorsetlengthatleast(&s->hasbndu, n, _state);
    for (i = 0; i < n; i++) {
       s->bndl.xR[i] = _state->v_neginf;
       s->bndu.xR[i] = _state->v_posinf;
@@ -8004,16 +7968,16 @@ void sasinit(ae_int_t n, sactiveset *s, ae_state *_state) {
    }
 // current point, scale
    s->hasxc = false;
-   rvectorsetlengthatleast(&s->xc, n, _state);
-   rvectorsetlengthatleast(&s->s, n, _state);
-   rvectorsetlengthatleast(&s->h, n, _state);
+   vectorsetlengthatleast(&s->xc, n, _state);
+   vectorsetlengthatleast(&s->s, n, _state);
+   vectorsetlengthatleast(&s->h, n, _state);
    for (i = 0; i < n; i++) {
       s->xc.xR[i] = 0.0;
       s->s.xR[i] = 1.0;
       s->h.xR[i] = 1.0;
    }
 // Other
-   rvectorsetlengthatleast(&s->unitdiagonal, n, _state);
+   vectorsetlengthatleast(&s->unitdiagonal, n, _state);
    for (i = 0; i < n; i++) {
       s->unitdiagonal.xR[i] = 1.0;
    }
@@ -8158,7 +8122,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
 //
 // NOTE: we convert inequality constraints to the form
 // A*x <= b before copying them.
-   rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
+   matrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
    for (i = 0; i < k; i++) {
@@ -8222,7 +8186,7 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae
    ae_assert(cleic->rows >= nec + nic, "SASSetLCX: Rows(CLEIC)<NEC+NIC", _state);
    ae_assert(apservisfinitematrix(cleic, nec + nic, n + 1, _state), "SASSetLCX: CLEIC contains infinite or NaN values!", _state);
 // Store constraints
-   rmatrixsetlengthatleast(&state->cleic, nec + nic, n + 1, _state);
+   matrixsetlengthatleast(&state->cleic, nec + nic, n + 1, _state);
    state->nec = nec;
    state->nic = nic;
    for (i = 0; i < nec + nic; i++) {
@@ -8273,7 +8237,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
 // Enforce feasibility and calculate set of "candidate"/"active" constraints.
 // Always active equality constraints are marked as "active", all other constraints
 // are marked as "candidate".
-   ivectorsetlengthatleast(&state->cstatus, n + nec + nic, _state);
+   vectorsetlengthatleast(&state->cstatus, n + nec + nic, _state);
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i]) {
          if (state->bndl.xR[i] > state->bndu.xR[i]) {
@@ -8286,7 +8250,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
    // General linear constraints are present.
    // Try to use fast code for feasible initial point with modest
    // memory requirements.
-      rvectorsetlengthatleast(&state->tmp0, n, _state);
+      vectorsetlengthatleast(&state->tmp0, n, _state);
       state->feasinitpt = true;
       for (i = 0; i < n; i++) {
          state->tmp0.xR[i] = x->xR[i];
@@ -8334,9 +8298,9 @@ bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
       }
    // Fast code failed? Use general code with ~(N+NIC)^2 memory requirements
       if (!state->feasinitpt) {
-         rvectorsetlengthatleast(&state->tmp0, n, _state);
-         rvectorsetlengthatleast(&state->tmpfeas, n + state->nic, _state);
-         rmatrixsetlengthatleast(&state->tmpm0, state->nec + state->nic, n + state->nic + 1, _state);
+         vectorsetlengthatleast(&state->tmp0, n, _state);
+         vectorsetlengthatleast(&state->tmpfeas, n + state->nic, _state);
+         matrixsetlengthatleast(&state->tmpm0, state->nec + state->nic, n + state->nic + 1, _state);
          for (i = 0; i < state->nec + state->nic; i++) {
             ae_v_move(state->tmpm0.xyR[i], 1, state->cleic.xyR[i], 1, n);
             for (j = n; j < n + state->nic; j++) {
@@ -8350,7 +8314,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
          ae_v_move(state->tmpfeas.xR, 1, state->xc.xR, 1, n);
          for (i = 0; i < state->nic; i++) {
             v = ae_v_dotproduct(state->cleic.xyR[i + state->nec], 1, state->xc.xR, 1, n);
-            state->tmpfeas.xR[i + n] = maxreal(state->cleic.xyR[i + state->nec][n] - v, 0.0, _state);
+            state->tmpfeas.xR[i + n] = rmax2(state->cleic.xyR[i + state->nec][n] - v, 0.0, _state);
          }
          if (!findfeasiblepoint(&state->tmpfeas, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, state->nic, &state->tmpm0, state->nec + state->nic, 1.0E-6, &i, &j, _state)) {
             return result;
@@ -8573,12 +8537,12 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
 // Try adding recommended entries to basis.
 // If reorthogonalization removes too much of candidate constraint,
 // we will invalidate basis and try to rebuild it from scratch.
-   rvectorsetlengthatleast(&state->tmp0, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpcp, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpcs, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpci, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpprodp, n, _state);
-   rvectorsetlengthatleast(&state->tmpprods, n, _state);
+   vectorsetlengthatleast(&state->tmp0, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpcp, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpcs, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpci, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpprodp, n, _state);
+   vectorsetlengthatleast(&state->tmpprods, n, _state);
    for (t = 0; t < n + nec + nic; t++) {
       if (newentries->xB[t]) {
       // Basis is full? Quick skip!
@@ -8673,8 +8637,8 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
          v = 1 / projnormi;
          ae_v_moved(state->idensebatch.xyR[state->densebatchsize], 1, state->tmpci.xR, 1, n + 1, v);
       // Increase set size
-         inc(&state->densebatchsize, _state);
-         inc(&state->basisage, _state);
+         state->densebatchsize++;
+         state->basisage++;
       }
    }
 }
@@ -8730,8 +8694,8 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, 
    nec = state->nec;
    nic = state->nic;
 // Save previous state, update current point
-   rvectorsetlengthatleast(&state->mtx, n, _state);
-   ivectorsetlengthatleast(&state->mtas, n + nec + nic, _state);
+   vectorsetlengthatleast(&state->mtx, n, _state);
+   vectorsetlengthatleast(&state->mtas, n + nec + nic, _state);
    for (i = 0; i < n; i++) {
       state->mtx.xR[i] = state->xc.xR[i];
       state->xc.xR[i] = xn->xR[i];
@@ -8740,7 +8704,7 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, 
       state->mtas.xZ[i] = state->cstatus.xZ[i];
    }
 // Activate constraints
-   bvectorsetlengthatleast(&state->mtnew, n + nec + nic, _state);
+   vectorsetlengthatleast(&state->mtnew, n + nec + nic, _state);
    wasactivation = false;
    for (i = 0; i < n + nec + nic; i++) {
       state->mtnew.xB[i] = false;
@@ -8840,7 +8804,7 @@ void sasimmediateactivation(sactiveset *state, ae_int_t cidx, double cval, ae_st
       state->xc.xR[cidx] = cval;
    }
    state->cstatus.xZ[cidx] = 1;
-   bvectorsetlengthatleast(&state->mtnew, state->n + state->nec + state->nic, _state);
+   vectorsetlengthatleast(&state->mtnew, state->n + state->nec + state->nic, _state);
    for (i = 0; i < state->n + state->nec + state->nic; i++) {
       state->mtnew.xB[i] = false;
    }
@@ -8888,17 +8852,17 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    n = state->n;
    nec = state->nec;
    nic = state->nic;
-   rvectorsetlengthatleast(&state->tmp0, n, _state);
-   rvectorsetlengthatleast(&state->tmpprodp, n, _state);
-   rvectorsetlengthatleast(&state->tmpprods, n, _state);
-   rvectorsetlengthatleast(&state->tmpcp, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpcs, n + 1, _state);
-   rvectorsetlengthatleast(&state->tmpci, n + 1, _state);
-   rmatrixsetlengthatleast(&state->tmpbasis, nec + nic, n + 1, _state);
-   rmatrixsetlengthatleast(&state->pdensebatch, nec + nic, n + 1, _state);
-   rmatrixsetlengthatleast(&state->idensebatch, nec + nic, n + 1, _state);
-   rmatrixsetlengthatleast(&state->sdensebatch, nec + nic, n + 1, _state);
-   ivectorsetlengthatleast(&state->sparsebatch, n, _state);
+   vectorsetlengthatleast(&state->tmp0, n, _state);
+   vectorsetlengthatleast(&state->tmpprodp, n, _state);
+   vectorsetlengthatleast(&state->tmpprods, n, _state);
+   vectorsetlengthatleast(&state->tmpcp, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpcs, n + 1, _state);
+   vectorsetlengthatleast(&state->tmpci, n + 1, _state);
+   matrixsetlengthatleast(&state->tmpbasis, nec + nic, n + 1, _state);
+   matrixsetlengthatleast(&state->pdensebatch, nec + nic, n + 1, _state);
+   matrixsetlengthatleast(&state->idensebatch, nec + nic, n + 1, _state);
+   matrixsetlengthatleast(&state->sdensebatch, nec + nic, n + 1, _state);
+   vectorsetlengthatleast(&state->sparsebatch, n, _state);
    state->sparsebatchsize = 0;
    state->densebatchsize = 0;
    state->basisage = 0;
@@ -8922,7 +8886,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
       return;
    }
 // Prepare precomputed values
-   rvectorsetlengthatleast(&state->tmpreciph, n, _state);
+   vectorsetlengthatleast(&state->tmpreciph, n, _state);
    for (i = 0; i < n; i++) {
       state->tmpreciph.xR[i] = 1 / state->h.xR[i];
    }
@@ -8935,7 +8899,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    for (i = 0; i < nec + nic; i++) {
       if (state->cstatus.xZ[n + i] > 0) {
          ae_v_move(state->tmpbasis.xyR[candidatescnt], 1, state->cleic.xyR[i], 1, n + 1);
-         inc(&candidatescnt, _state);
+         candidatescnt++;
       }
    }
    for (i = 0; i < candidatescnt; i++) {
@@ -9010,7 +8974,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
 //   can be set to 1.0
    ae_assert(state->densebatchsize == 0, "SAS: integrity check failed", _state);
    ae_assert(sactivesets_minnormseparation > 0.0, "SAS: integrity check failed", _state);
-   rvectorsetlengthatleast(&state->tmpnormestimates, candidatescnt, _state);
+   vectorsetlengthatleast(&state->tmpnormestimates, candidatescnt, _state);
    for (i = 0; i < candidatescnt; i++) {
       state->tmpnormestimates.xR[i] = 1.0;
    }
@@ -9085,7 +9049,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    // Reorthogonalize other candidates with respect to candidate #0:
    // * calculate projections en masse with GEMV()
    // * subtract projections with GER()
-      rvectorsetlengthatleast(&state->tmp0, candidatescnt - 1, _state);
+      vectorsetlengthatleast(&state->tmp0, candidatescnt - 1, _state);
       for (j = 0; j < n; j++) {
          state->tmpprodp.xR[j] = state->pdensebatch.xyR[state->densebatchsize][j] / state->h.xR[j];
          state->tmpprods.xR[j] = state->sdensebatch.xyR[state->densebatchsize][j] * sqr(state->s.xR[j], _state);
@@ -9102,8 +9066,8 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
       rmatrixgemv(candidatescnt - 1, n, 1.0, &state->idensebatch, state->densebatchsize + 1, 0, 0, &state->tmpci, 0, 0.0, &state->tmp0, 0, _state);
       rmatrixger(candidatescnt - 1, n + 1, &state->idensebatch, state->densebatchsize + 1, 0, -1.0, &state->tmp0, 0, &state->tmpci, 0, _state);
    // Increase basis, decrease candidates count
-      inc(&state->densebatchsize, _state);
-      dec(&candidatescnt, _state);
+      state->densebatchsize++;
+      candidatescnt--;
    }
 }
 
@@ -9136,7 +9100,7 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVecto
    ae_assert(state->algostate == 1, "SAS: internal error in ConstrainedDescent() - not in optimization mode", _state);
    ae_assert(state->basisisready, "SAS: internal error in ConstrainedDescent() - no basis", _state);
    n = state->n;
-   rvectorsetlengthatleast(d, n, _state);
+   vectorsetlengthatleast(d, n, _state);
 // Calculate preconditioned constrained descent direction:
 //
 //     d := -inv(H)*( g - HA'*(HA*inv(H)*g) )
@@ -9377,7 +9341,7 @@ void sascorrection(sactiveset *state, RVector *x, double *penalty, ae_state *_st
    ae_assert(state->algostate == 1, "SASCorrection: is not in optimization mode", _state);
    sasrebuildbasis(state, _state);
    n = state->n;
-   rvectorsetlengthatleast(&state->corrtmp, n, _state);
+   vectorsetlengthatleast(&state->corrtmp, n, _state);
 // Calculate penalty term.
    *penalty = sasactivelcpenalty1(state, x, _state);
 // Perform projection 1.
@@ -9455,7 +9419,7 @@ double sasscaledconstrainednorm(sactiveset *state, RVector *d, ae_state *_state)
    double result;
    ae_assert(state->algostate == 1, "SASMoveTo: is not in optimization mode", _state);
    n = state->n;
-   rvectorsetlengthatleast(&state->scntmp, n, _state);
+   vectorsetlengthatleast(&state->scntmp, n, _state);
 // Prepare basis (if needed)
    sasrebuildbasis(state, _state);
 // Calculate descent direction
@@ -9558,13 +9522,13 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    }
 // General case.
 // Allocate temporaries.
-   rvectorsetlengthatleast(&state->rctmpg, n, _state);
-   rvectorsetlengthatleast(&state->rctmprightpart, n, _state);
-   rvectorsetlengthatleast(&state->rctmps, n, _state);
-   rmatrixsetlengthatleast(&state->rctmpdense0, n, nec + nic, _state);
-   rmatrixsetlengthatleast(&state->rctmpdense1, n, nec + nic, _state);
-   bvectorsetlengthatleast(&state->rctmpisequality, n + nec + nic, _state);
-   ivectorsetlengthatleast(&state->rctmpconstraintidx, n + nec + nic, _state);
+   vectorsetlengthatleast(&state->rctmpg, n, _state);
+   vectorsetlengthatleast(&state->rctmprightpart, n, _state);
+   vectorsetlengthatleast(&state->rctmps, n, _state);
+   matrixsetlengthatleast(&state->rctmpdense0, n, nec + nic, _state);
+   matrixsetlengthatleast(&state->rctmpdense1, n, nec + nic, _state);
+   vectorsetlengthatleast(&state->rctmpisequality, n + nec + nic, _state);
+   vectorsetlengthatleast(&state->rctmpconstraintidx, n + nec + nic, _state);
 // Calculate descent direction
    ae_v_moveneg(state->rctmpg.xR, 1, gc->xR, 1, n);
 // Determine candidates to the active set.
@@ -9631,7 +9595,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          v = -state->cleic.xyR[i][n];
          for (j = 0; j < n; j++) {
             v += state->cleic.xyR[i][j] * state->xc.xR[j];
-            rowscale = maxreal(rowscale, fabs(state->cleic.xyR[i][j] * state->s.xR[j]), _state);
+            rowscale = rmax2(rowscale, fabs(state->cleic.xyR[i][j] * state->s.xR[j]), _state);
          }
          if (v <= -1.0E5 * machineepsilon * rowscale) {
          // NOTE: it is important to check for non-strict inequality
@@ -9737,7 +9701,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          idx1++;
       }
    }
-   snnlsinit(n, minint(nec + nic, n, _state), n, &state->solver, _state);
+   snnlsinit(n, imin2(nec + nic, n, _state), n, &state->solver, _state);
    snnlssetproblem(&state->solver, &state->rctmpdense1, &state->rctmprightpart, nactivebnd, nactiveconstraints - nactivebnd, n, _state);
    for (i = 0; i < nactiveconstraints; i++) {
       if (state->rctmpisequality.xB[i]) {
@@ -9812,7 +9776,6 @@ void sasreactivateconstraintsprec(sactiveset *state, RVector *gc, ae_state *_sta
 
 void sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
    sactiveset *p = (sactiveset *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->h, 0, DT_REAL, _state, make_automatic);
@@ -9913,7 +9876,6 @@ void sactiveset_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void sactiveset_free(void *_p, bool make_automatic) {
    sactiveset *p = (sactiveset *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->xc, make_automatic);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->h, make_automatic);
@@ -9976,7 +9938,7 @@ void qqploaddefaults(ae_int_t n, qqpsettings *s, ae_state *_state) {
    s->cgphase = true;
    s->cnphase = true;
    s->cgminits = 5;
-   s->cgmaxits = maxint(s->cgminits, iround(1 + 0.33 * n, _state), _state);
+   s->cgmaxits = imax2(s->cgminits, iround(1 + 0.33 * n, _state), _state);
    s->sparsesolver = 0;
    s->cnmaxupdates = iround(1 + 0.1 * n, _state);
 }
@@ -10019,10 +9981,10 @@ void qqpcopysettings(qqpsettings *src, qqpsettings *dst, ae_state *_state) {
 // ALGLIB: Copyright 09.10.2017 by Sergey Bochkanov
 void qqppreallocategrowdense(qqpbuffers *sstate, ae_int_t nexpected, ae_int_t ngrowto, ae_state *_state) {
    if (sstate->densea.rows < nexpected || sstate->densea.cols < nexpected) {
-      rmatrixsetlengthatleast(&sstate->densea, ngrowto, ngrowto, _state);
+      matrixsetlengthatleast(&sstate->densea, ngrowto, ngrowto, _state);
    }
    if (sstate->densez.rows < nexpected || sstate->densez.cols < nexpected) {
-      rmatrixsetlengthatleast(&sstate->densez, ngrowto, ngrowto, _state);
+      matrixsetlengthatleast(&sstate->densez, ngrowto, ngrowto, _state);
    }
 }
 
@@ -10041,8 +10003,8 @@ static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, 
    double v;
    double result;
    n = sstate->n;
-   rvectorsetlengthatleast(tmp0, n, _state);
-   rvectorsetlengthatleast(tmp1, n, _state);
+   vectorsetlengthatleast(tmp0, n, _state);
+   vectorsetlengthatleast(tmp1, n, _state);
 // Calculate projected point
    for (i = 0; i < n; i++) {
       if (stp != 0.0) {
@@ -10100,7 +10062,7 @@ static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, 
 static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g, ae_state *_state) {
    ae_int_t n;
    n = sstate->n;
-   rvectorsetlengthatleast(g, n, _state);
+   vectorsetlengthatleast(g, n, _state);
    if (sstate->akind == 0) {
    // Dense matrix A
       rmatrixsymv(n, 1.0, &sstate->densea, 0, 0, true, x, 0, 0.0, g, 0, _state);
@@ -10167,11 +10129,11 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
    md = 0.0;
    mb = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(x->xR[i]), _state);
-      md = maxreal(md, fabs(d->xR[i]), _state);
+      mx = rmax2(mx, fabs(x->xR[i]), _state);
+      md = rmax2(md, fabs(d->xR[i]), _state);
    }
    for (i = 0; i < n; i++) {
-      mb = maxreal(mb, fabs(sstate->b.xR[i]), _state);
+      mb = rmax2(mb, fabs(sstate->b.xR[i]), _state);
    }
 // D2
    if (sstate->akind == 0) {
@@ -10251,8 +10213,8 @@ static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, R
    double fbest;
    double fcand;
    n = sstate->n;
-   rvectorsetlengthatleast(tmp0, n, _state);
-   bvectorsetlengthatleast(activated, n, _state);
+   vectorsetlengthatleast(tmp0, n, _state);
+   vectorsetlengthatleast(activated, n, _state);
 // Calculate initial step, store to Tmp0
 //
 // NOTE: Tmp0 is guaranteed to be feasible w.r.t. boundary constraints
@@ -10388,7 +10350,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
 //
 // This step is same for dense and sparse problems.
    sstate->cnmodelage = 0;
-   ivectorsetlengthatleast(&sstate->yidx, n, _state);
+   vectorsetlengthatleast(&sstate->yidx, n, _state);
    ridx0 = 0;
    ridx1 = n - 1;
    for (i = 0; i < n; i++) {
@@ -10416,8 +10378,8 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
    }
 // Constrained Newton matrix: dense version
    if (sstate->akind == 0) {
-      rmatrixsetlengthatleast(&sstate->densez, n, n, _state);
-      rvectorsetlengthatleast(&sstate->tmpcn, n, _state);
+      matrixsetlengthatleast(&sstate->densez, n, n, _state);
+      vectorsetlengthatleast(&sstate->tmpcn, n, _state);
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
             sstate->densez.xyR[i][j] = sstate->densea.xyR[i][j];
@@ -10432,7 +10394,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
             sstate->densez.xyR[i][j] = sstate->densez.xyR[k][sstate->yidx.xZ[j]];
          }
       }
-      rvectorsetlengthatleast(&sstate->regdiag, n, _state);
+      vectorsetlengthatleast(&sstate->regdiag, n, _state);
       for (i = 0; i < nfree; i++) {
          v = 0.0;
          for (j = 0; j < i; j++) {
@@ -10449,7 +10411,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
       for (i = 0; i < nfree; i++) {
          sstate->densez.xyR[i][i] += sstate->regdiag.xR[i];
       }
-      inc(ncholesky, _state);
+      ++*ncholesky;
       if (!spdmatrixcholeskyrec(&sstate->densez, 0, nfree, true, &sstate->tmpcn, _state)) {
          return result;
       }
@@ -10480,7 +10442,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
    // constraints by zeros. Diagonal elements corresponding to active
    // constraints are filled by unit values.
       sparsecopytosksbuf(&sstate->sparsea, &sstate->sparsecca, _state);
-      rvectorsetlengthatleast(&sstate->tmpcn, n, _state);
+      vectorsetlengthatleast(&sstate->tmpcn, n, _state);
       for (i = 0; i < n; i++) {
          sstate->tmpcn.xR[i] = 0.0;
       }
@@ -10502,7 +10464,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
          }
       }
    // Perform sparse Cholesky
-      inc(ncholesky, _state);
+      ++*ncholesky;
       if (!sparsecholeskyskyline(&sstate->sparsecca, n, sstate->sparseupper, _state)) {
          return result;
       }
@@ -10575,7 +10537,7 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
    nfree = sstate->nfree;
 // Determine variables to fix and move them to YIdx[NFree-NToFix:NFree-1]
 // Exit if CNModelAge increased too much.
-   ivectorsetlengthatleast(&sstate->tmpcni, n, _state);
+   vectorsetlengthatleast(&sstate->tmpcni, n, _state);
    ridx0 = 0;
    ridx1 = nfree - 1;
    for (i = 0; i < nfree; i++) {
@@ -10610,7 +10572,7 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
 // Constrained Newton matrix: dense version.
    if (sstate->akind == 0) {
    // Update Cholesky matrix with SPDMatrixCholeskyUpdateFixBuf()
-      bvectorsetlengthatleast(&sstate->tmpcnb, n, _state);
+      vectorsetlengthatleast(&sstate->tmpcnb, n, _state);
       for (i = 0; i < n; i++) {
          sstate->tmpcnb.xB[i] = false;
       }
@@ -10833,21 +10795,21 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    }
    ae_assert(settings->cgphase || settings->cnphase, "QQPOptimize: both phases (CG and Newton) are inactive", _state);
 // Allocate data structures
-   rvectorsetlengthatleast(&sstate->bndl, n, _state);
-   rvectorsetlengthatleast(&sstate->bndu, n, _state);
-   bvectorsetlengthatleast(&sstate->havebndl, n, _state);
-   bvectorsetlengthatleast(&sstate->havebndu, n, _state);
-   rvectorsetlengthatleast(&sstate->xs, n, _state);
-   rvectorsetlengthatleast(&sstate->xf, n, _state);
-   rvectorsetlengthatleast(&sstate->xp, n, _state);
-   rvectorsetlengthatleast(&sstate->gc, n, _state);
-   rvectorsetlengthatleast(&sstate->cgc, n, _state);
-   rvectorsetlengthatleast(&sstate->cgp, n, _state);
-   rvectorsetlengthatleast(&sstate->dc, n, _state);
-   rvectorsetlengthatleast(&sstate->dp, n, _state);
-   rvectorsetlengthatleast(&sstate->tmp0, n, _state);
-   rvectorsetlengthatleast(&sstate->tmp1, n, _state);
-   rvectorsetlengthatleast(&sstate->stpbuf, 15, _state);
+   vectorsetlengthatleast(&sstate->bndl, n, _state);
+   vectorsetlengthatleast(&sstate->bndu, n, _state);
+   vectorsetlengthatleast(&sstate->havebndl, n, _state);
+   vectorsetlengthatleast(&sstate->havebndu, n, _state);
+   vectorsetlengthatleast(&sstate->xs, n, _state);
+   vectorsetlengthatleast(&sstate->xf, n, _state);
+   vectorsetlengthatleast(&sstate->xp, n, _state);
+   vectorsetlengthatleast(&sstate->gc, n, _state);
+   vectorsetlengthatleast(&sstate->cgc, n, _state);
+   vectorsetlengthatleast(&sstate->cgp, n, _state);
+   vectorsetlengthatleast(&sstate->dc, n, _state);
+   vectorsetlengthatleast(&sstate->dp, n, _state);
+   vectorsetlengthatleast(&sstate->tmp0, n, _state);
+   vectorsetlengthatleast(&sstate->tmp1, n, _state);
+   vectorsetlengthatleast(&sstate->stpbuf, 15, _state);
    sasinit(n, &sstate->sas, _state);
 // Scale/shift problem coefficients:
 //
@@ -10860,14 +10822,14 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 // Modified A_mod=S*A*S and b_mod=S*(b+A*x0) are
 // stored into SState.DenseA and SState.B.
 //
-   rvectorsetlengthatleast(&sstate->b, n, _state);
+   vectorsetlengthatleast(&sstate->b, n, _state);
    for (i = 0; i < n; i++) {
       sstate->b.xR[i] = sc->xR[i] * bc->xR[i];
    }
    sstate->akind = -99;
    if (akind == 0) {
    // Dense QP problem - just copy and scale.
-      rmatrixsetlengthatleast(&sstate->densea, n, n, _state);
+      matrixsetlengthatleast(&sstate->densea, n, n, _state);
       cqmgeta(cqmac, &sstate->densea, _state);
       sstate->akind = 0;
       sstate->absamax = 0.0;
@@ -10878,7 +10840,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             v = sc->xR[i] * sstate->densea.xyR[i][j] * sc->xR[j];
             vv = fabs(v);
             sstate->densea.xyR[i][j] = v;
-            sstate->absamax = maxreal(sstate->absamax, vv, _state);
+            sstate->absamax = rmax2(sstate->absamax, vv, _state);
             sstate->absasum += vv;
             sstate->absasum2 += vv * vv;
          }
@@ -10906,12 +10868,12 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             sstate->sparsea.vals.xR[k] = v;
             if (i == j) {
             // Diagonal terms are counted only once
-               sstate->absamax = maxreal(sstate->absamax, vv, _state);
+               sstate->absamax = rmax2(sstate->absamax, vv, _state);
                sstate->absasum += vv;
                sstate->absasum2 += vv * vv;
             } else {
             // Offdiagonal terms are counted twice
-               sstate->absamax = maxreal(sstate->absamax, vv, _state);
+               sstate->absamax = rmax2(sstate->absamax, vv, _state);
                sstate->absasum += 2 * vv;
                sstate->absasum2 += 2 * vv * vv;
             }
@@ -10921,7 +10883,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    }
    if (akind == 2) {
    // Dense QP problem - just copy and scale.
-      rmatrixsetlengthatleast(&sstate->densea, n, n, _state);
+      matrixsetlengthatleast(&sstate->densea, n, n, _state);
       sstate->akind = 0;
       sstate->absamax = 0.0;
       sstate->absasum = 0.0;
@@ -10938,7 +10900,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                } else {
                   k = 2;
                }
-               sstate->absamax = maxreal(sstate->absamax, vv, _state);
+               sstate->absamax = rmax2(sstate->absamax, vv, _state);
                sstate->absasum += vv * k;
                sstate->absasum2 += vv * vv * k;
             }
@@ -10955,7 +10917,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                } else {
                   k = 2;
                }
-               sstate->absamax = maxreal(sstate->absamax, vv, _state);
+               sstate->absamax = rmax2(sstate->absamax, vv, _state);
                sstate->absasum += vv * k;
                sstate->absasum2 += vv * vv * k;
             }
@@ -11024,14 +10986,14 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
       isconstrained = (isconstrained || sstate->havebndl.xB[i]) || sstate->havebndu.xB[i];
    }
    if ((!isconstrained && settings->cnphase) && akind == 0) {
-      rmatrixsetlengthatleast(&sstate->densez, n, n, _state);
-      rvectorsetlengthatleast(&sstate->tmpcn, n, _state);
+      matrixsetlengthatleast(&sstate->densez, n, n, _state);
+      vectorsetlengthatleast(&sstate->tmpcn, n, _state);
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
             sstate->densez.xyR[i][j] = sstate->densea.xyR[i][j];
          }
       }
-      inc(&sstate->repncholesky, _state);
+      sstate->repncholesky++;
       if (spdmatrixcholeskyrec(&sstate->densez, 0, n, true, &sstate->tmpcn, _state)) {
          ae_v_move(sstate->xf.xR, 1, sstate->xs.xR, 1, n);
          for (i = 0; i < n; i++) {
@@ -11092,7 +11054,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             //         of decreasing it.
                fprev = qqpsolver_projectedtargetfunction(sstate, &sstate->xp, &sstate->dc, 0.0, &sstate->tmp0, &sstate->tmp1, _state);
                fcur = qqpsolver_projectedtargetfunction(sstate, &sstate->sas.xc, &sstate->dc, 0.0, &sstate->tmp0, &sstate->tmp1, _state);
-               if (fprev - fcur <= settings->epsf * maxreal(fabs(fprev), maxreal(fabs(fcur), 1.0, _state), _state)) {
+               if (fprev - fcur <= settings->epsf * rmax2(fabs(fprev), rmax2(fabs(fcur), 1.0, _state), _state)) {
                   *terminationtype = 1;
                   break;
                }
@@ -11108,7 +11070,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                }
             }
          }
-         inc(&sstate->repouteriterationscount, _state);
+         sstate->repouteriterationscount++;
          ae_v_move(sstate->xp.xR, 1, sstate->sas.xc.xR, 1, n);
          if (!settings->cgphase) {
             cgmax = 0;
@@ -11295,7 +11257,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             if (!b) {
                break;
             }
-            inc(&newtcnt, _state);
+            newtcnt++;
          // Calculate gradient GC.
             qqpsolver_targetgradient(sstate, &sstate->sas.xc, &sstate->gc, _state);
          // Bound-constrained Newton step
@@ -11417,8 +11379,6 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 }
 
 void qqpsettings_init(void *_p, ae_state *_state, bool make_automatic) {
-   qqpsettings *p = (qqpsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qqpsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -11437,13 +11397,10 @@ void qqpsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void qqpsettings_free(void *_p, bool make_automatic) {
-   qqpsettings *p = (qqpsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qqpbuffers *p = (qqpbuffers *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
    sparsematrix_init(&p->sparsea, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
@@ -11523,7 +11480,6 @@ void qqpbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void qqpbuffers_free(void *_p, bool make_automatic) {
    qqpbuffers *p = (qqpbuffers *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->densea, make_automatic);
    sparsematrix_free(&p->sparsea, make_automatic);
    ae_vector_free(&p->b, make_automatic);
@@ -11627,7 +11583,7 @@ static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb,
 // * modify quadratic term
 // * modify linear term
 // * add Lagrangian term
-   rmatrixsetlengthatleast(tmp2, sclsftnec + sclsftnic, ntotal, _state);
+   matrixsetlengthatleast(tmp2, sclsftnec + sclsftnic, ntotal, _state);
    for (i = 0; i < sclsftnec + sclsftnic; i++) {
    // Given constraint row ci and right hand side ri,
    // I-th quadratic constraint adds penalty term
@@ -11776,16 +11732,16 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 // account for Lagrange multipliers for "simple" constraints.
    nqrcols = ntotal + ktotal;
    nqrrows = nqrcols;
-   rvectorsetlengthatleast(&buffers->qrsv0, nqrcols, _state);
-   rvectorsetlengthatleast(&buffers->qrsvx1, nqrcols, _state);
+   vectorsetlengthatleast(&buffers->qrsv0, nqrcols, _state);
+   vectorsetlengthatleast(&buffers->qrsvx1, nqrcols, _state);
    for (i = 0; i < ntotal; i++) {
       buffers->qrsv0.xR[i] = exxc->xR[i];
    }
    for (i = 0; i < ktotal; i++) {
       buffers->qrsv0.xR[ntotal + i] = nulcest->xR[i];
    }
-   rmatrixsetlengthatleast(&buffers->qrkkt, nqrcols + nqrcols, nqrcols + 1, _state);
-   rvectorsetlengthatleast(&buffers->qrrightpart, nqrcols + nqrcols, _state);
+   matrixsetlengthatleast(&buffers->qrkkt, nqrcols + nqrcols, nqrcols + 1, _state);
+   vectorsetlengthatleast(&buffers->qrrightpart, nqrcols + nqrcols, _state);
    lambdareg = 1.0E-8;
    while (true) {
    // Initialize matrix A1 and right part b1 with zeros
@@ -11803,7 +11759,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
             buffers->qrkkt.xyR[i][j] = sclsfta->xyR[i][j];
          }
          buffers->qrrightpart.xR[i] = -sclsftb->xR[i];
-         mxdiag = maxreal(mxdiag, fabs(sclsfta->xyR[i][i]), _state);
+         mxdiag = rmax2(mxdiag, fabs(sclsfta->xyR[i][i]), _state);
       }
       mxdiag = coalesce(mxdiag, 1.0, _state);
    // Append general linear constraints
@@ -11937,15 +11893,15 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
    ae_int_t ktotal;
    ae_assert(akind == 0 || akind == 1, "QPDENSEAULOptimize: unexpected AKind", _state);
    ktotal = dnec + dnic + snec + snic;
-   rmatrixsetlengthatleast(&state->sclsfta, nmain, nmain, _state);
-   rvectorsetlengthatleast(&state->sclsftb, nmain, _state);
-   rvectorsetlengthatleast(&state->sclsftxc, nmain, _state);
-   rvectorsetlengthatleast(&state->sclsftbndl, nmain, _state);
-   rvectorsetlengthatleast(&state->sclsftbndu, nmain, _state);
-   bvectorsetlengthatleast(&state->sclsfthasbndl, nmain, _state);
-   bvectorsetlengthatleast(&state->sclsfthasbndu, nmain, _state);
-   rmatrixsetlengthatleast(&state->sclsftcleic, ktotal, nmain + 1, _state);
-   rvectorsetlengthatleast(&state->cscales, ktotal, _state);
+   matrixsetlengthatleast(&state->sclsfta, nmain, nmain, _state);
+   vectorsetlengthatleast(&state->sclsftb, nmain, _state);
+   vectorsetlengthatleast(&state->sclsftxc, nmain, _state);
+   vectorsetlengthatleast(&state->sclsftbndl, nmain, _state);
+   vectorsetlengthatleast(&state->sclsftbndu, nmain, _state);
+   vectorsetlengthatleast(&state->sclsfthasbndl, nmain, _state);
+   vectorsetlengthatleast(&state->sclsfthasbndu, nmain, _state);
+   matrixsetlengthatleast(&state->sclsftcleic, ktotal, nmain + 1, _state);
+   vectorsetlengthatleast(&state->cscales, ktotal, _state);
    if (akind == 0) {
    // Extract dense A and scale
       cqmgeta(a, &state->tmp2, _state);
@@ -12145,7 +12101,7 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
    anorm = sqrt(anorm);
    if (usecleic && ktotal > 0) {
    // Calculate max(|diag(C*A*C')|), where C is constraint matrix
-      rmatrixsetlengthatleast(tmp2, ktotal, nmain, _state);
+      matrixsetlengthatleast(tmp2, ktotal, nmain, _state);
       rmatrixgemm(ktotal, nmain, nmain, 1.0, cleic, 0, 0, 0, a, 0, 0, 0, 0.0, tmp2, 0, 0, _state);
       maxcac = 0.0;
       for (i = 0; i < ktotal; i++) {
@@ -12156,12 +12112,12 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
             vv += sqr(cleic->xyR[i][j], _state);
          }
          ae_assert(fabs(vv - 1) < 1.0E-9 || vv == 0.0, "DENSE-AUL: integrity check failed", _state);
-         maxcac = maxreal(maxcac, fabs(v), _state);
+         maxcac = rmax2(maxcac, fabs(v), _state);
       }
    } else {
       maxcac = 0.0;
    }
-   result = coalesce(maxreal(maxcac, anorm / nmain, _state), 1.0, _state);
+   result = coalesce(rmax2(maxcac, anorm / nmain, _state), 1.0, _state);
    v = 1 / result;
    for (i = 0; i < nmain; i++) {
       for (j = 0; j < nmain; j++) {
@@ -12200,8 +12156,8 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
    ae_int_t j;
    *nicwork = 0;
    *allowwseviction = false;
-   rmatrixsetlengthatleast(tmp2, nmain, nmain, _state);
-   rvectorsetlengthatleast(tmp0, nmain, _state);
+   matrixsetlengthatleast(tmp2, nmain, nmain, _state);
+   vectorsetlengthatleast(tmp0, nmain, _state);
    for (i = 0; i < nmain; i++) {
       for (j = i; j < nmain; j++) {
          tmp2->xyR[i][j] = a->xyR[i][j];
@@ -12328,21 +12284,21 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
    state->repnwrk1 = 0;
    state->repnwrkf = 0;
    *terminationtype = 0;
-   ivectorsetlengthatleast(&state->cidx, ktotal, _state);
-   rvectorsetlengthatleast(&state->nulc, ktotal, _state);
-   rvectorsetlengthatleast(&state->nulcest, ktotal, _state);
-   rvectorsetlengthatleast(&state->exb, ntotal, _state);
-   rvectorsetlengthatleast(&state->exxc, ntotal, _state);
-   rvectorsetlengthatleast(&state->exxorigin, ntotal, _state);
-   rvectorsetlengthatleast(&state->exbndl, ntotal, _state);
-   rvectorsetlengthatleast(&state->exbndu, ntotal, _state);
-   rvectorsetlengthatleast(&state->exscale, ntotal, _state);
-   rvectorsetlengthatleast(&state->tmp0, ntotal, _state);
-   rvectorsetlengthatleast(&state->nicerr, nictotal, _state);
-   ivectorsetlengthatleast(&state->nicnact, nictotal, _state);
+   vectorsetlengthatleast(&state->cidx, ktotal, _state);
+   vectorsetlengthatleast(&state->nulc, ktotal, _state);
+   vectorsetlengthatleast(&state->nulcest, ktotal, _state);
+   vectorsetlengthatleast(&state->exb, ntotal, _state);
+   vectorsetlengthatleast(&state->exxc, ntotal, _state);
+   vectorsetlengthatleast(&state->exxorigin, ntotal, _state);
+   vectorsetlengthatleast(&state->exbndl, ntotal, _state);
+   vectorsetlengthatleast(&state->exbndu, ntotal, _state);
+   vectorsetlengthatleast(&state->exscale, ntotal, _state);
+   vectorsetlengthatleast(&state->tmp0, ntotal, _state);
+   vectorsetlengthatleast(&state->nicerr, nictotal, _state);
+   vectorsetlengthatleast(&state->nicnact, nictotal, _state);
 // Allocate Lagrange multipliers, fill by default values (zeros)
-   rvectorsetlengthatleast(lagbc, nmain, _state);
-   rvectorsetlengthatleast(laglc, ktotal, _state);
+   vectorsetlengthatleast(lagbc, nmain, _state);
+   vectorsetlengthatleast(laglc, ktotal, _state);
    for (i = 0; i < nmain; i++) {
       lagbc->xR[i] = 0.0;
    }
@@ -12424,7 +12380,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       //       preallocated to the maximum size required (NTotal).
          if (state->exa.rows < nwork || state->exa.cols < nwork) {
             i = nwork + nwork / 3 + 1;
-            rmatrixsetlengthatleast(&state->exa, i, i, _state);
+            matrixsetlengthatleast(&state->exa, i, i, _state);
          }
          qqppreallocategrowdense(&state->qqpbuf, nwork, i, _state);
       // Generate penalized quadratic model
@@ -12476,10 +12432,10 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                state->exxc.xR[nmain + nicwork] = 0.0;
                state->nulc.xR[nectotal + nicwork] = 0.0;
                state->nicnact.xZ[nicwork]++;
-               inc(&nicwork, _state);
-               inc(&nwork, _state);
-               inc(&kwork, _state);
-               inc(&i, _state);
+               nicwork++;
+               nwork++;
+               kwork++;
+               i++;
                workingsetextended = true;
             } else {
                break;
@@ -12501,9 +12457,9 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                   swapelementsi(&state->nicnact, nicwork - 1, k, _state);
                   swapelements(&state->exxc, nmain + nicwork - 1, nmain + k, _state);
                   swapelements(&state->nulc, nectotal + nicwork - 1, nectotal + k, _state);
-                  dec(&nicwork, _state);
-                  dec(&nwork, _state);
-                  dec(&kwork, _state);
+                  nicwork--;
+                  nwork--;
+                  kwork--;
                }
             }
          }
@@ -12513,7 +12469,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
          }
          state->repnwrkf = nicwork;
          if (workingsetextended) {
-            inc(&state->repnwrkchanges, _state);
+            state->repnwrkchanges++;
          }
       } while (workingsetextended);
    // Estimate Lagrange multipliers using alternative algorithm
@@ -12545,12 +12501,12 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       }
       feaserr = sqrt(feaserr);
       if (feaserr < epsx) {
-         inc(&goodcounter, _state);
+         goodcounter++;
       } else {
          goodcounter = 0;
       }
       if (feaserr > feaserrprev * requestedfeasdecrease) {
-         inc(&stagnationcounter, _state);
+         stagnationcounter++;
       } else {
          stagnationcounter = 0;
       }
@@ -12558,9 +12514,9 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
          break;
       }
       if (stagnationcounter >= 2) {
-         rho = minreal(rho * 10.0, maxrho, _state);
+         rho = rmin2(rho * 10.0, maxrho, _state);
       } else {
-         rho = minreal(rho * 1.41, maxrho, _state);
+         rho = rmin2(rho * 1.41, maxrho, _state);
       }
    }
 // Convert Lagrange multipliers from internal format to one expected
@@ -12572,7 +12528,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
    for (i = 0; i < nectotal + nicwork; i++) {
       laglc->xR[state->cidx.xZ[i]] = -state->nulc.xR[i] * targetscale / state->cscales.xR[i];
    }
-   rvectorsetlengthatleast(&state->tmpg, nmain, _state);
+   vectorsetlengthatleast(&state->tmpg, nmain, _state);
    for (i = 0; i < nmain; i++) {
       v = state->sclsftb.xR[i];
       for (j = 0; j < nmain; j++) {
@@ -12619,8 +12575,6 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
 }
 
 void qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic) {
-   qpdenseaulsettings *p = (qpdenseaulsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qpdenseaulsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -12632,13 +12586,10 @@ void qpdenseaulsettings_copy(void *_dst, void *_src, ae_state *_state, bool make
 }
 
 void qpdenseaulsettings_free(void *_p, bool make_automatic) {
-   qpdenseaulsettings *p = (qpdenseaulsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpdenseaulbuffers *p = (qpdenseaulbuffers *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->nulc, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->sclsfta, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclsftb, 0, DT_REAL, _state, make_automatic);
@@ -12728,7 +12679,6 @@ void qpdenseaulbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_
 
 void qpdenseaulbuffers_free(void *_p, bool make_automatic) {
    qpdenseaulbuffers *p = (qpdenseaulbuffers *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->nulc, make_automatic);
    ae_matrix_free(&p->sclsfta, make_automatic);
    ae_vector_free(&p->sclsftb, make_automatic);
@@ -12888,7 +12838,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
 //
 // NOTE: we convert inequality constraints to the form
 // A*x <= b before copying them.
-   rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
+   matrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
    for (i = 0; i < k; i++) {
@@ -13043,7 +12993,7 @@ void minbleicsetprecdiag(minbleicstate *state, RVector *d, ae_state *_state) {
       ae_assert(isfinite(d->xR[i]), "MinBLEICSetPrecDiag: D contains infinite or NAN elements", _state);
       ae_assert(d->xR[i] > 0.0, "MinBLEICSetPrecDiag: D contains non-positive elements", _state);
    }
-   rvectorsetlengthatleast(&state->diagh, state->nmain, _state);
+   vectorsetlengthatleast(&state->diagh, state->nmain, _state);
    state->prectype = 2;
    for (i = 0; i < state->nmain; i++) {
       state->diagh.xR[i] = d->xR[i];
@@ -13510,7 +13460,7 @@ bool minbleiciteration(minbleicstate *state, ae_state *_state) {
 // * GDecay     desired decrease of constrained gradient during L-BFGS iterations.
 //              This coefficient is decreased after each L-BFGS round until
 //              it reaches minimum decay.
-   m = minint(5, state->nmain, _state);
+   m = imin2(5, state->nmain, _state);
    gdecay = minbleic_initialdecay;
 // Init
    n = state->nmain;
@@ -13530,11 +13480,11 @@ bool minbleiciteration(minbleicstate *state, ae_state *_state) {
       result = false;
       return result;
    }
-   rmatrixsetlengthatleast(&state->bufyk, m + 1, n, _state);
-   rmatrixsetlengthatleast(&state->bufsk, m + 1, n, _state);
-   rvectorsetlengthatleast(&state->bufrho, m, _state);
-   rvectorsetlengthatleast(&state->buftheta, m, _state);
-   rvectorsetlengthatleast(&state->tmp0, n, _state);
+   matrixsetlengthatleast(&state->bufyk, m + 1, n, _state);
+   matrixsetlengthatleast(&state->bufsk, m + 1, n, _state);
+   vectorsetlengthatleast(&state->bufrho, m, _state);
+   vectorsetlengthatleast(&state->buftheta, m, _state);
+   vectorsetlengthatleast(&state->tmp0, n, _state);
    smoothnessmonitorinit(&state->smonitor, &state->s, n, 1, state->smoothnessguardlevel > 0, _state);
    for (i = 0; i < n; i++) {
       state->lastscaleused.xR[i] = state->s.xR[i];
@@ -13565,7 +13515,7 @@ lbl_0:
 lbl_25:
 lbl_22:
 // Fill TmpPrec with current preconditioner
-   rvectorsetlengthatleast(&state->tmpprec, n, _state);
+   vectorsetlengthatleast(&state->tmpprec, n, _state);
    for (i = 0; i < n; i++) {
       if (state->prectype == 2) {
          state->tmpprec.xR[i] = state->diagh.xR[i];
@@ -13739,7 +13689,7 @@ lbl_33:
       ginit += sqr(state->cgc.xR[i] * state->s.xR[i], _state);
    }
    ginit = sqrt(ginit);
-   state->maxscaledgrad = maxreal(state->maxscaledgrad, ginit, _state);
+   state->maxscaledgrad = rmax2(state->maxscaledgrad, ginit, _state);
    if (!isfinite(ginit) || !isfinite(state->fc)) {
    // Abnormal termination - infinities in function/gradient
       sasstopoptimization(&state->sas, _state);
@@ -13873,7 +13823,7 @@ lbl_39:
       v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
       v = sqrt(v);
       if (v > 0.0) {
-         state->curstpmax = minreal(state->curstpmax, state->stpmax / v, _state);
+         state->curstpmax = rmin2(state->curstpmax, state->stpmax / v, _state);
       }
    }
 // Report beginning of line search (if requested by caller).
@@ -14182,7 +14132,7 @@ lbl_52:
          goto lbl_40;
       }
    // Function change is small enough
-      if (fabs(state->fp - state->fc) <= state->epsf * maxreal(fabs(state->fc), maxreal(fabs(state->fp), 1.0, _state), _state)) {
+      if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0, _state), _state)) {
          state->repterminationtype = 1;
          goto lbl_40;
       }
@@ -14220,7 +14170,7 @@ lbl_40:
    }
 // Decrease decay coefficient. Subsequent L-BFGS stages will
 // have more stringent stopping criteria.
-   gdecay = maxreal(gdecay * minbleic_decaycorrection, minbleic_mindecay, _state);
+   gdecay = rmax2(gdecay * minbleic_decaycorrection, minbleic_mindecay, _state);
    goto lbl_30;
 lbl_31:
    sasstopoptimization(&state->sas, _state);
@@ -14648,7 +14598,6 @@ void minbleicemergencytermination(minbleicstate *state, ae_state *_state) {
 
 void minbleicstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbleicstate *p = (minbleicstate *)_p;
-   ae_touch_ptr((void *)p);
    sactiveset_init(&p->sas, _state, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
@@ -14779,7 +14728,6 @@ void minbleicstate_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 
 void minbleicstate_free(void *_p, bool make_automatic) {
    minbleicstate *p = (minbleicstate *)_p;
-   ae_touch_ptr((void *)p);
    sactiveset_free(&p->sas, make_automatic);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->diagh, make_automatic);
@@ -14814,8 +14762,6 @@ void minbleicstate_free(void *_p, bool make_automatic) {
 }
 
 void minbleicreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minbleicreport *p = (minbleicreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minbleicreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -14836,8 +14782,6 @@ void minbleicreport_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 }
 
 void minbleicreport_free(void *_p, bool make_automatic) {
-   minbleicreport *p = (minbleicreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -15299,12 +15243,12 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
 // Prepare max(|B|)
    mb = 0.0;
    for (i = 0; i < n; i++) {
-      mb = maxreal(mb, fabs(b->xR[i]), _state);
+      mb = rmax2(mb, fabs(b->xR[i]), _state);
    }
 // Temporaries
-   ivectorsetlengthatleast(&sstate->tmpi, nec + nic, _state);
-   rvectorsetlengthatleast(&sstate->tmp0, n, _state);
-   rvectorsetlengthatleast(&sstate->tmp1, n, _state);
+   vectorsetlengthatleast(&sstate->tmpi, nec + nic, _state);
+   vectorsetlengthatleast(&sstate->tmp0, n, _state);
+   vectorsetlengthatleast(&sstate->tmp1, n, _state);
    for (i = 0; i < nec; i++) {
       sstate->tmpi.xZ[i] = 0;
    }
@@ -15324,9 +15268,9 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
       // Iteration counters:
       // * inner iterations count is increased on every line search
       // * outer iterations count is increased only at steepest descent line search
-         inc(&sstate->repinneriterationscount, _state);
+         sstate->repinneriterationscount++;
          if (sstate->solver.steepestdescentstep) {
-            inc(&sstate->repouteriterationscount, _state);
+            sstate->repouteriterationscount++;
          }
       // Build quadratic model of F along descent direction:
       //
@@ -15351,8 +15295,8 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
          mx = 0.0;
          md = 0.0;
          for (i = 0; i < n; i++) {
-            mx = maxreal(mx, fabs(sstate->solver.x.xR[i]), _state);
-            md = maxreal(md, fabs(sstate->solver.d.xR[i]), _state);
+            mx = rmax2(mx, fabs(sstate->solver.x.xR[i]), _state);
+            md = rmax2(md, fabs(sstate->solver.d.xR[i]), _state);
          }
          estimateparabolicmodel(absasum, absasum2, mx, mb, md, d1, d2, &d1est, &d2est, _state);
       // Tests for "normal" convergence.
@@ -15420,7 +15364,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
             // 3. stop if function change is small enough
                v = -d1 / (2 * d2);
                v1 = d2 * v * v + d1 * v;
-               if (fabs(v1) <= settings->epsf * maxreal(d0, 1.0, _state)) {
+               if (fabs(v1) <= settings->epsf * rmax2(d0, 1.0, _state)) {
                   *terminationtype = 1;
                   for (i = 0; i < n; i++) {
                      xs->xR[i] = sstate->solver.x.xR[i];
@@ -15505,8 +15449,6 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
 }
 
 void qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic) {
-   qpbleicsettings *p = (qpbleicsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qpbleicsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -15519,13 +15461,10 @@ void qpbleicsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 }
 
 void qpbleicsettings_free(void *_p, bool make_automatic) {
-   qpbleicsettings *p = (qpbleicsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpbleicbuffers *p = (qpbleicbuffers *)_p;
-   ae_touch_ptr((void *)p);
    minbleicstate_init(&p->solver, _state, make_automatic);
    minbleicreport_init(&p->solverrep, _state, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, _state, make_automatic);
@@ -15547,7 +15486,6 @@ void qpbleicbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void qpbleicbuffers_free(void *_p, bool make_automatic) {
    qpbleicbuffers *p = (qpbleicbuffers *)_p;
-   ae_touch_ptr((void *)p);
    minbleicstate_free(&p->solver, make_automatic);
    minbleicreport_free(&p->solverrep, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
@@ -15619,7 +15557,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
    state->factorizationpresent = false;
    state->factorizationpoweredup = false;
 // Linear term
-   rvectorsetlengthatleast(&state->c, n, _state);
+   vectorsetlengthatleast(&state->c, n, _state);
    rvectorcopy(n, c, 0, &state->c, 0, _state);
 // Quadratic term and normalization
 //
@@ -15633,7 +15571,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
    // Quadratic term is stored in dense format: either copy dense
    // term of densify sparse one
       state->hkind = 0;
-      rmatrixsetlengthatleast(&state->denseh, nmain, nmain, _state);
+      matrixsetlengthatleast(&state->denseh, nmain, nmain, _state);
       if (hkind == 0) {
       // Copy dense quadratic term
          if (isupper) {
@@ -15711,9 +15649,9 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
                }
             }
          }
-         ivectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
-         ivectorsetlengthatleast(&state->sparseh.idx, nnz, _state);
-         rvectorsetlengthatleast(&state->sparseh.vals, nnz, _state);
+         vectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
+         vectorsetlengthatleast(&state->sparseh.idx, nnz, _state);
+         vectorsetlengthatleast(&state->sparseh.vals, nnz, _state);
          state->sparseh.ridx.xZ[0] = 0;
          offs = 0;
          vv = 0.0;
@@ -15761,9 +15699,9 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          ae_assert(sparseh->matrixtype == 1, "VIPMSetQuadraticLinear: unexpected sparse matrix format", _state);
          ae_assert(sparseh->m == n, "VIPMSetQuadraticLinear: unexpected sparse matrix size", _state);
          ae_assert(sparseh->n == n, "VIPMSetQuadraticLinear: unexpected sparse matrix size", _state);
-         ivectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
-         ivectorsetlengthatleast(&state->sparseh.idx, sparseh->ridx.xZ[n] + n, _state);
-         rvectorsetlengthatleast(&state->sparseh.vals, sparseh->ridx.xZ[n] + n, _state);
+         vectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
+         vectorsetlengthatleast(&state->sparseh.idx, sparseh->ridx.xZ[n] + n, _state);
+         vectorsetlengthatleast(&state->sparseh.vals, sparseh->ridx.xZ[n] + n, _state);
          state->sparseh.ridx.xZ[0] = 0;
          offs = 0;
          vv = 0.0;
@@ -15866,12 +15804,12 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    state->factorizationpresent = false;
    state->factorizationpoweredup = false;
 // Box constraints
-   rvectorsetlengthatleast(&state->bndl, n, _state);
-   rvectorsetlengthatleast(&state->bndu, n, _state);
-   rvectorsetlengthatleast(&state->rawbndl, n, _state);
-   rvectorsetlengthatleast(&state->rawbndu, n, _state);
-   bvectorsetlengthatleast(&state->hasbndl, n, _state);
-   bvectorsetlengthatleast(&state->hasbndu, n, _state);
+   vectorsetlengthatleast(&state->bndl, n, _state);
+   vectorsetlengthatleast(&state->bndu, n, _state);
+   vectorsetlengthatleast(&state->rawbndl, n, _state);
+   vectorsetlengthatleast(&state->rawbndu, n, _state);
+   vectorsetlengthatleast(&state->hasbndl, n, _state);
+   vectorsetlengthatleast(&state->hasbndu, n, _state);
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = isfinite(bndl->xR[i]);
       state->hasbndu.xB[i] = isfinite(bndu->xR[i]);
@@ -15884,12 +15822,12 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    scaleshiftbcinplace(&state->scl, &state->xorigin, &state->bndl, &state->bndu, n, _state);
 // Linear constraints (full matrices)
    m = mdense + msparse;
-   rvectorsetlengthatleast(&state->b, m, _state);
-   rvectorsetlengthatleast(&state->r, m, _state);
-   rvectorsetlengthatleast(&state->ascales, m, _state);
-   bvectorsetlengthatleast(&state->aflips, m, _state);
-   bvectorsetlengthatleast(&state->hasr, m, _state);
-   rmatrixsetlengthatleast(&state->denseafull, mdense, n, _state);
+   vectorsetlengthatleast(&state->b, m, _state);
+   vectorsetlengthatleast(&state->r, m, _state);
+   vectorsetlengthatleast(&state->ascales, m, _state);
+   vectorsetlengthatleast(&state->aflips, m, _state);
+   vectorsetlengthatleast(&state->hasr, m, _state);
+   matrixsetlengthatleast(&state->denseafull, mdense, n, _state);
    if (msparse > 0) {
       sparsecopytocrsbuf(sparsea, &state->sparseafull, _state);
    }
@@ -15980,22 +15918,22 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    state->mdense = mdense;
    state->msparse = msparse;
 // Separate main and slack parts of the constraint matrices
-   ivectorsetlengthatleast(&state->tmpi, nslack, _state);
+   vectorsetlengthatleast(&state->tmpi, nslack, _state);
    for (i = 0; i < nslack; i++) {
       state->tmpi.xZ[i] = 0;
    }
    state->combinedaslack.m = mdense + msparse;
    state->combinedaslack.n = nslack;
-   ivectorsetlengthatleast(&state->combinedaslack.ridx, mdense + msparse + 1, _state);
-   ivectorsetlengthatleast(&state->combinedaslack.idx, nslack, _state);
-   rvectorsetlengthatleast(&state->combinedaslack.vals, nslack, _state);
+   vectorsetlengthatleast(&state->combinedaslack.ridx, mdense + msparse + 1, _state);
+   vectorsetlengthatleast(&state->combinedaslack.idx, nslack, _state);
+   vectorsetlengthatleast(&state->combinedaslack.vals, nslack, _state);
    state->combinedaslack.ridx.xZ[0] = 0;
    state->sparseamain.m = msparse;
    state->sparseamain.n = nmain;
    if (msparse > 0) {
-      ivectorsetlengthatleast(&state->sparseamain.ridx, msparse + 1, _state);
-      ivectorsetlengthatleast(&state->sparseamain.idx, sparsea->ridx.xZ[msparse], _state);
-      rvectorsetlengthatleast(&state->sparseamain.vals, sparsea->ridx.xZ[msparse], _state);
+      vectorsetlengthatleast(&state->sparseamain.ridx, msparse + 1, _state);
+      vectorsetlengthatleast(&state->sparseamain.idx, sparsea->ridx.xZ[msparse], _state);
+      vectorsetlengthatleast(&state->sparseamain.vals, sparsea->ridx.xZ[msparse], _state);
       state->sparseamain.ridx.xZ[0] = 0;
       for (i = 0; i < msparse; i++) {
          offsmain = state->sparseamain.ridx.xZ[i];
@@ -16023,7 +15961,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    }
    sparsecreatecrsinplace(&state->sparseamain, _state);
    if (mdense > 0) {
-      rmatrixsetlengthatleast(&state->denseamain, mdense, nmain, _state);
+      matrixsetlengthatleast(&state->denseamain, mdense, nmain, _state);
       rmatrixcopy(mdense, nmain, &state->denseafull, 0, 0, &state->denseamain, 0, 0, _state);
       for (i = 0; i < mdense; i++) {
          offscombined = state->combinedaslack.ridx.xZ[msparse + i];
@@ -16121,9 +16059,9 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    state->repiterationscount = 0;
    state->repncholesky = 0;
 // Scale and origin
-   rvectorsetlengthatleast(&state->scl, n, _state);
-   rvectorsetlengthatleast(&state->invscl, n, _state);
-   rvectorsetlengthatleast(&state->xorigin, n, _state);
+   vectorsetlengthatleast(&state->scl, n, _state);
+   vectorsetlengthatleast(&state->invscl, n, _state);
+   vectorsetlengthatleast(&state->xorigin, n, _state);
    for (i = 0; i < n; i++) {
       ae_assert(s->xR[i] > 0.0, "VIPMInit: S[i] is non-positive", _state);
       state->scl.xR[i] = s->xR[i];
@@ -16132,14 +16070,14 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    }
    state->targetscale = 1.0;
 // Linear and quadratic terms - default value
-   rvectorsetlengthatleast(&state->c, n, _state);
+   vectorsetlengthatleast(&state->c, n, _state);
    for (i = 0; i < n; i++) {
       state->c.xR[i] = 0.0;
    }
    state->hkind = -1;
    if (ftype == 0) {
    // Dense quadratic term
-      rmatrixsetlengthatleast(&state->denseh, nmain, nmain, _state);
+      matrixsetlengthatleast(&state->denseh, nmain, nmain, _state);
       for (i = 0; i < nmain; i++) {
          for (j = 0; j <= i; j++) {
             state->denseh.xyR[i][j] = 0.0;
@@ -16153,9 +16091,9 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
       state->sparseh.m = n;
       state->sparseh.n = n;
       state->sparseh.ninitialized = n;
-      ivectorsetlengthatleast(&state->sparseh.idx, n, _state);
-      rvectorsetlengthatleast(&state->sparseh.vals, n, _state);
-      ivectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
+      vectorsetlengthatleast(&state->sparseh.idx, n, _state);
+      vectorsetlengthatleast(&state->sparseh.vals, n, _state);
+      vectorsetlengthatleast(&state->sparseh.ridx, n + 1, _state);
       for (i = 0; i < n; i++) {
          state->sparseh.idx.xZ[i] = i;
          state->sparseh.vals.xR[i] = 0.0;
@@ -16167,10 +16105,10 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    }
    ae_assert(state->hkind >= 0, "VIPMInit: integrity check failed", _state);
 // Box constraints - default values
-   rvectorsetlengthatleast(&state->bndl, n, _state);
-   rvectorsetlengthatleast(&state->bndu, n, _state);
-   bvectorsetlengthatleast(&state->hasbndl, n, _state);
-   bvectorsetlengthatleast(&state->hasbndu, n, _state);
+   vectorsetlengthatleast(&state->bndl, n, _state);
+   vectorsetlengthatleast(&state->bndu, n, _state);
+   vectorsetlengthatleast(&state->hasbndl, n, _state);
+   vectorsetlengthatleast(&state->hasbndu, n, _state);
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = false;
       state->hasbndu.xB[i] = false;
@@ -16320,16 +16258,16 @@ static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc, ae_state *
    ae_assert(m >= 0, "VarsInitFrom: M<0", _state);
    vstate->n = n;
    vstate->m = m;
-   rvectorsetlengthatleast(&vstate->x, n, _state);
-   rvectorsetlengthatleast(&vstate->g, n, _state);
-   rvectorsetlengthatleast(&vstate->t, n, _state);
-   rvectorsetlengthatleast(&vstate->w, m, _state);
-   rvectorsetlengthatleast(&vstate->p, m, _state);
-   rvectorsetlengthatleast(&vstate->z, n, _state);
-   rvectorsetlengthatleast(&vstate->s, n, _state);
-   rvectorsetlengthatleast(&vstate->y, m, _state);
-   rvectorsetlengthatleast(&vstate->v, m, _state);
-   rvectorsetlengthatleast(&vstate->q, m, _state);
+   vectorsetlengthatleast(&vstate->x, n, _state);
+   vectorsetlengthatleast(&vstate->g, n, _state);
+   vectorsetlengthatleast(&vstate->t, n, _state);
+   vectorsetlengthatleast(&vstate->w, m, _state);
+   vectorsetlengthatleast(&vstate->p, m, _state);
+   vectorsetlengthatleast(&vstate->z, n, _state);
+   vectorsetlengthatleast(&vstate->s, n, _state);
+   vectorsetlengthatleast(&vstate->y, m, _state);
+   vectorsetlengthatleast(&vstate->v, m, _state);
+   vectorsetlengthatleast(&vstate->q, m, _state);
    for (i = 0; i < n; i++) {
       vstate->x.xR[i] = vsrc->x.xR[i];
       vstate->g.xR[i] = vsrc->g.xR[i];
@@ -16544,7 +16482,7 @@ static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx, ae_
    ae_int_t i;
    n = state->n;
    nmain = state->nmain;
-   rvectorsetlengthatleast(hx, n, _state);
+   vectorsetlengthatleast(hx, n, _state);
    ae_assert(state->hkind == 0 || state->hkind == 1, "VIPMMultiplyHX: unexpected HKind", _state);
    if (state->hkind == 0) {
       rmatrixsymv(nmain, 1.0, &state->denseh, 0, 0, false, x, 0, 0.0, hx, 0, _state);
@@ -16697,8 +16635,8 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    // * freezing elements of Xh is a bit more complex - it needs:
    //   * zeroing out columns/rows of HWave and setting up unit diagonal prior to solving for Xh
    //   * explicitly zeroing out computed elements of Xh prior to computing Y and Xz
-      rvectorsetlengthatleast(&state->factregdhrh, nmain, _state);
-      rvectorsetlengthatleast(&state->factinvregdzrz, nslack, _state);
+      vectorsetlengthatleast(&state->factregdhrh, nmain, _state);
+      vectorsetlengthatleast(&state->factinvregdzrz, nslack, _state);
       for (i = 0; i < n; i++) {
          v = 0.0;
          if (alpha0 > 0.0) {
@@ -16721,7 +16659,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
          }
       }
    // Now we are ready to compute EWave
-      rvectorsetlengthatleast(&state->factregewave, m, _state);
+      vectorsetlengthatleast(&state->factregewave, m, _state);
       for (i = 0; i < m; i++) {
       // Compute diagonal element of E
          v = 0.0;
@@ -16747,7 +16685,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    // * store H
    // * add Dh
    // * add Ah'*inv(EWave)*Ah
-      rmatrixsetlengthatleast(&state->factdensehaug, nmain, nmain, _state);
+      matrixsetlengthatleast(&state->factdensehaug, nmain, nmain, _state);
       ae_assert(state->hkind == 0, "VIPMFactorize: unexpected HKind", _state);
       rmatrixcopy(nmain, nmain, &state->denseh, 0, 0, &state->factdensehaug, 0, 0, _state);
       for (i = 0; i < nmain; i++) {
@@ -16772,7 +16710,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
       }
       if (mdense > 0) {
       // Handle dense part of Ah in Ah'*inv(EWave)*Ah
-         rmatrixsetlengthatleast(&state->tmpr2, mdense, nmain, _state);
+         matrixsetlengthatleast(&state->tmpr2, mdense, nmain, _state);
          rmatrixcopy(mdense, nmain, &state->denseamain, 0, 0, &state->tmpr2, 0, 0, _state);
          for (i = 0; i < mdense; i++) {
             v = 1.0 / sqrt(state->factregewave.xR[msparse + i]);
@@ -16866,7 +16804,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    }
 // Done, integrity control
    ae_assert(state->factorizationpresent, "VIPMFactorize: integrity check failed", _state);
-   inc(&state->repncholesky, _state);
+   state->repncholesky++;
    return result;
 }
 
@@ -16904,7 +16842,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy,
          deltaxy->xR[nmain + i] *= state->factinvregdzrz.xR[i];
       }
       sparsegemv(&state->combinedaslack, 1.0, 0, deltaxy, nmain, 1.0, deltaxy, n, _state);
-      rvectorsetlengthatleast(&state->tmp1, m, _state);
+      vectorsetlengthatleast(&state->tmp1, m, _state);
       for (i = 0; i < m; i++) {
          state->tmp1.xR[i] = deltaxy->xR[n + i] / state->factregewave.xR[i];
       }
@@ -16929,7 +16867,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy,
          deltaxy->xR[n + i] /= state->factregewave.xR[i];
       }
    // Compute Xz = -(BzWave - inv(Dz+Rz)*Az'*y)
-      rvectorsetlengthatleast(&state->tmp0, nslack, _state);
+      vectorsetlengthatleast(&state->tmp0, nslack, _state);
       for (i = 0; i < nslack; i++) {
          state->tmp0.xR[i] = 0.0;
       }
@@ -17031,9 +16969,9 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
    // terms being added to diagonals)
       state->factsparsekkttmpl.m = n + m;
       state->factsparsekkttmpl.n = n + m;
-      ivectorsetlengthatleast(&state->factsparsekkttmpl.idx, nnzmax, _state);
-      rvectorsetlengthatleast(&state->factsparsekkttmpl.vals, nnzmax, _state);
-      ivectorsetlengthatleast(&state->factsparsekkttmpl.ridx, n + m + 1, _state);
+      vectorsetlengthatleast(&state->factsparsekkttmpl.idx, nnzmax, _state);
+      vectorsetlengthatleast(&state->factsparsekkttmpl.vals, nnzmax, _state);
+      vectorsetlengthatleast(&state->factsparsekkttmpl.ridx, n + m + 1, _state);
       state->factsparsekkttmpl.ridx.xZ[0] = 0;
       offs = 0;
       rowoffs = 0;
@@ -17137,12 +17075,12 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
          } else {
          // b <= 0, b+r can have any sign.
          // Select zero target if possible, if not - one with smallest absolute value.
-            v = minreal(vrhs + state->r.xR[i], 0.0, _state);
+            v = rmin2(vrhs + state->r.xR[i], 0.0, _state);
          }
       } else {
       // Single-sided constraint Ax >= b.
       // Select zero target if possible, if not - one with smallest absolute value.
-         v = maxreal(vrhs, 0.0, _state);
+         v = rmax2(vrhs, 0.0, _state);
       }
       state->deltaxy.xR[n + i] = v;
    }
@@ -17156,32 +17094,32 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
       state->current.y.xR[i] = state->deltaxy.xR[n + i];
    }
 // Set up slacks according to our own heuristic
-   initprimslack = maxreal(vipmsolver_initslackval, rmaxabsv(n, &state->current.x, _state), _state);
-   initdualslack = maxreal(vipmsolver_initslackval, rmaxabsv(m, &state->current.y, _state), _state);
+   initprimslack = rmax2(vipmsolver_initslackval, rmaxabsv(n, &state->current.x, _state), _state);
+   initdualslack = rmax2(vipmsolver_initslackval, rmaxabsv(m, &state->current.y, _state), _state);
    vipmsolver_multiplygeax(state, 1.0, &state->current.x, 0, 0.0, &state->tmpax, 0, _state);
    mu0 = 1.0;
    for (i = 0; i < n; i++) {
       if (state->hasgz.xB[i]) {
-         state->current.g.xR[i] = maxreal(fabs(state->current.x.xR[i] - state->bndl.xR[i]), initprimslack, _state);
-         state->current.z.xR[i] = maxreal(state->current.g.xR[i] * maxinitialimbalance, initdualslack, _state);
-         mu0 = maxreal(mu0, state->current.g.xR[i] * state->current.z.xR[i], _state);
+         state->current.g.xR[i] = rmax2(fabs(state->current.x.xR[i] - state->bndl.xR[i]), initprimslack, _state);
+         state->current.z.xR[i] = rmax2(state->current.g.xR[i] * maxinitialimbalance, initdualslack, _state);
+         mu0 = rmax2(mu0, state->current.g.xR[i] * state->current.z.xR[i], _state);
       }
       if (state->hasts.xB[i]) {
-         state->current.t.xR[i] = maxreal(fabs(state->current.x.xR[i] - state->bndu.xR[i]), initprimslack, _state);
-         state->current.s.xR[i] = maxreal(state->current.t.xR[i] * maxinitialimbalance, initdualslack, _state);
-         mu0 = maxreal(mu0, state->current.t.xR[i] * state->current.s.xR[i], _state);
+         state->current.t.xR[i] = rmax2(fabs(state->current.x.xR[i] - state->bndu.xR[i]), initprimslack, _state);
+         state->current.s.xR[i] = rmax2(state->current.t.xR[i] * maxinitialimbalance, initdualslack, _state);
+         mu0 = rmax2(mu0, state->current.t.xR[i] * state->current.s.xR[i], _state);
       }
    }
    for (i = 0; i < m; i++) {
       if (state->haswv.xB[i]) {
-         state->current.w.xR[i] = maxreal(fabs(state->tmpax.xR[i] - state->b.xR[i]), initprimslack, _state);
+         state->current.w.xR[i] = rmax2(fabs(state->tmpax.xR[i] - state->b.xR[i]), initprimslack, _state);
          state->current.v.xR[i] = rmax3(state->current.w.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), vipmsolver_initslackval, _state);
-         mu0 = maxreal(mu0, state->current.w.xR[i] * state->current.v.xR[i], _state);
+         mu0 = rmax2(mu0, state->current.w.xR[i] * state->current.v.xR[i], _state);
       }
       if (state->haspq.xB[i]) {
-         state->current.p.xR[i] = maxreal(fabs(state->r.xR[i] - state->current.w.xR[i]), initprimslack, _state);
+         state->current.p.xR[i] = rmax2(fabs(state->r.xR[i] - state->current.w.xR[i]), initprimslack, _state);
          state->current.q.xR[i] = rmax3(state->current.p.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), vipmsolver_initslackval, _state);
-         mu0 = maxreal(mu0, state->current.p.xR[i] * state->current.q.xR[i], _state);
+         mu0 = rmax2(mu0, state->current.p.xR[i] * state->current.q.xR[i], _state);
       }
    }
 // Additional shift to ensure that initial point is not too non-centered
@@ -17419,7 +17357,7 @@ static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, 
       state->rhsbetacap.xR[i] = rhs->beta.xR[i] - state->diagdwi.xR[i] * rhs->gammaw.xR[i];
    }
 // Solve reduced KKT system
-   rvectorsetlengthatleast(&state->deltaxy, n + m, _state);
+   vectorsetlengthatleast(&state->deltaxy, n + m, _state);
    for (i = 0; i < n; i++) {
       state->deltaxy.xR[i] = rhs->sigma.xR[i] - state->diagdziri.xR[i] * state->rhsnucap.xR[i] - state->diagdsiri.xR[i] * state->rhstaucap.xR[i];
    }
@@ -17462,13 +17400,13 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
    n = state->n;
    m = state->mdense + state->msparse;
 // Allocate
-   rvectorsetlengthatleast(&rhs->sigma, n, _state);
-   rvectorsetlengthatleast(&rhs->nu, n, _state);
-   rvectorsetlengthatleast(&rhs->tau, n, _state);
-   rvectorsetlengthatleast(&rhs->gammaz, n, _state);
-   rvectorsetlengthatleast(&rhs->gammas, n, _state);
-   rvectorsetlengthatleast(&rhs->gammaw, m, _state);
-   rvectorsetlengthatleast(&rhs->gammaq, m, _state);
+   vectorsetlengthatleast(&rhs->sigma, n, _state);
+   vectorsetlengthatleast(&rhs->nu, n, _state);
+   vectorsetlengthatleast(&rhs->tau, n, _state);
+   vectorsetlengthatleast(&rhs->gammaz, n, _state);
+   vectorsetlengthatleast(&rhs->gammas, n, _state);
+   vectorsetlengthatleast(&rhs->gammaw, m, _state);
+   vectorsetlengthatleast(&rhs->gammaq, m, _state);
    rsetallocv(m, 0.0, &rhs->beta, _state);
    rsetallocv(m, 0.0, &rhs->rho, _state);
    rsetallocv(m, 0.0, &rhs->alpha, _state);
@@ -17726,10 +17664,10 @@ static double vipmsolver_rhsdual2(vipmrighthandside *rhs, ae_int_t n, ae_int_t m
 static double vipmsolver_rhsprimalinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state) {
    double result;
    result = 0.0;
-   result = maxreal(result, rmaxabsv(m, &rhs->rho, _state), _state);
-   result = maxreal(result, rmaxabsv(n, &rhs->nu, _state), _state);
-   result = maxreal(result, rmaxabsv(n, &rhs->tau, _state), _state);
-   result = maxreal(result, rmaxabsv(m, &rhs->alpha, _state), _state);
+   result = rmax2(result, rmaxabsv(m, &rhs->rho, _state), _state);
+   result = rmax2(result, rmaxabsv(n, &rhs->nu, _state), _state);
+   result = rmax2(result, rmaxabsv(n, &rhs->tau, _state), _state);
+   result = rmax2(result, rmaxabsv(m, &rhs->alpha, _state), _state);
    return result;
 }
 
@@ -17745,8 +17683,8 @@ static double vipmsolver_rhsprimalinf(vipmrighthandside *rhs, ae_int_t n, ae_int
 static double vipmsolver_rhsdualinf(vipmrighthandside *rhs, ae_int_t n, ae_int_t m, ae_state *_state) {
    double result;
    result = 0.0;
-   result = maxreal(result, rmaxabsv(n, &rhs->sigma, _state), _state);
-   result = maxreal(result, rmaxabsv(m, &rhs->beta, _state), _state);
+   result = rmax2(result, rmaxabsv(n, &rhs->sigma, _state), _state);
+   result = rmax2(result, rmaxabsv(m, &rhs->beta, _state), _state);
    return result;
 }
 
@@ -17815,8 +17753,8 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    vrescmpl2 = vipmsolver_rhscompl2(&state->rhs, n, m, _state);
    vrespriminf = vipmsolver_rhsprimalinf(&state->rhs, n, m, _state);
    vresdualinf = vipmsolver_rhsdualinf(&state->rhs, n, m, _state);
-   primaldestabilized = vrhspriminf <= state->epsp && vrespriminf >= maxreal(verybadres * vrhspriminf, state->epsp, _state);
-   dualdestabilized = vrhsdualinf <= state->epsd && vresdualinf >= maxreal(verybadres * vrhsdualinf, state->epsd, _state);
+   primaldestabilized = vrhspriminf <= state->epsp && vrespriminf >= rmax2(verybadres * vrhspriminf, state->epsp, _state);
+   dualdestabilized = vrhsdualinf <= state->epsd && vresdualinf >= rmax2(verybadres * vrhsdualinf, state->epsd, _state);
    residualgrowth = sqrt((vresprim2 + vresdual2 + vrescmpl2) / coalesce(vrhsprim2 + vrhsdual2 + vrhscmpl2, 1.0, _state));
    if (((primaldestabilized || dualdestabilized) && residualgrowth > 0.01 * sqrt(machineepsilon)) && !isdampepslarge) {
       result = false;
@@ -17891,7 +17829,7 @@ static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vip
       }
    }
 // Because we may solve QP problem, step length has to be same for primal and dual variables
-   alpha = minreal(*alphap, *alphad, _state);
+   alpha = rmin2(*alphap, *alphad, _state);
 // Apply decay
    *alphap = stepdecay * alpha;
    *alphad = stepdecay * alpha;
@@ -17914,7 +17852,7 @@ static void vipmsolver_vipmperformstep(vipmstate *state, double alphap, double a
 // Perform step
    vipmsolver_varsaddstep(&state->current, &state->deltacorr, alphap, alphad, _state);
 // Update iterations count
-   inc(&state->repiterationscount, _state);
+   state->repiterationscount++;
 }
 
 // Compute primal/dual errors and complementarity gap
@@ -17941,27 +17879,27 @@ static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *er
    for (i = 0; i < m; i++) {
       v = state->tmpax.xR[i] - state->current.w.xR[i] - state->b.xR[i];
       *errp2 += v * v;
-      *errpinf = maxreal(*errpinf, fabs(v), _state);
-      inc(&cntp2, _state);
+      *errpinf = rmax2(*errpinf, fabs(v), _state);
+      cntp2++;
       if (state->haspq.xB[i]) {
          v = state->current.w.xR[i] + state->current.p.xR[i] - state->r.xR[i];
          *errp2 += v * v;
-         *errpinf = maxreal(*errpinf, fabs(v), _state);
-         inc(&cntp2, _state);
+         *errpinf = rmax2(*errpinf, fabs(v), _state);
+         cntp2++;
       }
    }
    for (i = 0; i < n; i++) {
       if (state->hasgz.xB[i]) {
          v = state->current.x.xR[i] - state->current.g.xR[i] - state->bndl.xR[i];
          *errp2 += v * v;
-         *errpinf = maxreal(*errpinf, fabs(v), _state);
-         inc(&cntp2, _state);
+         *errpinf = rmax2(*errpinf, fabs(v), _state);
+         cntp2++;
       }
       if (state->hasts.xB[i]) {
          v = state->current.x.xR[i] + state->current.t.xR[i] - state->bndu.xR[i];
          *errp2 += v * v;
-         *errpinf = maxreal(*errpinf, fabs(v), _state);
-         inc(&cntp2, _state);
+         *errpinf = rmax2(*errpinf, fabs(v), _state);
+         cntp2++;
       }
    }
    *errp2 = sqrt(*errp2 / coalesce((double)cntp2, 1.0, _state));
@@ -17978,8 +17916,8 @@ static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *er
             v += state->current.s.xR[i];
          }
          *errd2 += v * v;
-         *errdinf = maxreal(*errdinf, fabs(v), _state);
-         inc(&cntd2, _state);
+         *errdinf = rmax2(*errdinf, fabs(v), _state);
+         cntd2++;
       }
    }
    for (i = 0; i < m; i++) {
@@ -17991,9 +17929,9 @@ static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *er
          v += state->current.q.xR[i];
       }
       *errd2 += v * v;
-      *errdinf = maxreal(*errdinf, fabs(v), _state);
+      *errdinf = rmax2(*errdinf, fabs(v), _state);
       if (state->haswv.xB[i] || state->haspq.xB[i]) {
-         inc(&cntd2, _state);
+         cntd2++;
       }
    }
    *errd2 = sqrt(*errd2 / coalesce((double)cntd2, 1.0, _state));
@@ -18062,7 +18000,7 @@ static double vipmsolver_minnz(RVector *x, ae_int_t n, ae_state *_state) {
             result = x->xR[i];
             nz = true;
          } else {
-            result = minreal(result, x->xR[i], _state);
+            result = rmin2(result, x->xR[i], _state);
          }
       }
    }
@@ -18089,7 +18027,7 @@ static double vipmsolver_minprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
             result = x->xR[i] * y->xR[i];
             nz = true;
          } else {
-            result = minreal(result, x->xR[i] * y->xR[i], _state);
+            result = rmin2(result, x->xR[i] * y->xR[i], _state);
          }
       }
    }
@@ -18116,7 +18054,7 @@ static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
             result = x->xR[i] * y->xR[i];
             nz = true;
          } else {
-            result = maxreal(result, x->xR[i] * y->xR[i], _state);
+            result = rmax2(result, x->xR[i] * y->xR[i], _state);
          }
       }
    }
@@ -18188,7 +18126,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    double mxdeltaprimal;
    ae_int_t bestiteridx;
    double besterr;
-   double bestegap;
    double besteprimal;
    double bestedual;
    bool loadbest;
@@ -18233,15 +18170,14 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    vipmsolver_varsinitbyzero(&state->zerovars, n, m, _state);
    bestiteridx = -1;
    besterr = maxrealnumber;
-   bestegap = maxrealnumber;
    besteprimal = maxrealnumber;
    bestedual = maxrealnumber;
    y0nrm = 0.0;
-   y0nrm = maxreal(y0nrm, rmaxabsv(m, &state->current.y, _state), _state);
-   y0nrm = maxreal(y0nrm, rmaxabsv(m, &state->current.v, _state), _state);
-   y0nrm = maxreal(y0nrm, rmaxabsv(m, &state->current.q, _state), _state);
-   y0nrm = maxreal(y0nrm, rmaxabsv(n, &state->current.z, _state), _state);
-   y0nrm = maxreal(y0nrm, rmaxabsv(n, &state->current.s, _state), _state);
+   y0nrm = rmax2(y0nrm, rmaxabsv(m, &state->current.y, _state), _state);
+   y0nrm = rmax2(y0nrm, rmaxabsv(m, &state->current.v, _state), _state);
+   y0nrm = rmax2(y0nrm, rmaxabsv(m, &state->current.q, _state), _state);
+   y0nrm = rmax2(y0nrm, rmaxabsv(n, &state->current.z, _state), _state);
+   y0nrm = rmax2(y0nrm, rmaxabsv(n, &state->current.s, _state), _state);
 // Start iteration
    loadbest = true;
    primalstagnationcnt = 0;
@@ -18280,7 +18216,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       vipmsolver_varsinitfrom(&state->trial, &state->current, _state);
       vipmsolver_varsaddstep(&state->trial, &state->deltaaff, alphaaffp, alphaaffd, _state);
       muaff = vipmsolver_varscomputemu(&state->trial, _state);
-      sigma = minreal(pow((muaff + mumin) / (mu + mumin), 3.0), 1.0, _state);
+      sigma = rmin2(pow((muaff + mumin) / (mu + mumin), 3.0), 1.0, _state);
       ae_assert(isfinite(sigma) && sigma <= 1.0, "VIPMOptimize: critical integrity check failed for Sigma (infinite or greater than 1)", _state);
    // Compute corrector step
       vipmsolver_varsinitbyzero(&state->deltacorr, n, m, _state);
@@ -18308,34 +18244,34 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       // Determine variable and step scales.
       // Both quantities are bounded from below by 1.0
          mxprimal = 1.0;
-         mxprimal = maxreal(mxprimal, rmaxabsv(n, &state->current.x, _state), _state);
-         mxprimal = maxreal(mxprimal, rmaxabsv(n, &state->current.g, _state), _state);
-         mxprimal = maxreal(mxprimal, rmaxabsv(n, &state->current.t, _state), _state);
-         mxprimal = maxreal(mxprimal, rmaxabsv(m, &state->current.w, _state), _state);
-         mxprimal = maxreal(mxprimal, rmaxabsv(m, &state->current.p, _state), _state);
+         mxprimal = rmax2(mxprimal, rmaxabsv(n, &state->current.x, _state), _state);
+         mxprimal = rmax2(mxprimal, rmaxabsv(n, &state->current.g, _state), _state);
+         mxprimal = rmax2(mxprimal, rmaxabsv(n, &state->current.t, _state), _state);
+         mxprimal = rmax2(mxprimal, rmaxabsv(m, &state->current.w, _state), _state);
+         mxprimal = rmax2(mxprimal, rmaxabsv(m, &state->current.p, _state), _state);
          mxdeltaprimal = 1.0;
-         mxdeltaprimal = maxreal(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.x, _state), _state);
-         mxdeltaprimal = maxreal(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.g, _state), _state);
-         mxdeltaprimal = maxreal(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.t, _state), _state);
-         mxdeltaprimal = maxreal(mxdeltaprimal, alphap * rmaxabsv(m, &state->deltacorr.w, _state), _state);
-         mxdeltaprimal = maxreal(mxdeltaprimal, alphap * rmaxabsv(m, &state->deltacorr.p, _state), _state);
+         mxdeltaprimal = rmax2(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.x, _state), _state);
+         mxdeltaprimal = rmax2(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.g, _state), _state);
+         mxdeltaprimal = rmax2(mxdeltaprimal, alphap * rmaxabsv(n, &state->deltacorr.t, _state), _state);
+         mxdeltaprimal = rmax2(mxdeltaprimal, alphap * rmaxabsv(m, &state->deltacorr.w, _state), _state);
+         mxdeltaprimal = rmax2(mxdeltaprimal, alphap * rmaxabsv(m, &state->deltacorr.p, _state), _state);
       // If changes in primal variables are small enough, try dropping too large bounds
          if (mxdeltaprimal < mxprimal * vipmsolver_bigconstrxtol) {
          // Drop irrelevant box constraints
             primalxscale = 1.0;
-            primalxscale = maxreal(primalxscale, rmaxabsv(n, &state->current.x, _state), _state);
+            primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x, _state), _state);
             for (i = 0; i < n; i++) {
                if ((state->hasbndl.xB[i] && state->hasgz.xB[i]) && fabs(state->bndl.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
                   state->hasgz.xB[i] = false;
                   state->current.g.xR[i] = 0.0;
                   state->current.z.xR[i] = 0.0;
-                  inc(&droppedbounds, _state);
+                  droppedbounds++;
                }
                if ((state->hasbndu.xB[i] && state->hasts.xB[i]) && fabs(state->bndu.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
                   state->hasts.xB[i] = false;
                   state->current.t.xR[i] = 0.0;
                   state->current.s.xR[i] = 0.0;
-                  inc(&droppedbounds, _state);
+                  droppedbounds++;
                }
             }
          // Drop irrelevant linear constraints. Due to specifics of the solver
@@ -18348,15 +18284,15 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          // specify large value for 'absent' bound, but usually he does not mark both bounds as absent).
             vipmsolver_multiplygeax(state, 1.0, &state->current.x, 0, 0.0, &state->tmpax, 0, _state);
             primalxscale = 1.0;
-            primalxscale = maxreal(primalxscale, rmaxabsv(n, &state->current.x, _state), _state);
-            primalxscale = maxreal(primalxscale, rmaxabsv(m, &state->tmpax, _state), _state);
+            primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x, _state), _state);
+            primalxscale = rmax2(primalxscale, rmaxabsv(m, &state->tmpax, _state), _state);
             for (i = 0; i < m; i++) {
                if (((state->hasr.xB[i] && state->haspq.xB[i]) && fabs(state->b.xR[i] + state->r.xR[i]) > vipmsolver_bigconstrmag * primalxscale) && fabs(state->b.xR[i]) < vipmsolver_bigconstrmag * primalxscale) {
                   ae_assert(state->haswv.xB[i] && state->haspq.xB[i], "VIPMOptimize: unexpected integrity check failure (4y64)", _state);
                   state->haspq.xB[i] = false;
                   state->current.p.xR[i] = 0.0;
                   state->current.q.xR[i] = 0.0;
-                  inc(&droppedbounds, _state);
+                  droppedbounds++;
                }
             }
          }
@@ -18377,7 +18313,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          vipmsolver_varsinitfrom(&state->best, &state->current, _state);
          bestiteridx = iteridx;
          besterr = rmax3(egap, eprimal, edual, _state);
-         bestegap = egap;
          besteprimal = eprimal;
          bestedual = edual;
       }
@@ -18385,7 +18320,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          break;
       }
       if (((egap <= state->epsgap && errp2 >= vipmsolver_stagnationdelta * preverrp2) && errpinf >= vipmsolver_primalinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
-         inc(&primalstagnationcnt, _state);
+         primalstagnationcnt++;
          if (primalstagnationcnt >= vipmsolver_primalstagnationlen) {
             break;
          }
@@ -18393,7 +18328,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          primalstagnationcnt = 0;
       }
       if (((egap <= state->epsgap && errd2 >= vipmsolver_stagnationdelta * preverrd2) && errdinf >= vipmsolver_dualinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
-         inc(&dualstagnationcnt, _state);
+         dualstagnationcnt++;
          if (dualstagnationcnt >= vipmsolver_dualstagnationlen) {
             break;
          }
@@ -18410,12 +18345,12 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          break;
       }
       bady = vipmsolver_bigy;
-      bady = maxreal(bady, vipmsolver_ygrowth * y0nrm, _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.x, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.g, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.t, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.w, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * y0nrm, _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.x, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.g, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.t, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.w, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
       if (rmaxabsv(m, &state->current.y, _state) >= bady && iteridx >= vipmsolver_minitersbeforeinfeasible) {
          break;
       }
@@ -18426,17 +18361,14 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    //
    // NOTE: TouchReal() is used to avoid spurious compiler warnings about 'set but unused'
       vipmsolver_varsinitfrom(&state->current, &state->best, _state);
-      touchreal(&besteprimal, _state);
-      touchreal(&bestedual, _state);
-      touchreal(&bestegap, _state);
    // If no error flags were set yet, check solution quality
       bady = vipmsolver_bigy;
-      bady = maxreal(bady, vipmsolver_ygrowth * y0nrm, _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.x, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.g, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.t, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.w, _state), _state);
-      bady = maxreal(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * y0nrm, _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.x, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.g, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(n, &state->current.t, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.w, _state), _state);
+      bady = rmax2(bady, vipmsolver_ygrowth * rmaxabsv(m, &state->current.p, _state), _state);
       if (*terminationtype > 0 && rmaxabsv(m, &state->current.y, _state) >= bady) {
          *terminationtype = -2;
       }
@@ -18483,7 +18415,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 
 void vipmvars_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmvars *p = (vipmvars *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->w, 0, DT_REAL, _state, make_automatic);
@@ -18515,7 +18446,6 @@ void vipmvars_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic
 
 void vipmvars_free(void *_p, bool make_automatic) {
    vipmvars *p = (vipmvars *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->g, make_automatic);
    ae_vector_free(&p->w, make_automatic);
@@ -18530,7 +18460,6 @@ void vipmvars_free(void *_p, bool make_automatic) {
 
 void vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->sigma, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->beta, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rho, 0, DT_REAL, _state, make_automatic);
@@ -18560,7 +18489,6 @@ void vipmrighthandside_copy(void *_dst, void *_src, ae_state *_state, bool make_
 
 void vipmrighthandside_free(void *_p, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->sigma, make_automatic);
    ae_vector_free(&p->beta, make_automatic);
    ae_vector_free(&p->rho, make_automatic);
@@ -18575,7 +18503,6 @@ void vipmrighthandside_free(void *_p, bool make_automatic) {
 
 void vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmstate *p = (vipmstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->scl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->invscl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xorigin, 0, DT_REAL, _state, make_automatic);
@@ -18757,7 +18684,6 @@ void vipmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 
 void vipmstate_free(void *_p, bool make_automatic) {
    vipmstate *p = (vipmstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->scl, make_automatic);
    ae_vector_free(&p->invscl, make_automatic);
    ae_vector_free(&p->xorigin, make_automatic);
@@ -19360,7 +19286,7 @@ void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    ae_vector_set_length(&state->startx, n, _state);
    ae_vector_set_length(&state->xorigin, n, _state);
    ae_vector_set_length(&state->xs, n, _state);
-   rvectorsetlengthatleast(&state->replagbc, n, _state);
+   vectorsetlengthatleast(&state->replagbc, n, _state);
    for (i = 0; i < n; i++) {
       state->bndl.xR[i] = _state->v_neginf;
       state->bndu.xR[i] = _state->v_posinf;
@@ -19425,7 +19351,7 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, doub
    state->akind = 0;
    cqmseta(&state->a, a, isupper, 1.0, _state);
    if (s > 0.0) {
-      rvectorsetlengthatleast(&state->tmp0, n, _state);
+      vectorsetlengthatleast(&state->tmp0, n, _state);
       for (i = 0; i < n; i++) {
          state->tmp0.xR[i] = a->xyR[i][i] + s;
       }
@@ -19446,7 +19372,7 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, doub
       }
       for (j = j0; j <= j1; j++) {
          v = fabs(a->xyR[i][j]);
-         state->absamax = maxreal(state->absamax, v, _state);
+         state->absamax = rmax2(state->absamax, v, _state);
          state->absasum += v;
          state->absasum2 += v * v;
       }
@@ -19540,13 +19466,13 @@ void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isuppe
    while (sparseenumerate(a, &t0, &t1, &i, &j, &v, _state)) {
       if (i == j) {
       // Diagonal terms are counted only once
-         state->absamax = maxreal(state->absamax, v, _state);
+         state->absamax = rmax2(state->absamax, v, _state);
          state->absasum += v;
          state->absasum2 += v * v;
       }
-      if ((j > i && isupper) || (j < i && !isupper)) {
+      if (isupper ? j > i : j < i) {
       // Offdiagonal terms are counted twice
-         state->absamax = maxreal(state->absamax, v, _state);
+         state->absamax = rmax2(state->absamax, v, _state);
          state->absasum += 2 * v;
          state->absasum2 += 2 * v * v;
       }
@@ -19946,7 +19872,7 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    ae_assert(sparsek == 0 || sparsegetnrows(sparsec, _state) >= sparsek, "MinQPSetLCMixed: Rows(SparseC)<SparseK", _state);
    ae_assert(sparsect->cnt >= sparsek, "MinQPSetLCMixed: Length(SparseCT)<SparseK", _state);
 // Allocate place for Lagrange multipliers, fill by zero
-   rvectorsetlengthatleast(&state->replaglc, densek + sparsek, _state);
+   vectorsetlengthatleast(&state->replaglc, densek + sparsek, _state);
    for (i = 0; i < densek + sparsek; i++) {
       state->replaglc.xR[i] = 0.0;
    }
@@ -19979,9 +19905,9 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
       }
       state->sparsec.m = sparsek;
       state->sparsec.n = n;
-      ivectorsetlengthatleast(&state->sparsec.ridx, sparsek + 1, _state);
-      ivectorsetlengthatleast(&state->sparsec.idx, nnz, _state);
-      rvectorsetlengthatleast(&state->sparsec.vals, nnz, _state);
+      vectorsetlengthatleast(&state->sparsec.ridx, sparsek + 1, _state);
+      vectorsetlengthatleast(&state->sparsec.idx, nnz, _state);
+      vectorsetlengthatleast(&state->sparsec.vals, nnz, _state);
       ae_vector_set_length(&eoffs, sparsek + 1, _state);
       state->sparsec.ridx.xZ[0] = 0;
       eoffs.xZ[0] = 0;
@@ -20022,7 +19948,7 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    }
    if (densek > 0) {
    // Copy dense constraints
-      rmatrixsetlengthatleast(&state->densec, densek, n, _state);
+      matrixsetlengthatleast(&state->densec, densek, n, _state);
       for (i = 0; i < densek; i++) {
          for (j = 0; j < n; j++) {
             state->densec.xyR[i][j] = densec->xyR[i][j];
@@ -20159,7 +20085,7 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
       ae_assert(isfinite(au->xR[i]) || isposinf(au->xR[i]), "MinQPSetLC2Mixed: AU contains NAN or -INF", _state);
    }
 // Allocate place for Lagrange multipliers, fill by zero
-   rvectorsetlengthatleast(&state->replaglc, kdense + ksparse, _state);
+   vectorsetlengthatleast(&state->replaglc, kdense + ksparse, _state);
    for (i = 0; i < kdense + ksparse; i++) {
       state->replaglc.xR[i] = 0.0;
    }
@@ -20170,8 +20096,8 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
       return;
    }
 // Prepare
-   rvectorsetlengthatleast(&state->cl, m, _state);
-   rvectorsetlengthatleast(&state->cu, m, _state);
+   vectorsetlengthatleast(&state->cl, m, _state);
+   vectorsetlengthatleast(&state->cu, m, _state);
    for (i = 0; i < m; i++) {
       state->cl.xR[i] = al->xR[i];
       state->cu.xR[i] = au->xR[i];
@@ -20183,7 +20109,7 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
       sparsecopytocrsbuf(sparsea, &state->sparsec, _state);
    }
    if (kdense > 0) {
-      rmatrixsetlengthatleast(&state->densec, kdense, n, _state);
+      matrixsetlengthatleast(&state->densec, kdense, n, _state);
       rmatrixcopy(kdense, n, densea, 0, 0, &state->densec, 0, 0, _state);
    }
 }
@@ -20277,7 +20203,7 @@ void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au, ae_st
    state->cl.xR[state->msparse + state->mdense] = al;
    state->cu.xR[state->msparse + state->mdense] = au;
    state->replaglc.xR[state->msparse + state->mdense] = 0.0;
-   inc(&state->mdense, _state);
+   state->mdense++;
 }
 
 // This function appends two-sided linear constraint  AL <= A*x <= AU  to the
@@ -20330,7 +20256,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       state->sparsec.m = 0;
       state->sparsec.n = n;
       state->sparsec.ninitialized = 0;
-      ivectorsetlengthatleast(&state->sparsec.ridx, 1, _state);
+      vectorsetlengthatleast(&state->sparsec.ridx, 1, _state);
       state->sparsec.ridx.xZ[0] = 0;
    }
    ae_assert(state->sparsec.matrixtype == 1 && state->sparsec.m == state->msparse, "MinQPAddLC2: integrity check failed!", _state);
@@ -20358,8 +20284,8 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       state->sparsec.didx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.uidx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.ridx.xZ[state->msparse + 1] = state->sparsec.ridx.xZ[state->msparse];
-      inc(&state->sparsec.m, _state);
-      inc(&state->msparse, _state);
+      state->sparsec.m++;
+      state->msparse++;
       return;
    }
 // Now we are sure that SparseC contains properly initialized sparse
@@ -20411,8 +20337,8 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    state->sparsec.uidx.xZ[state->msparse] = uidx;
    state->sparsec.ridx.xZ[state->msparse + 1] = offsdst + 1;
    state->sparsec.ninitialized = state->sparsec.ridx.xZ[state->msparse + 1];
-   inc(&state->sparsec.m, _state);
-   inc(&state->msparse, _state);
+   state->sparsec.m++;
+   state->msparse++;
 }
 
 // This function appends two-sided linear constraint  AL <= A*x <= AU  to the
@@ -20455,7 +20381,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
       state->sparsec.m = 0;
       state->sparsec.n = n;
       state->sparsec.ninitialized = 0;
-      ivectorsetlengthatleast(&state->sparsec.ridx, 1, _state);
+      vectorsetlengthatleast(&state->sparsec.ridx, 1, _state);
       state->sparsec.ridx.xZ[0] = 0;
    }
    ae_assert(state->sparsec.matrixtype == 1 && state->sparsec.m == state->msparse, "MinQPAddLC2SparseFromDense: integrity check failed!", _state);
@@ -20490,8 +20416,8 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
       state->sparsec.didx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.uidx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.ridx.xZ[state->msparse + 1] = state->sparsec.ridx.xZ[state->msparse];
-      inc(&state->sparsec.m, _state);
-      inc(&state->msparse, _state);
+      state->sparsec.m++;
+      state->msparse++;
       return;
    }
 // Now we are sure that SparseC contains properly initialized sparse
@@ -20533,8 +20459,8 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
    state->sparsec.uidx.xZ[state->msparse] = uidx;
    state->sparsec.ridx.xZ[state->msparse + 1] = offs + nnz;
    state->sparsec.ninitialized = state->sparsec.ridx.xZ[state->msparse + 1];
-   inc(&state->sparsec.m, _state);
-   inc(&state->msparse, _state);
+   state->sparsec.m++;
+   state->msparse++;
 }
 
 // This function solves quadratic programming problem.
@@ -20638,7 +20564,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
       }
    }
 // Effective scale
-   rvectorsetlengthatleast(&state->effectives, n, _state);
+   vectorsetlengthatleast(&state->effectives, n, _state);
    if (state->stype == 0) {
    // User scale (or default one)
       for (i = 0; i < n; i++) {
@@ -20680,20 +20606,20 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
       nineq = 0;
       for (i = 0; i < m; i++) {
          if ((isfinite(state->cl.xR[i]) && isfinite(state->cu.xR[i])) && state->cl.xR[i] == state->cu.xR[i]) {
-            inc(&neq, _state);
+            neq++;
             continue;
          }
          if (isfinite(state->cl.xR[i])) {
-            inc(&nineq, _state);
+            nineq++;
          }
          if (isfinite(state->cu.xR[i])) {
-            inc(&nineq, _state);
+            nineq++;
          }
       }
    // Perform conversion
-      rmatrixsetlengthatleast(&state->ecleic, neq + nineq, n + 1, _state);
-      rvectorsetlengthatleast(&state->elagmlt, neq + nineq, _state);
-      ivectorsetlengthatleast(&state->elagidx, neq + nineq, _state);
+      matrixsetlengthatleast(&state->ecleic, neq + nineq, n + 1, _state);
+      vectorsetlengthatleast(&state->elagmlt, neq + nineq, _state);
+      vectorsetlengthatleast(&state->elagidx, neq + nineq, _state);
       curecpos = 0;
       curicpos = neq;
       for (i = 0; i < m; i++) {
@@ -20716,7 +20642,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
             state->ecleic.xyR[curecpos][n] = state->cu.xR[i];
             state->elagidx.xZ[curecpos] = i;
             state->elagmlt.xR[curecpos] = 1.0;
-            inc(&curecpos, _state);
+            curecpos++;
             continue;
          }
          if (isfinite(state->cl.xR[i])) {
@@ -20738,7 +20664,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
             state->ecleic.xyR[curicpos][n] = -state->cl.xR[i];
             state->elagidx.xZ[curicpos] = i;
             state->elagmlt.xR[curicpos] = -1.0;
-            inc(&curicpos, _state);
+            curicpos++;
          }
          if (isfinite(state->cu.xR[i])) {
          // Offload inequality constraint of the form C*x <= CU
@@ -20759,7 +20685,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
             state->ecleic.xyR[curicpos][n] = state->cu.xR[i];
             state->elagidx.xZ[curicpos] = i;
             state->elagmlt.xR[curicpos] = 1.0;
-            inc(&curicpos, _state);
+            curicpos++;
          }
       }
       ae_assert(curecpos == neq && curicpos == neq + nineq, "MinQPOptimize: critical integrity check failed (ECLEIC conversion)", _state);
@@ -20845,9 +20771,9 @@ void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep, ae_state *
    ae_assert(state->xs.cnt >= state->n, "MinQPResultsBuf: integrity check failed", _state);
    ae_assert(state->replagbc.cnt >= state->n, "MinQPResultsBuf: integrity check failed", _state);
    ae_assert(state->replaglc.cnt >= state->mdense + state->msparse, "MinQPResultsBuf: integrity check failed", _state);
-   rvectorsetlengthatleast(x, state->n, _state);
-   rvectorsetlengthatleast(&rep->lagbc, state->n, _state);
-   rvectorsetlengthatleast(&rep->laglc, state->mdense + state->msparse, _state);
+   vectorsetlengthatleast(x, state->n, _state);
+   vectorsetlengthatleast(&rep->lagbc, state->n, _state);
+   vectorsetlengthatleast(&rep->laglc, state->mdense + state->msparse, _state);
    for (i = 0; i < state->n; i++) {
       x->xR[i] = state->xs.xR[i];
       rep->lagbc.xR[i] = state->replagbc.xR[i];
@@ -20915,7 +20841,6 @@ void minqprewritediagonal(minqpstate *state, RVector *s, ae_state *_state) {
 
 void minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpstate *p = (minqpstate *)_p;
-   ae_touch_ptr((void *)p);
    qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
    qpbleicsettings_init(&p->qpbleicsettingsuser, _state, make_automatic);
    qpdenseaulsettings_init(&p->qpdenseaulsettingsuser, _state, make_automatic);
@@ -21022,7 +20947,6 @@ void minqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void minqpstate_free(void *_p, bool make_automatic) {
    minqpstate *p = (minqpstate *)_p;
-   ae_touch_ptr((void *)p);
    qqpsettings_free(&p->qqpsettingsuser, make_automatic);
    qpbleicsettings_free(&p->qpbleicsettingsuser, make_automatic);
    qpdenseaulsettings_free(&p->qpdenseaulsettingsuser, make_automatic);
@@ -21066,7 +20990,6 @@ void minqpstate_free(void *_p, bool make_automatic) {
 
 void minqpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpreport *p = (minqpreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->laglc, 0, DT_REAL, _state, make_automatic);
 }
@@ -21085,7 +21008,6 @@ void minqpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minqpreport_free(void *_p, bool make_automatic) {
    minqpreport *p = (minqpreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->lagbc, make_automatic);
    ae_vector_free(&p->laglc, make_automatic);
 }
@@ -21700,7 +21622,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //
 // NOTE: we convert inequality constraints to the form
 // A*x <= b before copying them.
-   rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
+   matrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
    for (i = 0; i < k; i++) {
@@ -21854,8 +21776,8 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
    for (i = 0; i < n; i++) {
       state->x.xR[i] = 0.0;
    }
-   minlbfgscreate(n, minint(minlm_additers, n, _state), &state->x, &state->internalstate, _state);
-   minlbfgssetcond(&state->internalstate, 0.0, 0.0, 0.0, minint(minlm_additers, n, _state), _state);
+   minlbfgscreate(n, imin2(minlm_additers, n, _state), &state->x, &state->internalstate, _state);
+   minlbfgssetcond(&state->internalstate, 0.0, 0.0, 0.0, imin2(minlm_additers, n, _state), _state);
 // Prepare internal QP solver
    minqpcreate(n, &state->qpstate, _state);
    minqpsetalgoquickqp(&state->qpstate, 0.0, 0.0, coalesce(0.01 * state->epsx, 1.0E-12, _state), 10, true, _state);
@@ -22292,20 +22214,20 @@ static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int
    state->stpmax = stpmax;
    state->epsx = epsx;
 // Allocate temporaries, create QP solver, select QP algorithm
-   rvectorsetlengthatleast(&state->bndl, n, _state);
-   rvectorsetlengthatleast(&state->bndu, n, _state);
-   rvectorsetlengthatleast(&state->s, n, _state);
-   bvectorsetlengthatleast(&state->havebndl, n, _state);
-   bvectorsetlengthatleast(&state->havebndu, n, _state);
-   rvectorsetlengthatleast(&state->x, n, _state);
-   rvectorsetlengthatleast(&state->xbase, n, _state);
-   rvectorsetlengthatleast(&state->tmp0, n, _state);
-   rvectorsetlengthatleast(&state->modeldiag, n, _state);
-   ivectorsetlengthatleast(&state->tmpct, nec + nic, _state);
-   rvectorsetlengthatleast(&state->xdir, n, _state);
+   vectorsetlengthatleast(&state->bndl, n, _state);
+   vectorsetlengthatleast(&state->bndu, n, _state);
+   vectorsetlengthatleast(&state->s, n, _state);
+   vectorsetlengthatleast(&state->havebndl, n, _state);
+   vectorsetlengthatleast(&state->havebndu, n, _state);
+   vectorsetlengthatleast(&state->x, n, _state);
+   vectorsetlengthatleast(&state->xbase, n, _state);
+   vectorsetlengthatleast(&state->tmp0, n, _state);
+   vectorsetlengthatleast(&state->modeldiag, n, _state);
+   vectorsetlengthatleast(&state->tmpct, nec + nic, _state);
+   vectorsetlengthatleast(&state->xdir, n, _state);
    if (hasfi) {
-      rvectorsetlengthatleast(&state->fi, m, _state);
-      rvectorsetlengthatleast(&state->fibase, m, _state);
+      vectorsetlengthatleast(&state->fi, m, _state);
+      vectorsetlengthatleast(&state->fibase, m, _state);
    }
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinLM: integrity check failed", _state);
@@ -22910,10 +22832,10 @@ lbl_44:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] -= state->s.xR[k] * state->diffstep;
    if (state->havebndl.xB[k]) {
-      state->x.xR[k] = maxreal(state->x.xR[k], state->bndl.xR[k], _state);
+      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k], _state);
    }
    if (state->havebndu.xB[k]) {
-      state->x.xR[k] = minreal(state->x.xR[k], state->bndu.xR[k], _state);
+      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k], _state);
    }
    state->xm1 = state->x.xR[k];
    minlm_clearrequestfields(state, _state);
@@ -22926,10 +22848,10 @@ lbl_4:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] += state->s.xR[k] * state->diffstep;
    if (state->havebndl.xB[k]) {
-      state->x.xR[k] = maxreal(state->x.xR[k], state->bndl.xR[k], _state);
+      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k], _state);
    }
    if (state->havebndu.xB[k]) {
-      state->x.xR[k] = minreal(state->x.xR[k], state->bndu.xR[k], _state);
+      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k], _state);
    }
    state->xp1 = state->x.xR[k];
    minlm_clearrequestfields(state, _state);
@@ -23033,7 +22955,7 @@ lbl_41:
    if (state->lambdav < 0.0) {
       state->lambdav = 0.0;
       for (i = 0; i < n; i++) {
-         state->lambdav = maxreal(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i], _state), _state);
+         state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i], _state), _state);
       }
       state->lambdav *= 0.001;
       if (state->lambdav == 0.0) {
@@ -23306,10 +23228,10 @@ lbl_81:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] -= state->s.xR[k] * state->diffstep;
    if (state->havebndl.xB[k]) {
-      state->x.xR[k] = maxreal(state->x.xR[k], state->bndl.xR[k], _state);
+      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k], _state);
    }
    if (state->havebndu.xB[k]) {
-      state->x.xR[k] = minreal(state->x.xR[k], state->bndu.xR[k], _state);
+      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k], _state);
    }
    state->xm1 = state->x.xR[k];
    minlm_clearrequestfields(state, _state);
@@ -23322,10 +23244,10 @@ lbl_16:
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    state->x.xR[k] += state->s.xR[k] * state->diffstep;
    if (state->havebndl.xB[k]) {
-      state->x.xR[k] = maxreal(state->x.xR[k], state->bndl.xR[k], _state);
+      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k], _state);
    }
    if (state->havebndu.xB[k]) {
-      state->x.xR[k] = minreal(state->x.xR[k], state->bndu.xR[k], _state);
+      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k], _state);
    }
    state->xp1 = state->x.xR[k];
    minlm_clearrequestfields(state, _state);
@@ -23464,7 +23386,7 @@ lbl_84:
    if (state->lambdav < 0.0) {
       state->lambdav = 0.0;
       for (i = 0; i < n; i++) {
-         state->lambdav = maxreal(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i], _state), _state);
+         state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i], _state), _state);
       }
       state->lambdav *= 0.001;
       if (state->lambdav == 0.0) {
@@ -23969,7 +23891,6 @@ void minlmrequesttermination(minlmstate *state, ae_state *_state) {
 
 void minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstepfinder *p = (minlmstepfinder *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->modeldiag, 0, DT_REAL, _state, make_automatic);
@@ -24028,7 +23949,6 @@ void minlmstepfinder_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 
 void minlmstepfinder_free(void *_p, bool make_automatic) {
    minlmstepfinder *p = (minlmstepfinder *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->fi, make_automatic);
    ae_vector_free(&p->modeldiag, make_automatic);
@@ -24051,7 +23971,6 @@ void minlmstepfinder_free(void *_p, bool make_automatic) {
 
 void minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstate *p = (minlmstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
@@ -24172,7 +24091,6 @@ void minlmstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void minlmstate_free(void *_p, bool make_automatic) {
    minlmstate *p = (minlmstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->fi, make_automatic);
    ae_matrix_free(&p->j, make_automatic);
@@ -24211,8 +24129,6 @@ void minlmstate_free(void *_p, bool make_automatic) {
 }
 
 void minlmreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minlmreport *p = (minlmreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minlmreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -24228,8 +24144,6 @@ void minlmreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void minlmreport_free(void *_p, bool make_automatic) {
-   minlmreport *p = (minlmreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -24819,8 +24733,8 @@ void mincgsetprecdefault(mincgstate *state, ae_state *_state) {
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state) {
    ae_int_t i;
-   rvectorsetlengthatleast(&state->diagh, state->n, _state);
-   rvectorsetlengthatleast(&state->diaghl2, state->n, _state);
+   vectorsetlengthatleast(&state->diagh, state->n, _state);
+   vectorsetlengthatleast(&state->diaghl2, state->n, _state);
    state->prectype = 2;
    state->vcnt = 0;
    state->innerresetneeded = true;
@@ -24925,9 +24839,9 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
    }
    n = state->n;
    ae_matrix_set_length(&b, vcnt, vcnt, _state);
-   rvectorsetlengthatleast(&state->diagh, n, _state);
-   rvectorsetlengthatleast(&state->diaghl2, n, _state);
-   rmatrixsetlengthatleast(&state->vcorr, vcnt, n, _state);
+   vectorsetlengthatleast(&state->diagh, n, _state);
+   vectorsetlengthatleast(&state->diaghl2, n, _state);
+   matrixsetlengthatleast(&state->vcorr, vcnt, n, _state);
    state->prectype = 2;
    state->vcnt = vcnt;
    state->innerresetneeded = true;
@@ -25099,7 +25013,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
    ae_vector_set_length(&state->s, n, _state);
    ae_vector_set_length(&state->invs, n, _state);
    ae_vector_set_length(&state->lastscaleused, n, _state);
-   rvectorsetlengthatleast(&state->xbase, n, _state);
+   vectorsetlengthatleast(&state->xbase, n, _state);
    for (i = 0; i < n; i++) {
       state->s.xR[i] = 1.0;
       state->invs.xR[i] = 1.0;
@@ -25394,7 +25308,7 @@ bool mincgiteration(mincgstate *state, ae_state *_state) {
    state->repnfev = 0;
    state->debugrestartscount = 0;
    smoothnessmonitorinit(&state->smonitor, &state->s, n, 1, state->smoothnessguardlevel > 0, _state);
-   rvectorsetlengthatleast(&state->invs, n, _state);
+   vectorsetlengthatleast(&state->invs, n, _state);
    for (i = 0; i < n; i++) {
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
@@ -25718,7 +25632,7 @@ lbl_44:
          betak = state->betady;
       }
       if (state->cgtype == 1) {
-         betak = maxreal(0.0, minreal(state->betady, state->betahs, _state), _state);
+         betak = rmax2(0.0, rmin2(state->betady, state->betahs, _state), _state);
       }
    } else {
    // Something is wrong (may be function is too wild or too flat)
@@ -25795,7 +25709,7 @@ lbl_44:
    }
    if (!state->innerresetneeded) {
    // These conditions are checked only when no inner reset was requested by user
-      if (state->fold - state->f <= state->epsf * maxreal(fabs(state->fold), maxreal(fabs(state->f), 1.0, _state), _state)) {
+      if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0, _state), _state)) {
       // F(k+1)-F(k) is small enough
          state->repterminationtype = 1;
          result = false;
@@ -26209,7 +26123,6 @@ void mincgrequesttermination(mincgstate *state, ae_state *_state) {
 
 void mincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    mincgstate *p = (mincgstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->diaghl2, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->vcorr, 0, 0, DT_REAL, _state, make_automatic);
@@ -26306,7 +26219,6 @@ void mincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void mincgstate_free(void *_p, bool make_automatic) {
    mincgstate *p = (mincgstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->diagh, make_automatic);
    ae_vector_free(&p->diaghl2, make_automatic);
    ae_matrix_free(&p->vcorr, make_automatic);
@@ -26330,8 +26242,6 @@ void mincgstate_free(void *_p, bool make_automatic) {
 }
 
 void mincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   mincgreport *p = (mincgreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void mincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -26343,8 +26253,6 @@ void mincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void mincgreport_free(void *_p, bool make_automatic) {
-   mincgreport *p = (mincgreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -26727,16 +26635,16 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
    lccnt = nec + nic + nlec + nlic;
 // Allocate temporaries
-   rvectorsetlengthatleast(&subsolver->cural, lccnt, _state);
-   rvectorsetlengthatleast(&subsolver->curau, lccnt, _state);
-   rvectorsetlengthatleast(&subsolver->curbndl, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->curbndu, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->curb, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->sk, n, _state);
-   rvectorsetlengthatleast(&subsolver->yk, n, _state);
+   vectorsetlengthatleast(&subsolver->cural, lccnt, _state);
+   vectorsetlengthatleast(&subsolver->curau, lccnt, _state);
+   vectorsetlengthatleast(&subsolver->curbndl, nslack, _state);
+   vectorsetlengthatleast(&subsolver->curbndu, nslack, _state);
+   vectorsetlengthatleast(&subsolver->curb, nslack, _state);
+   vectorsetlengthatleast(&subsolver->sk, n, _state);
+   vectorsetlengthatleast(&subsolver->yk, n, _state);
 // Initial state
    subsolver->algokind = 0;
-   rmatrixsetlengthatleast(&subsolver->h, n, n, _state);
+   matrixsetlengthatleast(&subsolver->h, n, n, _state);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          subsolver->h.xyR[i][j] = 0.0;
@@ -26761,11 +26669,11 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
          }
       }
    }
-   ivectorsetlengthatleast(&subsolver->sparserawlc.ridx, nec + nic + 1, _state);
-   rvectorsetlengthatleast(&subsolver->sparserawlc.vals, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.idx, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.didx, nec + nic, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.uidx, nec + nic, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.ridx, nec + nic + 1, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.vals, nnz, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.idx, nnz, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.didx, nec + nic, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.uidx, nec + nic, _state);
    offs = 0;
    subsolver->sparserawlc.ridx.xZ[0] = 0;
    for (i = 0; i < nec + nic; i++) {
@@ -26831,7 +26739,7 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
 // Proceed
    result = false;
    n = sstate->n;
-   rvectorsetlengthatleast(&subsolver->tmp0, n, _state);
+   vectorsetlengthatleast(&subsolver->tmp0, n, _state);
    rawsy = 0.0;
    sy = 0.0;
    snrm2 = 0.0;
@@ -26854,8 +26762,8 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
       snrm2 += sk * sk;
       ynrm2 += yk * yk;
       v2 += gk * gk;
-      mxs = maxreal(mxs, fabs(sk), _state);
-      mxy = maxreal(mxy, fabs(yk), _state);
+      mxs = rmax2(mxs, fabs(sk), _state);
+      mxy = rmax2(mxy, fabs(yk), _state);
       subsolver->sk.xR[i] = sk;
       subsolver->yk.xR[i] = yk;
    }
@@ -26863,7 +26771,7 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
    rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, &subsolver->sk, 0, 0.0, &subsolver->tmp0, 0, _state);
    mxhs = 0.0;
    for (i = 0; i < n; i++) {
-      mxhs = maxreal(mxhs, fabs(subsolver->tmp0.xR[i]), _state);
+      mxhs = rmax2(mxhs, fabs(subsolver->tmp0.xR[i]), _state);
    }
 // Skip updates if (Sk,Yk) <= 0 or Sk*H*Sk <= 0
 //
@@ -26921,8 +26829,8 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
    ae_int_t i;
    *terminationtype = 1;
 // Initial point, integrity check for constraints
-   bvectorsetlengthatleast(&subsolver->hasbndl, n, _state);
-   bvectorsetlengthatleast(&subsolver->hasbndu, n, _state);
+   vectorsetlengthatleast(&subsolver->hasbndl, n, _state);
+   vectorsetlengthatleast(&subsolver->hasbndu, n, _state);
    for (i = 0; i < n; i++) {
       subsolver->hasbndl.xB[i] = isfinite(bndl->xR[i]);
       subsolver->hasbndu.xB[i] = isfinite(bndu->xR[i]);
@@ -26930,8 +26838,8 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
       ae_assert(!subsolver->hasbndu.xB[i] || bndu->xR[i] >= d0->xR[i], "FASSolve: integrity check failed", _state);
       d->xR[i] = d0->xR[i];
    }
-   bvectorsetlengthatleast(&subsolver->hasal, m, _state);
-   bvectorsetlengthatleast(&subsolver->hasau, m, _state);
+   vectorsetlengthatleast(&subsolver->hasal, m, _state);
+   vectorsetlengthatleast(&subsolver->hasau, m, _state);
    for (i = 0; i < m; i++) {
       subsolver->hasal.xB[i] = isfinite(al->xR[i]);
       subsolver->hasau.xB[i] = isfinite(au->xR[i]);
@@ -26939,9 +26847,9 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
          ae_assert(al->xR[i] <= au->xR[i], "FASSolve: integrity check failed", _state);
       }
    }
-   rmatrixsetlengthatleast(&subsolver->activea, n, n, _state);
-   rvectorsetlengthatleast(&subsolver->activerhs, n, _state);
-   ivectorsetlengthatleast(&subsolver->activeidx, n, _state);
+   matrixsetlengthatleast(&subsolver->activea, n, n, _state);
+   vectorsetlengthatleast(&subsolver->activerhs, n, _state);
+   vectorsetlengthatleast(&subsolver->activeidx, n, _state);
    subsolver->activesetsize = 0;
 // Activate equality constraints (at most N)
    for (i = 0; i < m; i++) {
@@ -26952,8 +26860,8 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
          }
       }
    }
-   rvectorsetlengthatleast(&subsolver->tmp0, n, _state);
-   rvectorsetlengthatleast(&subsolver->tmp1, n, _state);
+   vectorsetlengthatleast(&subsolver->tmp0, n, _state);
+   vectorsetlengthatleast(&subsolver->tmp1, n, _state);
    for (i = 0; i < n; i++) {
       subsolver->tmp0.xR[i] = trustrad;
       subsolver->tmp1.xR[i] = 0.0;
@@ -27016,7 +26924,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
 // Prepare temporary structures
    rvectorgrowto(&subsolver->cural, lccnt, _state);
    rvectorgrowto(&subsolver->curau, lccnt, _state);
-   rvectorsetlengthatleast(&subsolver->d0, nslack, _state);
+   vectorsetlengthatleast(&subsolver->d0, nslack, _state);
 // Prepare default solution: all zeros
    result = true;
    *terminationtype = 0;
@@ -27046,10 +26954,10 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       subsolver->curbndl.xR[i] = -state->trustrad;
       subsolver->curbndu.xR[i] = state->trustrad;
       if (state->hasbndl.xB[i]) {
-         subsolver->curbndl.xR[i] = maxreal(subsolver->curbndl.xR[i], state->scaledbndl.xR[i] - x->xR[i], _state);
+         subsolver->curbndl.xR[i] = rmax2(subsolver->curbndl.xR[i], state->scaledbndl.xR[i] - x->xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         subsolver->curbndu.xR[i] = minreal(subsolver->curbndu.xR[i], state->scaledbndu.xR[i] - x->xR[i], _state);
+         subsolver->curbndu.xR[i] = rmin2(subsolver->curbndu.xR[i], state->scaledbndu.xR[i] - x->xR[i], _state);
       }
    }
 // Prepare storage for "effective" constraining matrix
@@ -27066,8 +26974,8 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    ivectorgrowto(&subsolver->sparseefflc.ridx, lccnt + 1, _state);
    rvectorgrowto(&subsolver->sparseefflc.vals, nnz, _state);
    ivectorgrowto(&subsolver->sparseefflc.idx, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparseefflc.didx, lccnt, _state);
-   ivectorsetlengthatleast(&subsolver->sparseefflc.uidx, lccnt, _state);
+   vectorsetlengthatleast(&subsolver->sparseefflc.didx, lccnt, _state);
+   vectorsetlengthatleast(&subsolver->sparseefflc.uidx, lccnt, _state);
    subsolver->sparseefflc.m = 0;
    subsolver->sparseefflc.n = nslack;
    subsolver->sparseefflc.matrixtype = 1;
@@ -27075,7 +26983,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
 //
 // Scan sparsified linear constraints stored in sparserawlc[], skip ones
 // which are inactive anywhere in the trust region.
-   rvectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
+   vectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
    for (i = 0; i < n; i++) {
       subsolver->tmp0.xR[i] = x->xR[i];
    }
@@ -27164,8 +27072,8 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->cural.xR[i] = _state->v_neginf;
          subsolver->curau.xR[i] = -v;
          subsolver->curbndl.xR[offsslackic + (i - nec)] = 0.0;
-         subsolver->curbndu.xR[offsslackic + (i - nec)] = maxreal(v, 0.0, _state);
-         subsolver->d0.xR[offsslackic + (i - nec)] = maxreal(v, 0.0, _state);
+         subsolver->curbndu.xR[offsslackic + (i - nec)] = rmax2(v, 0.0, _state);
+         subsolver->d0.xR[offsslackic + (i - nec)] = rmax2(v, 0.0, _state);
       }
    }
    subsolver->sparseefflc.m += (nec + nic);
@@ -27223,8 +27131,8 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->cural.xR[subsolver->sparseefflc.m + i] = _state->v_neginf;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curbndl.xR[offsslacknlic + (i - nlec)] = 0.0;
-         subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = maxreal(v, 0.0, _state);
-         subsolver->d0.xR[offsslacknlic + (i - nlec)] = maxreal(v, 0.0, _state);
+         subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0, _state);
+         subsolver->d0.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0, _state);
       }
    }
    subsolver->sparseefflc.m += (nlec + nlic);
@@ -27243,8 +27151,8 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    //
    // NOTE: because we cleaned up constraints that are DEFINITELY inactive within
    //       trust region, we do not have to worry about StopOnExcessiveBounds option.
-      rvectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
-      rvectorsetlengthatleast(&subsolver->tmp1, nslack, _state);
+      vectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
+      vectorsetlengthatleast(&subsolver->tmp1, nslack, _state);
       for (i = 0; i < nslack; i++) {
          subsolver->tmp0.xR[i] = state->trustrad;
          subsolver->tmp1.xR[i] = 0.0;
@@ -27302,21 +27210,21 @@ static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *cu
    meritstate->nic = nic;
    meritstate->nlec = nlec;
    meritstate->nlic = nlic;
-   rvectorsetlengthatleast(&meritstate->d, nslack, _state);
-   rvectorsetlengthatleast(&meritstate->dx, nslack, _state);
-   rvectorsetlengthatleast(&meritstate->stepkx, n, _state);
-   rvectorsetlengthatleast(&meritstate->stepkxc, n, _state);
-   rvectorsetlengthatleast(&meritstate->stepkxn, n, _state);
-   rvectorsetlengthatleast(&meritstate->stepkfi, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&meritstate->stepkfic, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&meritstate->stepkfin, 1 + nlec + nlic, _state);
-   rmatrixsetlengthatleast(&meritstate->stepkj, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&meritstate->stepkjc, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&meritstate->stepkjn, 1 + nlec + nlic, n, _state);
-   rvectorsetlengthatleast(&meritstate->stepklaggrad, n, _state);
-   rvectorsetlengthatleast(&meritstate->stepknlaggrad, n, _state);
-   rvectorsetlengthatleast(&meritstate->lagmult, nec + nic + nlec + nlic, _state);
-   rvectorsetlengthatleast(&meritstate->dummylagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&meritstate->d, nslack, _state);
+   vectorsetlengthatleast(&meritstate->dx, nslack, _state);
+   vectorsetlengthatleast(&meritstate->stepkx, n, _state);
+   vectorsetlengthatleast(&meritstate->stepkxc, n, _state);
+   vectorsetlengthatleast(&meritstate->stepkxn, n, _state);
+   vectorsetlengthatleast(&meritstate->stepkfi, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&meritstate->stepkfic, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&meritstate->stepkfin, 1 + nlec + nlic, _state);
+   matrixsetlengthatleast(&meritstate->stepkj, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&meritstate->stepkjc, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&meritstate->stepkjn, 1 + nlec + nlic, n, _state);
+   vectorsetlengthatleast(&meritstate->stepklaggrad, n, _state);
+   vectorsetlengthatleast(&meritstate->stepknlaggrad, n, _state);
+   vectorsetlengthatleast(&meritstate->lagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&meritstate->dummylagmult, nec + nic + nlec + nlic, _state);
    rsetallocv(nec + nic + nlec + nlic, 0.0, &meritstate->penalties, _state);
    for (i = 0; i < memlen; i++) {
       rmergemaxrv(nec + nic + nlec + nlic, abslagmemory, i, &meritstate->penalties, _state);
@@ -27431,8 +27339,8 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad,
 // Lagrangian terms for linear constraints, constraint violations
    if (nec + nic > 0) {
       usesparsegemv = state->subsolver.sparserawlc.ridx.xZ[nec + nic] < sparselevel2density(_state) * n * (nec + nic);
-      rvectorsetlengthatleast(&tmp->sclagtmp0, maxint(nec + nic, n, _state), _state);
-      rvectorsetlengthatleast(&tmp->sclagtmp1, maxint(nec + nic, n, _state), _state);
+      vectorsetlengthatleast(&tmp->sclagtmp0, imax2(nec + nic, n, _state), _state);
+      vectorsetlengthatleast(&tmp->sclagtmp1, imax2(nec + nic, n, _state), _state);
       if (usesparsegemv) {
          sparsemv(&state->subsolver.sparserawlc, x, &tmp->sclagtmp0, _state);
       } else {
@@ -27467,7 +27375,7 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad,
       }
    }
 // Lagrangian terms for nonlinear constraints
-   rvectorsetlengthatleast(&tmp->sclagtmp1, nlec + nlic, _state);
+   vectorsetlengthatleast(&tmp->sclagtmp1, nlec + nlic, _state);
    for (i = 0; i < nlec + nlic; i++) {
       v = fi->xR[1 + i];
       vlag = lagmult->xR[nec + nic + i];
@@ -27510,7 +27418,7 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x,
    *meritf = fi->xR[0];
    *rawlag = fi->xR[0];
 // Merit function: augmentation and penalty for linear constraints
-   rvectorsetlengthatleast(&tmp->mftmp0, nec + nic, _state);
+   vectorsetlengthatleast(&tmp->mftmp0, nec + nic, _state);
    rmatrixgemv(nec + nic, n, 1.0, &state->scaledcleic, 0, 0, 0, x, 0, 0.0, &tmp->mftmp0, 0, _state);
    for (i = 0; i < nec + nic; i++) {
       v = tmp->mftmp0.xR[i] - state->scaledcleic.xyR[i][n];
@@ -27522,8 +27430,8 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x,
          *rawlag += lagmult->xR[i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcsqp_augmentationfactor * sqr(maxreal(v, 0.0, _state), _state);
-         *meritf += nlcsqp_meritfunctionbase * maxreal(v, 0.0, _state) + nlcsqp_meritfunctiongain * fabs(1 + penalties->xR[i]) * maxreal(v, 0.0, _state);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * sqr(rmax2(v, 0.0, _state), _state);
+         *meritf += nlcsqp_meritfunctionbase * rmax2(v, 0.0, _state) + nlcsqp_meritfunctiongain * fabs(1 + penalties->xR[i]) * rmax2(v, 0.0, _state);
       // Raw Lagrangian
          *rawlag += lagmult->xR[i] * v;
       }
@@ -27539,8 +27447,8 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x,
          *rawlag += lagmult->xR[nec + nic + i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcsqp_augmentationfactor * sqr(maxreal(v, 0.0, _state), _state);
-         *meritf += nlcsqp_meritfunctionbase * maxreal(v, 0.0, _state) + nlcsqp_meritfunctiongain * fabs(1 + penalties->xR[nec + nic + i]) * maxreal(v, 0.0, _state);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * sqr(rmax2(v, 0.0, _state), _state);
+         *meritf += nlcsqp_meritfunctionbase * rmax2(v, 0.0, _state) + nlcsqp_meritfunctiongain * fabs(1 + penalties->xR[nec + nic + i]) * rmax2(v, 0.0, _state);
       // Raw Lagrangian
          *rawlag += lagmult->xR[nec + nic + i] * v;
       }
@@ -27690,7 +27598,7 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
       return result;
    }
    for (i = 0; i < nec + nic + nlec + nlic; i++) {
-      meritstate->penalties.xR[i] = maxreal(meritstate->penalties.xR[i], fabs(meritstate->lagmult.xR[i]), _state);
+      meritstate->penalties.xR[i] = rmax2(meritstate->penalties.xR[i], fabs(meritstate->lagmult.xR[i]), _state);
    }
 // Perform merit function line search.
 //
@@ -27781,17 +27689,17 @@ lbl_1:
       goto lbl_7;
    }
    localstp *= nu;
-   nu = maxreal(0.1, 0.5 * nu, _state);
+   nu = rmax2(0.1, 0.5 * nu, _state);
    goto lbl_6;
 lbl_7:
    smoothnessmonitorfinalizelinesearch(smonitor, _state);
 lbl_4:
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
-         meritstate->stepkxn.xR[i] = maxreal(meritstate->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
+         meritstate->stepkxn.xR[i] = rmax2(meritstate->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         meritstate->stepkxn.xR[i] = minreal(meritstate->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
+         meritstate->stepkxn.xR[i] = rmin2(meritstate->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
       }
    }
    if (userterminationneeded) {
@@ -27822,7 +27730,7 @@ lbl_4:
          }
          v -= state->scaledcleic.xyR[i][n];
          if (i >= nec) {
-            v = maxreal(v, 0.0, _state);
+            v = rmax2(v, 0.0, _state);
          }
          meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
       }
@@ -27833,7 +27741,7 @@ lbl_4:
             vv += fabs(state->stepkj.xyR[i][j] * state->trustrad);
          }
          if (i >= nlec + 1) {
-            v = maxreal(v, 0.0, _state);
+            v = rmax2(v, 0.0, _state);
          }
          meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
       }
@@ -27851,10 +27759,10 @@ lbl_12:
    for (j = 0; j < n; j++) {
       meritstate->stepkxc.xR[j] = meritstate->stepkx.xR[j] + smonitor->probingstp * meritstate->d.xR[j];
       if (state->hasbndl.xB[j]) {
-         meritstate->stepkxc.xR[j] = maxreal(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
+         meritstate->stepkxc.xR[j] = rmax2(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
       }
       if (state->hasbndu.xB[j]) {
-         meritstate->stepkxc.xR[j] = minreal(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
+         meritstate->stepkxc.xR[j] = rmin2(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
       }
    }
    nlcsqp_sqpsendx(state, &meritstate->stepkxc, _state);
@@ -27878,7 +27786,7 @@ lbl_10:
    mx = 0.0;
    for (j = 0; j < n; j++) {
       vv = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
-      mx = maxreal(mx, fabs(vv), _state);
+      mx = rmax2(mx, fabs(vv), _state);
       v += vv * vv;
    }
    if (v > 0.0) {
@@ -27893,7 +27801,7 @@ lbl_10:
 // Output other information
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(meritstate->d.xR[i]) / state->trustrad, _state);
+      mx = rmax2(mx, fabs(meritstate->d.xR[i]) / state->trustrad, _state);
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
@@ -27916,11 +27824,11 @@ lbl_10:
    }
    v = state->subsolver.h.xyR[0][0];
    for (i = 0; i < n; i++) {
-      v = minreal(v, state->subsolver.h.xyR[i][i], _state);
+      v = rmin2(v, state->subsolver.h.xyR[i][i], _state);
    }
    v = state->subsolver.h.xyR[0][0];
    for (i = 0; i < n; i++) {
-      v = maxreal(v, state->subsolver.h.xyR[i][i], _state);
+      v = rmax2(v, state->subsolver.h.xyR[i][i], _state);
    }
 lbl_8:
 // Perform Hessian update
@@ -28030,23 +27938,23 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    ae_vector_set_length(&state->fi, 1 + nlec + nlic, _state);
    ae_matrix_set_length(&state->j, 1 + nlec + nlic, n, _state);
 // Allocate memory.
-   rvectorsetlengthatleast(&state->s, n, _state);
-   rvectorsetlengthatleast(&state->step0x, n, _state);
-   rvectorsetlengthatleast(&state->stepkx, n, _state);
-   rvectorsetlengthatleast(&state->backupx, n, _state);
-   rvectorsetlengthatleast(&state->step0fi, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->stepkfi, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->backupfi, 1 + nlec + nlic, _state);
-   rmatrixsetlengthatleast(&state->step0j, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&state->stepkj, 1 + nlec + nlic, n, _state);
-   rvectorsetlengthatleast(&state->fscales, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->dummylagmult, nec + nic + nlec + nlic, _state);
-   bvectorsetlengthatleast(&state->hasbndl, n, _state);
-   bvectorsetlengthatleast(&state->hasbndu, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndl, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndu, n, _state);
-   rmatrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
-   ivectorsetlengthatleast(&state->lcsrcidx, nec + nic, _state);
+   vectorsetlengthatleast(&state->s, n, _state);
+   vectorsetlengthatleast(&state->step0x, n, _state);
+   vectorsetlengthatleast(&state->stepkx, n, _state);
+   vectorsetlengthatleast(&state->backupx, n, _state);
+   vectorsetlengthatleast(&state->step0fi, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->stepkfi, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->backupfi, 1 + nlec + nlic, _state);
+   matrixsetlengthatleast(&state->step0j, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&state->stepkj, 1 + nlec + nlic, n, _state);
+   vectorsetlengthatleast(&state->fscales, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->dummylagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->hasbndl, n, _state);
+   vectorsetlengthatleast(&state->hasbndu, n, _state);
+   vectorsetlengthatleast(&state->scaledbndl, n, _state);
+   vectorsetlengthatleast(&state->scaledbndu, n, _state);
+   matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
+   vectorsetlengthatleast(&state->lcsrcidx, nec + nic, _state);
    rallocv(nec + nic + nlec + nlic, &state->meritlagmult, _state);
    rsetallocm(nlcsqp_penaltymemlen, nec + nic + nlec + nlic, 0.0, &state->abslagmemory, _state);
 // Prepare scaled problem
@@ -28086,10 +27994,10 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // Initial enforcement of box constraints
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
-         state->step0x.xR[i] = maxreal(state->step0x.xR[i], state->scaledbndl.xR[i], _state);
+         state->step0x.xR[i] = rmax2(state->step0x.xR[i], state->scaledbndl.xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         state->step0x.xR[i] = minreal(state->step0x.xR[i], state->scaledbndu.xR[i], _state);
+         state->step0x.xR[i] = rmin2(state->step0x.xR[i], state->scaledbndu.xR[i], _state);
       }
    }
 // Stopping criteria
@@ -28277,7 +28185,7 @@ lbl_3:
    // and Jacobian row, and (b) new value of the function scale.
       mx = 0.0;
       for (j = 0; j < n; j++) {
-         mx = maxreal(mx, fabs(state->stepkj.xyR[i][j]), _state);
+         mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]), _state);
       }
       multiplyby = 1.0;
       setscaleto = state->fscales.xR[i];
@@ -28345,7 +28253,7 @@ lbl_6:
    }
 // Caller requested to update BigC - L1 penalty coefficient for linearized constraint violation
    if (increasebigc) {
-      state->bigc = minreal(10 * state->bigc, nlcsqp_maxbigc, _state);
+      state->bigc = rmin2(10 * state->bigc, nlcsqp_maxbigc, _state);
    }
 // Update trust region.
 //
@@ -28355,16 +28263,16 @@ lbl_6:
 //       fixed within few iterations.
    deltamax = 0.0;
    for (i = 0; i < n; i++) {
-      deltamax = maxreal(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad, _state);
+      deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad, _state);
    }
    trustradstagnated = false;
-   inc(&state->trustradstagnationcnt, _state);
+   state->trustradstagnationcnt++;
    prevtrustrad = state->trustrad;
    if (deltamax <= nlcsqp_sqpdeltadecrease) {
-      state->trustrad *= maxreal(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay, _state);
+      state->trustrad *= rmax2(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay, _state);
    }
    if (deltamax >= nlcsqp_sqpdeltaincrease) {
-      state->trustrad *= minreal(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth, _state);
+      state->trustrad *= rmin2(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth, _state);
    }
    if (state->trustrad < 0.99 * prevtrustrad || state->trustrad > 1.01 * prevtrustrad) {
       state->trustradstagnationcnt = 0;
@@ -28375,9 +28283,9 @@ lbl_6:
       trustradstagnated = true;
    }
 // Advance outer iteration counter, test stopping criteria
-   inc(&state->repiterationscount, _state);
+   state->repiterationscount++;
    if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcsqp_stagnationepsf * fabs(state->step0fi.xR[0])) {
-      inc(&state->fstagnationcnt, _state);
+      state->fstagnationcnt++;
    } else {
       state->fstagnationcnt = 0;
    }
@@ -28424,7 +28332,6 @@ lbl_rcomm:
 
 void minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpsubsolver *p = (minsqpsubsolver *)_p;
-   ae_touch_ptr((void *)p);
    vipmstate_init(&p->ipmsolver, _state, make_automatic);
    ae_vector_init(&p->curb, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->curbndl, 0, DT_REAL, _state, make_automatic);
@@ -28484,7 +28391,6 @@ void minsqpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 
 void minsqpsubsolver_free(void *_p, bool make_automatic) {
    minsqpsubsolver *p = (minsqpsubsolver *)_p;
-   ae_touch_ptr((void *)p);
    vipmstate_free(&p->ipmsolver, make_automatic);
    ae_vector_free(&p->curb, make_automatic);
    ae_vector_free(&p->curbndl, make_automatic);
@@ -28513,7 +28419,6 @@ void minsqpsubsolver_free(void *_p, bool make_automatic) {
 
 void minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmplagrangian *p = (minsqptmplagrangian *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
@@ -28527,14 +28432,12 @@ void minsqptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void minsqptmplagrangian_free(void *_p, bool make_automatic) {
    minsqptmplagrangian *p = (minsqptmplagrangian *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->sclagtmp0, make_automatic);
    ae_vector_free(&p->sclagtmp1, make_automatic);
 }
 
 void minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmpmerit *p = (minsqptmpmerit *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
@@ -28546,13 +28449,11 @@ void minsqptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void minsqptmpmerit_free(void *_p, bool make_automatic) {
    minsqptmpmerit *p = (minsqptmpmerit *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->mftmp0, make_automatic);
 }
 
 void minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkx, 0, DT_REAL, _state, make_automatic);
@@ -28607,7 +28508,6 @@ void minsqpmeritphasestate_copy(void *_dst, void *_src, ae_state *_state, bool m
 
 void minsqpmeritphasestate_free(void *_p, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->dx, make_automatic);
    ae_vector_free(&p->stepkx, make_automatic);
@@ -28631,7 +28531,6 @@ void minsqpmeritphasestate_free(void *_p, bool make_automatic) {
 
 void minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpstate *p = (minsqpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->scaledcleic, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->lcsrcidx, 0, DT_INT, _state, make_automatic);
@@ -28720,7 +28619,6 @@ void minsqpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minsqpstate_free(void *_p, bool make_automatic) {
    minsqpstate *p = (minsqpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_matrix_free(&p->scaledcleic, make_automatic);
    ae_vector_free(&p->lcsrcidx, make_automatic);
@@ -28818,9 +28716,9 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
       info->rawbndu.xR[i] = bndu->xR[i];
    }
 // Scale cost and box constraints
-   rvectorsetlengthatleast(&info->c, n, _state);
-   rvectorsetlengthatleast(&info->bndl, n, _state);
-   rvectorsetlengthatleast(&info->bndu, n, _state);
+   vectorsetlengthatleast(&info->c, n, _state);
+   vectorsetlengthatleast(&info->bndl, n, _state);
+   vectorsetlengthatleast(&info->bndu, n, _state);
    for (i = 0; i < n; i++) {
       info->c.xR[i] = c->xR[i] * s->xR[i];
       info->bndl.xR[i] = bndl->xR[i] / s->xR[i];
@@ -28849,9 +28747,9 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
       for (j = j0; j <= j1; j++) {
          v = s->xR[info->sparsea.idx.xZ[j]] * info->sparsea.vals.xR[j];
          info->sparsea.vals.xR[j] = v;
-         info->rowscales.xR[i] = maxreal(info->rowscales.xR[i], v, _state);
+         info->rowscales.xR[i] = rmax2(info->rowscales.xR[i], v, _state);
       }
-      info->rowscales.xR[i] = maxreal(info->rowscales.xR[i], 1.0, _state);
+      info->rowscales.xR[i] = rmax2(info->rowscales.xR[i], 1.0, _state);
       v = 1 / info->rowscales.xR[i];
       for (j = j0; j <= j1; j++) {
          info->sparsea.vals.xR[j] *= v;
@@ -28905,10 +28803,10 @@ void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc,
       }
       x->xR[i] *= info->colscales.xR[i];
       if (isfinite(info->rawbndl.xR[i])) {
-         x->xR[i] = maxreal(x->xR[i], info->rawbndl.xR[i], _state);
+         x->xR[i] = rmax2(x->xR[i], info->rawbndl.xR[i], _state);
       }
       if (isfinite(info->rawbndu.xR[i])) {
-         x->xR[i] = minreal(x->xR[i], info->rawbndu.xR[i], _state);
+         x->xR[i] = rmin2(x->xR[i], info->rawbndu.xR[i], _state);
       }
    }
    for (i = 0; i < n; i++) {
@@ -28921,7 +28819,6 @@ void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc,
 
 void presolveinfo_init(void *_p, ae_state *_state, bool make_automatic) {
    presolveinfo *p = (presolveinfo *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rawbndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->colscales, 0, DT_REAL, _state, make_automatic);
@@ -28956,7 +28853,6 @@ void presolveinfo_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 
 void presolveinfo_free(void *_p, bool make_automatic) {
    presolveinfo *p = (presolveinfo *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->rawbndl, make_automatic);
    ae_vector_free(&p->rawbndu, make_automatic);
    ae_vector_free(&p->colscales, make_automatic);
@@ -29004,14 +28900,14 @@ static void reviseddualsimplex_subprobleminit(ae_int_t n, dualsimplexsubproblem 
    s->ns = n;
    s->m = 0;
    s->state = reviseddualsimplex_ssinvalid;
-   rvectorsetlengthatleast(&s->xa, n, _state);
-   rvectorsetlengthatleast(&s->xb, 0, _state);
-   rvectorsetlengthatleast(&s->d, n, _state);
-   rvectorsetlengthatleast(&s->rawc, n, _state);
-   rvectorsetlengthatleast(&s->effc, n, _state);
-   rvectorsetlengthatleast(&s->bndl, n, _state);
-   rvectorsetlengthatleast(&s->bndu, n, _state);
-   ivectorsetlengthatleast(&s->bndt, n, _state);
+   vectorsetlengthatleast(&s->xa, n, _state);
+   vectorsetlengthatleast(&s->xb, 0, _state);
+   vectorsetlengthatleast(&s->d, n, _state);
+   vectorsetlengthatleast(&s->rawc, n, _state);
+   vectorsetlengthatleast(&s->effc, n, _state);
+   vectorsetlengthatleast(&s->bndl, n, _state);
+   vectorsetlengthatleast(&s->bndu, n, _state);
+   vectorsetlengthatleast(&s->bndt, n, _state);
    for (i = 0; i < n; i++) {
       s->rawc.xR[i] = 0.0;
       s->effc.xR[i] = 0.0;
@@ -29166,13 +29062,13 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
    ae_assert(s->isvalidtrf, "BasisSolve: integrity check failed", _state);
    m = s->m;
    processed = false;
-   rvectorsetlengthatleast(tx, m, _state);
+   vectorsetlengthatleast(tx, m, _state);
 // Dense/sparse factorizations with dense PFI
 //
 // NOTE: although we solve B*x=r, internally we store factorization of B^T
    if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
       ae_assert(s->trfage == 0 || s->trftype != 0, "BasisSolve: integrity check failed TrfAge vs TrfType", _state);
-      rvectorsetlengthatleast(x, m, _state);
+      vectorsetlengthatleast(x, m, _state);
       for (i = 0; i < m; i++) {
          x->xR[i] = r->xR[s->colpermbwd.xZ[i]];
       }
@@ -29204,7 +29100,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
 //
 // NOTE: although we solve B*x=r, internally we store factorization of B^T
    if (s->trftype == 3) {
-      rvectorsetlengthatleast(x, m, _state);
+      vectorsetlengthatleast(x, m, _state);
       for (i = 0; i < m; i++) {
          x->xR[i] = r->xR[s->colpermbwd.xZ[i]];
       }
@@ -29234,7 +29130,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
          x->xR[m - 1] = vv + vd * s->densemu.xR[k * m + m - 1];
       }
       if (needintermediate) {
-         rvectorsetlengthatleast(xim, m, _state);
+         vectorsetlengthatleast(xim, m, _state);
          for (i = 0; i < m; i++) {
             xim->xR[i] = x->xR[i];
          }
@@ -29282,11 +29178,11 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
    ae_assert(s->isvalidtrf, "BasisSolveT: integrity check failed", _state);
    m = s->m;
    processed = false;
-   rvectorsetlengthatleast(tx, m, _state);
+   vectorsetlengthatleast(tx, m, _state);
 // Dense factorizations
    if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
       ae_assert(s->trfage == 0 || s->trftype != 0, "BasisSolveT: integrity check failed TrfAge vs TrfType", _state);
-      rvectorsetlengthatleast(x, m, _state);
+      vectorsetlengthatleast(x, m, _state);
       for (i = 0; i < m; i++) {
          x->xR[i] = r->xR[i];
       }
@@ -29322,7 +29218,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
    }
 // Sparse factorization with Forest-Tomlin update
    if (s->trftype == 3) {
-      rvectorsetlengthatleast(x, m, _state);
+      vectorsetlengthatleast(x, m, _state);
       for (i = 0; i < m; i++) {
          x->xR[i] = r->xR[i];
       }
@@ -29402,7 +29298,7 @@ static void reviseddualsimplex_computeanxn(dualsimplexstate *state, dualsimplexs
 // Integrity check
    ae_assert(subproblem->state >= reviseddualsimplex_ssvalidxn, "ComputeANXN: XN is invalid", _state);
 // Compute
-   rvectorsetlengthatleast(y, m, _state);
+   vectorsetlengthatleast(y, m, _state);
    for (i = 0; i < m; i++) {
       y->xR[i] = 0.0;
    }
@@ -29436,7 +29332,7 @@ static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector *y, 
    m = state->m;
    nn = nx - m;
 // Allocate output, set to zero
-   rvectorsetlengthatleast(r, nx, _state);
+   vectorsetlengthatleast(r, nx, _state);
    for (i = 0; i < nx; i++) {
       r->xR[i] = 0.0;
    }
@@ -29533,7 +29429,7 @@ static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd, 
    ae_int_t i;
    ae_int_t k;
    ae_int_t t;
-   ivectorsetlengthatleast(bwd, m, _state);
+   vectorsetlengthatleast(bwd, m, _state);
    for (i = 0; i < m; i++) {
       bwd->xZ[i] = i;
    }
@@ -29589,11 +29485,11 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
    }
 // Dense TRF
    if (s->trftype == 0 || s->trftype == 1) {
-      ivectorsetlengthatleast(&s->colpermbwd, m, _state);
+      vectorsetlengthatleast(&s->colpermbwd, m, _state);
       for (i = 0; i < m; i++) {
          s->colpermbwd.xZ[i] = i;
       }
-      rmatrixsetlengthatleast(&s->denselu, m, m, _state);
+      matrixsetlengthatleast(&s->denselu, m, m, _state);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
             s->denselu.xyR[i][j] = 0.0;
@@ -29627,9 +29523,9 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
    //
    // After this block is done we have following arrays:
    // * tCInvIdx[j], which is an inverse of ColPermBwf[]
-      ivectorsetlengthatleast(&s->tcinvidx, m, _state);
-      ivectorsetlengthatleast(&s->rowpermbwd, m, _state);
-      ivectorsetlengthatleast(&s->colpermbwd, m, _state);
+      vectorsetlengthatleast(&s->tcinvidx, m, _state);
+      vectorsetlengthatleast(&s->rowpermbwd, m, _state);
+      vectorsetlengthatleast(&s->colpermbwd, m, _state);
       for (i = 0; i < m; i++) {
          s->tcinvidx.xZ[i] = i;
          s->rowpermbwd.xZ[i] = i;
@@ -29657,16 +29553,16 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       nstructural = m - nlogical;
    // Prepare SparseLU1 to receive factored out logical part of the matrix
    // and SparseLU2 to receive structural part of the matrix.
-      ivectorsetlengthatleast(&s->sparselu1.ridx, nstructural + 1, _state);
-      ivectorsetlengthatleast(&s->sparselu1.didx, nstructural, _state);
-      ivectorsetlengthatleast(&s->sparselu1.uidx, nstructural, _state);
+      vectorsetlengthatleast(&s->sparselu1.ridx, nstructural + 1, _state);
+      vectorsetlengthatleast(&s->sparselu1.didx, nstructural, _state);
+      vectorsetlengthatleast(&s->sparselu1.uidx, nstructural, _state);
       s->sparselu1.matrixtype = 1;
       s->sparselu1.m = nstructural;
       s->sparselu1.n = nlogical;
       s->sparselu1.ridx.xZ[0] = 0;
-      ivectorsetlengthatleast(&s->sparselu2.ridx, nstructural + 1, _state);
-      ivectorsetlengthatleast(&s->sparselu2.didx, nstructural, _state);
-      ivectorsetlengthatleast(&s->sparselu2.uidx, nstructural, _state);
+      vectorsetlengthatleast(&s->sparselu2.ridx, nstructural + 1, _state);
+      vectorsetlengthatleast(&s->sparselu2.didx, nstructural, _state);
+      vectorsetlengthatleast(&s->sparselu2.uidx, nstructural, _state);
       s->sparselu2.matrixtype = 1;
       s->sparselu2.m = nstructural;
       s->sparselu2.n = nstructural;
@@ -29733,11 +29629,11 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             nzl += (s->sparselu1.ridx.xZ[k + 1] - s->sparselu1.ridx.xZ[k]);
             nzl += 1 + (s->sparselu2.didx.xZ[i] - s->sparselu2.ridx.xZ[i]);
          }
-         rvectorsetlengthatleast(&s->sparsel.vals, nzl, _state);
-         ivectorsetlengthatleast(&s->sparsel.idx, nzl, _state);
-         ivectorsetlengthatleast(&s->sparsel.ridx, m + 1, _state);
-         ivectorsetlengthatleast(&s->sparsel.didx, m, _state);
-         ivectorsetlengthatleast(&s->sparsel.uidx, m, _state);
+         vectorsetlengthatleast(&s->sparsel.vals, nzl, _state);
+         vectorsetlengthatleast(&s->sparsel.idx, nzl, _state);
+         vectorsetlengthatleast(&s->sparsel.ridx, m + 1, _state);
+         vectorsetlengthatleast(&s->sparsel.didx, m, _state);
+         vectorsetlengthatleast(&s->sparsel.uidx, m, _state);
          s->sparsel.matrixtype = 1;
          s->sparsel.m = m;
          s->sparsel.n = m;
@@ -29781,11 +29677,11 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
          for (i = 0; i < nstructural; i++) {
             nzu += 1 + (s->sparselu2.ridx.xZ[i + 1] - s->sparselu2.uidx.xZ[i]);
          }
-         rvectorsetlengthatleast(&s->sparseu.vals, nzu, _state);
-         ivectorsetlengthatleast(&s->sparseu.idx, nzu, _state);
-         ivectorsetlengthatleast(&s->sparseu.ridx, m + 1, _state);
-         ivectorsetlengthatleast(&s->sparseu.didx, m, _state);
-         ivectorsetlengthatleast(&s->sparseu.uidx, m, _state);
+         vectorsetlengthatleast(&s->sparseu.vals, nzu, _state);
+         vectorsetlengthatleast(&s->sparseu.idx, nzu, _state);
+         vectorsetlengthatleast(&s->sparseu.ridx, m + 1, _state);
+         vectorsetlengthatleast(&s->sparseu.didx, m, _state);
+         vectorsetlengthatleast(&s->sparseu.uidx, m, _state);
          s->sparseu.matrixtype = 1;
          s->sparseu.m = m;
          s->sparseu.n = m;
@@ -29819,7 +29715,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
          ae_assert(s->sparseu.ninitialized == s->sparseu.ridx.xZ[m], "BasisFreshTrf: integrity check failed", _state);
          sparseinitduidx(&s->sparseu, _state);
       } else {
-         ivectorsetlengthatleast(&s->nrs, m, _state);
+         vectorsetlengthatleast(&s->nrs, m, _state);
          for (i = 0; i < m; i++) {
             s->nrs.xZ[i] = 1;
          }
@@ -29885,8 +29781,8 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
    m = s->m;
    ae_assert(s->state >= reviseddualsimplex_ssvalidxn, "InitialDualFeasibilityCorrection: XN is invalid", _state);
 // Prepare
-   rvectorsetlengthatleast(&state->dfctmp0, m, _state);
-   rvectorsetlengthatleast(&state->dfctmp1, m, _state);
+   vectorsetlengthatleast(&state->dfctmp0, m, _state);
+   vectorsetlengthatleast(&state->dfctmp1, m, _state);
 // Recompute D[] using fresh factorization
    reviseddualsimplex_basisfreshtrf(&state->basis, &state->at, settings, _state);
    for (i = 0; i < m; i++) {
@@ -29939,7 +29835,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
          continue;
       }
       if (bndt == reviseddualsimplex_ccfree) {
-         result = maxreal(result, fabs(s->d.xR[j]), _state);
+         result = rmax2(result, fabs(s->d.xR[j]), _state);
          continue;
       }
    }
@@ -30065,8 +29961,8 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
       for (i = 0; i < m; i++) {
          if (s->idx.xZ[i] < ns) {
          // Structural variable, DSE weight is computed by definition
-            rvectorsetlengthatleast(&s->wtmp0, m, _state);
-            rvectorsetlengthatleast(&s->wtmp1, m, _state);
+            vectorsetlengthatleast(&s->wtmp0, m, _state);
+            vectorsetlengthatleast(&s->wtmp1, m, _state);
             for (j = 0; j < m; j++) {
                s->wtmp0.xR[j] = 0.0;
             }
@@ -30261,9 +30157,9 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
 //     X           -   preallocated vector, X.N=N, contents undefined
 // ALGLIB: Copyright 24.07.2020 by Sergey Bochkanov
 static void reviseddualsimplex_dvalloc(dssvector *x, ae_int_t n, ae_state *_state) {
-   ivectorsetlengthatleast(&x->idx, n, _state);
-   rvectorsetlengthatleast(&x->vals, n, _state);
-   rvectorsetlengthatleast(&x->dense, n, _state);
+   vectorsetlengthatleast(&x->idx, n, _state);
+   vectorsetlengthatleast(&x->vals, n, _state);
+   vectorsetlengthatleast(&x->dense, n, _state);
    x->n = n;
 }
 
@@ -30281,8 +30177,8 @@ static void reviseddualsimplex_dvdensetosparse(dssvector *x, ae_state *_state) {
    ae_int_t k;
    double v;
    n = x->n;
-   ivectorsetlengthatleast(&x->idx, n, _state);
-   rvectorsetlengthatleast(&x->vals, n, _state);
+   vectorsetlengthatleast(&x->idx, n, _state);
+   vectorsetlengthatleast(&x->vals, n, _state);
    k = 0;
    for (i = 0; i < n; i++) {
       v = x->dense.xR[i];
@@ -30313,9 +30209,9 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
 // Timers
    t0 = 0;
 // BTran
-   rvectorsetlengthatleast(&state->btrantmp0, m, _state);
-   rvectorsetlengthatleast(&state->btrantmp1, m, _state);
-   rvectorsetlengthatleast(&state->btrantmp2, m, _state);
+   vectorsetlengthatleast(&state->btrantmp0, m, _state);
+   vectorsetlengthatleast(&state->btrantmp1, m, _state);
+   vectorsetlengthatleast(&state->btrantmp2, m, _state);
    for (i = 0; i < m; i++) {
       state->btrantmp0.xR[i] = 0.0;
    }
@@ -30338,9 +30234,9 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
 //                     * X.Dense is zero-filled.
 // ALGLIB: Copyright 24.07.2020 by Sergey Bochkanov
 static void reviseddualsimplex_dvinit(dssvector *x, ae_int_t n, ae_state *_state) {
-   ivectorsetlengthatleast(&x->idx, n, _state);
-   rvectorsetlengthatleast(&x->vals, n, _state);
-   rvectorsetlengthatleast(&x->dense, n, _state);
+   vectorsetlengthatleast(&x->idx, n, _state);
+   vectorsetlengthatleast(&x->vals, n, _state);
+   vectorsetlengthatleast(&x->dense, n, _state);
    rsetv(n, 0.0, &x->dense, _state);
    x->n = n;
    x->k = 0;
@@ -30481,7 +30377,7 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
 // Timers
    t0 = 0;
 // FTran
-   rvectorsetlengthatleast(&state->ftrantmp0, m, _state);
+   vectorsetlengthatleast(&state->ftrantmp0, m, _state);
    for (i = 0; i < m; i++) {
       state->ftrantmp0.xR[i] = 0.0;
    }
@@ -30553,11 +30449,11 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
 // Scaled tolerances are used to test AlphaWaveR for positivity/negativity,
 // scale of I-th tolerance is calculated as ratio of ColScale[I] and ColScale[P].
    dir = sign(delta, _state);
-   ivectorsetlengthatleast(possibleflips, nx, _state);
+   vectorsetlengthatleast(possibleflips, nx, _state);
 // Prepare set of eligible variables
 //
 // NOTE: free variables are immediately chosen at this stage
-   ivectorsetlengthatleast(&state->eligiblealphar, alphar->k, _state);
+   vectorsetlengthatleast(&state->eligiblealphar, alphar->k, _state);
    eligiblecnt = 0;
    for (j = 0; j < alphar->k; j++) {
       nj = alphar->idx.xZ[j];
@@ -30755,7 +30651,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
                s->densepfieta.xR[s->trfage * m + i] = invaq;
             }
          }
-         inc(&s->trfage, _state);
+         s->trfage++;
          s->statupdt++;
          s->statoffdiag += sqr((double)(m - 1), _state);
          processed = true;
@@ -30766,7 +30662,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          rvectorgrowto(&s->densemu, (s->trfage + 1) * m, _state);
          ivectorgrowto(&s->rk, s->trfage + 1, _state);
          ivectorgrowto(&s->dk, s->trfage + 1, _state);
-         rvectorsetlengthatleast(&s->utmp0, m, _state);
+         vectorsetlengthatleast(&s->utmp0, m, _state);
       // Determine D - index of row being overwritten by Forest-Tomlin update
          idxd = -1;
          for (i = 0; i < m; i++) {
@@ -30874,7 +30770,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       // Multiply row permutation matrix by cyclic permutation applied to L
          reviseddualsimplex_inversecyclicpermutation(&s->rowpermbwd, m, idxd, &s->utmpi, _state);
       // Done
-         inc(&s->trfage, _state);
+         s->trfage++;
          s->statupdt++;
          s->statoffdiag += (s->sparsel.ridx.xZ[m] - m) + (s->sparseu.ridx.xZ[m] - m);
          processed = true;
@@ -30908,7 +30804,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          for (i = 0; i < m; i++) {
             if (i != r) {
                s->dseweights.xR[i] -= 2 * (alphaq->xR[i] / alphaq->xR[r]) * tau->xR[i] - s->dseweights.xR[r] * sqr(alphaq->xR[i] / alphaq->xR[r], _state);
-               s->dseweights.xR[i] = maxreal(s->dseweights.xR[i], reviseddualsimplex_minbeta, _state);
+               s->dseweights.xR[i] = rmax2(s->dseweights.xR[i], reviseddualsimplex_minbeta, _state);
             }
          }
          s->dseweights.xR[r] /= alphaq->xR[r] * alphaq->xR[r];
@@ -30948,7 +30844,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n, ae_state *_s
    }
    mx = 1.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(x->xR[i]), _state);
+      mx = rmax2(mx, fabs(x->xR[i]), _state);
    }
    mx *= 1.0E5 * machineepsilon;
    k = 0;
@@ -31028,11 +30924,11 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    dir = sign(delta, _state);
    alpharlen = alphar->k;
    flip = 0.0;
-   rvectorsetlengthatleast(&state->tmp0, m, _state);
+   vectorsetlengthatleast(&state->tmp0, m, _state);
    for (k = 0; k < m; k++) {
       state->tmp0.xR[k] = 0.0;
    }
-   ivectorsetlengthatleast(&state->ustmpi, nx, _state);
+   vectorsetlengthatleast(&state->ustmpi, nx, _state);
    actualflipscnt = 0;
 // Evaluate and update non-basic elements of D
    for (ii = 0; ii < alpharlen; ii++) {
@@ -31165,27 +31061,27 @@ static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, d
       }
       if (bndt == reviseddualsimplex_ccrange) {
          if (s->xa.xR[j] == s->bndl.xR[j]) {
-            result = maxreal(result, -s->d.xR[j], _state);
+            result = rmax2(result, -s->d.xR[j], _state);
             continue;
          }
          if (s->xa.xR[j] == s->bndu.xR[j]) {
-            result = maxreal(result, s->d.xR[j], _state);
+            result = rmax2(result, s->d.xR[j], _state);
             continue;
          }
          ae_assert(false, "DualFeasibilityError: integrity check failed", _state);
       }
       if (bndt == reviseddualsimplex_cclower) {
          ae_assert(s->xa.xR[j] == s->bndl.xR[j], "DualFeasibilityError: integrity check failed", _state);
-         result = maxreal(result, -s->d.xR[j], _state);
+         result = rmax2(result, -s->d.xR[j], _state);
          continue;
       }
       if (bndt == reviseddualsimplex_ccupper) {
          ae_assert(s->xa.xR[j] == s->bndu.xR[j], "DualFeasibilityError: integrity check failed", _state);
-         result = maxreal(result, s->d.xR[j], _state);
+         result = rmax2(result, s->d.xR[j], _state);
          continue;
       }
       if (bndt == reviseddualsimplex_ccfree) {
-         result = maxreal(result, fabs(s->d.xR[j]), _state);
+         result = rmax2(result, fabs(s->d.xR[j]), _state);
          continue;
       }
       ae_assert(false, "DSSOptimize: integrity check failed (infeasible constraint)", _state);
@@ -31272,7 +31168,7 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
 // Actual processing
    reviseddualsimplex_offloadbasiccomponents(s, &state->basis, settings, _state);
    *info = 0;
-   rvectorsetlengthatleast(&state->tmp0, m, _state);
+   vectorsetlengthatleast(&state->tmp0, m, _state);
    while (true) {
    // Pricing
       reviseddualsimplex_pricingstep(state, s, isphase1, &p, &r, &delta, settings, _state);
@@ -31295,7 +31191,7 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
             reviseddualsimplex_basisfreshtrf(&state->basis, &state->at, settings, _state);
             reviseddualsimplex_subproblemhandlexnupdate(state, s, _state);
             reviseddualsimplex_offloadbasiccomponents(s, &state->basis, settings, _state);
-            inc(&forcedrestarts, _state);
+            forcedrestarts++;
             continue;
          }
       // Dual unbounded, primal infeasible
@@ -31320,11 +31216,11 @@ static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dual
       }
    // Basis change and update
       reviseddualsimplex_updatestep(state, s, p, q, r, delta, alpharpiv, thetap, thetad, &state->alphaq, &state->alphaqim, &state->alphar, &state->tau, &state->possibleflips, state->possibleflipscnt, settings, _state);
-      inc(&state->repiterationscount, _state);
+      state->repiterationscount++;
       if (isphase1) {
-         inc(&state->repiterationscount1, _state);
+         state->repiterationscount1++;
       } else {
-         inc(&state->repiterationscount2, _state);
+         state->repiterationscount2++;
       }
    }
 }
@@ -31424,7 +31320,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
    }
 // Actual processing
    *info = 1;
-   rvectorsetlengthatleast(&state->tmp0, m, _state);
+   vectorsetlengthatleast(&state->tmp0, m, _state);
    while (true) {
    // Primal simplex pricing step: we implement the very basic version
    // of the pricing step because it is expected that primal simplex method
@@ -31564,7 +31460,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
       // * update target value Z
       // * update factorization
       // * update D[]
-         rvectorsetlengthatleast(&state->tmp0, m, _state);
+         vectorsetlengthatleast(&state->tmp0, m, _state);
          for (i = 0; i < m; i++) {
             bi = state->basis.idx.xZ[i];
             vv = thetap * (dir * state->alphaq.xR[i]);
@@ -31595,8 +31491,8 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
             s->xa.xR[bi] -= vv;
          }
       }
-      inc(&state->repiterationscount, _state);
-      inc(&state->repiterationscount3, _state);
+      state->repiterationscount++;
+      state->repiterationscount3++;
    }
 }
 
@@ -31796,14 +31692,14 @@ static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexs
    m = s->m;
    ns = s->ns;
    nx = s->ns + s->m;
-   rvectorsetlengthatleast(x, ns, _state);
-   rvectorsetlengthatleast(laglc, m, _state);
-   ivectorsetlengthatleast(stats, nx, _state);
+   vectorsetlengthatleast(x, ns, _state);
+   vectorsetlengthatleast(laglc, m, _state);
+   vectorsetlengthatleast(stats, nx, _state);
    rsetallocv(ns, 0.0, lagbc, _state);
 // Compute Y (in Buffers.RA1) and D (in Buffers.RA3)
-   rvectorsetlengthatleast(&buffers->ra0, m, _state);
-   rvectorsetlengthatleast(&buffers->ra1, m, _state);
-   rvectorsetlengthatleast(&buffers->ra3, nx, _state);
+   vectorsetlengthatleast(&buffers->ra0, m, _state);
+   vectorsetlengthatleast(&buffers->ra1, m, _state);
+   vectorsetlengthatleast(&buffers->ra3, nx, _state);
    for (i = 0; i < m; i++) {
       buffers->ra0.xR[i] = s->rawc.xR[basis->idx.xZ[i]];
    }
@@ -31823,10 +31719,10 @@ static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexs
    for (i = 0; i < ns; i++) {
       x->xR[i] = s->xa.xR[i];
       if (isfinite(state->rawbndl.xR[i])) {
-         x->xR[i] = maxreal(x->xR[i], state->rawbndl.xR[i], _state);
+         x->xR[i] = rmax2(x->xR[i], state->rawbndl.xR[i], _state);
       }
       if (isfinite(state->rawbndu.xR[i])) {
-         x->xR[i] = minreal(x->xR[i], state->rawbndu.xR[i], _state);
+         x->xR[i] = rmin2(x->xR[i], state->rawbndu.xR[i], _state);
       }
    }
    for (i = 0; i < ns; i++) {
@@ -31838,11 +31734,11 @@ static void reviseddualsimplex_setxydstats(dualsimplexstate *state, dualsimplexs
          continue;
       }
       if (reviseddualsimplex_hasbndl(s, i, _state) && s->xa.xR[i] == s->bndl.xR[i]) {
-         lagbc->xR[i] = minreal(lagbc->xR[i], 0.0, _state);
+         lagbc->xR[i] = rmin2(lagbc->xR[i], 0.0, _state);
          continue;
       }
       if (reviseddualsimplex_hasbndu(s, i, _state) && s->xa.xR[i] == s->bndu.xR[i]) {
-         lagbc->xR[i] = maxreal(lagbc->xR[i], 0.0, _state);
+         lagbc->xR[i] = rmax2(lagbc->xR[i], 0.0, _state);
          continue;
       }
       ae_assert(!reviseddualsimplex_hasbndl(s, i, _state) && !reviseddualsimplex_hasbndu(s, i, _state), "SetStats: integrity check failed (zetta5)", _state);
@@ -31965,10 +31861,10 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    for (i = 0; i < nx; i++) {
       state->primary.xa.xR[i] = state->phase3.xa.xR[i];
       if (reviseddualsimplex_hasbndl(&state->primary, i, _state)) {
-         state->primary.xa.xR[i] = maxreal(state->primary.xa.xR[i], state->primary.bndl.xR[i], _state);
+         state->primary.xa.xR[i] = rmax2(state->primary.xa.xR[i], state->primary.bndl.xR[i], _state);
       }
       if (reviseddualsimplex_hasbndu(&state->primary, i, _state)) {
-         state->primary.xa.xR[i] = minreal(state->primary.xa.xR[i], state->primary.bndu.xR[i], _state);
+         state->primary.xa.xR[i] = rmin2(state->primary.xa.xR[i], state->primary.bndu.xR[i], _state);
       }
    }
 // Primal and dual feasible, problem solved
@@ -32006,7 +31902,7 @@ static void reviseddualsimplex_basisinit(ae_int_t ns, ae_int_t m, dualsimplexbas
    s->trftype = 3;
    s->trfage = 0;
    s->isvalidtrf = false;
-   rvectorsetlengthatleast(&s->dseweights, m, _state);
+   vectorsetlengthatleast(&s->dseweights, m, _state);
    for (i = 0; i < m; i++) {
       s->dseweights.xR[i] = 1.0;
    }
@@ -32142,7 +32038,7 @@ static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimp
       s0->isbasic.xB[i] = s1->isbasic.xB[i];
    }
    s0->isvalidtrf = false;
-   rvectorsetlengthatleast(&s0->dseweights, s1->m, _state);
+   vectorsetlengthatleast(&s0->dseweights, s1->m, _state);
    for (i = 0; i < s1->m; i++) {
       s0->dseweights.xR[i] = 1.0;
    }
@@ -32160,7 +32056,7 @@ static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimp
 // specified by user, nothing is changed)
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static void reviseddualsimplex_downgradestate(dualsimplexsubproblem *subproblem, ae_int_t s, ae_state *_state) {
-   subproblem->state = minint(subproblem->state, s, _state);
+   subproblem->state = imin2(subproblem->state, s, _state);
 }
 
 void dsssettingsinit(dualsimplexsettings *settings, ae_state *_state) {
@@ -32338,13 +32234,13 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
    //       1.0 in magnitude, which allows us later to move logical
    //       columns to the beginning of LU factors without loosing
    //       stability.
-      rvectorsetlengthatleast(&state->at.vals, sparsea->ridx.xZ[k] + k, _state);
-      ivectorsetlengthatleast(&state->at.idx, sparsea->ridx.xZ[k] + k, _state);
-      ivectorsetlengthatleast(&state->at.ridx, ns + k + 1, _state);
-      ivectorsetlengthatleast(&state->at.didx, ns + k, _state);
-      ivectorsetlengthatleast(&state->at.uidx, ns + k, _state);
+      vectorsetlengthatleast(&state->at.vals, sparsea->ridx.xZ[k] + k, _state);
+      vectorsetlengthatleast(&state->at.idx, sparsea->ridx.xZ[k] + k, _state);
+      vectorsetlengthatleast(&state->at.ridx, ns + k + 1, _state);
+      vectorsetlengthatleast(&state->at.didx, ns + k, _state);
+      vectorsetlengthatleast(&state->at.uidx, ns + k, _state);
       sparsecopytransposecrsbuf(sparsea, &state->at, _state);
-      rvectorsetlengthatleast(&state->rowscales, k, _state);
+      vectorsetlengthatleast(&state->rowscales, k, _state);
       for (i = 0; i < k; i++) {
          state->rowscales.xR[i] = 0.0;
       }
@@ -32358,7 +32254,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
             state->rowscales.xR[jj] += v * v;
          }
       }
-      rvectorsetlengthatleast(&state->tmp0, k, _state);
+      vectorsetlengthatleast(&state->tmp0, k, _state);
       for (i = 0; i < k; i++) {
          state->rowscales.xR[i] = coalesce(sqrt(state->rowscales.xR[i]), 1.0, _state);
          state->tmp0.xR[i] = 1 / state->rowscales.xR[i];
@@ -32506,8 +32402,6 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings, ae_stat
 }
 
 void dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic) {
-   dualsimplexsettings *p = (dualsimplexsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void dualsimplexsettings_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -32526,13 +32420,10 @@ void dualsimplexsettings_copy(void *_dst, void *_src, ae_state *_state, bool mak
 }
 
 void dualsimplexsettings_free(void *_p, bool make_automatic) {
-   dualsimplexsettings *p = (dualsimplexsettings *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void dssvector_init(void *_p, ae_state *_state, bool make_automatic) {
    dssvector *p = (dssvector *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->vals, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dense, 0, DT_REAL, _state, make_automatic);
@@ -32550,7 +32441,6 @@ void dssvector_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 
 void dssvector_free(void *_p, bool make_automatic) {
    dssvector *p = (dssvector *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->idx, make_automatic);
    ae_vector_free(&p->vals, make_automatic);
    ae_vector_free(&p->dense, make_automatic);
@@ -32558,7 +32448,6 @@ void dssvector_free(void *_p, bool make_automatic) {
 
 void dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexbasis *p = (dualsimplexbasis *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->nidx, 0, DT_INT, _state, make_automatic);
    ae_vector_init(&p->isbasic, 0, DT_BOOL, _state, make_automatic);
@@ -32636,7 +32525,6 @@ void dualsimplexbasis_copy(void *_dst, void *_src, ae_state *_state, bool make_a
 
 void dualsimplexbasis_free(void *_p, bool make_automatic) {
    dualsimplexbasis *p = (dualsimplexbasis *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->idx, make_automatic);
    ae_vector_free(&p->nidx, make_automatic);
    ae_vector_free(&p->isbasic, make_automatic);
@@ -32670,7 +32558,6 @@ void dualsimplexbasis_free(void *_p, bool make_automatic) {
 
 void dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexsubproblem *p = (dualsimplexsubproblem *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -32709,7 +32596,6 @@ void dualsimplexsubproblem_copy(void *_dst, void *_src, ae_state *_state, bool m
 
 void dualsimplexsubproblem_free(void *_p, bool make_automatic) {
    dualsimplexsubproblem *p = (dualsimplexsubproblem *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->rawc, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);
    ae_vector_free(&p->bndu, make_automatic);
@@ -32727,7 +32613,6 @@ void dualsimplexsubproblem_free(void *_p, bool make_automatic) {
 
 void dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexstate *p = (dualsimplexstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->rowscales, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->rawbndu, 0, DT_REAL, _state, make_automatic);
@@ -32819,7 +32704,6 @@ void dualsimplexstate_copy(void *_dst, void *_src, ae_state *_state, bool make_a
 
 void dualsimplexstate_free(void *_p, bool make_automatic) {
    dualsimplexstate *p = (dualsimplexstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->rowscales, make_automatic);
    ae_vector_free(&p->rawbndl, make_automatic);
    ae_vector_free(&p->rawbndu, make_automatic);
@@ -33174,14 +33058,14 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
       nz = 0;
       for (j = 0; j < n; j++) {
          if (a->xyR[i][j] != 0.0) {
-            inc(&nz, _state);
+            nz++;
          }
       }
       nrs.xZ[i] = nz;
    }
 // Allocate storage, copy
-   rvectorsetlengthatleast(&state->al, state->m, _state);
-   rvectorsetlengthatleast(&state->au, state->m, _state);
+   vectorsetlengthatleast(&state->al, state->m, _state);
+   vectorsetlengthatleast(&state->au, state->m, _state);
    sparsecreatecrsbuf(state->m, n, &nrs, &state->a, _state);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
@@ -33238,8 +33122,8 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 // Copy
    state->m = k;
    sparsecopytocrsbuf(a, &state->a, _state);
-   rvectorsetlengthatleast(&state->al, k, _state);
-   rvectorsetlengthatleast(&state->au, k, _state);
+   vectorsetlengthatleast(&state->al, k, _state);
+   vectorsetlengthatleast(&state->au, k, _state);
    for (i = 0; i < k; i++) {
       state->al.xR[i] = al->xR[i];
       state->au.xR[i] = au->xR[i];
@@ -33436,7 +33320,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       state->a.m = 0;
       state->a.n = n;
       state->a.ninitialized = 0;
-      ivectorsetlengthatleast(&state->a.ridx, 1, _state);
+      vectorsetlengthatleast(&state->a.ridx, 1, _state);
       state->a.ridx.xZ[0] = 0;
    }
 // Reallocate storage
@@ -33544,8 +33428,8 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_st
    ae_assert(isfinitevector(a, n, _state), "MinLPAddLC2Dense: A contains infinite or NaN values!", _state);
    ae_assert(isfinite(al) || isneginf(al), "MinLPAddLC2Dense: AL is NAN or +INF", _state);
    ae_assert(isfinite(au) || isposinf(au), "MinLPAddLC2Dense: AU is NAN or -INF", _state);
-   ivectorsetlengthatleast(&state->adddtmpi, n, _state);
-   rvectorsetlengthatleast(&state->adddtmpr, n, _state);
+   vectorsetlengthatleast(&state->adddtmpi, n, _state);
+   vectorsetlengthatleast(&state->adddtmpr, n, _state);
    nnz = 0;
    for (i = 0; i < n; i++) {
       if (a->xR[i] != 0.0) {
@@ -33604,23 +33488,23 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
       state->repprimalerror = 0.0;
       for (i = 0; i < n; i++) {
          if (isfinite(state->bndl.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, state->bndl.xR[i] - 0, _state);
+            state->repprimalerror = rmax2(state->repprimalerror, state->bndl.xR[i] - 0, _state);
          }
          if (isfinite(state->bndu.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, 0 - state->bndu.xR[i], _state);
+            state->repprimalerror = rmax2(state->repprimalerror, 0 - state->bndu.xR[i], _state);
          }
       }
       for (i = 0; i < m; i++) {
          if (isfinite(state->al.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, state->al.xR[i] - 0, _state);
+            state->repprimalerror = rmax2(state->repprimalerror, state->al.xR[i] - 0, _state);
          }
          if (isfinite(state->au.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, 0 - state->au.xR[i], _state);
+            state->repprimalerror = rmax2(state->repprimalerror, 0 - state->au.xR[i], _state);
          }
       }
       state->repdualerror = 0.0;
       for (i = 0; i < n; i++) {
-         state->repdualerror = maxreal(state->repdualerror, fabs(state->c.xR[i]), _state);
+         state->repdualerror = rmax2(state->repdualerror, fabs(state->c.xR[i]), _state);
       }
       state->repslackerror = 0.0;
       ae_frame_leave(_state);
@@ -33639,10 +33523,10 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
          dsssetproblem(&state->dss, &state->presolver.c, &state->presolver.bndl, &state->presolver.bndu, &dummy, &state->presolver.sparsea, 1, &state->presolver.al, &state->presolver.au, state->presolver.newm, &dummybasis, minlp_alllogicalsbasis, &settings, _state);
          dssoptimize(&state->dss, &settings, _state);
       // Export results, convert from presolve
-         rvectorsetlengthatleast(&state->xs, state->presolver.newn, _state);
-         rvectorsetlengthatleast(&state->lagbc, state->presolver.newn, _state);
-         rvectorsetlengthatleast(&state->laglc, state->presolver.newm, _state);
-         ivectorsetlengthatleast(&state->cs, state->presolver.newn + state->presolver.newm, _state);
+         vectorsetlengthatleast(&state->xs, state->presolver.newn, _state);
+         vectorsetlengthatleast(&state->lagbc, state->presolver.newn, _state);
+         vectorsetlengthatleast(&state->laglc, state->presolver.newm, _state);
+         vectorsetlengthatleast(&state->cs, state->presolver.newn + state->presolver.newm, _state);
          for (i = 0; i < state->presolver.newn; i++) {
             state->xs.xR[i] = state->dss.repx.xR[i];
             state->lagbc.xR[i] = state->dss.replagbc.xR[i];
@@ -33693,24 +33577,24 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
       raddv(n, 1.0, &state->lagbc, &state->tmpg, _state);
       for (i = 0; i < n; i++) {
          if (isfinite(state->bndl.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, state->bndl.xR[i] - state->xs.xR[i], _state);
-            state->repslackerror = maxreal(state->repslackerror, maxreal(state->xs.xR[i] - state->bndl.xR[i], 0.0, _state) * maxreal(-state->lagbc.xR[i], 0.0, _state), _state);
+            state->repprimalerror = rmax2(state->repprimalerror, state->bndl.xR[i] - state->xs.xR[i], _state);
+            state->repslackerror = rmax2(state->repslackerror, rmax2(state->xs.xR[i] - state->bndl.xR[i], 0.0, _state) * rmax2(-state->lagbc.xR[i], 0.0, _state), _state);
          }
          if (isfinite(state->bndu.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, state->xs.xR[i] - state->bndu.xR[i], _state);
-            state->repslackerror = maxreal(state->repslackerror, maxreal(state->bndu.xR[i] - state->xs.xR[i], 0.0, _state) * maxreal(state->lagbc.xR[i], 0.0, _state), _state);
+            state->repprimalerror = rmax2(state->repprimalerror, state->xs.xR[i] - state->bndu.xR[i], _state);
+            state->repslackerror = rmax2(state->repslackerror, rmax2(state->bndu.xR[i] - state->xs.xR[i], 0.0, _state) * rmax2(state->lagbc.xR[i], 0.0, _state), _state);
          }
-         state->repdualerror = maxreal(state->repdualerror, fabs(state->tmpg.xR[i]), _state);
+         state->repdualerror = rmax2(state->repdualerror, fabs(state->tmpg.xR[i]), _state);
       }
       for (i = 0; i < m; i++) {
          v = state->tmpax.xR[i];
          if (isfinite(state->al.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, state->al.xR[i] - v, _state);
-            state->repslackerror = maxreal(state->repslackerror, maxreal(v - state->al.xR[i], 0.0, _state) * maxreal(-state->laglc.xR[i], 0.0, _state), _state);
+            state->repprimalerror = rmax2(state->repprimalerror, state->al.xR[i] - v, _state);
+            state->repslackerror = rmax2(state->repslackerror, rmax2(v - state->al.xR[i], 0.0, _state) * rmax2(-state->laglc.xR[i], 0.0, _state), _state);
          }
          if (isfinite(state->au.xR[i])) {
-            state->repprimalerror = maxreal(state->repprimalerror, v - state->au.xR[i], _state);
-            state->repslackerror = maxreal(state->repslackerror, maxreal(state->au.xR[i] - v, 0.0, _state) * maxreal(state->laglc.xR[i], 0.0, _state), _state);
+            state->repprimalerror = rmax2(state->repprimalerror, v - state->au.xR[i], _state);
+            state->repslackerror = rmax2(state->repslackerror, rmax2(state->au.xR[i] - v, 0.0, _state) * rmax2(state->laglc.xR[i], 0.0, _state), _state);
          }
       }
       ae_frame_leave(_state);
@@ -33790,7 +33674,6 @@ void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_st
 
 void minlpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpstate *p = (minlpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
@@ -33856,7 +33739,6 @@ void minlpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void minlpstate_free(void *_p, bool make_automatic) {
    minlpstate *p = (minlpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->c, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);
@@ -33882,7 +33764,6 @@ void minlpstate_free(void *_p, bool make_automatic) {
 
 void minlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpreport *p = (minlpreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->laglc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->y, 0, DT_REAL, _state, make_automatic);
@@ -33906,7 +33787,6 @@ void minlpreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minlpreport_free(void *_p, bool make_automatic) {
    minlpreport *p = (minlpreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->lagbc, make_automatic);
    ae_vector_free(&p->laglc, make_automatic);
    ae_vector_free(&p->y, make_automatic);
@@ -34211,22 +34091,22 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
    dsssettingsinit(&subsolver->dsssettings, _state);
    subsolver->dsssettings.pricing = 0;
 // Allocate temporaries
-   rvectorsetlengthatleast(&subsolver->cural, lccnt + n, _state);
-   rvectorsetlengthatleast(&subsolver->curau, lccnt + n, _state);
-   rmatrixsetlengthatleast(&subsolver->curd, n, n, _state);
-   rmatrixsetlengthatleast(&subsolver->curhd, n, n, _state);
-   rvectorsetlengthatleast(&subsolver->curbndl, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->curbndu, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->curb, nslack, _state);
-   rvectorsetlengthatleast(&subsolver->sk, n, _state);
-   rvectorsetlengthatleast(&subsolver->yk, n, _state);
+   vectorsetlengthatleast(&subsolver->cural, lccnt + n, _state);
+   vectorsetlengthatleast(&subsolver->curau, lccnt + n, _state);
+   matrixsetlengthatleast(&subsolver->curd, n, n, _state);
+   matrixsetlengthatleast(&subsolver->curhd, n, n, _state);
+   vectorsetlengthatleast(&subsolver->curbndl, nslack, _state);
+   vectorsetlengthatleast(&subsolver->curbndu, nslack, _state);
+   vectorsetlengthatleast(&subsolver->curb, nslack, _state);
+   vectorsetlengthatleast(&subsolver->sk, n, _state);
+   vectorsetlengthatleast(&subsolver->yk, n, _state);
 // Initial state
    subsolver->basispresent = false;
    subsolver->curdcnt = 0;
    subsolver->hessiantype = hessiantype;
    if (hessiantype == 1 || hessiantype == 2) {
    // Prepare Hessian matrix
-      rmatrixsetlengthatleast(&subsolver->h, n, n, _state);
+      matrixsetlengthatleast(&subsolver->h, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             subsolver->h.xyR[i][j] = 0.0;
@@ -34252,11 +34132,11 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
          }
       }
    }
-   ivectorsetlengthatleast(&subsolver->sparserawlc.ridx, nec + nic + 1, _state);
-   rvectorsetlengthatleast(&subsolver->sparserawlc.vals, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.idx, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.didx, nec + nic, _state);
-   ivectorsetlengthatleast(&subsolver->sparserawlc.uidx, nec + nic, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.ridx, nec + nic + 1, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.vals, nnz, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.idx, nnz, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.didx, nec + nic, _state);
+   vectorsetlengthatleast(&subsolver->sparserawlc.uidx, nec + nic, _state);
    offs = 0;
    subsolver->sparserawlc.ridx.xZ[0] = 0;
    for (i = 0; i < nec + nic; i++) {
@@ -34306,7 +34186,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
    double yk;
    n = sstate->n;
    if (subsolver->hessiantype == 1 || subsolver->hessiantype == 2) {
-      rvectorsetlengthatleast(&subsolver->tmp0, n, _state);
+      vectorsetlengthatleast(&subsolver->tmp0, n, _state);
       v = 0.0;
       v0 = 0.0;
       v1 = 0.0;
@@ -34322,7 +34202,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
          subsolver->sk.xR[i] = sk;
          subsolver->yk.xR[i] = yk;
       }
-      if ((sqrt(v0) > maxreal(sstate->epsx, nlcslp_bfgstol, _state) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2)) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
+      if ((sqrt(v0) > rmax2(sstate->epsx, nlcslp_bfgstol, _state) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2)) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
       // Update Hessian if following criteria hold:
       // * MCINFO=1 (good step)
       // * step length is large enough
@@ -34409,10 +34289,10 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       subsolver->curbndl.xR[i] = -state->trustrad;
       subsolver->curbndu.xR[i] = state->trustrad;
       if (state->hasbndl.xB[i]) {
-         subsolver->curbndl.xR[i] = maxreal(subsolver->curbndl.xR[i], state->scaledbndl.xR[i] - x->xR[i], _state);
+         subsolver->curbndl.xR[i] = rmax2(subsolver->curbndl.xR[i], state->scaledbndl.xR[i] - x->xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         subsolver->curbndu.xR[i] = minreal(subsolver->curbndu.xR[i], state->scaledbndu.xR[i] - x->xR[i], _state);
+         subsolver->curbndu.xR[i] = rmin2(subsolver->curbndu.xR[i], state->scaledbndu.xR[i] - x->xR[i], _state);
       }
    }
 // Prepare storage for "effective" constraining matrix
@@ -34430,8 +34310,8 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    ivectorgrowto(&subsolver->sparseefflc.ridx, lccnt + n + 1, _state);
    rvectorgrowto(&subsolver->sparseefflc.vals, nnz, _state);
    ivectorgrowto(&subsolver->sparseefflc.idx, nnz, _state);
-   ivectorsetlengthatleast(&subsolver->sparseefflc.didx, lccnt + n, _state);
-   ivectorsetlengthatleast(&subsolver->sparseefflc.uidx, lccnt + n, _state);
+   vectorsetlengthatleast(&subsolver->sparseefflc.didx, lccnt + n, _state);
+   vectorsetlengthatleast(&subsolver->sparseefflc.uidx, lccnt + n, _state);
    subsolver->sparseefflc.m = 0;
    subsolver->sparseefflc.n = nslack;
    subsolver->sparseefflc.matrixtype = 1;
@@ -34439,7 +34319,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
 //
 // Scan sparsified linear constraints stored in sparserawlc[], skip ones
 // which are inactive anywhere in the trust region.
-   rvectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
+   vectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
    for (i = 0; i < n; i++) {
       subsolver->tmp0.xR[i] = x->xR[i];
    }
@@ -34521,7 +34401,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->cural.xR[i] = _state->v_neginf;
          subsolver->curau.xR[i] = -v;
          subsolver->curbndl.xR[offsslackic + (i - nec)] = 0.0;
-         subsolver->curbndu.xR[offsslackic + (i - nec)] = maxreal(v, 0.0, _state);
+         subsolver->curbndu.xR[offsslackic + (i - nec)] = rmax2(v, 0.0, _state);
       }
    }
    subsolver->sparseefflc.m += (nec + nic);
@@ -34572,7 +34452,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->cural.xR[subsolver->sparseefflc.m + i] = _state->v_neginf;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curbndl.xR[offsslacknlic + (i - nlec)] = 0.0;
-         subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = maxreal(v, 0.0, _state);
+         subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0, _state);
       }
    }
    subsolver->sparseefflc.m += (nlec + nlic);
@@ -34613,7 +34493,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       basisinittype = 1;
    }
 // Solve linear program
-   rvectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
+   vectorsetlengthatleast(&subsolver->tmp0, nslack, _state);
    for (i = 0; i < nslack; i++) {
       subsolver->tmp0.xR[i] = state->trustrad;
    }
@@ -34665,14 +34545,14 @@ static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, min
       subsolver->curd.xyR[subsolver->curdcnt][i] = d->xR[i];
       subsolver->curhd.xyR[subsolver->curdcnt][i] = d->xR[i];
    }
-   inc(&subsolver->curdcnt, _state);
+   subsolver->curdcnt++;
    if (state->hessiantype == 1) {
    // Conjugacy constraint d*H*Dprev=0, full recomputation of (H*Dprev)
       rmatrixgemm(subsolver->curdcnt, n, n, 1.0, &subsolver->curd, 0, 0, 0, &subsolver->h, 0, 0, 0, 0.0, &subsolver->curhd, 0, 0, _state);
    }
    if (state->hessiantype == 2) {
    // Conjugacy constraint d*H*Dprev=0, only last row of (H*Dprev) is recomputed
-      rvectorsetlengthatleast(&subsolver->tmp0, n, _state);
+      vectorsetlengthatleast(&subsolver->tmp0, n, _state);
       rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, d, 0, 0.0, &subsolver->tmp0, 0, _state);
       for (j = 0; j < n; j++) {
          subsolver->curhd.xyR[subsolver->curdcnt - 1][j] = subsolver->tmp0.xR[j];
@@ -34698,15 +34578,15 @@ static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t
    ae_int_t nslack;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
    state13->usecorrection = usecorrection;
-   rvectorsetlengthatleast(&state13->d, nslack, _state);
-   rvectorsetlengthatleast(&state13->dx, nslack, _state);
-   rvectorsetlengthatleast(&state13->stepkxc, n, _state);
-   rvectorsetlengthatleast(&state13->stepkxn, n, _state);
-   rvectorsetlengthatleast(&state13->stepkfic, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state13->stepkfin, 1 + nlec + nlic, _state);
-   rmatrixsetlengthatleast(&state13->stepkjc, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&state13->stepkjn, 1 + nlec + nlic, n, _state);
-   rvectorsetlengthatleast(&state13->dummylagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state13->d, nslack, _state);
+   vectorsetlengthatleast(&state13->dx, nslack, _state);
+   vectorsetlengthatleast(&state13->stepkxc, n, _state);
+   vectorsetlengthatleast(&state13->stepkxn, n, _state);
+   vectorsetlengthatleast(&state13->stepkfic, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state13->stepkfin, 1 + nlec + nlic, _state);
+   matrixsetlengthatleast(&state13->stepkjc, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&state13->stepkjn, 1 + nlec + nlic, n, _state);
+   vectorsetlengthatleast(&state13->dummylagmult, nec + nic + nlec + nlic, _state);
    ae_vector_set_length(&state13->rphase13state.ia, 8 + 1, _state);
    ae_vector_set_length(&state13->rphase13state.ba, 2 + 1, _state);
    ae_vector_set_length(&state13->rphase13state.ra, 6 + 1, _state);
@@ -34824,8 +34704,8 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
 // Lagrangian terms for linear constraints, constraint violations
    if (nec + nic > 0) {
       usesparsegemv = state->subsolver.sparserawlc.ridx.xZ[nec + nic] < sparselevel2density(_state) * n * (nec + nic);
-      rvectorsetlengthatleast(&tmp->sclagtmp0, maxint(nec + nic, n, _state), _state);
-      rvectorsetlengthatleast(&tmp->sclagtmp1, maxint(nec + nic, n, _state), _state);
+      vectorsetlengthatleast(&tmp->sclagtmp0, imax2(nec + nic, n, _state), _state);
+      vectorsetlengthatleast(&tmp->sclagtmp1, imax2(nec + nic, n, _state), _state);
       if (usesparsegemv) {
          sparsemv(&state->subsolver.sparserawlc, x, &tmp->sclagtmp0, _state);
       } else {
@@ -34878,7 +34758,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
       }
    }
 // Lagrangian terms for nonlinear constraints
-   rvectorsetlengthatleast(&tmp->sclagtmp1, nlec + nlic, _state);
+   vectorsetlengthatleast(&tmp->sclagtmp1, nlec + nlic, _state);
    for (i = 0; i < nlec + nlic; i++) {
       v = fi->xR[1 + i];
       if (i < nlec || v > 0) {
@@ -34936,7 +34816,7 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
    *meritf = fi->xR[0];
    *rawlag = fi->xR[0];
 // Merit function: augmentation and penalty for linear constraints
-   rvectorsetlengthatleast(&tmp->mftmp0, nec + nic, _state);
+   vectorsetlengthatleast(&tmp->mftmp0, nec + nic, _state);
    rmatrixgemv(nec + nic, n, 1.0, &state->scaledcleic, 0, 0, 0, x, 0, 0.0, &tmp->mftmp0, 0, _state);
    for (i = 0; i < nec + nic; i++) {
       v = tmp->mftmp0.xR[i] - state->scaledcleic.xyR[i][n];
@@ -34947,7 +34827,7 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
          *rawlag += lagmult->xR[i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += nlcslp_meritfunctionbase * maxreal(v, 0.0, _state) + nlcslp_meritfunctiongain * mu * maxreal(v, 0.0, _state);
+         *meritf += nlcslp_meritfunctionbase * rmax2(v, 0.0, _state) + nlcslp_meritfunctiongain * mu * rmax2(v, 0.0, _state);
       // Raw Lagrangian
          *rawlag += lagmult->xR[i] * v;
       }
@@ -34962,7 +34842,7 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
          *rawlag += lagmult->xR[nec + nic + i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += nlcslp_meritfunctionbase * maxreal(v, 0.0, _state) + nlcslp_meritfunctiongain * mu * maxreal(v, 0.0, _state);
+         *meritf += nlcslp_meritfunctionbase * rmax2(v, 0.0, _state) + nlcslp_meritfunctiongain * mu * rmax2(v, 0.0, _state);
       // Raw Lagrangian
          *rawlag += lagmult->xR[nec + nic + i] * v;
       }
@@ -35112,7 +34992,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state13->d, lagmult, _state)) {
    // Increase failures counter.
    // Stop after too many subsequent failures
-      inc(&state->lpfailurecnt, _state);
+      state->lpfailurecnt++;
       if (state->lpfailurecnt >= nlcslp_lpfailureslimit) {
          state->repterminationtype = 7;
          *status = 0;
@@ -35131,7 +35011,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       return result;
    }
    nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d, _state);
-   mu = maxreal(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, lagmult, _state), _state);
+   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, lagmult, _state), _state);
 // Compute second order correction if required. The issue we address here
 // is a tendency of L1 penalized function to reject steps built using simple
 // linearized model when nonlinear constraints change faster than the target.
@@ -35235,16 +35115,16 @@ lbl_1:
       goto lbl_7;
    }
    localstp *= nu;
-   nu = maxreal(0.1, 0.5 * nu, _state);
+   nu = rmax2(0.1, 0.5 * nu, _state);
    goto lbl_6;
 lbl_7:
    smoothnessmonitorfinalizelinesearch(smonitor, _state);
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
-         state13->stepkxn.xR[i] = maxreal(state13->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
+         state13->stepkxn.xR[i] = rmax2(state13->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         state13->stepkxn.xR[i] = minreal(state13->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
+         state13->stepkxn.xR[i] = rmin2(state13->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
       }
    }
    if (userterminationneeded) {
@@ -35264,10 +35144,10 @@ lbl_12:
    for (j = 0; j < n; j++) {
       state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
       if (state->hasbndl.xB[j]) {
-         state13->stepkxc.xR[j] = maxreal(state13->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
+         state13->stepkxc.xR[j] = rmax2(state13->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
       }
       if (state->hasbndu.xB[j]) {
-         state13->stepkxc.xR[j] = minreal(state13->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
+         state13->stepkxc.xR[j] = rmin2(state13->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
       }
    }
    nlcslp_slpsendx(state, &state13->stepkxc, _state);
@@ -35286,7 +35166,7 @@ lbl_13:
 lbl_10:
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(state13->d.xR[i]) / state->trustrad, _state);
+      mx = rmax2(mx, fabs(state13->d.xR[i]) / state->trustrad, _state);
    }
 lbl_8:
 // Move to new point
@@ -35296,7 +35176,7 @@ lbl_8:
       goto lbl_14;
    }
 // Report one more inner iteration
-   inc(&state->repinneriterationscount, _state);
+   state->repinneriterationscount++;
    nlcslp_slpsendx(state, curx, _state);
    state->f = curfi->xR[0] * state->fscales.xR[0];
    state->xupdated = true;
@@ -35354,18 +35234,18 @@ static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t ne
    ae_int_t i;
    ae_int_t nslack;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-   rvectorsetlengthatleast(&state2->d, nslack, _state);
-   rvectorsetlengthatleast(&state2->tmp0, nslack, _state);
-   rvectorsetlengthatleast(&state2->stepkxn, n, _state);
-   rvectorsetlengthatleast(&state2->stepkxc, n, _state);
-   rvectorsetlengthatleast(&state2->stepkfin, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state2->stepkfic, 1 + nlec + nlic, _state);
-   rmatrixsetlengthatleast(&state2->stepkjn, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&state2->stepkjc, 1 + nlec + nlic, n, _state);
-   rvectorsetlengthatleast(&state2->stepklaggrad, n, _state);
-   rvectorsetlengthatleast(&state2->stepknlaggrad, n, _state);
-   rvectorsetlengthatleast(&state2->stepknlagmult, nec + nic + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state2->meritlagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state2->d, nslack, _state);
+   vectorsetlengthatleast(&state2->tmp0, nslack, _state);
+   vectorsetlengthatleast(&state2->stepkxn, n, _state);
+   vectorsetlengthatleast(&state2->stepkxc, n, _state);
+   vectorsetlengthatleast(&state2->stepkfin, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state2->stepkfic, 1 + nlec + nlic, _state);
+   matrixsetlengthatleast(&state2->stepkjn, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&state2->stepkjc, 1 + nlec + nlic, n, _state);
+   vectorsetlengthatleast(&state2->stepklaggrad, n, _state);
+   vectorsetlengthatleast(&state2->stepknlaggrad, n, _state);
+   vectorsetlengthatleast(&state2->stepknlagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state2->meritlagmult, nec + nic + nlec + nlic, _state);
    for (i = 0; i < nec + nic + nlec + nlic; i++) {
       state2->meritlagmult.xR[i] = meritlagmult->xR[i];
    }
@@ -35518,7 +35398,7 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
 // * location X (scaled coordinates)
 // * function vector Fi (target function + nonlinear constraints)
 // * scaled Jacobian J
-   mu = maxreal(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult, _state), _state);
+   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult, _state), _state);
    nondescentcnt = 0;
    nlcslp_lpsubproblemrestart(state, &state->subsolver, _state);
    innerk = 1;
@@ -35540,7 +35420,7 @@ lbl_3:
    }
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(state2->d.xR[i]) / state->trustrad, _state);
+      mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad, _state);
    }
    if (mx == 0.0) {
    // Nearly-zero direction is suggested (maybe we arrived exactly to the solution), stop iterations
@@ -35563,7 +35443,7 @@ lbl_3:
    state2->lastlcidx = -1;
    state2->lastnlcerr = 0.0;
    state2->lastnlcidx = -1;
-   rvectorsetlengthatleast(&state2->tmp0, n, _state);
+   vectorsetlengthatleast(&state2->tmp0, n, _state);
    nlcslp_lagrangianfg(state, curx, state->trustrad, curfi, curj, lagmult, &state2->tmplagrangianfg, &stepklagval, &state2->stepklaggrad, &state2->lastlcerr, &state2->lastlcidx, &state2->lastnlcerr, &state2->lastnlcidx, _state);
    nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, _state);
    v = 0.0;
@@ -35579,7 +35459,7 @@ lbl_3:
    // Append direction to the conjugacy constraints and retry direction generation.
    //
    // We make several retries with conjugate directions before giving up.
-      inc(&nondescentcnt, _state);
+      nondescentcnt++;
       if (nlcslp_nondescentlimit > 0 && nondescentcnt > nlcslp_nondescentlimit) {
          *status = 1;
          result = false;
@@ -35618,10 +35498,10 @@ lbl_7:
    smoothnessmonitorfinalizelinesearch(smonitor, _state);
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
-         state2->stepkxn.xR[i] = maxreal(state2->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
+         state2->stepkxn.xR[i] = rmax2(state2->stepkxn.xR[i], state->scaledbndl.xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         state2->stepkxn.xR[i] = minreal(state2->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
+         state2->stepkxn.xR[i] = rmin2(state2->stepkxn.xR[i], state->scaledbndu.xR[i], _state);
       }
    }
    if (mcinfo <= 0) {
@@ -35649,13 +35529,13 @@ lbl_7:
    vv = 0.0;
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(state2->stepkxn.xR[i] - curx->xR[i]), _state);
+      mx = rmax2(mx, fabs(state2->stepkxn.xR[i] - curx->xR[i]), _state);
       v += sqr(state2->stepkxn.xR[i] - curx->xR[i], _state);
       vv += (state2->stepkjn.xyR[0][i] - curj->xyR[0][i]) * (state2->stepkxn.xR[i] - curx->xR[i]);
    }
    gammaprev = *gammamax;
    if (mx > nlcslp_bfgstol) {
-      *gammamax = maxreal(*gammamax, fabs(vv / v), _state);
+      *gammamax = rmax2(*gammamax, fabs(vv / v), _state);
    }
    goto lbl_8;
    goto lbl_10;
@@ -35667,10 +35547,10 @@ lbl_12:
    for (j = 0; j < n; j++) {
       state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
       if (state->hasbndl.xB[j]) {
-         state2->stepkxc.xR[j] = maxreal(state2->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
+         state2->stepkxc.xR[j] = rmax2(state2->stepkxc.xR[j], state->scaledbndl.xR[j], _state);
       }
       if (state->hasbndu.xB[j]) {
-         state2->stepkxc.xR[j] = minreal(state2->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
+         state2->stepkxc.xR[j] = rmin2(state2->stepkxc.xR[j], state->scaledbndu.xR[j], _state);
       }
    }
    nlcslp_slpsendx(state, &state2->stepkxc, _state);
@@ -35689,7 +35569,7 @@ lbl_13:
 lbl_10:
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = maxreal(mx, fabs(state2->d.xR[i]) / state->trustrad, _state);
+      mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad, _state);
    }
    f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit, _state);
    f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit, _state);
@@ -35710,7 +35590,7 @@ lbl_8:
    state->replcidx = state2->lastlcidx;
    state->repnlcerr = state2->lastnlcerr;
    state->repnlcidx = state2->lastnlcidx;
-   inc(&state->repinneriterationscount, _state);
+   state->repinneriterationscount++;
    nlcslp_slpsendx(state, curx, _state);
    state->f = curfi->xR[0] * state->fscales.xR[0];
    state->xupdated = true;
@@ -35802,27 +35682,27 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    ae_vector_set_length(&state->fi, 1 + nlec + nlic, _state);
    ae_matrix_set_length(&state->j, 1 + nlec + nlic, n, _state);
 // Allocate memory.
-   rvectorsetlengthatleast(&state->s, n, _state);
-   rvectorsetlengthatleast(&state->step0x, n, _state);
-   rvectorsetlengthatleast(&state->stepkx, n, _state);
-   rvectorsetlengthatleast(&state->backupx, n, _state);
-   rvectorsetlengthatleast(&state->step0fi, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->stepkfi, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->backupfi, 1 + nlec + nlic, _state);
-   rmatrixsetlengthatleast(&state->step0j, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&state->stepkj, 1 + nlec + nlic, n, _state);
-   rmatrixsetlengthatleast(&state->backupj, 1 + nlec + nlic, n, _state);
-   rvectorsetlengthatleast(&state->fscales, 1 + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->meritlagmult, nec + nic + nlec + nlic, _state);
-   rvectorsetlengthatleast(&state->dummylagmult, nec + nic + nlec + nlic, _state);
-   bvectorsetlengthatleast(&state->hasbndl, n, _state);
-   bvectorsetlengthatleast(&state->hasbndu, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndl, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndu, n, _state);
-   rmatrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
-   ivectorsetlengthatleast(&state->lcsrcidx, nec + nic, _state);
-   rvectorsetlengthatleast(&state->meritfunctionhistory, nlcslp_nonmonotonicphase2limit + 1, _state);
-   rvectorsetlengthatleast(&state->maxlaghistory, nlcslp_nonmonotonicphase2limit + 1, _state);
+   vectorsetlengthatleast(&state->s, n, _state);
+   vectorsetlengthatleast(&state->step0x, n, _state);
+   vectorsetlengthatleast(&state->stepkx, n, _state);
+   vectorsetlengthatleast(&state->backupx, n, _state);
+   vectorsetlengthatleast(&state->step0fi, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->stepkfi, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->backupfi, 1 + nlec + nlic, _state);
+   matrixsetlengthatleast(&state->step0j, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&state->stepkj, 1 + nlec + nlic, n, _state);
+   matrixsetlengthatleast(&state->backupj, 1 + nlec + nlic, n, _state);
+   vectorsetlengthatleast(&state->fscales, 1 + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->meritlagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->dummylagmult, nec + nic + nlec + nlic, _state);
+   vectorsetlengthatleast(&state->hasbndl, n, _state);
+   vectorsetlengthatleast(&state->hasbndu, n, _state);
+   vectorsetlengthatleast(&state->scaledbndl, n, _state);
+   vectorsetlengthatleast(&state->scaledbndu, n, _state);
+   matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
+   vectorsetlengthatleast(&state->lcsrcidx, nec + nic, _state);
+   vectorsetlengthatleast(&state->meritfunctionhistory, nlcslp_nonmonotonicphase2limit + 1, _state);
+   vectorsetlengthatleast(&state->maxlaghistory, nlcslp_nonmonotonicphase2limit + 1, _state);
 // Prepare scaled problem
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = isfinite(bndl->xR[i]);
@@ -35860,10 +35740,10 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // Initial enforcement of box constraints
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
-         state->step0x.xR[i] = maxreal(state->step0x.xR[i], state->scaledbndl.xR[i], _state);
+         state->step0x.xR[i] = rmax2(state->step0x.xR[i], state->scaledbndl.xR[i], _state);
       }
       if (state->hasbndu.xB[i]) {
-         state->step0x.xR[i] = minreal(state->step0x.xR[i], state->scaledbndu.xR[i], _state);
+         state->step0x.xR[i] = rmin2(state->step0x.xR[i], state->scaledbndu.xR[i], _state);
       }
    }
 // Stopping criteria
@@ -36080,7 +35960,7 @@ lbl_5:
    // and Jacobian row, and (b) new value of the function scale.
       mx = 0.0;
       for (j = 0; j < n; j++) {
-         mx = maxreal(mx, fabs(state->stepkj.xyR[i][j]), _state);
+         mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]), _state);
       }
       multiplyby = 1.0;
       setscaleto = state->fscales.xR[i];
@@ -36139,14 +36019,14 @@ lbl_8:
    if (status == 0) {
       goto lbl_6;
    }
-   mu = maxreal(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult, _state), _state);
+   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory, _state), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult, _state), _state);
    for (i = state->historylen; i >= 1; i--) {
       state->meritfunctionhistory.xR[i] = state->meritfunctionhistory.xR[i - 1];
       state->maxlaghistory.xR[i] = state->maxlaghistory.xR[i - 1];
    }
    state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit, _state);
    state->maxlaghistory.xR[0] = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult, _state);
-   state->historylen = minint(state->historylen + 1, nlcslp_nonmonotonicphase2limit, _state);
+   state->historylen = imin2(state->historylen + 1, nlcslp_nonmonotonicphase2limit, _state);
 // PHASE 2: conjugate subiterations
 //
 // If step with second order correction is shorter than 1.0, it means
@@ -36186,7 +36066,7 @@ lbl_12:
 // whilst having nonzero limits means that we perform more robust nonmonotonic search.
    f1 = state->meritfunctionhistory.xR[0];
    for (i = 1; i <= state->historylen; i++) {
-      f1 = maxreal(f1, state->meritfunctionhistory.xR[i], _state);
+      f1 = rmax2(f1, state->meritfunctionhistory.xR[i], _state);
    }
    f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit, _state);
    if (f2 < f1) {
@@ -36197,7 +36077,7 @@ lbl_12:
 //
 // NOTE: it is important that F2=F1 is considered as "does not decrease"
    nlcslp_slpcopystate(state, &state->backupx, &state->backupfi, &state->backupj, &state->stepkx, &state->stepkfi, &state->stepkj, _state);
-   inc(&state->repinneriterationscount, _state);
+   state->repinneriterationscount++;
    nlcslp_slpsendx(state, &state->stepkx, _state);
    state->f = state->stepkfi.xR[0] * state->fscales.xR[0];
    state->xupdated = true;
@@ -36220,18 +36100,18 @@ lbl_10:
    prevtrustrad = state->trustrad;
    deltamax = 0.0;
    for (i = 0; i < n; i++) {
-      deltamax = maxreal(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad, _state);
+      deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad, _state);
    }
    if (deltamax <= nlcslp_slpdeltadecrease) {
-      state->trustrad *= maxreal(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay, _state);
+      state->trustrad *= rmax2(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay, _state);
    }
    if (deltamax >= nlcslp_slpdeltaincrease) {
-      state->trustrad *= minreal(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth, _state);
+      state->trustrad *= rmin2(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth, _state);
    }
 // Advance outer iteration counter, test stopping criteria
-   inc(&state->repouteriterationscount, _state);
+   state->repouteriterationscount++;
    if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcslp_stagnationepsf * fabs(state->step0fi.xR[0])) {
-      inc(&state->fstagnationcnt, _state);
+      state->fstagnationcnt++;
    } else {
       state->fstagnationcnt = 0;
    }
@@ -36282,7 +36162,6 @@ lbl_rcomm:
 
 void minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpsubsolver *p = (minslpsubsolver *)_p;
-   ae_touch_ptr((void *)p);
    presolveinfo_init(&p->presolver, _state, make_automatic);
    dualsimplexstate_init(&p->dss, _state, make_automatic);
    dualsimplexsettings_init(&p->dsssettings, _state, make_automatic);
@@ -36343,7 +36222,6 @@ void minslpsubsolver_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 
 void minslpsubsolver_free(void *_p, bool make_automatic) {
    minslpsubsolver *p = (minslpsubsolver *)_p;
-   ae_touch_ptr((void *)p);
    presolveinfo_free(&p->presolver, make_automatic);
    dualsimplexstate_free(&p->dss, make_automatic);
    dualsimplexsettings_free(&p->dsssettings, make_automatic);
@@ -36372,7 +36250,6 @@ void minslpsubsolver_free(void *_p, bool make_automatic) {
 
 void minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmplagrangian *p = (minslptmplagrangian *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
@@ -36386,14 +36263,12 @@ void minslptmplagrangian_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void minslptmplagrangian_free(void *_p, bool make_automatic) {
    minslptmplagrangian *p = (minslptmplagrangian *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->sclagtmp0, make_automatic);
    ae_vector_free(&p->sclagtmp1, make_automatic);
 }
 
 void minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmpmerit *p = (minslptmpmerit *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
@@ -36405,13 +36280,11 @@ void minslptmpmerit_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void minslptmpmerit_free(void *_p, bool make_automatic) {
    minslptmpmerit *p = (minslptmpmerit *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->mftmp0, make_automatic);
 }
 
 void minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase13state *p = (minslpphase13state *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->dx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkxc, 0, DT_REAL, _state, make_automatic);
@@ -36444,7 +36317,6 @@ void minslpphase13state_copy(void *_dst, void *_src, ae_state *_state, bool make
 
 void minslpphase13state_free(void *_p, bool make_automatic) {
    minslpphase13state *p = (minslpphase13state *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->dx, make_automatic);
    ae_vector_free(&p->stepkxc, make_automatic);
@@ -36460,7 +36332,6 @@ void minslpphase13state_free(void *_p, bool make_automatic) {
 
 void minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase2state *p = (minslpphase2state *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->stepkxn, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkxc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->stepkfin, 0, DT_REAL, _state, make_automatic);
@@ -36506,7 +36377,6 @@ void minslpphase2state_copy(void *_dst, void *_src, ae_state *_state, bool make_
 
 void minslpphase2state_free(void *_p, bool make_automatic) {
    minslpphase2state *p = (minslpphase2state *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->stepkxn, make_automatic);
    ae_vector_free(&p->stepkxc, make_automatic);
    ae_vector_free(&p->stepkfin, make_automatic);
@@ -36527,7 +36397,6 @@ void minslpphase2state_free(void *_p, bool make_automatic) {
 
 void minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpstate *p = (minslpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->scaledcleic, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->lcsrcidx, 0, DT_INT, _state, make_automatic);
@@ -36623,7 +36492,6 @@ void minslpstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minslpstate_free(void *_p, bool make_automatic) {
    minslpstate *p = (minslpstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_matrix_free(&p->scaledcleic, make_automatic);
    ae_vector_free(&p->lcsrcidx, make_automatic);
@@ -36765,8 +36633,8 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
 //
 // NOTE: we convert inequality constraints to the form
 // A*x <= b before copying them.
-   rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
-   ivectorsetlengthatleast(&state->lcsrcidx, k, _state);
+   matrixsetlengthatleast(&state->cleic, k, n + 1, _state);
+   vectorsetlengthatleast(&state->lcsrcidx, k, _state);
    state->nec = 0;
    state->nic = 0;
    for (i = 0; i < k; i++) {
@@ -37492,7 +37360,7 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    minnlcsetalgosqp(state, _state);
    minnlcsetprecexactrobust(state, 0, _state);
    minnlcsetstpmax(state, 0.0, _state);
-   minlbfgscreate(n, minint(minnlc_lbfgsfactor, n, _state), x, &state->auloptimizer, _state);
+   minlbfgscreate(n, imin2(minnlc_lbfgsfactor, n, _state), x, &state->auloptimizer, _state);
    minnlcrestartfrom(state, x, _state);
    ae_frame_leave(_state);
 }
@@ -37833,10 +37701,10 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    double d2p;
    bool bflag;
    ae_assert(rho > 0.0, "MinNLC: integrity check failed", _state);
-   rvectorsetlengthatleast(bufd, n, _state);
-   rvectorsetlengthatleast(bufc, nec + nic + ng + nh, _state);
-   rmatrixsetlengthatleast(bufw, nec + nic + ng + nh, n, _state);
-   rvectorsetlengthatleast(tmp0, n, _state);
+   vectorsetlengthatleast(bufd, n, _state);
+   vectorsetlengthatleast(bufc, nec + nic + ng + nh, _state);
+   matrixsetlengthatleast(bufw, nec + nic + ng + nh, n, _state);
+   vectorsetlengthatleast(tmp0, n, _state);
 // Preconditioner before update from barrier/penalty functions
    if (gammak == 0.0) {
       gammak = 1.0;
@@ -37920,7 +37788,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    }
    if (prectype == 3 && *preccounter % updatefreq == 0) {
    // Generate full NxN dense Hessian
-      rmatrixsetlengthatleast(bufz, n, n, _state);
+      matrixsetlengthatleast(bufz, n, n, _state);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             bufz->xyR[i][j] = 0.0;
@@ -37942,7 +37810,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
       ae_assert(bflag, "MinNLC: updatepreconditioner() failure, Cholesky failed", _state);
       minlbfgssetpreccholesky(auloptimizer, bufz, true, _state);
    }
-   inc(preccounter, _state);
+   ++*preccounter;
 }
 
 // This subroutine adds penalty from boundary constraints to target  function
@@ -38189,9 +38057,9 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor,
    ng = state->ng;
    nh = state->nh;
 // Prepare scaled problem
-   rvectorsetlengthatleast(&state->scaledbndl, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndu, n, _state);
-   rmatrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
+   vectorsetlengthatleast(&state->scaledbndl, n, _state);
+   vectorsetlengthatleast(&state->scaledbndu, n, _state);
+   matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
          state->scaledbndl.xR[i] = state->bndl.xR[i] / state->s.xR[i];
@@ -38223,13 +38091,13 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor,
 // Main AUL cycle:
 // * prepare Lagrange multipliers NuNB/NuLC
 // * set GammaK (current estimate of Hessian norm) to InitGamma and XKPresent to False
-   rvectorsetlengthatleast(&state->nubc, 2 * n, _state);
-   rvectorsetlengthatleast(&state->nulc, nec + nic, _state);
-   rvectorsetlengthatleast(&state->nunlc, ng + nh, _state);
-   rvectorsetlengthatleast(&state->xk, n, _state);
-   rvectorsetlengthatleast(&state->gk, n, _state);
-   rvectorsetlengthatleast(&state->xk1, n, _state);
-   rvectorsetlengthatleast(&state->gk1, n, _state);
+   vectorsetlengthatleast(&state->nubc, 2 * n, _state);
+   vectorsetlengthatleast(&state->nulc, nec + nic, _state);
+   vectorsetlengthatleast(&state->nunlc, ng + nh, _state);
+   vectorsetlengthatleast(&state->xk, n, _state);
+   vectorsetlengthatleast(&state->gk, n, _state);
+   vectorsetlengthatleast(&state->xk1, n, _state);
+   vectorsetlengthatleast(&state->gk1, n, _state);
    for (i = 0; i < n; i++) {
       state->nubc.xR[2 * i + 0] = 0.0;
       state->nubc.xR[2 * i + 1] = 0.0;
@@ -38381,7 +38249,7 @@ lbl_12:
             v0 += state->gk.xR[i] * v;
             v1 += state->gk1.xR[i] * v;
          }
-         state->gammak = maxreal(state->gammak, fabs(v1 - v0) / v2, _state);
+         state->gammak = rmax2(state->gammak, fabs(v1 - v0) / v2, _state);
       }
    } else {
    // Beginning of the first line search, XK is not yet initialized.
@@ -38400,7 +38268,7 @@ lbl_7:
    state->repinneriterationscount += state->aulreport.iterationscount;
    state->repnfev += state->aulreport.nfev;
    state->repterminationtype = state->aulreport.terminationtype;
-   inc(&state->repouteriterationscount, _state);
+   state->repouteriterationscount++;
    if (state->repterminationtype <= 0 || state->repterminationtype == 8) {
       goto lbl_5;
    }
@@ -38441,7 +38309,7 @@ lbl_2:
    // constraints.
       if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
          minnlcequalitypenaltyfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho, &p, &dp, &d2p, _state);
-         state->nubc.xR[2 * i + 0] = boundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
          continue;
       }
    // Process coefficients corresponding to inequality-type
@@ -38451,16 +38319,16 @@ lbl_2:
       if (state->hasbndl.xB[i]) {
          minnlcinequalityshiftfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho + 1, &p, &dp, &d2p, _state);
          v = fabs(dp);
-         v = minreal(v, minnlc_aulmaxgrowth, _state);
-         v = maxreal(v, 1 / minnlc_aulmaxgrowth, _state);
-         state->nubc.xR[2 * i + 0] = boundval(state->nubc.xR[2 * i + 0] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         v = rmin2(v, minnlc_aulmaxgrowth, _state);
+         v = rmax2(v, 1 / minnlc_aulmaxgrowth, _state);
+         state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       }
       if (state->hasbndu.xB[i]) {
          minnlcinequalityshiftfunction((state->scaledbndu.xR[i] - state->xc.xR[i]) * state->rho + 1, &p, &dp, &d2p, _state);
          v = fabs(dp);
-         v = minreal(v, minnlc_aulmaxgrowth, _state);
-         v = maxreal(v, 1 / minnlc_aulmaxgrowth, _state);
-         state->nubc.xR[2 * i + 1] = boundval(state->nubc.xR[2 * i + 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         v = rmin2(v, minnlc_aulmaxgrowth, _state);
+         v = rmax2(v, 1 / minnlc_aulmaxgrowth, _state);
+         state->nubc.xR[2 * i + 1] = rboundval(state->nubc.xR[2 * i + 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       }
    }
    for (i = 0; i < nec + nic; i++) {
@@ -38468,13 +38336,13 @@ lbl_2:
       v -= state->scaledcleic.xyR[i][n];
       if (i < nec) {
          minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p, _state);
-         state->nulc.xR[i] = boundval(state->nulc.xR[i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         state->nulc.xR[i] = rboundval(state->nulc.xR[i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       } else {
          minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p, _state);
          v = fabs(dp);
-         v = minreal(v, minnlc_aulmaxgrowth, _state);
-         v = maxreal(v, 1 / minnlc_aulmaxgrowth, _state);
-         state->nulc.xR[i] = boundval(state->nulc.xR[i] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         v = rmin2(v, minnlc_aulmaxgrowth, _state);
+         v = rmax2(v, 1 / minnlc_aulmaxgrowth, _state);
+         state->nulc.xR[i] = rboundval(state->nulc.xR[i] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       }
    }
    for (i = 1; i <= ng + nh; i++) {
@@ -38482,13 +38350,13 @@ lbl_2:
       v = state->fi.xR[i];
       if (i <= ng) {
          minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p, _state);
-         state->nunlc.xR[i - 1] = boundval(state->nunlc.xR[i - 1] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] - dp, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       } else {
          minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p, _state);
          v = fabs(dp);
-         v = minreal(v, minnlc_aulmaxgrowth, _state);
-         v = maxreal(v, 1 / minnlc_aulmaxgrowth, _state);
-         state->nunlc.xR[i - 1] = boundval(state->nunlc.xR[i - 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
+         v = rmin2(v, minnlc_aulmaxgrowth, _state);
+         v = rmax2(v, 1 / minnlc_aulmaxgrowth, _state);
+         state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult, _state);
       }
    }
    outerit++;
@@ -38732,12 +38600,12 @@ lbl_25:
       goto lbl_29;
    }
    if (state->diffstep != 0.0) {
-      rvectorsetlengthatleast(&state->xbase, n, _state);
-      rvectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->xbase, n, _state);
+      vectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
    }
    ae_vector_set_length(&state->rstateaul.ia, 8 + 1, _state);
    ae_vector_set_length(&state->rstateaul.ra, 7 + 1, _state);
@@ -38812,12 +38680,12 @@ lbl_29:
       goto lbl_38;
    }
    if (state->diffstep != 0.0) {
-      rvectorsetlengthatleast(&state->xbase, n, _state);
-      rvectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->xbase, n, _state);
+      vectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
    }
    minslpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->slpsolverstate, _state);
 lbl_40:
@@ -38939,7 +38807,7 @@ lbl_14:
       }
    }
 lbl_45:
-   inc(&state->repnfev, _state);
+   state->repnfev++;
    goto lbl_40;
 lbl_42:
    if (!state->slpsolverstate.xupdated) {
@@ -38980,12 +38848,12 @@ lbl_38:
       goto lbl_55;
    }
    if (state->diffstep != 0.0) {
-      rvectorsetlengthatleast(&state->xbase, n, _state);
-      rvectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->xbase, n, _state);
+      vectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm2, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp1, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp2, 1 + ng + nh, _state);
    }
    minsqpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->sqpsolverstate, _state);
 lbl_57:
@@ -39107,7 +38975,7 @@ lbl_23:
       }
    }
 lbl_62:
-   inc(&state->repnfev, _state);
+   state->repnfev++;
    goto lbl_57;
 lbl_59:
    if (!state->sqpsolverstate.xupdated) {
@@ -39575,7 +39443,6 @@ void minnlcrequesttermination(minnlcstate *state, ae_state *_state) {
 
 void minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnlcstate *p = (minnlcstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -39712,7 +39579,6 @@ void minnlcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minnlcstate_free(void *_p, bool make_automatic) {
    minnlcstate *p = (minnlcstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);
    ae_vector_free(&p->bndu, make_automatic);
@@ -39761,8 +39627,6 @@ void minnlcstate_free(void *_p, bool make_automatic) {
 }
 
 void minnlcreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minnlcreport *p = (minnlcreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minnlcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -39781,8 +39645,6 @@ void minnlcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void minnlcreport_free(void *_p, bool make_automatic) {
-   minnlcreport *p = (minnlcreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -40296,7 +40158,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //
 // NOTE: we convert inequality constraints to the form
 // A*x <= b before copying them.
-   rmatrixsetlengthatleast(&state->cleic, k, n + 1, _state);
+   matrixsetlengthatleast(&state->cleic, k, n + 1, _state);
    state->nec = 0;
    state->nic = 0;
    for (i = 0; i < k; i++) {
@@ -40604,8 +40466,8 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    state->agsmaxbacktracknonfull = 8;
    state->agspenaltylevel = 50.0;
    state->agspenaltyincrease = 100.0;
-   state->agsminupdate = maxint(5, n / 2, _state);
-   state->agssamplesize = maxint(2 * n + 1, state->agsminupdate + 1, _state);
+   state->agsminupdate = imax2(5, n / 2, _state);
+   state->agssamplesize = imax2(2 * n + 1, state->agsminupdate + 1, _state);
    state->agsshortlimit = 4 + state->agssamplesize / state->agsminupdate;
 // Initialize other params
    state->n = n;
@@ -40847,8 +40709,8 @@ static void minns_qpcalculategradfunc(RMatrix *sampleg, RVector *diagh, ae_int_t
    ae_int_t j;
    double v;
    *f = 0;
-   rvectorsetlengthatleast(g, nsample, _state);
-   rvectorsetlengthatleast(tmp, nvars, _state);
+   vectorsetlengthatleast(g, nsample, _state);
+   vectorsetlengthatleast(tmp, nvars, _state);
 // Calculate GS*p
    for (j = 0; j < nvars; j++) {
       tmp->xR[j] = 0.0;
@@ -40880,7 +40742,7 @@ static void minns_qpcalculatefunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsa
    ae_int_t j;
    double v;
    *f = 0;
-   rvectorsetlengthatleast(tmp, nvars, _state);
+   vectorsetlengthatleast(tmp, nvars, _state);
 // Calculate GS*p
    for (j = 0; j < nvars; j++) {
       tmp->xR[j] = 0.0;
@@ -40964,18 +40826,18 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    ae_int_t termcnt;
    n = nsample;
 // Allocate arrays, prepare data
-   rvectorsetlengthatleast(coeffs, n, _state);
-   rvectorsetlengthatleast(&state->xc, n, _state);
-   rvectorsetlengthatleast(&state->xn, n, _state);
-   rvectorsetlengthatleast(&state->x0, n, _state);
-   rvectorsetlengthatleast(&state->gc, n, _state);
-   rvectorsetlengthatleast(&state->d, n, _state);
-   rmatrixsetlengthatleast(&state->uh, n, n, _state);
-   rmatrixsetlengthatleast(&state->ch, n, n, _state);
-   rmatrixsetlengthatleast(&state->rk, nsample, nvars, _state);
-   rvectorsetlengthatleast(&state->invutc, n, _state);
-   rvectorsetlengthatleast(&state->tmp0, n, _state);
-   bvectorsetlengthatleast(&state->tmpb, n, _state);
+   vectorsetlengthatleast(coeffs, n, _state);
+   vectorsetlengthatleast(&state->xc, n, _state);
+   vectorsetlengthatleast(&state->xn, n, _state);
+   vectorsetlengthatleast(&state->x0, n, _state);
+   vectorsetlengthatleast(&state->gc, n, _state);
+   vectorsetlengthatleast(&state->d, n, _state);
+   matrixsetlengthatleast(&state->uh, n, n, _state);
+   matrixsetlengthatleast(&state->ch, n, n, _state);
+   matrixsetlengthatleast(&state->rk, nsample, nvars, _state);
+   vectorsetlengthatleast(&state->invutc, n, _state);
+   vectorsetlengthatleast(&state->tmp0, n, _state);
+   vectorsetlengthatleast(&state->tmpb, n, _state);
    for (i = 0; i < n; i++) {
       state->xc.xR[i] = 1.0 / n;
       coeffs->xR[i] = 1.0 / n;
@@ -40988,7 +40850,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    rmatrixsyrk(nsample, nvars, 1.0, &state->rk, 0, 0, 0, 0.0, &state->uh, 0, 0, true, _state);
    maxdiag = 0.0;
    for (i = 0; i < nsample; i++) {
-      maxdiag = maxreal(maxdiag, state->uh.xyR[i][i], _state);
+      maxdiag = rmax2(maxdiag, state->uh.xyR[i][i], _state);
    }
    maxdiag = coalesce(maxdiag, 1.0, _state);
 // Main cycle:
@@ -41025,9 +40887,9 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // so we can perform exact projection by explicitly setting elements of D
    // to zeros.
       minns_qpcalculategradfunc(sampleg, diagh, nsample, nvars, &state->xc, &state->gc, &state->fc, &state->tmp0, _state);
-      ivectorsetlengthatleast(&state->tmpidx, n, _state);
-      rvectorsetlengthatleast(&state->tmpd, n, _state);
-      rmatrixsetlengthatleast(&state->tmpc2, n, 1, _state);
+      vectorsetlengthatleast(&state->tmpidx, n, _state);
+      vectorsetlengthatleast(&state->tmpd, n, _state);
+      matrixsetlengthatleast(&state->tmpc2, n, 1, _state);
       idx0 = 0;
       ncandbnd = 0;
       for (i = 0; i < n; i++) {
@@ -41110,7 +40972,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          for (i = 0; i < n; i++) {
             state->xc.xR[i] /= v;
          }
-         inc(&innerits, _state);
+         innerits++;
          continue;
       }
    // Calculate Cholesky decomposition of constrained Hessian
@@ -41132,7 +40994,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
                }
             }
          }
-         inc(dbgncholesky, _state);
+         ++*dbgncholesky;
          if (!spdmatrixcholeskyrec(&state->ch, 0, n, true, &state->tmp0, _state)) {
          // Cholesky decomposition failed.
          // Increase LambdaV and repeat iteration.
@@ -41229,9 +41091,9 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
       // Break if:
       // a) no constraint was activated
       // b) norm of D is small enough
-         stp = minreal(1.0, stpmax, _state);
+         stp = rmin2(1.0, stpmax, _state);
          for (i = 0; i < n; i++) {
-            state->xn.xR[i] = maxreal(state->xc.xR[i] + stp * state->d.xR[i], 0.0, _state);
+            state->xn.xR[i] = rmax2(state->xc.xR[i] + stp * state->d.xR[i], 0.0, _state);
          }
          if (stp == stpmax && actidx >= 0) {
             state->xn.xR[actidx] = 0.0;
@@ -41260,7 +41122,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          werechanges = werechanges || sign(state->x0.xR[i], _state) != sign(state->xc.xR[i], _state);
       }
       if (!werechanges) {
-         inc(&termcnt, _state);
+         termcnt++;
       } else {
          termcnt = 0;
       }
@@ -41269,7 +41131,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
       }
    // Increase number of outer iterations.
    // Break if we performed too many.
-      inc(&outerits, _state);
+      outerits++;
       if (outerits == 10) {
          break;
       }
@@ -41412,20 +41274,20 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
       return result;
    }
 // Allocate arrays.
-   rvectorsetlengthatleast(&state->colmax, n, _state);
-   rvectorsetlengthatleast(&state->diagh, n, _state);
-   rvectorsetlengthatleast(&state->signmin, n, _state);
-   rvectorsetlengthatleast(&state->signmax, n, _state);
+   vectorsetlengthatleast(&state->colmax, n, _state);
+   vectorsetlengthatleast(&state->diagh, n, _state);
+   vectorsetlengthatleast(&state->signmin, n, _state);
+   vectorsetlengthatleast(&state->signmax, n, _state);
    maxsamplesize = state->agssamplesize;
-   rmatrixsetlengthatleast(&state->samplex, maxsamplesize + 1, n, _state);
-   rmatrixsetlengthatleast(&state->samplegm, maxsamplesize + 1, n, _state);
-   rmatrixsetlengthatleast(&state->samplegmbc, maxsamplesize + 1, n, _state);
-   rvectorsetlengthatleast(&state->samplef, maxsamplesize + 1, _state);
+   matrixsetlengthatleast(&state->samplex, maxsamplesize + 1, n, _state);
+   matrixsetlengthatleast(&state->samplegm, maxsamplesize + 1, n, _state);
+   matrixsetlengthatleast(&state->samplegmbc, maxsamplesize + 1, n, _state);
+   vectorsetlengthatleast(&state->samplef, maxsamplesize + 1, _state);
 // Prepare optimizer
-   rvectorsetlengthatleast(&state->tmp0, maxsamplesize, _state);
-   rvectorsetlengthatleast(&state->tmp1, maxsamplesize, _state);
-   ivectorsetlengthatleast(&state->tmp3, 1, _state);
-   rmatrixsetlengthatleast(&state->tmp2, 1, maxsamplesize + 1, _state);
+   vectorsetlengthatleast(&state->tmp0, maxsamplesize, _state);
+   vectorsetlengthatleast(&state->tmp1, maxsamplesize, _state);
+   vectorsetlengthatleast(&state->tmp3, 1, _state);
+   matrixsetlengthatleast(&state->tmp2, 1, maxsamplesize + 1, _state);
    for (i = 0; i < maxsamplesize; i++) {
       state->tmp0.xR[i] = 0.0;
       state->tmp1.xR[i] = _state->v_posinf;
@@ -41435,8 +41297,8 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    hqrndseed(7235, 98532, &state->agsrs, _state);
 // Prepare initial point subject to current bound constraints and
 // perform scaling of bound constraints, linear constraints, point itself
-   rvectorsetlengthatleast(&state->scaledbndl, n, _state);
-   rvectorsetlengthatleast(&state->scaledbndu, n, _state);
+   vectorsetlengthatleast(&state->scaledbndl, n, _state);
+   vectorsetlengthatleast(&state->scaledbndu, n, _state);
    for (i = 0; i < n; i++) {
    // Check and scale constraints
       if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndu.xR[i] < state->bndl.xR[i]) {
@@ -41478,7 +41340,7 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
          state->xc.xR[i] = state->scaledbndu.xR[i];
       }
    }
-   rmatrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
+   matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1, _state);
    for (i = 0; i < nec + nic; i++) {
    // Scale and normalize linear constraints
       vv = 0.0;
@@ -41506,7 +41368,7 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
 // * RadiusDecays   -   total number of decreases performed for sampling radius
    radius = state->agsradius;
    radius0 = radius;
-   recommendedstep = minreal(radius0, state->agsinitstp, _state);
+   recommendedstep = rmin2(radius0, state->agsinitstp, _state);
    cursamplesize = 1;
    radiusdecays = 0;
    shortstepscnt = 0;
@@ -41525,7 +41387,7 @@ lbl_4:
 //    if directional derivative of function being optimized (not
 //    merit function!) is larger than derivative of penalty.
 // 4. update report on constraint violation
-   cursamplesize = maxint(cursamplesize, 1, _state);
+   cursamplesize = imax2(cursamplesize, 1, _state);
    ae_v_move(state->samplex.xyR[0], 1, state->xc.xR, 1, n);
    ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
    minns_clearrequestfields(state, _state);
@@ -41544,7 +41406,7 @@ lbl_0:
       if (i >= nec && v <= 0.0) {
          continue;
       }
-      state->replcerr = maxreal(state->replcerr, fabs(v), _state);
+      state->replcerr = rmax2(state->replcerr, fabs(v), _state);
    }
    state->repnlcerr = 0.0;
    for (i = 1; i <= ng + nh; i++) {
@@ -41552,7 +41414,7 @@ lbl_0:
       if (i > ng && v <= 0.0) {
          continue;
       }
-      state->repnlcerr = maxreal(state->repnlcerr, fabs(v), _state);
+      state->repnlcerr = rmax2(state->repnlcerr, fabs(v), _state);
    }
    state->samplef.xR[0] = state->meritf;
    rcopyvr(n, &state->meritg, &state->samplegm, 0, _state);
@@ -41624,7 +41486,7 @@ lbl_6:
    // If entry is outside of Radius-ball around XC, discard it.
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = maxreal(v, fabs(state->samplex.xyR[i][j] - state->xc.xR[j]), _state);
+         v = rmax2(v, fabs(state->samplex.xyR[i][j] - state->xc.xR[j]), _state);
       }
       if (v > radius) {
          continue;
@@ -41650,7 +41512,7 @@ lbl_6:
    k = 0;
    i = cursamplesize;
 lbl_8:
-   if (i > minint(cursamplesize + state->agsminupdate, state->agssamplesize, _state) - 1) {
+   if (i > imin2(cursamplesize + state->agsminupdate, state->agssamplesize, _state) - 1) {
       goto lbl_10;
    }
    for (j = 0; j < n; j++) {
@@ -41666,18 +41528,18 @@ lbl_8:
          v0 = state->samplex.xyR[i][j] - radius;
          v1 = state->samplex.xyR[i][j];
          if (state->hasbndl.xB[j]) {
-            v0 = maxreal(state->scaledbndl.xR[j], v0, _state);
+            v0 = rmax2(state->scaledbndl.xR[j], v0, _state);
          }
       } else {
       // Sample at the right side with 50% probability
          v0 = state->samplex.xyR[i][j];
          v1 = state->samplex.xyR[i][j] + radius;
          if (state->hasbndu.xB[j]) {
-            v1 = minreal(state->scaledbndu.xR[j], v1, _state);
+            v1 = rmin2(state->scaledbndu.xR[j], v1, _state);
          }
       }
       ae_assert(v1 >= v0, "MinNS: integrity check failed (9743)", _state);
-      state->samplex.xyR[i][j] = boundval(v0 + (v1 - v0) * hqrnduniformr(&state->agsrs, _state), v0, v1, _state);
+      state->samplex.xyR[i][j] = rboundval(v0 + (v1 - v0) * hqrnduniformr(&state->agsrs, _state), v0, v1, _state);
    }
    ae_v_move(state->x.xR, 1, state->samplex.xyR[i], 1, n);
    minns_clearrequestfields(state, _state);
@@ -41746,9 +41608,9 @@ lbl_10:
    for (i = 0; i < cursamplesize; i++) {
       for (j = 0; j < n; j++) {
          v = state->samplegmbc.xyR[i][j];
-         state->colmax.xR[j] = maxreal(state->colmax.xR[j], fabs(v), _state);
-         state->signmin.xR[j] = minreal(state->signmin.xR[j], (double)sign(v, _state), _state);
-         state->signmax.xR[j] = maxreal(state->signmax.xR[j], (double)sign(v, _state), _state);
+         state->colmax.xR[j] = rmax2(state->colmax.xR[j], fabs(v), _state);
+         state->signmin.xR[j] = rmin2(state->signmin.xR[j], (double)sign(v, _state), _state);
+         state->signmax.xR[j] = rmax2(state->signmax.xR[j], (double)sign(v, _state), _state);
       }
    }
    for (j = 0; j < n; j++) {
@@ -41788,7 +41650,7 @@ lbl_10:
    }
    v = 0.0;
    for (j = 0; j < n; j++) {
-      v = maxreal(v, fabs(state->d.xR[j] / coalesce(state->colmax.xR[j], 1.0, _state)), _state);
+      v = rmax2(v, fabs(state->d.xR[j] / coalesce(state->colmax.xR[j], 1.0, _state)), _state);
    }
    if (v <= state->agsstattold) {
    // Stationarity test succeeded.
@@ -41797,8 +41659,8 @@ lbl_10:
    // NOTE: we also clear ShortStepsCnt on restart
       radius *= state->agsraddecay;
       shortstepscnt = 0;
-      inc(&radiusdecays, _state);
-      inc(&state->repinneriterationscount, _state);
+      radiusdecays++;
+      state->repinneriterationscount++;
       goto lbl_4;
    }
    for (i = 0; i < n; i++) {
@@ -41851,7 +41713,7 @@ lbl_3:
    alpha *= state->agsalphadecay;
    alphadecreased = true;
 // Update and check iterations counter.
-   inc(&backtrackits, _state);
+   backtrackits++;
    if (backtrackits >= maxbacktrackits) {
    // Too many backtracking searches performed without success.
    // Terminate iterations.
@@ -41863,7 +41725,7 @@ lbl_3:
    goto lbl_11;
 lbl_12:
    if ((alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius) || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
-      inc(&shortstepscnt, _state);
+      shortstepscnt++;
    } else {
       shortstepscnt = 0;
    }
@@ -41877,8 +41739,8 @@ lbl_12:
    // Decrease radius and restart.
       radius *= state->agsraddecay;
       shortstepscnt = 0;
-      inc(&radiusdecays, _state);
-      inc(&state->repinneriterationscount, _state);
+      radiusdecays++;
+      state->repinneriterationscount++;
       goto lbl_4;
    }
    if (!alphadecreased) {
@@ -41889,7 +41751,7 @@ lbl_12:
    }
 // Next iteration
    ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
-   inc(&state->repinneriterationscount, _state);
+   state->repinneriterationscount++;
    goto lbl_4;
 lbl_5:
 // Convert back from scaled to unscaled representation
@@ -42017,14 +41879,14 @@ bool minnsiteration(minnsstate *state, ae_state *_state) {
       goto lbl_4;
    }
    if (state->diffstep != 0.0) {
-      rvectorsetlengthatleast(&state->xbase, n, _state);
-      rvectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fm, 1 + ng + nh, _state);
-      rvectorsetlengthatleast(&state->fp, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->xbase, n, _state);
+      vectorsetlengthatleast(&state->fbase, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fm, 1 + ng + nh, _state);
+      vectorsetlengthatleast(&state->fp, 1 + ng + nh, _state);
    }
-   rvectorsetlengthatleast(&state->xscaled, n, _state);
-   rvectorsetlengthatleast(&state->rawg, n, _state);
-   rvectorsetlengthatleast(&state->meritg, n, _state);
+   vectorsetlengthatleast(&state->xscaled, n, _state);
+   vectorsetlengthatleast(&state->rawg, n, _state);
+   vectorsetlengthatleast(&state->meritg, n, _state);
    ae_vector_set_length(&state->rstateags.ia, 13 + 1, _state);
    ae_vector_set_length(&state->rstateags.ba, 5 + 1, _state);
    ae_vector_set_length(&state->rstateags.ra, 10 + 1, _state);
@@ -42101,7 +41963,7 @@ lbl_8:
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   inc(&state->repnfev, _state);
+   state->repnfev++;
    rcopyv(n, &state->xscaled, &state->x, _state);
 lbl_9:
 // Postprocess Jacobian: scale and produce 'raw' and 'merit' functions
@@ -42174,7 +42036,7 @@ void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *
    rep->varidx = state->repvaridx;
    rep->funcidx = state->repfuncidx;
    rep->terminationtype = state->repterminationtype;
-   rep->cerr = maxreal(state->replcerr, state->repnlcerr, _state);
+   rep->cerr = rmax2(state->replcerr, state->repnlcerr, _state);
    rep->lcerr = state->replcerr;
    rep->nlcerr = state->repnlcerr;
    if (state->repterminationtype > 0) {
@@ -42218,7 +42080,6 @@ void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_st
 
 void minnsqp_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsqp *p = (minnsqp *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xn, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -42264,7 +42125,6 @@ void minnsqp_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic)
 
 void minnsqp_free(void *_p, bool make_automatic) {
    minnsqp *p = (minnsqp *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->xc, make_automatic);
    ae_vector_free(&p->xn, make_automatic);
    ae_vector_free(&p->x0, make_automatic);
@@ -42286,7 +42146,6 @@ void minnsqp_free(void *_p, bool make_automatic) {
 
 void minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsstate *p = (minnsstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
@@ -42419,7 +42278,6 @@ void minnsstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void minnsstate_free(void *_p, bool make_automatic) {
    minnsstate *p = (minnsstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);
    ae_vector_free(&p->bndu, make_automatic);
@@ -42462,8 +42320,6 @@ void minnsstate_free(void *_p, bool make_automatic) {
 }
 
 void minnsreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minnsreport *p = (minnsreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minnsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -42480,8 +42336,6 @@ void minnsreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void minnsreport_free(void *_p, bool make_automatic) {
-   minnsreport *p = (minnsreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -42973,7 +42827,7 @@ static double mincomp_asad1norm(minasastate *state, ae_state *_state) {
    double result;
    result = 0.0;
    for (i = 0; i < state->n; i++) {
-      result += sqr(boundval(state->x.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state) - state->x.xR[i], _state);
+      result += sqr(rboundval(state->x.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state) - state->x.xR[i], _state);
    }
    result = sqrt(result);
    return result;
@@ -43000,7 +42854,7 @@ static bool mincomp_asauisempty(minasastate *state, ae_state *_state) {
    d32 = d * d2;
    result = true;
    for (i = 0; i < state->n; i++) {
-      if (fabs(state->g.xR[i]) >= d2 && minreal(state->x.xR[i] - state->bndl.xR[i], state->bndu.xR[i] - state->x.xR[i], _state) >= d32) {
+      if (fabs(state->g.xR[i]) >= d2 && rmin2(state->x.xR[i] - state->bndl.xR[i], state->bndu.xR[i] - state->x.xR[i], _state) >= d32) {
          result = false;
          return result;
       }
@@ -43162,7 +43016,7 @@ lbl_21:
    }
 // Determine Dk = proj(xk - gk)-xk
    for (i = 0; i < n; i++) {
-      state->d.xR[i] = boundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state) - state->xk.xR[i];
+      state->d.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state) - state->xk.xR[i];
    }
 // Armijo line search.
 // * exact search with alpha=1 is tried first,
@@ -43186,7 +43040,7 @@ lbl_21:
    }
 // Try alpha=1 step first
    for (i = 0; i < n; i++) {
-      state->x.xR[i] = boundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
+      state->x.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
    }
    mincomp_clearrequestfields(state, _state);
    state->needfg = true;
@@ -43214,7 +43068,7 @@ lbl_25:
    state->dginit /= state->stp;
    state->stp *= mincomp_gpadecay;
    if (state->stpmax > 0.0) {
-      state->stp = minreal(state->stp, state->stpmax, _state);
+      state->stp = rmin2(state->stp, state->stpmax, _state);
    }
 lbl_27:
    if (false) {
@@ -43329,7 +43183,7 @@ lbl_41:
    result = false;
    return result;
 lbl_39:
-   if (state->finit - state->f > state->epsf * maxreal(fabs(state->finit), maxreal(fabs(state->f), 1.0, _state), _state)) {
+   if (state->finit - state->f > state->epsf * rmax2(fabs(state->finit), rmax2(fabs(state->f), 1.0, _state), _state)) {
       goto lbl_43;
    }
 // F(k+1)-F(k) is small enough
@@ -43425,7 +43279,7 @@ lbl_51:
 // preprocess data: bound State.XN so it belongs to the
 // feasible set and store it in the State.X
    for (i = 0; i < n; i++) {
-      state->x.xR[i] = boundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
+      state->x.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
    }
 // RComm
    mincomp_clearrequestfields(state, _state);
@@ -43450,7 +43304,7 @@ lbl_52:
    for (i = 0; i < n; i++) {
    // XN contains unprojected result, project it,
    // save copy to X (will be used for progress reporting)
-      state->xn.xR[i] = boundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
+      state->xn.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i], _state);
    // update active set
       if (state->xn.xR[i] == state->bndl.xR[i] || state->xn.xR[i] == state->bndu.xR[i]) {
          state->an.xR[i] = 0.0;
@@ -43533,7 +43387,7 @@ lbl_59:
 // may occur when |G|=Mu*|D1| (we DON'T test stopping
 // conditions and we DON'T switch to GPA, so we cycle
 // indefinitely).
-   if (state->fold - state->f > state->epsf * maxreal(fabs(state->fold), maxreal(fabs(state->f), 1.0, _state), _state)) {
+   if (state->fold - state->f > state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0, _state), _state)) {
       goto lbl_65;
    }
 // F(k+1)-F(k) is small enough
@@ -43602,7 +43456,7 @@ lbl_63:
          betak = state->betady;
       }
       if (state->cgtype == 1) {
-         betak = maxreal(0.0, minreal(state->betady, state->betahs, _state), _state);
+         betak = rmax2(0.0, rmin2(state->betady, state->betahs, _state), _state);
       }
    } else {
    // Something is wrong (may be function is too wild or too flat).
@@ -43673,7 +43527,6 @@ void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *
 
 void minasastate_init(void *_p, ae_state *_state, bool make_automatic) {
    minasastate *p = (minasastate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndu, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->ak, 0, DT_REAL, _state, make_automatic);
@@ -43743,7 +43596,6 @@ void minasastate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void minasastate_free(void *_p, bool make_automatic) {
    minasastate *p = (minasastate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->bndl, make_automatic);
    ae_vector_free(&p->bndu, make_automatic);
    ae_vector_free(&p->ak, make_automatic);
@@ -43763,8 +43615,6 @@ void minasastate_free(void *_p, bool make_automatic) {
 }
 
 void minasareport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minasareport *p = (minasareport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minasareport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -43777,8 +43627,6 @@ void minasareport_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void minasareport_free(void *_p, bool make_automatic) {
-   minasareport *p = (minasareport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -44111,7 +43959,7 @@ void minbcsetprecdiag(minbcstate *state, RVector *d, ae_state *_state) {
       ae_assert(isfinite(d->xR[i]), "MinBCSetPrecDiag: D contains infinite or NAN elements", _state);
       ae_assert(d->xR[i] > 0.0, "MinBCSetPrecDiag: D contains non-positive elements", _state);
    }
-   rvectorsetlengthatleast(&state->diagh, state->nmain, _state);
+   vectorsetlengthatleast(&state->diagh, state->nmain, _state);
    state->prectype = 2;
    for (i = 0; i < state->nmain; i++) {
       state->diagh.xR[i] = d->xR[i];
@@ -44222,25 +44070,25 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    state->nmain = n;
    state->diffstep = diffstep;
-   rvectorsetlengthatleast(&state->bndl, n, _state);
-   bvectorsetlengthatleast(&state->hasbndl, n, _state);
-   rvectorsetlengthatleast(&state->bndu, n, _state);
-   bvectorsetlengthatleast(&state->hasbndu, n, _state);
-   rvectorsetlengthatleast(&state->xstart, n, _state);
-   rvectorsetlengthatleast(&state->xc, n, _state);
-   rvectorsetlengthatleast(&state->cgc, n, _state);
-   rvectorsetlengthatleast(&state->ugc, n, _state);
-   rvectorsetlengthatleast(&state->xn, n, _state);
-   rvectorsetlengthatleast(&state->cgn, n, _state);
-   rvectorsetlengthatleast(&state->ugn, n, _state);
-   rvectorsetlengthatleast(&state->xp, n, _state);
-   rvectorsetlengthatleast(&state->d, n, _state);
-   rvectorsetlengthatleast(&state->s, n, _state);
-   rvectorsetlengthatleast(&state->invs, n, _state);
-   rvectorsetlengthatleast(&state->lastscaleused, n, _state);
-   rvectorsetlengthatleast(&state->x, n, _state);
-   rvectorsetlengthatleast(&state->g, n, _state);
-   rvectorsetlengthatleast(&state->work, n, _state);
+   vectorsetlengthatleast(&state->bndl, n, _state);
+   vectorsetlengthatleast(&state->hasbndl, n, _state);
+   vectorsetlengthatleast(&state->bndu, n, _state);
+   vectorsetlengthatleast(&state->hasbndu, n, _state);
+   vectorsetlengthatleast(&state->xstart, n, _state);
+   vectorsetlengthatleast(&state->xc, n, _state);
+   vectorsetlengthatleast(&state->cgc, n, _state);
+   vectorsetlengthatleast(&state->ugc, n, _state);
+   vectorsetlengthatleast(&state->xn, n, _state);
+   vectorsetlengthatleast(&state->cgn, n, _state);
+   vectorsetlengthatleast(&state->ugn, n, _state);
+   vectorsetlengthatleast(&state->xp, n, _state);
+   vectorsetlengthatleast(&state->d, n, _state);
+   vectorsetlengthatleast(&state->s, n, _state);
+   vectorsetlengthatleast(&state->invs, n, _state);
+   vectorsetlengthatleast(&state->lastscaleused, n, _state);
+   vectorsetlengthatleast(&state->x, n, _state);
+   vectorsetlengthatleast(&state->g, n, _state);
+   vectorsetlengthatleast(&state->work, n, _state);
    for (i = 0; i < n; i++) {
       state->bndl.xR[i] = _state->v_neginf;
       state->hasbndl.xB[i] = false;
@@ -44578,7 +44426,7 @@ bool minbciteration(minbcstate *state, ae_state *_state) {
 // * GDecay     desired decrease of constrained gradient during L-BFGS iterations.
 //              This coefficient is decreased after each L-BFGS round until
 //              it reaches minimum decay.
-   m = minint(5, state->nmain, _state);
+   m = imin2(5, state->nmain, _state);
    gdecay = minbc_initialdecay;
 // Init
    n = state->nmain;
@@ -44596,18 +44444,18 @@ bool minbciteration(minbcstate *state, ae_state *_state) {
    state->repiterationscount = 0;
    state->repnfev = 0;
    state->repvaridx = -1;
-   rmatrixsetlengthatleast(&state->bufyk, m + 1, n, _state);
-   rmatrixsetlengthatleast(&state->bufsk, m + 1, n, _state);
-   rvectorsetlengthatleast(&state->bufrho, m, _state);
-   rvectorsetlengthatleast(&state->buftheta, m, _state);
-   rvectorsetlengthatleast(&state->tmp0, n, _state);
+   matrixsetlengthatleast(&state->bufyk, m + 1, n, _state);
+   matrixsetlengthatleast(&state->bufsk, m + 1, n, _state);
+   vectorsetlengthatleast(&state->bufrho, m, _state);
+   vectorsetlengthatleast(&state->buftheta, m, _state);
+   vectorsetlengthatleast(&state->tmp0, n, _state);
    smoothnessmonitorinit(&state->smonitor, &state->s, n, 1, state->smoothnessguardlevel > 0, _state);
    for (i = 0; i < n; i++) {
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
    }
 // Fill TmpPrec with current preconditioner
-   rvectorsetlengthatleast(&state->tmpprec, n, _state);
+   vectorsetlengthatleast(&state->tmpprec, n, _state);
    for (i = 0; i < n; i++) {
       if (state->prectype == 2) {
          state->tmpprec.xR[i] = 1 / state->diagh.xR[i];
@@ -44833,7 +44681,7 @@ lbl_41:
       state->curstpmax = 1.0E50;
    }
    if (state->stpmax > 0.0) {
-      state->curstpmax = minreal(state->curstpmax, state->stpmax / scaleddnorm, _state);
+      state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm, _state);
    }
    ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
    ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
@@ -45050,7 +44898,7 @@ lbl_56:
          result = false;
          return result;
       }
-      if (fabs(state->fp - state->fc) <= state->epsf * maxreal(fabs(state->fc), maxreal(fabs(state->fp), 1.0, _state), _state)) {
+      if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0, _state), _state)) {
       // Function change is small enough
          state->repterminationtype = 1;
          result = false;
@@ -45149,7 +44997,7 @@ lbl_58:
    }
    state->curstpmax = 1.0E50;
    if (state->stpmax > 0.0) {
-      state->curstpmax = minreal(state->curstpmax, state->stpmax / scaleddnorm, _state);
+      state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm, _state);
    }
 // Minimize G(t) = F(CONSTRAIN(XC + t*D)), with t being scalar, XC and D being vectors.
    ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
@@ -45412,7 +45260,7 @@ lbl_59:
 lbl_60:
 // Decrease decay coefficient. Subsequent L-BFGS stages will
 // have more stringent stopping criteria.
-   gdecay = maxreal(gdecay * minbc_decaycorrection, minbc_mindecay, _state);
+   gdecay = rmax2(gdecay * minbc_decaycorrection, minbc_mindecay, _state);
    goto lbl_38;
 lbl_39:
    result = false;
@@ -45821,7 +45669,6 @@ void minbcrequesttermination(minbcstate *state, ae_state *_state) {
 
 void minbcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbcstate *p = (minbcstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -45929,7 +45776,6 @@ void minbcstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void minbcstate_free(void *_p, bool make_automatic) {
    minbcstate *p = (minbcstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->diagh, make_automatic);
    ae_vector_free(&p->x, make_automatic);
@@ -45962,8 +45808,6 @@ void minbcstate_free(void *_p, bool make_automatic) {
 }
 
 void minbcreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   minbcreport *p = (minbcreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void minbcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -45976,8 +45820,6 @@ void minbcreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void minbcreport_free(void *_p, bool make_automatic) {
-   minbcreport *p = (minbcreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -46457,32 +46299,27 @@ void lptestproblemserialize(ae_serializer *s, lptestproblem *p, ae_state *_state
 // API: void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj);
 // API: void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj);
 void lptestproblemunserialize(ae_serializer *s, lptestproblem *p, ae_state *_state) {
-   ae_int_t k;
    SetObj(lptestproblem, p);
-   ae_serializer_unserialize_int(s, &k, _state);
-   ae_assert(k == getlptestserializationcode(_state), "LPTestProblemUnserialize: stream header corrupted", _state);
-   ae_serializer_unserialize_int(s, &k, _state);
-   ae_assert(k == 0, "LPTestProblemUnserialize: stream header corrupted", _state);
-   ae_serializer_unserialize_int(s, &p->n, _state);
-   ae_serializer_unserialize_bool(s, &p->hasknowntarget, _state);
-   ae_serializer_unserialize_double(s, &p->targetf, _state);
+   ae_assert(ae_serializer_unserialize_int(s, _state) == getlptestserializationcode(_state), "LPTestProblemUnserialize: stream header corrupted", _state);
+   ae_assert(ae_serializer_unserialize_int(s, _state) == 0, "LPTestProblemUnserialize: stream header corrupted", _state);
+   p->n = ae_serializer_unserialize_int(s, _state);
+   p->hasknowntarget = ae_serializer_unserialize_bool(s, _state);
+   p->targetf = ae_serializer_unserialize_double(s, _state);
    unserializerealarray(s, &p->s, _state);
    unserializerealarray(s, &p->c, _state);
    unserializerealarray(s, &p->bndl, _state);
    unserializerealarray(s, &p->bndu, _state);
-   ae_serializer_unserialize_int(s, &p->m, _state);
+   p->m = ae_serializer_unserialize_int(s, _state);
    if (p->m > 0) {
       sparseunserialize(s, &p->a, _state);
       unserializerealarray(s, &p->al, _state);
       unserializerealarray(s, &p->au, _state);
    }
-   ae_serializer_unserialize_int(s, &k, _state);
-   ae_assert(k == 872, "LPTestProblemUnserialize: end-of-stream marker not found", _state);
+   ae_assert(ae_serializer_unserialize_int(s, _state) == 872, "LPTestProblemUnserialize: end-of-stream marker not found", _state);
 }
 
 void lptestproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    lptestproblem *p = (lptestproblem *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->c, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
@@ -46510,7 +46347,6 @@ void lptestproblem_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 
 void lptestproblem_free(void *_p, bool make_automatic) {
    lptestproblem *p = (lptestproblem *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->s, make_automatic);
    ae_vector_free(&p->c, make_automatic);
    ae_vector_free(&p->bndl, make_automatic);

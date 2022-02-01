@@ -35,68 +35,12 @@ void apbuffers_init(void *_p, ae_state *_state, bool make_automatic);
 void apbuffers_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void apbuffers_free(void *_p, bool make_automatic);
 
-struct sboolean {
-   bool val;
-};
-void sboolean_init(void *_p, ae_state *_state, bool make_automatic);
-void sboolean_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void sboolean_free(void *_p, bool make_automatic);
+void RVector_init(void *_p, ae_state *_state, bool make_automatic);
+void RVector_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
+void RVector_free(void *_p, bool make_automatic);
 
-struct sbooleanarray {
-   ae_vector val;
-};
-void sbooleanarray_init(void *_p, ae_state *_state, bool make_automatic);
-void sbooleanarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void sbooleanarray_free(void *_p, bool make_automatic);
-
-struct sinteger {
-   ae_int_t val;
-};
-void sinteger_init(void *_p, ae_state *_state, bool make_automatic);
-void sinteger_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void sinteger_free(void *_p, bool make_automatic);
-
-struct sintegerarray {
-   ae_vector val;
-};
-void sintegerarray_init(void *_p, ae_state *_state, bool make_automatic);
-void sintegerarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void sintegerarray_free(void *_p, bool make_automatic);
-
-struct sreal {
-   double val;
-};
-void sreal_init(void *_p, ae_state *_state, bool make_automatic);
-void sreal_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void sreal_free(void *_p, bool make_automatic);
-
-struct srealarray {
-   ae_vector val;
-};
-void srealarray_init(void *_p, ae_state *_state, bool make_automatic);
-void srealarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void srealarray_free(void *_p, bool make_automatic);
-
-struct scomplex {
-   complex val;
-};
-void scomplex_init(void *_p, ae_state *_state, bool make_automatic);
-void scomplex_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void scomplex_free(void *_p, bool make_automatic);
-
-struct scomplexarray {
-   ae_vector val;
-};
-void scomplexarray_init(void *_p, ae_state *_state, bool make_automatic);
-void scomplexarray_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
-void scomplexarray_free(void *_p, bool make_automatic);
-
-bool alwaysfalse(ae_state *_state);
-void touchint(ae_int_t *a, ae_state *_state);
-void touchreal(double *a, ae_state *_state);
 double coalesce(double a, double b, ae_state *_state);
 ae_int_t coalescei(ae_int_t a, ae_int_t b, ae_state *_state);
-double inttoreal(ae_int_t a, ae_state *_state);
 double logbase2(double x, ae_state *_state);
 bool approxequal(double a, double b, double tol, ae_state *_state);
 bool approxequalrel(double a, double b, double tol, ae_state *_state);
@@ -105,13 +49,9 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y
 void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y, ae_state *_state);
 bool aredistinct(RVector *x, ae_int_t n, ae_state *_state);
-bool aresameboolean(bool v1, bool v2, ae_state *_state);
 void setlengthzero(RVector *x, ae_int_t n, ae_state *_state);
-void bvectorsetlengthatleast(BVector *x, ae_int_t n, ae_state *_state);
-void ivectorsetlengthatleast(ZVector *x, ae_int_t n, ae_state *_state);
-void rvectorsetlengthatleast(RVector *x, ae_int_t n, ae_state *_state);
-void bmatrixsetlengthatleast(BMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
-void rmatrixsetlengthatleast(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
+void vectorsetlengthatleast(ae_vector *x, ae_int_t n, ae_state *_state);
+void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void bvectorgrowto(BVector *x, ae_int_t n, ae_state *_state);
 void ivectorgrowto(ZVector *x, ae_int_t n, ae_state *_state);
 void rvectorgrowto(RVector *x, ae_int_t n, ae_state *_state);
@@ -121,7 +61,6 @@ void ivectorresize(ZVector *x, ae_int_t n, ae_state *_state);
 void rvectorresize(RVector *x, ae_int_t n, ae_state *_state);
 void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
 void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
-void ivectorappend(ZVector *x, ae_int_t v, ae_state *_state);
 bool isfinitevector(RVector *x, ae_int_t n, ae_state *_state);
 bool isfinitecvector(CVector *z, ae_int_t n, ae_state *_state);
 bool apservisfinitematrix(RMatrix *x, ae_int_t m, ae_int_t n, ae_state *_state);
@@ -143,27 +82,7 @@ void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols, ae_state *_s
 void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth, ae_state *_state);
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
 void swapelements(RVector *a, ae_int_t i0, ae_int_t i1, ae_state *_state);
-void inc(ae_int_t *v, ae_state *_state);
-void dec(ae_int_t *v, ae_state *_state);
-void threadunsafeinc(ae_int_t *v, ae_state *_state);
-void threadunsafeincby(ae_int_t *v, ae_int_t k, ae_state *_state);
-void countdown(ae_int_t *v, ae_state *_state);
 double possign(double x, ae_state *_state);
-double rmul2(double v0, double v1, ae_state *_state);
-double rmul3(double v0, double v1, double v2, ae_state *_state);
-ae_int_t idivup(ae_int_t a, ae_int_t b, ae_state *_state);
-ae_int_t imin2(ae_int_t i0, ae_int_t i1, ae_state *_state);
-ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
-ae_int_t imax2(ae_int_t i0, ae_int_t i1, ae_state *_state);
-ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
-double maxreal3(double v0, double v1, double v2, ae_state *_state);
-double rmax3(double r0, double r1, double r2, ae_state *_state);
-double rmaxabs3(double r0, double r1, double r2, ae_state *_state);
-double boundval(double x, double b1, double b2, ae_state *_state);
-ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state);
-double rboundval(double x, double b1, double b2, ae_state *_state);
-ae_int_t countnz1(RVector *v, ae_int_t n, ae_state *_state);
-ae_int_t countnz2(RMatrix *v, ae_int_t m, ae_int_t n, ae_state *_state);
 void alloccomplex(ae_serializer *s, complex v, ae_state *_state);
 void serializecomplex(ae_serializer *s, complex v, ae_state *_state);
 complex unserializecomplex(ae_serializer *s, ae_state *_state);
@@ -180,9 +99,6 @@ void copybooleanarray(BVector *src, BVector *dst, ae_state *_state);
 void copyintegerarray(ZVector *src, ZVector *dst, ae_state *_state);
 void copyrealarray(RVector *src, RVector *dst, ae_state *_state);
 void copyrealmatrix(RMatrix *src, RMatrix *dst, ae_state *_state);
-void unsetintegerarray(ZVector *a, ae_state *_state);
-void unsetrealarray(RVector *a, ae_state *_state);
-void unsetrealmatrix(RMatrix *a, ae_state *_state);
 ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize, ae_state *_state);
 void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);
 void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1, ae_state *_state);

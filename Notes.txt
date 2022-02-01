@@ -394,6 +394,36 @@ A6.2. Test Stages
 	―	_*state->v_posinf,fp_posinf ⇒ +INFINITY
 	―	_*state->v_neginf,fp_neginf ⇒ -INFINITY
 	―	_*state->v_{nan,posinf,neginf} are retained (for now) as in-line constant members.
+0-39	Removing translator-generated artifacts.
+	Commenting out or eliminating translator-generated dead-code or vestigial code from the commercial version of ALGLIB.
+	―	Merge {b,i,r}{vector,matrix}setlengthatleast() into {vector,matrix}setlengthatleast().
+	―	Normalize boolean comparisons: A&&B || !A&&!B ⇒ A == B, A&&B || !A&&C ⇒ A? B: C
+		(including some places where A and !A are opposite comparisons on floating point).
+	―	Removed aresameboolean(); already subsumed by "==";
+	―	Removed countdown(): it is unused.
+	―	Removed ivectorappend(): it is unused.
+	―	Removed {min,max}int(): they are duplicates respectively of i{min,max}2().
+	―	Renamed ae_minreal() as rmin2() and ae_maxreal() as rmax2().
+	―	Moved i{min,max}2(), imin3(), {i,r}max3(), rmaxabs3(), {i,r}boundval() from AlgLibInternal.{cpp,h} to Ap.{cpp,h}.
+	―	Removed maxreal3(); it's a duplicate of rmax3().
+	―	Removed boundval(): it's a duplicate of rboundval().
+	―	Removed unsetintegerarray(), unsetrealarray(): they are duplicates of SetVector().
+	―	Removed unsetrealmatrix(): it's a duplicate of SetMatrix().
+	―	Removed ae_touch_ptr(), touchint(), touchreal(), alwaysfalse();
+		touchint(), touchreal() unused variables are rectified or eliminated;
+		code shielded by touchint(), in ftbase_ftapplysubplan() and dsoptimalsplitk(), rectified;
+		"inaccessible" code, shielded by alwaysfalse(), rectified.
+	―	Removed threadunsafeinc(), threadunsafeincby() and in-line substituted for it.
+	―	Removed inc(), dec() and in-line substituted for it.
+	―	Removed inttoreal() from AlgLibInternal.{cpp,h} ― it's unused and duplicates the typecast function double().
+	―	Removed countnz{1,2}() from AlgLibInternal.{cpp,h} ― they are unused.
+	―	Removed idivup() from AlgLibInternal.{cpp,h}; replacing idivup(a,b) by the operation (a + b - 1) / b.
+	―	Removed rmul{2,3}() from AlgLibInternal.{cpp,h}; replacing rmul2(a,b) by (double)a * b, rmul3(a,b,c) by (double)a * b * c.
+	―	The output parameters in ae_serializer_unserialize_{bool,int,int64,double} were remade into return values.
+	―	The parameter type in ae_shared_pool_is_initialized() was raised from (void *) to (ae_shared_pool *).
+	―	Removed the unused or redundant types s{boolean,integer,real,complex}[array] from AlgLibInternal.{cpp,h};
+	―	Converted sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector;
+	―	Redefined and replaced srealarray_{init,copy,free} by RVector_{init,copy,free}.
 
 A6.3. Test Results
 ──────────────────
@@ -423,6 +453,8 @@ A6.3. Test Results
 39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&}= operators.
 39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators & set_error_msg(), etc.
 39	6803 1.1x 11629 1.0x 11909 1.0x 9143 1.0x 1643389187 (61f42103) 81 // Nativize floating point constants and operations.
+39	7752 1.0x 12501 1.0x 12199 1.0x 9608 1.0x 1643680716 (61f893cc) // Remove translator-artifacts. (Crashed in TestC at testspline2d.)
+39	8000 1.0x 12196 1.0x 12199 1.0x 9187 1.0x 1643685611 (61f8a6eb) 80 // Remove translator-artifacts. (Corrected.)
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -479,19 +511,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   6803
-* RGEMM-MTN-16              1.1x
-* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-SEQ-16   (MFLOPS)   8000
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)  12196
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11909
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9143
+* RGEMM-SEQ-1024 (MFLOPS)   9187
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643389187
+SEED: 1643685611
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -591,4 +623,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 81 seconds
+Done in 80 seconds

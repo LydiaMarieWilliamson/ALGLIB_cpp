@@ -574,7 +574,7 @@ struct ae_shared_pool {
 void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic);
 void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_automatic);
 void ae_shared_pool_free(void *dst, bool make_automatic);
-bool ae_shared_pool_is_initialized(void *_dst);
+bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*free)(void *ptr, bool make_automatic), ae_state *state);
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
@@ -647,13 +647,13 @@ void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
 void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
 
-void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state);
+bool ae_serializer_unserialize_bool(ae_serializer *serializer, ae_state *state);
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *state);
-void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v, ae_state *state);
+ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer, ae_state *state);
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state *state);
-void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v, ae_state *state);
+ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer, ae_state *state);
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_state *state);
-void ae_serializer_unserialize_double(ae_serializer *serializer, double *v, ae_state *state);
+double ae_serializer_unserialize_double(ae_serializer *serializer, ae_state *state);
 void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_state *state);
 
 void ae_serializer_stop(ae_serializer *serializer, ae_state *state);
@@ -668,18 +668,26 @@ bool isposinf(double x);
 bool isneginf(double x);
 
 // * standard functions
+ae_int_t imin2(ae_int_t m1, ae_int_t m2, ae_state *state);
+ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
+ae_int_t imax2(ae_int_t m1, ae_int_t m2, ae_state *state);
+ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
 ae_int_t ae_iabs(ae_int_t x, ae_state *state);
-double sqr(double x, ae_state *state);
 ae_int_t sign(double x, ae_state *state);
 ae_int_t iround(double x, ae_state *state);
 ae_int_t itrunc(double x, ae_state *state);
 ae_int_t ifloor(double x, ae_state *state);
 ae_int_t iceil(double x, ae_state *state);
 
-ae_int_t maxint(ae_int_t m1, ae_int_t m2, ae_state *state);
-ae_int_t minint(ae_int_t m1, ae_int_t m2, ae_state *state);
-double maxreal(double m1, double m2, ae_state *state);
-double minreal(double m1, double m2, ae_state *state);
+double rmin2(double m1, double m2, ae_state *state);
+double rmax2(double m1, double m2, ae_state *state);
+double rmax3(double r0, double r1, double r2, ae_state *_state);
+double rmaxabs3(double r0, double r1, double r2, ae_state *_state);
+double sqr(double x, ae_state *state);
+
+ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state);
+double rboundval(double x, double b1, double b2, ae_state *_state);
+
 double randomreal(ae_state *state);
 ae_int_t randominteger(ae_int_t maxv, ae_state *state);
 
@@ -750,7 +758,6 @@ extern const double pi;
 
 // Debugging and tracing functions
 bool ae_check_zeros(const void *ptr, ae_int_t n);
-void ae_touch_ptr(void *p);
 
 // debug functions (must be turned on by preprocessor definitions):
 // * flushconsole(), fluches console
@@ -1059,6 +1066,17 @@ extern const double machineepsilon, maxrealnumber, minrealnumber;
 extern const ae_int_t endianness;
 int sign(double x);
 
+// Debug-support.
+#if 0 //(@) Not used anywhere, and not useful for debugging.
+// Flush the console.
+#   define flushconsole(s) fflush(stdout)
+#endif
+
+// Debug-enabled random number functions:
+// TODO:
+// *  ae_set_seed():          set the seed of the debug random number generator (NOT thread-safe!!!).
+// *  ae_get_seed():          the seed value of the debug random number generator (NOT thread-safe!!!).
+// *  ae_debugrng():          a random number generated with a high-quality random number generator.
 double randomreal();
 ae_int_t randominteger(ae_int_t maxv);
 

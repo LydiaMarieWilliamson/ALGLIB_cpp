@@ -123,14 +123,12 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
          v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
          vv = ae_c_mul(vv, x->xC[i]);
       }
-      rep->maxerr = maxreal(rep->maxerr, abscomplex(v, _state), _state);
+      rep->maxerr = rmax2(rep->maxerr, abscomplex(v, _state), _state);
    }
    ae_frame_leave(_state);
 }
 
 void polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   polynomialsolverreport *p = (polynomialsolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void polynomialsolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -140,8 +138,6 @@ void polynomialsolverreport_copy(void *_dst, void *_src, ae_state *_state, bool 
 }
 
 void polynomialsolverreport_free(void *_p, bool make_automatic) {
-   polynomialsolverreport *p = (polynomialsolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -398,7 +394,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
          v = b->xyR[i][j];
-         mxb = maxreal(mxb, fabs(v), _state);
+         mxb = rmax2(mxb, fabs(v), _state);
          x->xyR[i][j] = v;
       }
    }
@@ -3092,7 +3088,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       ae_frame_leave(_state);
       return;
    }
-   nsv = minint(ncols, nrows, _state);
+   nsv = imin2(ncols, nrows, _state);
    if (nsv == ncols) {
       rep->r2 = sv.xR[nsv - 1] / sv.xR[0];
    } else {
@@ -3189,8 +3185,6 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
 }
 
 void densesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   densesolverreport *p = (densesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void densesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -3201,13 +3195,10 @@ void densesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_
 }
 
 void densesolverreport_free(void *_p, bool make_automatic) {
-   densesolverreport *p = (densesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    densesolverlsreport *p = (densesolverlsreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->cx, 0, 0, DT_REAL, _state, make_automatic);
 }
 
@@ -3222,7 +3213,6 @@ void densesolverlsreport_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void densesolverlsreport_free(void *_p, bool make_automatic) {
    densesolverlsreport *p = (densesolverlsreport *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->cx, make_automatic);
 }
 } // end of namespace alglib_impl
@@ -3912,8 +3902,6 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
 }
 
 void sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   sparsesolverreport *p = (sparsesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void sparsesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -3926,8 +3914,6 @@ void sparsesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make
 }
 
 void sparsesolverreport_free(void *_p, bool make_automatic) {
-   sparsesolverreport *p = (sparsesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -4018,7 +4004,7 @@ void sparsesolversetalgogmres(sparsesolverstate *state, ae_int_t k, ae_state *_s
    if (k == 0) {
       k = 50;
    }
-   state->gmresk = minint(k, state->n, _state);
+   state->gmresk = imin2(k, state->n, _state);
 }
 
 // This function sets starting point.
@@ -4927,7 +4913,6 @@ void sparsesolverrequesttermination(sparsesolverstate *state, ae_state *_state) 
 
 void sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    sparsesolverstate *p = (sparsesolverstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xf, 0, DT_REAL, _state, make_automatic);
@@ -4969,7 +4954,6 @@ void sparsesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_
 
 void sparsesolverstate_free(void *_p, bool make_automatic) {
    sparsesolverstate *p = (sparsesolverstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x0, make_automatic);
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->xf, make_automatic);
@@ -5696,7 +5680,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
    ae_assert(b->cnt >= state->n, "LinCGSetB: Length(B)<N", _state);
    ae_assert(isfinitevector(b, state->n, _state), "LinCGSetB: B contains infinite or NaN values!", _state);
 // Allocate temporaries
-   rvectorsetlengthatleast(&state->tmpd, n, _state);
+   vectorsetlengthatleast(&state->tmpd, n, _state);
 // Compute diagonal scaling matrix D
    if (state->prectype == 0) {
    // Default preconditioner - inverse of matrix diagonal
@@ -5819,7 +5803,6 @@ void lincgsetxrep(lincgstate *state, bool needxrep, ae_state *_state) {
 
 void lincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    lincgstate *p = (lincgstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->rx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->cx, 0, DT_REAL, _state, make_automatic);
@@ -5879,7 +5862,6 @@ void lincgstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 
 void lincgstate_free(void *_p, bool make_automatic) {
    lincgstate *p = (lincgstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->rx, make_automatic);
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->cx, make_automatic);
@@ -5897,8 +5879,6 @@ void lincgstate_free(void *_p, bool make_automatic) {
 }
 
 void lincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   lincgreport *p = (lincgreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void lincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -5911,8 +5891,6 @@ void lincgreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 }
 
 void lincgreport_free(void *_p, bool make_automatic) {
-   lincgreport *p = (lincgreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -6442,7 +6420,7 @@ lbl_5:
 // precision used internally by Intel chips allows R2 to increase
 // slightly in some rare, but possible cases. This property is
 // undesirable, so we prefer to guard against R increase.
-   state->r2 = minreal(state->r2, state->phibarip1 * state->phibarip1, _state);
+   state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1, _state);
 // Update d and DNorm, check condition-related stopping criteria
    for (i = 0; i < state->n; i++) {
       state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
@@ -6572,8 +6550,8 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b, ae_sta
    ae_assert(b->cnt >= state->m, "LinLSQRSolveSparse: Length(B)<M", _state);
    ae_assert(isfinitevector(b, state->m, _state), "LinLSQRSolveSparse: B contains infinite or NaN values", _state);
 // Allocate temporaries
-   rvectorsetlengthatleast(&state->tmpd, n, _state);
-   rvectorsetlengthatleast(&state->tmpx, n, _state);
+   vectorsetlengthatleast(&state->tmpd, n, _state);
+   vectorsetlengthatleast(&state->tmpx, n, _state);
 // Compute diagonal scaling matrix D
    if (state->prectype == 0) {
    // Default preconditioner - inverse of column norms
@@ -6752,7 +6730,6 @@ void linlsqrrequesttermination(linlsqrstate *state, ae_state *_state) {
 
 void linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic) {
    linlsqrstate *p = (linlsqrstate *)_p;
-   ae_touch_ptr((void *)p);
    normestimatorstate_init(&p->nes, _state, make_automatic);
    ae_vector_init(&p->rx, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, _state, make_automatic);
@@ -6831,7 +6808,6 @@ void linlsqrstate_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 
 void linlsqrstate_free(void *_p, bool make_automatic) {
    linlsqrstate *p = (linlsqrstate *)_p;
-   ae_touch_ptr((void *)p);
    normestimatorstate_free(&p->nes, make_automatic);
    ae_vector_free(&p->rx, make_automatic);
    ae_vector_free(&p->b, make_automatic);
@@ -6851,8 +6827,6 @@ void linlsqrstate_free(void *_p, bool make_automatic) {
 }
 
 void linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   linlsqrreport *p = (linlsqrreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void linlsqrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -6864,8 +6838,6 @@ void linlsqrreport_copy(void *_dst, void *_src, ae_state *_state, bool make_auto
 }
 
 void linlsqrreport_free(void *_p, bool make_automatic) {
-   linlsqrreport *p = (linlsqrreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
@@ -7342,7 +7314,7 @@ lbl_9:
    }
    linminnormalized(&state->candstep, &stepnorm, n, _state);
    if (state->stpmax != 0.0) {
-      stepnorm = minreal(stepnorm, state->stpmax, _state);
+      stepnorm = rmin2(stepnorm, state->stpmax, _state);
    }
 // Test new step - is it good enough?
 // * if not, Lambda is increased and we try again.
@@ -7491,7 +7463,6 @@ void nleqresults(nleqstate *state, RVector *x, nleqreport *rep, ae_state *_state
 
 void nleqstate_init(void *_p, ae_state *_state, bool make_automatic) {
    nleqstate *p = (nleqstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, _state, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, _state, make_automatic);
@@ -7533,7 +7504,6 @@ void nleqstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automati
 
 void nleqstate_free(void *_p, bool make_automatic) {
    nleqstate *p = (nleqstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->fi, make_automatic);
    ae_matrix_free(&p->j, make_automatic);
@@ -7545,8 +7515,6 @@ void nleqstate_free(void *_p, bool make_automatic) {
 }
 
 void nleqreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   nleqreport *p = (nleqreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void nleqreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -7559,8 +7527,6 @@ void nleqreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automat
 }
 
 void nleqreport_free(void *_p, bool make_automatic) {
-   nleqreport *p = (nleqreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 

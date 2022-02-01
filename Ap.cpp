@@ -859,18 +859,6 @@ bool ae_check_zeros(const void *ptr, ae_int_t n) {
    return c == 0x0;
 }
 
-// This  dummy  function  is  used to prevent compiler messages about unused
-// locals in automatically generated code.
-//
-// It makes nothing - just accepts pointer, "touches" it - and that is  all.
-// It performs several tricky operations without side effects which  confuse
-// compiler so it does not compain about unused locals in THIS function.
-void ae_touch_ptr(void *p) {
-   void *volatile fake_variable0 = p;
-   void *volatile fake_variable1 = fake_variable0;
-   fake_variable0 = fake_variable1;
-}
-
 // This function attaches block to the dynamic block list
 //
 // block               block
@@ -913,8 +901,6 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, bool make_a
    ae_assert(size >= 0, "ae_db_init(): negative size", state);
    block->ptr = NULL;
    block->valgrind_hint = NULL;
-   ae_touch_ptr(block->ptr);
-   ae_touch_ptr(block->valgrind_hint);
    if (make_automatic)
       ae_db_attach(block, state);
    else
@@ -2607,8 +2593,7 @@ void ae_shared_pool_free(void *_dst, bool make_automatic) {
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-bool ae_shared_pool_is_initialized(void *_dst) {
-   ae_shared_pool *dst = (ae_shared_pool *)_dst;
+bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
    return dst->seed_object != NULL;
 }
 
@@ -3103,20 +3088,21 @@ static bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheen
    return was1 ? true : false;
 }
 
-void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state) {
+bool ae_serializer_unserialize_bool(ae_serializer *serializer, ae_state *state) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
-         *v = ae_str2bool(serializer->in_str, state, &serializer->in_str);
+         return ae_str2bool(serializer->in_str, state, &serializer->in_str);
       break;
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
-         *v = ae_str2bool(buf, state, &p);
+         return ae_str2bool(buf, state, &p);
       }
       break;
       default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
    }
+   return false;
 }
 
 // This function serializes boolean value into buffer
@@ -3217,20 +3203,21 @@ static ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pastth
    return u.ival;
 }
 
-void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v, ae_state *state) {
+ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer, ae_state *state) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
-         *v = ae_str2int(serializer->in_str, state, &serializer->in_str);
+         return ae_str2int(serializer->in_str, state, &serializer->in_str);
       break;
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
-         *v = ae_str2int(buf, state, &p);
+         return ae_str2int(buf, state, &p);
       }
       break;
       default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
    }
+   return 0;
 }
 
 // This function serializes integer value into buffer
@@ -3365,20 +3352,21 @@ static ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pa
    return result;
 }
 
-void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v, ae_state *state) {
+ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer, ae_state *state) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
-         *v = ae_str2int64(serializer->in_str, state, &serializer->in_str);
+         return ae_str2int64(serializer->in_str, state, &serializer->in_str);
       break;
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
-         *v = ae_str2int64(buf, state, &p);
+         return ae_str2int64(buf, state, &p);
       }
       break;
       default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
    }
+   return 0L;
 }
 
 // This function serializes 64-bit integer value into buffer
@@ -3528,20 +3516,21 @@ static double ae_str2double(const char *buf, ae_state *state, const char **pastt
    return u.dval;
 }
 
-void ae_serializer_unserialize_double(ae_serializer *serializer, double *v, ae_state *state) {
+double ae_serializer_unserialize_double(ae_serializer *serializer, ae_state *state) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
-         *v = ae_str2double(serializer->in_str, state, &serializer->in_str);
+         return ae_str2double(serializer->in_str, state, &serializer->in_str);
       break;
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream", state);
-         *v = ae_str2double(buf, state, &p);
+         return ae_str2double(buf, state, &p);
       }
       break;
       default: ae_break(state, ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
    }
+   return 0.0;
 }
 
 // This function serializes double value into buffer
@@ -3676,7 +3665,7 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
    ae_int_t chunk_size, n, entries_count;
    chunk_size = 8;
 // read array length, allocate output
-   ae_serializer_unserialize_int(serializer, &n, state);
+   n = ae_serializer_unserialize_int(serializer, state);
    ae_vector_set_length(bytes, n, state);
 // determine entries count, read entries
    entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
@@ -3685,7 +3674,7 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
       ae_int64_t tmp64;
       elen = n - eidx * chunk_size;
       elen = elen > chunk_size ? chunk_size : elen;
-      ae_serializer_unserialize_int64(serializer, &tmp64, state);
+      tmp64 = ae_serializer_unserialize_int64(serializer, state);
       memmove(bytes->xU + eidx * chunk_size, &tmp64, elen);
    }
 }
@@ -3717,12 +3706,42 @@ bool isneginf(double x) {
    return isinf(x) && signbit(x);
 }
 
-ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
-   return x >= 0 ? x : -x;
+ae_int_t imin2(ae_int_t m1, ae_int_t m2, ae_state *state) {
+   return m1 > m2 ? m2 : m1;
 }
 
-double sqr(double x, ae_state *state) {
-   return x * x;
+// This function returns min(i0,i1,i2)
+ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state) {
+   ae_int_t result;
+   result = i0;
+   if (i1 < result) {
+      result = i1;
+   }
+   if (i2 < result) {
+      result = i2;
+   }
+   return result;
+}
+
+ae_int_t imax2(ae_int_t m1, ae_int_t m2, ae_state *state) {
+   return m1 > m2 ? m1 : m2;
+}
+
+// This function returns max(i0,i1,i2)
+ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state) {
+   ae_int_t result;
+   result = i0;
+   if (i1 > result) {
+      result = i1;
+   }
+   if (i2 > result) {
+      result = i2;
+   }
+   return result;
+}
+
+ae_int_t ae_iabs(ae_int_t x, ae_state *state) {
+   return x >= 0 ? x : -x;
 }
 
 ae_int_t sign(double x, ae_state *state) {
@@ -3747,20 +3766,77 @@ ae_int_t iceil(double x, ae_state *state) {
    return (ae_int_t)ceil(x);
 }
 
-ae_int_t maxint(ae_int_t m1, ae_int_t m2, ae_state *state) {
-   return m1 > m2 ? m1 : m2;
-}
-
-ae_int_t minint(ae_int_t m1, ae_int_t m2, ae_state *state) {
+double rmin2(double m1, double m2, ae_state *state) {
    return m1 > m2 ? m2 : m1;
 }
 
-double maxreal(double m1, double m2, ae_state *state) {
+double rmax2(double m1, double m2, ae_state *state) {
    return m1 > m2 ? m1 : m2;
 }
 
-double minreal(double m1, double m2, ae_state *state) {
-   return m1 > m2 ? m2 : m1;
+// This function returns max(r0,r1,r2)
+double rmax3(double r0, double r1, double r2, ae_state *_state) {
+   double result;
+   result = r0;
+   if (r1 > result) {
+      result = r1;
+   }
+   if (r2 > result) {
+      result = r2;
+   }
+   return result;
+}
+
+// This function returns max(|r0|,|r1|,|r2|)
+double rmaxabs3(double r0, double r1, double r2, ae_state *_state) {
+   double result;
+   r0 = fabs(r0);
+   r1 = fabs(r1);
+   r2 = fabs(r2);
+   result = r0;
+   if (r1 > result) {
+      result = r1;
+   }
+   if (r2 > result) {
+      result = r2;
+   }
+   return result;
+}
+
+double sqr(double x, ae_state *state) {
+   return x * x;
+}
+
+// 'bounds' value: maps X to [B1,B2]
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state) {
+   ae_int_t result;
+   if (x <= b1) {
+      result = b1;
+      return result;
+   }
+   if (x >= b2) {
+      result = b2;
+      return result;
+   }
+   result = x;
+   return result;
+}
+
+// 'bounds' value: maps X to [B1,B2]
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+double rboundval(double x, double b1, double b2, ae_state *_state) {
+   double result;
+   if (x <= b1) {
+      result = b1;
+      return result;
+   }
+   if (x >= b2) {
+      result = b2;
+      return result;
+   }
+   result = x;
+   return result;
 }
 
 double randomreal(ae_state *state) {
@@ -6076,7 +6152,7 @@ bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, a
 
 bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if ((alpha.x == 0.0 && alpha.y == 0) || k == 0 || n == 0 || m == 0)
+   if ((alpha.x == 0.0 && alpha.y == 0.0) || k == 0 || n == 0 || m == 0)
       return false;
 // handle with optimized ALGLIB kernel
    return _ialglib_cmatrixgemm(m, n, k, alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, beta, _c->xyC[ic] + jc, _c->stride);
@@ -7268,7 +7344,7 @@ void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = maxreal(x->xR[i], y->xR[i], _state);
+      x->xR[i] = rmax2(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -7289,7 +7365,7 @@ void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = maxreal(x->xyR[rowidx][i], y->xR[i], _state);
+      x->xyR[rowidx][i] = rmax2(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -7310,7 +7386,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i < n; i++) {
-      y->xR[i] = maxreal(y->xR[i], x->xyR[rowidx][i], _state);
+      y->xR[i] = rmax2(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -7331,7 +7407,7 @@ void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state) {
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xR, _state))
    for (i = 0; i < n; i++) {
-      x->xR[i] = minreal(x->xR[i], y->xR[i], _state);
+      x->xR[i] = rmin2(x->xR[i], y->xR[i], _state);
    }
 }
 
@@ -7352,7 +7428,7 @@ void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, y->xR, x->xyR[rowidx], _state))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] = minreal(x->xyR[rowidx][i], y->xR[i], _state);
+      x->xyR[rowidx][i] = rmin2(x->xyR[rowidx][i], y->xR[i], _state);
    }
 }
 
@@ -7373,7 +7449,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y, ae_state *
    if (n >= _ABLASF_KERNEL_SIZE1)
       _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv, (n, x->xyR[rowidx], y->xR, _state))
    for (i = 0; i < n; i++) {
-      y->xR[i] = minreal(y->xR[i], x->xyR[rowidx][i], _state);
+      y->xR[i] = rmin2(y->xR[i], x->xyR[rowidx][i], _state);
    }
 }
 
@@ -8334,7 +8410,7 @@ void ap_error::make_assertion(bool Cond, const char *Msg) {
 #else
 static const char *_alglib_last_error = NULL;
 
-void set_error_flag(const char *Msg) {
+static void set_error_flag(const char *Msg) {
    if (Msg == NULL)
       Msg = "ALGLIB: unknown error";
    _alglib_last_error = Msg;

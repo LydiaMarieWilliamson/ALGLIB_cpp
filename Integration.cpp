@@ -951,7 +951,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
       wkronrod->xR[i] = 0.0;
       wgauss->xR[i] = 0.0;
    }
-   *eps = maxreal(machineepsilon, 1.0E-32, _state);
+   *eps = rmax2(machineepsilon, 1.0E-32, _state);
    if (n == 15) {
       ng = 4;
       wgauss->xR[0] = 0.129484966168869693270611432679082;
@@ -2117,8 +2117,8 @@ lbl_3:
       alpha = beta;
       beta = tmp;
    }
-   alpha = minreal(alpha, 0.0, _state);
-   beta = minreal(beta, 0.0, _state);
+   alpha = rmin2(alpha, 0.0, _state);
+   beta = rmin2(beta, 0.0, _state);
 // first, integrate left half of [a,b]:
 //     integral(f(x)dx, a, (b+a)/2) =
 //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
@@ -2236,8 +2236,6 @@ void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_
 }
 
 void autogkreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   autogkreport *p = (autogkreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -2249,13 +2247,10 @@ void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 }
 
 void autogkreport_free(void *_p, bool make_automatic) {
-   autogkreport *p = (autogkreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic) {
    autogkinternalstate *p = (autogkinternalstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->heap, 0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->qn, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->wg, 0, DT_REAL, _state, make_automatic);
@@ -2291,7 +2286,6 @@ void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool mak
 
 void autogkinternalstate_free(void *_p, bool make_automatic) {
    autogkinternalstate *p = (autogkinternalstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->heap, make_automatic);
    ae_vector_free(&p->qn, make_automatic);
    ae_vector_free(&p->wg, make_automatic);
@@ -2302,7 +2296,6 @@ void autogkinternalstate_free(void *_p, bool make_automatic) {
 
 void autogkstate_init(void *_p, ae_state *_state, bool make_automatic) {
    autogkstate *p = (autogkstate *)_p;
-   ae_touch_ptr((void *)p);
    autogkinternalstate_init(&p->internalstate, _state, make_automatic);
    rcommstate_init(&p->rstate, _state, make_automatic);
 }
@@ -2331,7 +2324,6 @@ void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
 
 void autogkstate_free(void *_p, bool make_automatic) {
    autogkstate *p = (autogkstate *)_p;
-   ae_touch_ptr((void *)p);
    autogkinternalstate_free(&p->internalstate, make_automatic);
    rcommstate_free(&p->rstate, make_automatic);
 }

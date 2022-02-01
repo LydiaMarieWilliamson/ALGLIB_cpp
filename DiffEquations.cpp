@@ -66,7 +66,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    if (h == 0.0) {
       v = fabs(x->xR[1] - x->xR[0]);
       for (i = 2; i < m; i++) {
-         v = minreal(v, fabs(x->xR[i] - x->xR[i - 1]), _state);
+         v = rmin2(v, fabs(x->xR[i] - x->xR[i - 1]), _state);
       }
       h = 0.001 * v;
    }
@@ -306,7 +306,7 @@ lbl_6:
 // These maximums are initialized by zeros,
 // then updated every iterations.
    for (j = 0; j < n; j++) {
-      state->escale.xR[j] = maxreal(state->escale.xR[j], fabs(state->yc.xR[j]), _state);
+      state->escale.xR[j] = rmax2(state->escale.xR[j], fabs(state->yc.xR[j]), _state);
    }
 // make one step:
 // 1. calculate all info needed to do step
@@ -352,14 +352,14 @@ lbl_10:
    for (j = 0; j < n; j++) {
       if (!state->fraceps) {
       // absolute error is estimated
-         err = maxreal(err, fabs(state->yn.xR[j] - state->yns.xR[j]), _state);
+         err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]), _state);
       } else {
       // Relative error is estimated
          v = state->escale.xR[j];
          if (v == 0.0) {
             v = 1.0;
          }
-         err = maxreal(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v, _state);
+         err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v, _state);
       }
    }
 // calculate new step, restart if necessary
@@ -372,7 +372,7 @@ lbl_10:
       h2 = h / odesolver_odesolvermaxshrink;
    }
    if (err > state->eps) {
-      h = minreal(h2, odesolver_odesolverguaranteeddecay * h, _state);
+      h = rmin2(h2, odesolver_odesolverguaranteeddecay * h, _state);
       goto lbl_6;
    }
 // advance position
@@ -461,7 +461,6 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
 
 void odesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    odesolverstate *p = (odesolverstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->yc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->escale, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->xg, 0, DT_REAL, _state, make_automatic);
@@ -510,7 +509,6 @@ void odesolverstate_copy(void *_dst, void *_src, ae_state *_state, bool make_aut
 
 void odesolverstate_free(void *_p, bool make_automatic) {
    odesolverstate *p = (odesolverstate *)_p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->yc, make_automatic);
    ae_vector_free(&p->escale, make_automatic);
    ae_vector_free(&p->xg, make_automatic);
@@ -528,8 +526,6 @@ void odesolverstate_free(void *_p, bool make_automatic) {
 }
 
 void odesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
-   odesolverreport *p = (odesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 
 void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
@@ -540,8 +536,6 @@ void odesolverreport_copy(void *_dst, void *_src, ae_state *_state, bool make_au
 }
 
 void odesolverreport_free(void *_p, bool make_automatic) {
-   odesolverreport *p = (odesolverreport *)_p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
