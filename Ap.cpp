@@ -2356,61 +2356,34 @@ void _ae_free_lock_raw(_lock *p) {
 #endif
 }
 
-// This function initializes ae_lock structure.
-//
+// Initialize an ae_lock.
 // Inputs:
-//     lock                -   pointer to lock structure, must be zero-filled
-//     state               -   pointer to state structure, used for exception
-//                             handling and management of automatic objects.
-//     make_automatic      -   if true, lock object is added to automatic
-//                             memory management list.
-//
-// NOTE: as a special exception, this function allows you  to  specify  NULL
-//       state pointer. In this case all exception arising during construction
-//       are handled as critical failures, with abort() being called.
-//       make_automatic must be false on such calls.
-void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic) {
-   _lock *p;
-   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
-   if (state == NULL) {
-      ae_state _tmp_state;
+//	lock:		a pointer to the lock, must be zero-filled.
+//	state:		a pointer to the state, used for exception handling and management of automatic objects;
+//			state != NULL if is_static.
+//	is_static:	indicates that the lock is to be made "eternal" (i.e. static),
+//			which is expected to persist until the end of the execution of the program.
+//	make_automatic:	indicates whether or not the lock is to be added to the automatic memory management list.
+// NOTES:
+// *	As a special exception, this function allows you to specify state == NULL.
+//	In this case, exceptions arising during construction are handled as critical failures, resulting in abort().
+//	make_automatic must be false on such calls.
+// *	Eternal locks can not be deallocated (cleared) and do not increase debug allocation counters.
+//	Errors during allocation of such locks are considered critical exceptions and are handled by calling abort().
+void ae_init_lock(ae_lock *lock, ae_state *state, bool is_static, bool make_automatic) {
+   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof *lock));
+   bool is_auto = is_static || state != NULL;
+   ae_state _tmp_state;
+   if (!is_auto) {
       AE_CRITICAL_ASSERT(!make_automatic);
-      ae_state_init(&_tmp_state);
-      ae_init_lock(lock, &_tmp_state, false);
-      ae_state_clear(&_tmp_state);
-      return;
+      ae_state_init(state = &_tmp_state);
    }
-   lock->eternal = false;
-   ae_db_init(&lock->db, sizeof(_lock), state, make_automatic);
-   lock->lock_ptr = lock->db.ptr;
-   p = (_lock *)lock->lock_ptr;
-   _ae_init_lock_raw(p);
-}
-
-static void *eternal_malloc(size_t size) {
-   return size == 0 ? NULL : _force_malloc_failure ? NULL : malloc(size);
-}
-
-// This function initializes "eternal" ae_lock structure which  is  expected
-// to persist until the end of the execution of the program.  Eternal  locks
-// can not be deallocated (cleared) and  do  not  increase debug  allocation
-// counters.  Errors  during  allocation  of eternal  locks  are  considered
-// critical exceptions and handled by calling abort().
-//
-// Inputs:
-//     lock                -   pointer to lock structure, must be zero-filled
-//     state               -   pointer to state structure, used for exception
-//                             handling and management of automatic objects;
-//                             non-NULL.
-//     make_automatic      -   if true, lock object is added to automatic
-//                             memory management list.
-void ae_init_lock_eternal(ae_lock *lock) {
-   _lock *p;
-   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
-   lock->eternal = true;
-   lock->lock_ptr = eternal_malloc(sizeof(_lock));
-   p = (_lock *)lock->lock_ptr;
-   _ae_init_lock_raw(p);
+   lock->is_static = is_static;
+   size_t size = sizeof(_lock);
+   if (!is_static) ae_db_init(&lock->db, size, state, make_automatic);
+   lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
+   _ae_init_lock_raw((_lock *)lock->lock_ptr);
+   if (!is_auto) ae_state_clear(&_tmp_state);
 }
 
 // This function acquires lock. In case lock is busy, we perform several
@@ -2431,7 +2404,7 @@ void ae_release_lock(ae_lock *lock) {
 // This function frees ae_lock structure.
 void ae_free_lock(ae_lock *lock) {
    _lock *p;
-   AE_CRITICAL_ASSERT(!lock->eternal);
+   AE_CRITICAL_ASSERT(!lock->is_static);
    p = (_lock *)lock->lock_ptr;
    if (p != NULL)
       _ae_free_lock_raw(p);
@@ -2476,7 +2449,7 @@ void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic) {
    dst->frame_entry.ptr = dst;
    if (make_automatic)
       ae_db_attach(&dst->frame_entry, state);
-   ae_init_lock(&dst->pool_lock, state, false);
+   ae_init_lock(&dst->pool_lock, state, false, false);
 }
 
 // This function clears all dynamically allocated fields of the pool except
@@ -3845,14 +3818,14 @@ double randomreal() {
 }
 
 double randommid() {
-   const double mx = (double)RAND_MAX + 1.0; 
+   const double mx = (double)RAND_MAX + 1.0;
    return 2.0 * (rand() + rand() / mx) / mx - 1.0;
-}  
+}
 
 ae_int_t randominteger(ae_int_t maxv) {
    return rand() % maxv;
 }
-   
+
 bool randombool(double p/* = 0.5*/) {
    const double mx = (double)RAND_MAX + 1.0;
    return rand() + rand()/mx <= p * mx;

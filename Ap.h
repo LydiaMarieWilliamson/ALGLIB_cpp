@@ -526,15 +526,14 @@ struct ae_lock {
 // Pointer to _lock structure.
 // This pointer has type void * in order to make the header file OS-independent (the lock declaration depends on the OS).
    void *lock_ptr;
-// For eternal == false this field manages pointer to the _lock structure.
+// For is_static == false this field manages pointer to the _lock structure.
 // The frame that is is responsible for deallocation the lock's frame is freed.
    ae_frame db;
 // True if we have a static lock (used by thread pool) or transient lock.
 // Static locks are allocated without using the frame and cannot de deallocated.
-   bool eternal;
+   bool is_static;
 };
-void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic);
-void ae_init_lock_eternal(ae_lock *lock);
+void ae_init_lock(ae_lock *lock, ae_state *state, bool is_static, bool make_automatic);
 void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
