@@ -58,7 +58,7 @@ static double gammafunc_gammastirf(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
-// API: double gammafunction(const double x, const xparams _xparams = xdefault);
+// API: double gammafunction(const double x, const xparams _xparams = NonTH);
 double gammafunction(double x, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_SPECFUNCS
    double p;
@@ -170,7 +170,7 @@ double gammafunction(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
-// API: double lngamma(const double x, double &sgngam, const xparams _xparams = xdefault);
+// API: double lngamma(const double x, double &sgngam, const xparams _xparams = NonTH);
 double lngamma(double x, double *sgngam, ae_state *_state) {
 #ifndef ALGLIB_INTERCEPTS_SPECFUNCS
    double a;
@@ -280,8 +280,8 @@ namespace alglib {
 double gammafunction(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::gammafunction(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -290,8 +290,8 @@ double gammafunction(const double x, const xparams _xparams) {
 double lngamma(const double x, double &sgngam, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::lngamma(x, &sgngam, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -330,7 +330,7 @@ double errorfunctionc(double x, ae_state *_state);
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double errorfunction(const double x, const xparams _xparams = xdefault);
+// API: double errorfunction(const double x, const xparams _xparams = NonTH);
 double errorfunction(double x, ae_state *_state) {
    double xsq;
    double s;
@@ -391,7 +391,7 @@ double errorfunction(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double errorfunctionc(const double x, const xparams _xparams = xdefault);
+// API: double errorfunctionc(const double x, const xparams _xparams = NonTH);
 double errorfunctionc(double x, ae_state *_state) {
    double p;
    double q;
@@ -431,7 +431,7 @@ double errorfunctionc(double x, ae_state *_state) {
 }
 
 // Same as normalcdf(), obsolete name.
-// API: double normaldistribution(const double x, const xparams _xparams = xdefault);
+// API: double normaldistribution(const double x, const xparams _xparams = NonTH);
 double normaldistribution(double x, ae_state *_state) {
    double result;
    result = 0.5 * (errorfunction(x / 1.41421356237309504880, _state) + 1);
@@ -448,7 +448,7 @@ double normaldistribution(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double normalpdf(const double x, const xparams _xparams = xdefault);
+// API: double normalpdf(const double x, const xparams _xparams = NonTH);
 double normalpdf(double x, ae_state *_state) {
    double result;
    ae_assert(isfinite(x), "NormalPDF: X is infinite", _state);
@@ -484,7 +484,7 @@ double normalpdf(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double normalcdf(const double x, const xparams _xparams = xdefault);
+// API: double normalcdf(const double x, const xparams _xparams = NonTH);
 double normalcdf(double x, ae_state *_state) {
    double result;
    result = 0.5 * (errorfunction(x / 1.41421356237309504880, _state) + 1);
@@ -514,7 +514,7 @@ double normalcdf(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double invnormalcdf(const double y0, const xparams _xparams = xdefault);
+// API: double invnormalcdf(const double y0, const xparams _xparams = NonTH);
 double invnormalcdf(double y0, ae_state *_state) {
    double expm2;
    double s2pi;
@@ -623,7 +623,7 @@ double invnormalcdf(double y0, ae_state *_state) {
 }
 
 // Same as invnormalcdf(), deprecated name
-// API: double invnormaldistribution(const double y0, const xparams _xparams = xdefault);
+// API: double invnormaldistribution(const double y0, const xparams _xparams = NonTH);
 double invnormaldistribution(double y0, ae_state *_state) {
    double result;
    result = invnormalcdf(y0, _state);
@@ -634,7 +634,7 @@ double invnormaldistribution(double y0, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-// API: double inverf(const double e, const xparams _xparams = xdefault);
+// API: double inverf(const double e, const xparams _xparams = NonTH);
 double inverf(double e, ae_state *_state) {
    double result;
    result = invnormaldistribution(0.5 * (e + 1), _state) / sqrt(2.0);
@@ -655,7 +655,7 @@ double inverf(double e, ae_state *_state) {
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-// API: double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
+// API: double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = NonTH);
 double bivariatenormalpdf(double x, double y, double rho, ae_state *_state) {
    double onerho2;
    double result;
@@ -737,7 +737,7 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-// API: double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = xdefault);
+// API: double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = NonTH);
 double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
    double rangea;
    double rangeb;
@@ -832,8 +832,8 @@ namespace alglib {
 double errorfunction(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::errorfunction(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -842,8 +842,8 @@ double errorfunction(const double x, const xparams _xparams) {
 double errorfunctionc(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::errorfunctionc(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -852,8 +852,8 @@ double errorfunctionc(const double x, const xparams _xparams) {
 double normaldistribution(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::normaldistribution(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -862,8 +862,8 @@ double normaldistribution(const double x, const xparams _xparams) {
 double normalpdf(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::normalpdf(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -872,8 +872,8 @@ double normalpdf(const double x, const xparams _xparams) {
 double normalcdf(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::normalcdf(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -882,8 +882,8 @@ double normalcdf(const double x, const xparams _xparams) {
 double invnormalcdf(const double y0, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invnormalcdf(y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -892,8 +892,8 @@ double invnormalcdf(const double y0, const xparams _xparams) {
 double invnormaldistribution(const double y0, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invnormaldistribution(y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -902,8 +902,8 @@ double invnormaldistribution(const double y0, const xparams _xparams) {
 double inverf(const double e, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::inverf(e, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -912,8 +912,8 @@ double inverf(const double e, const xparams _xparams) {
 double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::bivariatenormalpdf(x, y, rho, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -922,8 +922,8 @@ double bivariatenormalpdf(const double x, const double y, const double rho, cons
 double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::bivariatenormalcdf(x, y, rho, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1214,7 +1214,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
-// API: double incompletebeta(const double a, const double b, const double x, const xparams _xparams = xdefault);
+// API: double incompletebeta(const double a, const double b, const double x, const xparams _xparams = NonTH);
 double incompletebeta(double a, double b, double x, ae_state *_state) {
    double t;
    double xc;
@@ -1337,7 +1337,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1996, 2000 by Stephen L. Moshier
-// API: double invincompletebeta(const double a, const double b, const double y, const xparams _xparams = xdefault);
+// API: double invincompletebeta(const double a, const double b, const double y, const xparams _xparams = NonTH);
 double invincompletebeta(double a, double b, double y, ae_state *_state) {
    double aaa;
    double bbb;
@@ -1670,8 +1670,8 @@ namespace alglib {
 double incompletebeta(const double a, const double b, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::incompletebeta(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1680,8 +1680,8 @@ double incompletebeta(const double a, const double b, const double x, const xpar
 double invincompletebeta(const double a, const double b, const double y, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invincompletebeta(a, b, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1730,7 +1730,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams = xdefault);
+// API: double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams = NonTH);
 double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
    double x;
    double rk;
@@ -1807,7 +1807,7 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams = xdefault);
+// API: double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams = NonTH);
 double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
    double t;
    double rk;
@@ -1850,8 +1850,8 @@ namespace alglib {
 double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::studenttdistribution(k, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1860,8 +1860,8 @@ double studenttdistribution(const ae_int_t k, const double t, const xparams _xpa
 double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invstudenttdistribution(k, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1901,7 +1901,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = xdefault);
+// API: double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = NonTH);
 double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
    double w;
    double result;
@@ -1946,7 +1946,7 @@ double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = xdefault);
+// API: double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = NonTH);
 double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
    double w;
    double result;
@@ -1989,7 +1989,7 @@ double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams = xdefault);
+// API: double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams = NonTH);
 double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state) {
    double w;
    double result;
@@ -2013,8 +2013,8 @@ namespace alglib {
 double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::fdistribution(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2023,8 +2023,8 @@ double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const x
 double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::fcdistribution(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2033,8 +2033,8 @@ double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const 
 double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invfdistribution(a, b, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2076,7 +2076,7 @@ double incompletegammac(double a, double x, ae_state *_state);
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
-// API: double incompletegamma(const double a, const double x, const xparams _xparams = xdefault);
+// API: double incompletegamma(const double a, const double x, const xparams _xparams = NonTH);
 double incompletegamma(double a, double x, ae_state *_state) {
    double igammaepsilon;
    double ans;
@@ -2143,7 +2143,7 @@ double incompletegamma(double a, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
-// API: double incompletegammac(const double a, const double x, const xparams _xparams = xdefault);
+// API: double incompletegammac(const double a, const double x, const xparams _xparams = NonTH);
 double incompletegammac(double a, double x, ae_state *_state) {
    double igammaepsilon;
    double igammabignumber;
@@ -2252,7 +2252,7 @@ double incompletegammac(double a, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double invincompletegammac(const double a, const double y0, const xparams _xparams = xdefault);
+// API: double invincompletegammac(const double a, const double y0, const xparams _xparams = NonTH);
 double invincompletegammac(double a, double y0, ae_state *_state) {
    double igammaepsilon;
    double iinvgammabignumber;
@@ -2384,8 +2384,8 @@ namespace alglib {
 double incompletegamma(const double a, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::incompletegamma(a, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2394,8 +2394,8 @@ double incompletegamma(const double a, const double x, const xparams _xparams) {
 double incompletegammac(const double a, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::incompletegammac(a, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2404,8 +2404,8 @@ double incompletegammac(const double a, const double x, const xparams _xparams) 
 double invincompletegammac(const double a, const double y0, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invincompletegammac(a, y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2446,7 +2446,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double chisquaredistribution(const double v, const double x, const xparams _xparams = xdefault);
+// API: double chisquaredistribution(const double v, const double x, const xparams _xparams = NonTH);
 double chisquaredistribution(double v, double x, ae_state *_state) {
    double result;
    ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistribution", _state);
@@ -2483,7 +2483,7 @@ double chisquaredistribution(double v, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double chisquarecdistribution(const double v, const double x, const xparams _xparams = xdefault);
+// API: double chisquarecdistribution(const double v, const double x, const xparams _xparams = NonTH);
 double chisquarecdistribution(double v, double x, ae_state *_state) {
    double result;
    ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistributionC", _state);
@@ -2509,7 +2509,7 @@ double chisquarecdistribution(double v, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double invchisquaredistribution(const double v, const double y, const xparams _xparams = xdefault);
+// API: double invchisquaredistribution(const double v, const double y, const xparams _xparams = NonTH);
 double invchisquaredistribution(double v, double y, ae_state *_state) {
    double result;
    ae_assert((y >= 0.0 && y <= 1.0) && v >= 1.0, "Domain error in InvChiSquareDistribution", _state);
@@ -2522,8 +2522,8 @@ namespace alglib {
 double chisquaredistribution(const double v, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::chisquaredistribution(v, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2532,8 +2532,8 @@ double chisquaredistribution(const double v, const double x, const xparams _xpar
 double chisquarecdistribution(const double v, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::chisquarecdistribution(v, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2542,8 +2542,8 @@ double chisquarecdistribution(const double v, const double x, const xparams _xpa
 double invchisquaredistribution(const double v, const double y, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invchisquaredistribution(v, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2583,7 +2583,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = xdefault);
+// API: double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = NonTH);
 double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) {
    double dk;
    double dn;
@@ -2640,7 +2640,7 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) 
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = xdefault);
+// API: double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = NonTH);
 double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) {
    double dk;
    double dn;
@@ -2696,7 +2696,7 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state)
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams = xdefault);
+// API: double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams = NonTH);
 double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_state) {
    double dk;
    double dn;
@@ -2728,8 +2728,8 @@ namespace alglib {
 double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::binomialdistribution(k, n, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2738,8 +2738,8 @@ double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, 
 double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::binomialcdistribution(k, n, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2748,8 +2748,8 @@ double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p,
 double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invbinomialdistribution(k, n, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2781,7 +2781,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  May, 1999
 // Copyright 1999 by Stephen L. Moshier
-// API: double exponentialintegralei(const double x, const xparams _xparams = xdefault);
+// API: double exponentialintegralei(const double x, const xparams _xparams = NonTH);
 double exponentialintegralei(double x, ae_state *_state) {
    double eul;
    double f;
@@ -2978,7 +2978,7 @@ double exponentialintegralei(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 2000 by Stephen L. Moshier
-// API: double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams = xdefault);
+// API: double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams = NonTH);
 double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
    double r;
    double t;
@@ -3100,8 +3100,8 @@ namespace alglib {
 double exponentialintegralei(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::exponentialintegralei(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3110,8 +3110,8 @@ double exponentialintegralei(const double x, const xparams _xparams) {
 double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::exponentialintegralen(x, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3158,7 +3158,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams = xdefault);
+// API: void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams = NonTH);
 void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph, ae_state *_state) {
    ae_frame _frame_block;
    double ai;
@@ -3240,8 +3240,8 @@ namespace alglib {
 void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3286,7 +3286,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.1:  January, 1989
 // Copyright 1984, 1987, 1989 by Stephen L. Moshier
-// API: void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams = xdefault);
+// API: void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams = NonTH);
 void sinecosineintegrals(double x, double *si, double *ci, ae_state *_state) {
    double z;
    double c;
@@ -3484,7 +3484,7 @@ static void trigintegrals_chebiterationshichi(double x, double c, double *b0, do
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams = xdefault);
+// API: void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams = NonTH);
 void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state *_state) {
    double k;
    double z;
@@ -3654,8 +3654,8 @@ namespace alglib {
 void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sinecosineintegrals(x, &si, &ci, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3663,8 +3663,8 @@ void sinecosineintegrals(const double x, double &si, double &ci, const xparams _
 void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3682,7 +3682,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Chebyshev polynomial at x
-// API: double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
    ae_int_t i;
    double a;
@@ -3730,7 +3730,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
 //
 // Result:
 //     the value of the Chebyshev polynomial at x
-// API: double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_state) {
    double b1;
    double b2;
@@ -3758,7 +3758,7 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 //
 // Outputs:
 //     C   -   coefficients
-// API: void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+// API: void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
 void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
    SetVector(c);
@@ -3787,7 +3787,7 @@ void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 //
 // Outputs:
 //     B   -   power series coefficients
-// API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = xdefault);
+// API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = NonTH);
 void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3835,8 +3835,8 @@ namespace alglib {
 double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::chebyshevcalculate(r, n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3845,8 +3845,8 @@ double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, co
 double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::chebyshevsum(ConstT(ae_vector, c), r, n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3855,8 +3855,8 @@ double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, 
 void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::chebyshevcoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3864,8 +3864,8 @@ void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xp
 void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fromchebyshev(ConstT(ae_vector, a), n, ConstT(ae_vector, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3897,7 +3897,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double poissondistribution(const ae_int_t k, const double m, const xparams _xparams = xdefault);
+// API: double poissondistribution(const ae_int_t k, const double m, const xparams _xparams = NonTH);
 double poissondistribution(ae_int_t k, double m, ae_state *_state) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistribution", _state);
@@ -3929,7 +3929,7 @@ double poissondistribution(ae_int_t k, double m, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams = xdefault);
+// API: double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams = NonTH);
 double poissoncdistribution(ae_int_t k, double m, ae_state *_state) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistributionC", _state);
@@ -3954,7 +3954,7 @@ double poissoncdistribution(ae_int_t k, double m, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
-// API: double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams = xdefault);
+// API: double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams = NonTH);
 double invpoissondistribution(ae_int_t k, double y, ae_state *_state) {
    double result;
    ae_assert((k >= 0 && y >= 0.0) && y < 1.0, "Domain error in InvPoissonDistribution", _state);
@@ -3967,8 +3967,8 @@ namespace alglib {
 double poissondistribution(const ae_int_t k, const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::poissondistribution(k, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3977,8 +3977,8 @@ double poissondistribution(const ae_int_t k, const double m, const xparams _xpar
 double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::poissoncdistribution(k, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3987,8 +3987,8 @@ double poissoncdistribution(const ae_int_t k, const double m, const xparams _xpa
 double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::invpoissondistribution(k, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4018,7 +4018,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.0:  April, 1987
 // Copyright 1984, 1987 by Stephen L. Moshier
-// API: double beta(const double a, const double b, const xparams _xparams = xdefault);
+// API: double beta(const double a, const double b, const xparams _xparams = NonTH);
 double beta(double a, double b, ae_state *_state) {
    double y;
    double sg;
@@ -4057,8 +4057,8 @@ namespace alglib {
 double beta(const double a, const double b, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::beta(a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4107,7 +4107,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: void fresnelintegral(const double x, double &c, double &s, const xparams _xparams = xdefault);
+// API: void fresnelintegral(const double x, double &c, double &s, const xparams _xparams = NonTH);
 void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
    double xxa;
    double f;
@@ -4234,8 +4234,8 @@ namespace alglib {
 void fresnelintegral(const double x, double &c, double &s, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fresnelintegral(x, &c, &s, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4280,7 +4280,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1992, 2000 by Stephen L. Moshier
-// API: double psi(const double x, const xparams _xparams = xdefault);
+// API: double psi(const double x, const xparams _xparams = NonTH);
 double psi(double x, ae_state *_state) {
    double p;
    double q;
@@ -4359,8 +4359,8 @@ namespace alglib {
 double psi(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::psi(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4399,7 +4399,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams = xdefault);
+// API: void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams = NonTH);
 void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *_state) {
    double z;
    double zz;
@@ -4693,8 +4693,8 @@ namespace alglib {
 void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::airy(x, &ai, &aip, &bi, &bip, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4725,7 +4725,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double dawsonintegral(const double x, const xparams _xparams = xdefault);
+// API: double dawsonintegral(const double x, const xparams _xparams = NonTH);
 double dawsonintegral(double x, ae_state *_state) {
    double x2;
    double y;
@@ -4822,8 +4822,8 @@ namespace alglib {
 double dawsonintegral(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::dawsonintegral(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4840,7 +4840,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Hermite polynomial Hn at x
-// API: double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
    ae_int_t i;
    double a;
@@ -4879,7 +4879,7 @@ double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
 //
 // Result:
 //     the value of the Hermite polynomial at x
-// API: double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
    double b1;
    double b2;
@@ -4903,7 +4903,7 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 //
 // Outputs:
 //     C   -   coefficients
-// API: void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+// API: void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
 void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
    SetVector(c);
@@ -4922,8 +4922,8 @@ namespace alglib {
 double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hermitecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4932,8 +4932,8 @@ double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams
 double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hermitesum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4942,8 +4942,8 @@ double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, cons
 void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hermitecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4959,7 +4959,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Legendre polynomial Pn at x
-// API: double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double legendrecalculate(ae_int_t n, double x, ae_state *_state) {
    double a;
    double b;
@@ -4995,7 +4995,7 @@ double legendrecalculate(ae_int_t n, double x, ae_state *_state) {
 //
 // Result:
 //     the value of the Legendre polynomial at x
-// API: double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
    double b1;
    double b2;
@@ -5019,7 +5019,7 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 //
 // Outputs:
 //     C   -   coefficients
-// API: void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+// API: void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
 void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
    SetVector(c);
@@ -5041,8 +5041,8 @@ namespace alglib {
 double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::legendrecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -5051,8 +5051,8 @@ double legendrecalculate(const ae_int_t n, const double x, const xparams _xparam
 double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::legendresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -5061,8 +5061,8 @@ double legendresum(const real_1d_array &c, const ae_int_t n, const double x, con
 void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::legendrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -5218,7 +5218,7 @@ static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_stat
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double besselj0(const double x, const xparams _xparams = xdefault);
+// API: double besselj0(const double x, const xparams _xparams = NonTH);
 double besselj0(double x, ae_state *_state) {
    double xsq;
    double nn;
@@ -5277,7 +5277,7 @@ double besselj0(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double besselj1(const double x, const xparams _xparams = xdefault);
+// API: double besselj1(const double x, const xparams _xparams = NonTH);
 double besselj1(double x, ae_state *_state) {
    double s;
    double xsq;
@@ -5348,7 +5348,7 @@ double besselj1(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double besseljn(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double besseljn(const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double besseljn(ae_int_t n, double x, ae_state *_state) {
    double pkm2;
    double pkm1;
@@ -5451,7 +5451,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double bessely0(const double x, const xparams _xparams = xdefault);
+// API: double bessely0(const double x, const xparams _xparams = NonTH);
 double bessely0(double x, ae_state *_state) {
    double nn;
    double xsq;
@@ -5508,7 +5508,7 @@ double bessely0(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double bessely1(const double x, const xparams _xparams = xdefault);
+// API: double bessely1(const double x, const xparams _xparams = NonTH);
 double bessely1(double x, ae_state *_state) {
    double nn;
    double xsq;
@@ -5567,7 +5567,7 @@ double bessely1(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double besselyn(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double besselyn(const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double besselyn(ae_int_t n, double x, ae_state *_state) {
    ae_int_t i;
    double a;
@@ -5620,7 +5620,7 @@ double besselyn(ae_int_t n, double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double besseli0(const double x, const xparams _xparams = xdefault);
+// API: double besseli0(const double x, const xparams _xparams = NonTH);
 double besseli0(double x, ae_state *_state) {
    double y;
    double v;
@@ -5718,7 +5718,7 @@ double besseli0(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
-// API: double besseli1(const double x, const xparams _xparams = xdefault);
+// API: double besseli1(const double x, const xparams _xparams = NonTH);
 double besseli1(double x, ae_state *_state) {
    double y;
    double z;
@@ -5817,7 +5817,7 @@ double besseli1(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double besselk0(const double x, const xparams _xparams = xdefault);
+// API: double besselk0(const double x, const xparams _xparams = NonTH);
 double besselk0(double x, ae_state *_state) {
    double y;
    double z;
@@ -5892,7 +5892,7 @@ double besselk0(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double besselk1(const double x, const xparams _xparams = xdefault);
+// API: double besselk1(const double x, const xparams _xparams = NonTH);
 double besselk1(double x, ae_state *_state) {
    double y;
    double z;
@@ -5971,7 +5971,7 @@ double besselk1(double x, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 2000 by Stephen L. Moshier
-// API: double besselkn(const ae_int_t nn, const double x, const xparams _xparams = xdefault);
+// API: double besselkn(const ae_int_t nn, const double x, const xparams _xparams = NonTH);
 double besselkn(ae_int_t nn, double x, ae_state *_state) {
    double k;
    double kf;
@@ -6103,8 +6103,8 @@ namespace alglib {
 double besselj0(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselj0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6113,8 +6113,8 @@ double besselj0(const double x, const xparams _xparams) {
 double besselj1(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselj1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6123,8 +6123,8 @@ double besselj1(const double x, const xparams _xparams) {
 double besseljn(const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besseljn(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6133,8 +6133,8 @@ double besseljn(const ae_int_t n, const double x, const xparams _xparams) {
 double bessely0(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::bessely0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6143,8 +6143,8 @@ double bessely0(const double x, const xparams _xparams) {
 double bessely1(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::bessely1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6153,8 +6153,8 @@ double bessely1(const double x, const xparams _xparams) {
 double besselyn(const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselyn(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6163,8 +6163,8 @@ double besselyn(const ae_int_t n, const double x, const xparams _xparams) {
 double besseli0(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besseli0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6173,8 +6173,8 @@ double besseli0(const double x, const xparams _xparams) {
 double besseli1(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besseli1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6183,8 +6183,8 @@ double besseli1(const double x, const xparams _xparams) {
 double besselk0(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselk0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6193,8 +6193,8 @@ double besselk0(const double x, const xparams _xparams) {
 double besselk1(const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselk1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6203,8 +6203,8 @@ double besselk1(const double x, const xparams _xparams) {
 double besselkn(const ae_int_t nn, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::besselkn(nn, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6221,7 +6221,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Laguerre polynomial Ln at x
-// API: double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
    double a;
    double b;
@@ -6253,7 +6253,7 @@ double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
 //
 // Result:
 //     the value of the Laguerre polynomial at x
-// API: double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = xdefault);
+// API: double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = NonTH);
 double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
    double b1;
    double b2;
@@ -6277,7 +6277,7 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 //
 // Outputs:
 //     C   -   coefficients
-// API: void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+// API: void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
 void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
    ae_int_t i;
    SetVector(c);
@@ -6293,8 +6293,8 @@ namespace alglib {
 double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::laguerrecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6303,8 +6303,8 @@ double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparam
 double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::laguerresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6313,8 +6313,8 @@ double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, con
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::laguerrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6356,7 +6356,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double ellipticintegralkhighprecision(const double m1, const xparams _xparams = xdefault);
+// API: double ellipticintegralkhighprecision(const double m1, const xparams _xparams = NonTH);
 double ellipticintegralkhighprecision(double m1, ae_state *_state) {
    double p;
    double q;
@@ -6419,7 +6419,7 @@ double ellipticintegralkhighprecision(double m1, ae_state *_state) {
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double ellipticintegralk(const double m, const xparams _xparams = xdefault);
+// API: double ellipticintegralk(const double m, const xparams _xparams = NonTH);
 double ellipticintegralk(double m, ae_state *_state) {
    double result;
    result = ellipticintegralkhighprecision(1.0 - m, _state);
@@ -6458,7 +6458,7 @@ double ellipticintegralk(double m, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-// API: double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = xdefault);
+// API: double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = NonTH);
 double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
    double a;
    double b;
@@ -6564,7 +6564,7 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
 //
 // Cephes Math Library, Release 2.8: June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
-// API: double ellipticintegrale(const double m, const xparams _xparams = xdefault);
+// API: double ellipticintegrale(const double m, const xparams _xparams = NonTH);
 double ellipticintegrale(double m, ae_state *_state) {
    double p;
    double q;
@@ -6628,7 +6628,7 @@ double ellipticintegrale(double m, ae_state *_state) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1993, 2000 by Stephen L. Moshier
-// API: double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = xdefault);
+// API: double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = NonTH);
 double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    double pio2;
    double a;
@@ -6721,8 +6721,8 @@ namespace alglib {
 double ellipticintegralkhighprecision(const double m1, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::ellipticintegralkhighprecision(m1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6731,8 +6731,8 @@ double ellipticintegralkhighprecision(const double m1, const xparams _xparams) {
 double ellipticintegralk(const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::ellipticintegralk(m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6741,8 +6741,8 @@ double ellipticintegralk(const double m, const xparams _xparams) {
 double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::incompleteellipticintegralk(phi, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6751,8 +6751,8 @@ double incompleteellipticintegralk(const double phi, const double m, const xpara
 double ellipticintegrale(const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::ellipticintegrale(m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6761,8 +6761,8 @@ double ellipticintegrale(const double m, const xparams _xparams) {
 double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams.flags != 0x0)
-      ae_state_set_flags(&_alglib_env_state, _xparams.flags);
+   if (_xparams != NonTH)
+      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::incompleteellipticintegrale(phi, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;

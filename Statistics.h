@@ -45,46 +45,46 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 } // end of namespace alglib_impl
 
 namespace alglib {
-void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
-void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = xdefault);
-double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
-double samplemean(const real_1d_array &x, const xparams _xparams = xdefault);
-double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
-double samplevariance(const real_1d_array &x, const xparams _xparams = xdefault);
-double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
-double sampleskewness(const real_1d_array &x, const xparams _xparams = xdefault);
-double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _xparams = xdefault);
-double samplekurtosis(const real_1d_array &x, const xparams _xparams = xdefault);
-void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams = xdefault);
-void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams = xdefault);
-void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams = xdefault);
-void samplemedian(const real_1d_array &x, double &median, const xparams _xparams = xdefault);
-void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams = xdefault);
-void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams = xdefault);
-void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
-void rankdata(real_2d_array &xy, const xparams _xparams = xdefault);
-void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = xdefault);
-void rankdatacentered(real_2d_array &xy, const xparams _xparams = xdefault);
-double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
-double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
-double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = xdefault);
-double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = xdefault);
-void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
-void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
-void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
-void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
-void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = xdefault);
-void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = xdefault);
-void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
-void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
-void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
-void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
-void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = xdefault);
-void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = xdefault);
+void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = NonTH);
+void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams = NonTH);
+double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+double samplemean(const real_1d_array &x, const xparams _xparams = NonTH);
+double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+double samplevariance(const real_1d_array &x, const xparams _xparams = NonTH);
+double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+double sampleskewness(const real_1d_array &x, const xparams _xparams = NonTH);
+double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+double samplekurtosis(const real_1d_array &x, const xparams _xparams = NonTH);
+void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams = NonTH);
+void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams = NonTH);
+void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams = NonTH);
+void samplemedian(const real_1d_array &x, double &median, const xparams _xparams = NonTH);
+void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams = NonTH);
+void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams = NonTH);
+void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = NonTH);
+void rankdata(real_2d_array &xy, const xparams _xparams = NonTH);
+void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams = NonTH);
+void rankdatacentered(real_2d_array &xy, const xparams _xparams = NonTH);
+double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = NonTH);
+double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = NonTH);
+double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = NonTH);
+double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = NonTH);
+double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = NonTH);
+double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams = NonTH);
+double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = NonTH);
+double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams = NonTH);
+void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = NonTH);
+void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = NonTH);
+void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = NonTH);
+void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = NonTH);
+void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams = NonTH);
+void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = NonTH);
+void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = NonTH);
+void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = NonTH);
+void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = NonTH);
+void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = NonTH);
+void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams = NonTH);
+void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === CORRELATIONTESTS Package ===
@@ -96,8 +96,8 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 } // end of namespace alglib_impl
 
 namespace alglib {
-void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
+void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === JARQUEBERA Package ===
@@ -106,7 +106,7 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = xdefault);
+void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === VARIANCETESTS Package ===
@@ -117,8 +117,8 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 } // end of namespace alglib_impl
 
 namespace alglib {
-void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
+void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === WSR Package ===
@@ -128,7 +128,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
 } // end of namespace alglib_impl
 
 namespace alglib {
-void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === MANNWHITNEYU Package ===
@@ -138,7 +138,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
 } // end of namespace alglib_impl
 
 namespace alglib {
-void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === STEST Package ===
@@ -148,7 +148,7 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
 } // end of namespace alglib_impl
 
 namespace alglib {
-void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === STUDENTTTESTS Package ===
@@ -160,9 +160,9 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
 } // end of namespace alglib_impl
 
 namespace alglib {
-void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
-void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = xdefault);
+void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
+void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
+void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 #endif // OnceOnly

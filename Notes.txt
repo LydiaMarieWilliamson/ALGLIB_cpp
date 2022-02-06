@@ -438,6 +438,16 @@ A6.2. Test Stages
 		with
 		―	is_static = true, make_automatic = false for ae_init_lock_eternal(),
 		―	is_static = false for ae_init_lock().
+0-39	Reorder Ap.{cpp,h} & reconcile with the local version of AlgLib.
+	―	alglib::ByteOrder made local in Ap.cpp and commented out (it's not used).
+	OS-dependent low-level lock routines in Ap.cpp are consolidated and made in-line.
+	―	Renamed _ae_{init,acquire,release,free}_lock_raw as _ae_{init,acquire,release,free}_lock.
+39	Reduced the xparams types and values.
+	―	Combined the threading model names AE_{SERIAL_UNSAFE,SERIAL,PARALLEL}.
+		and flags _ALGLIB_FLG_THREADING_{USE_GLOBAL,SERIAL,PARALLEL} into {Non,Ser,Par}TH.
+	―	Replaced the threading flag names "xdefault, "serial" and "parallel" respectively by NonTH, SerTH and ParTH.
+	―	Changed xparams into enum { NonTH = 0, SerTH = 1, ParTH = 2 }.
+0-39	Consolidated {get,set}nworkers(), _ae_cores_count(), _ae_{get,set}_global_threading(), setglobalthreading().
 
 A6.3. Test Results
 ──────────────────
@@ -471,6 +481,7 @@ A6.3. Test Results
 39	8000 1.0x 12196 1.0x 12199 1.0x 9187 1.0x 1643685611 (61f8a6eb) 80 // Remove translator-artifacts. (Corrected.)
 39	7937 1.0x 12501 1.0x 10873 0.9x 9172 1.1x 1643757812 (61f9c0f4) 80 // Recode random*() and *pythag2().
 39	7692 1.0x 12347 0.9x 11240 1.0x 9492 1.0x 1643828901 (61fad6a5) 78 // Recode "eternal" locks in Ap.{cpp,h}.
+39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines & xparams.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -527,19 +538,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7692
+* RGEMM-SEQ-16   (MFLOPS)   7874
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12347
-* RGEMM-MTN-32              0.9x
-* RGEMM-SEQ-64   (MFLOPS)  11240
+* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9492
+* RGEMM-SEQ-1024 (MFLOPS)   9018
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1643828901
+SEED: 1644128862
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -639,4 +650,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 78 seconds
+Done in 79 seconds

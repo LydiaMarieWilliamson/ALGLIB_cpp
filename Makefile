@@ -76,7 +76,7 @@ TestX$X: ${ObjX} TestX$O
 TestY$X: ${ObjY} TestY$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestZ$X: ${SrcZ} TestZ.cpp
-	${Cpp} ${CcOpt} $^ ${Libs} -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=AE_SERIAL_UNSAFE -o $@
+	${Cpp} ${CcOpt} $^ ${Libs} -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=NonTH -o $@
 test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestI: API Interface"
 	./TestI$X

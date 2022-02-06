@@ -67,11 +67,11 @@ namespace alglib {
 DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
 DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 
-void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
-void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = xdefault);
-bool odesolveriteration(const odesolverstate &state, const xparams _xparams = xdefault);
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = xdefault);
-void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = xdefault);
+void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = NonTH);
+void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = NonTH);
+bool odesolveriteration(const odesolverstate &state, const xparams _xparams = NonTH);
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = NonTH);
+void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 #endif // OnceOnly

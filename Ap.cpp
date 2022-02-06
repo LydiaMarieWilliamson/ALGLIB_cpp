@@ -143,6 +143,23 @@ void ae_frame_leave(ae_state *state) {
    state->p_top_block = state->p_top_block->p_next;
 }
 
+// Determine the byte order.
+// Only big-endian and little-endian are supported for ByteOrder, not mixed-endian hardware.
+static ae_int_t GetByteOrder() {
+// 1983 is used as the magic number because its non-periodic double representation
+// allow us to easily distinguish between upper and lower halfs and to detect mixed endian hardware.
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   u.a = 1.0 / 1983.0;
+   return
+      u.p[1] == (ae_int32_t)0x3f408642 ? AE_LITTLE_ENDIAN :
+      u.p[0] == (ae_int32_t)0x3f408642 ? AE_BIG_ENDIAN :
+      AE_MIXED_ENDIAN; //(@) Originally, this prompted an abort().
+}
+static const ae_int_t ByteOrder = GetByteOrder();
+
 // This function initializes ALGLIB environment state.
 //
 // NOTES:
@@ -164,30 +181,9 @@ void ae_state_init(ae_state *state) {
    state->p_top_block = &(state->last_block);
    state->break_jump = NULL;
    state->error_msg = "";
-// determine endianness and initialize precomputed IEEE special quantities.
-   state->endianness = ae_get_endianness();
-   if (state->endianness == AE_LITTLE_ENDIAN) {
-      vp = (ae_int32_t *)&state->v_nan;
-      vp[0] = 0;
-      vp[1] = (ae_int32_t)0x7FF80000;
-      vp = (ae_int32_t *)&state->v_posinf;
-      vp[0] = 0;
-      vp[1] = (ae_int32_t)0x7FF00000;
-      vp = (ae_int32_t *)&state->v_neginf;
-      vp[0] = 0;
-      vp[1] = (ae_int32_t)0xFFF00000;
-   } else if (state->endianness == AE_BIG_ENDIAN) {
-      vp = (ae_int32_t *)&state->v_nan;
-      vp[1] = 0;
-      vp[0] = (ae_int32_t)0x7FF80000;
-      vp = (ae_int32_t *)&state->v_posinf;
-      vp[1] = 0;
-      vp[0] = (ae_int32_t)0x7FF00000;
-      vp = (ae_int32_t *)&state->v_neginf;
-      vp[1] = 0;
-      vp[0] = (ae_int32_t)0xFFF00000;
-   } else
-      abort();
+// Determine the byte order and initialize the precomputed IEEE special quantities.
+   state->endianness = ByteOrder;
+// state->v_nan = NAN, state->v_posinf = +INFINITY, state->v_neginf = -INFINITY; //(@) Already in-line initialized.
 // set threading information
    state->worker_thread = NULL;
    state->parent_task = NULL;
@@ -210,23 +206,18 @@ void ae_state_clear(ae_state *state) {
 //
 // Following variables are included:
 // * threading-related settings
-static unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
+static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
 
-// This function gets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
+// Get/set the default (global) threading model:
+// *	serial execution,
+// *	multithreading, if cores_to_use allows it.
 ae_uint64_t ae_get_global_threading() {
    return (ae_uint64_t)_alglib_global_threading_flags << _ALGLIB_FLG_THREADING_SHIFT;
 }
 
-// This function sets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
 void ae_set_global_threading(ae_uint64_t flg_value) {
    flg_value &= _ALGLIB_FLG_THREADING_MASK;
-   AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
+   AE_CRITICAL_ASSERT(flg_value == SerTH || flg_value == ParTH);
    _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
 }
 
@@ -379,11 +370,6 @@ static bool _use_vendor_kernels = true;
 static bool debug_workstealing = false; // debug workstealing environment? False by default
 static ae_int_t dbgws_pushroot_ok = 0;
 static ae_int_t dbgws_pushroot_failed = 0;
-#ifdef AE_SMP_DEBUGCOUNTERS
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
-#endif
 
 // Standard function wrappers for better GLIBC portability
 #if defined X_FOR_LINUX
@@ -2264,97 +2250,78 @@ void ae_spin_wait(ae_int_t cnt) {
 // Internal OS-dependent lock routines.
 static const int AE_LOCK_ALIGNMENT = 0x10, AE_LOCK_CYCLES = 0x200, AE_LOCK_TESTS_BEFORE_YIELD = 0x10;
 
-// Lock.
-//
-// This is internal structure which implements lock functionality.
-struct _lock {
-#if AE_OS == AE_POSIX
-   pthread_mutex_t mutex;
-#elif AE_OS == AE_WINDOWS
-   volatile ae_int_t *volatile p_lock;
-   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
-#else
-   bool is_locked;
-#endif
-};
+// The internal OS-dependent lock structure.
+struct _lock;
 
-// This function initializes _lock structure which  is  internally  used  by
-// ae_lock high-level structure.
-//
-// _lock structure is statically allocated, no malloc() calls  is  performed
-// during its allocation. However, you have to call  _ae_free_lock_raw()  in
-// order to deallocate this lock properly.
-void _ae_init_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_init(&p->mutex, NULL);
-#elif AE_OS == AE_WINDOWS
-   p->p_lock = (ae_int_t *)ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
-   p->p_lock[0] = 0;
-#else
-   p->is_locked = false;
-#endif
-}
+// Initialize the _lock p to be internally used by the high-level ae_lock structure.
+// It is statically allocated, no malloc() calls are performed during its allocation,
+// but _ae_free_lock() must be used to deallocate it properly.
+static inline void _ae_init_lock(_lock *p);
 
-// This function acquires _lock structure.
-//
-// It is low-level workhorse utilized by ae_acquire_lock().
-void _ae_acquire_lock_raw(_lock *p) {
+// Acquire the _lock p; the low-level workhorse function used by ae_acquire_lock().
+static inline void _ae_acquire_lock(_lock *p);
+
+// Release the _lock p; the low-level workhorse function used by ae_release_lock().
+static inline void _ae_release_lock(_lock *p);
+
+// Free the _lock p.
+static inline void _ae_free_lock(_lock *p);
+
 #if AE_OS == AE_POSIX
+struct _lock { pthread_mutex_t mutex; };
+static inline void _ae_init_lock(_lock *p) { pthread_mutex_init(&p->mutex, NULL); }
+static inline void _ae_acquire_lock(_lock *p) {
    ae_int_t cnt = 0;
-   while (true) {
-      if (pthread_mutex_trylock(&p->mutex) == 0)
-         return;
+   while (pthread_mutex_trylock(&p->mutex) != 0) {
       ae_spin_wait(AE_LOCK_CYCLES);
-      cnt++;
-      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
+      if (++cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
          ae_yield();
    }
-   ;
+}
+static inline void _ae_release_lock(_lock *p) { pthread_mutex_unlock(&p->mutex); }
+static inline void _ae_free_lock(_lock *p) { pthread_mutex_destroy(&p->mutex); }
 #elif AE_OS == AE_WINDOWS
+struct _lock {
+   volatile ae_int_t *volatile p_lock;
+   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
+};
+static inline void _ae_init_lock(_lock *p) {
+   p->p_lock = (ae_int_t *)ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
+   p->p_lock[0] = 0;
+}
+static inline void _ae_acquire_lock(_lock *p) {
+#   ifdef AE_SMP_DEBUGCOUNTERS
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
+#      define BumpLock(X) (InterlockedIncrement((LONG volatile *)(X)))
+#   else
+#      define BumpLock(X) (X)
+#   endif
    ae_int_t cnt = 0;
-#   ifdef AE_SMP_DEBUGCOUNTERS
-   InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_acquisitions);
-#   endif
-   while (true) {
-      if (InterlockedCompareExchange((LONG volatile *)p->p_lock, 1, 0) == 0)
-         return;
+   BumpLock(&_ae_dbg_lock_acquisitions);
+   while (InterlockedCompareExchange((LONG volatile *)p->p_lock, 1, 0) != 0) {
       ae_spin_wait(AE_LOCK_CYCLES);
-#   ifdef AE_SMP_DEBUGCOUNTERS
-      InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_spinwaits);
-#   endif
-      cnt++;
-      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0) {
-#   ifdef AE_SMP_DEBUGCOUNTERS
-         InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_yields);
-#   endif
+      BumpLock(&_ae_dbg_lock_spinwaits);
+      if (++cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0) {
+         BumpLock(&_ae_dbg_lock_yields);
          ae_yield();
       }
    }
+#   undef BumpLock
+}
+static inline void _ae_release_lock(_lock *p) { InterlockedExchange((LONG volatile *)p->p_lock, 0); }
+static inline void _ae_free_lock(_lock *p) { }
 #else
+struct _lock { bool is_locked; };
+static inline void _ae_init_lock(_lock *p) { p->is_locked = false; }
+static inline void _ae_acquire_lock(_lock *p) {
    AE_CRITICAL_ASSERT(!p->is_locked);
    p->is_locked = true;
-#endif
 }
-
-// This function releases _lock structure.
-//
-// It is low-level lock function which is used by ae_release_lock.
-void _ae_release_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_unlock(&p->mutex);
-#elif AE_OS == AE_WINDOWS
-   InterlockedExchange((LONG volatile *)p->p_lock, 0);
-#else
-   p->is_locked = false;
+static inline void _ae_release_lock(_lock *p) { p->is_locked = false; }
+static inline void _ae_free_lock(_lock *p) { }
 #endif
-}
-
-// This function frees _lock structure.
-void _ae_free_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_destroy(&p->mutex);
-#endif
-}
 
 // Initialize an ae_lock.
 // Inputs:
@@ -2382,32 +2349,26 @@ void ae_init_lock(ae_lock *lock, ae_state *state, bool is_static, bool make_auto
    size_t size = sizeof(_lock);
    if (!is_static) ae_db_init(&lock->db, size, state, make_automatic);
    lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
-   _ae_init_lock_raw((_lock *)lock->lock_ptr);
+   _ae_init_lock((_lock *)lock->lock_ptr);
    if (!is_auto) ae_state_clear(&_tmp_state);
 }
 
 // This function acquires lock. In case lock is busy, we perform several
 // iterations inside tight loop before trying again.
 void ae_acquire_lock(ae_lock *lock) {
-   _lock *p;
-   p = (_lock *)lock->lock_ptr;
-   _ae_acquire_lock_raw(p);
+   _ae_acquire_lock((_lock *)lock->lock_ptr);
 }
 
 // This function releases lock.
 void ae_release_lock(ae_lock *lock) {
-   _lock *p;
-   p = (_lock *)lock->lock_ptr;
-   _ae_release_lock_raw(p);
+   _ae_release_lock((_lock *)lock->lock_ptr);
 }
 
 // This function frees ae_lock structure.
 void ae_free_lock(ae_lock *lock) {
-   _lock *p;
    AE_CRITICAL_ASSERT(!lock->is_static);
-   p = (_lock *)lock->lock_ptr;
-   if (p != NULL)
-      _ae_free_lock_raw(p);
+   _lock *p = (_lock *)lock->lock_ptr;
+   if (p != NULL) _ae_free_lock(p);
    ae_db_free(&lock->db);
 }
 
@@ -2921,27 +2882,6 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    return result;
 }
 
-ae_int_t ae_get_endianness() {
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-// determine endianness
-// two types are supported: big-endian and little-endian.
-// mixed-endian hardware is NOT supported.
-//
-// 1983 is used as magic number because its non-periodic double
-// representation allow us to easily distinguish between upper
-// and lower halfs and to detect mixed endian hardware.
-//
-   u.a = 1.0 / 1983.0;
-   if (u.p[1] == (ae_int32_t)0x3f408642)
-      return AE_LITTLE_ENDIAN;
-   if (u.p[0] == (ae_int32_t)0x3f408642)
-      return AE_BIG_ENDIAN;
-   return AE_MIXED_ENDIAN;
-}
-
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf) {
    serializer->mode = AE_SM_TO_CPPSTRING;
@@ -3165,7 +3105,7 @@ static ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pastth
    ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
@@ -3223,7 +3163,7 @@ static void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
    for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
       u.bytes[i] = c;
    u.bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
@@ -3313,7 +3253,7 @@ static ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pa
    ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = bytes[i];
@@ -3366,7 +3306,7 @@ static void ae_int642str(ae_int64_t v, char *buf, ae_state *state) {
    memset(bytes, v < 0 ? 0xFF : 0x00, 8);
    memmove(bytes, &v, 8);
    bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
          unsigned char tc;
          tc = bytes[i];
@@ -3478,7 +3418,7 @@ static double ae_str2double(const char *buf, ae_state *state, const char **pastt
    ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
@@ -3544,7 +3484,7 @@ static void ae_double2str(double v, char *buf, ae_state *state) {
 //    (last 12th element of sixbits is always zero, we do not output it)
    u.dval = v;
    u.bytes[8] = 0;
-   if (state->endianness == AE_BIG_ENDIAN) {
+   if (ByteOrder == AE_BIG_ENDIAN) {
       for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
          unsigned char tc;
          tc = u.bytes[i];
@@ -8415,9 +8355,8 @@ void clear_error_flag() {
 // Global and local constants/variables.
 #if 0
 const double machineepsilon = 5E-16, maxrealnumber = 1E300, minrealnumber = 1E-300;
+const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
-
-const ae_int_t endianness = alglib_impl::ae_get_endianness();
 
 // standard functions
 int sign(double x) {
@@ -8729,54 +8668,21 @@ complex csqr(const complex &z) {
    return complex (z.x * z.x - z.y * z.y, 2 * z.x * z.y);
 }
 
-static const alglib_impl::ae_uint64_t _i64_xdefault = 0x0;
-static const alglib_impl::ae_uint64_t _i64_xserial = _ALGLIB_FLG_THREADING_SERIAL;
-static const alglib_impl::ae_uint64_t _i64_xparallel = _ALGLIB_FLG_THREADING_PARALLEL;
-const xparams &xdefault = *(const xparams *)&_i64_xdefault;
-const xparams &serial = *(const xparams *)&_i64_xserial;
-const xparams &parallel = *(const xparams *)&_i64_xparallel;
-
-ae_int_t getnworkers() {
 #ifdef AE_HPC
-   return alglib_impl::getnworkers();
+ae_int_t getnworkers() { return alglib_impl::getnworkers(); }
+void setnworkers(ae_int_t nworkers) { alglib_impl::setnworkers(nworkers); }
+ae_int_t _ae_cores_count() { return alglib_impl::ae_cores_count(); }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return alglib_impl::ae_get_global_threading(); }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { alglib_impl::ae_set_global_threading(flg_value); }
+void setglobalthreading(const xparams settings) { alglib_impl::ae_set_global_threading((ae_uint64_t)settings); }
 #else
-   return 1;
+ae_int_t getnworkers() { return 1; }
+void setnworkers(ae_int_t nworkers) { }
+ae_int_t _ae_cores_count() { return 1; }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return SerTH; }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
+void setglobalthreading(const xparams settings) { }
 #endif
-}
-
-void setnworkers(ae_int_t nworkers) {
-#ifdef AE_HPC
-   alglib_impl::setnworkers(nworkers);
-#endif
-}
-
-ae_int_t _ae_cores_count() {
-#ifdef AE_HPC
-   return alglib_impl::ae_cores_count();
-#else
-   return 1;
-#endif
-}
-
-alglib_impl::ae_uint64_t _ae_get_global_threading() {
-#ifdef AE_HPC
-   return alglib_impl::ae_get_global_threading();
-#else
-   return _ALGLIB_FLG_THREADING_SERIAL;
-#endif
-}
-
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_global_threading(flg_value);
-#endif
-}
-
-void setglobalthreading(const xparams settings) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_global_threading(settings.flags);
-#endif
-}
 
 // Level 1 BLAS functions
 

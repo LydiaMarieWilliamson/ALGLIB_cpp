@@ -32,7 +32,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
 namespace alglib {
 DecClass(polynomialsolverreport, double &maxerr;);
 
-void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep, const xparams _xparams = xdefault);
+void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === DIRECTDENSESOLVERS Package ===
@@ -100,43 +100,43 @@ namespace alglib {
 DecClass(densesolverreport, double &r1; double &rinf;);
 DecClass(densesolverlsreport, double &r2; real_2d_array cx; ae_int_t &n; ae_int_t &k;);
 
-void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
-void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
-void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
-void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
-void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
-void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
-void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
-void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
-void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
-void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
-void cmatrixlusolvefast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
-void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
-void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
-void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
-void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = xdefault);
-void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
-void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
-void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
-void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = xdefault);
-void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = xdefault);
-void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = xdefault);
-void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = xdefault);
-void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x, const xparams _xparams = xdefault);
+void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = NonTH);
+void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
+void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = NonTH);
+void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
+void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = NonTH);
+void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
+void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = NonTH);
+void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = NonTH);
+void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = NonTH);
+void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = NonTH);
+void cmatrixlusolvefast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = NonTH);
+void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = NonTH);
+void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = NonTH);
+void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
+void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = NonTH);
+void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
+void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = NonTH);
+void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = NonTH);
+void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = NonTH);
+void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, const xparams _xparams = NonTH);
+void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = NonTH);
+void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, const xparams _xparams = NonTH);
+void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === DIRECTSPARSESOLVERS Package ===
@@ -163,11 +163,11 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
 namespace alglib {
 DecClass(sparsesolverreport, ae_int_t &terminationtype; ae_int_t &nmv; ae_int_t &iterationscount; double &r2;);
 
-void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsespdcholeskysolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
+void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsespdcholeskysolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === ITERATIVESPARSE Package ===
@@ -226,24 +226,24 @@ void sparsesolverrequesttermination(sparsesolverstate *state, ae_state *_state);
 namespace alglib {
 DecClass(sparsesolverstate, );
 
-void sparsesolversetalgogmres(const sparsesolverstate &state, const ae_int_t k, const xparams _xparams = xdefault);
-void sparsesolversetstartingpoint(const sparsesolverstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
-void sparsesolversetcond(const sparsesolverstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
-void sparsesolversetxrep(const sparsesolverstate &state, const bool needxrep, const xparams _xparams = xdefault);
-void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state, const xparams _xparams = xdefault);
-void sparsesolveroocstart(const sparsesolverstate &state, const real_1d_array &b, const xparams _xparams = xdefault);
-bool sparsesolverooccontinue(const sparsesolverstate &state, const xparams _xparams = xdefault);
-void sparsesolveroocgetrequestinfo(const sparsesolverstate &state, ae_int_t &requesttype, const xparams _xparams = xdefault);
-void sparsesolveroocgetrequestdata(const sparsesolverstate &state, real_1d_array &x, const xparams _xparams = xdefault);
-void sparsesolveroocgetrequestdata1(const sparsesolverstate &state, double &v, const xparams _xparams = xdefault);
-void sparsesolveroocsendresult(const sparsesolverstate &state, const real_1d_array &ax, const xparams _xparams = xdefault);
-void sparsesolveroocstop(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsesolversolvesymmetric(const sparsesolverstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b, const xparams _xparams = xdefault);
-void sparsesolvesymmetricgmres(const sparsematrix &a, const bool isupper, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsesolversolve(const sparsesolverstate &state, const sparsematrix &a, const real_1d_array &b, const xparams _xparams = xdefault);
-void sparsesolvegmres(const sparsematrix &a, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = xdefault);
-void sparsesolverrequesttermination(const sparsesolverstate &state, const xparams _xparams = xdefault);
+void sparsesolversetalgogmres(const sparsesolverstate &state, const ae_int_t k, const xparams _xparams = NonTH);
+void sparsesolversetstartingpoint(const sparsesolverstate &state, const real_1d_array &x, const xparams _xparams = NonTH);
+void sparsesolversetcond(const sparsesolverstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = NonTH);
+void sparsesolversetxrep(const sparsesolverstate &state, const bool needxrep, const xparams _xparams = NonTH);
+void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state, const xparams _xparams = NonTH);
+void sparsesolveroocstart(const sparsesolverstate &state, const real_1d_array &b, const xparams _xparams = NonTH);
+bool sparsesolverooccontinue(const sparsesolverstate &state, const xparams _xparams = NonTH);
+void sparsesolveroocgetrequestinfo(const sparsesolverstate &state, ae_int_t &requesttype, const xparams _xparams = NonTH);
+void sparsesolveroocgetrequestdata(const sparsesolverstate &state, real_1d_array &x, const xparams _xparams = NonTH);
+void sparsesolveroocgetrequestdata1(const sparsesolverstate &state, double &v, const xparams _xparams = NonTH);
+void sparsesolveroocsendresult(const sparsesolverstate &state, const real_1d_array &ax, const xparams _xparams = NonTH);
+void sparsesolveroocstop(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsesolversolvesymmetric(const sparsesolverstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b, const xparams _xparams = NonTH);
+void sparsesolvesymmetricgmres(const sparsematrix &a, const bool isupper, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsesolversolve(const sparsesolverstate &state, const sparsematrix &a, const real_1d_array &b, const xparams _xparams = NonTH);
+void sparsesolvegmres(const sparsematrix &a, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep, const xparams _xparams = NonTH);
+void sparsesolverrequesttermination(const sparsesolverstate &state, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === LINCG Package ===
@@ -320,16 +320,16 @@ namespace alglib {
 DecClass(lincgstate, );
 DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype; double &r2;);
 
-void lincgcreate(const ae_int_t n, lincgstate &state, const xparams _xparams = xdefault);
-void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
-void lincgsetprecunit(const lincgstate &state, const xparams _xparams = xdefault);
-void lincgsetprecdiag(const lincgstate &state, const xparams _xparams = xdefault);
-void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
-void lincgsolvesparse(const lincgstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b, const xparams _xparams = xdefault);
-void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep, const xparams _xparams = xdefault);
-void lincgsetrestartfreq(const lincgstate &state, const ae_int_t srf, const xparams _xparams = xdefault);
-void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq, const xparams _xparams = xdefault);
-void lincgsetxrep(const lincgstate &state, const bool needxrep, const xparams _xparams = xdefault);
+void lincgcreate(const ae_int_t n, lincgstate &state, const xparams _xparams = NonTH);
+void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x, const xparams _xparams = NonTH);
+void lincgsetprecunit(const lincgstate &state, const xparams _xparams = NonTH);
+void lincgsetprecdiag(const lincgstate &state, const xparams _xparams = NonTH);
+void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = NonTH);
+void lincgsolvesparse(const lincgstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b, const xparams _xparams = NonTH);
+void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep, const xparams _xparams = NonTH);
+void lincgsetrestartfreq(const lincgstate &state, const ae_int_t srf, const xparams _xparams = NonTH);
+void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq, const xparams _xparams = NonTH);
+void lincgsetxrep(const lincgstate &state, const bool needxrep, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === LINLSQR Package ===
@@ -423,17 +423,17 @@ namespace alglib {
 DecClass(linlsqrstate, );
 DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
-void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state, const xparams _xparams = xdefault);
-void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams = xdefault);
-void linlsqrsetprecunit(const linlsqrstate &state, const xparams _xparams = xdefault);
-void linlsqrsetprecdiag(const linlsqrstate &state, const xparams _xparams = xdefault);
-void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai, const xparams _xparams = xdefault);
-void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b, const xparams _xparams = xdefault);
-void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits, const xparams _xparams = xdefault);
-void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep, const xparams _xparams = xdefault);
-void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep, const xparams _xparams = xdefault);
-ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s, const xparams _xparams = xdefault);
-void linlsqrrequesttermination(const linlsqrstate &state, const xparams _xparams = xdefault);
+void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state, const xparams _xparams = NonTH);
+void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state, const xparams _xparams = NonTH);
+void linlsqrsetprecunit(const linlsqrstate &state, const xparams _xparams = NonTH);
+void linlsqrsetprecdiag(const linlsqrstate &state, const xparams _xparams = NonTH);
+void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai, const xparams _xparams = NonTH);
+void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b, const xparams _xparams = NonTH);
+void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits, const xparams _xparams = NonTH);
+void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep, const xparams _xparams = NonTH);
+void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep, const xparams _xparams = NonTH);
+ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s, const xparams _xparams = NonTH);
+void linlsqrrequesttermination(const linlsqrstate &state, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === NLEQ Package ===
@@ -494,16 +494,16 @@ namespace alglib {
 DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
 
-void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = xdefault);
-void nleqsetxrep(const nleqstate &state, const bool needxrep, const xparams _xparams = xdefault);
-void nleqsetstpmax(const nleqstate &state, const double stpmax, const xparams _xparams = xdefault);
-void nleqrestartfrom(const nleqstate &state, const real_1d_array &x, const xparams _xparams = xdefault);
-void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = xdefault);
-void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = xdefault);
-bool nleqiteration(const nleqstate &state, const xparams _xparams = xdefault);
-void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = xdefault);
-void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = xdefault);
-void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = xdefault);
+void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits, const xparams _xparams = NonTH);
+void nleqsetxrep(const nleqstate &state, const bool needxrep, const xparams _xparams = NonTH);
+void nleqsetstpmax(const nleqstate &state, const double stpmax, const xparams _xparams = NonTH);
+void nleqrestartfrom(const nleqstate &state, const real_1d_array &x, const xparams _xparams = NonTH);
+void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = NonTH);
+void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state, const xparams _xparams = NonTH);
+bool nleqiteration(const nleqstate &state, const xparams _xparams = NonTH);
+void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = NonTH);
+void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 #endif // OnceOnly

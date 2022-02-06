@@ -28,14 +28,14 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
-void fftc1d(complex_1d_array &a, const xparams _xparams = xdefault);
-void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
-void fftc1dinv(complex_1d_array &a, const xparams _xparams = xdefault);
-void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const xparams _xparams = xdefault);
-void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams = xdefault);
-void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, const xparams _xparams = xdefault);
-void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams = xdefault);
+void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+void fftc1d(complex_1d_array &a, const xparams _xparams = NonTH);
+void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+void fftc1dinv(complex_1d_array &a, const xparams _xparams = NonTH);
+void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const xparams _xparams = NonTH);
+void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams = NonTH);
+void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, const xparams _xparams = NonTH);
+void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === FHT Package ===
@@ -46,8 +46,8 @@ void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
-void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = xdefault);
+void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === CONV Package ===
@@ -66,14 +66,14 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 } // end of namespace alglib_impl
 
 namespace alglib {
-void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = xdefault);
-void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = xdefault);
-void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams = xdefault);
-void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = xdefault);
-void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = xdefault);
-void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = xdefault);
-void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
-void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = xdefault);
+void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams = NonTH);
+void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
+void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
+void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
+void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 // === CORR Package ===
@@ -86,10 +86,10 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
 } // end of namespace alglib_impl
 
 namespace alglib {
-void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams = xdefault);
-void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams = xdefault);
-void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams = xdefault);
-void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams = xdefault);
+void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams = NonTH);
+void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams = NonTH);
+void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams = NonTH);
+void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
 } // end of namespace alglib
 
 #endif // OnceOnly

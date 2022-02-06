@@ -90237,7 +90237,7 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
       return false;
    }
    if (use_smp)
-      ae_state_set_flags(&_alglib_env_state, _ALGLIB_FLG_THREADING_PARALLEL);
+      ae_state_set_flags(&_alglib_env_state, ParTH);
    ae_frame_make(&_alglib_env_state, &_frame_block);
    result = testfunc(true, &_alglib_env_state);
    ae_state_clear(&_alglib_env_state);
@@ -90251,7 +90251,7 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
       ae_state _alglib_env_state; ae_state_init(&_alglib_env_state);
       ae_frame_make(&_alglib_env_state, &_frame_block);
       if (use_smp)
-         ae_state_set_flags(&_alglib_env_state, _ALGLIB_FLG_THREADING_PARALLEL);
+         ae_state_set_flags(&_alglib_env_state, ParTH);
       result = testfunc(true, &_alglib_env_state);
       ae_state_clear(&_alglib_env_state);
       if (!result)

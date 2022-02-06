@@ -58,14 +58,12 @@
 #endif
 
 // The threading models for AE_THREADING / state flags.
-#define AE_PARALLEL		100
-#define AE_SERIAL		101
-#define AE_SERIAL_UNSAFE	102
-#define _ALGLIB_FLG_THREADING_USE_GLOBAL    0x0
-#define _ALGLIB_FLG_THREADING_SERIAL        0x1
-#define _ALGLIB_FLG_THREADING_PARALLEL      0x2
+//	NonTH: Serial Unsafe / Use Global.
+//	SerTH: Serial.
+//	ParTH: Parallel.
+typedef enum { NonTH, SerTH, ParTH } xparams;
 #if !defined AE_THREADING
-#   define AE_THREADING AE_PARALLEL
+#   define AE_THREADING ParTH
 #endif
 
 // The memory allocation types for AE_MALLOC.
@@ -239,7 +237,7 @@ typedef struct ae_dyn_block ae_frame;
 
 // ALGLIB environment state
 struct ae_state {
-// endianness type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
+// The byte order type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
    ae_int_t endianness;
 // double values for NAN, +INFINITY and -INFINITY.
    const double v_nan = NAN, v_posinf = +INFINITY, v_neginf = -INFINITY;
@@ -633,7 +631,6 @@ void ae_serializer_init(ae_serializer *serializer);
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer);
-ae_int_t ae_get_endianness();
 
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf);
@@ -981,8 +978,8 @@ struct ap_error {
 // #   if AE_OS != AE_OTHER_OS
 // #      error Exception-free mode can not be combined with AE_OS definition
 // #   endif
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
+#   if AE_THREADING != NonTH
+#      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
 #   define BegPoll	{
 #   define EndPoll(Q)	}
@@ -1075,7 +1072,6 @@ typedef alglib_impl::ae_int_t ae_int_t;
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 #endif
 
-extern const ae_int_t endianness;
 int sign(double x);
 
 double randomreal();
@@ -1143,9 +1139,6 @@ complex csqr(const complex &z);
 
 // Multi-threading and multi-core functions.
 // These are mostly stubs from the commercial version of ALGLIB.
-// xparams type and several predefined constants
-struct xparams { alglib_impl::ae_uint64_t flags; };
-extern const xparams &xdefault, &serial, &parallel;
 
 // Get/Set the number of cores: can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
 ae_int_t getnworkers();
