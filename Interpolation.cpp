@@ -6146,7 +6146,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    scalepenaltyby = 1 / sqrt((double)m);
    for (i = 0; i < n; i++) {
    // Generate design matrix row #I which corresponds to I-th dataset point
-      k = FloorZ(rboundval(xywork.xR[2 * i] * (m - 1), 0.0, (double)(m - 1)));
+      k = ifloor(rboundval(xywork.xR[2 * i] * (m - 1), 0.0, (double)(m - 1)));
       k0 = imax2(k - (bfrad - 1), 0);
       k1 = imin2(k + bfrad, m - 1);
       for (j = k0; j <= k1; j++) {
@@ -7854,9 +7854,9 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
    //
    // First section is stored at K-th position, second one is appended to the table.
    // Then we update heap which stores pairs of (error,section_index)
-      k0 = RoundZ(sections.xyR[k][0]);
-      k1 = RoundZ(sections.xyR[k][1]);
-      k2 = RoundZ(sections.xyR[k][2]);
+      k0 = iround(sections.xyR[k][0]);
+      k1 = iround(sections.xyR[k][1]);
+      k2 = iround(sections.xyR[k][2]);
       lsfit_rdpanalyzesection(x, y, k0, k2, &idx0, &e0);
       lsfit_rdpanalyzesection(x, y, k2, k1, &idx1, &e1);
       sections.xyR[k][0] = (double)k0;
@@ -7872,11 +7872,11 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
    }
 // Convert from sections to points
    ae_vector_set_length(&points, *nsections + 1);
-   k = RoundZ(sections.xyR[0][1]);
+   k = iround(sections.xyR[0][1]);
    for (i = 0; i < *nsections; i++) {
       points.xR[i] = round(sections.xyR[i][0]);
-      if (x->xR[RoundZ(sections.xyR[i][1])] > x->xR[k]) {
-         k = RoundZ(sections.xyR[i][1]);
+      if (x->xR[iround(sections.xyR[i][1])] > x->xR[k]) {
+         k = iround(sections.xyR[i][1]);
       }
    }
    points.xR[*nsections] = (double)k;
@@ -7888,8 +7888,8 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
    ae_vector_set_length(x2, *nsections + 1);
    ae_vector_set_length(y2, *nsections + 1);
    for (i = 0; i <= *nsections; i++) {
-      x2->xR[i] = x->xR[RoundZ(points.xR[i])];
-      y2->xR[i] = y->xR[RoundZ(points.xR[i])];
+      x2->xR[i] = x->xR[iround(points.xR[i])];
+      y2->xR[i] = y->xR[iround(points.xR[i])];
    }
    ae_frame_leave();
 }
@@ -14808,7 +14808,7 @@ void pspline2calc(pspline2interpolant *p, double t, double *x, double *y) {
    *x = 0;
    *y = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    *x = spline1dcalc(&p->x, t);
    *y = spline1dcalc(&p->y, t);
@@ -14837,7 +14837,7 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
    *y = 0;
    *z = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    *x = spline1dcalc(&p->x, t);
    *y = spline1dcalc(&p->y, t);
@@ -14869,7 +14869,7 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
    *y = 0;
    *dy = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    spline1ddiff(&p->x, t, x, dx, &d2s);
    spline1ddiff(&p->y, t, y, dy, &d2s);
@@ -14904,7 +14904,7 @@ void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, doubl
    *z = 0;
    *dz = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    spline1ddiff(&p->x, t, x, dx, &d2s);
    spline1ddiff(&p->y, t, y, dy, &d2s);
@@ -14937,7 +14937,7 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y) {
    *x = 0;
    *y = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    pspline2diff(p, t, &v0, x, &v1, y);
    if (*x != 0.0 || *y != 0.0) {
@@ -14978,7 +14978,7 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
    *y = 0;
    *z = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    pspline3diff(p, t, &v0, x, &v1, y, &v2, z);
    if (*x != 0.0 || *y != 0.0 || *z != 0.0) {
@@ -15017,7 +15017,7 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
    *dy = 0;
    *d2y = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    spline1ddiff(&p->x, t, x, dx, d2x);
    spline1ddiff(&p->y, t, y, dy, d2y);
@@ -15057,7 +15057,7 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
    *dz = 0;
    *d2z = 0;
    if (p->periodic) {
-      t -= FloorZ(t);
+      t -= ifloor(t);
    }
    spline1ddiff(&p->x, t, x, dx, d2x);
    spline1ddiff(&p->y, t, y, dy, d2y);
@@ -15362,9 +15362,9 @@ void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, doub
    //
    // First section is stored at K-th position, second one is appended to the table.
    // Then we update heap which stores pairs of (error,section_index)
-      k0 = RoundZ(sections.xyR[k][0]);
-      k1 = RoundZ(sections.xyR[k][1]);
-      k2 = RoundZ(sections.xyR[k][2]);
+      k0 = iround(sections.xyR[k][0]);
+      k1 = iround(sections.xyR[k][1]);
+      k2 = iround(sections.xyR[k][2]);
       parametric_rdpanalyzesectionpar(x, k0, k2, d, &idx0, &e0);
       parametric_rdpanalyzesectionpar(x, k2, k1, d, &idx1, &e1);
       sections.xyR[k][0] = (double)k0;
@@ -15387,7 +15387,7 @@ void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, doub
    tagsortfast(&buf0, &buf1, *nsections + 1);
    ae_vector_set_length(idx2, *nsections + 1);
    for (i = 0; i <= *nsections; i++) {
-      idx2->xZ[i] = RoundZ(buf0.xR[i]);
+      idx2->xZ[i] = iround(buf0.xR[i]);
    }
    ae_assert(idx2->xZ[0] == 0, "RDP algorithm: integrity check failed");
    ae_assert(idx2->xZ[*nsections] == n - 1, "RDP algorithm: integrity check failed");
@@ -20181,8 +20181,8 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
    ae_vector_set_length(&crx, npoints);
    ae_vector_set_length(&cry, npoints);
    for (i = 0; i < npoints; i++) {
-      crx.xZ[i] = iboundval(FloorZ(xy->xR[i * ew]) - nzshift, 0, kx - nzwidth);
-      cry.xZ[i] = iboundval(FloorZ(xy->xR[i * ew + 1]) - nzshift, 0, ky - nzwidth);
+      crx.xZ[i] = iboundval(ifloor(xy->xR[i * ew]) - nzshift, 0, kx - nzwidth);
+      cry.xZ[i] = iboundval(ifloor(xy->xR[i * ew + 1]) - nzshift, 0, ky - nzwidth);
    }
 // Create vertical and horizontal design matrices
    *arows = npoints + kx * ky;
@@ -20837,8 +20837,8 @@ static void spline2d_reorderdatasetandbuildindex(RVector *xy, ae_int_t npoints, 
    vectorsetlengthatleast(xyindex, (kx - 1) * (ky - 1) + 1);
    vectorsetlengthatleast(bufi, npoints);
    for (i = 0; i < npoints; i++) {
-      i0 = iboundval(FloorZ(xy->xR[i * entrywidth]), 0, kx - 2);
-      i1 = iboundval(FloorZ(xy->xR[i * entrywidth + 1]), 0, ky - 2);
+      i0 = iboundval(ifloor(xy->xR[i * entrywidth]), 0, kx - 2);
+      i1 = iboundval(ifloor(xy->xR[i * entrywidth + 1]), 0, ky - 2);
       bufi->xZ[i] = i1 * (kx - 1) + i0;
    }
 // Reorder
@@ -20877,10 +20877,10 @@ static void spline2d_expandindexrows(RVector *xy, ae_int_t d, RVector *shadow, a
    for (i = pt0; i < pt1; i++) {
       v = 2 * xy->xR[i * entrywidth];
       xy->xR[i * entrywidth] = v;
-      i0 = iboundval(FloorZ(v), 0, kxnew - 2);
+      i0 = iboundval(ifloor(v), 0, kxnew - 2);
       v = 2 * xy->xR[i * entrywidth + 1];
       xy->xR[i * entrywidth + 1] = v;
-      i1 = iboundval(FloorZ(v), 0, kynew - 2);
+      i1 = iboundval(ifloor(v), 0, kynew - 2);
       cidx->xZ[i] = i1 * (kxnew - 1) + i0;
    }
    spline2d_reorderdatasetandbuildindexrec(xy, d, shadow, ns, cidx, pt0, pt1, xyindexnew, 2 * row0 * (kxnew - 1) + 0, 2 * row1 * (kxnew - 1) + 0, false);
@@ -23900,8 +23900,8 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
                rprogress *= 10000;
                rprogress = rmax2(rprogress, 0.0);
                rprogress = rmin2(rprogress, 10000.0);
-               ae_assert(*progress10000 <= RoundZ(rprogress) + 1, "HRBF: integrity check failed (progress indicator) even after +1 safeguard correction");
-               *progress10000 = RoundZ(rprogress);
+               ae_assert(*progress10000 <= iround(rprogress) + 1, "HRBF: integrity check failed (progress indicator) even after +1 safeguard correction");
+               *progress10000 = iround(rprogress);
             } else ae_assert(false, "HRBF: unexpected request from LSQR solver");
          }
          linlsqrresults(&linstate, &densew1, &lsqrrep);

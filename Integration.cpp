@@ -710,12 +710,12 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    NewVector(s, 0, DT_REAL);
    NewVector(xgtmp, 0, DT_REAL);
    NewVector(wgtmp, 0, DT_REAL);
-   if (n % 2 != 1 || n < 3) {
+   if (!(n % 2) || n < 3) {
       *info = -1;
       ae_frame_leave();
       return;
    }
-   for (i = 0; i <= CeilZ((double)(3 * (n / 2)) / 2.0); i++) {
+   for (i = 0; i <= iceil((double)(3 * (n / 2)) / 2.0); i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave();
@@ -735,18 +735,19 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 // Resize:
 // * A from 0..floor(3*n/2) to 0..2*n
 // * B from 0..ceil(3*n/2)  to 0..2*n
-   ae_vector_set_length(&ta, FloorZ((double)(3 * n) / 2.0) + 1);
-   ae_v_move(ta.xR, 1, alpha->xR, 1, FloorZ((double)(3 * n) / 2.0) + 1);
+   ae_int_t alen = 3 * n / 2 + 1, blen = (3 * n + 1) / 2 + 1;
+   ae_vector_set_length(&ta, alen);
+   ae_v_move(ta.xR, 1, alpha->xR, 1, alen);
    ae_vector_set_length(alpha, 2 * n + 1);
-   ae_v_move(alpha->xR, 1, ta.xR, 1, FloorZ((double)(3 * n) / 2.0) + 1);
-   for (i = FloorZ((double)(3 * n) / 2.0) + 1; i <= 2 * n; i++) {
+   ae_v_move(alpha->xR, 1, ta.xR, 1, alen);
+   for (i = alen; i <= 2 * n; i++) {
       alpha->xR[i] = 0.0;
    }
-   ae_vector_set_length(&ta, CeilZ((double)(3 * n) / 2.0) + 1);
-   ae_v_move(ta.xR, 1, beta->xR, 1, CeilZ((double)(3 * n) / 2.0) + 1);
+   ae_vector_set_length(&ta, blen);
+   ae_v_move(ta.xR, 1, beta->xR, 1, blen);
    ae_vector_set_length(beta, 2 * n + 1);
-   ae_v_move(beta->xR, 1, ta.xR, 1, CeilZ((double)(3 * n) / 2.0) + 1);
-   for (i = CeilZ((double)(3 * n) / 2.0) + 1; i <= 2 * n; i++) {
+   ae_v_move(beta->xR, 1, ta.xR, 1, blen);
+   for (i = blen; i <= 2 * n; i++) {
       beta->xR[i] = 0.0;
    }
 // Initialize T, S
@@ -860,14 +861,14 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    SetVector(wgauss);
    NewVector(alpha, 0, DT_REAL);
    NewVector(beta, 0, DT_REAL);
-   if (n % 2 != 1 || n < 3) {
+   if (!(n % 2) || n < 3) {
       *info = -1;
       ae_frame_leave();
       return;
    }
    mu0 = 2.0;
-   alen = FloorZ((double)(3 * (n / 2)) / 2.0) + 1;
-   blen = CeilZ((double)(3 * (n / 2)) / 2.0) + 1;
+   alen = 3 * n / 2 + 1;
+   blen = (3 * n + 1) / 2 + 1;
    ae_vector_set_length(&alpha, alen);
    ae_vector_set_length(&beta, blen);
    for (k = 0; k < alen; k++) {
@@ -1356,7 +1357,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       ae_frame_leave();
       return;
    }
-   clen = CeilZ((double)(3 * (n / 2)) / 2.0) + 1;
+   clen = iceil((double)(3 * (n / 2)) / 2.0) + 1;
    ae_vector_set_length(&a, clen);
    ae_vector_set_length(&b, clen);
    for (i = 0; i < clen; i++) {
@@ -1744,7 +1745,7 @@ Spawn:
    } else {
    // maximum subinterval should be no more than XWidth.
    // so we create ceil((B-A)/XWidth)+1 small subintervals
-      ns = CeilZ(fabs(state->b - state->a) / state->xwidth) + 1;
+      ns = iceil(fabs(state->b - state->a) / state->xwidth) + 1;
       state->heapsize = ns;
       state->heapused = ns;
       state->heapwidth = 5;

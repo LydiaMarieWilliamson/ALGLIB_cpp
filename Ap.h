@@ -56,9 +56,10 @@
 #endif
 
 // The threading models for AE_THREADING / state flags.
-#define NonTH	0	// Serial Unsafe / Use Global.
-#define SerTH	1	// Serial.
-#define ParTH	2	// Parallel.
+//	NonTH: Serial Unsafe / Use Global.
+//	SerTH: Serial.
+//	ParTH: Parallel.
+typedef enum { NonTH, SerTH, ParTH } xparams;
 #if !defined AE_THREADING
 #   define AE_THREADING ParTH
 #endif
@@ -397,7 +398,7 @@ enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 struct x_string {
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
-// It it is owned by X, it will call one of the *_free() functions.
+// If it is owned by X, it will call one of the *_free() functions.
    ALIGNED ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
@@ -413,15 +414,15 @@ struct x_string {
 // x-vectors: members are ae_int64_t aligned to avoid alignment problems.
 struct x_vector {
 // The vector size; i.e., the number of elements.
-   ae_int64_t cnt;		// ae_int_t N;
+   ae_int64_t cnt;		// ae_int_t cnt;
 // One of the DT_* values.
    ae_int64_t datatype;		// ae_datatype datatype;
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
-// It it is owned by X, it will call one of the *_free() functions.
+// If it is owned by X, it will call one of the *_free() functions.
    ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
-//	ACT_UNCHANGED:		unchanged.
+//	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
 //	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
@@ -449,10 +450,10 @@ struct x_matrix {
    ae_int64_t datatype;		// ae_datatype datatype;
 // Determines what to do on realloc().
 // If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
-// It it is owned by X, it will call one of the *_free() functions.
+// If it is owned by X, it will call one of the *_free() functions.
    ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
-//	ACT_UNCHANGED:		unchanged.
+//	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
 //	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
@@ -620,21 +621,21 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
-// * IEEE-compliant floating point comparisons
+// * IEEE-compliant floating point comparisons.
 bool isneginf(double x);
 bool isposinf(double x);
 
-// * standard functions
+// * Standard functions.
 ae_int_t imin2(ae_int_t x, ae_int_t y);
 ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z);
 ae_int_t imax2(ae_int_t x, ae_int_t y);
 ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z);
 ae_int_t ae_iabs(ae_int_t x);
 ae_int_t sign(double x);
-ae_int_t RoundZ(double x);
-ae_int_t TruncZ(double x);
-ae_int_t FloorZ(double x);
-ae_int_t CeilZ(double x);
+ae_int_t iround(double x);
+ae_int_t itrunc(double x);
+ae_int_t ifloor(double x);
+ae_int_t iceil(double x);
 
 double rmin2(double x, double y);
 double rmax2(double x, double y);
@@ -653,9 +654,9 @@ double rboundval(double x, double b1, double b2);
 
 // Debug-enabled random number functions:
 // TODO:
-// ∙	ae_set_seed():		set the seed of the debug random number generator (NOT thread-safe!!!).
-// ∙	ae_get_seed():		the seed value of the debug random number generator (NOT thread-safe!!!).
-// ∙	ae_debugrng():		a random number generated with a high-quality random number generator.
+// ∙	ae_set_seed():	set the seed of the debug random number generator (NOT thread-safe!!!).
+// ∙	ae_get_seed():	the seed value of the debug random number generator (NOT thread-safe!!!).
+// ∙	ae_debugrng():	a random number generated with a high-quality random number generator.
 double randomreal();
 double randommid();
 ae_int_t randominteger(ae_int_t maxv);
@@ -664,13 +665,13 @@ bool randombool(double p = 0.5);
 // Complex math functions:
 // *	basic arithmetic operations
 // *	standard functions
-inline complex ae_complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (double)x, r.y = (double)y; return r; }
-inline complex ae_complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
+inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (double)x, r.y = (double)y; return r; }
+inline complex complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
 
 complex ae_c_neg(complex A);
 complex conj(complex A);
 complex csqr(complex A);
-double abscomplex(complex z);
+double abscomplex(complex A);
 
 bool ae_c_eq(complex A, complex B);
 bool ae_c_neq(complex A, complex B);
@@ -723,13 +724,13 @@ extern const double pi;
 #   define machineepsilon	5.0E-16
 #   define maxrealnumber	1.0E300
 #   define minrealnumber	1.0E-300
-#   define pi		3.1415926535897932384626433832795
+#   define pi			3.1415926535897932384626433832795
 #endif
 
 // Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
@@ -765,11 +766,11 @@ struct ap_error {
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
 #   if AE_THREADING != NonTH
-#      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it
+#      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
 #   define BegPoll		{
 #   define EndPoll		}
-// Set the error flag and (optionally) the error message.
+// Set the error flag and the pending error message.
 void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
@@ -844,7 +845,7 @@ Type &Type::operator=(const Type &A) { \
 typedef alglib_impl::ae_int_t ae_int_t;
 
 #if 0
-// Constants and functions introduced for compatibility with AlgoPascal
+// Constants and functions introduced for compatibility with AlgoPascal.
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 extern const double pi;
 #endif
@@ -855,10 +856,10 @@ bool isposinf(double x);
 int minint(int x, int y);
 int maxint(int x, int y);
 int sign(double x);
-int RoundZ(double x);
-int TruncZ(double x);
-int FloorZ(double x);
-int CeilZ(double x);
+int iround(double x);
+int itrunc(double x);
+int ifloor(double x);
+int iceil(double x);
 
 double minreal(double x, double y);
 double maxreal(double x, double y);
@@ -915,14 +916,12 @@ complex csqr(const complex &A);
 
 // Multi-threading and multi-core functions.
 // These are mostly stubs from the commercial version of ALGLIB.
-// xparams type and several predefined constants
-typedef alglib_impl::ae_uint64_t xparams;	// enum { NonTH, SerTH, ParTH };
 
 // Get/Set the number of cores; can be 1, 2, ...; or 0 for auto; or -1/-2/... for all except for one/two/...
 ae_int_t getnworkers();
 void setnworkers(ae_int_t nworkers);
 
-// Internal functions used by TestX.cpp, interfaces for functions present only in commercial version of ALGLIB.
+// Internal functions used by TestX.cpp, interfaces for functions present only in the commercial version of ALGLIB.
 ae_int_t _ae_cores_count();
 alglib_impl::ae_uint64_t _ae_get_global_threading();
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
@@ -996,7 +995,7 @@ struct ae_vector_wrapper {
 // NOTE:
 // *	An exception is thrown if datatype != e_ptr->datatype.
    ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype);
-// A copy of the object rhs (can be a reference to one of the derived classes), with run-time type-checking
+// A copy of the object rhs (can be a reference to one of the derived classes), with run-time type-checking.
 // NOTE:
 // *	An exception is thrown if datatype != rhs.datatype.
    ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype);
@@ -1009,11 +1008,13 @@ struct ae_vector_wrapper {
    ae_int_t length() const;
 // Access to the internal C-structure used by the C-core.
 // Not intended for external use.
-   const alglib_impl::ae_vector *c_ptr() const { return This; }
    alglib_impl::ae_vector *c_ptr() { return This; }
+   const alglib_impl::ae_vector *c_ptr() const { return This; }
 #if 0 //(@) Not implemented.
 private:
+   ae_vector_wrapper();
    ae_vector_wrapper(const ae_vector_wrapper &rhs);
+   const ae_vector_wrapper &operator=(const ae_vector_wrapper &rhs);
 #endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
@@ -1153,11 +1154,13 @@ struct ae_matrix_wrapper {
    bool isempty() const;
 // Access to the internal c-structure used by the c-core.
 // Not meant for external use.
-   const alglib_impl::ae_matrix *c_ptr() const { return This; }
    alglib_impl::ae_matrix *c_ptr() { return This; }
+   const alglib_impl::ae_matrix *c_ptr() const { return This; }
 #if 0 //(@) Not implemented.
 private:
+   ae_matrix_wrapper();
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
+   const ae_matrix_wrapper &operator=(const ae_matrix_wrapper &rhs);
 #endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
@@ -1167,7 +1170,7 @@ protected:
 // *	The X-object pointed to by new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
-// *	The state structure is used for error reporting purposes (longjmp on errors).
+// *	The state structure is used for error-handling purposes (longjmp on errors).
 //	All previously allocated memory is correctly freed on error.
    void attach_to(alglib_impl::x_matrix *new_ptr);
 // Assign rhs to the current object and return *this.
@@ -1186,7 +1189,7 @@ protected:
 // The internal C-structure used by the C-core and the inner ae_matrix.
 // *	This == &Obj:	the matrix owns the ae_matrix and is to handle its deallocation.
 // *	This != &Obj:	someone else owns the ae_matrix object and is to handle its deallocation;
-//			while Obj is assumed to be uninitialized and to ignored.
+//			while Obj is assumed to be uninitialized and to be ignored.
    alglib_impl::ae_matrix *This, Obj;
 // True if and only if the matrix's object was internally allocated and is owned.
 // *	ae_matrix's, directly owned or not, can be read and modified.

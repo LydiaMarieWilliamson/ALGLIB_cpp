@@ -80,7 +80,7 @@ double gammafunction(double x) {
    if (q > 33.0) {
       if (x < 0.0) {
          p = floor(q);
-         i = RoundZ(p);
+         i = iround(p);
          if (i % 2 == 0) {
             sgngam = -1.0;
          }
@@ -200,7 +200,7 @@ double lngamma(double x, double *sgngam) {
       q = -x;
       w = lngamma(q, &tmp);
       p = floor(q);
-      i = RoundZ(p);
+      i = iround(p);
       if (i % 2 == 0) {
          *sgngam = -1.0;
       } else {
@@ -3956,7 +3956,7 @@ double psi(double x) {
    }
    if (x <= 10.0 && x == floor(x)) {
       y = 0.0;
-      n = FloorZ(x);
+      n = ifloor(x);
       for (i = 1; i < n; i++) {
          w = (double)i;
          y += 1.0 / w;
@@ -5691,7 +5691,7 @@ double incompleteellipticintegralk(double phi, double m) {
       result = log(tan(0.5 * (HalfPi + phi)));
       return result;
    }
-   npio2 = FloorZ(phi / HalfPi);
+   npio2 = ifloor(phi / HalfPi);
    if (npio2 % 2 != 0) {
       npio2++;
    }
@@ -5731,7 +5731,7 @@ double incompleteellipticintegralk(double phi, double m) {
    while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
       phi += atan(t * temp) + md * pi;
-      md = TruncZ((phi + HalfPi) / pi);
+      md = itrunc((phi + HalfPi) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -5854,7 +5854,7 @@ double incompleteellipticintegrale(double phi, double m) {
       return result;
    }
    lphi = phi;
-   npio2 = FloorZ(lphi / HalfPi);
+   npio2 = ifloor(lphi / HalfPi);
    if (npio2 % 2 != 0) {
       npio2++;
    }
@@ -5901,7 +5901,7 @@ double incompleteellipticintegrale(double phi, double m) {
    while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
       lphi += atan(t * temp) + md * pi;
-      md = TruncZ((lphi + HalfPi) / pi);
+      md = itrunc((lphi + HalfPi) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);

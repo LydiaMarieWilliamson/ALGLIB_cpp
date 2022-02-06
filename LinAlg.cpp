@@ -773,7 +773,7 @@ void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    }
    if (n == 0) {
       for (i = 0; i < m; i++) {
-         y->xC[iy + i] = ae_complex_from_i(0);
+         y->xC[iy + i] = complex_from_i(0);
       }
       return;
    }
@@ -796,7 +796,7 @@ void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    if (opa == 1) {
    // y = A^T*x
       for (i = 0; i < m; i++) {
-         y->xC[iy + i] = ae_complex_from_i(0);
+         y->xC[iy + i] = complex_from_i(0);
       }
       for (i = 0; i < n; i++) {
          v = x->xC[ix + i];
@@ -807,7 +807,7 @@ void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    if (opa == 2) {
    // y = A^H*x
       for (i = 0; i < m; i++) {
-         y->xC[iy + i] = ae_complex_from_i(0);
+         y->xC[iy + i] = complex_from_i(0);
       }
       for (i = 0; i < n; i++) {
          v = x->xC[ix + i];
@@ -1087,7 +1087,7 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, complex alp
       ablas_cmatrixgemmrec(m, n, k0, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
       if (optypea == 0) ja += k0; else ia += k0;
       if (optypeb == 0) ib += k0; else jb += k0;
-      ablas_cmatrixgemmrec(m, n, k1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, ae_complex_from_d(1.0), c, ic, jc);
+      ablas_cmatrixgemmrec(m, n, k1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, complex_from_d(1.0), c, ic, jc);
    }
 }
 
@@ -1320,7 +1320,7 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
                if (isunit) {
-                  vd = ae_complex_from_i(1);
+                  vd = complex_from_i(1);
                } else {
                   vd = a->xyC[i1 + j][j1 + j];
                }
@@ -1337,8 +1337,8 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
       // X*A^(-T)
          for (i = 0; i < m; i++) {
             for (j = n - 1; j >= 0; j--) {
-               vc = ae_complex_from_i(0);
-               vd = ae_complex_from_i(1);
+               vc = complex_from_i(0);
+               vd = complex_from_i(1);
                if (j < n - 1) {
                   vc = ae_v_cdotproduct(&x->xyC[i2 + i][j2 + j + 1], 1, "N", &a->xyC[i1 + j][j1 + j + 1], 1, "N", n - j - 1);
                }
@@ -1354,8 +1354,8 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
       // X*A^(-H)
          for (i = 0; i < m; i++) {
             for (j = n - 1; j >= 0; j--) {
-               vc = ae_complex_from_i(0);
-               vd = ae_complex_from_i(1);
+               vc = complex_from_i(0);
+               vd = complex_from_i(1);
                if (j < n - 1) {
                   vc = ae_v_cdotproduct(&x->xyC[i2 + i][j2 + j + 1], 1, "N", &a->xyC[i1 + j][j1 + j + 1], 1, "Conj", n - j - 1);
                }
@@ -1374,7 +1374,7 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
          for (i = 0; i < m; i++) {
             for (j = n - 1; j >= 0; j--) {
                if (isunit) {
-                  vd = ae_complex_from_i(1);
+                  vd = complex_from_i(1);
                } else {
                   vd = a->xyC[i1 + j][j1 + j];
                }
@@ -1391,8 +1391,8 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
       // X*A^(-T)
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               vc = ae_complex_from_i(0);
-               vd = ae_complex_from_i(1);
+               vc = complex_from_i(0);
+               vd = complex_from_i(1);
                if (j > 0) {
                   vc = ae_v_cdotproduct(&x->xyC[i2 + i][j2], 1, "N", &a->xyC[i1 + j][j1], 1, "N", j);
                }
@@ -1408,8 +1408,8 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
       // X*A^(-H)
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               vc = ae_complex_from_i(0);
-               vd = ae_complex_from_i(1);
+               vc = complex_from_i(0);
+               vd = complex_from_i(1);
                if (j > 0) {
                   vc = ae_v_cdotproduct(&x->xyC[i2 + i][j2], 1, "N", &a->xyC[i1 + j][j1], 1, "Conj", j);
                }
@@ -1607,7 +1607,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
       // X*A^-1 = (X1 X2)*(       )
       //                  (     A2)
          cmatrixrighttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-         cmatrixgemm(m, s2, s1, ae_complex_from_d(-1.0), x, i2, j2, 0, a, i1, j1 + s1, 0, ae_complex_from_d(1.0), x, i2, j2 + s1);
+         cmatrixgemm(m, s2, s1, complex_from_d(-1.0), x, i2, j2, 0, a, i1, j1 + s1, 0, complex_from_d(1.0), x, i2, j2 + s1);
          cmatrixrighttrsm(m, s2, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2, j2 + s1);
       }
       if (isupper && optype != 0) {
@@ -1615,7 +1615,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
       // X*A^-1 = (X1 X2)*(        )
       //                  (A12' A2')
          cmatrixrighttrsm(m, s2, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2, j2 + s1);
-         cmatrixgemm(m, s1, s2, ae_complex_from_d(-1.0), x, i2, j2 + s1, 0, a, i1, j1 + s1, optype, ae_complex_from_d(1.0), x, i2, j2);
+         cmatrixgemm(m, s1, s2, complex_from_d(-1.0), x, i2, j2 + s1, 0, a, i1, j1 + s1, optype, complex_from_d(1.0), x, i2, j2);
          cmatrixrighttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       }
       if (!isupper && optype == 0) {
@@ -1623,7 +1623,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
       // X*A^-1 = (X1 X2)*(       )
       //                  (A21  A2)
          cmatrixrighttrsm(m, s2, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2, j2 + s1);
-         cmatrixgemm(m, s1, s2, ae_complex_from_d(-1.0), x, i2, j2 + s1, 0, a, i1 + s1, j1, 0, ae_complex_from_d(1.0), x, i2, j2);
+         cmatrixgemm(m, s1, s2, complex_from_d(-1.0), x, i2, j2 + s1, 0, a, i1 + s1, j1, 0, complex_from_d(1.0), x, i2, j2);
          cmatrixrighttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       }
       if (!isupper && optype != 0) {
@@ -1631,7 +1631,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
       // X*A^-1 = (X1 X2)*(        )
       //                  (     A2')
          cmatrixrighttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-         cmatrixgemm(m, s2, s1, ae_complex_from_d(-1.0), x, i2, j2, 0, a, i1 + s1, j1, optype, ae_complex_from_d(1.0), x, i2, j2 + s1);
+         cmatrixgemm(m, s2, s1, complex_from_d(-1.0), x, i2, j2, 0, a, i1 + s1, j1, optype, complex_from_d(1.0), x, i2, j2 + s1);
          cmatrixrighttrsm(m, s2, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2, j2 + s1);
       }
    }
@@ -1756,7 +1756,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
       // A^(-T)*X
          for (i = 0; i < m; i++) {
             if (isunit) {
-               vd = ae_complex_from_i(1);
+               vd = complex_from_i(1);
             } else {
                vd = ae_c_d_div(1, a->xyC[i1 + i][j1 + i]);
             }
@@ -1772,7 +1772,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
       // A^(-H)*X
          for (i = 0; i < m; i++) {
             if (isunit) {
-               vd = ae_complex_from_i(1);
+               vd = complex_from_i(1);
             } else {
                vd = ae_c_d_div(1, conj(a->xyC[i1 + i][j1 + i]));
             }
@@ -1794,7 +1794,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
                ae_v_csubc(&x->xyC[i2 + i][j2], 1, &x->xyC[i2 + j][j2], 1, "N", n, vc);
             }
             if (isunit) {
-               vd = ae_complex_from_i(1);
+               vd = complex_from_i(1);
             } else {
                vd = ae_c_d_div(1, a->xyC[i1 + j][j1 + j]);
             }
@@ -1806,7 +1806,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
       // A^(-T)*X
          for (i = m - 1; i >= 0; i--) {
             if (isunit) {
-               vd = ae_complex_from_i(1);
+               vd = complex_from_i(1);
             } else {
                vd = ae_c_d_div(1, a->xyC[i1 + i][j1 + i]);
             }
@@ -1822,7 +1822,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
       // A^(-H)*X
          for (i = m - 1; i >= 0; i--) {
             if (isunit) {
-               vd = ae_complex_from_i(1);
+               vd = complex_from_i(1);
             } else {
                vd = ae_c_d_div(1, conj(a->xyC[i1 + i][j1 + i]));
             }
@@ -2006,7 +2006,7 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
       // A^-1*X* = (       )   *(    )
       //           (     A2)    ( X2 )
          cmatrixlefttrsm(s2, n, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2 + s1, j2);
-         cmatrixgemm(s1, n, s2, ae_complex_from_d(-1.0), a, i1, j1 + s1, 0, x, i2 + s1, j2, 0, ae_complex_from_d(1.0), x, i2, j2);
+         cmatrixgemm(s1, n, s2, complex_from_d(-1.0), a, i1, j1 + s1, 0, x, i2 + s1, j2, 0, complex_from_d(1.0), x, i2, j2);
          cmatrixlefttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       }
       if (isupper && optype != 0) {
@@ -2014,7 +2014,7 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
       // A^-1*X = (        )  *(    )
       //          (A12' A2')   ( X2 )
          cmatrixlefttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-         cmatrixgemm(s2, n, s1, ae_complex_from_d(-1.0), a, i1, j1 + s1, optype, x, i2, j2, 0, ae_complex_from_d(1.0), x, i2 + s1, j2);
+         cmatrixgemm(s2, n, s1, complex_from_d(-1.0), a, i1, j1 + s1, optype, x, i2, j2, 0, complex_from_d(1.0), x, i2 + s1, j2);
          cmatrixlefttrsm(s2, n, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2 + s1, j2);
       }
       if (!isupper && optype == 0) {
@@ -2022,7 +2022,7 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
       // A^-1*X = (       )  *(    )
       //          (A21  A2)   ( X2 )
          cmatrixlefttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-         cmatrixgemm(s2, n, s1, ae_complex_from_d(-1.0), a, i1 + s1, j1, 0, x, i2, j2, 0, ae_complex_from_d(1.0), x, i2 + s1, j2);
+         cmatrixgemm(s2, n, s1, complex_from_d(-1.0), a, i1 + s1, j1, 0, x, i2, j2, 0, complex_from_d(1.0), x, i2 + s1, j2);
          cmatrixlefttrsm(s2, n, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2 + s1, j2);
       }
       if (!isupper && optype != 0) {
@@ -2030,7 +2030,7 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
       // A^-1*X = (        )  *(    )
       //          (     A2')   ( X2 )
          cmatrixlefttrsm(s2, n, a, i1 + s1, j1 + s1, isupper, isunit, optype, x, i2 + s1, j2);
-         cmatrixgemm(s1, n, s2, ae_complex_from_d(-1.0), a, i1 + s1, j1, optype, x, i2 + s1, j2, 0, ae_complex_from_d(1.0), x, i2, j2);
+         cmatrixgemm(s1, n, s2, complex_from_d(-1.0), a, i1 + s1, j1, optype, x, i2 + s1, j2, 0, complex_from_d(1.0), x, i2, j2);
          cmatrixlefttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       }
    }
@@ -2143,7 +2143,7 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
             if (alpha != 0.0 && k > 0) {
                v = ae_v_cdotproduct(&a->xyC[ia + i][ja], 1, "N", &a->xyC[ia + j][ja], 1, "Conj", k);
             } else {
-               v = ae_complex_from_i(0);
+               v = complex_from_i(0);
             }
             if (beta == 0.0) {
                c->xyC[ic + i][jc + j] = ae_c_mul_d(v, alpha);
@@ -2165,7 +2165,7 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
          }
          if (beta == 0.0) {
             for (j = j1; j <= j2; j++) {
-               c->xyC[ic + i][jc + j] = ae_complex_from_i(0);
+               c->xyC[ic + i][jc + j] = complex_from_i(0);
             }
          } else {
             ae_v_cmuld(&c->xyC[ic + i][jc + j1], 1, j2 - j1 + 1, beta);
@@ -2352,22 +2352,22 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
       if (optypea == 0 && isupper) {
          cmatrixherk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(s2, k, alpha, a, ia + s1, ja, optypea, beta, c, ic + s1, jc + s1, isupper);
-         cmatrixgemm(s1, s2, k, ae_complex_from_d(alpha), a, ia, ja, 0, a, ia + s1, ja, 2, ae_complex_from_d(beta), c, ic, jc + s1);
+         cmatrixgemm(s1, s2, k, complex_from_d(alpha), a, ia, ja, 0, a, ia + s1, ja, 2, complex_from_d(beta), c, ic, jc + s1);
       }
       if (optypea == 0 && !isupper) {
          cmatrixherk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(s2, k, alpha, a, ia + s1, ja, optypea, beta, c, ic + s1, jc + s1, isupper);
-         cmatrixgemm(s2, s1, k, ae_complex_from_d(alpha), a, ia + s1, ja, 0, a, ia, ja, 2, ae_complex_from_d(beta), c, ic + s1, jc);
+         cmatrixgemm(s2, s1, k, complex_from_d(alpha), a, ia + s1, ja, 0, a, ia, ja, 2, complex_from_d(beta), c, ic + s1, jc);
       }
       if (optypea != 0 && isupper) {
          cmatrixherk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(s2, k, alpha, a, ia, ja + s1, optypea, beta, c, ic + s1, jc + s1, isupper);
-         cmatrixgemm(s1, s2, k, ae_complex_from_d(alpha), a, ia, ja, 2, a, ia, ja + s1, 0, ae_complex_from_d(beta), c, ic, jc + s1);
+         cmatrixgemm(s1, s2, k, complex_from_d(alpha), a, ia, ja, 2, a, ia, ja + s1, 0, complex_from_d(beta), c, ic, jc + s1);
       }
       if (optypea != 0 && !isupper) {
          cmatrixherk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(s2, k, alpha, a, ia, ja + s1, optypea, beta, c, ic + s1, jc + s1, isupper);
-         cmatrixgemm(s2, s1, k, ae_complex_from_d(alpha), a, ia, ja + s1, 2, a, ia, ja, 0, ae_complex_from_d(beta), c, ic + s1, jc);
+         cmatrixgemm(s2, s1, k, complex_from_d(alpha), a, ia, ja + s1, 2, a, ia, ja, 0, complex_from_d(beta), c, ic + s1, jc);
       }
    }
 }
@@ -2684,14 +2684,14 @@ static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwi
    // load 1.0 in the first non-zero element
       if (columnwisea) {
          for (i = 0; i < k; i++) {
-            a->xyC[i][k] = ae_complex_from_i(0);
+            a->xyC[i][k] = complex_from_i(0);
          }
       } else {
          for (i = 0; i < k; i++) {
-            a->xyC[k][i] = ae_complex_from_i(0);
+            a->xyC[k][i] = complex_from_i(0);
          }
       }
-      a->xyC[k][k] = ae_complex_from_i(1);
+      a->xyC[k][k] = complex_from_i(1);
    // fill non-zero part of T,
       for (i = 0; i < k; i++) {
          if (columnwisea) {
@@ -2708,7 +2708,7 @@ static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwi
       t->xyC[k][k] = ae_c_neg(tau->xC[k]);
    // Rest of T is filled by zeros
       for (i = k + 1; i < blocksize; i++) {
-         t->xyC[i][k] = ae_complex_from_i(0);
+         t->xyC[i][k] = complex_from_i(0);
       }
    }
 }
@@ -2770,7 +2770,7 @@ static void ortfac_cmatrixqrbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
       complexgeneratereflection(t, mmi, &tmp);
       tau->xC[i] = tmp;
       ae_v_cmove(&a->xyC[i][i], a->stride, &t->xC[1], 1, "N", m - i);
-      t->xC[1] = ae_complex_from_i(1);
+      t->xC[1] = complex_from_i(1);
       if (i < n - 1) {
       // Apply H'(i) to A(i:m,i+1:n) from the left
          complexapplyreflectionfromtheleft(a, conj(tau->xC[i]), t, i, m - 1, i + 1, n - 1, work);
@@ -2833,7 +2833,7 @@ static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
       complexgeneratereflection(t, n - i, &tmp);
       tau->xC[i] = tmp;
       ae_v_cmove(&a->xyC[i][i], 1, &t->xC[1], 1, "Conj", n - i);
-      t->xC[1] = ae_complex_from_i(1);
+      t->xC[1] = complex_from_i(1);
       if (i < m - 1) {
       // Apply H'(i)
          complexapplyreflectionfromtheright(a, tau->xC[i], t, i + 1, m - 1, i, n - 1, work);
@@ -3028,14 +3028,14 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
          //
          // Q  = E + Y*T*Y'  = E + TmpA*TmpT*TmpA'
          // Q' = E + Y*T'*Y' = E + TmpA*TmpT'*TmpA'
-            cmatrixgemm(blocksize, n - blockstart - blocksize, rowscount, ae_complex_from_d(1.0), &tmpa, 0, 0, 2, a, blockstart, blockstart + blocksize, 0, ae_complex_from_d(0.0), &tmpr, 0, 0);
-            cmatrixgemm(blocksize, n - blockstart - blocksize, blocksize, ae_complex_from_d(1.0), &tmpt, 0, 0, 2, &tmpr, 0, 0, 0, ae_complex_from_d(0.0), &tmpr, blocksize, 0);
-            cmatrixgemm(rowscount, n - blockstart - blocksize, blocksize, ae_complex_from_d(1.0), &tmpa, 0, 0, 0, &tmpr, blocksize, 0, 0, ae_complex_from_d(1.0), a, blockstart, blockstart + blocksize);
+            cmatrixgemm(blocksize, n - blockstart - blocksize, rowscount, complex_from_d(1.0), &tmpa, 0, 0, 2, a, blockstart, blockstart + blocksize, 0, complex_from_d(0.0), &tmpr, 0, 0);
+            cmatrixgemm(blocksize, n - blockstart - blocksize, blocksize, complex_from_d(1.0), &tmpt, 0, 0, 2, &tmpr, 0, 0, 0, complex_from_d(0.0), &tmpr, blocksize, 0);
+            cmatrixgemm(rowscount, n - blockstart - blocksize, blocksize, complex_from_d(1.0), &tmpa, 0, 0, 0, &tmpr, blocksize, 0, 0, complex_from_d(1.0), a, blockstart, blockstart + blocksize);
          } else {
          // Level 2 algorithm
             for (i = 0; i < blocksize; i++) {
                ae_v_cmove(&t.xC[1], 1, &tmpa.xyC[i][i], tmpa.stride, "N", rowscount - i);
-               t.xC[1] = ae_complex_from_i(1);
+               t.xC[1] = complex_from_i(1);
                complexapplyreflectionfromtheleft(a, conj(taubuf.xC[i]), &t, blockstart + i, m - 1, blockstart + blocksize, n - 1, &work);
             }
          }
@@ -3231,14 +3231,14 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
          // Multiply the rest of A by Q.
          //
          // Q  = E + Y*T*Y'  = E + TmpA'*TmpT*TmpA
-            cmatrixgemm(m - blockstart - blocksize, blocksize, columnscount, ae_complex_from_d(1.0), a, blockstart + blocksize, blockstart, 0, &tmpa, 0, 0, 2, ae_complex_from_d(0.0), &tmpr, 0, 0);
-            cmatrixgemm(m - blockstart - blocksize, blocksize, blocksize, ae_complex_from_d(1.0), &tmpr, 0, 0, 0, &tmpt, 0, 0, 0, ae_complex_from_d(0.0), &tmpr, 0, blocksize);
-            cmatrixgemm(m - blockstart - blocksize, columnscount, blocksize, ae_complex_from_d(1.0), &tmpr, 0, blocksize, 0, &tmpa, 0, 0, 0, ae_complex_from_d(1.0), a, blockstart + blocksize, blockstart);
+            cmatrixgemm(m - blockstart - blocksize, blocksize, columnscount, complex_from_d(1.0), a, blockstart + blocksize, blockstart, 0, &tmpa, 0, 0, 2, complex_from_d(0.0), &tmpr, 0, 0);
+            cmatrixgemm(m - blockstart - blocksize, blocksize, blocksize, complex_from_d(1.0), &tmpr, 0, 0, 0, &tmpt, 0, 0, 0, complex_from_d(0.0), &tmpr, 0, blocksize);
+            cmatrixgemm(m - blockstart - blocksize, columnscount, blocksize, complex_from_d(1.0), &tmpr, 0, blocksize, 0, &tmpa, 0, 0, 0, complex_from_d(1.0), a, blockstart + blocksize, blockstart);
          } else {
          // Level 2 algorithm
             for (i = 0; i < blocksize; i++) {
                ae_v_cmove(&t.xC[1], 1, &tmpa.xyC[i][i], 1, "Conj", columnscount - i);
-               t.xC[1] = ae_complex_from_i(1);
+               t.xC[1] = complex_from_i(1);
                complexapplyreflectionfromtheright(a, taubuf.xC[i], &t, blockstart + blocksize, m - 1, blockstart + i, n - 1, &work);
             }
          }
@@ -3402,9 +3402,9 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    for (i = 0; i < m; i++) {
       for (j = 0; j < qcolumns; j++) {
          if (i == j) {
-            q->xyC[i][j] = ae_complex_from_i(1);
+            q->xyC[i][j] = complex_from_i(1);
          } else {
-            q->xyC[i][j] = ae_complex_from_i(0);
+            q->xyC[i][j] = complex_from_i(0);
          }
       }
    }
@@ -3431,14 +3431,14 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
          // Multiply the rest of A by Q.
          //
          // Q  = E + Y*T*Y'  = E + TmpA*TmpT*TmpA'
-            cmatrixgemm(blocksize, qcolumns, rowscount, ae_complex_from_d(1.0), &tmpa, 0, 0, 2, q, blockstart, 0, 0, ae_complex_from_d(0.0), &tmpr, 0, 0);
-            cmatrixgemm(blocksize, qcolumns, blocksize, ae_complex_from_d(1.0), &tmpt, 0, 0, 0, &tmpr, 0, 0, 0, ae_complex_from_d(0.0), &tmpr, blocksize, 0);
-            cmatrixgemm(rowscount, qcolumns, blocksize, ae_complex_from_d(1.0), &tmpa, 0, 0, 0, &tmpr, blocksize, 0, 0, ae_complex_from_d(1.0), q, blockstart, 0);
+            cmatrixgemm(blocksize, qcolumns, rowscount, complex_from_d(1.0), &tmpa, 0, 0, 2, q, blockstart, 0, 0, complex_from_d(0.0), &tmpr, 0, 0);
+            cmatrixgemm(blocksize, qcolumns, blocksize, complex_from_d(1.0), &tmpt, 0, 0, 0, &tmpr, 0, 0, 0, complex_from_d(0.0), &tmpr, blocksize, 0);
+            cmatrixgemm(rowscount, qcolumns, blocksize, complex_from_d(1.0), &tmpa, 0, 0, 0, &tmpr, blocksize, 0, 0, complex_from_d(1.0), q, blockstart, 0);
          } else {
          // Level 2 algorithm
             for (i = blocksize - 1; i >= 0; i--) {
                ae_v_cmove(&t.xC[1], 1, &tmpa.xyC[i][i], tmpa.stride, "N", rowscount - i);
-               t.xC[1] = ae_complex_from_i(1);
+               t.xC[1] = complex_from_i(1);
                complexapplyreflectionfromtheleft(q, taubuf.xC[i], &t, blockstart + i, m - 1, 0, qcolumns - 1, &work);
             }
          }
@@ -3504,7 +3504,7 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r) {
    k = imin2(m, n);
    ae_matrix_set_length(r, m, n);
    for (i = 0; i < n; i++) {
-      r->xyC[0][i] = ae_complex_from_i(0);
+      r->xyC[0][i] = complex_from_i(0);
    }
    for (i = 1; i < m; i++) {
       ae_v_cmove(r->xyC[i], 1, r->xyC[0], 1, "N", n);
@@ -3666,9 +3666,9 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    for (i = 0; i < qrows; i++) {
       for (j = 0; j < n; j++) {
          if (i == j) {
-            q->xyC[i][j] = ae_complex_from_i(1);
+            q->xyC[i][j] = complex_from_i(1);
          } else {
-            q->xyC[i][j] = ae_complex_from_i(0);
+            q->xyC[i][j] = complex_from_i(0);
          }
       }
    }
@@ -3695,14 +3695,14 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
          // Multiply the rest of A by Q'.
          //
          // Q'  = E + Y*T'*Y'  = E + TmpA'*TmpT'*TmpA
-            cmatrixgemm(qrows, blocksize, columnscount, ae_complex_from_d(1.0), q, 0, blockstart, 0, &tmpa, 0, 0, 2, ae_complex_from_d(0.0), &tmpr, 0, 0);
-            cmatrixgemm(qrows, blocksize, blocksize, ae_complex_from_d(1.0), &tmpr, 0, 0, 0, &tmpt, 0, 0, 2, ae_complex_from_d(0.0), &tmpr, 0, blocksize);
-            cmatrixgemm(qrows, columnscount, blocksize, ae_complex_from_d(1.0), &tmpr, 0, blocksize, 0, &tmpa, 0, 0, 0, ae_complex_from_d(1.0), q, 0, blockstart);
+            cmatrixgemm(qrows, blocksize, columnscount, complex_from_d(1.0), q, 0, blockstart, 0, &tmpa, 0, 0, 2, complex_from_d(0.0), &tmpr, 0, 0);
+            cmatrixgemm(qrows, blocksize, blocksize, complex_from_d(1.0), &tmpr, 0, 0, 0, &tmpt, 0, 0, 2, complex_from_d(0.0), &tmpr, 0, blocksize);
+            cmatrixgemm(qrows, columnscount, blocksize, complex_from_d(1.0), &tmpr, 0, blocksize, 0, &tmpa, 0, 0, 0, complex_from_d(1.0), q, 0, blockstart);
          } else {
          // Level 2 algorithm
             for (i = blocksize - 1; i >= 0; i--) {
                ae_v_cmove(&t.xC[1], 1, &tmpa.xyC[i][i], 1, "Conj", columnscount - i);
-               t.xC[1] = ae_complex_from_i(1);
+               t.xC[1] = complex_from_i(1);
                complexapplyreflectionfromtheright(q, conj(taubuf.xC[i]), &t, 0, qrows - 1, blockstart + i, n - 1, &work);
             }
          }
@@ -3767,7 +3767,7 @@ void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l) {
    }
    ae_matrix_set_length(l, m, n);
    for (i = 0; i < n; i++) {
-      l->xyC[0][i] = ae_complex_from_i(0);
+      l->xyC[0][i] = complex_from_i(0);
    }
    for (i = 1; i < m; i++) {
       ae_v_cmove(l->xyC[i], 1, l->xyC[0], 1, "N", n);
@@ -4723,7 +4723,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
 // ALGLIB version
    if (isupper) {
    // Reduce the upper triangle of A
-      a->xyC[n - 1][n - 1] = ae_complex_from_d(a->xyC[n - 1][n - 1].x);
+      a->xyC[n - 1][n - 1] = complex_from_d(a->xyC[n - 1][n - 1].x);
       for (i = n - 2; i >= 0; i--) {
       // Generate elementary reflector H = I+1 - tau * v * v'
          alpha = a->xyC[i][i + 1];
@@ -4739,7 +4739,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          e->xR[i] = alpha.x;
          if (ae_c_neq_d(taui, 0.0)) {
          // Apply H(I+1) from both sides to A
-            a->xyC[i][i + 1] = ae_complex_from_i(1);
+            a->xyC[i][i + 1] = complex_from_i(1);
          // Compute  x := tau * A * v  storing x in TAU
             ae_v_cmove(&t.xC[1], 1, &a->xyC[0][i + 1], a->stride, "N", i + 1);
             hermitianmatrixvectormultiply(a, isupper, 0, i, &t, taui, &t2);
@@ -4752,18 +4752,18 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          //    A := A - v * w' - w * v'
             ae_v_cmove(&t.xC[1], 1, &a->xyC[0][i + 1], a->stride, "N", i + 1);
             ae_v_cmove(&t3.xC[1], 1, tau->xC, 1, "N", i + 1);
-            hermitianrank2update(a, isupper, 0, i, &t, &t3, &t2, ae_complex_from_i(-1));
+            hermitianrank2update(a, isupper, 0, i, &t, &t3, &t2, complex_from_i(-1));
          } else {
-            a->xyC[i][i] = ae_complex_from_d(a->xyC[i][i].x);
+            a->xyC[i][i] = complex_from_d(a->xyC[i][i].x);
          }
-         a->xyC[i][i + 1] = ae_complex_from_d(e->xR[i]);
+         a->xyC[i][i + 1] = complex_from_d(e->xR[i]);
          d->xR[i + 1] = a->xyC[i + 1][i + 1].x;
          tau->xC[i] = taui;
       }
       d->xR[0] = a->xyC[0][0].x;
    } else {
    // Reduce the lower triangle of A
-      a->xyC[0][0] = ae_complex_from_d(a->xyC[0][0].x);
+      a->xyC[0][0] = complex_from_d(a->xyC[0][0].x);
       for (i = 0; i < n - 1; i++) {
       // Generate elementary reflector H = I - tau * v * v'
          ae_v_cmove(&t.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
@@ -4772,7 +4772,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          e->xR[i] = a->xyC[i + 1][i].x;
          if (ae_c_neq_d(taui, 0.0)) {
          // Apply H(i) from both sides to A(i+1:n,i+1:n)
-            a->xyC[i + 1][i] = ae_complex_from_i(1);
+            a->xyC[i + 1][i] = complex_from_i(1);
          // Compute  x := tau * A * v  storing y in TAU
             ae_v_cmove(&t.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
             hermitianmatrixvectormultiply(a, isupper, i + 1, n - 1, &t, taui, &t2);
@@ -4785,11 +4785,11 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          // A := A - v * w' - w * v'
             ae_v_cmove(&t.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
             ae_v_cmove(&t2.xC[1], 1, &tau->xC[i], 1, "N", n - i - 1);
-            hermitianrank2update(a, isupper, i + 1, n - 1, &t, &t2, &t3, ae_complex_from_i(-1));
+            hermitianrank2update(a, isupper, i + 1, n - 1, &t, &t2, &t3, complex_from_i(-1));
          } else {
-            a->xyC[i + 1][i + 1] = ae_complex_from_d(a->xyC[i + 1][i + 1].x);
+            a->xyC[i + 1][i + 1] = complex_from_d(a->xyC[i + 1][i + 1].x);
          }
-         a->xyC[i + 1][i] = ae_complex_from_d(e->xR[i]);
+         a->xyC[i + 1][i] = complex_from_d(e->xR[i]);
          d->xR[i] = a->xyC[i][i].x;
          tau->xC[i] = taui;
       }
@@ -4900,9 +4900,9 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (i == j) {
-            q->xyC[i][j] = ae_complex_from_i(1);
+            q->xyC[i][j] = complex_from_i(1);
          } else {
-            q->xyC[i][j] = ae_complex_from_i(0);
+            q->xyC[i][j] = complex_from_i(0);
          }
       }
    }
@@ -4910,14 +4910,14 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
       for (i = 0; i < n - 1; i++) {
       // Apply H(i)
          ae_v_cmove(&v.xC[1], 1, &a->xyC[0][i + 1], a->stride, "N", i + 1);
-         v.xC[i + 1] = ae_complex_from_i(1);
+         v.xC[i + 1] = complex_from_i(1);
          complexapplyreflectionfromtheleft(q, tau->xC[i], &v, 0, i, 0, n - 1, &work);
       }
    } else {
       for (i = n - 2; i >= 0; i--) {
       // Apply H(i)
          ae_v_cmove(&v.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
-         v.xC[1] = ae_complex_from_i(1);
+         v.xC[1] = complex_from_i(1);
          complexapplyreflectionfromtheleft(q, tau->xC[i], &v, i + 1, n - 1, 0, n - 1, &work);
       }
    }
@@ -5219,7 +5219,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
       } while (ae_c_eq_d(lambdav, 0.0));
    // Prepare and apply reflection
       complexgeneratereflection(&v, s, &tau);
-      v.xC[1] = ae_complex_from_i(1);
+      v.xC[1] = complex_from_i(1);
       complexapplyreflectionfromtheright(a, tau, &v, 0, m - 1, n - s, n - 1, &w);
    }
 // Second pass.
@@ -5344,7 +5344,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
       } while (ae_c_eq_d(lambdav, 0.0));
    // Prepare and apply reflection
       complexgeneratereflection(&v, s, &tau);
-      v.xC[1] = ae_complex_from_i(1);
+      v.xC[1] = complex_from_i(1);
       complexapplyreflectionfromtheleft(a, tau, &v, m - s, m - 1, 0, n - 1, &w);
    }
 // Second pass.
@@ -5422,9 +5422,9 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (i == j) {
-            a->xyC[i][j] = ae_complex_from_i(1);
+            a->xyC[i][j] = complex_from_i(1);
          } else {
-            a->xyC[i][j] = ae_complex_from_i(0);
+            a->xyC[i][j] = complex_from_i(0);
          }
       }
    }
@@ -5512,14 +5512,14 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a->xyC[i][j] = ae_complex_from_i(0);
+         a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = ae_complex_from_d(exp(l1));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = ae_complex_from_d(exp(hqrnduniformr(&state) * (l2 - l1) + l1));
+      a->xyC[i][i] = complex_from_d(exp(hqrnduniformr(&state) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = ae_complex_from_d(exp(l2));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
    cmatrixrndorthogonalfromtheleft(a, n, n);
    cmatrixrndorthogonalfromtheright(a, n, n);
    ae_frame_leave();
@@ -5621,7 +5621,7 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
       } while (ae_c_eq_d(lambdav, 0.0));
    // Prepare and apply reflection
       complexgeneratereflection(&v, s, &tau);
-      v.xC[1] = ae_complex_from_i(1);
+      v.xC[1] = complex_from_i(1);
       complexapplyreflectionfromtheright(a, tau, &v, 0, n - 1, n - s, n - 1, &w);
       complexapplyreflectionfromtheleft(a, conj(tau), &v, n - s, n - 1, 0, n - 1, &w);
    }
@@ -5716,7 +5716,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
    // special case
-      a->xyC[0][0] = ae_complex_from_i(2 * randominteger(2) - 1);
+      a->xyC[0][0] = complex_from_i(2 * randominteger(2) - 1);
       ae_frame_leave();
       return;
    }
@@ -5726,14 +5726,14 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a->xyC[i][j] = ae_complex_from_i(0);
+         a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = ae_complex_from_d(exp(l1));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = ae_complex_from_d((2 * hqrnduniformi(&rs, 2) - 1) * exp(hqrnduniformr(&rs) * (l2 - l1) + l1));
+      a->xyC[i][i] = complex_from_d((2 * hqrnduniformi(&rs, 2) - 1) * exp(hqrnduniformr(&rs) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = ae_complex_from_d(exp(l2));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
 // Multiply
    hmatrixrndmultiply(a, n);
 // post-process to ensure that matrix diagonal is real
@@ -5820,7 +5820,7 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    }
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
-      a->xyC[0][0] = ae_complex_from_i(1);
+      a->xyC[0][0] = complex_from_i(1);
       ae_frame_leave();
       return;
    }
@@ -5830,14 +5830,14 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    l2 = log(1 / c);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a->xyC[i][j] = ae_complex_from_i(0);
+         a->xyC[i][j] = complex_from_i(0);
       }
    }
-   a->xyC[0][0] = ae_complex_from_d(exp(l1));
+   a->xyC[0][0] = complex_from_d(exp(l1));
    for (i = 1; i < n - 1; i++) {
-      a->xyC[i][i] = ae_complex_from_d(exp(hqrnduniformr(&rs) * (l2 - l1) + l1));
+      a->xyC[i][i] = complex_from_d(exp(hqrnduniformr(&rs) * (l2 - l1) + l1));
    }
-   a->xyC[n - 1][n - 1] = ae_complex_from_d(exp(l2));
+   a->xyC[n - 1][n - 1] = complex_from_d(exp(l2));
 // Multiply
    hmatrixrndmultiply(a, n);
 // post-process to ensure that matrix diagonal is real
@@ -6032,7 +6032,7 @@ void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s) {
 //       1.000.000 elements, we have to create such table from the
 //       very beginning. Otherwise, the very idea of memory reuse
 //       will be compromised.
-   s->tablesize = RoundZ(k / sparse_desiredloadfactor + sparse_additional);
+   s->tablesize = iround(k / sparse_desiredloadfactor + sparse_additional);
    vectorsetlengthatleast(&s->vals, s->tablesize);
    s->tablesize = s->vals.cnt;
 // Initialize other fields
@@ -6643,7 +6643,7 @@ void sparseresizematrix(sparsematrix *s) {
       }
    }
 // Initialization value for free space
-   s->tablesize = RoundZ(k1 / sparse_desiredloadfactor * sparse_growfactor + sparse_additional);
+   s->tablesize = iround(k1 / sparse_desiredloadfactor * sparse_growfactor + sparse_additional);
    s->nfree = s->tablesize - k1;
    ae_vector_set_length(&tvals, s->tablesize);
    ae_vector_set_length(&tidx, 2 * s->tablesize);
@@ -10327,7 +10327,7 @@ void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1) {
 // This function performs integrity check on user-specified values, with  the
 // only exception being Vals[] array:
 // * it does not require values to be non-zero
-// * it does not checks for element of Vals[] being finite IEEE-754 values
+// * it does not check for elements of Vals[] being finite IEEE-754 values
 //
 // Inputs:
 //     S   -   sparse matrix with corresponding fields set by caller
@@ -14525,7 +14525,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       gl -= fudge * tnorm * ulp * n + fudge * 2 * pivmin;
       gu += fudge * tnorm * ulp * n + fudge * pivmin;
    // Compute Iteration parameters
-      itmax = CeilZ((log(tnorm + pivmin) - log(pivmin)) / log(2.0)) + 2;
+      itmax = iceil((log(tnorm + pivmin) - log(pivmin)) / log(2.0)) + 2;
       if (abstol <= 0.0) {
          atoli = ulp * tnorm;
       } else {
@@ -14713,7 +14713,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          nwu += iwork.xZ[iin + 1];
          iwoff = *m - iwork.xZ[1];
       // Compute Eigenvalues
-         itmax = CeilZ((log(gu - gl + pivmin) - log(pivmin)) / log(2.0)) + 2;
+         itmax = iceil((log(gu - gl + pivmin) - log(pivmin)) / log(2.0)) + 2;
       // Calling DLAEBZ
       //
       // CALL DLAEBZ( 2, ITMAX, IN, IN, 1, NB, ATOLI, RTOLI, PIVMIN,
@@ -17468,7 +17468,7 @@ void cmatrixluprec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
          }
       }
       cmatrixrighttrsm(m2, m1, a, offs, offs, true, true, 0, a, offs + m1, offs);
-      cmatrixgemm(m - m1, n - m1, m1, ae_complex_from_d(-1.0), a, offs + m1, offs, 0, a, offs, offs + m1, 0, ae_complex_from_d(1.0), a, offs + m1, offs + m1);
+      cmatrixgemm(m - m1, n - m1, m1, complex_from_d(-1.0), a, offs + m1, offs, 0, a, offs, offs + m1, 0, complex_from_d(1.0), a, offs + m1, offs + m1);
       cmatrixluprec(a, offs + m1, m - m1, n - m1, pivots, tmp);
       for (i = 0; i < m2; i++) {
          if (offs + m1 + i != pivots->xZ[offs + m1 + i]) {
@@ -17661,7 +17661,7 @@ void cmatrixplurec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
          }
       }
       cmatrixlefttrsm(n1, n2, a, offs, offs, false, true, 0, a, offs, offs + n1);
-      cmatrixgemm(m - n1, n - n1, n1, ae_complex_from_d(-1.0), a, offs + n1, offs, 0, a, offs, offs + n1, 0, ae_complex_from_d(1.0), a, offs + n1, offs + n1);
+      cmatrixgemm(m - n1, n - n1, n1, complex_from_d(-1.0), a, offs + n1, offs, 0, a, offs, offs + n1, 0, complex_from_d(1.0), a, offs + n1, offs + n1);
       cmatrixplurec(a, offs + n1, m - n1, n - n1, pivots, tmp);
       for (i = 0; i < n2; i++) {
          if (offs + n1 + i != pivots->xZ[offs + n1 + i]) {
@@ -17804,7 +17804,7 @@ static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n) {
 // Note: excessive rows are allocated to accomodate for situation when
 //       this buffer is used to solve successive problems with increasing
 //       sizes.
-   excessivesize = imax2(RoundZ(1.333 * n), n);
+   excessivesize = imax2(iround(1.333 * n), n);
    d->n = n;
    d->ndense = 0;
    vectorsetlengthatleast(&d->did, n);
@@ -17866,7 +17866,7 @@ static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a) {
       a->isdensified.xB[i] = false;
    }
 // Working set of columns
-   a->maxwrkcnt = iboundval(RoundZ(1 + (double)n / 3.0), 1, imin2(n, 50));
+   a->maxwrkcnt = iboundval(iround(1 + (double)n / 3.0), 1, imin2(n, 50));
    a->wrkcnt = 0;
    vectorsetlengthatleast(&a->wrkset, a->maxwrkcnt);
 // Sparse linked storage (SLS). Store CRS matrix to SLS format,
@@ -18013,7 +18013,7 @@ static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, 
                }
             }
          // Advance scan range
-            jp = RoundZ(1.41 * (wrk1 - wrk0)) + 1;
+            jp = iround(1.41 * (wrk1 - wrk0)) + 1;
             wrk0 = wrk1;
             wrk1 = wrk0 + jp;
          }
@@ -18345,7 +18345,7 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
    n = a->n;
    k = a->k;
    ae_assert(k < n, "SparseTrailPivotOut: integrity check failed");
-   densifyabove = RoundZ(sptrf_densebnd * (n - k)) + 1;
+   densifyabove = iround(sptrf_densebnd * (n - k)) + 1;
    ae_assert(v0i->cnt >= nz0 + 1, "SparseTrailUpdate: integrity check failed");
    ae_assert(v0r->cnt >= nz0 + 1, "SparseTrailUpdate: integrity check failed");
    v0i->xZ[nz0] = -1;
@@ -18540,7 +18540,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
    sptrf_sparsetrailinit(a, &buf->strail);
 // Prepare dense trail, initial densification
    sptrf_densetrailinit(&buf->dtrail, n);
-   densifyabove = RoundZ(sptrf_densebnd * n) + 1;
+   densifyabove = iround(sptrf_densebnd * n) + 1;
    if (densificationsupported) {
       for (i = 0; i < n; i++) {
          if (buf->strail.nzc.xZ[i] > densifyabove) {
@@ -22844,14 +22844,14 @@ void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
       }
    }
    if (mx != 0.0) {
-      v = ae_complex_from_d(1 / mx);
+      v = complex_from_d(1 / mx);
       for (i = 0; i < m; i++) {
          ae_v_cmulc(a->xyC[i], 1, n, v);
       }
    }
    cmatrixplurec(a, 0, m, n, pivots, &tmp);
    if (mx != 0.0) {
-      v = ae_complex_from_d(mx);
+      v = complex_from_d(mx);
       for (i = 0; i < imin2(m, n); i++) {
          ae_v_cmulc(&a->xyC[i][i], 1, n - i, v);
       }
@@ -23023,12 +23023,12 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
          v = ae_v_cdotproduct(&aaa->xyC[offs][offs + j], aaa->stride, "Conj", &aaa->xyC[offs][offs + j], aaa->stride, "N", j);
          ajj = ae_c_sub(aaa->xyC[offs + j][offs + j], v).x;
          if (ajj <= 0.0) {
-            aaa->xyC[offs + j][offs + j] = ae_complex_from_d(ajj);
+            aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
             result = false;
             return result;
          }
          ajj = sqrt(ajj);
-         aaa->xyC[offs + j][offs + j] = ae_complex_from_d(ajj);
+         aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
       // Compute elements J+1:N-1 of row J.
          if (j < n - 1) {
             if (j > 0) {
@@ -23047,12 +23047,12 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
          v = ae_v_cdotproduct(&aaa->xyC[offs + j][offs], 1, "Conj", &aaa->xyC[offs + j][offs], 1, "N", j);
          ajj = ae_c_sub(aaa->xyC[offs + j][offs + j], v).x;
          if (ajj <= 0.0) {
-            aaa->xyC[offs + j][offs + j] = ae_complex_from_d(ajj);
+            aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
             result = false;
             return result;
          }
          ajj = sqrt(ajj);
-         aaa->xyC[offs + j][offs + j] = ae_complex_from_d(ajj);
+         aaa->xyC[offs + j][offs + j] = complex_from_d(ajj);
       // Compute elements J+1:N of column J.
          if (j < n - 1) {
             r = 1 / ajj;
@@ -23179,7 +23179,7 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 //       minor part of overall running time for N>256.
    if (n == 1) {
       if (a->xyC[offs][offs].x > 0.0) {
-         a->xyC[offs][offs] = ae_complex_from_d(sqrt(a->xyC[offs][offs].x));
+         a->xyC[offs][offs] = complex_from_d(sqrt(a->xyC[offs][offs].x));
          result = true;
       } else {
          result = false;
@@ -25921,7 +25921,7 @@ Spawn:
    ae_vector_set_length(v, n + 1);
    ae_vector_set_length(x, n + 1);
    for (i = 1; i <= n; i++) {
-      x->xC[i] = ae_complex_from_d(1.0 / n);
+      x->xC[i] = complex_from_d(1.0 / n);
    }
    *kase = 1; jump = 1; goto Pause; Resume1: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
    if (n == 1) {
@@ -25935,7 +25935,7 @@ Spawn:
       if (absxi > safmin) {
          x->xC[i] = ae_c_div_d(x->xC[i], absxi);
       } else {
-         x->xC[i] = ae_complex_from_i(1);
+         x->xC[i] = complex_from_i(1);
       }
    }
    *kase = 2; jump = 2; goto Pause; Resume2: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
@@ -25944,9 +25944,9 @@ Spawn:
    do {
    // MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
       for (i = 1; i <= n; i++) {
-         x->xC[i] = ae_complex_from_i(0);
+         x->xC[i] = complex_from_i(0);
       }
-      x->xC[j] = ae_complex_from_i(1);
+      x->xC[j] = complex_from_i(1);
       *kase = 1; jump = 3; goto Pause; Resume3: // X HAS BEEN OVERWRITTEN BY A*X.
       ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
       estold = *est;
@@ -25960,7 +25960,7 @@ Spawn:
          if (absxi > safmin) {
             x->xC[i] = ae_c_div_d(x->xC[i], absxi);
          } else {
-            x->xC[i] = ae_complex_from_i(1);
+            x->xC[i] = complex_from_i(1);
          }
       }
       *kase = 2; jump = 4; goto Pause; Resume4: // X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
@@ -25970,7 +25970,7 @@ Spawn:
 // ITERATION COMPLETE.  FINAL STAGE.
    altsgn = 1.0;
    for (i = 1; i <= n; i++) {
-      x->xC[i] = ae_complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
+      x->xC[i] = complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
       altsgn = -altsgn;
    }
    *kase = 1; jump = 5; goto Pause; Resume5: // X HAS BEEN OVERWRITTEN BY A*X.
@@ -26235,13 +26235,13 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    if (isupper) {
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            sa = rmax2(sa, abscomplex(ae_complex_from_d(cha->xyR[i][j])));
+            sa = rmax2(sa, abscomplex(complex_from_d(cha->xyR[i][j])));
          }
       }
    } else {
       for (i = 0; i < n; i++) {
          for (j = 0; j <= i; j++) {
-            sa = rmax2(sa, abscomplex(ae_complex_from_d(cha->xyR[i][j])));
+            sa = rmax2(sa, abscomplex(complex_from_d(cha->xyR[i][j])));
          }
       }
    }
@@ -26403,7 +26403,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
             ae_v_cmuld(&ex.xC[1], 1, n, sa);
          // Multiply by U'
             for (i = 0; i < n; i++) {
-               tmp.xC[i] = ae_complex_from_i(0);
+               tmp.xC[i] = complex_from_i(0);
             }
             for (i = 0; i < n; i++) {
                v = ex.xC[i + 1];
@@ -26414,7 +26414,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
          } else {
          // Multiply by L'
             for (i = 0; i < n; i++) {
-               tmp.xC[i] = ae_complex_from_i(0);
+               tmp.xC[i] = complex_from_i(0);
             }
             for (i = 0; i < n; i++) {
                v = ex.xC[i + 1];
@@ -26717,7 +26717,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
                }
             // Multiply by L
                for (i = n; i >= 1; i--) {
-                  v = ae_complex_from_i(0);
+                  v = complex_from_i(0);
                   if (i > 1) {
                      v = ae_v_cdotproduct(lua->xyC[i - 1], 1, "N", &ex.xC[1], 1, "N", i - 1);
                   }
@@ -26726,7 +26726,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
             } else {
             // Multiply by L'
                for (i = 1; i <= n; i++) {
-                  cwork2.xC[i] = ae_complex_from_i(0);
+                  cwork2.xC[i] = complex_from_i(0);
                }
                for (i = 1; i <= n; i++) {
                   v = ex.xC[i];
@@ -26737,7 +26737,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
                }
             // Multiply by U'
                for (i = 1; i <= n; i++) {
-                  ex.xC[i] = ae_complex_from_i(0);
+                  ex.xC[i] = complex_from_i(0);
                }
                for (i = 1; i <= n; i++) {
                   v = cwork2.xC[i];
@@ -28843,7 +28843,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
                a->xyC[offs + j][offs + j] = ae_c_d_div(1, a->xyC[offs + j][offs + j]);
                ajj = ae_c_neg(a->xyC[offs + j][offs + j]);
             } else {
-               ajj = ae_complex_from_i(-1);
+               ajj = complex_from_i(-1);
             }
          // Compute elements 1:j-1 of j-th column.
             if (j > 0) {
@@ -28852,7 +28852,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
                   if (i < j - 1) {
                      v = ae_v_cdotproduct(&a->xyC[offs + i][offs + i + 1], 1, "N", &tmp->xC[offs + i + 1], 1, "N", j - i - 1);
                   } else {
-                     v = ae_complex_from_i(0);
+                     v = complex_from_i(0);
                   }
                   if (!isunit) {
                      a->xyC[offs + i][offs + j] = ae_c_add(v, ae_c_mul(a->xyC[offs + i][offs + i], tmp->xC[offs + i]));
@@ -28874,7 +28874,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
                a->xyC[offs + j][offs + j] = ae_c_d_div(1, a->xyC[offs + j][offs + j]);
                ajj = ae_c_neg(a->xyC[offs + j][offs + j]);
             } else {
-               ajj = ae_complex_from_i(-1);
+               ajj = complex_from_i(-1);
             }
             if (j < n - 1) {
             // Compute elements j+1:n of j-th column.
@@ -28883,7 +28883,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
                   if (i > j + 1) {
                      v = ae_v_cdotproduct(&a->xyC[offs + i][offs + j + 1], 1, "N", &tmp->xC[offs + j + 1], 1, "N", i - j - 1);
                   } else {
-                     v = ae_complex_from_i(0);
+                     v = complex_from_i(0);
                   }
                   if (!isunit) {
                      a->xyC[offs + i][offs + j] = ae_c_add(v, ae_c_mul(a->xyC[offs + i][offs + i], tmp->xC[offs + i]));
@@ -29029,7 +29029,7 @@ static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RV
    matinv_rmatrixluinverserec(a, offs + n1, n2, work, info, rep);
 }
 
-static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, ae_int_t *ssinfo, matinvreport *rep) {
+static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CVector *work, ae_int_t *info, matinvreport *rep) {
    ae_int_t i;
    ae_int_t j;
    complex v;
@@ -29039,7 +29039,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
    ae_int_t tsb;
    ae_int_t tscur;
    if (n < 1) {
-      *ssinfo = -1;
+      *info = -1;
       return;
    }
    tsa = matrixtilesizea() / 2;
@@ -29052,8 +29052,8 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 // Base case
    if (n <= tsa) {
    // Form inv(U)
-      matinv_cmatrixtrinverserec(a, offs, n, true, false, work, ssinfo);
-      if (*ssinfo <= 0) {
+      matinv_cmatrixtrinverserec(a, offs, n, true, false, work, info);
+      if (*info <= 0) {
          return;
       }
    // Solve the equation inv(A)*L = inv(U) for inv(A).
@@ -29061,7 +29061,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
       // Copy current column of L to WORK and replace with zeros.
          for (i = j + 1; i < n; i++) {
             work->xC[i] = a->xyC[offs + i][offs + j];
-            a->xyC[offs + i][offs + j] = ae_complex_from_i(0);
+            a->xyC[offs + i][offs + j] = complex_from_i(0);
          }
       // Compute current column of inv(A).
          if (j < n - 1) {
@@ -29118,12 +29118,12 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 // W := inv(L1*U1)
    cmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, true, false, 0, a, offs, offs + n1);
    cmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, false, true, 0, a, offs + n1, offs);
-   matinv_cmatrixluinverserec(a, offs, n1, work, ssinfo, rep);
-   if (*ssinfo <= 0) {
+   matinv_cmatrixluinverserec(a, offs, n1, work, info, rep);
+   if (*info <= 0) {
       return;
    }
 // W := W+X*Y
-   cmatrixgemm(n1, n1, n2, ae_complex_from_d(1.0), a, offs, offs + n1, 0, a, offs + n1, offs, 0, ae_complex_from_d(1.0), a, offs, offs);
+   cmatrixgemm(n1, n1, n2, complex_from_d(1.0), a, offs, offs + n1, 0, a, offs + n1, offs, 0, complex_from_d(1.0), a, offs, offs);
 // X := -X*inv(L2)
 // Y := -inv(U2)*Y
    cmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, false, true, 0, a, offs, offs + n1);
@@ -29135,7 +29135,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
       ae_v_cmuld(&a->xyC[offs + n1 + i][offs], 1, n1, -1);
    }
 // Z := inv(L2*U2)
-   matinv_cmatrixluinverserec(a, offs + n1, n2, work, ssinfo, rep);
+   matinv_cmatrixluinverserec(a, offs + n1, n2, work, info, rep);
 }
 
 // Recursive subroutine for SPD inversion.
@@ -29152,7 +29152,7 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
    ae_int_t tsa;
    ae_int_t tsb;
    ae_int_t tscur;
-   ae_int_t sinfo2;
+   ae_int_t info2;
    ae_frame_make(&_frame_block);
    if (n < 1) {
       ae_frame_leave();
@@ -29166,9 +29166,9 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
    }
 // Base case
    if (n <= tsa) {
-      sinfo2 = 1;
-      matinv_rmatrixtrinverserec(a, offs, n, isupper, false, tmp, &sinfo2);
-      ae_assert(sinfo2 > 0, "SPDMatrixCholeskyInverseRec: integrity check failed");
+      info2 = 1;
+      matinv_rmatrixtrinverserec(a, offs, n, isupper, false, tmp, &info2);
+      ae_assert(info2 > 0, "SPDMatrixCholeskyInverseRec: integrity check failed");
       if (isupper) {
       // Compute the product U * U'.
       // NOTE: we never assume that diagonal of U is real
@@ -29268,7 +29268,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    ae_int_t tsa;
    ae_int_t tsb;
    ae_int_t tscur;
-   ae_int_t sinfo;
+   ae_int_t info;
    ae_frame_make(&_frame_block);
    if (n < 1) {
       ae_frame_leave();
@@ -29282,16 +29282,16 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    }
 // Base case
    if (n <= tsa) {
-      sinfo = 1;
-      matinv_cmatrixtrinverserec(a, offs, n, isupper, false, tmp, &sinfo);
-      ae_assert(sinfo > 0, "HPDMatrixCholeskyInverseRec: integrity check failed");
+      info = 1;
+      matinv_cmatrixtrinverserec(a, offs, n, isupper, false, tmp, &info);
+      ae_assert(info > 0, "HPDMatrixCholeskyInverseRec: integrity check failed");
       if (isupper) {
       // Compute the product U * U'.
       // NOTE: we never assume that diagonal of U is real
          for (i = 0; i < n; i++) {
             if (i == 0) {
             // 1x1 matrix
-               a->xyC[offs + i][offs + i] = ae_complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
+               a->xyC[offs + i][offs + i] = complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
             } else {
             // (I+1)x(I+1) matrix,
             //
@@ -29307,7 +29307,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
                }
                v = conj(a->xyC[offs + i][offs + i]);
                ae_v_cmulc(&a->xyC[offs][offs + i], a->stride, i, v);
-               a->xyC[offs + i][offs + i] = ae_complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
+               a->xyC[offs + i][offs + i] = complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
             }
          }
       } else {
@@ -29316,7 +29316,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
          for (i = 0; i < n; i++) {
             if (i == 0) {
             // 1x1 matrix
-               a->xyC[offs + i][offs + i] = ae_complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
+               a->xyC[offs + i][offs + i] = complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
             } else {
             // (I+1)x(I+1) matrix,
             //
@@ -29332,7 +29332,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
                }
                v = conj(a->xyC[offs + i][offs + i]);
                ae_v_cmulc(&a->xyC[offs + i][offs], 1, i, v);
-               a->xyC[offs + i][offs + i] = ae_complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
+               a->xyC[offs + i][offs + i] = complex_from_d(sqr(a->xyC[offs + i][offs + i].x) + sqr(a->xyC[offs + i][offs + i].y));
             }
          }
       }
@@ -29407,7 +29407,6 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t sinfo;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -29441,9 +29440,8 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    }
 // Call cache-oblivious code
    ae_vector_set_length(&work, n);
-   sinfo = 1;
-   matinv_rmatrixluinverserec(a, 0, n, &work, &sinfo, rep);
-   *info = sinfo;
+   *info = 1;
+   matinv_rmatrixluinverserec(a, 0, n, &work, info, rep);
 // apply permutations
    for (i = 0; i < n; i++) {
       for (j = n - 2; j >= 0; j--) {
@@ -29477,7 +29475,6 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t sinfo;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -29500,7 +29497,7 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    if (rep->r1 < rcondthreshold() || rep->rinf < rcondthreshold()) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a->xyC[i][j] = ae_complex_from_i(0);
+            a->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -29511,9 +29508,8 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    }
 // Call cache-oblivious code
    ae_vector_set_length(&work, n);
-   sinfo = 1;
-   matinv_cmatrixluinverserec(a, 0, n, &work, &sinfo, rep);
-   *info = sinfo;
+   *info = 1;
+   matinv_cmatrixluinverserec(a, 0, n, &work, info, rep);
 // apply permutations
    for (i = 0; i < n; i++) {
       for (j = n - 2; j >= 0; j--) {
@@ -29721,13 +29717,13 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
       if (isupper) {
          for (i = 0; i < n; i++) {
             for (j = i; j < n; j++) {
-               a->xyC[i][j] = ae_complex_from_i(0);
+               a->xyC[i][j] = complex_from_i(0);
             }
          }
       } else {
          for (i = 0; i < n; i++) {
             for (j = 0; j <= i; j++) {
-               a->xyC[i][j] = ae_complex_from_i(0);
+               a->xyC[i][j] = complex_from_i(0);
             }
          }
       }
@@ -29875,7 +29871,6 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t sinfo;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -29901,9 +29896,8 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    }
 // Invert
    ae_vector_set_length(&tmp, n);
-   sinfo = 1;
-   matinv_rmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, &sinfo);
-   *info = sinfo;
+   *info = 1;
+   matinv_rmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, info);
    ae_frame_leave();
 }
 
@@ -29947,7 +29941,6 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t sinfo;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -29962,7 +29955,7 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    if (rep->r1 < rcondthreshold() || rep->rinf < rcondthreshold()) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a->xyC[i][j] = ae_complex_from_i(0);
+            a->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -29973,9 +29966,8 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    }
 // Invert
    ae_vector_set_length(&tmp, n);
-   sinfo = 1;
-   matinv_cmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, &sinfo);
-   *info = sinfo;
+   *info = 1;
+   matinv_cmatrixtrinverserec(a, 0, n, isupper, isunit, &tmp, info);
    ae_frame_leave();
 }
 
@@ -30889,7 +30881,7 @@ complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n) {
    ae_assert(a->rows >= n, "CMatrixLUDet: rows(A)<N!");
    ae_assert(a->cols >= n, "CMatrixLUDet: cols(A)<N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixLUDet: A contains infinite or NaN values!");
-   result = ae_complex_from_i(1);
+   result = complex_from_i(1);
    s = 1;
    for (i = 0; i < n; i++) {
       result = ae_c_mul(result, a->xyC[i][i]);

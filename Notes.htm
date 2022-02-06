@@ -1045,11 +1045,19 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	―	ae_randommid → randommid, ae_randomreal → randomreal,
 	―	ae_randombool → randombool, ae_randominteger → randominteger,
 	―	ae_tickcount → tickcount,
+	―	ae_complex_from_{i,d,c} → complex_from_{i,d,c}.
 	Simplified the ‟class” declaration macros, removing EndD and AndD.
 	Normalized the typecasts ― removing redundant typecasts, and normalized the layout of the others.
 	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
 	Toplogical re-sorting of routines to match the sorting for version 3.18.0.
 	Made inverfr{0,1,2}() static local in SpecialFunctions.cpp.
+	Renamed {Round,Trunc,Floor,Ceil}Z() as i{round,trunc,floor,ceil}().
+	Replaced i{round,trunc}() by std::{round,trunc}() for floating point types.
+	Optimized iround(A,B) as A / B and iceil(A,B) as (A + B - 1) / B for integer types A and B.
+	Renamed _ae_{init,acquire,release,free}_lock_raw as _ae_{init,acquire,release,free}_lock.
+	Changed xparams into enum { NonTH = 0, SerTH = 1, ParTH = 2 };
+39	Continuing stage 28: conversions of more assignment expressions to update operators (++X, --X, X++, X--, X op= Y).
+39	Continuing stage 33: more conversions related to sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector.
 </pre>
 </p>
 <p>
@@ -1195,6 +1203,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 39	5465 0.9x 7875 1.0x 8406 0.9x 7258 1.0x 1639362698 (61b6b08a) 82 // Minor fixes in TestX.cpp.
 39	5319 1.0x 7813 1.0x 8133 1.0x 7428 1.0x 1639430716 (61b7ba3c) 79 // Removing the CPU initialization from Ap.{cpp,h}.
 39	5000 1.0x 6494 1.2x 8003 1.0x 6826 1.0x 1641872436 (61dcfc34) 82 // Re-sorting of routines to better match 3.18.0.
+39	4505 0.9x 6994 1.0x 7815 1.0x 7225 1.0x 1644177884 (620029dc) 77 // Retrofitting changes made separately for 3.18.0 into here.
 </pre>
 </p>
 </div>

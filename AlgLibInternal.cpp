@@ -256,7 +256,7 @@ void bvectorgrowto(BVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -289,7 +289,7 @@ void ivectorgrowto(ZVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -322,7 +322,7 @@ void rvectorgrowto(RVector *x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, iround(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
@@ -361,7 +361,7 @@ void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
    }
 // Sizes and metrics
    if (a->rows < n) {
-      n = imax2(n, RoundZ(1.8 * a->rows + 1));
+      n = imax2(n, iround(1.8 * a->rows + 1));
    }
    n2 = imin2(a->rows, n);
    m = a->cols;
@@ -400,7 +400,7 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
    }
 // Sizes and metrics
    if (a->cols < n) {
-      n = imax2(n, RoundZ(1.8 * a->cols + 1));
+      n = imax2(n, iround(1.8 * a->cols + 1));
    }
    n2 = imin2(a->cols, n);
    m = a->rows;
@@ -2076,7 +2076,7 @@ void igrowv(ae_int_t newn, ZVector *x) {
       return;
    }
    ae_int_t oldn = x->cnt;
-   newn = imax2(newn, RoundZ(1.8 * oldn + 1));
+   newn = imax2(newn, iround(1.8 * oldn + 1));
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
    icopyv(oldn, &oldx, x);
@@ -3322,7 +3322,7 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
          } else {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c->xyC[ic + i][jc + j] = ae_complex_from_i(0);
+                  c->xyC[ic + i][jc + j] = complex_from_i(0);
                }
             }
          }
@@ -3425,10 +3425,10 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
                offsa++;
                offsb++;
             }
-            v00 = ae_complex_from_d(v00x, v00y);
-            v10 = ae_complex_from_d(v10x, v10y);
-            v01 = ae_complex_from_d(v01x, v01y);
-            v11 = ae_complex_from_d(v11x, v11y);
+            v00 = complex_from_d(v00x, v00y);
+            v10 = complex_from_d(v10x, v10y);
+            v01 = complex_from_d(v01x, v01y);
+            v11 = complex_from_d(v11x, v11y);
             if (ae_c_eq_d(beta, 0.0)) {
                c->xyC[ic + i][jc + j] = ae_c_mul(alpha, v00);
                c->xyC[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
@@ -3450,9 +3450,9 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
                   if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
-                     v = ae_complex_from_i(0);
+                     v = complex_from_i(0);
                   } else {
-                     v = ae_complex_from_d(0.0);
+                     v = complex_from_d(0.0);
                      if (optypea == 0 && optypeb == 0) {
                         v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
                      }
@@ -3636,7 +3636,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    tau->x = 0;
    tau->y = 0;
    if (n <= 0) {
-      *tau = ae_complex_from_i(0);
+      *tau = complex_from_i(0);
       return;
    }
 // Scale if needed (to avoid overflow/underflow during intermediate
@@ -3649,11 +3649,11 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    if (mx != 0.0) {
       if (mx < 1.0) {
          s = sqrt(minrealnumber);
-         v = ae_complex_from_d(1 / s);
+         v = complex_from_d(1 / s);
          ae_v_cmulc(&x->xC[1], 1, n, v);
       } else {
          s = sqrt(maxrealnumber);
-         v = ae_complex_from_d(1 / s);
+         v = complex_from_d(1 / s);
          ae_v_cmulc(&x->xC[1], 1, n, v);
       }
    }
@@ -3674,7 +3674,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    alphr = alpha.x;
    alphi = alpha.y;
    if (xnorm == 0.0 && alphi == 0.0) {
-      *tau = ae_complex_from_i(0);
+      *tau = complex_from_i(0);
       x->xC[1] = ae_c_mul_d(x->xC[1], s);
       return;
    }
@@ -3690,7 +3690,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    if (n > 1) {
       ae_v_cmulc(&x->xC[2], 1, n - 1, alpha);
    }
-   alpha = ae_complex_from_d(beta);
+   alpha = complex_from_d(beta);
    x->xC[1] = alpha;
 // Scale back
    x->xC[1] = ae_c_mul_d(x->xC[1], s);
@@ -3733,7 +3733,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_i
    }
 // w := C^T * conj(v)
    for (i = n1; i <= n2; i++) {
-      work->xC[i] = ae_complex_from_i(0);
+      work->xC[i] = complex_from_i(0);
    }
    for (i = m1; i <= m2; i++) {
       t = conj(v->xC[i + 1 - m1]);
@@ -6241,7 +6241,7 @@ static bool safesolve_cbasicsolveandupdate(complex alpha, complex beta, double l
       *x = ae_c_div(beta, alpha);
    } else {
    // alpha*x[i]=0
-      *x = ae_complex_from_i(0);
+      *x = complex_from_i(0);
    }
 // update NrmX, test growth limit
    *xnorm = rmax2(*xnorm, abscomplex(*x));
@@ -6290,16 +6290,16 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       for (i = n - 1; i >= 0; i--) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
+            alpha = complex_from_d(a->xyR[i][i] * sa);
          }
          if (i < n - 1) {
             ae_v_moved(&tmp.xR[i + 1], 1, &a->xyR[i][i + 1], 1, n - i - 1, sa);
             vr = ae_v_dotproduct(&tmp.xR[i + 1], 1, &x->xR[i + 1], 1, n - i - 1);
-            beta = ae_complex_from_d(x->xR[i] - vr);
+            beta = complex_from_d(x->xR[i] - vr);
          } else {
-            beta = ae_complex_from_d(x->xR[i]);
+            beta = complex_from_d(x->xR[i]);
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
@@ -6317,16 +6317,16 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       for (i = 0; i < n; i++) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
+            alpha = complex_from_d(a->xyR[i][i] * sa);
          }
          if (i > 0) {
             ae_v_moved(tmp.xR, 1, a->xyR[i], 1, i, sa);
             vr = ae_v_dotproduct(tmp.xR, 1, x->xR, 1, i);
-            beta = ae_complex_from_d(x->xR[i] - vr);
+            beta = complex_from_d(x->xR[i] - vr);
          } else {
-            beta = ae_complex_from_d(x->xR[i]);
+            beta = complex_from_d(x->xR[i]);
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
@@ -6344,11 +6344,11 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       for (i = 0; i < n; i++) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
+            alpha = complex_from_d(a->xyR[i][i] * sa);
          }
-         beta = ae_complex_from_d(x->xR[i]);
+         beta = complex_from_d(x->xR[i]);
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
@@ -6371,11 +6371,11 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
       for (i = n - 1; i >= 0; i--) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
+            alpha = complex_from_d(a->xyR[i][i] * sa);
          }
-         beta = ae_complex_from_d(x->xR[i]);
+         beta = complex_from_d(x->xR[i]);
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
@@ -6446,7 +6446,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = n - 1; i >= 0; i--) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
@@ -6473,7 +6473,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = 0; i < n; i++) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
@@ -6500,7 +6500,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = 0; i < n; i++) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
@@ -6526,7 +6526,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = n - 1; i >= 0; i--) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
@@ -6552,7 +6552,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = 0; i < n; i++) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(conj(a->xyC[i][i]), sa);
          }
@@ -6578,7 +6578,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
       for (i = n - 1; i >= 0; i--) {
       // Task is reduced to alpha*x[i] = beta
          if (isunit) {
-            alpha = ae_complex_from_d(sa);
+            alpha = complex_from_d(sa);
          } else {
             alpha = ae_c_mul_d(conj(a->xyC[i][i]), sa);
          }
@@ -6673,7 +6673,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 // 1. find S such that 0.5 <= S*MX<1
 // 2. multiply W by S, so task is normalized in some sense
 // 3. S:=1/S so we can obtain original vector multiplying by S
-   k = RoundZ(log(mx) / ln2);
+   k = iround(log(mx) / ln2);
    s = xblas_xfastpow(2.0, -k);
    if (!isfinite(s)) {
    // Overflow or underflow during evaluation of S; fallback low-precision code
@@ -6697,7 +6697,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 // we have chosen upper limit (2^29) with enough space left
 // to tolerate possible problems with rounding and N's close
 // to the limit, so we don't want to be very strict here.
-   k = TruncZ(log(536870912.0 / n) / ln2);
+   k = itrunc(log(536870912.0 / n) / ln2);
    chunk = xblas_xfastpow(2.0, k);
    if (chunk < 2.0) {
       chunk = 2.0;
@@ -6712,7 +6712,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
       ks = 0;
       for (i = 0; i < n; i++) {
          v = w->xR[i];
-         k = TruncZ(v);
+         k = itrunc(v);
          if (v != (double)k) {
             allzeros = false;
          }
@@ -6802,7 +6802,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
 // special cases:
 // * N=0
    if (n == 0) {
-      *r = ae_complex_from_i(0);
+      *r = complex_from_i(0);
       *rerr = 0.0;
       return;
    }
@@ -7756,7 +7756,7 @@ static const ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
 // ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
 static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n) {
    ae_assert(n > 0, "ftbase_ftoptimisticestimate: n <= 0");
-   return FloorZ(0.00005 * n * logbase2(n));
+   return ifloor(0.00005 * n * logbase2(n));
 }
 
 // Apply a complex reference FFT to an input/output vector.
@@ -8289,7 +8289,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1p, ae_int_t 
    }
 // Large n: recursive split.
    if (n > ftbase_recursivethreshold) {
-      ae_int_t k = CeilZ(sqrt(n)) + 1;
+      ae_int_t k = iceil(sqrt(n)) + 1;
       ae_assert(k * k >= n, "ftbase_ftfactorize: internal error during recursive factorization");
       for (ae_int_t j = k; j >= 2; j--) if (n % j == 0) {
          *n1p = imin2(n / j, j), *n2p = imax2(n / j, j);

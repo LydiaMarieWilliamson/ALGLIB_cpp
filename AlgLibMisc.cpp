@@ -537,7 +537,7 @@ namespace alglib_impl {
 void xdebuginitrecord1(xdebugrecord1 *rec1) {
    SetObj(xdebugrecord1, rec1);
    rec1->i = 1;
-   rec1->c = ae_complex_from_d(1.0, 1.0);
+   rec1->c = complex_from_d(1.0, 1.0);
    ae_vector_set_length(&rec1->a, 2);
    rec1->a.xR[0] = 2.0;
    rec1->a.xR[1] = 3.0;
@@ -734,7 +734,7 @@ void xdebugr1outeven(ae_int_t n, RVector *a) {
 complex xdebugc1sum(CVector *a) {
    ae_int_t i;
    complex result;
-   result = ae_complex_from_i(0);
+   result = complex_from_i(0);
    for (i = 0; i < a->cnt; i++) {
       result = ae_c_add(result, a->xC[i]);
    }
@@ -784,9 +784,9 @@ void xdebugc1outeven(ae_int_t n, CVector *a) {
    ae_vector_set_length(a, n);
    for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
-         a->xC[i] = ae_complex_from_d(i * 0.250, i * 0.125);
+         a->xC[i] = complex_from_d(i * 0.250, i * 0.125);
       } else {
-         a->xC[i] = ae_complex_from_i(0);
+         a->xC[i] = complex_from_i(0);
       }
    }
 }
@@ -1013,7 +1013,7 @@ complex xdebugc2sum(CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    complex result;
-   result = ae_complex_from_i(0);
+   result = complex_from_i(0);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
          result = ae_c_add(result, a->xyC[i][j]);
@@ -1072,7 +1072,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j] = ae_complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
+         a->xyC[i][j] = complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
       }
    }
 }

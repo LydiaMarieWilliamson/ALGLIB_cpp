@@ -905,7 +905,7 @@ contains computational core; written mostly in C, but meant for internal use onl
 None of the routines in this namespace are part of the API documented in <a href=#alglib_main>ALGLIB++ Packages and Subpackages</a>.
 If you attempt to include only the alglib_impl namepace in a C program, you are pretty much on your own.
 At minimum, you will need a compiler that supports C99;
-some routines now have default values (e.g. ae_complex_from_{i,d} in Ap.{cpp,h}) and you may also need to move some of the <code>const</code> or startup routines (e.g. the CPU-identifying function ae_cpuid()) to the head of the <code>main()</code> routine.
+some routines now have default values (e.g. complex_from_{i,d} in Ap.{cpp,h}) and you may also need to move some of the <code>const</code> or startup routines (e.g. the CPU-identifying function ae_cpuid()) to the head of the <code>main()</code> routine.
 No protection against memory leaks or system crashes is guaranteed if you make direct use of <code>alglib_impl</code>.
 Future compatibility with C should not be assumed: it is being recoded into C++.
 It is undergoing structural changes and simplifications, as part of the process of nativizing it to C++ that have already distanced it from compatibility with C (or C99) too far for any simple fixes to undo, except with the aid of a translator.

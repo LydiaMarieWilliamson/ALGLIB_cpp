@@ -9583,9 +9583,9 @@ void qqploaddefaults(ae_int_t n, qqpsettings *s) {
    s->cgphase = true;
    s->cnphase = true;
    s->cgminits = 5;
-   s->cgmaxits = imax2(s->cgminits, RoundZ(1 + 0.33 * n));
+   s->cgmaxits = imax2(s->cgminits, iround(1 + 0.33 * n));
    s->sparsesolver = 0;
-   s->cnmaxupdates = RoundZ(1 + 0.1 * n);
+   s->cnmaxupdates = iround(1 + 0.1 * n);
 }
 
 // This function initializes QQPSettings  structure  with  copy  of  another,
@@ -12185,7 +12185,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       }
    }
    for (i = 0; i < nmain; i++) {
-      lagbc->xR[i] = lagbc->xR[i] * targetscale / s->xR[i];
+      lagbc->xR[i] *= targetscale / s->xR[i];
    }
 // Unpack results.
 //
@@ -13114,7 +13114,7 @@ Spawn:
    state->lastgoodstep = 0.0;
    state->lastscaledgoodstep = 0.0;
    state->maxscaledgrad = 0.0;
-   state->nonmonotoniccnt = RoundZ(1.5 * (n + state->nic)) + 5;
+   state->nonmonotoniccnt = iround(1.5 * (n + state->nic)) + 5;
    ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
    if (state->diffstep == 0.0) {
       state->needfg = true, state->PQ = 1; goto Pause; Resume01: state->needfg = false;
@@ -17812,7 +17812,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 // Unscale point and Lagrange multipliers
    unscaleunshiftpointbc(&state->scl, &state->xorigin, &state->rawbndl, &state->rawbndu, &state->bndl, &state->bndu, &state->hasbndl, &state->hasbndu, xs, n);
    for (i = 0; i < n; i++) {
-      lagbc->xR[i] = lagbc->xR[i] * state->targetscale / state->scl.xR[i];
+      lagbc->xR[i] *= state->targetscale / state->scl.xR[i];
    }
    for (i = 0; i < m; i++) {
       laglc->xR[i] = laglc->xR[i] * state->targetscale / coalesce(state->ascales.xR[i], 1.0);
@@ -29016,7 +29016,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    for (i = 0; i < n; i++) {
       mx = rmax2(mx, fabs(x->xR[i]));
    }
-   mx = 1.0E5 * machineepsilon * mx;
+   mx *= 1.0E5 * machineepsilon;
    k = 0;
    for (i = 0; i < n; i++) {
       if (fabs(x->xR[i]) > mx) {
@@ -41259,7 +41259,7 @@ Spawn:
 // Main cycle of BC-PG algorithm
    state->repterminationtype = 0;
    state->lastscaledgoodstep = 0.0;
-   state->nonmonotoniccnt = RoundZ(1.5 * n) + 5;
+   state->nonmonotoniccnt = iround(1.5 * n) + 5;
    ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
    if (state->diffstep == 0.0) {
       state->needfg = true, state->PQ = 1; goto Pause; Resume01: state->needfg = false;

@@ -466,10 +466,10 @@ void dserraccumulate(RVector *buf, RVector *y, RVector *desiredy) {
    double v;
    double ev;
    offs = 5;
-   nclasses = RoundZ(buf->xR[offs]);
+   nclasses = iround(buf->xR[offs]);
    if (nclasses > 0) {
    // Classification
-      rmax = RoundZ(desiredy->xR[0]);
+      rmax = iround(desiredy->xR[0]);
       mmax = 0;
       for (j = 1; j < nclasses; j++) {
          if (y->xR[j] > y->xR[mmax]) {
@@ -537,7 +537,7 @@ void dserrfinish(RVector *buf) {
    ae_int_t nout;
    ae_int_t offs;
    offs = 5;
-   nout = ae_iabs(RoundZ(buf->xR[offs]));
+   nout = ae_iabs(iround(buf->xR[offs]));
    if (buf->xR[offs + 1] != 0.0) {
       buf->xR[0] /= buf->xR[offs + 1];
       buf->xR[1] /= buf->xR[offs + 1];
@@ -3206,7 +3206,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          offs0 = entrysize * ntotal + 2 * nout * chunksize;
          for (k = 0; k < csize; k++) {
             s = batch4buf->xR[offs0 + k];
-            kl = RoundZ(xy->xyR[cstart + k][nin]);
+            kl = iround(xy->xyR[cstart + k][nin]);
             offs1 = (ntotal - nout) * entrysize + derroroffs + k;
             offs2 = entrysize * ntotal + k;
             for (i = 0; i < nout; i++) {
@@ -3229,7 +3229,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          offs0 = entrysize * ntotal + chunksize * 2 * nout;
          for (k = 0; k < csize; k++) {
             s = batch4buf->xR[offs0 + k];
-            kl = RoundZ(xy->xyR[cstart + k][nin]);
+            kl = iround(xy->xyR[cstart + k][nin]);
             vv = 0.0;
             offs1 = entrysize * ntotal + k;
             offs2 = entrysize * ntotal + nout * chunksize + k;
@@ -4201,7 +4201,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
       ae_v_move(x.xR, 1, xy->xyR[k], 1, nin);
       if (mlpissoftmax(network)) {
       // class labels outputs
-         kl = RoundZ(xy->xyR[k][nin]);
+         kl = iround(xy->xyR[k][nin]);
          for (i = 0; i < nout; i++) {
             if (i == kl) {
                desiredy.xR[i] = 1.0;
@@ -5120,13 +5120,13 @@ void mlpunserializeold(RVector *ra, multilayerperceptron *network) {
    ae_int_t sigmalen;
    ae_int_t offs;
    SetObj(multilayerperceptron, network);
-   ae_assert(RoundZ(ra->xR[1]) == mlpbase_mlpvnum, "MLPUnserialize: incorrect array!");
+   ae_assert(iround(ra->xR[1]) == mlpbase_mlpvnum, "MLPUnserialize: incorrect array!");
 // Unload StructInfo from IA
    offs = 3;
-   ssize = RoundZ(ra->xR[2]);
+   ssize = iround(ra->xR[2]);
    ae_vector_set_length(&network->structinfo, ssize);
    for (i = 0; i < ssize; i++) {
-      network->structinfo.xZ[i] = RoundZ(ra->xR[offs + i]);
+      network->structinfo.xZ[i] = iround(ra->xR[offs + i]);
    }
    offs += ssize;
 // Unload info from StructInfo
@@ -5844,7 +5844,7 @@ double mlperrorn(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize) {
          result += e / 2;
       } else {
       // Cross-entropy error function
-         k = RoundZ(xy->xyR[i][nin]);
+         k = iround(xy->xyR[i][nin]);
          if (k >= 0 && k < nout) {
             result += mlpbase_safecrossentropy(1.0, network->y.xR[k]);
          }
@@ -5894,7 +5894,7 @@ ae_int_t mlpclserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoint
       }
    }
    mlpallerrorsx(network, xy, &network->dummysxy, npoints, 0, &network->dummyidx, 0, npoints, 0, &network->buf, &network->err);
-   result = RoundZ(npoints * network->err.relclserror);
+   result = iround(npoints * network->err.relclserror);
    return result;
 }
 
@@ -10883,7 +10883,7 @@ void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "dfbuildersetdataset: xy parameter contains INFs or NANs");
    if (nclasses > 1) {
       for (i = 0; i < npoints; i++) {
-         j = RoundZ(xy->xyR[i][nvars]);
+         j = iround(xy->xyR[i][nvars]);
          ae_assert(j >= 0 && j < nclasses, "dfbuildersetdataset: last column of xy contains invalid class number");
       }
    }
@@ -10901,7 +10901,7 @@ void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints
    if (nclasses > 1) {
       vectorsetlengthatleast(&s->dsival, npoints);
       for (i = 0; i < npoints; i++) {
-         s->dsival.xZ[i] = RoundZ(xy->xyR[i][nvars]);
+         s->dsival.xZ[i] = iround(xy->xyR[i][nvars]);
       }
    } else {
       vectorsetlengthatleast(&s->dsrval, npoints);
@@ -11308,7 +11308,7 @@ static void dforest_outputleaf(decisionforestbuilder *s, dfworkbuf *workbuf, RVe
       treebuf->xR[*treesize] = -1.0;
       treebuf->xR[*treesize + 1] = leafval;
    // Update training and OOB voting stats
-      leafvali = RoundZ(leafval);
+      leafvali = iround(leafval);
       for (i = idx0; i < idx1; i++) {
          j = workbuf->trnset.xZ[i];
          votebuf->trntotals.xR[j * nclasses + leafvali]++;
@@ -11347,7 +11347,7 @@ static void dforest_classifiersplit(decisionforestbuilder *s, dfworkbuf *workbuf
    nclasses = s->nclasses;
    advanceby = 1;
    if (n >= 20) {
-      advanceby = imax2(2, RoundZ(n * 0.05));
+      advanceby = imax2(2, iround(n * 0.05));
    }
    *info = -1;
    *threshold = 0.0;
@@ -11530,7 +11530,7 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
    *e = 0;
    advanceby = 1;
    if (n >= 20) {
-      advanceby = imax2(2, RoundZ(n * 0.05));
+      advanceby = imax2(2, iround(n * 0.05));
    }
 // Sort data
 // Quick check for degeneracy
@@ -12173,12 +12173,12 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
          workbuf->ooblabelsr.xR[i] = s->dsrval.xR[j];
       }
    }
-   varstoselect = RoundZ(sqrt((double)nvars));
+   varstoselect = iround(sqrt((double)nvars));
    if (s->rdfvars > 0.0) {
-      varstoselect = RoundZ(s->rdfvars);
+      varstoselect = iround(s->rdfvars);
    }
    if (s->rdfvars < 0.0) {
-      varstoselect = RoundZ(-nvars * s->rdfvars);
+      varstoselect = iround(-nvars * s->rdfvars);
    }
    varstoselect = imax2(varstoselect, 1);
    varstoselect = imin2(varstoselect, nvars);
@@ -12219,15 +12219,15 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
          if (df->nclasses == 1) {
             y->xR[0] += df->trees.xR[nodeoffs + 1];
          } else {
-            idx = RoundZ(df->trees.xR[nodeoffs + 1]);
+            idx = iround(df->trees.xR[nodeoffs + 1]);
             y->xR[idx]++;
          }
          break;
       }
-      if (x->xR[RoundZ(df->trees.xR[nodeoffs])] < df->trees.xR[nodeoffs + 1]) {
+      if (x->xR[iround(df->trees.xR[nodeoffs])] < df->trees.xR[nodeoffs + 1]) {
          nodeoffs += dforest_innernodewidth;
       } else {
-         nodeoffs = subtreeroot + RoundZ(df->trees.xR[nodeoffs + 2]);
+         nodeoffs = subtreeroot + iround(df->trees.xR[nodeoffs + 2]);
       }
    }
 }
@@ -12316,20 +12316,20 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
                   prediction = df->trees.xR[nodeoffs + 1];
                   break;
                }
-               j = RoundZ(df->trees.xR[nodeoffs]);
+               j = iround(df->trees.xR[nodeoffs]);
                if (permimpbuf->startnodes.xZ[j] < 0) {
                   permimpbuf->startnodes.xZ[j] = nodeoffs;
                }
                if (permimpbuf->xraw.xR[j] < df->trees.xR[nodeoffs + 1]) {
                   nodeoffs += dforest_innernodewidth;
                } else {
-                  nodeoffs = treeroot + RoundZ(df->trees.xR[nodeoffs + 2]);
+                  nodeoffs = treeroot + iround(df->trees.xR[nodeoffs + 2]);
                }
             }
          // Save loss for unperturbed point
             varidx = nvars + 1;
             if (nclasses > 1) {
-               j = RoundZ(prediction);
+               j = iround(prediction);
                permimpbuf->yv.xR[varidx * nclasses + j]++;
             } else {
                permimpbuf->yv.xR[varidx] += prediction;
@@ -12361,18 +12361,18 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
                   while (true) {
                      if (df->trees.xR[nodeoffs] == -1.0) {
                         if (nclasses > 1) {
-                           j = RoundZ(df->trees.xR[nodeoffs + 1]);
+                           j = iround(df->trees.xR[nodeoffs + 1]);
                            permimpbuf->yv.xR[varidx * nclasses + j]++;
                         } else {
                            permimpbuf->yv.xR[varidx] += df->trees.xR[nodeoffs + 1];
                         }
                         break;
                      }
-                     j = RoundZ(df->trees.xR[nodeoffs]);
+                     j = iround(df->trees.xR[nodeoffs]);
                      if (permimpbuf->xcur.xR[j] < df->trees.xR[nodeoffs + 1]) {
                         nodeoffs += dforest_innernodewidth;
                      } else {
-                        nodeoffs = treeroot + RoundZ(df->trees.xR[nodeoffs + 2]);
+                        nodeoffs = treeroot + iround(df->trees.xR[nodeoffs + 2]);
                      }
                   }
                   permimpbuf->xcur.xR[varidx] = permimpbuf->xraw.xR[varidx];
@@ -12380,7 +12380,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
                // Path from tree root to the final leaf does NOT involve split on variable #VarIdx.
                // Permutation does not change tree output, reuse already computed value.
                   if (nclasses > 1) {
-                     j = RoundZ(prediction);
+                     j = iround(prediction);
                      permimpbuf->yv.xR[varidx * nclasses + j]++;
                   } else {
                      permimpbuf->yv.xR[varidx] += prediction;
@@ -12390,7 +12390,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
          // update OOB counter
             oobcounts++;
          }
-         treeroot += RoundZ(df->trees.xR[treeroot]);
+         treeroot += iround(df->trees.xR[treeroot]);
       }
    // Now YV[] stores NPerm versions of the forest output for various permutations of variable values.
    // Update losses.
@@ -12671,8 +12671,8 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
    for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
       ae_assert(tree->treeidx >= 0 && tree->treeidx < df->ntrees, "MergeTrees: integrity check failed (wrong TreeIdx)");
       ae_assert(treesizes.xZ[tree->treeidx] < 0, "MergeTrees: integrity check failed (duplicate TreeIdx)");
-      df->bufsize += RoundZ(tree->treebuf.xR[0]);
-      treesizes.xZ[tree->treeidx] = RoundZ(tree->treebuf.xR[0]);
+      df->bufsize += iround(tree->treebuf.xR[0]);
+      treesizes.xZ[tree->treeidx] = iround(tree->treebuf.xR[0]);
    }
    for (i = 0; i < df->ntrees; i++) {
       ae_assert(treesizes.xZ[i] > 0, "MergeTrees: integrity check failed (wrong TreeSize)");
@@ -12690,7 +12690,7 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
 //       why we need array of tree offsets
    ae_vector_set_length(&df->trees, df->bufsize);
    for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
-      cursize = RoundZ(tree->treebuf.xR[0]);
+      cursize = iround(tree->treebuf.xR[0]);
       offs = treeoffsets.xZ[tree->treeidx];
       for (i = 0; i < cursize; i++) {
          df->trees.xR[offs + i] = tree->treebuf.xR[i];
@@ -12905,21 +12905,21 @@ static ae_int_t dforest_computecompressedsizerec(decisionforest *df, bool useman
       if (df->nclasses == 1) {
          result += fpwidth;
       } else {
-         result += dforest_computecompresseduintsize(RoundZ(df->trees.xR[treepos + 1]));
+         result += dforest_computecompresseduintsize(iround(df->trees.xR[treepos + 1]));
       }
    } else {
    // Split
-      jmponbranch = RoundZ(df->trees.xR[treepos + 2]);
+      jmponbranch = iround(df->trees.xR[treepos + 2]);
       child0size = dforest_computecompressedsizerec(df, usemantissa8, treeroot, treepos + dforest_innernodewidth, compressedsizes, savecompressedsizes);
       child1size = dforest_computecompressedsizerec(df, usemantissa8, treeroot, treeroot + jmponbranch, compressedsizes, savecompressedsizes);
       if (child0size <= child1size) {
       // Child #0 comes first because it is shorter
-         result = dforest_computecompresseduintsize(RoundZ(df->trees.xR[treepos]));
+         result = dforest_computecompresseduintsize(iround(df->trees.xR[treepos]));
          result += fpwidth;
          result += dforest_computecompresseduintsize(child0size);
       } else {
       // Child #1 comes first because it is shorter
-         result = dforest_computecompresseduintsize(RoundZ(df->trees.xR[treepos]) + df->nvars);
+         result = dforest_computecompresseduintsize(iround(df->trees.xR[treepos]) + df->nvars);
          result += fpwidth;
          result += dforest_computecompresseduintsize(child1size);
       }
@@ -13082,7 +13082,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
    }
 // Save to stream
    if (usemantissa8) {
-      m = RoundZ(v * 256);
+      m = iround(v * 256);
       if (m == 256) {
          m /= 2;
          e = imin2(e + 1, 63);
@@ -13091,7 +13091,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
       buf->xU[*offs + 1] = (unsigned char)(m);
       *offs += 2;
    } else {
-      m = RoundZ(v * 65536);
+      m = iround(v * 65536);
       if (m == 65536) {
          m /= 2;
          e = imin2(e + 1, 63);
@@ -13164,7 +13164,7 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
    ae_int_t dstoffsold;
    dstoffsold = *dstoffs;
 // Leaf or split?
-   varidx = RoundZ(df->trees.xR[treepos]);
+   varidx = iround(df->trees.xR[treepos]);
    if (varidx == -1) {
    // Leaf node:
    // * stream special value which denotes leaf (2*NVars)
@@ -13174,12 +13174,12 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
       if (df->nclasses == 1) {
          dforest_streamfloat(buf, usemantissa8, dstoffs, leafval);
       } else {
-         dforest_streamuint(buf, dstoffs, RoundZ(leafval));
+         dforest_streamuint(buf, dstoffs, iround(leafval));
       }
    } else {
    // Split node:
    // * fetch compressed sizes of child nodes, decide which child goes first
-      jmponbranch = RoundZ(df->trees.xR[treepos + 2]);
+      jmponbranch = iround(df->trees.xR[treepos + 2]);
       splitval = df->trees.xR[treepos + 1];
       child0size = compressedsizes->xZ[treepos + dforest_innernodewidth - treeroot];
       child1size = compressedsizes->xZ[treeroot + jmponbranch - treeroot];
@@ -13248,8 +13248,8 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
    for (i = 0; i < df->ntrees; i++) {
       size8i = dforest_computecompressedsizerec(df, usemantissa8, offssrc, offssrc + 1, &dummyi, false);
       size8 += dforest_computecompresseduintsize(size8i) + size8i;
-      maxrawtreesize = imax2(maxrawtreesize, RoundZ(df->trees.xR[offssrc]));
-      offssrc += RoundZ(df->trees.xR[offssrc]);
+      maxrawtreesize = imax2(maxrawtreesize, iround(df->trees.xR[offssrc]));
+      offssrc += iround(df->trees.xR[offssrc]);
    }
    result = (double)(8 * df->trees.cnt) / (size8 + 1);
 // Allocate memory and perform compression
@@ -13265,7 +13265,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
    // Compress recursively
       dforest_compressrec(df, usemantissa8, offssrc, offssrc + 1, &compressedsizes, &df->trees8, &offsdst);
    // Next tree
-      offssrc += RoundZ(df->trees.xR[offssrc]);
+      offssrc += iround(df->trees.xR[offssrc]);
    }
    ae_assert(offsdst == size8, "BinaryCompression: integrity check failed (stream length)");
 // Finalize forest conversion, clear previously allocated memory
@@ -13431,7 +13431,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
 // Analyze dataset statistics, perform preprocessing
    dforest_analyzeandpreprocessdataset(s);
 // Prepare "work", "vote" and "tree" pools and other settings
-   trnsize = RoundZ(npoints * s->rdfratio);
+   trnsize = iround(npoints * s->rdfratio);
    trnsize = imax2(trnsize, 1);
    trnsize = imin2(trnsize, npoints);
    maxtreesize = 1 + dforest_innernodewidth * (trnsize - 1) + dforest_leafnodewidth * trnsize;
@@ -13607,7 +13607,7 @@ void dfprocess(decisionforest *df, RVector *x, RVector *y) {
       offs = 0;
       for (i = 0; i < df->ntrees; i++) {
          dforest_dfprocessinternaluncompressed(df, offs, offs + 1, x, y);
-         offs += RoundZ(df->trees.xR[offs]);
+         offs += iround(df->trees.xR[offs]);
       }
       processed = true;
    }
@@ -13787,7 +13787,7 @@ static ae_int_t dforest_dfclserror(decisionforest *df, RMatrix *xy, ae_int_t npo
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy->xyR[i], 1, df->nvars);
       dfprocess(df, &x, &y);
-      k = RoundZ(xy->xyR[i][df->nvars]);
+      k = iround(xy->xyR[i][df->nvars]);
       tmpi = 0;
       for (j = 1; j < df->nclasses; j++) {
          if (y.xR[j] > y.xR[tmpi]) {
@@ -13850,7 +13850,7 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       dfprocess(df, &x, &y);
       if (df->nclasses > 1) {
       // classification-specific code
-         k = RoundZ(xy->xyR[i][df->nvars]);
+         k = iround(xy->xyR[i][df->nvars]);
          tmpi = 0;
          for (j = 1; j < df->nclasses; j++) {
             if (y.xR[j] > y.xR[tmpi]) {
@@ -13901,7 +13901,7 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       dfprocess(df, &x, &y);
       if (df->nclasses > 1) {
       // classification-specific code
-         k = RoundZ(xy->xyR[i][df->nvars]);
+         k = iround(xy->xyR[i][df->nvars]);
          tmpi = 0;
          for (j = 1; j < df->nclasses; j++) {
             if (y.xR[j] > y.xR[tmpi]) {
@@ -13955,7 +13955,7 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       dfprocess(df, &x, &y);
       if (df->nclasses > 1) {
       // classification-specific code
-         k = RoundZ(xy->xyR[i][df->nvars]);
+         k = iround(xy->xyR[i][df->nvars]);
          for (j = 0; j < df->nclasses; j++) {
             if (j == k) {
                result += fabs(y.xR[j] - 1);
@@ -14005,7 +14005,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
       dfprocess(df, &x, &y);
       if (df->nclasses > 1) {
       // classification-specific code
-         k = RoundZ(xy->xyR[i][df->nvars]);
+         k = iround(xy->xyR[i][df->nvars]);
          for (j = 0; j < df->nclasses; j++) {
             if (j == k) {
                result += fabs(y.xR[j] - 1);
@@ -14083,7 +14083,7 @@ void dfbuildinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t ncl
    }
    if (nclasses > 1) {
       for (i = 0; i < npoints; i++) {
-         if (RoundZ(xy->xyR[i][nvars]) < 0 || RoundZ(xy->xyR[i][nvars]) >= nclasses) {
+         if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -14113,7 +14113,7 @@ void dfbuildrandomdecisionforest(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, 
       *info = -1;
       return;
    }
-   samplesize = imax2(RoundZ(r * npoints), 1);
+   samplesize = imax2(iround(r * npoints), 1);
    dfbuildinternal(xy, npoints, nvars, nclasses, ntrees, samplesize, imax2(nvars / 2, 1), dforest_dfusestrongsplits + dforest_dfuseevs, info, df, rep);
 }
 
@@ -14135,7 +14135,7 @@ void dfbuildrandomdecisionforestx1(RMatrix *xy, ae_int_t npoints, ae_int_t nvars
       *info = -1;
       return;
    }
-   samplesize = imax2(RoundZ(r * npoints), 1);
+   samplesize = imax2(iround(r * npoints), 1);
    dfbuildinternal(xy, npoints, nvars, nclasses, ntrees, samplesize, nrndvars, dforest_dfusestrongsplits + dforest_dfuseevs, info, df, rep);
 }
 
@@ -14985,9 +14985,9 @@ double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints) {
    ae_int_t offs;
    ae_int_t nvars;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
-   nvars = RoundZ(lm->w.xR[2]);
-   offs = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
+   nvars = iround(lm->w.xR[2]);
+   offs = iround(lm->w.xR[3]);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       v = ae_v_dotproduct(xy->xyR[i], 1, &lm->w.xR[offs], 1, nvars);
@@ -15015,9 +15015,9 @@ double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints) {
    ae_int_t offs;
    ae_int_t nvars;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
-   nvars = RoundZ(lm->w.xR[2]);
-   offs = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
+   nvars = iround(lm->w.xR[2]);
+   offs = iround(lm->w.xR[3]);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       v = ae_v_dotproduct(xy->xyR[i], 1, &lm->w.xR[offs], 1, nvars);
@@ -15046,9 +15046,9 @@ double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints) {
    ae_int_t offs;
    ae_int_t nvars;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
-   nvars = RoundZ(lm->w.xR[2]);
-   offs = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
+   nvars = iround(lm->w.xR[2]);
+   offs = iround(lm->w.xR[3]);
    result = 0.0;
    k = 0;
    for (i = 0; i < npoints; i++) {
@@ -15436,7 +15436,7 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
       return;
    }
 // Un-standartization
-   offs = RoundZ(lm->w.xR[3]);
+   offs = iround(lm->w.xR[3]);
    for (j = 0; j < nvars; j++) {
    // Constant term is updated (and its covariance too,
    // since it gets some variance from J-th component)
@@ -15580,7 +15580,7 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
       return;
    }
 // Un-standartization
-   offs = RoundZ(lm->w.xR[3]);
+   offs = iround(lm->w.xR[3]);
    for (j = 0; j < nvars; j++) {
    // J-th term is updated
       lm->w.xR[offs + j] /= c.xR[j];
@@ -15644,9 +15644,9 @@ void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars) {
    ae_int_t offs;
    SetVector(v);
    *nvars = 0;
-   ae_assert(RoundZ(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
-   *nvars = RoundZ(lm->w.xR[2]);
-   offs = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
+   *nvars = iround(lm->w.xR[2]);
+   offs = iround(lm->w.xR[3]);
    ae_vector_set_length(v, *nvars + 1);
    ae_v_move(v->xR, 1, &lm->w.xR[offs], 1, *nvars + 1);
 }
@@ -15689,9 +15689,9 @@ double lrprocess(linearmodel *lm, RVector *x) {
    ae_int_t offs;
    ae_int_t nvars;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
-   nvars = RoundZ(lm->w.xR[2]);
-   offs = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == linreg_lrvnum, "LINREG: Incorrect LINREG version!");
+   nvars = iround(lm->w.xR[2]);
+   offs = iround(lm->w.xR[3]);
    v = ae_v_dotproduct(x->xR, 1, &lm->w.xR[offs], 1, nvars);
    result = v + lm->w.xR[offs + nvars];
    return result;
@@ -15708,7 +15708,7 @@ double lrprocess(linearmodel *lm, RVector *x) {
 void lrcopy(linearmodel *lm1, linearmodel *lm2) {
    ae_int_t k;
    SetObj(linearmodel, lm2);
-   k = RoundZ(lm1->w.xR[0]);
+   k = iround(lm1->w.xR[0]);
    ae_vector_set_length(&lm2->w, k);
    ae_v_move(lm2->w.xR, 1, lm1->w.xR, 1, k);
 }
@@ -16600,7 +16600,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
       // Update is performed for invalid basis or for non-zero UpdateIts.
          needevd = !s->arebasisandsolvervalid;
          needevd = needevd || updateits >= 1.0;
-         needevd = needevd || hqrnduniformr(&s->rs) < updateits - FloorZ(updateits);
+         needevd = needevd || hqrnduniformr(&s->rs) < updateits - ifloor(updateits);
          if (needevd) {
             s->dbgcntevd++;
             s->nbasis = imin2(winw, s->topk);
@@ -16640,8 +16640,8 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
             if (appendlen > 0) {
                ae_assert(s->arebasisandsolvervalid, "SSA: integrity check in UpdateBasis() failed / srg6f");
                ae_assert(updateits >= 0.0, "SSA: integrity check in UpdateBasis() failed / srg4f");
-               subspaceits = FloorZ(updateits);
-               if (hqrnduniformr(&s->rs) < updateits - FloorZ(updateits)) {
+               subspaceits = ifloor(updateits);
+               if (hqrnduniformr(&s->rs) < updateits - ifloor(updateits)) {
                   subspaceits++;
                }
                ae_assert(subspaceits >= 0, "SSA: integrity check in UpdateBasis() failed / srg9f");
@@ -18812,7 +18812,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       return;
    }
    for (i = 0; i < npoints; i++) {
-      if (RoundZ(xy->xyR[i][nvars]) < 0 || RoundZ(xy->xyR[i][nvars]) >= nclasses) {
+      if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
          *info = -2;
          ae_frame_leave();
          return;
@@ -18843,7 +18843,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
 // Convert class labels from reals to integers (just for convenience)
    ae_vector_set_length(&c, npoints);
    for (i = 0; i < npoints; i++) {
-      c.xZ[i] = RoundZ(xy->xyR[i][nvars]);
+      c.xZ[i] = iround(xy->xyR[i][nvars]);
    }
 // Calculate class sizes, class means
    ae_vector_set_length(&mu, nvars);
@@ -20282,9 +20282,9 @@ static void logit_mnliexp(RVector *w, RVector *x) {
    double v;
    double mx;
    ae_assert(w->xR[1] == (double)logit_logitvnum, "LOGIT: unexpected model version");
-   nvars = RoundZ(w->xR[2]);
-   nclasses = RoundZ(w->xR[3]);
-   offs = RoundZ(w->xR[4]);
+   nvars = iround(w->xR[2]);
+   nclasses = iround(w->xR[3]);
+   offs = iround(w->xR[4]);
    i1 = offs + (nvars + 1) * (nclasses - 1);
    for (i = 0; i < nclasses - 1; i++) {
       v = ae_v_dotproduct(&w->xR[offs + i * (nvars + 1)], 1, x->xR, 1, nvars);
@@ -20324,9 +20324,9 @@ void mnlprocess(logitmodel *lm, RVector *x, RVector *y) {
    ae_int_t i1;
    double s;
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLProcess: unexpected model version");
-   nvars = RoundZ(lm->w.xR[2]);
-   nclasses = RoundZ(lm->w.xR[3]);
-   offs = RoundZ(lm->w.xR[4]);
+   nvars = iround(lm->w.xR[2]);
+   nclasses = iround(lm->w.xR[3]);
+   offs = iround(lm->w.xR[4]);
    logit_mnliexp(&lm->w, x);
    s = 0.0;
    i1 = offs + (nvars + 1) * (nclasses - 1);
@@ -20627,7 +20627,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
       return;
    }
    for (i = 0; i < npoints; i++) {
-      if (RoundZ(xy->xyR[i][nvars]) < 0 || RoundZ(xy->xyR[i][nvars]) >= nclasses) {
+      if (iround(xy->xyR[i][nvars]) < 0 || iround(xy->xyR[i][nvars]) >= nclasses) {
          *info = -2;
          ae_frame_leave();
          return;
@@ -20649,7 +20649,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 // Degenerate case: all outputs are equal
    allsame = true;
    for (i = 1; i < npoints; i++) {
-      if (RoundZ(xy->xyR[i][nvars]) != RoundZ(xy->xyR[i - 1][nvars])) {
+      if (iround(xy->xyR[i][nvars]) != iround(xy->xyR[i - 1][nvars])) {
          allsame = false;
       }
    }
@@ -20658,7 +20658,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
          lm->w.xR[offs + i] = 0.0;
       }
       v = -2 * log(minrealnumber);
-      k = RoundZ(xy->xyR[0][nvars]);
+      k = iround(xy->xyR[0][nvars]);
       if (k == nclasses - 1) {
          for (i = 0; i < nclasses - 1; i++) {
             lm->w.xR[offs + i * (nvars + 1) + nvars] = -v;
@@ -20798,9 +20798,9 @@ void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses) 
    *nvars = 0;
    *nclasses = 0;
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLUnpack: unexpected model version");
-   *nvars = RoundZ(lm->w.xR[2]);
-   *nclasses = RoundZ(lm->w.xR[3]);
-   offs = RoundZ(lm->w.xR[4]);
+   *nvars = iround(lm->w.xR[2]);
+   *nclasses = iround(lm->w.xR[3]);
+   offs = iround(lm->w.xR[4]);
    ae_matrix_set_length(a, *nclasses - 1, *nvars + 1);
    for (i = 0; i < *nclasses - 1; i++) {
       ae_v_move(a->xyR[i], 1, &lm->w.xR[offs + i * (*nvars + 1)], 1, *nvars + 1);
@@ -20848,7 +20848,7 @@ void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm) {
 void mnlcopy(logitmodel *lm1, logitmodel *lm2) {
    ae_int_t k;
    SetObj(logitmodel, lm2);
-   k = RoundZ(lm1->w.xR[0]);
+   k = iround(lm1->w.xR[0]);
    ae_vector_set_length(&lm2->w, k);
    ae_v_move(lm2->w.xR, 1, lm1->w.xR, 1, k);
 }
@@ -20870,9 +20870,9 @@ static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, do
    NewVector(workx, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
    NewVector(dy, 0, DT_REAL);
-   ae_assert(RoundZ(lm->w.xR[1]) == logit_logitvnum, "MNL unit: Incorrect MNL version!");
-   nvars = RoundZ(lm->w.xR[2]);
-   nclasses = RoundZ(lm->w.xR[3]);
+   ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNL unit: Incorrect MNL version!");
+   nvars = iround(lm->w.xR[2]);
+   nclasses = iround(lm->w.xR[3]);
    ae_vector_set_length(&workx, nvars);
    ae_vector_set_length(&y, nclasses);
    ae_vector_set_length(&dy, 0 + 1);
@@ -20913,18 +20913,18 @@ double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    NewVector(workx, 0, DT_REAL);
    NewVector(worky, 0, DT_REAL);
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLClsError: unexpected model version");
-   nvars = RoundZ(lm->w.xR[2]);
-   nclasses = RoundZ(lm->w.xR[3]);
+   nvars = iround(lm->w.xR[2]);
+   nclasses = iround(lm->w.xR[3]);
    ae_vector_set_length(&workx, nvars);
    ae_vector_set_length(&worky, nclasses);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
-      ae_assert(RoundZ(xy->xyR[i][nvars]) >= 0 && RoundZ(xy->xyR[i][nvars]) < nclasses, "MNLAvgCE: incorrect class number!");
+      ae_assert(iround(xy->xyR[i][nvars]) >= 0 && iround(xy->xyR[i][nvars]) < nclasses, "MNLAvgCE: incorrect class number!");
    // Process
       ae_v_move(workx.xR, 1, xy->xyR[i], 1, nvars);
       mnlprocess(lm, &workx, &worky);
-      if (worky.xR[RoundZ(xy->xyR[i][nvars])] > 0.0) {
-         result -= log(worky.xR[RoundZ(xy->xyR[i][nvars])]);
+      if (worky.xR[iround(xy->xyR[i][nvars])] > 0.0) {
+         result -= log(worky.xR[iround(xy->xyR[i][nvars])]);
       } else {
          result -= log(minrealnumber);
       }
@@ -20949,8 +20949,8 @@ ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    NewVector(workx, 0, DT_REAL);
    NewVector(worky, 0, DT_REAL);
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLClsError: unexpected model version");
-   nvars = RoundZ(lm->w.xR[2]);
-   nclasses = RoundZ(lm->w.xR[3]);
+   nvars = iround(lm->w.xR[2]);
+   nclasses = iround(lm->w.xR[3]);
    ae_vector_set_length(&workx, nvars);
    ae_vector_set_length(&worky, nclasses);
    result = 0;
@@ -20966,7 +20966,7 @@ ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
          }
       }
    // compare
-      if (nmax != RoundZ(xy->xyR[i][nvars])) {
+      if (nmax != iround(xy->xyR[i][nvars])) {
          result++;
       }
    }
@@ -21009,7 +21009,7 @@ double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    double avg;
    double avgrel;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
+   ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
    logit_mnlallerrors(lm, xy, npoints, &relcls, &avgce, &rms, &avg, &avgrel);
    result = rms;
    return result;
@@ -21033,7 +21033,7 @@ double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    double avg;
    double avgrel;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
+   ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
    logit_mnlallerrors(lm, xy, npoints, &relcls, &avgce, &rms, &avg, &avgrel);
    result = avg;
    return result;
@@ -21057,7 +21057,7 @@ double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize) {
    double avg;
    double avgrel;
    double result;
-   ae_assert(RoundZ(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
+   ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNLRMSError: Incorrect MNL version!");
    logit_mnlallerrors(lm, xy, ssize, &relcls, &avgce, &rms, &avg, &avgrel);
    result = avgrel;
    return result;
@@ -21379,7 +21379,7 @@ void knnbuildersetdatasetcls(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
    ae_assert(xy->cols >= nvars + 1, "knnbuildersetdatasetcls: cols(xy)<nvars+1");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "knnbuildersetdatasetcls: xy parameter contains INFs or NANs");
    for (i = 0; i < npoints; i++) {
-      j = RoundZ(xy->xyR[i][nvars]);
+      j = iround(xy->xyR[i][nvars]);
       ae_assert(j >= 0 && j < nclasses, "knnbuildersetdatasetcls: last column of xy contains invalid class number");
    }
 // Set dataset
@@ -21396,7 +21396,7 @@ void knnbuildersetdatasetcls(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
    }
    vectorsetlengthatleast(&s->dsival, npoints);
    for (i = 0; i < npoints; i++) {
-      s->dsival.xZ[i] = RoundZ(xy->xyR[i][nvars]);
+      s->dsival.xZ[i] = iround(xy->xyR[i][nvars]);
    }
 }
 
@@ -21556,7 +21556,7 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
          buf.x.xR[j] = xy->xyR[i][j];
       }
       if (iscls) {
-         j = RoundZ(xy->xyR[i][nvars]);
+         j = iround(xy->xyR[i][nvars]);
          ae_assert(j >= 0 && j < nout, "knnallerrors: one of the class labels is not in [0,NClasses)");
          desiredy.xR[0] = (double)j;
       } else {
@@ -22494,7 +22494,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
    }
    if (mlpissoftmax(network)) {
       for (i = 0; i < npoints; i++) {
-         if (RoundZ(xy->xyR[i][nin]) < 0 || RoundZ(xy->xyR[i][nin]) >= nout) {
+         if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -22731,7 +22731,7 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
    mlpproperties(network, &nin, &nout, &wcount);
    if (mlpissoftmax(network)) {
       for (i = 0; i < npoints; i++) {
-         if (RoundZ(xy->xyR[i][nin]) < 0 || RoundZ(xy->xyR[i][nin]) >= nout) {
+         if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -22864,14 +22864,14 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    mlpproperties(network, &nin, &nout, &wcount);
    if (mlpissoftmax(network)) {
       for (i = 0; i < trnsize; i++) {
-         if (RoundZ(trnxy->xyR[i][nin]) < 0 || RoundZ(trnxy->xyR[i][nin]) >= nout) {
+         if (iround(trnxy->xyR[i][nin]) < 0 || iround(trnxy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
          }
       }
       for (i = 0; i < valsize; i++) {
-         if (RoundZ(valxy->xyR[i][nin]) < 0 || RoundZ(valxy->xyR[i][nin]) >= nout) {
+         if (iround(valxy->xyR[i][nin]) < 0 || iround(valxy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -23074,7 +23074,7 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
          mlpprocess(&network, &x, &y);
          if (mlpissoftmax(&network)) {
          // Classification-specific code
-            k = RoundZ(testset.xyR[i][nin]);
+            k = iround(testset.xyR[i][nin]);
             for (j = 0; j < nout; j++) {
                if (j == k) {
                   cvrep->rmserror += sqr(y.xR[j] - 1);
@@ -23801,7 +23801,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
    }
    if (mlpissoftmax(&ensemble->network)) {
       for (i = 0; i < npoints; i++) {
-         if (RoundZ(xy->xyR[i][nin]) < 0 || RoundZ(xy->xyR[i][nin]) >= nout) {
+         if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -24191,7 +24191,7 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints) {
       ae_assert(ndim <= xy->cols, "MLPSetDataset: invalid size of matrix XY(too few columns in matrix XY).");
       ae_assert(apservisfinitematrix(xy, npoints, ndim), "MLPSetDataset: parameter XY contains Infinite or NaN.");
       for (i = 0; i < npoints; i++) {
-         ae_assert(RoundZ(xy->xyR[i][s->nin]) >= 0 && RoundZ(xy->xyR[i][s->nin]) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
+         ae_assert(iround(xy->xyR[i][s->nin]) >= 0 && iround(xy->xyR[i][s->nin]) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
       }
    }
    matrixsetlengthatleast(&s->densexy, npoints, ndim);
@@ -24263,7 +24263,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints) {
                if (j != s->nin) {
                   ae_assert(isfinite(v), "MLPSetSparseDataset: sparse matrix XY contains Infinite or NaN.");
                } else {
-                  ae_assert(isfinite(v) && RoundZ(v) >= 0 && RoundZ(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
+                  ae_assert(isfinite(v) && iround(v) >= 0 && iround(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
                }
             }
          }
@@ -24739,7 +24739,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
    }
    if (mlpissoftmax(&ensemble->network)) {
       for (i = 0; i < npoints; i++) {
-         if (RoundZ(xy->xyR[i][nin]) < 0 || RoundZ(xy->xyR[i][nin]) >= nout) {
+         if (iround(xy->xyR[i][nin]) < 0 || iround(xy->xyR[i][nin]) >= nout) {
             *info = -2;
             ae_frame_leave();
             return;
@@ -24839,7 +24839,6 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
    ae_int_t nout;
    ae_int_t ntype;
    ae_int_t ttype;
-   ae_int_t sgrad;
    ae_frame_make(&_frame_block);
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, esessions);
@@ -24877,9 +24876,8 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
 //
 // NOTE: ESessions is not initialized because MLPTrainEnsembleX
 //       needs uninitialized pool.
-   sgrad = 0;
-   mlptrain_mlptrainensemblex(s, ensemble, 0, ensemble->ensemblesize, nrestarts, 0, &sgrad, true, &esessions);
-   rep->ngrad = sgrad;
+   rep->ngrad = 0;
+   mlptrain_mlptrainensemblex(s, ensemble, 0, ensemble->ensemblesize, nrestarts, 0, &rep->ngrad, true, &esessions);
 // Calculate errors.
    if (s->datatype == 0) {
       mlpeallerrorsx(ensemble, &s->densexy, &s->sparsexy, s->npoints, 0, &ensemble->network.dummyidx, 0, s->npoints, 0, &ensemble->network.buf, &tmprep);

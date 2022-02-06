@@ -107,18 +107,18 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
       status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr);
       ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed");
       for (i = 0; i < ne; i++) {
-         x->xC[i] = ae_complex_from_d(wr.xR[i], wi.xR[i]);
+         x->xC[i] = complex_from_d(wr.xR[i], wi.xR[i]);
       }
    }
 // Remaining NZ zero roots
    for (i = ne; i < n; i++) {
-      x->xC[i] = ae_complex_from_i(0);
+      x->xC[i] = complex_from_i(0);
    }
 // Rep
    rep->maxerr = 0.0;
    for (i = 0; i < ne; i++) {
-      v = ae_complex_from_i(0);
-      vv = ae_complex_from_i(1);
+      v = complex_from_i(0);
+      vv = complex_from_i(1);
       for (j = 0; j <= ne; j++) {
          v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
          vv = ae_c_mul(vv, x->xC[i]);
@@ -484,7 +484,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    if (rep->r1 < rcondthreshold() || rep->rinf < rcondthreshold()) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -533,7 +533,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
             ae_v_cmove(xb.xC, 1, xc.xC, 1, "N", n);
             for (i = 0; i < n; i++) {
                ae_v_cmove(xa.xC, 1, a->xyC[i], 1, "N", n);
-               xa.xC[n] = ae_complex_from_i(-1);
+               xa.xC[n] = complex_from_i(-1);
                xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr);
                y.xC[i] = ae_c_neg(v);
@@ -633,7 +633,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    if (rep->r1 < rcondthreshold()) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -1434,7 +1434,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < m; k++) {
-               b->xyC[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1561,7 +1561,7 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info) {
    for (i = 0; i < n; i++) {
       if (ae_c_eq_d(a->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
-            b->xC[j] = ae_complex_from_d(0.0);
+            b->xC[j] = complex_from_d(0.0);
          }
          *info = -3;
          ae_frame_leave();
@@ -1679,7 +1679,7 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < m; k++) {
-               b->xyC[j][k] = ae_complex_from_d(0.0);
+               b->xyC[j][k] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -1811,7 +1811,7 @@ void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int
    for (i = 0; i < n; i++) {
       if (ae_c_eq_d(lua->xyC[i][i], 0.0)) {
          for (j = 0; j < n; j++) {
-            b->xC[j] = ae_complex_from_d(0.0);
+            b->xC[j] = complex_from_d(0.0);
          }
          *info = -3;
          return;
@@ -2517,7 +2517,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t 
       ae_matrix_set_length(x, n, m);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x->xyC[i][j] = ae_complex_from_i(0);
+            x->xyC[i][j] = complex_from_i(0);
          }
       }
       rep->r1 = 0.0;
@@ -2573,7 +2573,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_in
    if (!hpdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            b->xyC[i][j] = ae_complex_from_d(0.0);
+            b->xyC[i][j] = complex_from_d(0.0);
          }
       }
       *info = -3;
@@ -2695,7 +2695,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
    }
    if (!hpdmatrixcholesky(a, n, isupper)) {
       for (i = 0; i < n; i++) {
-         b->xC[i] = ae_complex_from_d(0.0);
+         b->xC[i] = complex_from_d(0.0);
       }
       *info = -3;
       ae_frame_leave();
@@ -2821,7 +2821,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-               b->xyC[i][j] = ae_complex_from_d(0.0);
+               b->xyC[i][j] = complex_from_d(0.0);
             }
          }
          *info = -3;
@@ -2948,7 +2948,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
    for (k = 0; k < n; k++) {
       if (cha->xyC[k][k].x == 0.0 && cha->xyC[k][k].y == 0.0) {
          for (i = 0; i < n; i++) {
-            b->xC[i] = ae_complex_from_d(0.0);
+            b->xC[i] = complex_from_d(0.0);
          }
          *info = -3;
          return;

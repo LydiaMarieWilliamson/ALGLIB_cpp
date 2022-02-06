@@ -383,8 +383,8 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
       return;
    }
    t = p * (n - 1);
-   i1 = FloorZ(t);
-   t -= FloorZ(t);
+   i1 = ifloor(t);
+   t -= ifloor(t);
    *v = x->xR[i1] * (1 - t) + x->xR[i1 + 1] * t;
    ae_frame_leave();
 }
@@ -3172,7 +3172,7 @@ static double wsr_w5(double s) {
       -3.466e+00, -2.773e+00, -2.367e+00, -1.856e+00, -1.520e+00, -1.163e+00, -9.008e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-3.708099e+00 * s + 7.500000e+00);
+   ae_int_t w = iround(-3.708099e+00 * s + 7.500000e+00);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3183,7 +3183,7 @@ static double wsr_w6(double s) {
       -1.068e+00, -8.630e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-4.769696e+00 * s + 1.050000e+01);
+   ae_int_t w = iround(-4.769696e+00 * s + 1.050000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3194,7 +3194,7 @@ static double wsr_w7(double s) {
       -1.674e+00, -1.451e+00, -1.241e+00, -1.068e+00, -9.008e-01, -7.577e-01, -6.325e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-5.916080e+00 * s + 1.400000e+01);
+   ae_int_t w = iround(-5.916080e+00 * s + 1.400000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3206,7 +3206,7 @@ static double wsr_w8(double s) {
       -8.630e-01, -7.494e-01, -6.399e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-7.141428e+00 * s + 1.800000e+01);
+   ae_int_t w = iround(-7.141428e+00 * s + 1.800000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3218,7 +3218,7 @@ static double wsr_w9(double s) {
       -1.394e+00, -1.255e+00, -1.120e+00, -1.002e+00, -8.912e-01, -7.873e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-8.440972e+00 * s + 2.250000e+01);
+   ae_int_t w = iround(-8.440972e+00 * s + 2.250000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3231,7 +3231,7 @@ static double wsr_w10(double s) {
       -9.551e-01, -8.607e-01, -7.745e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-9.810708e+00 * s + 2.750000e+01);
+   ae_int_t w = iround(-9.810708e+00 * s + 2.750000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3245,7 +3245,7 @@ static double wsr_w11(double s) {
       -7.279e-01, -6.595e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.124722e+01 * s + 3.300000e+01);
+   ae_int_t w = iround(-1.124722e+01 * s + 3.300000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3259,7 +3259,7 @@ static double wsr_w12(double s) {
       -1.168e+00, -1.083e+00, -1.003e+00, -9.276e-01, -8.556e-01, -7.878e-01, -7.239e-01, -6.633e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.274755e+01 * s + 3.900000e+01);
+   ae_int_t w = iround(-1.274755e+01 * s + 3.900000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3274,7 +3274,7 @@ static double wsr_w13(double s) {
       -1.001e+00, -9.328e-01, -8.683e-01, -8.068e-01, -7.486e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.430909e+01 * s + 4.550000e+01);
+   ae_int_t w = iround(-1.430909e+01 * s + 4.550000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3290,7 +3290,7 @@ static double wsr_w14(double s) {
       -9.067e-01, -8.495e-01, -7.950e-01, -7.428e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.592953e+01 * s + 5.250000e+01);
+   ae_int_t w = iround(-1.592953e+01 * s + 5.250000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3307,7 +3307,7 @@ static double wsr_w15(double s) {
       -8.593e-01, -8.093e-01, -7.613e-01, -7.154e-01, -6.714e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.760682e+01 * s + 6.000000e+01);
+   ae_int_t w = iround(-1.760682e+01 * s + 6.000000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3325,7 +3325,7 @@ static double wsr_w16(double s) {
       -8.437e-01, -7.986e-01, -7.551e-01, -7.134e-01, -6.733e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-1.933908e+01 * s + 6.800000e+01);
+   ae_int_t w = iround(-1.933908e+01 * s + 6.800000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3344,7 +3344,7 @@ static double wsr_w17(double s) {
       -8.514e-01, -8.097e-01, -7.695e-01, -7.306e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-2.112463e+01 * s + 7.650000e+01);
+   ae_int_t w = iround(-2.112463e+01 * s + 7.650000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3364,7 +3364,7 @@ static double wsr_w18(double s) {
       -8.774e-01, -8.381e-01, -8.001e-01, -7.633e-01, -7.276e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-2.296193e+01 * s + 8.550000e+01);
+   ae_int_t w = iround(-2.296193e+01 * s + 8.550000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3385,7 +3385,7 @@ static double wsr_w19(double s) {
       -9.185e-01, -8.809e-01, -8.445e-01, -8.090e-01, -7.747e-01, -7.413e-01, -7.089e-01, -6.776e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-2.484955e+01 * s + 9.500000e+01);
+   ae_int_t w = iround(-2.484955e+01 * s + 9.500000e+01);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3408,7 +3408,7 @@ static double wsr_w20(double s) {
       -7.078e-01, -6.787e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-2.678619e+01 * s + 1.050000e+02);
+   ae_int_t w = iround(-2.678619e+01 * s + 1.050000e+02);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3432,7 +3432,7 @@ static double wsr_w21(double s) {
       -7.779e-01, -7.489e-01, -7.207e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-2.877064e+01 * s + 1.155000e+02);
+   ae_int_t w = iround(-2.877064e+01 * s + 1.155000e+02);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3457,7 +3457,7 @@ static double wsr_w22(double s) {
       -8.573e-01, -8.283e-01, -7.999e-01, -7.722e-01, -7.452e-01, -7.189e-01, -6.931e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-3.080179e+01 * s + 1.265000e+02);
+   ae_int_t w = iround(-3.080179e+01 * s + 1.265000e+02);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3484,7 +3484,7 @@ static double wsr_w23(double s) {
       -7.295e-01, -7.051e-01, -6.813e-01
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-3.287856e+01 * s + 1.380000e+02);
+   ae_int_t w = iround(-3.287856e+01 * s + 1.380000e+02);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
@@ -3512,7 +3512,7 @@ static double wsr_w24(double s) {
       -8.239e-01, -7.990e-01, -7.746e-01, -7.507e-01, -7.273e-01, -7.044e-01, -6.820e-01,
    };
    const size_t n = sizeof tab/sizeof tab[0] - 1;
-   ae_int_t w = RoundZ(-3.500000e+01 * s + 1.500000e+02);
+   ae_int_t w = iround(-3.500000e+01 * s + 1.500000e+02);
    return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
